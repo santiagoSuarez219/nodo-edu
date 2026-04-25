@@ -1,0 +1,53 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  /* Tipografía — JetBrains Mono en todo el proyecto */
+  --font-sans: var(--font-jetbrains-mono), "ui-monospace", monospace;
+  --font-body: var(--font-jetbrains-mono), "ui-monospace", monospace;
+  --font-mono: var(--font-jetbrains-mono), "ui-monospace", monospace;
+
+  /* Tokens semánticos — Texto */
+  --color-body: var(--color-gray-600);
+  --color-body-subtle: var(--color-gray-500);
+  --color-heading: var(--color-gray-900);
+  --color-fg-brand: var(--color-blue-700);
+  --color-fg-brand-subtle: var(--color-blue-200);
+  --color-fg-brand-strong: var(--color-blue-900);
+  --color-fg-success: var(--color-green-700);
+  --color-fg-danger: var(--color-red-700);
+  --color-fg-warning: var(--color-orange-600);
+  --color-fg-disabled: var(--color-gray-400);
+
+  /* Fondos — jerarquía de superficies */
+  --color-neutral-primary: white;
+  --color-neutral-secondary: var(--color-gray-50);
+  --color-neutral-tertiary: var(--color-gray-100);
+  --color-neutral-quaternary: var(--color-gray-200);
+
+  /* Brand */
+  --color-brand-softer: var(--color-blue-50);
+  --color-brand-soft: var(--color-blue-100);
+  --color-brand: var(--color-blue-700);
+  --color-brand-medium: var(--color-blue-200);
+  --color-brand-strong: var(--color-blue-800);
+
+  /* Estados */
+  --color-success: var(--color-green-700);
+  --color-danger: var(--color-red-700);
+  --color-warning: var(--color-yellow-500);
+
+  /* Bordes */
+  --color-border-light: var(--color-gray-100);
+  --color-border-default: var(--color-gray-200);
+  --color-border-brand: var(--color-blue-200);
+  --color-border-dark: var(--color-gray-800);
+
+  /* Border radius */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius: 8px;
+  --radius-base: 12px;
+  --radius-lg: 16px;
+}
