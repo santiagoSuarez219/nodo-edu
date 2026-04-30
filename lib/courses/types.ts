@@ -12,13 +12,17 @@ export interface Topic {
 
 export interface Lesson {
   id: string;
+  // URL de la lección (`/<courseSlug>/<slug>`). Por defecto coincide con `id`.
+  slug: string;
   order: number;
   title: string;
   summary?: string;
   topics: Topic[];
   durationMinutes?: number;
   publishedAt?: string;
-  // Anchor a la futura página de la clase (Fase 1.5: artículos MDX).
+  // Clave opaca al cuerpo del artículo. En Fase 1 corresponde al nombre del
+  // archivo MDX en content/cursos/<courseSlug>/. En Fase 2 será el ID del
+  // documento Payload. El frontend nunca asume su forma.
   articleSlug?: string;
 }
 

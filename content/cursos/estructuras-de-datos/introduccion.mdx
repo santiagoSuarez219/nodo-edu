@@ -1,0 +1,66 @@
+---
+title: Introducción a las estructuras de datos
+summary: Visión general del curso y motivación desde problemas concretos.
+updatedAt: 2026-04-30
+---
+
+## Por qué importan las estructuras de datos
+
+Una **estructura de datos** es una forma de organizar información en memoria para que ciertas operaciones —insertar, buscar, recorrer, ordenar— sean lo más eficientes posibles. La elección correcta puede convertir un programa de horas en uno de segundos.
+
+> "Los datos dominan. Si has elegido las estructuras correctas y has organizado bien las cosas, los algoritmos casi siempre se vuelven evidentes."
+>
+> — Rob Pike
+
+## Costo y complejidad asintótica
+
+Para razonar sobre eficiencia comparamos cómo crece el costo en función del tamaño de la entrada. Las notaciones más comunes son:
+
+| Notación | Significado intuitivo                |
+| -------- | ------------------------------------ |
+| O(f(n))  | Cota superior asintótica             |
+| Ω(f(n))  | Cota inferior asintótica             |
+| Θ(f(n))  | Cota ajustada (superior e inferior)  |
+
+La definición formal de $O$ es: $f(n) \in O(g(n))$ si existen $c > 0$ y $n_0$ tales que
+
+$$
+0 \le f(n) \le c \cdot g(n) \quad \text{para todo } n \ge n_0.
+$$
+
+## Un ejemplo
+
+Buscar un elemento en un arreglo no ordenado es $O(n)$ en el peor caso:
+
+```python
+def linear_search(items, target):
+    for i, x in enumerate(items):
+        if x == target:
+            return i
+    return -1
+```
+
+En cambio, una búsqueda binaria sobre un arreglo **ordenado** es $O(\log n)$:
+
+```python
+def binary_search(items, target):
+    lo, hi = 0, len(items) - 1
+    while lo <= hi:
+        mid = (lo + hi) // 2
+        if items[mid] == target:
+            return mid
+        elif items[mid] < target:
+            lo = mid + 1
+        else:
+            hi = mid - 1
+    return -1
+```
+
+## Criterios para elegir una estructura
+
+1. **Operaciones predominantes**: ¿lecturas, escrituras, búsquedas o recorridos?
+2. **Tamaño esperado y crecimiento**: ¿cabe en memoria? ¿es estática o muta?
+3. **Patrón de acceso**: ¿aleatorio, secuencial, por clave?
+4. **Restricciones del lenguaje y del runtime**: tipos disponibles, garbage collector, locality.
+
+En las siguientes clases aterrizamos estos criterios sobre estructuras concretas.

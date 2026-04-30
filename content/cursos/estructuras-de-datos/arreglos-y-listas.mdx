@@ -1,0 +1,59 @@
+---
+title: Arreglos y listas enlazadas
+summary: Comparación de las dos estructuras lineales más fundamentales.
+updatedAt: 2026-04-30
+---
+
+## Arreglos
+
+Un **arreglo** almacena los elementos en posiciones contiguas de memoria. El acceso por índice es $O(1)$ porque la dirección del elemento $i$ se calcula como:
+
+$$
+\text{addr}(a, i) = \text{base}(a) + i \cdot \text{sizeof}(T).
+$$
+
+### Estáticos vs. dinámicos
+
+- **Estáticos**: capacidad fija; tamaño conocido en tiempo de compilación.
+- **Dinámicos** (p. ej. `list` en Python, `Vec<T>` en Rust): redimensionan al crecer, típicamente duplicando capacidad.
+
+La inserción al final de un arreglo dinámico es **amortizada $O(1)$**, aunque puntualmente sea $O(n)$ cuando hay realocación.
+
+```python
+xs = []
+for i in range(1_000_000):
+    xs.append(i)  # amortizado O(1)
+```
+
+## Listas enlazadas
+
+Una **lista enlazada** almacena cada elemento en un nodo que apunta al siguiente. No requiere memoria contigua, pero pierde el acceso por índice $O(1)$.
+
+```python
+class Node:
+    def __init__(self, value, next=None):
+        self.value = value
+        self.next = next
+```
+
+### Simplemente vs. doblemente enlazadas
+
+| Característica          | Simple    | Doble     |
+| ----------------------- | --------- | --------- |
+| Memoria por nodo        | 1 puntero | 2 punteros |
+| Recorrer hacia atrás    | No        | Sí        |
+| Eliminar nodo arbitrario | $O(n)$    | $O(1)$ con referencia |
+
+## Cuándo usar cada una
+
+| Operación                     | Arreglo  | Lista enlazada |
+| ----------------------------- | -------- | -------------- |
+| Acceso por índice             | $O(1)$   | $O(n)$         |
+| Inserción al final            | $O(1)*$  | $O(1)$         |
+| Inserción al inicio           | $O(n)$   | $O(1)$         |
+| Inserción en medio (con ref.) | $O(n)$   | $O(1)$         |
+| Memoria por elemento          | Compacta | Overhead de punteros |
+
+`*` amortizado.
+
+**Regla práctica**: si dudas, usa arreglos. Las listas enlazadas brillan cuando insertas/eliminas con frecuencia en posiciones que ya tienes referenciadas (LRU caches, listas de tareas en kernels, etc.).
