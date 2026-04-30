@@ -51,3 +51,27 @@
   --radius-base: 12px;
   --radius-lg: 16px;
 }
+
+/* Shiki dual theme — rehype-pretty-code emite vars --shiki-light / --shiki-dark */
+.mdx-content code[data-theme],
+.mdx-content code[data-theme] span {
+  color: var(--shiki-light);
+}
+.mdx-content pre[data-theme],
+.mdx-content pre[data-theme] span {
+  background-color: var(--shiki-light-bg);
+}
+:where(.dark) .mdx-content code[data-theme],
+:where(.dark) .mdx-content code[data-theme] span {
+  color: var(--shiki-dark);
+}
+:where(.dark) .mdx-content pre[data-theme],
+:where(.dark) .mdx-content pre[data-theme] span {
+  background-color: var(--shiki-dark-bg);
+}
+
+/* Inline code (rehype-pretty-code marca con data-inline-code) */
+.mdx-content code[data-inline-code] {
+  padding: 0.15rem 0.3rem;
+  border-radius: var(--radius-xs);
+}
