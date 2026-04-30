@@ -10,6 +10,7 @@ export const analisisDeAlgoritmos: Course = {
   lessons: [
     {
       id: "complejidad",
+      slug: "complejidad",
       order: 1,
       title: "Complejidad computacional",
       topics: [
@@ -20,6 +21,7 @@ export const analisisDeAlgoritmos: Course = {
     },
     {
       id: "divide-y-venceras",
+      slug: "divide-y-venceras",
       order: 2,
       title: "Divide y vencerás",
       topics: [
@@ -30,6 +32,7 @@ export const analisisDeAlgoritmos: Course = {
     },
     {
       id: "programacion-dinamica",
+      slug: "programacion-dinamica",
       order: 3,
       title: "Programación dinámica",
       topics: [
@@ -40,6 +43,7 @@ export const analisisDeAlgoritmos: Course = {
     },
     {
       id: "algoritmos-voraces",
+      slug: "algoritmos-voraces",
       order: 4,
       title: "Algoritmos voraces",
       topics: [
@@ -51,6 +55,7 @@ export const analisisDeAlgoritmos: Course = {
     },
     {
       id: "complejidad-np",
+      slug: "complejidad-np",
       order: 5,
       title: "P, NP y reducciones",
       topics: [

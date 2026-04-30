@@ -1,4 +1,6 @@
-import type { Course } from "./types";
+import { existsSync } from "node:fs";
+import path from "node:path";
+import type { Course, Lesson } from "./types";
 import { estructurasDeDatos } from "./data/estructuras-de-datos";
 import { programacionCientifica } from "./data/programacion-cientifica";
 import { analisisDeAlgoritmos } from "./data/analisis-de-algoritmos";
@@ -12,6 +14,14 @@ const courses: readonly Course[] = Object.freeze([
   analisisDeAlgoritmos,
 ]);
 
+// Slugs reservados que no pueden usarse como `lessonSlug` para evitar colisión
+// con futuras rutas hermanas dentro de un curso.
+const RESERVED_LESSON_SLUGS = new Set([
+  "recursos",
+  "evaluaciones",
+  "notebooks",
+]);
+
 (function validate() {
   const slugs = new Set<string>();
   for (const course of courses) {
@@ -21,6 +31,7 @@ const courses: readonly Course[] = Object.freeze([
     slugs.add(course.slug);
 
     const lessonIds = new Set<string>();
+    const lessonSlugs = new Set<string>();
     for (const lesson of course.lessons) {
       if (lessonIds.has(lesson.id)) {
         throw new Error(
@@ -28,9 +39,45 @@ const courses: readonly Course[] = Object.freeze([
         );
       }
       lessonIds.add(lesson.id);
+
+      if (lessonSlugs.has(lesson.slug)) {
+        throw new Error(
+          `Duplicate lesson slug "${lesson.slug}" in course "${course.slug}"`,
+        );
+      }
+      lessonSlugs.add(lesson.slug);
+
+      if (RESERVED_LESSON_SLUGS.has(lesson.slug)) {
+        throw new Error(
+          `Lesson slug "${lesson.slug}" in course "${course.slug}" is reserved`,
+        );
+      }
+
+      if (lesson.articleSlug && shouldValidateContentFiles()) {
+        const articlePath = path.join(
+          process.cwd(),
+          "content",
+          "cursos",
+          course.slug,
+          `${lesson.articleSlug}.mdx`,
+        );
+        if (!existsSync(articlePath)) {
+          throw new Error(
+            `Missing MDX article "${articlePath}" referenced by lesson "${course.slug}/${lesson.slug}"`,
+          );
+        }
+      }
     }
   }
 })();
+
+function shouldValidateContentFiles(): boolean {
+  // Validar en build y en dev. En runtime de producción evitamos fs syscalls
+  // al cargar el módulo (los archivos ya fueron verificados en build).
+  const phase = process.env.NEXT_PHASE;
+  if (phase === "phase-production-build") return true;
+  return process.env.NODE_ENV !== "production";
+}
 
 export async function getAllCourses(): Promise<Course[]> {
   return [...courses];
@@ -44,4 +91,52 @@ export async function getCourseSlugs(): Promise<string[]> {
   return courses.map((c) => c.slug);
 }
 
-export type { Course, Lesson, Topic, CourseLevel, CourseAudience } from "./types";
+export interface LessonWithContext {
+  course: Course;
+  lesson: Lesson;
+  prev: Lesson | null;
+  next: Lesson | null;
+}
+
+export async function getLessonBySlug(
+  courseSlug: string,
+  lessonSlug: string,
+): Promise<LessonWithContext | null> {
+  const course = courses.find((c) => c.slug === courseSlug);
+  if (!course) return null;
+
+  const ordered = [...course.lessons].sort((a, b) => a.order - b.order);
+  const idx = ordered.findIndex((l) => l.slug === lessonSlug);
+  if (idx === -1) return null;
+
+  return {
+    course,
+    lesson: ordered[idx],
+    prev: idx > 0 ? ordered[idx - 1] : null,
+    next: idx < ordered.length - 1 ? ordered[idx + 1] : null,
+  };
+}
+
+export async function getCourseLessonSlugPairs(): Promise<
+  { courseSlug: string; lessonSlug: string }[]
+> {
+  const pairs: { courseSlug: string; lessonSlug: string }[] = [];
+  for (const course of courses) {
+    for (const lesson of course.lessons) {
+      // Sólo pre-renderizar lecciones con artículo. Las demás se generan
+      // dinámicamente como placeholder.
+      if (lesson.articleSlug) {
+        pairs.push({ courseSlug: course.slug, lessonSlug: lesson.slug });
+      }
+    }
+  }
+  return pairs;
+}
+
+export type {
+  Course,
+  Lesson,
+  Topic,
+  CourseLevel,
+  CourseAudience,
+} from "./types";

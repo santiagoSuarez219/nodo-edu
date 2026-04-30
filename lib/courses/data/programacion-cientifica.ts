@@ -14,6 +14,7 @@ export const programacionCientifica: Course = {
   lessons: [
     {
       id: "entorno-y-numpy",
+      slug: "entorno-y-numpy",
       order: 1,
       title: "Entorno de trabajo y NumPy",
       summary: "Configuración de un entorno reproducible y primeros arreglos.",
@@ -26,6 +27,7 @@ export const programacionCientifica: Course = {
     },
     {
       id: "vectorizacion",
+      slug: "vectorizacion",
       order: 2,
       title: "Vectorización y broadcasting",
       topics: [
@@ -36,6 +38,7 @@ export const programacionCientifica: Course = {
     },
     {
       id: "algebra-lineal",
+      slug: "algebra-lineal",
       order: 3,
       title: "Álgebra lineal numérica",
       topics: [
@@ -47,6 +50,7 @@ export const programacionCientifica: Course = {
     },
     {
       id: "visualizacion",
+      slug: "visualizacion",
       order: 4,
       title: "Visualización con Matplotlib",
       topics: [
@@ -57,6 +61,7 @@ export const programacionCientifica: Course = {
     },
     {
       id: "pandas",
+      slug: "pandas",
       order: 5,
       title: "Manipulación de datos con Pandas",
       topics: [

@@ -10,6 +10,7 @@ export const estructurasDeDatos: Course = {
   lessons: [
     {
       id: "introduccion",
+      slug: "introduccion",
       order: 1,
       title: "Introducción a las estructuras de datos",
       summary:
@@ -22,6 +23,7 @@ export const estructurasDeDatos: Course = {
     },
     {
       id: "arreglos-y-listas",
+      slug: "arreglos-y-listas",
       order: 2,
       title: "Arreglos y listas enlazadas",
       topics: [
@@ -33,6 +35,7 @@ export const estructurasDeDatos: Course = {
     },
     {
       id: "pilas-y-colas",
+      slug: "pilas-y-colas",
       order: 3,
       title: "Pilas y colas",
       topics: [
@@ -44,6 +47,7 @@ export const estructurasDeDatos: Course = {
     },
     {
       id: "arboles",
+      slug: "arboles",
       order: 4,
       title: "Árboles",
       topics: [
@@ -55,6 +59,7 @@ export const estructurasDeDatos: Course = {
     },
     {
       id: "tablas-hash",
+      slug: "tablas-hash",
       order: 5,
       title: "Tablas hash",
       topics: [
@@ -66,6 +71,7 @@ export const estructurasDeDatos: Course = {
     },
     {
       id: "grafos",
+      slug: "grafos",
       order: 6,
       title: "Grafos",
       topics: [
