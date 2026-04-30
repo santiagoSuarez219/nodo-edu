@@ -29,11 +29,24 @@ export async function getLessonArticle(
     const file = await fs.readFile(filePath, "utf8");
     const { data, content } = matter(file);
     return {
-      frontmatter: data as LessonArticleFrontmatter,
+      frontmatter: normalizeFrontmatter(data),
       rawSource: content,
     };
   } catch (err) {
     if ((err as NodeJS.ErrnoException).code === "ENOENT") return null;
     throw err;
   }
+}
+
+function normalizeFrontmatter(data: Record<string, unknown>): LessonArticleFrontmatter {
+  const out: LessonArticleFrontmatter = {};
+  if (typeof data.title === "string") out.title = data.title;
+  if (typeof data.summary === "string") out.summary = data.summary;
+  if (typeof data.cover === "string") out.cover = data.cover;
+  if (data.updatedAt instanceof Date) {
+    out.updatedAt = data.updatedAt.toISOString().slice(0, 10);
+  } else if (typeof data.updatedAt === "string") {
+    out.updatedAt = data.updatedAt;
+  }
+  return out;
 }

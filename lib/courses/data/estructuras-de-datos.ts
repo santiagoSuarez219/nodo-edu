@@ -11,6 +11,7 @@ export const estructurasDeDatos: Course = {
     {
       id: "introduccion",
       slug: "introduccion",
+      articleSlug: "introduccion",
       order: 1,
       title: "Introducción a las estructuras de datos",
       summary:
@@ -24,6 +25,7 @@ export const estructurasDeDatos: Course = {
     {
       id: "arreglos-y-listas",
       slug: "arreglos-y-listas",
+      articleSlug: "arreglos-y-listas",
       order: 2,
       title: "Arreglos y listas enlazadas",
       topics: [
