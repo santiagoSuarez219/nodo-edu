@@ -41,7 +41,7 @@ export default async function CoursePage({ params }: CoursePageProps) {
     <main className="flex-1 bg-gray-50 dark:bg-gray-900">
       <div className="mx-auto w-full max-w-5xl px-4 md:px-6 lg:px-8 py-12 lg:py-16">
         <CourseHeader course={course} />
-        <LessonList lessons={course.lessons} />
+        <LessonList courseSlug={course.slug} lessons={course.lessons} />
       </div>
     </main>
   );
