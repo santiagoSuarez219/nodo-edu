@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import { Navbar } from "@/components/navbar/Navbar";
 
 const jetbrainsMono = JetBrains_Mono({
   variable: "--font-jetbrains-mono",
@@ -42,7 +43,8 @@ export default function RootLayout({
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
-      <body className="min-h-full flex flex-col bg-white text-gray-900 dark:bg-gray-900 dark:text-white">
+      <body className="min-h-full flex flex-col pt-16 lg:pt-20 bg-white text-gray-900 dark:bg-gray-900 dark:text-white">
+        <Navbar />
         {children}
       </body>
     </html>
