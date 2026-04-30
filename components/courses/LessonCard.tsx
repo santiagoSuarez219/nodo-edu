@@ -7,10 +7,7 @@ interface LessonCardProps {
 
 export function LessonCard({ lesson }: LessonCardProps) {
   return (
-    <article
-      aria-disabled={!lesson.articleSlug}
-      className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 shadow-sm transition-colors"
-    >
+    <article className="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 shadow-sm transition-colors">
       <div className="flex items-baseline gap-3">
         <span className="text-sm font-semibold text-blue-700 dark:text-blue-400">
           Clase {lesson.order.toString().padStart(2, "0")}
