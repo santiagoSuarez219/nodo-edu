@@ -1,189 +1,400 @@
-# Educational Page
+# CLAUDE.md — Educational Page
 
-Plataforma web educativa para publicar y gestionar material académico de cursos de programación e inteligencia artificial dirigidos a ingenieros de sistemas, electrónicos y de ciencias de datos.
-
-## Visión del Proyecto
-
-- **Hoy**: artículos tipo blog organizados por curso, escritos por el docente principal.
-- **Mediano plazo**: colaboración con otros docentes para publicar contenido sin tocar código.
-- **Largo plazo**: evaluaciones, formularios, videos, notebooks ejecutables y seguimiento de estudiantes.
-
-## Roles previstos
-
-- **Docente principal / admin**: gestiona cursos, usuarios, permisos.
-- **Docente colaborador**: publica y edita artículos de sus cursos.
-- **Estudiante**: consume contenido, responde evaluaciones (fase futura).
-- **Visitante**: lectura pública del material abierto.
+> Este archivo es la fuente de verdad para Claude Code en este proyecto.
+> Léelo completo antes de ejecutar cualquier acción.
 
 ---
 
-## Stack Tecnológico
+## Inicialización de sesión
+
+Antes de cualquier tarea, Claude debe ejecutar estos pasos en orden:
+
+1. Leer este archivo completo.
+2. Leer `DESIGN.md` si la tarea involucra UI.
+3. Listar los specs activos (`[IN PROGRESS]` o `[TESTING]`) en `specs/`.
+4. Confirmar el repositorio activo y la rama actual con `git status`.
+5. Si hay contexto previo relevante (spec en curso, decisión de arquitectura,
+   deuda técnica pendiente), pedirlo al usuario antes de proceder.
+
+---
+
+## Reglas generales
+
+- Toda la comunicación con el usuario debe ser en español.
+- Antes de editar cualquier archivo, leer las secciones relevantes de su contenido.
+  Para archivos de más de 300 líneas, navegar por secciones antes de editar;
+  no asumir estructura sin haberla leído.
+- No adivines rutas, imports ni nombres de variables: confírmalos leyendo el código.
+- Si tienes dudas bloqueantes, usa `AskUserQuestion` antes de proceder.
+- Nunca interrumpas una tarea a mitad para pedir confirmación, salvo que el
+  riesgo de continuar sea alto (borrado de datos, cambios en producción, etc.).
+- Prefiere cambios quirúrgicos sobre refactors amplios no solicitados.
+- Para cualquier tarea que involucre UI, leer `DESIGN.md` antes de escribir código.
+
+---
+
+## Agentes especializados
+
+En `/.agents/` viven instrucciones para subagentes. Leer el archivo del agente
+antes de invocarlo. No improvisar su comportamiento.
+
+| Agente        | Cuándo invocarlo                                              |
+|---------------|---------------------------------------------------------------|
+| `@architect`  | Diseño de specs: fases, archivos impactados, sin código       |
+| `@reviewer`   | Revisión de código antes de marcar un spec como `[DONE]`     |
+| `@tester`     | Generación y ejecución de casos de prueba e2e                 |
+
+> Si en `/.agents/` existen agentes adicionales específicos del proyecto,
+> tienen precedencia sobre la tabla anterior.
+
+---
+
+## Contexto del proyecto
+
+Plataforma web educativa para publicar y gestionar material académico de cursos de programación e inteligencia artificial, dirigida a ingenieros de sistemas, electrónicos y de ciencias de datos.
+
+**Estado actual:** MVP en desarrollo — Fase 1 (contenido MDX versionado en Git, publicado por el docente principal).
+
+**Roles previstos:**
+- **Docente principal / admin**: gestiona cursos, usuarios y permisos.
+- **Docente colaborador**: publica y edita artículos de sus cursos (Fase 2).
+- **Estudiante**: consume contenido y responde evaluaciones (fase futura).
+- **Visitante**: lectura pública del material abierto.
+
+**Visión:**
+- **Hoy**: artículos tipo blog organizados por curso, escritos por el docente principal.
+- **Mediano plazo**: colaboración con otros docentes mediante Payload CMS, sin tocar código.
+- **Largo plazo**: evaluaciones, formularios, videos, notebooks ejecutables y seguimiento de estudiantes.
+
+---
+
+## Repositorios del ecosistema
+
+Este proyecto vive en un único repositorio. No hay monorepo ni submódulos.
+
+```
+02-Educational-Page/
+├── app/                   # Next.js App Router — rutas y layouts
+├── components/            # Componentes React reutilizables
+├── lib/                   # Utilidades, configuración y clientes externos
+├── content/               # Artículos MDX por curso
+│   └── cursos/
+│       └── <curso>/       # Un directorio por curso
+├── courses/               # Microdiseños curriculares (info.md, projects/)
+├── public/                # Assets estáticos
+└── docs/                  # Documentación y casos de prueba
+    ├── specs/             # Specs de funcionalidades
+    └── testing/
+```
+
+---
+
+## Stack tecnológico
 
 ### Frontend / Framework principal
 - **Next.js 15** (App Router) + **TypeScript** — full-stack React con server actions y API routes.
-- **Tailwind CSS 4** — estilos utilitarios (ver Sistema de Diseño abajo).
-- **Flowbite** — componentes UI sobre Tailwind.
+- **Tailwind CSS 4** — estilos utilitarios (ver `DESIGN.md`).
+- **Flowbite** — componentes UI sobre Tailwind; usar primero.
 - **shadcn/ui** — componentes accesibles complementarios cuando Flowbite no cubra.
-- **React Hook Form + Zod** — formularios y validación (clave para evaluaciones futuras).
+- **React Hook Form + Zod** — formularios y validación.
 
 ### Contenido
-- **Fase 1 (solo docente principal)**: artículos en MDX versionados en Git bajo `/content/cursos/<curso>/<articulo>.mdx`.
-  - `next-mdx-remote` o `contentlayer` para parseo.
-  - **Shiki** para syntax highlighting de código.
-  - **KaTeX** para fórmulas matemáticas.
-- **Fase 2 (colaboración)**: **Payload CMS 3** embebido en el mismo Next.js, con panel admin para roles docente/admin/estudiante. Migración de MDX a Postgres sin reescribir el frontend público.
+- Artículos en **MDX** versionados en Git bajo `content/cursos/<curso>/<articulo>.mdx`.
+- **Shiki** para syntax highlighting de código.
+- **KaTeX** para fórmulas matemáticas.
+- **Fase 2:** Payload CMS 3 embebido, con panel admin para roles.
 
 ### Backend / Datos
-- **Supabase**:
-  - **Postgres** gestionado (cursos, módulos, artículos, usuarios, evaluaciones).
-  - **Auth** (email/password, OAuth Google/GitHub).
-  - **Storage** para archivos PDF e imágenes.
-  - **Row Level Security** para permisos por rol.
-
-### Multimedia (fase futura)
-- **Mux** o **Cloudflare Stream** para video (transcodificación + player).
-- **JupyterLite** o embeds de **Google Colab** para notebooks ejecutables.
+- **Supabase**: Postgres gestionado, Auth (email/password + OAuth), Storage (PDFs e imágenes), Row Level Security.
 
 ### Infraestructura
 - **Vercel** — hosting y deploy continuo desde Git.
 - **GitHub** — repositorio y control de versiones.
+- **npm** — package manager.
 
 ### Tipografía
-- **JetBrains Mono** para todo el proyecto (texto, UI, código).
+- **JetBrains Mono** en todo el proyecto (texto, UI, código) — sin excepciones.
+
+### Comandos
+
+```bash
+# Instalar dependencias
+npm install
+
+# Desarrollo
+npm run dev
+
+# Build / Producción
+npm run build
+
+# Linter
+npm run lint
+```
 
 ---
 
-## Sistema de Diseño — Flowbite + Tailwind CSS 4
+## Dependencias
 
-### Fuente
-
-**JetBrains Mono** para todo el proyecto (texto, UI, código).
-
-```css
-/* index.css */
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
-
-@theme {
-  --font-sans: 'JetBrains Mono', 'ui-monospace', monospace;
-  --font-body: 'JetBrains Mono', 'ui-monospace', monospace;
-  --font-mono: 'JetBrains Mono', 'ui-monospace', monospace;
-}
-```
-
-### Paleta Primitiva
-
-| Escala | 50 | 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900 |
-|--------|-----|-----|-----|-----|-----|-----|-----|-----|-----|-----|
-| **gray** | `#F9FAFB` | `#F3F4F6` | `#E5E7EB` | `#D1D5DB` | `#9CA3AF` | `#6B7280` | `#4B5563` | `#374151` | `#1F2937` | `#111827` |
-| **blue** | `#EBF5FF` | `#E1EFFE` | `#C3DDFD` | `#A4CAFE` | `#76A9FA` | `#3F83F8` | `#1C64F2` | `#1A56DB` | `#1E429F` | `#233876` |
-| **green** | `#F3FAF7` | `#DEF7EC` | `#BCF0DA` | `#84E1BC` | `#31C48D` | `#0E9F6E` | `#057A55` | `#046C4E` | `#03543F` | `#014737` |
-| **red** | `#FDF2F2` | `#FDE8E8` | `#FBD5D5` | `#F8B4B4` | `#F98080` | `#F05252` | `#E02424` | `#C81E1E` | `#9B1C1C` | `#771D1D` |
-| **yellow** | `#FDFDEA` | `#FDF6B2` | `#FCE96A` | `#FACA15` | `#E3A008` | `#C27803` | `#9F580A` | `#8E4B10` | `#723B13` | `#633112` |
-| **purple** | `#F6F5FF` | `#EDEBFE` | `#DCD7FE` | `#CABFFD` | `#AC94FA` | `#9061F9` | `#7E3AF2` | `#6C2BD9` | `#5521B5` | `#4A1D96` |
-| **pink** | `#FDF2F8` | `#FCE8F3` | `#FAD1E8` | `#F8B4D9` | `#F17EB8` | `#E74694` | `#D61F69` | `#BF125D` | `#99154B` | `#751A3D` |
-
-### Tokens Semánticos
-
-```css
-@theme {
-  /* Texto */
-  --color-body:              var(--color-gray-600);
-  --color-body-subtle:       var(--color-gray-500);
-  --color-heading:           var(--color-gray-900);
-  --color-fg-brand:          var(--color-blue-700);
-  --color-fg-brand-subtle:   var(--color-blue-200);
-  --color-fg-brand-strong:   var(--color-blue-900);
-  --color-fg-success:        var(--color-green-700);
-  --color-fg-danger:         var(--color-red-700);
-  --color-fg-warning:        var(--color-orange-600);
-  --color-fg-disabled:       var(--color-gray-400);
-
-  /* Fondos — jerarquía de superficies */
-  --color-neutral-primary:        white;
-  --color-neutral-secondary:      var(--color-gray-50);
-  --color-neutral-tertiary:       var(--color-gray-100);
-  --color-neutral-quaternary:     var(--color-gray-200);
-
-  /* Brand */
-  --color-brand-softer:    var(--color-blue-50);
-  --color-brand-soft:      var(--color-blue-100);
-  --color-brand:           var(--color-blue-700);
-  --color-brand-medium:    var(--color-blue-200);
-  --color-brand-strong:    var(--color-blue-800);
-
-  /* Estados */
-  --color-success:         var(--color-green-700);  /* emerald en Flowbite */
-  --color-danger:          var(--color-red-700);    /* rose en Flowbite */
-  --color-warning:         var(--color-yellow-500);
-
-  /* Bordes */
-  --color-border-light:    var(--color-gray-100);
-  --color-border-default:  var(--color-gray-200);
-  --color-border-brand:    var(--color-blue-200);
-  --color-border-dark:     var(--color-gray-800);
-
-  /* Border radius */
-  --radius-xs:   4px;
-  --radius-sm:   6px;
-  --radius:      8px;
-  --radius-base: 12px;
-  --radius-lg:   16px;
-}
-```
-
-### Modo Claro / Oscuro — Tabla de Referencia
-
-| Elemento | Modo Claro | Modo Oscuro |
-|----------|-----------|-------------|
-| Fondo página | `bg-white` | `dark:bg-gray-900` |
-| Fondo card / panel | `bg-white` | `dark:bg-gray-800` |
-| Fondo sidebar | `bg-gray-50` | `dark:bg-gray-800` |
-| Fondo input | `bg-white` | `dark:bg-gray-700` |
-| Fondo hover nav | `hover:bg-gray-100` | `dark:hover:bg-gray-700` |
-| Fondo deshabilitado | `bg-gray-100` | `dark:bg-gray-700` |
-| Texto principal | `text-gray-900` | `dark:text-white` |
-| Texto secundario | `text-gray-600` | `dark:text-gray-300` |
-| Texto sutil | `text-gray-500` | `dark:text-gray-400` |
-| Texto deshabilitado | `text-gray-400` | `dark:text-gray-500` |
-| Texto placeholder | `placeholder:text-gray-500` | `dark:placeholder:text-gray-400` |
-| Borde estándar | `border-gray-200` | `dark:border-gray-700` |
-| Borde input | `border-gray-300` | `dark:border-gray-600` |
-| Focus ring | `focus:ring-gray-200` | `dark:focus:ring-gray-700` |
-| Botón primario | `bg-blue-700 text-white` | `dark:bg-blue-600` |
-| Botón primario hover | `hover:bg-blue-800` | `dark:hover:bg-blue-700` |
-| Badge éxito | `bg-green-100 text-green-800` | `dark:bg-green-900 dark:text-green-300` |
-| Badge peligro | `bg-red-100 text-red-800` | `dark:bg-red-900 dark:text-red-300` |
-| Badge advertencia | `bg-yellow-100 text-yellow-800` | `dark:bg-yellow-900 dark:text-yellow-300` |
-| Badge info | `bg-blue-100 text-blue-800` | `dark:bg-blue-900 dark:text-blue-300` |
-
-### Implementación Dark Mode
-
-```javascript
-// Pegar en el <head> de index.html (antes del bundle) para evitar FOUC
-if (
-  localStorage.getItem('color-theme') === 'dark' ||
-  (!('color-theme' in localStorage) &&
-    window.matchMedia('(prefers-color-scheme: dark)').matches)
-) {
-  document.documentElement.classList.add('dark');
-} else {
-  document.documentElement.classList.remove('dark');
-}
-```
-
-```css
-/* index.css — Tailwind v4 */
-@custom-variant dark (&:where(.dark, .dark *));
-```
-
-Toggle persiste en `localStorage` con clave `'color-theme'` (`'dark'` | `'light'`).
+- Package manager: `npm` — no mezclar managers en el mismo proyecto.
+- Antes de instalar cualquier dependencia nueva:
+  1. Verificar si ya existe algo equivalente en `package.json`.
+  2. Mencionarlo al usuario con justificación clara (qué resuelve, por qué esa librería).
+  3. Esperar confirmación explícita.
+- Preferir dependencias con mantenimiento activo y bajo footprint.
+- Nunca instalar dependencias de desarrollo en `dependencies` ni al revés.
 
 ---
 
-## Convenciones
+## Variables de entorno
 
+- Archivo de referencia: `.env.example`
+- Archivo real (nunca commitear): `.env.local`
+
+| Variable | Descripción |
+|----------|-------------|
+| `NEXT_PUBLIC_SUPABASE_URL` | URL del proyecto Supabase |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Clave pública anon de Supabase |
+| `SUPABASE_SERVICE_ROLE_KEY` | Clave de servicio (solo en server-side, nunca en cliente) |
+
+> ⚠️ Nunca escribas valores reales de variables de entorno en este archivo
+> ni en ningún archivo rastreado por git.
+
+---
+
+## Base de datos
+
+- Proveedor: **Supabase Postgres**.
+- Cuando hagas modificaciones al esquema, crea siempre una migración para producción.
+- Nunca ejecutar migraciones en entornos distintos al local sin confirmación explícita.
+- Row Level Security habilitado; verificar políticas antes de añadir nuevas tablas.
+
+---
+
+## Backend y APIs
+
+- **Supabase** actúa como backend principal (Auth, DB, Storage).
+- El cliente de Supabase se inicializa en `lib/supabase/`.
+- Las server actions y API routes de Next.js consumen Supabase directamente.
+- Autenticación: sesión gestionada por Supabase Auth; el token se mantiene en cookies httpOnly via el helper de Next.js.
+
+---
+
+## Arquitectura y patrones internos
+
+```
+app/
+├── (cursos)/              # Rutas públicas de cursos y artículos
+│   └── [courseSlug]/      # Página de cada curso
+│       └── [lessonSlug]/  # Página de cada lección/artículo
+├── (admin)/               # Panel de administración (acceso restringido)
+└── api/                   # API routes
+
+components/                # Componentes React reutilizables (sin lógica de negocio)
+lib/
+├── courses/               # Lógica de lectura y parseo de contenido MDX
+└── supabase/              # Clientes de Supabase (server y client)
+
+content/cursos/<curso>/    # Artículos MDX del curso
+courses/<curso>/           # Microdiseño curricular (info.md, projects/)
+```
+
+- Patrón de contenido: MDX en disco, parseado en build/request con `next-mdx-remote`.
+- Patrón de datos dinámicos: Supabase directamente desde server components y server actions.
+- No usar `useEffect` para fetch de datos; preferir server components.
+
+---
+
+## Convenciones de código
+
+- Lenguaje: **TypeScript estricto** (`strict: true`).
+- Nombres de archivos: `kebab-case` para páginas y rutas, `PascalCase` para componentes React.
+- Nombres de funciones y variables: `camelCase`.
+- Exportaciones: preferir **named exports**; default export solo para componentes de página.
+- Estilos: **Tailwind CSS 4** con tokens semánticos definidos en `DESIGN.md`. Nunca usar valores crudos de la paleta.
+- No usar `any` salvo que sea absolutamente inevitable; documentarlo con `// TODO: type this`.
 - **Idioma**: contenido y UI en español; código, identificadores y commits en inglés.
 - **Comentarios en código**: solo cuando el *por qué* no sea obvio.
-- **Componentes UI**: preferir Flowbite primero, shadcn/ui como complemento.
-- **Colores**: usar siempre los tokens semánticos del sistema de diseño, no los valores crudos de la paleta.
-- **Tipografía**: JetBrains Mono en todo, sin excepciones.
+- **Componentes UI**: Flowbite primero, shadcn/ui como complemento.
+
+---
+
+## Testing
+
+- Framework: por definir (pendiente de decisión de arquitectura).
+- Antes de cerrar una tarea con lógica crítica, verificar que existe al menos
+  un test que cubra el caso feliz.
+- No borrar ni modificar tests existentes sin instrucción explícita.
+- Los tests e2e son responsabilidad de `@tester` y se ejecutan como última
+  fase de cada spec antes del merge a `development`.
+
+---
+
+## Specs de funcionalidades
+
+### Ubicación y nomenclatura
+
+- Carpeta: `docs/specs/` en la raíz del proyecto.
+- Nomenclatura: `spec-{{NNN}}-{{slug-descriptivo}}.md`
+  (NNN = correlativo con cero a la izquierda, ej. `spec-007-auth-estudiante.md`)
+- Consultar specs anteriores antes de nombrar uno nuevo para evitar solapamiento.
+
+### Estados válidos
+
+| Estado          | Significado                                                     |
+|-----------------|-----------------------------------------------------------------|
+| `[IN PROGRESS]` | Implementación iniciada                                         |
+| `[TESTING]`     | Implementación completa, pendiente de pruebas manuales/e2e      |
+| `[DONE]`        | Pruebas superadas, listo para merge a `development`             |
+
+- Los specs completados **no se borran**; se marcan con `[DONE]` en el título.
+- Solo specs en estado `[DONE]` con su archivo `test-NNN` correspondiente
+  pueden hacer merge a `development`.
+
+### Estructura mínima de un spec
+
+```md
+# spec-NNN — [Estado] Título descriptivo
+
+## Contexto
+Por qué se necesita esta funcionalidad y qué problema resuelve.
+
+## Alcance
+Qué incluye y qué **no** incluye este spec.
+
+## Impacto en el sistema
+Componentes, rutas, modelos o servicios afectados.
+
+## Fases de implementación
+
+### Fase 1 — Nombre
+- [ ] Paso concreto
+- [ ] Paso concreto
+
+### Fase 2 — Nombre
+- [ ] Paso concreto
+
+## Criterios de aceptación
+- El usuario puede hacer X.
+- El sistema responde con Y ante Z.
+
+## Pruebas e2e (si aplica)
+Descripción de los casos a automatizar en la última fase, ejecutados por @tester.
+```
+
+---
+
+## Nuevas funcionalidades
+
+### Antes de implementar
+
+1. Analizar el impacto del feature en todos los componentes del proyecto.
+2. Usar el subagente `@architect` para crear el plan de implementación:
+   - Solo descripción de fases, pasos y archivos a editar.
+   - Sin código.
+3. Guardar el plan en `docs/specs/` con la nomenclatura definida.
+4. Esperar aprobación del usuario antes de escribir código.
+5. Crear una rama nueva desde `development` siguiendo las reglas de git.
+
+### Durante la implementación
+
+- Trabajar fase por fase según el spec; no saltarse pasos.
+- Al iniciar la Fase 1 de cualquier spec, cambiar su estado a `[IN PROGRESS]`.
+- Al completar cada fase, documentarla como completada en el propio spec.
+- Si el scope del spec debe cambiar (nuevo hallazgo, bloqueante estructural),
+  proponer la modificación al usuario **antes** de proceder. No editar el spec
+  unilateralmente ni implementar fuera de él.
+- Si se descubre deuda técnica fuera del scope, documentarla con un comentario
+  `// DEBT:` en el código y registrarla en `docs/specs/backlog.md`, sin actuar
+  sobre ella en la tarea actual.
+- Si aparece un bloqueante no previsto en el spec, reportarlo antes de improvisar.
+- No modificar archivos fuera del alcance del spec sin avisar.
+
+### Después de terminar la implementación
+
+1. Crear el archivo de pruebas manuales en `docs/testing/` con la nomenclatura
+   `test-{{NNN}}-{{slug-descriptivo}}.md` (mismos NNN y slug que el spec).
+2. Cambiar el estado del spec a `[TESTING]`.
+3. El usuario ejecutará los casos manualmente e indicará cuáles pasan.
+   Claude marcará cada caso como completado en el archivo de test.
+4. Cuando todos los casos estén aprobados, invocar `@tester` para ejecutar
+   las pruebas e2e definidas en el spec (si aplica).
+5. Al superar todas las pruebas, marcar el spec como `[DONE]`.
+
+### Pruebas manuales — estructura del archivo
+
+- Todos los archivos `test-NNN` van en `docs/testing/` en la raíz del proyecto.
+- Solo incluir casos manuales de flujos con UI. Los endpoints se validan con pruebas e2e desde el propio spec.
+- Cada caso de prueba debe tener un código identificador único (ej. `TC-001`).
+
+```md
+# test-NNN — Título descriptivo
+
+## Casos de prueba
+
+### TC-001 — Nombre del caso
+**Precondición:** ...
+**Pasos:**
+1. ...
+2. ...
+**Resultado esperado:** ...
+**Estado:** ⬜ Pendiente / ✅ Aprobado / ❌ Fallido
+```
+
+---
+
+## Acciones prohibidas
+
+> Claude nunca debe realizar las siguientes acciones sin confirmación explícita
+> del usuario en esa misma sesión:
+
+- Borrar archivos o carpetas (salvo temporales generados por la propia tarea).
+- Ejecutar migraciones de base de datos en entornos distintos al local.
+- Hacer push a `main` o `development` directamente.
+- Modificar variables de entorno de producción.
+- Instalar dependencias nuevas sin mencionarlo y esperar confirmación.
+- Hacer commit de archivos `.env*` reales.
+- Editar el spec activo para ampliar su scope sin aprobación del usuario.
+
+---
+
+## Git — Branching & Commits
+
+### Estructura de ramas
+
+| Propósito                         | Prefijo     | Ejemplo                          |
+|-----------------------------------|-------------|----------------------------------|
+| Nueva funcionalidad o spec        | `feat/`     | `feat/auth-estudiante`           |
+| Corrección de bug                 | `fix/`      | `fix/lesson-pagination`          |
+| Preparación de despliegue         | `deploy/`   | `deploy/v1.0.0`                  |
+
+- `main` — producción; solo recibe merges desde `deploy/`.
+- `development` — integración y pruebas; todas las ramas `feat/` y `fix/`
+  se desprenden de aquí.
+- Al mergear una rama a `development`, eliminarla inmediatamente.
+- Los ajustes de despliegue van en `deploy/<nombre>` y se mergean a `main`.
+- Solo se puede hacer merge a `development` de specs en estado `[DONE]` que
+  cuenten con su archivo `test-NNN` aprobado.
+
+### Commits
+
+- Hacer commits cuando el volumen de cambios lo justifique; no commits triviales.
+- Mensajes **completamente en inglés**, siguiendo
+  [Conventional Commits](https://www.conventionalcommits.org/):
+
+```
+<type>(<scope>): <short description>
+
+[optional body]
+[optional footer]
+```
+
+Tipos válidos: `feat`, `fix`, `refactor`, `chore`, `docs`, `test`,
+`style`, `perf`, `ci`.
+
+Ejemplos:
+```
+feat(courses): add lesson page with MDX rendering
+fix(auth): resolve session token refresh on page reload
+chore(deps): upgrade next to v15.3
+docs(courses): add estructura-de-datos project specs
+```
