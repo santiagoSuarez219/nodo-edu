@@ -153,8 +153,9 @@ npm run lint
 | Variable | Descripción |
 |----------|-------------|
 | `NEXT_PUBLIC_SUPABASE_URL` | URL del proyecto Supabase |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Clave pública anon de Supabase |
-| `SUPABASE_SERVICE_ROLE_KEY` | Clave de servicio (solo en server-side, nunca en cliente) |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Clave pública de Supabase (nueva nomenclatura) |
+| `SUPABASE_SERVICE_ROLE_KEY` | Clave de servicio (solo server-side, nunca en cliente) |
+| `NEXT_PUBLIC_SITE_URL` | URL base del sitio (redirects OAuth y password recovery) |
 
 > ⚠️ Nunca escribas valores reales de variables de entorno en este archivo
 > ni en ningún archivo rastreado por git.
@@ -173,9 +174,13 @@ npm run lint
 ## Backend y APIs
 
 - **Supabase** actúa como backend principal (Auth, DB, Storage).
-- El cliente de Supabase se inicializa en `lib/supabase/`.
-- Las server actions y API routes de Next.js consumen Supabase directamente.
-- Autenticación: sesión gestionada por Supabase Auth; el token se mantiene en cookies httpOnly via el helper de Next.js.
+- Los clientes de Supabase se inicializan en `lib/auth/` — un archivo por contexto:
+  - `lib/auth/server.ts` — Server Components y Server Actions (`createServerClient` de `@supabase/ssr`).
+  - `lib/auth/middleware.ts` — middleware de Next.js (`updateSupabaseSession`).
+  - `lib/auth/browser.ts` — Client Components puntuales (`createBrowserClient`).
+- Las server actions y API routes de Next.js consumen Supabase a través de los helpers de `lib/auth/session.ts`.
+- Autenticación: sesión gestionada por Supabase Auth; el token se mantiene en cookies httpOnly via `@supabase/ssr`.
+- `SUPABASE_SERVICE_ROLE_KEY` bypasa RLS — **nunca** importar en archivos bajo `app/` o `components/`.
 
 ---
 
@@ -192,7 +197,9 @@ app/
 components/                # Componentes React reutilizables (sin lógica de negocio)
 lib/
 ├── courses/               # Lógica de lectura y parseo de contenido MDX
-└── supabase/              # Clientes de Supabase (server y client)
+├── auth/                  # Clientes Supabase, helpers de sesión y Server Actions de auth
+├── students/              # Perfil de usuario (Profile, Student)
+└── progress/              # Progreso de lecciones por usuario
 
 content/cursos/<curso>/    # Artículos MDX del curso
 courses/<curso>/           # Microdiseño curricular (info.md, projects/)
