@@ -20,6 +20,14 @@ export interface LessonArticle {
 
 const CONTENT_ROOT = path.join(process.cwd(), "content", "cursos");
 
+const WELCOME_SLUG = "bienvenida-al-curso";
+
+export async function getCourseWelcome(
+  courseSlug: string,
+): Promise<LessonArticle | null> {
+  return getLessonArticle(courseSlug, WELCOME_SLUG);
+}
+
 export async function getLessonArticle(
   courseSlug: string,
   articleSlug: string,
