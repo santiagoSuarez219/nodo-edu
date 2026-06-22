@@ -43,7 +43,7 @@ export default function RootLayout({
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
-      <body className="min-h-full flex flex-col pt-16 lg:pt-20 bg-white text-gray-900 dark:bg-gray-900 dark:text-white">
+      <body className="min-h-full flex flex-col pt-16 lg:pt-0 bg-white text-gray-900 dark:bg-gray-900 dark:text-white">
         <Navbar />
         {children}
       </body>
