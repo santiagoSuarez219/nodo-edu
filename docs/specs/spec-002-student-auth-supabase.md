@@ -161,15 +161,15 @@ Tablas nuevas con RLS habilitado:
 
 - [x] Crear `.env.example` con `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `NEXT_PUBLIC_SITE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (marcada como `# SERVER-ONLY`).
 - [x] Instalar `@supabase/supabase-js` y `@supabase/ssr`.
-- [ ] Instalar `react-hook-form`, `@hookform/resolvers`, `zod`.
-- [ ] Crear `lib/auth/server.ts`: `createServerSupabaseClient()` con `createServerClient` de `@supabase/ssr` + `cookies()` de Next.
-- [ ] Crear `lib/auth/middleware.ts`: `updateSupabaseSession(request)` que refresca la sesión y devuelve `NextResponse` con cookies actualizadas.
-- [ ] Crear `lib/auth/browser.ts`: `createBrowserSupabaseClient()`.
-- [ ] Crear `lib/auth/session.ts`: `getSession()` (memoizado con `cache()` de React), `getCurrentUser()`, `getCurrentProfile()`, `requireUser(redirectTo?)`.
-- [ ] Crear `lib/auth/types.ts` con `AuthResult<T>` y `AuthError`.
-- [ ] Crear `lib/auth/schemas.ts` con Zod: `SignInSchema`, `SignUpSchema`, `PasswordResetRequestSchema`, `PasswordResetConfirmSchema`, `UpdateProfileSchema`.
-- [ ] Crear `lib/students/types.ts` con `Profile` y `Student`.
-- [ ] Crear `lib/students/index.ts` con `getProfileByUserId`, `getStudentByProfileId`, `updateProfile`, `updateStudent`, `ensureProfile` (crea perfil on-demand si el trigger falló).
+- [x] Instalar `react-hook-form`, `@hookform/resolvers`, `zod`.
+- [x] Crear `lib/auth/server.ts`: `createServerSupabaseClient()` con `createServerClient` de `@supabase/ssr` + `cookies()` de Next.
+- [x] Crear `lib/auth/middleware.ts`: `updateSupabaseSession(request)` que refresca la sesión y devuelve `NextResponse` con cookies actualizadas.
+- [x] Crear `lib/auth/browser.ts`: `createBrowserSupabaseClient()`.
+- [x] Crear `lib/auth/session.ts`: `getCurrentUser()`, `getCurrentProfile()`, `requireUser(redirectTo?)` memoizados con `cache()` de React.
+- [x] Crear `lib/auth/types.ts` con `AuthResult<T>`.
+- [x] Crear `lib/auth/schemas.ts` con Zod: `SignInSchema`, `SignUpSchema`, `PasswordResetRequestSchema`, `PasswordResetConfirmSchema`, `UpdateProfileSchema`.
+- [x] Crear `lib/students/types.ts` con `Profile`, `Student` y `ProfileWithStudent`.
+- [x] Crear `lib/students/index.ts` con `getProfileByUserId`, `getStudentByProfileId`, `getProfileWithStudent`, `updateProfile`, `updateStudent`, `ensureProfile`.
 
 **Verificación:** `tsc --noEmit` pasa sin errores. Los clientes se instancian correctamente en un Server Component de prueba.
 
