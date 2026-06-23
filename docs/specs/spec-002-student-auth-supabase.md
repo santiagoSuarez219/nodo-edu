@@ -248,12 +248,12 @@ Tablas nuevas con RLS habilitado:
 
 ### Fase I — Frontera de progreso (sin UI)
 
-- [ ] Crear `lib/progress/types.ts` con `LessonProgress`.
-- [ ] Crear `lib/progress/index.ts` con:
+- [x] Crear `lib/progress/types.ts` con `LessonProgress`.
+- [x] Crear `lib/progress/index.ts` con:
   - `getLessonProgress(courseSlug, lessonSlug): Promise<LessonProgress | null>`
   - `getCourseProgress(courseSlug): Promise<LessonProgress[]>`
   - `markLessonViewed(courseSlug, lessonSlug)` — Server Action con `upsert` en `lesson_progress`.
-- [ ] Verificar manualmente que `markLessonViewed` inserta y `getLessonProgress` devuelve el registro.
+- [ ] Verificar manualmente que `markLessonViewed` inserta y `getLessonProgress` devuelve el registro (Fase J).
 
 ---
 
