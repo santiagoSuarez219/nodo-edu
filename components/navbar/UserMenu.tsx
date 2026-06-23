@@ -17,13 +17,22 @@ function getInitials(name: string): string {
 export function UserMenu({ profile }: { profile: Profile }) {
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const firstItemRef = useRef<HTMLAnchorElement>(null);
   const initials = getInitials(profile.full_name);
+
+  function close() {
+    setOpen(false);
+    triggerRef.current?.focus();
+  }
 
   useEffect(() => {
     if (!open) return;
 
+    firstItemRef.current?.focus();
+
     function handleKey(e: KeyboardEvent) {
-      if (e.key === "Escape") setOpen(false);
+      if (e.key === "Escape") close();
     }
     function handleClick(e: MouseEvent) {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
@@ -42,6 +51,7 @@ export function UserMenu({ profile }: { profile: Profile }) {
   return (
     <div ref={menuRef} className="relative">
       <button
+        ref={triggerRef}
         type="button"
         onClick={() => setOpen((p) => !p)}
         aria-haspopup="menu"
@@ -82,10 +92,11 @@ export function UserMenu({ profile }: { profile: Profile }) {
           </div>
 
           <Link
+            ref={firstItemRef}
             href="/cuenta"
             role="menuitem"
-            onClick={() => setOpen(false)}
-            className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            onClick={close}
+            className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors focus-visible:outline-none focus-visible:bg-gray-100 dark:focus-visible:bg-gray-700"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -103,8 +114,8 @@ export function UserMenu({ profile }: { profile: Profile }) {
             <button
               type="submit"
               role="menuitem"
-              onClick={() => setOpen(false)}
-              className="flex w-full items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              onClick={close}
+              className="flex w-full items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors focus-visible:outline-none focus-visible:bg-gray-100 dark:focus-visible:bg-gray-700"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"

@@ -1,4 +1,4 @@
-# spec-002 — [IN PROGRESS] Autenticación de usuarios con Supabase
+# spec-002 — [TESTING] Autenticación de usuarios con Supabase
 
 ## Contexto
 
@@ -259,14 +259,13 @@ Tablas nuevas con RLS habilitado:
 
 ### Fase J — Pulido, accesibilidad y validación final
 
-- [ ] Revisar todos los componentes nuevos contra los tokens semánticos de `DESIGN.md`. Eliminar valores crudos de paleta.
-- [ ] Validar modo claro y oscuro en todas las rutas nuevas.
-- [ ] Validar accesibilidad de `UserMenu`: navegación por teclado, foco-trap, `aria-live` en mensajes de error.
-- [ ] Verificar que las rutas de specs 001 y 002 anteriores siguen generándose estáticamente (`next build`).
-- [ ] Configurar variables de entorno en Vercel (Development, Preview, Production).
-- [ ] Correr `npm run lint` y `tsc --noEmit` sin errores nuevos.
-- [ ] Crear `docs/testing/test-002-student-auth-supabase.md` con los casos de prueba manuales.
-- [ ] Cambiar el estado del spec a `[TESTING]`.
+- [x] Revisar todos los componentes nuevos contra los tokens semánticos de `DESIGN.md`. Sin valores crudos de paleta.
+- [ ] Validar modo claro y oscuro en todas las rutas nuevas (prueba manual TC-015).
+- [x] Mejorar accesibilidad de `UserMenu`: foco al primer ítem al abrir, devolver foco al trigger al cerrar con Escape, `role="menu"` / `role="menuitem"`, focus ring en ítems.
+- [ ] Configurar variables de entorno en Vercel (Development, Preview, Production) — responsabilidad del usuario.
+- [x] Correr `npm run lint` y `tsc --noEmit` sin errores nuevos.
+- [x] Crear `docs/testing/test-002-student-auth-supabase.md` con los casos de prueba manuales.
+- [x] Cambiar el estado del spec a `[TESTING]`.
 
 ---
 
