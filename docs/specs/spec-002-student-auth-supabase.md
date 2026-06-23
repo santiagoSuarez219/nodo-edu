@@ -189,15 +189,15 @@ Tablas nuevas con RLS habilitado:
 
 ### Fase D — Server Actions de autenticación
 
-- [ ] Crear `lib/auth/actions.ts` con:
-  - `signIn(formData)` — valida con Zod, `signInWithPassword`, en éxito `revalidatePath('/', 'layout')` + `redirect`.
-  - `signUp(formData)` — `signUp` con `options.data = { full_name }` y `emailRedirectTo`. Redirige a `/registro/confirmar`.
-  - `signOut()` — `signOut`, `revalidatePath('/', 'layout')`, `redirect('/')`.
-  - `requestPasswordReset(formData)` — `resetPasswordForEmail`. Mensaje genérico siempre.
-  - `updatePassword(formData)` — `updateUser({ password })`. Requiere sesión activa.
-  - `resendConfirmation(formData)` — `auth.resend({ type: 'signup', email })`.
-- [ ] Toda action devuelve `AuthResult<T>`: `{ ok: true } | { ok: false, error: string, fieldErrors? }`.
-- [ ] Mensajes de error en español, genéricos donde corresponda.
+- [x] Crear `lib/auth/actions.ts` con:
+  - `signIn` — valida con Zod, `signInWithPassword`, en éxito `revalidatePath('/', 'layout')` + `redirect`.
+  - `signUp` — `signUp` con `options.data = { full_name }` y `emailRedirectTo`. Redirige a `/registro/confirmar`.
+  - `signOut` — `signOut`, `revalidatePath('/', 'layout')`, `redirect('/')`.
+  - `requestPasswordReset` — `resetPasswordForEmail`. Mensaje genérico siempre.
+  - `updatePassword` — `updateUser({ password })`. Requiere sesión activa.
+  - `resendConfirmation` — `auth.resend({ type: 'signup', email })`.
+- [x] Toda action devuelve `AuthResult<T>`: `{ ok: true } | { ok: false, error: string, fieldErrors? }`.
+- [x] Mensajes de error en español, genéricos donde corresponda.
 
 **Verificación:** Las actions se pueden invocar desde un formulario mínimo de prueba.
 
