@@ -1,5 +1,9 @@
 # test-002 — Autenticación de usuarios con Supabase
 
+> **TC-011, TC-012 y TC-014** quedaron bloqueados por el límite de 3 emails/hora
+> del plan gratuito de Supabase. Registrado como DEBT-001 en `docs/specs/backlog.md`.
+> Pendiente de ejecución tras configurar SMTP propio.
+
 ## Casos de prueba
 
 ---
@@ -32,7 +36,7 @@
 2. Ingresar correo y contraseña correctos.
 3. Hacer clic en "Iniciar sesión".
 **Resultado esperado:** Redirige a `/`. El navbar muestra el `UserMenu` con las iniciales del nombre.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ---
 
@@ -43,7 +47,7 @@
 2. Ingresar correo correcto y contraseña incorrecta.
 3. Hacer clic en "Iniciar sesión".
 **Resultado esperado:** No redirige. Se muestra el mensaje "Correo o contraseña incorrectos." en rojo.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ---
 
@@ -53,7 +57,7 @@
 1. Hacer clic en el `UserMenu` (iniciales en navbar).
 2. Hacer clic en "Cerrar sesión".
 **Resultado esperado:** Redirige a `/`. El navbar muestra el botón "Iniciar sesión".
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ---
 
@@ -62,7 +66,7 @@
 **Pasos:**
 1. Navegar directamente a `/cuenta` en el browser.
 **Resultado esperado:** Redirige a `/login?redirectTo=%2Fcuenta`.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ---
 
@@ -72,7 +76,7 @@
 1. Ingresar credenciales correctas.
 2. Hacer clic en "Iniciar sesión".
 **Resultado esperado:** Redirige a `/cuenta` (no a `/`).
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ---
 
@@ -83,7 +87,7 @@
 2. Navegar a `/estructuras-de-datos`.
 3. Navegar a `/estructuras-de-datos/git-github` (o cualquier lección existente).
 **Resultado esperado:** Todas retornan 200. El contenido es visible sin login.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ---
 
@@ -92,7 +96,7 @@
 **Pasos:**
 1. Ir a `/cuenta`.
 **Resultado esperado:** Se muestra el correo y la fecha de registro en `AccountInfoCard`. El formulario tiene el nombre precargado.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ---
 
@@ -103,7 +107,7 @@
 2. Ingresar carrera y semestre.
 3. Hacer clic en "Guardar cambios".
 **Resultado esperado:** Mensaje verde "Perfil actualizado correctamente." El `UserMenu` en el navbar refleja el nuevo nombre (tras recargar la página).
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ---
 
@@ -140,7 +144,7 @@
 3. Verificar que el foco se mueve a "Mi cuenta".
 4. Presionar Escape.
 **Resultado esperado:** El dropdown se abre, el primer ítem recibe foco. Al presionar Escape, el dropdown se cierra y el foco vuelve al botón del menú.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ---
 
@@ -160,4 +164,4 @@
 **Pasos:**
 1. Visitar `/login`, `/registro`, `/recuperar-password` y `/cuenta`.
 **Resultado esperado:** Todos los fondos, textos, bordes e inputs respetan el tema oscuro definido en `DESIGN.md`. No hay elementos con colores crudos de paleta.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado

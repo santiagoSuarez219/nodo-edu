@@ -1,4 +1,4 @@
-# spec-002 — [TESTING] Autenticación de usuarios con Supabase
+# spec-002 — [DONE] Autenticación de usuarios con Supabase
 
 ## Contexto
 
