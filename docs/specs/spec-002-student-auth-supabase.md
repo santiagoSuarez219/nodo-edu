@@ -212,14 +212,14 @@ Tablas nuevas con RLS habilitado:
 
 ### Fase F — UI de autenticación
 
-- [ ] Crear `components/auth/AuthShell.tsx` (server): card centrada, título, subtítulo, `{children}`. Tokens semánticos del sistema de diseño, modo claro/oscuro.
-- [ ] Crear `components/auth/LoginForm.tsx` (client): React Hook Form + Zod resolver, inputs Flowbite, invoca `signIn`. Pinta `fieldErrors` y alert general de error. Botón con `aria-busy` durante pending. Soporta `redirectTo`.
-- [ ] Crear `app/(auth)/login/page.tsx` (server).
-- [ ] Crear `components/auth/SignUpForm.tsx` (client) con campos: `full_name`, `email`, `password`, `password_confirmation`. Invoca `signUp`.
-- [ ] Crear `app/(auth)/registro/page.tsx` (server).
-- [ ] Crear `app/(auth)/registro/confirmar/page.tsx` con instrucciones y botón "Reenviar email".
-- [ ] Crear `components/auth/PasswordResetRequestForm.tsx` (client) y `app/(auth)/recuperar-password/page.tsx`.
-- [ ] Crear `components/auth/PasswordResetConfirmForm.tsx` (client) y `app/(auth)/recuperar-password/confirmar/page.tsx`. La página verifica `token_hash` + `type` server-side con `verifyOtp`; si falla, muestra "enlace inválido o expirado".
+- [x] Crear `components/auth/AuthShell.tsx` (server): card centrada, título, subtítulo, `{children}`. Tokens semánticos del sistema de diseño, modo claro/oscuro.
+- [x] Crear `components/auth/LoginForm.tsx` (client): `useActionState` + Zod, inputs Tailwind/Flowbite, invoca `signIn`. Pinta `fieldErrors` y alert general de error. Botón con `aria-busy` durante pending. Soporta `redirectTo`.
+- [x] Crear `app/(auth)/login/page.tsx` (server).
+- [x] Crear `components/auth/SignUpForm.tsx` (client) con campos: `full_name`, `email`, `password`, `password_confirmation`. Invoca `signUp`.
+- [x] Crear `app/(auth)/registro/page.tsx` (server).
+- [x] Crear `app/(auth)/registro/confirmar/page.tsx` con instrucciones y `ResendConfirmationForm`.
+- [x] Crear `components/auth/PasswordResetRequestForm.tsx` (client) y `app/(auth)/recuperar-password/page.tsx`.
+- [x] Crear `components/auth/PasswordResetConfirmForm.tsx` (client) y `app/(auth)/recuperar-password/confirmar/page.tsx`. La página verifica `token_hash` + `type` server-side con `verifyOtp`; si falla, muestra "enlace inválido o expirado".
 - [ ] (Opcional) Crear `components/auth/OAuthButtons.tsx` (client) con botón "Continuar con Google".
 
 **Verificación:** Flujo completo de registro → confirmación → login → logout funciona end-to-end.
