@@ -177,9 +177,9 @@ Tablas nuevas con RLS habilitado:
 
 ### Fase C — Middleware
 
-- [ ] Crear `middleware.ts` en la raíz: llama `updateSupabaseSession(request)` y devuelve la `NextResponse`.
-- [ ] Si `pathname.startsWith('/cuenta')` y la sesión es null, redirigir a `/login?redirectTo=<original>`.
-- [ ] Configurar `matcher` para excluir `_next/static`, `_next/image`, `favicon.ico` y `app/auth/callback`.
+- [x] Crear `middleware.ts` en la raíz: llama `updateSupabaseSession(request)` y devuelve la `NextResponse`.
+- [x] Si `pathname.startsWith('/cuenta')` y la sesión es null, redirigir a `/login?redirectTo=<original>`.
+- [x] Configurar `matcher` para excluir `_next/static`, `_next/image`, `favicon.ico` y assets estáticos.
 - [ ] Verificar que `/`, `/[courseSlug]` y `/[courseSlug]/[lessonSlug]` siguen devolviendo 200 sin sesión.
 - [ ] Verificar que `/cuenta` sin sesión redirige a `/login?redirectTo=/cuenta`.
 
