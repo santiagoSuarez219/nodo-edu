@@ -228,9 +228,9 @@ Tablas nuevas con RLS habilitado:
 
 ### Fase G — Navbar consciente de sesión
 
-- [ ] Editar `app/layout.tsx`: llamar `getCurrentProfile()` y pasar `profile` a `<Navbar profile={profile} />`.
-- [ ] Editar `components/navbar/Navbar.tsx`: aceptar `profile?: Profile`. Render condicional: sin perfil muestra "Iniciar sesión"; con perfil muestra `<UserMenu profile={profile} />`.
-- [ ] Crear `components/navbar/UserMenu.tsx` (client): avatar con iniciales si no hay `avatar_url`, dropdown Flowbite con "Mi cuenta" → `/cuenta` y "Cerrar sesión" (form con Server Action `signOut`). `aria-haspopup="menu"`, `aria-expanded`, cierre con `Esc`.
+- [x] Editar `app/layout.tsx`: llamar `getCurrentProfile()` y pasar `profile` a `<Navbar profile={profile} />`.
+- [x] Editar `components/navbar/Navbar.tsx`: aceptar `profile?: Profile | null`. Render condicional: sin perfil muestra "Iniciar sesión"; con perfil muestra `<UserMenu profile={profile} />` en desktop y opciones de cuenta en menú móvil.
+- [x] Crear `components/navbar/UserMenu.tsx` (client): avatar con iniciales, dropdown con "Mi cuenta" → `/cuenta` y "Cerrar sesión" (form con Server Action `signOut`). `aria-haspopup="menu"`, `aria-expanded`, cierre con `Esc` y click fuera.
 
 **Verificación:** El navbar cambia correctamente entre estado sin sesión y con sesión.
 
