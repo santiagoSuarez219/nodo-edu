@@ -138,7 +138,6 @@ export const Navbar = ({ profile }: { profile?: Profile | null }) => {
                 <form action={signOut}>
                   <button
                     type="submit"
-                    onClick={closeMenu}
                     className="block w-full text-left py-3 text-gray-700 dark:text-gray-300 hover:text-blue-700 dark:hover:text-blue-400 transition-colors"
                   >
                     Cerrar sesión
