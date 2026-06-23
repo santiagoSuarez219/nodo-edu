@@ -1,4 +1,4 @@
-# spec-002 — Autenticación de usuarios con Supabase
+# spec-002 — [IN PROGRESS] Autenticación de usuarios con Supabase
 
 ## Contexto
 
@@ -143,14 +143,15 @@ Tablas nuevas con RLS habilitado:
 
 ### Fase A — Infraestructura Supabase y migraciones SQL
 
-- [ ] Crear proyecto Supabase (producción) e inicializar local con `supabase init` + `supabase start`.
-- [ ] Configurar Auth en el dashboard: email+password habilitado, confirmación de email activada, OAuth Google opcional, Site URL y redirect URLs configuradas, plantillas de email en español.
-- [ ] Crear `supabase/migrations/<ts>_init_profiles_students_roles.sql`: enum `app_role`, tablas `profiles`, `students`, `user_roles` con FKs e índices.
-- [ ] Crear `supabase/migrations/<ts>_init_lesson_progress.sql`: tabla `lesson_progress` con PK compuesta e índices.
-- [ ] Crear `supabase/migrations/<ts>_rls_policies.sql`: `enable row level security` en las 4 tablas + función `has_role` + todas las políticas.
-- [ ] Crear `supabase/migrations/<ts>_triggers_and_functions.sql`: trigger `on_auth_user_created`.
-- [ ] Aplicar con `supabase db reset` localmente y verificar schema en Supabase Studio.
-- [ ] Documentar el orden de migraciones y el comando de reset en `supabase/README.md`.
+- [x] Crear proyecto Supabase (producción) — proyecto cloud creado y credenciales obtenidas.
+- [x] Inicializar CLI local con `supabase init` + vincular con `supabase link --project-ref <ref>`.
+- [x] Configurar Auth en el dashboard: email+password habilitado, confirmación de email activada, Site URL `http://localhost:3000` y redirect URLs configuradas.
+- [x] Crear `supabase/migrations/20260623000000_init_profiles_students_roles.sql`: enum `app_role`, tablas `profiles`, `students`, `user_roles` con FKs e índices.
+- [x] Crear `supabase/migrations/20260623000001_init_lesson_progress.sql`: tabla `lesson_progress` con PK compuesta e índices.
+- [x] Crear `supabase/migrations/20260623000002_rls_policies.sql`: `enable row level security` en las 4 tablas + función `has_role` + todas las políticas.
+- [x] Crear `supabase/migrations/20260623000003_triggers_and_functions.sql`: trigger `on_auth_user_created`.
+- [x] Aplicar migraciones y verificar schema en Supabase Studio.
+- [x] Documentar el orden de migraciones y el comando de reset en `supabase/README.md`.
 
 **Verificación:** `supabase db reset` pasa sin errores. Las 4 tablas existen con RLS habilitado. El trigger crea filas en `profiles`, `user_roles` y `students` al registrar un usuario de prueba.
 
@@ -158,8 +159,9 @@ Tablas nuevas con RLS habilitado:
 
 ### Fase B — Variables de entorno y clientes Supabase
 
-- [ ] Crear `.env.example` con `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `NEXT_PUBLIC_SITE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (marcada como `# SERVER-ONLY`).
-- [ ] Instalar dependencias: `@supabase/supabase-js`, `@supabase/ssr`, `react-hook-form`, `@hookform/resolvers`, `zod`.
+- [x] Crear `.env.example` con `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `NEXT_PUBLIC_SITE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (marcada como `# SERVER-ONLY`).
+- [x] Instalar `@supabase/supabase-js` y `@supabase/ssr`.
+- [ ] Instalar `react-hook-form`, `@hookform/resolvers`, `zod`.
 - [ ] Crear `lib/auth/server.ts`: `createServerSupabaseClient()` con `createServerClient` de `@supabase/ssr` + `cookies()` de Next.
 - [ ] Crear `lib/auth/middleware.ts`: `updateSupabaseSession(request)` que refresca la sesión y devuelve `NextResponse` con cookies actualizadas.
 - [ ] Crear `lib/auth/browser.ts`: `createBrowserSupabaseClient()`.
