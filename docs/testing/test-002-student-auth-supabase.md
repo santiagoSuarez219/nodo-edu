@@ -11,7 +11,7 @@
 2. Completar nombre, correo, contraseña y confirmación de contraseña.
 3. Hacer clic en "Crear cuenta".
 **Resultado esperado:** Redirige a `/registro/confirmar`. El navbar no muestra aún sesión activa.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ---
 
@@ -21,7 +21,7 @@
 1. Abrir el correo de confirmación enviado por Supabase.
 2. Hacer clic en el enlace de confirmación.
 **Resultado esperado:** El enlace redirige al sitio (vía `/auth/callback`). La sesión queda activa y el navbar muestra el `UserMenu` con las iniciales del usuario.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ---
 

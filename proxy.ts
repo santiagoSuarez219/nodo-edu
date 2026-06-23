@@ -3,7 +3,7 @@ import { updateSupabaseSession } from "@/lib/auth/middleware";
 
 const PRIVATE_PREFIXES = ["/cuenta"];
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { supabaseResponse, user } = await updateSupabaseSession(request);
 
   const { pathname } = request.nextUrl;
