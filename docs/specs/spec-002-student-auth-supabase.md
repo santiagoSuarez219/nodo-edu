@@ -238,12 +238,11 @@ Tablas nuevas con RLS habilitado:
 
 ### Fase H — Página privada `/cuenta`
 
-- [ ] Crear `app/cuenta/page.tsx` (server): llama `requireUser()` y `getCurrentProfile()`. Monta `AccountInfoCard` + `AccountForm`.
-- [ ] Crear `app/cuenta/layout.tsx` opcional con encabezado de cuenta.
-- [ ] Crear `components/account/AccountInfoCard.tsx` (server): email, fecha de registro (solo lectura).
-- [ ] Crear `components/account/AccountForm.tsx` (client): edita `full_name`, `career`, `semester`. Invoca Server Action `updateAccount` en `lib/students/actions.ts`. Valida con Zod.
-- [ ] Crear `lib/students/actions.ts` con `updateAccountAction`: actualiza `profiles` y `students`. Devuelve `AuthResult`.
-- [ ] Verificar que RLS rechaza updates sobre filas ajenas con dos cuentas distintas.
+- [x] Crear `app/cuenta/page.tsx` (server): llama `requireUser()` y `getProfileWithStudent()`. Monta `AccountInfoCard` + `AccountForm`.
+- [x] Crear `components/account/AccountInfoCard.tsx` (server): email del usuario y fecha de registro (solo lectura).
+- [x] Crear `components/account/AccountForm.tsx` (client): edita `full_name`, `career`, `semester` con valores iniciales precargados. Invoca `updateAccountAction`. Muestra mensaje de éxito inline.
+- [x] Crear `lib/students/actions.ts` con `updateAccountAction`: valida con `UpdateProfileSchema`, actualiza `profiles` y `students`, devuelve `AuthResult`.
+- [ ] Verificar que RLS rechaza updates sobre filas ajenas con dos cuentas distintas (validación manual en Fase J).
 
 ---
 
