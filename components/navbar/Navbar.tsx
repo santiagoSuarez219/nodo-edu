@@ -2,6 +2,9 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import type { Profile } from "@/lib/students/types";
+import { signOut } from "@/lib/auth/actions";
+import { UserMenu } from "./UserMenu";
 
 const sectionLinks = [
   { href: "/estructuras-de-datos", label: "Estructuras de datos" },
@@ -9,7 +12,7 @@ const sectionLinks = [
   { href: "/analisis-de-algoritmos", label: "Análisis de algoritmos" },
 ] as const;
 
-export const Navbar = () => {
+export const Navbar = ({ profile }: { profile?: Profile | null }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const toggleMenu = () => setIsMenuOpen((p) => !p);
@@ -44,12 +47,18 @@ export const Navbar = () => {
           </ul>
 
           <div className="flex gap-3 items-center">
-            <Link
-              href="/login"
-              className="hidden lg:inline-flex items-center px-4 py-2 rounded-lg bg-blue-700 hover:bg-blue-800 dark:bg-blue-600 dark:hover:bg-blue-700 text-white text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-200 dark:focus-visible:ring-blue-700 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-gray-900"
-            >
-              Iniciar sesión
-            </Link>
+            {profile ? (
+              <div className="hidden lg:block">
+                <UserMenu profile={profile} />
+              </div>
+            ) : (
+              <Link
+                href="/login"
+                className="hidden lg:inline-flex items-center px-4 py-2 rounded-lg bg-blue-700 hover:bg-blue-800 dark:bg-blue-600 dark:hover:bg-blue-700 text-white text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-200 dark:focus-visible:ring-blue-700 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-gray-900"
+              >
+                Iniciar sesión
+              </Link>
+            )}
 
             <button
               type="button"
@@ -109,15 +118,44 @@ export const Navbar = () => {
               </Link>
             </li>
           ))}
-          <li className="mt-2">
-            <Link
-              href="/login"
-              onClick={closeMenu}
-              className="block w-full rounded-lg bg-blue-700 hover:bg-blue-800 dark:bg-blue-600 dark:hover:bg-blue-700 py-3 text-center text-sm font-bold text-white transition-colors"
-            >
-              Iniciar sesión
-            </Link>
-          </li>
+          {profile ? (
+            <>
+              <li className="mt-2 border-t border-gray-100 dark:border-gray-700 pt-2">
+                <p className="px-1 py-1.5 text-xs font-semibold text-gray-500 dark:text-gray-400 truncate">
+                  {profile.full_name}
+                </p>
+              </li>
+              <li>
+                <Link
+                  href="/cuenta"
+                  onClick={closeMenu}
+                  className="block py-3 text-gray-700 dark:text-gray-300 hover:text-blue-700 dark:hover:text-blue-400 transition-colors"
+                >
+                  Mi cuenta
+                </Link>
+              </li>
+              <li>
+                <form action={signOut}>
+                  <button
+                    type="submit"
+                    className="block w-full text-left py-3 text-gray-700 dark:text-gray-300 hover:text-blue-700 dark:hover:text-blue-400 transition-colors"
+                  >
+                    Cerrar sesión
+                  </button>
+                </form>
+              </li>
+            </>
+          ) : (
+            <li className="mt-2">
+              <Link
+                href="/login"
+                onClick={closeMenu}
+                className="block w-full rounded-lg bg-blue-700 hover:bg-blue-800 dark:bg-blue-600 dark:hover:bg-blue-700 py-3 text-center text-sm font-bold text-white transition-colors"
+              >
+                Iniciar sesión
+              </Link>
+            </li>
+          )}
         </ul>
       </div>
     </>
