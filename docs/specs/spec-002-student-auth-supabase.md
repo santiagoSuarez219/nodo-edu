@@ -205,8 +205,8 @@ Tablas nuevas con RLS habilitado:
 
 ### Fase E — Route Handler OAuth
 
-- [ ] Crear `app/auth/callback/route.ts` (GET): lee `code` de `searchParams`, `exchangeCodeForSession(code)`, redirige a `searchParams.next ?? '/'`. Si falla, redirige a `/login?error=oauth`.
-- [ ] Validar el flujo completo con Google si OAuth está habilitado.
+- [x] Crear `app/auth/callback/route.ts` (GET): lee `code` de `searchParams`, `exchangeCodeForSession(code)`, redirige a `searchParams.next ?? '/'`. Si falla, redirige a `/login?error=auth_callback_failed`.
+- [ ] Validar el flujo completo una vez que las páginas de auth estén implementadas (Fase F).
 
 ---
 
