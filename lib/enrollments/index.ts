@@ -47,6 +47,18 @@ export async function enrollByCode(
   return { ok: true, enrollment: data };
 }
 
+async function fetchTeacherNames(
+  supabase: Awaited<ReturnType<typeof createServerSupabaseClient>>,
+  teacherIds: string[]
+): Promise<Map<string, string>> {
+  if (teacherIds.length === 0) return new Map();
+  const { data } = await supabase
+    .from("profiles")
+    .select("id, full_name")
+    .in("id", teacherIds);
+  return new Map((data ?? []).map((p: { id: string; full_name: string }) => [p.id, p.full_name]));
+}
+
 export async function getEnrollmentsByStudent(): Promise<EnrollmentWithCourse[]> {
   const user = await getCurrentUser();
   if (!user) return [];
@@ -55,22 +67,22 @@ export async function getEnrollmentsByStudent(): Promise<EnrollmentWithCourse[]>
 
   const { data } = await supabase
     .from("enrollments")
-    .select(
-      "*, academic_course:academic_courses(*), student_grades(score)"
-    )
+    .select("*, academic_course:academic_courses(*), student_grades(score)")
     .eq("student_id", user.id)
     .order("enrolled_at", { ascending: false });
 
   if (!data) return [];
 
+  const teacherIds = [...new Set(data.map((r) => r.academic_course.teacher_id as string))];
+  const teacherNames = await fetchTeacherNames(supabase, teacherIds);
+
   return data.map((row) => {
-    const scores = (row.student_grades as { score: number | null }[]).map(
-      (g) => g.score
-    );
+    const scores = (row.student_grades as { score: number | null }[]).map((g) => g.score);
     const { student_grades: _sg, ...enrollment } = row;
     return {
       ...enrollment,
       academic_course: row.academic_course,
+      teacher_name: teacherNames.get(row.academic_course.teacher_id) ?? null,
       total_grade: computeTotalGrade(scores),
     } as EnrollmentWithCourse;
   });
@@ -89,13 +101,13 @@ export async function getEnrollmentById(
 
   if (!data) return null;
 
-  const scores = (data.student_grades as { score: number | null }[]).map(
-    (g) => g.score
-  );
+  const teacherNames = await fetchTeacherNames(supabase, [data.academic_course.teacher_id]);
+  const scores = (data.student_grades as { score: number | null }[]).map((g) => g.score);
   const { student_grades: _sg, ...enrollment } = data;
   return {
     ...enrollment,
     academic_course: data.academic_course,
+    teacher_name: teacherNames.get(data.academic_course.teacher_id) ?? null,
     total_grade: computeTotalGrade(scores),
   } as EnrollmentWithCourse;
 }
@@ -122,10 +134,7 @@ export async function getEnrollmentsByAcademicCourse(
     const { student_grades: _sg, profile, ...enrollment } = row;
     return {
       ...enrollment,
-      profile: {
-        ...(profile as { id: string; full_name: string }),
-        email: "",
-      },
+      profile: profile as { id: string; full_name: string },
       total_grade: computeTotalGrade(scores),
     } as EnrollmentWithStudent;
   });

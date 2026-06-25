@@ -303,12 +303,12 @@ En una fase posterior, si el rendimiento lo justifica, se puede materializar com
 
 **Objetivo:** el docente puede ver sus cursos y crear uno nuevo desde `/admin/courses`.
 
-- [ ] Crear `app/(admin)/layout.tsx` con la barra lateral o cabecera del panel admin. Llama `requireRole('teacher')` (o `requireRole('admin')`) al inicio. Incluye navegación mínima: "Mis Cursos" y, en el futuro, "Estudiantes". Usa tokens semánticos del sistema de diseño; Flowbite primero.
-- [ ] Crear `app/(admin)/courses/page.tsx` (Server Component): llama `getCoursesByTeacher()` y renderiza `<AcademicCourseList courses={courses} />`. Incluye un botón o enlace a `/admin/courses/new`.
-- [ ] Crear `components/admin/AcademicCourseList.tsx` (server): tabla con columnas: Nombre, Código, Horario, Código de matrícula, Estado (activo/inactivo), acciones (Ver detalle). Si la lista está vacía, muestra un estado vacío con CTA para crear el primer curso.
-- [ ] Crear `app/(admin)/courses/new/page.tsx` (Server Component): renderiza `<AcademicCourseForm />`.
-- [ ] Crear `components/admin/AcademicCourseForm.tsx` (`"use client"`): React Hook Form + Zod resolver para `AcademicCourseSchema`. Campos: Nombre, Código del curso, Días de clase (checkboxes: lunes a sábado), Hora inicio, Hora fin, Código de matrícula (con sugerencia de generar automáticamente), Slug de contenido (opcional). Al submit llama `createCourseAction`. En éxito redirige a `/admin/courses/[id]`. En error pinta `fieldErrors`.
-- [ ] El campo "Código de matrícula" tiene un botón "Generar" que popula el campo con un código aleatorio en el cliente (8 caracteres alfanuméricos, solo como sugerencia; la validación de unicidad real ocurre en el servidor).
+- [x] Crear `app/(admin)/layout.tsx` con la barra lateral o cabecera del panel admin. Llama `requireRole('teacher')` (o `requireRole('admin')`) al inicio. Incluye navegación mínima: "Mis Cursos" y, en el futuro, "Estudiantes". Usa tokens semánticos del sistema de diseño; Flowbite primero.
+- [x] Crear `app/(admin)/courses/page.tsx` (Server Component): llama `getCoursesByTeacher()` y renderiza `<AcademicCourseList courses={courses} />`. Incluye un botón o enlace a `/admin/courses/new`.
+- [x] Crear `components/admin/AcademicCourseList.tsx` (server): tabla con columnas: Nombre, Código, Horario, Código de matrícula, Estado (activo/inactivo), acciones (Ver detalle). Si la lista está vacía, muestra un estado vacío con CTA para crear el primer curso.
+- [x] Crear `app/(admin)/courses/new/page.tsx` (Server Component): renderiza `<AcademicCourseForm />`.
+- [x] Crear `components/admin/AcademicCourseForm.tsx` (`"use client"`): React Hook Form + Zod resolver para `AcademicCourseSchema`. Campos: Nombre, Código del curso, Días de clase (checkboxes: lunes a sábado), Hora inicio, Hora fin, Código de matrícula (con sugerencia de generar automáticamente), Slug de contenido (opcional). Al submit llama `createCourseAction`. En éxito redirige a `/admin/courses/[id]`. En error pinta `fieldErrors`.
+- [x] El campo "Código de matrícula" tiene un botón "Generar" que popula el campo con un código aleatorio en el cliente (8 caracteres alfanuméricos, solo como sugerencia; la validación de unicidad real ocurre en el servidor).
 - [ ] Validar que el formulario funciona en modo claro y oscuro, tipografía JetBrains Mono, sin colores crudos.
 
 **Verificación de fase:** Un usuario con rol `teacher` puede crear un curso y verlo en el listado. Un usuario con rol `student` ve el listado vacío de sus cursos (rutas `/cuenta/cursos`), pero no puede acceder a `/admin/courses`.
@@ -319,12 +319,12 @@ En una fase posterior, si el rendimiento lo justifica, se puede materializar com
 
 **Objetivo:** el docente ve los estudiantes matriculados y puede retirarlos.
 
-- [ ] Crear `app/(admin)/courses/[academicCourseId]/page.tsx` (Server Component): llama `getAcademicCourseById` y `getEnrollmentsByAcademicCourse`. Renderiza cabecera del curso (nombre, código, horario, código de matrícula) + `<EnrollmentTable enrollments={...} />`.
-- [ ] Crear `components/admin/EnrollmentTable.tsx` (server): tabla con columnas: Nombre del estudiante, Email, Fecha de matrícula, Estado (activo/retirado), Nota total, acción "Retirar" (solo si activo). La nota total se calcula en `lib/grades` y se pasa como prop.
-- [ ] La acción "Retirar" dispara `withdrawStudentAction` desde un `<form>` con botón que invoca la Server Action directamente (sin necesidad de un componente client para este caso simple).
-- [ ] Crear enlace o pestaña "Calificaciones" hacia `/admin/courses/[academicCourseId]/grades`.
-- [ ] Crear enlace "Editar curso" que muestra el formulario de edición (puede ser la misma ruta con un `?edit=true` param o una ruta `/admin/courses/[id]/edit` — se prefiere ruta explícita para claridad).
-- [ ] Crear `app/(admin)/courses/[academicCourseId]/edit/page.tsx` con `<AcademicCourseForm />` prellenado con los datos del curso. Al submit llama `updateCourseAction`.
+- [x] Crear `app/(admin)/courses/[academicCourseId]/page.tsx` (Server Component): llama `getAcademicCourseById` y `getEnrollmentsByAcademicCourse`. Renderiza cabecera del curso (nombre, código, horario, código de matrícula) + `<EnrollmentTable enrollments={...} />`.
+- [x] Crear `components/admin/EnrollmentTable.tsx` (server): tabla con columnas: Nombre del estudiante, Fecha de matrícula, Estado (activo/retirado), Nota total, acción "Retirar" (solo si activo). Nota: email omitido — requiere service role, pendiente en backlog.
+- [x] La acción "Retirar" dispara `withdrawStudentAction` desde un `<form>` con botón que invoca la Server Action directamente (sin necesidad de un componente client para este caso simple).
+- [x] Crear enlace o pestaña "Calificaciones" hacia `/admin/courses/[academicCourseId]/grades`.
+- [x] Crear enlace "Editar curso" que muestra el formulario de edición (puede ser la misma ruta con un `?edit=true` param o una ruta `/admin/courses/[id]/edit` — se prefiere ruta explícita para claridad).
+- [x] Crear `app/(admin)/courses/[academicCourseId]/edit/page.tsx` con `<AcademicCourseForm />` prellenado con los datos del curso. Al submit llama `updateCourseAction`.
 
 **Verificación de fase:** El docente puede ver la lista de estudiantes matriculados con su nota total (null inicialmente), retirar a uno, y editar los datos del curso.
 
@@ -334,12 +334,12 @@ En una fase posterior, si el rendimiento lo justifica, se puede materializar com
 
 **Objetivo:** el docente define ítems de calificación y registra notas por estudiante.
 
-- [ ] Crear `app/(admin)/courses/[academicCourseId]/grades/page.tsx` (Server Component): llama `getGradeItemsByCourse`, `getEnrollmentsByAcademicCourse` y `getGradesByCourse`. Renderiza `<GradeItemsPanel />` y `<GradesTable />`.
-- [ ] Crear `components/admin/GradeItemsPanel.tsx` (`"use client"`): lista los ítems existentes con botón para añadir uno nuevo. El formulario de ítem es inline (input de nombre + número de orden). Al confirmar llama `createGradeItemAction`. Permite eliminar un ítem (con confirmación si ya hay notas registradas).
-- [ ] Crear `components/admin/GradesTable.tsx` (`"use client"`): tabla con filas = estudiantes activos, columnas = ítems de calificación + columna "Total". Cada celda es `<GradeInputCell />`.
-- [ ] Crear `components/admin/GradeInputCell.tsx` (`"use client"`): input numérico (0.00–5.00) que llama `upsertStudentGradeAction` al perder el foco (`onBlur`). Muestra un indicador visual de guardado (spinner breve, luego check) y de error. El valor null se representa como celda vacía (no "0").
-- [ ] La columna "Total" calcula el promedio de las notas no nulas del estudiante en el cliente (dato ya disponible en la carga inicial). Se recalcula reactivamente cuando se cambia una celda.
-- [ ] Si no hay ítems definidos todavía, `GradesTable` muestra un estado vacío orientando al docente a crear ítems primero.
+- [x] Crear `app/(admin)/courses/[academicCourseId]/grades/page.tsx` (Server Component): llama `getGradeItemsByCourse`, `getEnrollmentsByAcademicCourse` y `getGradesByCourse`. Renderiza `<GradeItemsPanel />` y `<GradesTable />`.
+- [x] Crear `components/admin/GradeItemsPanel.tsx` (`"use client"`): lista los ítems existentes con botón para añadir uno nuevo. El formulario de ítem es inline (input de nombre + número de orden). Al confirmar llama `createGradeItemAction`. Permite eliminar un ítem (con confirmación si ya hay notas registradas).
+- [x] Crear `components/admin/GradesTable.tsx` (`"use client"`): tabla con filas = estudiantes activos, columnas = ítems de calificación + columna "Total". Cada celda es `<GradeInputCell />`.
+- [x] Crear `components/admin/GradeInputCell.tsx` (`"use client"`): input numérico (0.00–5.00) que llama `upsertStudentGradeAction` al perder el foco (`onBlur`). Muestra un indicador visual de guardado (spinner breve, luego check) y de error. El valor null se representa como celda vacía (no "0").
+- [x] La columna "Total" calcula el promedio de las notas no nulas del estudiante en el cliente (dato ya disponible en la carga inicial). Se recalcula reactivamente cuando se cambia una celda.
+- [x] Si no hay ítems definidos todavía, `GradesTable` muestra un estado vacío orientando al docente a crear ítems primero.
 
 **Verificación de fase:** El docente puede añadir ítems de calificación, ingresar notas por estudiante celda a celda, y ver la nota total actualizarse. Dos docentes con cursos distintos no ven las notas del otro (validar con dos cuentas teacher).
 
@@ -349,13 +349,13 @@ En una fase posterior, si el rendimiento lo justifica, se puede materializar com
 
 **Objetivo:** el estudiante puede matricularse con un código y ver sus cursos con sus calificaciones.
 
-- [ ] Editar `app/cuenta/layout.tsx` para añadir el enlace "Mis Cursos" apuntando a `/cuenta/cursos`.
-- [ ] Crear `app/cuenta/cursos/page.tsx` (Server Component): llama `requireUser()` y `getEnrollmentsByStudent()`. Renderiza `<EnrollmentForm />` para matricularse y `<EnrolledCourseList enrollments={...} />`.
-- [ ] Crear `components/account/EnrollmentForm.tsx` (`"use client"`): un campo de texto para el código de matrícula + botón "Matricularme". Llama `enrollByCourseCodeAction`. Muestra mensajes de error claros: "Código no encontrado", "Ya estás matriculado en este curso", "El curso no está aceptando matrículas". En éxito recarga la lista (revalidación de la ruta).
-- [ ] Crear `components/account/EnrolledCourseList.tsx` (server): tarjetas o tabla con columnas: Nombre del curso, Código, Docente (nombre del perfil), Horario, Nota total, Estado (activo/retirado). Enlace a `/cuenta/cursos/[enrollmentId]` para ver el detalle.
-- [ ] Crear `app/cuenta/cursos/[enrollmentId]/page.tsx` (Server Component): llama `getEnrollmentById` y `getGradesByEnrollment`. Verifica que `student_id = auth.uid()` (el helper de lib lo hace por RLS). Renderiza `<EnrollmentDetail />`.
-- [ ] Crear `components/account/EnrollmentDetail.tsx` (server): muestra datos del curso (nombre, docente, horario), tabla de calificaciones (ítem + nota, nota nula se muestra como "–"), y nota total. Modo de solo lectura para el estudiante.
-- [ ] Si el estudiante no tiene matrículas activas, `EnrolledCourseList` muestra un estado vacío con instrucciones para ingresar un código.
+- [x] Editar `app/cuenta/layout.tsx` para añadir el enlace "Mis Cursos" apuntando a `/cuenta/cursos`.
+- [x] Crear `app/cuenta/cursos/page.tsx` (Server Component): llama `requireUser()` y `getEnrollmentsByStudent()`. Renderiza `<EnrollmentForm />` para matricularse y `<EnrolledCourseList enrollments={...} />`.
+- [x] Crear `components/account/EnrollmentForm.tsx` (`"use client"`): un campo de texto para el código de matrícula + botón "Matricularme". Llama `enrollByCourseCodeAction`. Muestra mensajes de error claros: "Código no encontrado", "Ya estás matriculado en este curso", "El curso no está aceptando matrículas". En éxito recarga la lista (revalidación de la ruta).
+- [x] Crear `components/account/EnrolledCourseList.tsx` (server): tarjetas con Nombre del curso, Código, Docente (nombre del perfil), Horario, Nota total, Estado (activo/retirado). Enlace a `/cuenta/cursos/[enrollmentId]` para ver el detalle.
+- [x] Crear `app/cuenta/cursos/[enrollmentId]/page.tsx` (Server Component): llama `getEnrollmentById` y `getGradesByEnrollment`. Verifica que `student_id = auth.uid()`. Renderiza `<EnrollmentDetail />`.
+- [x] Crear `components/account/EnrollmentDetail.tsx` (server): muestra datos del curso (nombre, docente, horario), tabla de calificaciones (ítem + nota, nota nula se muestra como "—"), y nota total. Modo de solo lectura para el estudiante.
+- [x] Si el estudiante no tiene matrículas activas, `EnrolledCourseList` muestra un estado vacío con instrucciones para ingresar un código.
 
 **Verificación de fase:** Un estudiante puede matricularse con un código válido, ver el curso en su lista, y consultar sus calificaciones (inicialmente todas vacías). El error se muestra correctamente para códigos inválidos o cursos ya matriculados.
 

@@ -50,3 +50,18 @@ export async function requireRole(role: AppRole) {
   if (!data) redirect("/");
   return user;
 }
+
+export async function requireAnyRole(roles: AppRole[]) {
+  const user = await requireUser();
+  const supabase = await createServerSupabaseClient();
+
+  const { data } = await supabase
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", user.id)
+    .in("role", roles)
+    .maybeSingle();
+
+  if (!data) redirect("/");
+  return user;
+}

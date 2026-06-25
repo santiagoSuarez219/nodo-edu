@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth/session";
-import { AcademicCourseSchema } from "./schemas";
+import { AcademicCourseSchema, type AcademicCourseSchemaInput } from "./schemas";
 import {
   createAcademicCourse,
   updateAcademicCourse,
@@ -12,21 +12,11 @@ import {
 import type { AuthResult } from "@/lib/auth/types";
 
 export async function createCourseAction(
-  _prev: AuthResult,
-  formData: FormData
+  data: AcademicCourseSchemaInput
 ): Promise<AuthResult<{ id: string }>> {
   const user = await requireUser();
 
-  const parsed = AcademicCourseSchema.safeParse({
-    name: formData.get("name"),
-    code: formData.get("code"),
-    class_days: formData.getAll("class_days"),
-    class_time_start: formData.get("class_time_start"),
-    class_time_end: formData.get("class_time_end"),
-    enrollment_code: formData.get("enrollment_code") || undefined,
-    course_slug: formData.get("course_slug") || undefined,
-  });
-
+  const parsed = AcademicCourseSchema.safeParse(data);
   if (!parsed.success) {
     return {
       ok: false,
@@ -59,21 +49,11 @@ export async function createCourseAction(
 
 export async function updateCourseAction(
   courseId: string,
-  _prev: AuthResult,
-  formData: FormData
+  data: AcademicCourseSchemaInput
 ): Promise<AuthResult> {
   await requireUser();
 
-  const parsed = AcademicCourseSchema.safeParse({
-    name: formData.get("name"),
-    code: formData.get("code"),
-    class_days: formData.getAll("class_days"),
-    class_time_start: formData.get("class_time_start"),
-    class_time_end: formData.get("class_time_end"),
-    enrollment_code: formData.get("enrollment_code") || undefined,
-    course_slug: formData.get("course_slug") || undefined,
-  });
-
+  const parsed = AcademicCourseSchema.safeParse(data);
   if (!parsed.success) {
     return {
       ok: false,

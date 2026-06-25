@@ -12,10 +12,11 @@ export interface Enrollment {
 
 export interface EnrollmentWithCourse extends Enrollment {
   academic_course: AcademicCourse;
+  teacher_name: string | null;
   total_grade: number | null;
 }
 
 export interface EnrollmentWithStudent extends Enrollment {
-  profile: Pick<Profile, "id" | "full_name"> & { email: string };
+  profile: Pick<Profile, "id" | "full_name">;
   total_grade: number | null;
 }

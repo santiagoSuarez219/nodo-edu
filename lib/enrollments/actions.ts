@@ -24,9 +24,11 @@ export async function enrollByCourseCodeAction(
 }
 
 export async function withdrawStudentAction(
-  enrollmentId: string
+  enrollmentId: string,
+  academicCourseId: string
 ): Promise<void> {
   await requireUser();
   await withdrawStudent(enrollmentId);
+  revalidatePath(`/admin/courses/${academicCourseId}`);
   revalidatePath("/admin/courses");
 }

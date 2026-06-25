@@ -2,7 +2,6 @@
 
 import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/auth/session";
-import { GradeItemSchema, StudentGradeSchema } from "./schemas";
 import {
   createGradeItem,
   updateGradeItem,
@@ -13,32 +12,17 @@ import type { AuthResult } from "@/lib/auth/types";
 
 export async function createGradeItemAction(
   academicCourseId: string,
-  _prev: AuthResult,
-  formData: FormData
-): Promise<AuthResult> {
+  name: string,
+  orderIndex: number
+): Promise<AuthResult<{ id: string }>> {
   await requireUser();
 
-  const parsed = GradeItemSchema.safeParse({
-    name: formData.get("name"),
-    order_index: formData.get("order_index") ?? 0,
-  });
-
-  if (!parsed.success) {
-    return {
-      ok: false,
-      error: "Revisa los campos del ítem.",
-      fieldErrors: parsed.error.flatten().fieldErrors as Record<string, string[]>,
-    };
-  }
+  if (!name.trim()) return { ok: false, error: "El nombre del ítem es requerido." };
 
   try {
-    await createGradeItem(
-      academicCourseId,
-      parsed.data.name,
-      parsed.data.order_index
-    );
+    const item = await createGradeItem(academicCourseId, name.trim(), orderIndex);
     revalidatePath(`/admin/courses/${academicCourseId}/grades`);
-    return { ok: true };
+    return { ok: true, data: { id: item.id } };
   } catch {
     return { ok: false, error: "No se pudo crear el ítem. El nombre puede estar duplicado." };
   }
@@ -47,25 +31,17 @@ export async function createGradeItemAction(
 export async function updateGradeItemAction(
   gradeItemId: string,
   academicCourseId: string,
-  _prev: AuthResult,
-  formData: FormData
+  name: string,
+  orderIndex: number
 ): Promise<AuthResult> {
   await requireUser();
 
-  const parsed = GradeItemSchema.safeParse({
-    name: formData.get("name"),
-    order_index: formData.get("order_index") ?? 0,
+  if (!name.trim()) return { ok: false, error: "El nombre del ítem es requerido." };
+
+  const updated = await updateGradeItem(gradeItemId, {
+    name: name.trim(),
+    order_index: orderIndex,
   });
-
-  if (!parsed.success) {
-    return {
-      ok: false,
-      error: "Revisa los campos del ítem.",
-      fieldErrors: parsed.error.flatten().fieldErrors as Record<string, string[]>,
-    };
-  }
-
-  const updated = await updateGradeItem(gradeItemId, parsed.data);
   if (!updated) return { ok: false, error: "No se pudo actualizar el ítem." };
 
   revalidatePath(`/admin/courses/${academicCourseId}/grades`);
@@ -93,21 +69,12 @@ export async function upsertStudentGradeAction(
 ): Promise<AuthResult> {
   await requireUser();
 
-  const parsed = StudentGradeSchema.safeParse({
-    enrollment_id: enrollmentId,
-    grade_item_id: gradeItemId,
-    score,
-  });
-
-  if (!parsed.success) {
-    return {
-      ok: false,
-      error: "Nota inválida. Debe estar entre 0.0 y 5.0.",
-    };
+  if (score !== null && (score < 0 || score > 5)) {
+    return { ok: false, error: "Nota inválida. Debe estar entre 0.0 y 5.0." };
   }
 
   try {
-    await upsertStudentGrade(enrollmentId, gradeItemId, parsed.data.score);
+    await upsertStudentGrade(enrollmentId, gradeItemId, score);
     revalidatePath(`/admin/courses/${academicCourseId}/grades`);
     return { ok: true };
   } catch {
