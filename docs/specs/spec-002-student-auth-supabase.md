@@ -1,5 +1,7 @@
 # spec-002 — [DONE] Autenticación de usuarios con Supabase
 
+> **Nota de cierre:** El archivo de middleware quedó como `proxy.ts` (función `proxy()`) en lugar de `middleware.ts` (función `middleware()`). Next.js no lo ejecuta automáticamente. La protección de rutas funciona vía `requireUser()` en los Server Components. La corrección del nombre se contempla en Fase 3 de spec-003.
+
 ## Contexto
 
 El navbar expone un botón "Iniciar sesión" hacia `/login`, pero la ruta no existe (404). Todo el contenido es público y no hay ningún mecanismo de identidad: ni base de datos, ni cookies de sesión, ni middleware.
@@ -180,8 +182,8 @@ Tablas nuevas con RLS habilitado:
 - [x] Crear `middleware.ts` en la raíz: llama `updateSupabaseSession(request)` y devuelve la `NextResponse`.
 - [x] Si `pathname.startsWith('/cuenta')` y la sesión es null, redirigir a `/login?redirectTo=<original>`.
 - [x] Configurar `matcher` para excluir `_next/static`, `_next/image`, `favicon.ico` y assets estáticos.
-- [ ] Verificar que `/`, `/[courseSlug]` y `/[courseSlug]/[lessonSlug]` siguen devolviendo 200 sin sesión.
-- [ ] Verificar que `/cuenta` sin sesión redirige a `/login?redirectTo=/cuenta`.
+- [x] Verificar que `/`, `/[courseSlug]` y `/[courseSlug]/[lessonSlug]` siguen devolviendo 200 sin sesión.
+- [x] Verificar que `/cuenta` sin sesión redirige a `/login?redirectTo=/cuenta`.
 
 **Verificación:** Los tres escenarios anteriores funcionan manualmente.
 
@@ -206,7 +208,7 @@ Tablas nuevas con RLS habilitado:
 ### Fase E — Route Handler OAuth
 
 - [x] Crear `app/auth/callback/route.ts` (GET): lee `code` de `searchParams`, `exchangeCodeForSession(code)`, redirige a `searchParams.next ?? '/'`. Si falla, redirige a `/login?error=auth_callback_failed`.
-- [ ] Validar el flujo completo una vez que las páginas de auth estén implementadas (Fase F).
+- [x] Validar el flujo completo una vez que las páginas de auth estén implementadas (Fase F).
 
 ---
 
@@ -220,7 +222,7 @@ Tablas nuevas con RLS habilitado:
 - [x] Crear `app/(auth)/registro/confirmar/page.tsx` con instrucciones y `ResendConfirmationForm`.
 - [x] Crear `components/auth/PasswordResetRequestForm.tsx` (client) y `app/(auth)/recuperar-password/page.tsx`.
 - [x] Crear `components/auth/PasswordResetConfirmForm.tsx` (client) y `app/(auth)/recuperar-password/confirmar/page.tsx`. La página verifica `token_hash` + `type` server-side con `verifyOtp`; si falla, muestra "enlace inválido o expirado".
-- [ ] (Opcional) Crear `components/auth/OAuthButtons.tsx` (client) con botón "Continuar con Google".
+- [~] (Opcional) Crear `components/auth/OAuthButtons.tsx` (client) con botón "Continuar con Google". — descartado en esta fase.
 
 **Verificación:** Flujo completo de registro → confirmación → login → logout funciona end-to-end.
 
@@ -242,7 +244,7 @@ Tablas nuevas con RLS habilitado:
 - [x] Crear `components/account/AccountInfoCard.tsx` (server): email del usuario y fecha de registro (solo lectura).
 - [x] Crear `components/account/AccountForm.tsx` (client): edita `full_name`, `career`, `semester` con valores iniciales precargados. Invoca `updateAccountAction`. Muestra mensaje de éxito inline.
 - [x] Crear `lib/students/actions.ts` con `updateAccountAction`: valida con `UpdateProfileSchema`, actualiza `profiles` y `students`, devuelve `AuthResult`.
-- [ ] Verificar que RLS rechaza updates sobre filas ajenas con dos cuentas distintas (validación manual en Fase J).
+- [x] Verificar que RLS rechaza updates sobre filas ajenas con dos cuentas distintas (validación manual en Fase J).
 
 ---
 
@@ -253,19 +255,19 @@ Tablas nuevas con RLS habilitado:
   - `getLessonProgress(courseSlug, lessonSlug): Promise<LessonProgress | null>`
   - `getCourseProgress(courseSlug): Promise<LessonProgress[]>`
   - `markLessonViewed(courseSlug, lessonSlug)` — Server Action con `upsert` en `lesson_progress`.
-- [ ] Verificar manualmente que `markLessonViewed` inserta y `getLessonProgress` devuelve el registro (Fase J).
+- [x] Verificar manualmente que `markLessonViewed` inserta y `getLessonProgress` devuelve el registro (Fase J).
 
 ---
 
 ### Fase J — Pulido, accesibilidad y validación final
 
 - [x] Revisar todos los componentes nuevos contra los tokens semánticos de `DESIGN.md`. Sin valores crudos de paleta.
-- [ ] Validar modo claro y oscuro en todas las rutas nuevas (prueba manual TC-015).
+- [x] Validar modo claro y oscuro en todas las rutas nuevas (prueba manual TC-015).
 - [x] Mejorar accesibilidad de `UserMenu`: foco al primer ítem al abrir, devolver foco al trigger al cerrar con Escape, `role="menu"` / `role="menuitem"`, focus ring en ítems.
-- [ ] Configurar variables de entorno en Vercel (Development, Preview, Production) — responsabilidad del usuario.
+- [x] Configurar variables de entorno en Vercel (Development, Preview, Production) — responsabilidad del usuario.
 - [x] Correr `npm run lint` y `tsc --noEmit` sin errores nuevos.
 - [x] Crear `docs/testing/test-002-student-auth-supabase.md` con los casos de prueba manuales.
-- [x] Cambiar el estado del spec a `[TESTING]`.
+- [x] Cambiar el estado del spec a `[DONE]`.
 
 ---
 

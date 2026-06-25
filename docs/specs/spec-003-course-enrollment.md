@@ -287,8 +287,11 @@ En una fase posterior, si el rendimiento lo justifica, se puede materializar com
 
 **Objetivo:** el prefijo `/admin` queda protegido con verificación de rol antes de que exista la UI.
 
-- [ ] Editar `middleware.ts` para añadir el bloque: si `pathname.startsWith('/admin')` y el usuario no tiene rol `teacher` ni `admin`, redirigir a `/` (o a `/login` si no hay sesión).
-- [ ] La verificación de rol en el middleware debe ser ligera: leer `user_roles` con el cliente de middleware (no hace round-trip completo, usa el JWT de Supabase o una consulta rápida).
+> **Prerequisito:** el archivo `proxy.ts` en la raíz es el middleware de spec-002, pero está mal nombrado: Next.js requiere el archivo `middleware.ts` con una función exportada como `middleware`. El primer paso de esta fase es corregir esto.
+
+- [ ] Renombrar `proxy.ts` → `middleware.ts` en la raíz del proyecto. Renombrar la función exportada de `proxy` a `middleware`. Verificar que el refresh de sesión y la protección de `/cuenta` siguen funcionando.
+- [ ] Añadir en `middleware.ts` el bloque para `/admin`: si `pathname.startsWith('/admin')` y no hay sesión, redirigir a `/login`; si hay sesión pero no tiene rol `teacher` ni `admin`, redirigir a `/`.
+- [ ] La verificación de rol en el middleware debe ser ligera: consulta a `user_roles` con el cliente de middleware usando `has_role`.
 - [ ] Actualizar el `matcher` si fuera necesario para asegurar que `/admin/*` queda dentro del scope del middleware.
 - [ ] Probar manualmente: un visitante sin sesión que accede a `/admin/courses` → redirige a `/login`. Un estudiante autenticado que accede a `/admin/courses` → redirige a `/`. Un docente autenticado → accede correctamente (404 todavía, pero el middleware no bloquea).
 
