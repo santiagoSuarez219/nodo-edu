@@ -91,6 +91,8 @@ export function GradesTable({ academicCourseId, gradeItems, rows }: Props) {
                         gradeItemId={item.id}
                         academicCourseId={academicCourseId}
                         initialScore={grades[item.id] ?? null}
+                        studentName={row.student_name}
+                        itemName={item.name}
                         onSave={(gradeItemId, score) =>
                           handleCellSave(row.enrollment_id, gradeItemId, score)
                         }

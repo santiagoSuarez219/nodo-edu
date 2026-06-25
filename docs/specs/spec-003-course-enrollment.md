@@ -1,4 +1,4 @@
-# spec-003 — [IN PROGRESS] Gestión de cursos académicos con matrículas y calificaciones
+# spec-003 — [TESTING] Gestión de cursos académicos con matrículas y calificaciones
 
 ---
 
@@ -365,15 +365,15 @@ En una fase posterior, si el rendimiento lo justifica, se puede materializar com
 
 **Objetivo:** paridad visual, accesibilidad, robustez y cierre del spec.
 
-- [ ] Revisar todos los componentes nuevos contra los tokens semánticos definidos en `DESIGN.md`. Eliminar cualquier valor crudo de la paleta.
-- [ ] Validar modo claro y oscuro en todas las rutas nuevas: `/admin/courses`, `/admin/courses/new`, `/admin/courses/[id]`, `/admin/courses/[id]/grades`, `/cuenta/cursos`, `/cuenta/cursos/[enrollmentId]`.
-- [ ] Validar accesibilidad de `GradeInputCell`: label asociado, navegación por teclado entre celdas (tab), anuncio de estado de guardado con `aria-live`.
-- [ ] Validar que las rutas públicas de specs 001 y 002 no se ven afectadas: home de curso, página de lección y páginas de auth siguen funcionando sin errores.
-- [ ] Probar los casos de error de RLS directamente: intentar insertar en `academic_courses` con rol `student` → rechazado. Intentar leer `student_grades` de otro estudiante → vacío. Intentar actualizar calificaciones de un curso ajeno → rechazado.
-- [ ] Probar la retirada de un estudiante y verificar que desaparece de la vista activa del docente pero la fila persiste en la DB con `status = 'withdrawn'`.
-- [ ] Correr `npm run lint` y `tsc --noEmit` sin errores nuevos.
-- [ ] Crear `docs/testing/test-003-course-enrollment.md` con los casos de prueba manuales.
-- [ ] Cambiar el estado del spec a `[TESTING]` y ejecutar los casos de prueba manuales.
+- [x] Revisar todos los componentes nuevos contra los tokens semánticos definidos en `DESIGN.md`. Eliminar cualquier valor crudo de la paleta.
+- [ ] Validar modo claro y oscuro en todas las rutas nuevas: `/admin/courses`, `/admin/courses/new`, `/admin/courses/[id]`, `/admin/courses/[id]/grades`, `/cuenta/cursos`, `/cuenta/cursos/[enrollmentId]`. — **pendiente validación manual (TC-020)**
+- [x] Validar accesibilidad de `GradeInputCell`: label asociado con nombre de estudiante e ítem, navegación por teclado (tab nativo), anuncio de estado con `aria-live="polite"`.
+- [ ] Validar que las rutas públicas de specs 001 y 002 no se ven afectadas. — **pendiente (TC-019)**
+- [ ] Probar los casos de error de RLS directamente. — **pendiente (TC-018)**
+- [ ] Probar la retirada de un estudiante. — **pendiente (TC-014)**
+- [x] Correr `npm run lint` y `tsc --noEmit` sin errores nuevos.
+- [x] Crear `docs/testing/test-003-course-enrollment.md` con los casos de prueba manuales.
+- [x] Cambiar el estado del spec a `[TESTING]` y ejecutar los casos de prueba manuales.
 
 ---
 

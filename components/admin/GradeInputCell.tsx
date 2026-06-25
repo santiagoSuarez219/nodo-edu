@@ -11,6 +11,8 @@ interface Props {
   academicCourseId: string;
   initialScore: number | null;
   onSave: (gradeItemId: string, score: number | null) => void;
+  studentName: string;
+  itemName: string;
 }
 
 export function GradeInputCell({
@@ -19,6 +21,8 @@ export function GradeInputCell({
   academicCourseId,
   initialScore,
   onSave,
+  studentName,
+  itemName,
 }: Props) {
   const [value, setValue] = useState(
     initialScore !== null ? String(initialScore) : ""
@@ -67,7 +71,7 @@ export function GradeInputCell({
         onChange={(e) => { setValue(e.target.value); setStatus("idle"); }}
         onBlur={handleBlur}
         placeholder="—"
-        aria-label="Calificación"
+        aria-label={`Nota de ${studentName} en ${itemName}`}
         className={`w-20 rounded border px-2 py-1 text-right text-sm font-mono transition-colors focus:outline-none focus:ring-2
           ${status === "error"
             ? "border-red-400 dark:border-red-500 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 focus:ring-red-200 dark:focus:ring-red-800"

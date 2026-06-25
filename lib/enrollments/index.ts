@@ -78,9 +78,13 @@ export async function getEnrollmentsByStudent(): Promise<EnrollmentWithCourse[]>
 
   return data.map((row) => {
     const scores = (row.student_grades as { score: number | null }[]).map((g) => g.score);
-    const { student_grades: _sg, ...enrollment } = row;
     return {
-      ...enrollment,
+      id: row.id,
+      student_id: row.student_id,
+      academic_course_id: row.academic_course_id,
+      status: row.status,
+      enrolled_at: row.enrolled_at,
+      withdrawn_at: row.withdrawn_at,
       academic_course: row.academic_course,
       teacher_name: teacherNames.get(row.academic_course.teacher_id) ?? null,
       total_grade: computeTotalGrade(scores),
@@ -103,9 +107,13 @@ export async function getEnrollmentById(
 
   const teacherNames = await fetchTeacherNames(supabase, [data.academic_course.teacher_id]);
   const scores = (data.student_grades as { score: number | null }[]).map((g) => g.score);
-  const { student_grades: _sg, ...enrollment } = data;
   return {
-    ...enrollment,
+    id: data.id,
+    student_id: data.student_id,
+    academic_course_id: data.academic_course_id,
+    status: data.status,
+    enrolled_at: data.enrolled_at,
+    withdrawn_at: data.withdrawn_at,
     academic_course: data.academic_course,
     teacher_name: teacherNames.get(data.academic_course.teacher_id) ?? null,
     total_grade: computeTotalGrade(scores),
@@ -131,10 +139,14 @@ export async function getEnrollmentsByAcademicCourse(
     const scores = (row.student_grades as { score: number | null }[]).map(
       (g) => g.score
     );
-    const { student_grades: _sg, profile, ...enrollment } = row;
     return {
-      ...enrollment,
-      profile: profile as { id: string; full_name: string },
+      id: row.id,
+      student_id: row.student_id,
+      academic_course_id: row.academic_course_id,
+      status: row.status,
+      enrolled_at: row.enrolled_at,
+      withdrawn_at: row.withdrawn_at,
+      profile: row.profile as { id: string; full_name: string },
       total_grade: computeTotalGrade(scores),
     } as EnrollmentWithStudent;
   });
