@@ -232,14 +232,14 @@ En una fase posterior, si el rendimiento lo justifica, se puede materializar com
 
 **Objetivo:** tener las tablas, índices y políticas RLS creadas y aplicadas localmente. Sin tocar código de Next.js todavía.
 
-- [ ] Crear `supabase/migrations/<timestamp>_init_academic_courses.sql` con la tabla `academic_courses`, su índice y trigger de `updated_at`.
-- [ ] Crear `supabase/migrations/<timestamp>_init_enrollments.sql` con la tabla `enrollments` y sus índices.
-- [ ] Crear `supabase/migrations/<timestamp>_init_grade_items.sql` con la tabla `grade_items` y su índice compuesto.
-- [ ] Crear `supabase/migrations/<timestamp>_init_student_grades.sql` con la tabla `student_grades`, sus índices y restricción de rango.
-- [ ] Crear `supabase/migrations/<timestamp>_rls_academic.sql` con `enable row level security` en las cuatro tablas y todas las políticas descritas en el schema.
-- [ ] Aplicar con `supabase db reset` localmente y verificar que no hay conflictos con las migraciones de spec-002.
+- [x] Crear `supabase/migrations/<timestamp>_init_academic_courses.sql` con la tabla `academic_courses`, su índice y trigger de `updated_at`.
+- [x] Crear `supabase/migrations/<timestamp>_init_enrollments.sql` con la tabla `enrollments` y sus índices.
+- [x] Crear `supabase/migrations/<timestamp>_init_grade_items.sql` con la tabla `grade_items` y su índice compuesto.
+- [x] Crear `supabase/migrations/<timestamp>_init_student_grades.sql` con la tabla `student_grades`, sus índices y restricción de rango.
+- [x] Crear `supabase/migrations/<timestamp>_rls_academic.sql` con `enable row level security` en las cuatro tablas y todas las políticas descritas en el schema.
+- [x] Aplicar con `supabase db reset` localmente y verificar que no hay conflictos con las migraciones de spec-002.
 - [ ] Verificar en el studio local (`supabase studio`) que las políticas están activas y las relaciones son correctas.
-- [ ] Documentar en `supabase/README.md` (o en el README raíz) el orden de migraciones y las dependencias entre specs.
+- [x] Documentar en `supabase/README.md` (o en el README raíz) el orden de migraciones y las dependencias entre specs.
 
 **Verificación de fase:** `supabase db reset` pasa sin errores. Las cuatro tablas existen con RLS habilitado. Se puede insertar un `academic_course` con un usuario que tenga rol `teacher` y se rechaza con un usuario que tenga rol `student`.
 
@@ -249,25 +249,25 @@ En una fase posterior, si el rendimiento lo justifica, se puede materializar com
 
 **Objetivo:** tipos TypeScript, funciones de acceso a Supabase y Server Actions para los tres módulos nuevos. Sin UI todavía.
 
-- [ ] Crear `lib/academic-courses/types.ts` con los tipos `AcademicCourse`, `AcademicCourseInput` (para creación), `AcademicCourseUpdate`.
-- [ ] Crear `lib/academic-courses/index.ts` con:
+- [x] Crear `lib/academic-courses/types.ts` con los tipos `AcademicCourse`, `AcademicCourseInput` (para creación), `AcademicCourseUpdate`.
+- [x] Crear `lib/academic-courses/index.ts` con:
   - `getCoursesByTeacher(teacherId)`: lista los cursos del docente autenticado.
   - `getAcademicCourseById(courseId)`: detalle de un curso (verifica que el docente sea el dueño).
   - `createAcademicCourse(input)`: inserta un nuevo curso. Genera el `enrollment_code` si no se provee (string aleatorio de 8 caracteres alfanuméricos mayúsculas, verificando unicidad antes de insertar).
   - `updateAcademicCourse(courseId, update)`: actualiza campos editables del curso.
   - `deactivateAcademicCourse(courseId)`: cambia `is_active = false` (no borra).
-- [ ] Crear `lib/academic-courses/actions.ts` con Server Actions: `createCourseAction`, `updateCourseAction`, `deactivateCourseAction`. Cada una valida con Zod, aplica la función de `index.ts` y devuelve `{ ok: true } | { ok: false, error: string, fieldErrors? }`.
-- [ ] Crear `lib/academic-courses/schemas.ts` con Zod: `AcademicCourseSchema` (validación de `name`, `code`, `class_days` como array de al menos un día, `class_time_start` y `class_time_end` como strings `HH:mm`, `enrollment_code` opcional, `course_slug` opcional).
-- [ ] Crear `lib/enrollments/types.ts` con `Enrollment`, `EnrollmentWithCourse`, `EnrollmentWithStudents`.
-- [ ] Crear `lib/enrollments/index.ts` con:
+- [x] Crear `lib/academic-courses/actions.ts` con Server Actions: `createCourseAction`, `updateCourseAction`, `deactivateCourseAction`. Cada una valida con Zod, aplica la función de `index.ts` y devuelve `{ ok: true } | { ok: false, error: string, fieldErrors? }`.
+- [x] Crear `lib/academic-courses/schemas.ts` con Zod: `AcademicCourseSchema` (validación de `name`, `code`, `class_days` como array de al menos un día, `class_time_start` y `class_time_end` como strings `HH:mm`, `enrollment_code` opcional, `course_slug` opcional).
+- [x] Crear `lib/enrollments/types.ts` con `Enrollment`, `EnrollmentWithCourse`, `EnrollmentWithStudents`.
+- [x] Crear `lib/enrollments/index.ts` con:
   - `enrollByCode(enrollmentCode)`: busca el curso activo por `enrollment_code`, inserta en `enrollments` con `student_id = auth.uid()`. Devuelve error si el código no existe, el curso está inactivo, o el estudiante ya está matriculado (incluso si fue retirado).
   - `getEnrollmentsByStudent()`: lista los cursos del estudiante autenticado con nombre del curso y nota total calculada.
   - `getEnrollmentById(enrollmentId)`: detalle de matrícula para el estudiante (valida que `student_id = auth.uid()`).
   - `getEnrollmentsByAcademicCourse(academicCourseId)`: lista estudiantes matriculados para el docente dueño.
   - `withdrawStudent(enrollmentId)`: cambia `status = 'withdrawn'` y `withdrawn_at = now()` (solo docente dueño).
-- [ ] Crear `lib/enrollments/actions.ts` con Server Actions: `enrollByCourseCodeAction`, `withdrawStudentAction`.
-- [ ] Crear `lib/grades/types.ts` con `GradeItem`, `StudentGrade`, `EnrollmentWithGrades` (incluye array de ítems con la nota del estudiante y la nota total calculada como campo derivado).
-- [ ] Crear `lib/grades/index.ts` con:
+- [x] Crear `lib/enrollments/actions.ts` con Server Actions: `enrollByCourseCodeAction`, `withdrawStudentAction`.
+- [x] Crear `lib/grades/types.ts` con `GradeItem`, `StudentGrade`, `EnrollmentWithGrades` (incluye array de ítems con la nota del estudiante y la nota total calculada como campo derivado).
+- [x] Crear `lib/grades/index.ts` con:
   - `getGradeItemsByCourse(academicCourseId)`: lista los ítems de calificación del curso.
   - `createGradeItem(academicCourseId, name, orderIndex)`.
   - `updateGradeItem(gradeItemId, fields)`.
@@ -275,9 +275,9 @@ En una fase posterior, si el rendimiento lo justifica, se puede materializar com
   - `getGradesByEnrollment(enrollmentId)`: notas de un estudiante en un curso (para el estudiante propio o el docente).
   - `getGradesByCourse(academicCourseId)`: todas las notas del curso organizadas por estudiante (para el docente).
   - `upsertStudentGrade(enrollmentId, gradeItemId, score)`: inserta o actualiza la nota.
-- [ ] Crear `lib/grades/actions.ts` con Server Actions: `createGradeItemAction`, `updateGradeItemAction`, `deleteGradeItemAction`, `upsertStudentGradeAction`.
-- [ ] Crear `lib/grades/schemas.ts` con Zod: `GradeItemSchema`, `StudentGradeSchema` (score entre 0 y 5, dos decimales máximo).
-- [ ] Añadir `requireRole(role: app_role)` a `lib/auth/session.ts`. La función llama `getCurrentUser()`, verifica con `has_role` y dispara `redirect('/login')` o `redirect('/')` según corresponda si el rol no se cumple.
+- [x] Crear `lib/grades/actions.ts` con Server Actions: `createGradeItemAction`, `updateGradeItemAction`, `deleteGradeItemAction`, `upsertStudentGradeAction`.
+- [x] Crear `lib/grades/schemas.ts` con Zod: `GradeItemSchema`, `StudentGradeSchema` (score entre 0 y 5, dos decimales máximo).
+- [x] Añadir `requireRole(role: app_role)` a `lib/auth/session.ts`. La función llama `getCurrentUser()`, verifica con `has_role` y dispara `redirect('/login')` o `redirect('/')` según corresponda si el rol no se cumple.
 
 **Verificación de fase:** Correr `tsc --noEmit` sin errores. Los módulos exportan sus tipos y funciones correctamente. Se pueden probar las funciones de lectura desde una página temporal de server component.
 
@@ -289,10 +289,10 @@ En una fase posterior, si el rendimiento lo justifica, se puede materializar com
 
 > **Prerequisito:** el archivo `proxy.ts` en la raíz es el middleware de spec-002, pero está mal nombrado: Next.js requiere el archivo `middleware.ts` con una función exportada como `middleware`. El primer paso de esta fase es corregir esto.
 
-- [ ] Renombrar `proxy.ts` → `middleware.ts` en la raíz del proyecto. Renombrar la función exportada de `proxy` a `middleware`. Verificar que el refresh de sesión y la protección de `/cuenta` siguen funcionando.
-- [ ] Añadir en `middleware.ts` el bloque para `/admin`: si `pathname.startsWith('/admin')` y no hay sesión, redirigir a `/login`; si hay sesión pero no tiene rol `teacher` ni `admin`, redirigir a `/`.
-- [ ] La verificación de rol en el middleware debe ser ligera: consulta a `user_roles` con el cliente de middleware usando `has_role`.
-- [ ] Actualizar el `matcher` si fuera necesario para asegurar que `/admin/*` queda dentro del scope del middleware.
+- [x] Renombrar `proxy.ts` → `middleware.ts` en la raíz del proyecto. Renombrar la función exportada de `proxy` a `middleware`. Verificar que el refresh de sesión y la protección de `/cuenta` siguen funcionando.
+- [x] Añadir en `middleware.ts` el bloque para `/admin`: si `pathname.startsWith('/admin')` y no hay sesión, redirigir a `/login`; si hay sesión pero no tiene rol `teacher` ni `admin`, redirigir a `/`.
+- [x] La verificación de rol en el middleware debe ser ligera: consulta a `user_roles` con el cliente de middleware usando `has_role`.
+- [x] Actualizar el `matcher` si fuera necesario para asegurar que `/admin/*` queda dentro del scope del middleware.
 - [ ] Probar manualmente: un visitante sin sesión que accede a `/admin/courses` → redirige a `/login`. Un estudiante autenticado que accede a `/admin/courses` → redirige a `/`. Un docente autenticado → accede correctamente (404 todavía, pero el middleware no bloquea).
 
 **Verificación de fase:** El middleware bloquea accesos no autorizados a `/admin/*` en los tres casos descritos.

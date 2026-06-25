@@ -3,6 +3,8 @@ import { redirect } from "next/navigation";
 import { createServerSupabaseClient } from "./server";
 import type { Profile } from "@/lib/students/types";
 
+type AppRole = "student" | "teacher" | "admin";
+
 export const getCurrentUser = cache(async () => {
   const supabase = await createServerSupabaseClient();
   const {
@@ -31,5 +33,20 @@ export async function requireUser(redirectTo?: string) {
     const params = redirectTo ? `?redirectTo=${encodeURIComponent(redirectTo)}` : "";
     redirect(`/login${params}`);
   }
+  return user;
+}
+
+export async function requireRole(role: AppRole) {
+  const user = await requireUser();
+  const supabase = await createServerSupabaseClient();
+
+  const { data } = await supabase
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", user.id)
+    .eq("role", role)
+    .maybeSingle();
+
+  if (!data) redirect("/");
   return user;
 }

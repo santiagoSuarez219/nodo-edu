@@ -11,7 +11,12 @@ Las migraciones están versionadas en `supabase/migrations/` y se aplican en ord
 | `20260623000000_init_profiles_students_roles.sql` | Enum `app_role`, tablas `profiles`, `students`, `user_roles` |
 | `20260623000001_init_lesson_progress.sql` | Tabla `lesson_progress` |
 | `20260623000002_rls_policies.sql` | RLS en todas las tablas, función `has_role` |
-| `20260623000003_triggers_and_functions.sql` | Trigger `on_auth_user_created` |
+| `20260623000003_triggers_and_functions.sql` | Trigger `on_auth_user_created`, función `handle_new_user` |
+| `20260625000000_init_academic_courses.sql` | Tabla `academic_courses`, función `set_updated_at`, trigger de `updated_at` |
+| `20260625000001_init_enrollments.sql` | Tabla `enrollments` |
+| `20260625000002_init_grade_items.sql` | Tabla `grade_items` |
+| `20260625000003_init_student_grades.sql` | Tabla `student_grades`, trigger de `updated_at` |
+| `20260625000004_rls_academic.sql` | RLS en `academic_courses`, `enrollments`, `grade_items`, `student_grades` |
 
 ## Comandos
 
@@ -41,5 +46,5 @@ El UUID se obtiene desde **Authentication → Users** en el dashboard de Supabas
 
 | Spec | Migraciones que añade |
 |---|---|
-| spec-002 | `000000` → `000003` |
-| spec-003 | `academic_courses`, `enrollments`, `grade_items`, `student_grades` (pendiente) |
+| spec-002 | `20260623000000` → `20260623000003` |
+| spec-003 | `20260625000000` → `20260625000004` (requiere spec-002) |
