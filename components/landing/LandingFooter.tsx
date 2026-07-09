@@ -8,13 +8,13 @@ interface LandingFooterProps {
 export function LandingFooter({ links }: LandingFooterProps) {
   return (
     <footer
-      className="border-t border-gray-200 dark:border-gray-700 mt-16 pt-12 pb-8"
+      className="pt-8 pb-8"
       role="contentinfo"
     >
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
         <div>
           <p className="text-sm font-semibold text-gray-900 dark:text-white">
-            nodo © 2026
+            Nodo © {new Date().getFullYear()}
           </p>
           <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
             Plataforma educativa para ingenieros

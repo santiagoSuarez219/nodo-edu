@@ -23,27 +23,27 @@ export const metadata: Metadata = {
 export default function Home() {
   return (
     <main className="bg-white dark:bg-gray-900 pt-6 lg:pt-16">
-      <div className="max-w-7xl mx-auto px-6 lg:px-13 pb-6 lg:pb-16">
+      <div className="w-full 2xl:max-w-7xl lg:px-18 mx-auto px-6  pb-6 lg:pb-16">
         <Hero resumeState={RESUME_STATE} />
       </div>
       <div className="border-t border-gray-200 dark:border-gray-700" />
 
-      <div className="max-w-7xl mx-auto px-6 lg:px-13">
+      <div className="w-full 2xl:max-w-7xl lg:px-18 mx-auto px-6 ">
         <CourseScroller courses={LANDING_COURSES} />
       </div>
       <div className="border-t border-gray-200 dark:border-gray-700" />
 
-      <div className="max-w-7xl mx-auto px-6 lg:px-13">
+      {/* <div className="w-full 2xl:max-w-7xl lg:px-18 mx-auto px-6 ">
         <HowItWorks steps={ROADMAP_STEPS} />
       </div>
-      <div className="border-t border-gray-200 dark:border-gray-700" />
+      <div className="border-t border-gray-200 dark:border-gray-700" /> */}
 
-      <div className="max-w-7xl mx-auto px-6 lg:px-13">
+      <div className="w-full 2xl:max-w-7xl lg:px-18 mx-auto px-6 ">
         <TeacherBar teacher={MAIN_TEACHER} />
       </div>
       <div className="border-t border-gray-200 dark:border-gray-700" />
 
-      <div className="max-w-7xl mx-auto px-6 lg:px-13">
+      <div className="w-full 2xl:max-w-7xl lg:px-18 mx-auto px-6 ">
         <LandingFooter links={FOOTER_LINKS} />
       </div>
     </main>
