@@ -22,12 +22,6 @@ export function CourseCard({ course }: CourseCardProps) {
         <p className="text-sm text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">
           {course.description}
         </p>
-
-        <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400 mb-4">
-          <span>{course.progress}%</span>
-          <span>{course.hours}h</span>
-        </div>
-
         <ProgressBar
           value={course.progress}
           label="Progreso"

@@ -7,10 +7,10 @@ interface CourseScrollerProps {
 }
 
 export function CourseScroller({ courses }: CourseScrollerProps) {
-  const recommendedCourses = courses.slice(0, 4);
+  const recommendedCourses = courses.slice(0, 3);
 
   return (
-    <section className="py-12">
+    <section className="py-16">
       <div className="flex items-center justify-between mb-8">
         <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
           Cursos recomendados
@@ -24,7 +24,7 @@ export function CourseScroller({ courses }: CourseScrollerProps) {
       </div>
 
       <ul
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
         role="list"
       >
         {recommendedCourses.map((course) => (
