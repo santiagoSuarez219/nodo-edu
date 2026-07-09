@@ -5,6 +5,24 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+## DEBT-002 — Definir marca canónica: "Semillero SITAIM" vs "nodo"
+
+**Origen:** spec-004 (landing home)
+**Prioridad:** Media — impacto visual pero no funcional
+
+El Navbar global muestra "Semillero SITAIM" mientras la landing home (spec-004)
+usa "nodo" en el hero y footer. No se unificó en spec-004 para no bloquear.
+
+**Acción:** Decidir marca canónica y aplicarla consistentemente en:
+- Navbar (`components/navbar/`)
+- Landing footer (`components/landing/LandingFooter.tsx`)
+- Metadata global y títulos de página
+- Assets de marca (logo, favicon — si aplica)
+
+**Nota:** Esta decisión afecta la identidad visual de toda la plataforma.
+
+---
+
 ## DEBT-001 — Configurar SMTP propio en Supabase
 
 **Origen:** spec-002 / test-002 (TC-011, TC-012, TC-014)
