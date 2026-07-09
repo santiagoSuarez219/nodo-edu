@@ -1,16 +1,15 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+
+function getInitialVisibility() {
+  if (typeof window === 'undefined') return true;
+  const isClosed = localStorage.getItem('announcement-bar-closed');
+  return !isClosed;
+}
 
 export function AnnouncementBar() {
-  const [isVisible, setIsVisible] = useState(true);
-
-  useEffect(() => {
-    const isClosed = localStorage.getItem('announcement-bar-closed');
-    if (isClosed) {
-      setIsVisible(false);
-    }
-  }, []);
+  const [isVisible, setIsVisible] = useState(getInitialVisibility);
 
   const handleClose = () => {
     setIsVisible(false);

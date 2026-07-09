@@ -49,9 +49,7 @@ export default async function RootLayout({
       </head>
       <body suppressHydrationWarning className="min-h-full flex flex-col bg-white text-gray-900 dark:bg-gray-900 dark:text-white">
         <AnnouncementBar />
-        <div className="pt-16 lg:pt-0">
-          <Navbar profile={profile} />
-        </div>
+        <Navbar profile={profile} />
         {children}
       </body>
     </html>
