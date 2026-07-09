@@ -10,7 +10,7 @@ interface CourseCardProps {
 export function CourseCard({ course }: CourseCardProps) {
   return (
     <Link href={`/cursos/${course.slug}`}>
-      <div className="flex-shrink-0 w-60 p-5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:shadow-lg dark:hover:shadow-gray-900/50 transition-shadow duration-200 cursor-pointer">
+      <div className="w-full p-5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:shadow-lg dark:hover:shadow-gray-900/50 transition-shadow duration-200 cursor-pointer">
         <div className="mb-4">
           <LevelBadge level={course.level} />
         </div>

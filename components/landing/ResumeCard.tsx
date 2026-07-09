@@ -28,7 +28,7 @@ export function ResumeCard({ resumeState }: ResumeCardProps) {
       </p>
 
       <Link href={resumeState.href}>
-        <button className="w-full px-4 py-3 bg-blue-700 hover:bg-blue-800 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200">
+        <button className="max-w-max px-4 py-3 text-white font-medium rounded-lg transition-colors duration-200 border border-gray-700 text-sm">
           Retomar lección →
         </button>
       </Link>

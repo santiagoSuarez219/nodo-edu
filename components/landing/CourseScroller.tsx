@@ -7,11 +7,13 @@ interface CourseScrollerProps {
 }
 
 export function CourseScroller({ courses }: CourseScrollerProps) {
+  const recommendedCourses = courses.slice(0, 4);
+
   return (
     <section className="py-12">
       <div className="flex items-center justify-between mb-8">
         <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
-          Tus cursos
+          Cursos recomendados
         </h2>
         <Link
           href="/cursos"
@@ -22,11 +24,11 @@ export function CourseScroller({ courses }: CourseScrollerProps) {
       </div>
 
       <ul
-        className="flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
         role="list"
       >
-        {courses.map((course) => (
-          <li key={course.id} className="snap-start">
+        {recommendedCourses.map((course) => (
+          <li key={course.id}>
             <CourseCard course={course} />
           </li>
         ))}
