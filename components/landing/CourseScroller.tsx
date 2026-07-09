@@ -22,7 +22,7 @@ export function CourseScroller({ courses }: CourseScrollerProps) {
       </div>
 
       <ul
-        className="flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory"
+        className="flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         role="list"
       >
         {courses.map((course) => (
