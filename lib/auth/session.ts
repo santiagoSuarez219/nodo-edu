@@ -59,9 +59,8 @@ export async function requireAnyRole(roles: AppRole[]) {
     .from("user_roles")
     .select("role")
     .eq("user_id", user.id)
-    .in("role", roles)
-    .maybeSingle();
+    .in("role", roles);
 
-  if (!data) redirect("/");
+  if (!data || data.length === 0) redirect("/");
   return user;
 }

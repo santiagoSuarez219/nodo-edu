@@ -27,3 +27,7 @@ export type AcademicCourseInput = Pick<
 export type AcademicCourseUpdate = Partial<
   AcademicCourseInput & { is_active: boolean }
 >;
+
+// Subconjunto seguro de columnas para exponer a un estudiante matriculado
+// (excluye enrollment_code, confidencial para el docente dueño).
+export type AcademicCoursePublic = Omit<AcademicCourse, "enrollment_code">;

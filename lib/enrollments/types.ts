@@ -1,4 +1,4 @@
-import type { AcademicCourse } from "@/lib/academic-courses/types";
+import type { AcademicCoursePublic } from "@/lib/academic-courses/types";
 import type { Profile } from "@/lib/students/types";
 
 export interface Enrollment {
@@ -11,7 +11,7 @@ export interface Enrollment {
 }
 
 export interface EnrollmentWithCourse extends Enrollment {
-  academic_course: AcademicCourse;
+  academic_course: AcademicCoursePublic;
   teacher_name: string | null;
   total_grade: number | null;
 }

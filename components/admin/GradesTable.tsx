@@ -80,7 +80,7 @@ export function GradesTable({ academicCourseId, gradeItems, rows }: Props) {
               const grades = gradesState[row.enrollment_id] ?? row.grades;
               const total = computeTotal(grades);
               return (
-                <tr key={row.enrollment_id} className="hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors">
+                <tr key={row.enrollment_id}>
                   <td className="px-5 py-3 font-medium text-gray-900 dark:text-white sticky left-0 bg-white dark:bg-gray-800">
                     {row.student_name}
                   </td>

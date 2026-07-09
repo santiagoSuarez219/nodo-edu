@@ -71,7 +71,7 @@ export function EnrollmentTable({ enrollments, academicCourseId }: Props) {
                     academicCourseId
                   );
                   return (
-                    <tr key={enrollment.id} className="hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors">
+                    <tr key={enrollment.id}>
                       <td className="px-5 py-4 font-medium text-gray-900 dark:text-white">
                         {enrollment.profile.full_name}
                       </td>

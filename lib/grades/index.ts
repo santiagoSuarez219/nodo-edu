@@ -1,4 +1,5 @@
 import { createServerSupabaseClient } from "@/lib/auth/server";
+import { fetchStudentProfilesPublic } from "@/lib/enrollments/index";
 import type {
   GradeItem,
   StudentGrade,
@@ -134,12 +135,15 @@ export async function getGradesByCourse(
       .order("order_index", { ascending: true }),
     supabase
       .from("enrollments")
-      .select("id, student_id, status, profile:profiles(id, full_name), student_grades(grade_item_id, score)")
+      .select("id, student_id, status, student_grades(grade_item_id, score)")
       .eq("academic_course_id", academicCourseId)
       .order("enrolled_at", { ascending: true }),
   ]);
 
   if (!enrollments || !gradeItems) return [];
+
+  const studentIds = [...new Set(enrollments.map((r) => r.student_id as string))];
+  const profiles = await fetchStudentProfilesPublic(supabase, studentIds);
 
   return enrollments.map((row) => {
     const gradeMap: Record<string, number | null> = {};
@@ -150,7 +154,7 @@ export async function getGradesByCourse(
       gradeMap[g.grade_item_id] = g.score;
     }
 
-    const profile = (row.profile as unknown) as { id: string; full_name: string } | null;
+    const profile = profiles.get(row.student_id);
     const scores = Object.values(gradeMap);
 
     return {

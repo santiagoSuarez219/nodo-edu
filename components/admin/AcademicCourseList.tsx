@@ -57,7 +57,7 @@ export function AcademicCourseList({ courses }: Props) {
           </thead>
           <tbody className="divide-y divide-gray-100 dark:divide-gray-700 bg-white dark:bg-gray-800">
             {courses.map((course) => (
-              <tr key={course.id} className="hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors">
+              <tr key={course.id}>
                 <td className="px-5 py-4 font-medium text-gray-900 dark:text-white">
                   {course.name}
                 </td>

@@ -1,4 +1,4 @@
-# spec-003 — [TESTING] Gestión de cursos académicos con matrículas y calificaciones
+# spec-003 — [DONE] Gestión de cursos académicos con matrículas y calificaciones
 
 ---
 
@@ -238,7 +238,7 @@ En una fase posterior, si el rendimiento lo justifica, se puede materializar com
 - [x] Crear `supabase/migrations/<timestamp>_init_student_grades.sql` con la tabla `student_grades`, sus índices y restricción de rango.
 - [x] Crear `supabase/migrations/<timestamp>_rls_academic.sql` con `enable row level security` en las cuatro tablas y todas las políticas descritas en el schema.
 - [x] Aplicar con `supabase db reset` localmente y verificar que no hay conflictos con las migraciones de spec-002.
-- [ ] Verificar en el studio local (`supabase studio`) que las políticas están activas y las relaciones son correctas.
+- [x] Verificar que las políticas están activas y las relaciones son correctas. — verificado vía `supabase db query --linked` contra el proyecto remoto (no se usó studio local) y validado en la práctica durante las pruebas manuales de TC-018/TC-021.
 - [x] Documentar en `supabase/README.md` (o en el README raíz) el orden de migraciones y las dependencias entre specs.
 
 **Verificación de fase:** `supabase db reset` pasa sin errores. Las cuatro tablas existen con RLS habilitado. Se puede insertar un `academic_course` con un usuario que tenga rol `teacher` y se rechaza con un usuario que tenga rol `student`.
@@ -293,7 +293,7 @@ En una fase posterior, si el rendimiento lo justifica, se puede materializar com
 - [x] Añadir en `middleware.ts` el bloque para `/admin`: si `pathname.startsWith('/admin')` y no hay sesión, redirigir a `/login`; si hay sesión pero no tiene rol `teacher` ni `admin`, redirigir a `/`.
 - [x] La verificación de rol en el middleware debe ser ligera: consulta a `user_roles` con el cliente de middleware usando `has_role`.
 - [x] Actualizar el `matcher` si fuera necesario para asegurar que `/admin/*` queda dentro del scope del middleware.
-- [ ] Probar manualmente: un visitante sin sesión que accede a `/admin/courses` → redirige a `/login`. Un estudiante autenticado que accede a `/admin/courses` → redirige a `/`. Un docente autenticado → accede correctamente (404 todavía, pero el middleware no bloquea).
+- [x] Probar manualmente: un visitante sin sesión que accede a `/admin/courses` → redirige a `/login`. Un estudiante autenticado que accede a `/admin/courses` → redirige a `/`. Un docente autenticado → accede correctamente (404 todavía, pero el middleware no bloquea). — validado (TC-001, TC-002, TC-003)
 
 **Verificación de fase:** El middleware bloquea accesos no autorizados a `/admin/*` en los tres casos descritos.
 
@@ -309,7 +309,7 @@ En una fase posterior, si el rendimiento lo justifica, se puede materializar com
 - [x] Crear `app/(admin)/courses/new/page.tsx` (Server Component): renderiza `<AcademicCourseForm />`.
 - [x] Crear `components/admin/AcademicCourseForm.tsx` (`"use client"`): React Hook Form + Zod resolver para `AcademicCourseSchema`. Campos: Nombre, Código del curso, Días de clase (checkboxes: lunes a sábado), Hora inicio, Hora fin, Código de matrícula (con sugerencia de generar automáticamente), Slug de contenido (opcional). Al submit llama `createCourseAction`. En éxito redirige a `/admin/courses/[id]`. En error pinta `fieldErrors`.
 - [x] El campo "Código de matrícula" tiene un botón "Generar" que popula el campo con un código aleatorio en el cliente (8 caracteres alfanuméricos, solo como sugerencia; la validación de unicidad real ocurre en el servidor).
-- [ ] Validar que el formulario funciona en modo claro y oscuro, tipografía JetBrains Mono, sin colores crudos.
+- [x] Validar que el formulario funciona en modo claro y oscuro, tipografía JetBrains Mono, sin colores crudos. — validado (TC-020)
 
 **Verificación de fase:** Un usuario con rol `teacher` puede crear un curso y verlo en el listado. Un usuario con rol `student` ve el listado vacío de sus cursos (rutas `/cuenta/cursos`), pero no puede acceder a `/admin/courses`.
 
@@ -366,11 +366,11 @@ En una fase posterior, si el rendimiento lo justifica, se puede materializar com
 **Objetivo:** paridad visual, accesibilidad, robustez y cierre del spec.
 
 - [x] Revisar todos los componentes nuevos contra los tokens semánticos definidos en `DESIGN.md`. Eliminar cualquier valor crudo de la paleta.
-- [ ] Validar modo claro y oscuro en todas las rutas nuevas: `/admin/courses`, `/admin/courses/new`, `/admin/courses/[id]`, `/admin/courses/[id]/grades`, `/cuenta/cursos`, `/cuenta/cursos/[enrollmentId]`. — **pendiente validación manual (TC-020)**
+- [x] Validar modo claro y oscuro en todas las rutas nuevas: `/admin/courses`, `/admin/courses/new`, `/admin/courses/[id]`, `/admin/courses/[id]/grades`, `/cuenta/cursos`, `/cuenta/cursos/[enrollmentId]`. — validado (TC-020)
 - [x] Validar accesibilidad de `GradeInputCell`: label asociado con nombre de estudiante e ítem, navegación por teclado (tab nativo), anuncio de estado con `aria-live="polite"`.
-- [ ] Validar que las rutas públicas de specs 001 y 002 no se ven afectadas. — **pendiente (TC-019)**
-- [ ] Probar los casos de error de RLS directamente. — **pendiente (TC-018)**
-- [ ] Probar la retirada de un estudiante. — **pendiente (TC-014)**
+- [x] Validar que las rutas públicas de specs 001 y 002 no se ven afectadas. — validado (TC-019)
+- [x] Probar los casos de error de RLS directamente. — validado (TC-018, con nota: `docente-b@nodo.test` como cuenta teacher pura)
+- [x] Probar la retirada de un estudiante. — validado (TC-014)
 - [x] Correr `npm run lint` y `tsc --noEmit` sin errores nuevos.
 - [x] Crear `docs/testing/test-003-course-enrollment.md` con los casos de prueba manuales.
 - [x] Cambiar el estado del spec a `[TESTING]` y ejecutar los casos de prueba manuales.

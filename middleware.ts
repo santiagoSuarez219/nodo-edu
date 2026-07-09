@@ -28,14 +28,13 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(loginUrl);
     }
 
-    const { data: role } = await supabase
+    const { data: roles } = await supabase
       .from("user_roles")
       .select("role")
       .eq("user_id", user.id)
-      .in("role", ["teacher", "admin"])
-      .maybeSingle();
+      .in("role", ["teacher", "admin"]);
 
-    if (!role) {
+    if (!roles || roles.length === 0) {
       const homeUrl = request.nextUrl.clone();
       homeUrl.pathname = "/";
       return NextResponse.redirect(homeUrl);

@@ -1,5 +1,6 @@
 import { createServerSupabaseClient } from "@/lib/auth/server";
 import { getCurrentUser } from "@/lib/auth/session";
+import type { AcademicCoursePublic } from "@/lib/academic-courses/types";
 import type { Enrollment, EnrollmentWithCourse, EnrollmentWithStudent } from "./types";
 
 function computeTotalGrade(scores: (number | null)[]): number | null {
@@ -7,6 +8,45 @@ function computeTotalGrade(scores: (number | null)[]): number | null {
   if (valid.length === 0) return null;
   const sum = valid.reduce((acc, s) => acc + s, 0);
   return Math.round((sum / valid.length) * 100) / 100;
+}
+
+// El estudiante no tiene acceso vía RLS a academic_courses (solo el docente
+// dueño o admin) ni a profiles de otros usuarios, así que el embed de
+// PostgREST llega null. Este RPC (security definer) resuelve ambos datos
+// en una sola llamada sin exponer enrollment_code.
+async function fetchAcademicCoursesPublic(
+  supabase: Awaited<ReturnType<typeof createServerSupabaseClient>>,
+  courseIds: string[]
+): Promise<Map<string, { course: AcademicCoursePublic; teacher_name: string | null }>> {
+  if (courseIds.length === 0) return new Map();
+
+  const { data } = await supabase.rpc("get_academic_courses_public", {
+    p_ids: courseIds,
+  });
+
+  const map = new Map<string, { course: AcademicCoursePublic; teacher_name: string | null }>();
+  for (const row of data ?? []) {
+    const { teacher_name, ...course } = row;
+    map.set(row.id, { course, teacher_name });
+  }
+  return map;
+}
+
+// El docente no tiene acceso vía RLS a profiles de sus estudiantes (misma
+// política "select own or admin"), así que el embed many-to-one también
+// se resuelve como inner join implícito y descarta la matrícula completa
+// cuando el perfil no puede leerse. RPC security definer, sin email.
+export async function fetchStudentProfilesPublic(
+  supabase: Awaited<ReturnType<typeof createServerSupabaseClient>>,
+  studentIds: string[]
+): Promise<Map<string, { id: string; full_name: string }>> {
+  if (studentIds.length === 0) return new Map();
+
+  const { data } = await supabase.rpc("get_student_profiles_public", {
+    p_ids: studentIds,
+  });
+
+  return new Map((data ?? []).map((p: { id: string; full_name: string }) => [p.id, p]));
 }
 
 export async function enrollByCode(
@@ -17,11 +57,10 @@ export async function enrollByCode(
 
   const supabase = await createServerSupabaseClient();
 
-  const { data: course } = await supabase
-    .from("academic_courses")
-    .select("id, is_active")
-    .eq("enrollment_code", enrollmentCode)
-    .maybeSingle();
+  const { data: courses } = await supabase.rpc("find_course_by_enrollment_code", {
+    p_enrollment_code: enrollmentCode,
+  });
+  const course = courses?.[0];
 
   if (!course) return { ok: false, error: "Código no encontrado." };
   if (!course.is_active)
@@ -47,18 +86,6 @@ export async function enrollByCode(
   return { ok: true, enrollment: data };
 }
 
-async function fetchTeacherNames(
-  supabase: Awaited<ReturnType<typeof createServerSupabaseClient>>,
-  teacherIds: string[]
-): Promise<Map<string, string>> {
-  if (teacherIds.length === 0) return new Map();
-  const { data } = await supabase
-    .from("profiles")
-    .select("id, full_name")
-    .in("id", teacherIds);
-  return new Map((data ?? []).map((p: { id: string; full_name: string }) => [p.id, p.full_name]));
-}
-
 export async function getEnrollmentsByStudent(): Promise<EnrollmentWithCourse[]> {
   const user = await getCurrentUser();
   if (!user) return [];
@@ -67,17 +94,18 @@ export async function getEnrollmentsByStudent(): Promise<EnrollmentWithCourse[]>
 
   const { data } = await supabase
     .from("enrollments")
-    .select("*, academic_course:academic_courses(*), student_grades(score)")
+    .select("*, student_grades(score)")
     .eq("student_id", user.id)
     .order("enrolled_at", { ascending: false });
 
   if (!data) return [];
 
-  const teacherIds = [...new Set(data.map((r) => r.academic_course.teacher_id as string))];
-  const teacherNames = await fetchTeacherNames(supabase, teacherIds);
+  const courseIds = [...new Set(data.map((r) => r.academic_course_id as string))];
+  const courses = await fetchAcademicCoursesPublic(supabase, courseIds);
 
   return data.map((row) => {
     const scores = (row.student_grades as { score: number | null }[]).map((g) => g.score);
+    const courseEntry = courses.get(row.academic_course_id);
     return {
       id: row.id,
       student_id: row.student_id,
@@ -85,8 +113,8 @@ export async function getEnrollmentsByStudent(): Promise<EnrollmentWithCourse[]>
       status: row.status,
       enrolled_at: row.enrolled_at,
       withdrawn_at: row.withdrawn_at,
-      academic_course: row.academic_course,
-      teacher_name: teacherNames.get(row.academic_course.teacher_id) ?? null,
+      academic_course: courseEntry?.course,
+      teacher_name: courseEntry?.teacher_name ?? null,
       total_grade: computeTotalGrade(scores),
     } as EnrollmentWithCourse;
   });
@@ -99,13 +127,14 @@ export async function getEnrollmentById(
 
   const { data } = await supabase
     .from("enrollments")
-    .select("*, academic_course:academic_courses(*), student_grades(score)")
+    .select("*, student_grades(score)")
     .eq("id", enrollmentId)
     .single();
 
   if (!data) return null;
 
-  const teacherNames = await fetchTeacherNames(supabase, [data.academic_course.teacher_id]);
+  const courses = await fetchAcademicCoursesPublic(supabase, [data.academic_course_id]);
+  const courseEntry = courses.get(data.academic_course_id);
   const scores = (data.student_grades as { score: number | null }[]).map((g) => g.score);
   return {
     id: data.id,
@@ -114,8 +143,8 @@ export async function getEnrollmentById(
     status: data.status,
     enrolled_at: data.enrolled_at,
     withdrawn_at: data.withdrawn_at,
-    academic_course: data.academic_course,
-    teacher_name: teacherNames.get(data.academic_course.teacher_id) ?? null,
+    academic_course: courseEntry?.course,
+    teacher_name: courseEntry?.teacher_name ?? null,
     total_grade: computeTotalGrade(scores),
   } as EnrollmentWithCourse;
 }
@@ -127,13 +156,14 @@ export async function getEnrollmentsByAcademicCourse(
 
   const { data } = await supabase
     .from("enrollments")
-    .select(
-      "*, profile:profiles(id, full_name), student_grades(score)"
-    )
+    .select("*, student_grades(score)")
     .eq("academic_course_id", academicCourseId)
     .order("enrolled_at", { ascending: true });
 
   if (!data) return [];
+
+  const studentIds = [...new Set(data.map((r) => r.student_id as string))];
+  const profiles = await fetchStudentProfilesPublic(supabase, studentIds);
 
   return data.map((row) => {
     const scores = (row.student_grades as { score: number | null }[]).map(
@@ -146,7 +176,7 @@ export async function getEnrollmentsByAcademicCourse(
       status: row.status,
       enrolled_at: row.enrolled_at,
       withdrawn_at: row.withdrawn_at,
-      profile: row.profile as { id: string; full_name: string },
+      profile: profiles.get(row.student_id) ?? { id: row.student_id, full_name: "Estudiante" },
       total_grade: computeTotalGrade(scores),
     } as EnrollmentWithStudent;
   });

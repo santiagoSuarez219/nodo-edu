@@ -37,6 +37,7 @@ export function AcademicCourseForm({ course }: Props) {
     register,
     handleSubmit,
     setValue,
+    setError,
     formState: { errors },
   } = useForm<AcademicCourseSchemaInput>({
     resolver: zodResolver(AcademicCourseSchema),
@@ -64,6 +65,14 @@ export function AcademicCourseForm({ course }: Props) {
 
       if (!result.ok) {
         setServerError(result.error);
+        if (result.fieldErrors) {
+          for (const [field, messages] of Object.entries(result.fieldErrors)) {
+            setError(field as keyof AcademicCourseSchemaInput, {
+              type: "server",
+              message: messages[0],
+            });
+          }
+        }
         return;
       }
 
