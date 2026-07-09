@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import { AnnouncementBar } from "@/components/navbar/AnnouncementBar";
 import { Navbar } from "@/components/navbar/Navbar";
 import { getCurrentProfile } from "@/lib/auth/session";
 
@@ -46,8 +47,11 @@ export default async function RootLayout({
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
-      <body suppressHydrationWarning className="min-h-full flex flex-col pt-16 lg:pt-0 bg-white text-gray-900 dark:bg-gray-900 dark:text-white">
-        <Navbar profile={profile} />
+      <body suppressHydrationWarning className="min-h-full flex flex-col bg-white text-gray-900 dark:bg-gray-900 dark:text-white">
+        <div className="sticky top-0 left-0 w-full z-50">
+          <AnnouncementBar />
+          <Navbar profile={profile} />
+        </div>
         {children}
       </body>
     </html>

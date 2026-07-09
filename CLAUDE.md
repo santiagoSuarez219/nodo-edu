@@ -1,4 +1,4 @@
-# CLAUDE.md — Educational Page
+# CLAUDE.md — Nodo
 
 > Este archivo es la fuente de verdad para Claude Code en este proyecto.
 > Léelo completo antes de ejecutar cualquier acción.
@@ -11,9 +11,12 @@ Antes de cualquier tarea, Claude debe ejecutar estos pasos en orden:
 
 1. Leer este archivo completo.
 2. Leer `DESIGN.md` si la tarea involucra UI.
-3. Listar los specs activos (`[IN PROGRESS]` o `[TESTING]`) en `specs/`.
-4. Confirmar el repositorio activo y la rama actual con `git status`.
-5. Si hay contexto previo relevante (spec en curso, decisión de arquitectura,
+3. Revisar los subagentes disponibles en `/.claude/agents/` y las skills
+   disponibles en `/.claude/skills/` para saber con qué capacidades cuenta
+   antes de planificar la tarea.
+4. Listar los specs activos (`[IN PROGRESS]` o `[TESTING]`) en `docs/specs/`.
+5. Confirmar el repositorio activo y la rama actual con `git status`.
+6. Si hay contexto previo relevante (spec en curso, decisión de arquitectura,
    deuda técnica pendiente), pedirlo al usuario antes de proceder.
 
 ---
@@ -35,23 +38,60 @@ Antes de cualquier tarea, Claude debe ejecutar estos pasos en orden:
 
 ## Agentes especializados
 
-En `/.agents/` viven instrucciones para subagentes. Leer el archivo del agente
-antes de invocarlo. No improvisar su comportamiento.
+En `/.claude/agents/` viven las definiciones de los subagentes. Leer el archivo
+del agente antes de invocarlo. No improvisar su comportamiento.
 
-| Agente        | Cuándo invocarlo                                              |
-|---------------|---------------------------------------------------------------|
-| `@architect`  | Diseño de specs: fases, archivos impactados, sin código       |
-| `@reviewer`   | Revisión de código antes de marcar un spec como `[DONE]`     |
-| `@tester`     | Generación y ejecución de casos de prueba e2e                 |
+| Agente        | Cuándo invocarlo                                                              |
+|---------------|-------------------------------------------------------------------------------|
+| `@architect`  | Diseño de specs: fases, archivos impactados, sin código                       |
+| `@reviewer`   | Revisión de código antes de marcar un spec como `[DONE]`                     |
+| `@tester`     | Generación y ejecución de casos de prueba e2e                                 |
+| `@mcp-builder`| Evaluación, diseño, creación y actualización de MCPs y sus system prompts     |
 
-> Si en `/.agents/` existen agentes adicionales específicos del proyecto,
+> Si en `/.claude/agents/` existen agentes adicionales específicos del proyecto,
 > tienen precedencia sobre la tabla anterior.
+
+---
+
+## Skills
+
+En `/.claude/skills/` viven las skills del proyecto. Cada skill es una carpeta
+con su propio `SKILL.md` que documenta buenas prácticas, convenciones o
+procedimientos para un tipo de tarea concreto.
+
+- Antes de ejecutar una tarea, revisar si alguna skill de `/.claude/skills/`
+  cubre ese dominio y, si es así, leer su `SKILL.md` **completo** antes de
+  escribir código o generar archivos. Varias skills pueden aplicar a una
+  misma tarea.
+- No asumir el contenido de una skill por su nombre: leerla siempre.
+- Las skills describen cómo hacer las cosas en **este** proyecto; sus
+  instrucciones tienen precedencia sobre suposiciones generales.
+- Si una tarea recurrente carece de skill y valdría la pena documentarla,
+  proponerlo al usuario antes de crear una skill nueva.
+
+| Skill                       | Cuándo aplicarla                                              |
+|-----------------------------|--------------------------------------------------------------|
+| `frontend-design`           | Construir UI de alta calidad: componentes, páginas, layouts  |
+| `tailwind-css-patterns`     | Estilar con Tailwind CSS (responsive, grid/flex, tokens)     |
+| `react-best-practices`      | Rendimiento y patrones en React/Next.js                      |
+| `composition-patterns`      | Componer componentes React reutilizables (compound, context) |
+| `next-best-practices`       | Convenciones de Next.js (RSC, data fetching, metadata)       |
+| `next-cache-components`     | Cache Components de Next 16 (PPR, `use cache`, `cacheTag`)    |
+| `next-upgrade`              | Actualizar Next.js a una versión mayor                       |
+| `typescript-advanced-types` | Tipos avanzados de TypeScript (genéricos, mapped, condicional)|
+| `accessibility`             | Auditar/mejorar accesibilidad (WCAG 2.2)                     |
+| `seo`                       | Optimizar para buscadores (meta tags, structured data)       |
+| `nodejs-backend-patterns`   | Servicios backend Node (API routes, middleware, errores)     |
+| `nodejs-best-practices`     | Principios de desarrollo Node (async, seguridad, arquitectura)|
+
+> Mantener esta tabla actualizada cuando se agreguen o modifiquen skills en
+> `/.claude/skills/`.
 
 ---
 
 ## Contexto del proyecto
 
-Plataforma web educativa para publicar y gestionar material académico de cursos de programación e inteligencia artificial, dirigida a ingenieros de sistemas, electrónicos y de ciencias de datos.
+**Nodo** es una plataforma web educativa para publicar y gestionar material académico de cursos de programación e inteligencia artificial, dirigida a ingenieros de sistemas, electrónicos y de ciencias de datos.
 
 **Estado actual:** MVP en desarrollo — Fase 1 (contenido MDX versionado en Git, publicado por el docente principal).
 
@@ -82,9 +122,10 @@ Este proyecto vive en un único repositorio. No hay monorepo ni submódulos.
 │       └── <curso>/       # Un directorio por curso
 ├── courses/               # Microdiseños curriculares (info.md, projects/)
 ├── public/                # Assets estáticos
-└── docs/                  # Documentación y casos de prueba
+└── docs/                  # Documentación
     ├── specs/             # Specs de funcionalidades
-    └── testing/
+    ├── testing/           # Casos de prueba manuales
+    └── mcps/              # System prompts e índice de MCPs (cuando apliquen)
 ```
 
 ---
@@ -92,7 +133,8 @@ Este proyecto vive en un único repositorio. No hay monorepo ni submódulos.
 ## Stack tecnológico
 
 ### Frontend / Framework principal
-- **Next.js 15** (App Router) + **TypeScript** — full-stack React con server actions y API routes.
+- **Next.js 16** (App Router) + **TypeScript** — full-stack React con server actions y API routes.
+- **React 19**.
 - **Tailwind CSS 4** — estilos utilitarios (ver `DESIGN.md`).
 - **Flowbite** — componentes UI sobre Tailwind; usar primero.
 - **shadcn/ui** — componentes accesibles complementarios cuando Flowbite no cubra.
@@ -127,8 +169,14 @@ npm run dev
 # Build / Producción
 npm run build
 
+# Iniciar build de producción
+npm run start
+
 # Linter
 npm run lint
+
+# Tests
+# (framework por definir — ver sección Testing)
 ```
 
 ---
@@ -211,6 +259,71 @@ courses/<curso>/           # Microdiseño curricular (info.md, projects/)
 
 ---
 
+## MCPs del proyecto
+
+Los MCPs (Model Context Protocol) son servidores que exponen herramientas
+y recursos del proyecto a agentes de IA. Centralizar su gestión permite que
+tanto Claude Code como otros agentes accedan a datos y acciones del sistema
+de forma consistente y trazable.
+
+### Estructura de carpetas
+
+```
+docs/
+└── mcps/
+    ├── README.md                        # Índice de MCPs activos y su propósito
+    ├── {{nombre-mcp}}.system-prompt.md  # System prompt del agente que usa este MCP
+    └── …
+```
+
+### Inventario de MCPs
+
+> Mantener este inventario actualizado. Cada MCP registrado debe tener
+> su entrada en `docs/mcps/README.md`.
+
+| MCP               | Propósito                          | Estado     | System prompt                              |
+|-------------------|------------------------------------|------------|--------------------------------------------|
+| _(ninguno)_       | Aún no hay MCPs propios del proyecto | —        | —                                          |
+
+### Reglas de gestión de MCPs
+
+- Antes de implementar cualquier spec, evaluar si la funcionalidad nueva
+  expone datos o acciones que un agente podría necesitar → candidato a MCP.
+- Si ya existe un MCP relacionado, evaluar si requiere nuevas herramientas
+  o ajustes en su configuración.
+- Todo MCP nuevo o modificado debe actualizarse en `docs/mcps/README.md`.
+- Si el MCP tiene un agente asociado, su system prompt en `docs/mcps/`
+  debe reflejar las capacidades actuales del MCP tras cada cambio.
+- Los system prompts deben ser precisos: describir qué puede hacer el agente,
+  qué herramientas tiene disponibles, sus límites y el tono esperado.
+- Nunca eliminar un MCP sin confirmar con el usuario que ningún agente
+  activo lo consume.
+
+### Estructura mínima de un system prompt (`docs/mcps/`)
+
+```md
+# System prompt — {{Nombre del agente}}
+
+## Rol y propósito
+Descripción del agente: qué es, para quién trabaja y cuál es su objetivo.
+
+## MCP(s) disponibles
+- `{{nombre-mcp}}`: {{qué herramientas expone y para qué sirven}}
+
+## Capacidades
+- {{Acción concreta que puede realizar}}
+- {{Acción concreta que puede realizar}}
+
+## Restricciones
+- {{Qué NO puede o NO debe hacer}}
+- {{Límites de acceso a datos}}
+
+## Tono y formato de respuesta
+{{Instrucciones de estilo: formal/informal, idioma, longitud de respuestas, etc.}}
+```
+
+---
+
 ## Convenciones de código
 
 - Lenguaje: **TypeScript estricto** (`strict: true`).
@@ -227,12 +340,21 @@ courses/<curso>/           # Microdiseño curricular (info.md, projects/)
 
 ## Testing
 
-- Framework: por definir (pendiente de decisión de arquitectura).
-- Antes de cerrar una tarea con lógica crítica, verificar que existe al menos
-  un test que cubra el caso feliz.
+- Framework: **por definir** (pendiente de decisión de arquitectura). Hasta
+  entonces, las pruebas automáticas se describen en el spec pero no se ejecutan;
+  las pruebas manuales (`docs/testing/test-NNN`) sí aplican desde ya.
+- Ubicación de tests unitarios: por definir junto con el framework.
+- Ubicación de tests e2e: por definir junto con el framework.
+- Convención de nombres (cuando exista framework): `{{nombre}}.test.ts` / `{{nombre}}.spec.ts`.
+- **Los archivos de prueba se escriben al redactar el spec, no al final.** Ver
+  "Specs de funcionalidades → Artefactos que acompañan al spec". Encodifican los
+  criterios de aceptación: las pruebas manuales arrancan en estado Pendiente y
+  las automáticas (cuando haya framework) arrancan en rojo hasta que la
+  implementación las pone en verde.
 - No borrar ni modificar tests existentes sin instrucción explícita.
-- Los tests e2e son responsabilidad de `@tester` y se ejecutan como última
-  fase de cada spec antes del merge a `development`.
+- Los tests e2e son responsabilidad de `@tester`, que los ejecuta como última
+  fase de cada spec antes del merge a `development`; el archivo de test ya
+  existe desde la redacción del spec.
 
 ---
 
@@ -257,6 +379,31 @@ courses/<curso>/           # Microdiseño curricular (info.md, projects/)
 - Solo specs en estado `[DONE]` con su archivo `test-NNN` correspondiente
   pueden hacer merge a `development`.
 
+### Artefactos que acompañan al spec
+
+> Al redactar un spec se escriben, **en el mismo momento**, sus archivos de
+> prueba. No se dejan para el final del spec ni para el cierre de la
+> implementación: definen la aceptación por adelantado (enfoque test-first).
+
+Cada spec `spec-NNN-slug` nace junto con:
+
+| Artefacto           | Ubicación                                            | Contenido                                                                    |
+|---------------------|------------------------------------------------------|------------------------------------------------------------------------------|
+| Spec                | `docs/specs/spec-NNN-slug.md`                        | Contexto, alcance, fases, criterios de aceptación                            |
+| Pruebas manuales    | `docs/testing/test-NNN-slug.md`                      | Casos manuales (`TC-NNN`, y `TC-MCP-NNN` si aplica) — solo flujos con UI      |
+| Pruebas automáticas | `{{ubicación e2e por definir}}/e2e-NNN-slug.spec.ts` | Casos e2e/unit derivados de los criterios de aceptación, en rojo (cuando exista framework) |
+
+- Los tres archivos comparten el mismo `NNN` y `slug`.
+- Mientras el framework de testing esté "por definir" (ver "Testing"), las
+  pruebas automáticas se describen en el spec pero su archivo se crea cuando el
+  framework exista; las pruebas manuales sí se escriben desde la redacción.
+- Escribir estos archivos de prueba **no cuenta como la implementación**:
+  encodifica lo que debe cumplirse. La implementación es lo que los pone en
+  verde y es lo que requiere la aprobación previa del usuario.
+- Si durante la implementación cambia el scope aprobado, actualizar también
+  estos archivos de prueba (no editar el scope unilateralmente; ver
+  "Durante la implementación").
+
 ### Estructura mínima de un spec
 
 ```md
@@ -271,21 +418,46 @@ Qué incluye y qué **no** incluye este spec.
 ## Impacto en el sistema
 Componentes, rutas, modelos o servicios afectados.
 
+## Evaluación MCP
+> Completar esta sección antes de iniciar la implementación.
+
+**¿Aplica MCP?** Sí / No
+
+Si aplica, describir:
+- **MCP existente a modificar:** `{{nombre-mcp}}` — herramientas a agregar/cambiar.
+- **MCP nuevo a crear:** `{{nombre-mcp}}` — propósito y herramientas que expondrá.
+- **System prompt afectado:** `docs/mcps/{{nombre}}.system-prompt.md`
+- **Fase de MCP en este spec:** Fase {{N}}
+
+Si no aplica, justificar brevemente por qué esta funcionalidad
+no requiere exponer herramientas o datos a agentes.
+
 ## Fases de implementación
 
 ### Fase 1 — Nombre
 - [ ] Paso concreto
 - [ ] Paso concreto
 
-### Fase 2 — Nombre
+### Fase N — MCP: {{crear / actualizar}} `{{nombre-mcp}}`
+> Incluir esta fase solo si "Evaluación MCP" indica que aplica.
+- [ ] {{Crear servidor MCP / Agregar herramienta al MCP existente}}
+- [ ] Registrar o actualizar entrada en `docs/mcps/README.md`
+- [ ] Crear o actualizar `docs/mcps/{{nombre}}.system-prompt.md`
+- [ ] Verificar que el MCP responde correctamente a las herramientas declaradas
+
+### Fase N+1 — Nombre
 - [ ] Paso concreto
 
 ## Criterios de aceptación
 - El usuario puede hacer X.
 - El sistema responde con Y ante Z.
+- (Si aplica MCP) El agente puede invocar `{{herramienta}}` y obtener `{{resultado esperado}}`.
 
-## Pruebas e2e (si aplica)
-Descripción de los casos a automatizar en la última fase, ejecutados por @tester.
+## Pruebas asociadas
+> Estos archivos se crean junto con el spec (ver "Artefactos que acompañan al spec").
+- **Manuales:** `docs/testing/test-NNN-slug.md` — casos `TC-NNN` (y `TC-MCP-NNN` si aplica).
+- **Automáticas (e2e/unit):** `{{ubicación e2e por definir}}/e2e-NNN-slug.spec.ts`
+  — un caso por criterio de aceptación, en rojo desde el inicio (cuando exista framework).
 ```
 
 ---
@@ -297,19 +469,49 @@ Descripción de los casos a automatizar en la última fase, ejecutados por @test
 1. Analizar el impacto del feature en todos los componentes del proyecto.
 2. Usar el subagente `@architect` para crear el plan de implementación:
    - Solo descripción de fases, pasos y archivos a editar.
-   - Sin código.
-3. Guardar el plan en `docs/specs/` con la nomenclatura definida.
-4. Esperar aprobación del usuario antes de escribir código.
-5. Crear una rama nueva desde `development` siguiendo las reglas de git.
+   - Sin código de implementación.
+3. **Evaluar si aplica MCP** (ver criterios en la sección siguiente).
+   Si aplica, invocar `@mcp-builder` para diseñar la fase de MCP dentro del spec.
+4. Crear la rama nueva desde `development` siguiendo las reglas de git.
+   Esta rama aloja el spec, sus archivos de prueba y la futura implementación.
+5. **Escribir, junto con el spec, sus archivos de prueba** (ver
+   "Specs de funcionalidades → Artefactos que acompañan al spec"):
+   - Pruebas manuales en `docs/testing/test-NNN-slug.md` (flujos con UI).
+   - Pruebas automáticas (e2e/unit) derivadas de los criterios de aceptación,
+     en rojo — cuando exista framework de testing (ver "Testing").
+   - Invocar `@tester` para el diseño de los casos automáticos cuando aporte
+     rigor al conjunto de pruebas.
+6. Guardar el spec en `docs/specs/` y los archivos de prueba en sus carpetas,
+   todos con la misma nomenclatura `NNN-slug`.
+7. Esperar aprobación del usuario del **paquete completo (spec + pruebas)**
+   antes de escribir el código de implementación.
+
+### Criterios para evaluar si una funcionalidad requiere MCP
+
+Responder estas preguntas antes de diseñar el spec:
+
+| Pregunta                                                                 | Si la respuesta es "sí"…                          |
+|--------------------------------------------------------------------------|---------------------------------------------------|
+| ¿La funcionalidad expone datos que un agente podría necesitar consultar? | Candidato a herramienta de lectura en un MCP      |
+| ¿La funcionalidad permite acciones que un agente debería poder ejecutar? | Candidato a herramienta de escritura/acción en MCP|
+| ¿Ya existe un MCP que cubre un dominio relacionado?                      | Evaluar si extenderlo en lugar de crear uno nuevo |
+| ¿Hay un agente definido en `docs/mcps/` que se beneficiaría del cambio? | Su system prompt debe actualizarse obligatoriamente|
+
+> Si ninguna respuesta es afirmativa, documentar la justificación en
+> la sección "Evaluación MCP" del spec y continuar sin fase de MCP.
 
 ### Durante la implementación
 
 - Trabajar fase por fase según el spec; no saltarse pasos.
 - Al iniciar la Fase 1 de cualquier spec, cambiar su estado a `[IN PROGRESS]`.
 - Al completar cada fase, documentarla como completada en el propio spec.
+- La implementación consiste en poner en verde las pruebas ya escritas al
+  redactar el spec; usarlas como guía de avance.
+- La fase de MCP debe ejecutarse antes de la fase de pruebas e2e,
+  para que `@tester` pueda validar también las herramientas expuestas.
 - Si el scope del spec debe cambiar (nuevo hallazgo, bloqueante estructural),
   proponer la modificación al usuario **antes** de proceder. No editar el spec
-  unilateralmente ni implementar fuera de él.
+  ni los archivos de prueba unilateralmente ni implementar fuera de él.
 - Si se descubre deuda técnica fuera del scope, documentarla con un comentario
   `// DEBT:` en el código y registrarla en `docs/specs/backlog.md`, sin actuar
   sobre ella en la tarea actual.
@@ -318,19 +520,26 @@ Descripción de los casos a automatizar en la última fase, ejecutados por @test
 
 ### Después de terminar la implementación
 
-1. Crear el archivo de pruebas manuales en `docs/testing/` con la nomenclatura
-   `test-{{NNN}}-{{slug-descriptivo}}.md` (mismos NNN y slug que el spec).
+1. Verificar que los archivos de prueba creados al redactar el spec
+   (`test-NNN` y, si existe framework, las pruebas automáticas) siguen cubriendo
+   los criterios de aceptación finales; ajustarlos si el scope cambió durante la
+   implementación (con la aprobación correspondiente).
 2. Cambiar el estado del spec a `[TESTING]`.
-3. El usuario ejecutará los casos manualmente e indicará cuáles pasan.
-   Claude marcará cada caso como completado en el archivo de test.
-4. Cuando todos los casos estén aprobados, invocar `@tester` para ejecutar
-   las pruebas e2e definidas en el spec (si aplica).
-5. Al superar todas las pruebas, marcar el spec como `[DONE]`.
+3. El usuario ejecutará los casos manuales de `docs/testing/test-NNN` e indicará
+   cuáles pasan. Claude marcará cada caso como completado en el archivo de test.
+4. Cuando todos los casos manuales estén aprobados, invocar `@tester` para
+   ejecutar las pruebas automáticas ya definidas y confirmar que pasan en verde
+   (cuando exista framework de testing).
+5. Al superar todas las pruebas (manuales y automáticas), marcar el spec como `[DONE]`.
 
 ### Pruebas manuales — estructura del archivo
 
-- Todos los archivos `test-NNN` van en `docs/testing/` en la raíz del proyecto.
-- Solo incluir casos manuales de flujos con UI. Los endpoints se validan con pruebas e2e desde el propio spec.
+- Todos los archivos `test-NNN` van en `docs/testing/` en la raíz del proyecto
+  y se crean al redactar el spec, no al cerrarlo.
+- Solo incluir casos manuales de flujos con UI. Los endpoints se validan con las
+  pruebas automáticas asociadas al spec.
+- Si el spec incluyó una fase de MCP, agregar casos de prueba específicos
+  para las herramientas creadas o modificadas (prefijo `TC-MCP-NNN`).
 - Cada caso de prueba debe tener un código identificador único (ej. `TC-001`).
 
 ```md
@@ -345,7 +554,194 @@ Descripción de los casos a automatizar en la última fase, ejecutados por @test
 2. ...
 **Resultado esperado:** ...
 **Estado:** ⬜ Pendiente / ✅ Aprobado / ❌ Fallido
+
+### TC-MCP-001 — Nombre del caso MCP (si aplica)
+**Herramienta probada:** `{{nombre-herramienta}}` en `{{nombre-mcp}}`
+**Precondición:** ...
+**Input de prueba:** ...
+**Output esperado:** ...
+**Estado:** ⬜ Pendiente / ✅ Aprobado / ❌ Fallido
 ```
+
+---
+
+## Despliegue
+
+> ⚠️ Ningún paso de esta sección debe ejecutarse sin confirmación explícita
+> del usuario en la misma sesión. El despliegue siempre lo inicia el usuario;
+> Claude puede asistir en la preparación y verificación.
+
+Esta plataforma es una app **Next.js full-stack desplegada en Vercel**, con
+**Supabase** como backend gestionado (Postgres, Auth y Storage). No existe un
+servicio de backend independiente: el "backend" es Supabase y no requiere un
+paso de deploy propio más allá de aplicar migraciones de esquema.
+
+---
+
+### Infraestructura
+
+#### Base de datos / Backend (Supabase)
+
+| Campo                | Valor                                                   |
+|----------------------|---------------------------------------------------------|
+| Proveedor            | `Supabase` (Postgres gestionado + Auth + Storage)       |
+| Proyecto             | `{{nombre del proyecto en Supabase}}`                   |
+| Project ref          | `{{project-ref}}`                                        |
+| Región               | `{{región de producción}}`                              |
+| Variables de conexión| `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`  |
+| Panel de control     | `https://supabase.com/dashboard/project/{{project-ref}}`|
+
+#### Frontend (Vercel)
+
+| Campo              | Valor                                          |
+|--------------------|------------------------------------------------|
+| Proveedor          | `Vercel`                                       |
+| Proyecto           | `{{nombre del proyecto en Vercel}}`            |
+| Rama de producción | `main`                                         |
+| URL producción     | `{{url del proyecto desplegado}}`              |
+| Deploy trigger     | `push a main → auto-deploy`                     |
+| Panel de control   | `https://vercel.com/{{equipo}}/{{proyecto}}`   |
+
+---
+
+### Checklist pre-despliegue
+
+Ejecutar este checklist **antes de iniciar cualquier despliegue**:
+
+- [ ] Todos los specs afectados están en estado `[DONE]`.
+- [ ] La rama `development` tiene todos los merges requeridos.
+- [ ] Las variables de entorno de producción están actualizadas en Vercel y
+      Supabase — **no en archivos locales**.
+- [ ] Si hay cambios de esquema, el script de migración está preparado y revisado.
+- [ ] El build local pasa sin errores (`npm run build`).
+- [ ] El linter pasa sin errores (`npm run lint`).
+- [ ] (Cuando exista framework de tests) los tests pasan en su totalidad.
+- [ ] Se creó la rama `deploy/{{versión-o-descripción}}` desde `development`.
+
+---
+
+### Proceso de despliegue (Vercel + Supabase)
+
+```
+development ──merge──▶ deploy/vX.Y.Z ──merge──▶ main ──push──▶ Vercel (auto-deploy)
+```
+
+#### Paso a paso
+
+1. **Preparar rama de despliegue**
+   ```bash
+   git checkout development
+   git pull origin development
+   git checkout -b deploy/{{versión}}
+   ```
+
+2. **Aplicar migraciones en Supabase** *(solo si hay cambios de esquema)*
+   > ⚠️ Requiere confirmación explícita del usuario antes de ejecutar.
+   ```bash
+   # Aplicar migraciones pendientes en producción:
+   supabase db push --project-ref {{project-ref}}
+
+   # Ver estado de migraciones:
+   supabase migration list --project-ref {{project-ref}}
+   ```
+   - Verificar los cambios en `Table Editor` del panel de Supabase antes de continuar.
+   - Si el proyecto usa Row Level Security (RLS), validar que las nuevas tablas
+     o columnas tienen las políticas correctas aplicadas.
+
+3. **Verificar variables de entorno en Vercel**
+   - Acceder a `Settings → Environment Variables` en el panel de Vercel.
+   - Confirmar que todas las variables requeridas están presentes para el
+     entorno `Production`:
+     ```
+     NEXT_PUBLIC_SUPABASE_URL
+     NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+     SUPABASE_SERVICE_ROLE_KEY
+     NEXT_PUBLIC_SITE_URL
+     ```
+
+4. **Merge a `main`**
+   > ⚠️ Requiere confirmación explícita del usuario.
+   ```bash
+   git checkout main
+   git pull origin main
+   git merge deploy/{{versión}} --no-ff -m "deploy: release {{versión}}"
+   ```
+
+5. **Push a `main`**
+   > ⚠️ Requiere confirmación explícita del usuario.
+   ```bash
+   git push origin main
+   ```
+   Vercel detecta el push y lanza el build automáticamente.
+   Si es deploy manual, ejecutar:
+   ```bash
+   npx vercel --prod
+   ```
+
+6. **Verificar el despliegue en Vercel**
+   - Confirmar que el build terminó sin errores en el panel de Vercel
+     (`Deployments → último deployment`).
+   - Navegar a `{{url de producción}}` y verificar que la aplicación carga.
+   - Revisar la consola del navegador en busca de errores críticos.
+   - Validar un flujo con Supabase (login/lectura de contenido) para confirmar
+     la conexión con la base de datos.
+
+7. **Limpiar ramas**
+   ```bash
+   git branch -d deploy/{{versión}}
+   git push origin --delete deploy/{{versión}}
+   ```
+
+---
+
+### Migraciones de base de datos — Supabase
+
+- Proveedor PostgreSQL gestionado con Storage, Auth y Realtime integrados.
+- Las migraciones se gestionan con la CLI de Supabase:
+  ```bash
+  # Aplicar migraciones pendientes en producción:
+  supabase db push --project-ref {{project-ref}}
+
+  # Ver estado de migraciones:
+  supabase migration list --project-ref {{project-ref}}
+  ```
+- Verificar cambios en `Table Editor` del panel antes de confirmar.
+- Si el proyecto usa Row Level Security (RLS), validar que las nuevas
+  tablas o columnas tienen las políticas correctas aplicadas.
+- Panel: `https://supabase.com/dashboard/project/{{project-ref}}`
+
+---
+
+### Rollback de emergencia
+
+Si el despliegue produce errores críticos en producción:
+
+#### Frontend — Vercel
+1. Acceder al panel de Vercel → proyecto → `Deployments`.
+2. Localizar el último deployment exitoso.
+3. Hacer clic en `···` → `Promote to Production`.
+4. Vercel redirige el tráfico al deployment anterior en segundos.
+
+#### Base de datos — Supabase
+> No existe rollback automático para migraciones de esquema.
+> Si la migración causó pérdida o corrupción de datos, escalar
+> inmediatamente al usuario con el detalle del error antes de
+> ejecutar cualquier acción. El rollback de esquema debe planificarse
+> manualmente (script SQL de reversión revisado con el usuario).
+
+---
+
+### Acciones prohibidas en despliegue
+
+Además de las acciones prohibidas generales, durante el proceso de despliegue
+Claude **nunca** debe:
+
+- Ejecutar migraciones en producción sin confirmación explícita del usuario
+  en esa misma sesión, incluso si forman parte del checklist.
+- Hacer `push` a `main` sin que el usuario haya aprobado el merge previamente.
+- Modificar variables de entorno directamente en Vercel o Supabase.
+- Ejecutar un rollback de base de datos sin escalar al usuario primero.
+- Crear o eliminar proyectos, bases de datos o servicios en cualquier proveedor.
 
 ---
 
@@ -360,7 +756,11 @@ Descripción de los casos a automatizar en la última fase, ejecutados por @test
 - Modificar variables de entorno de producción.
 - Instalar dependencias nuevas sin mencionarlo y esperar confirmación.
 - Hacer commit de archivos `.env*` reales.
-- Editar el spec activo para ampliar su scope sin aprobación del usuario.
+- Editar el spec activo o sus archivos de prueba para ampliar su scope sin
+  aprobación del usuario.
+- Eliminar o reemplazar un MCP activo sin confirmar que ningún agente lo consume.
+- Modificar un system prompt en `docs/mcps/` fuera de una fase de MCP
+  aprobada en el spec correspondiente.
 
 ---
 
@@ -402,6 +802,9 @@ Ejemplos:
 ```
 feat(courses): add lesson page with MDX rendering
 fix(auth): resolve session token refresh on page reload
-chore(deps): upgrade next to v15.3
+chore(deps): upgrade next to v16.2
 docs(courses): add estructura-de-datos project specs
+docs(mcps): update content-agent system prompt with new tools
+feat(mcp): add lesson-read tool to courses-mcp server
+test(enrollment): add manual test cases for spec-003 course enrollment
 ```
