@@ -6,8 +6,7 @@ interface TeacherBarProps {
 
 export function TeacherBar({ teacher }: TeacherBarProps) {
   return (
-    <>
-      <section className="py-12">
+    <section className="py-12">
       <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">
         Docente principal
       </h2>
@@ -31,9 +30,6 @@ export function TeacherBar({ teacher }: TeacherBarProps) {
           </p>
         </div>
       </div>
-      </section>
-
-      <div className="border-t border-gray-200 dark:border-gray-700 mt-8" />
-    </>
+    </section>
   );
 }

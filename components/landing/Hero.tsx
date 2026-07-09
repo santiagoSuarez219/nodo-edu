@@ -8,8 +8,7 @@ interface HeroProps {
 
 export function Hero({ resumeState }: HeroProps) {
   return (
-    <>
-      <section className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-8 lg:gap-12 items-center">
+    <section className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-8 lg:gap-12 items-center">
       <div>
         <p className="text-lg text-gray-600 dark:text-gray-300 mb-4">
           Hola de nuevo 👋
@@ -35,7 +34,5 @@ export function Hero({ resumeState }: HeroProps) {
         <ResumeCard resumeState={resumeState} />
       </div>
     </section>
-      <div className="border-t border-gray-200 dark:border-gray-700 my-12" />
-    </>
   );
 }

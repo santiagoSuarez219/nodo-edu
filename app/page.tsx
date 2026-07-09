@@ -25,9 +25,25 @@ export default function Home() {
     <main className="bg-white dark:bg-gray-900 pt-6 lg:pt-16">
       <div className="max-w-7xl mx-auto px-6 lg:px-13">
         <Hero resumeState={RESUME_STATE} />
+      </div>
+      <div className="border-t border-gray-200 dark:border-gray-700" />
+
+      <div className="max-w-7xl mx-auto px-6 lg:px-13">
         <CourseScroller courses={LANDING_COURSES} />
+      </div>
+      <div className="border-t border-gray-200 dark:border-gray-700" />
+
+      <div className="max-w-7xl mx-auto px-6 lg:px-13">
         <HowItWorks steps={ROADMAP_STEPS} />
+      </div>
+      <div className="border-t border-gray-200 dark:border-gray-700" />
+
+      <div className="max-w-7xl mx-auto px-6 lg:px-13">
         <TeacherBar teacher={MAIN_TEACHER} />
+      </div>
+      <div className="border-t border-gray-200 dark:border-gray-700" />
+
+      <div className="max-w-7xl mx-auto px-6 lg:px-13">
         <LandingFooter links={FOOTER_LINKS} />
       </div>
     </main>

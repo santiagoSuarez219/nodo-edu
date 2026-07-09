@@ -8,8 +8,7 @@ interface CourseScrollerProps {
 
 export function CourseScroller({ courses }: CourseScrollerProps) {
   return (
-    <>
-      <section className="py-12">
+    <section className="py-12">
       <div className="flex items-center justify-between mb-8">
         <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
           Tus cursos
@@ -32,9 +31,6 @@ export function CourseScroller({ courses }: CourseScrollerProps) {
           </li>
         ))}
       </ul>
-      </section>
-
-      <div className="border-t border-gray-200 dark:border-gray-700 mt-8" />
-    </>
+    </section>
   );
 }

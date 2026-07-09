@@ -6,8 +6,7 @@ interface HowItWorksProps {
 
 export function HowItWorks({ steps }: HowItWorksProps) {
   return (
-    <>
-      <section className="py-12">
+    <section className="py-12">
       <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8">
         Cómo funciona
       </h2>
@@ -31,9 +30,6 @@ export function HowItWorks({ steps }: HowItWorksProps) {
           </li>
         ))}
       </ol>
-      </section>
-
-      <div className="border-t border-gray-200 dark:border-gray-700 mt-8" />
-    </>
+    </section>
   );
 }
