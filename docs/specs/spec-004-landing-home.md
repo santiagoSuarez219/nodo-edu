@@ -1,4 +1,4 @@
-# spec-004 — [IN PROGRESS] Landing page pública (home `/`) — Dashboard de retorno
+# spec-004 — [DONE] Landing page pública (home `/`) — Dashboard de retorno
 
 ## Contexto
 
