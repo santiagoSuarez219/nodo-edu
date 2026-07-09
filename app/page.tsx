@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 
 export default function Home() {
   return (
-    <main className="bg-white dark:bg-gray-900 pt-6 lg:pt-16">
+    <main className="bg-white dark:bg-gray-900 mt-19 pt-6 lg:pt-16">
       <div className="w-full 2xl:max-w-7xl lg:px-18 mx-auto px-6  pb-6 lg:pb-16">
         <Hero resumeState={RESUME_STATE} />
       </div>

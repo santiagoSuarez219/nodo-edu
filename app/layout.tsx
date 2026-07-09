@@ -47,7 +47,7 @@ export default async function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
       <body suppressHydrationWarning className="min-h-full flex flex-col pt-16 lg:pt-0 bg-white text-gray-900 dark:bg-gray-900 dark:text-white">
-        {/* <Navbar profile={profile} /> */}
+        <Navbar profile={profile} />
         {children}
       </body>
     </html>
