@@ -28,7 +28,7 @@ export default function Home() {
       </div>
       <div className="border-t border-gray-200 dark:border-gray-700" />
 
-      <div className="w-full 2xl:max-w-7xl lg:px-18 mx-auto px-6 ">
+      <div id="cursos" className="w-full 2xl:max-w-7xl lg:px-18 mx-auto px-6 ">
         <CourseScroller courses={LANDING_COURSES} />
       </div>
       <div className="border-t border-gray-200 dark:border-gray-700" />
@@ -38,7 +38,7 @@ export default function Home() {
       </div>
       <div className="border-t border-gray-200 dark:border-gray-700" /> */}
 
-      <div className="w-full 2xl:max-w-7xl lg:px-18 mx-auto px-6 ">
+      <div id="docentes" className="w-full 2xl:max-w-7xl lg:px-18 mx-auto px-6 ">
         <TeacherBar teacher={MAIN_TEACHER} />
       </div>
       <div className="border-t border-gray-200 dark:border-gray-700" />

@@ -3,6 +3,9 @@ import { getCurrentUser } from "@/lib/auth/session";
 import type { AcademicCoursePublic } from "@/lib/academic-courses/types";
 import type { Enrollment, EnrollmentWithCourse, EnrollmentWithStudent } from "./types";
 
+export { hasCourseAccess, requireCourseAccess } from "./access";
+export type { CourseAccess } from "./access";
+
 function computeTotalGrade(scores: (number | null)[]): number | null {
   const valid = scores.filter((s): s is number => s !== null);
   if (valid.length === 0) return null;

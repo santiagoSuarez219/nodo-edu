@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { getCourseBySlug } from "@/lib/courses";
+import { requireCourseAccess } from "@/lib/enrollments";
 import { LessonSidebar } from "@/components/courses/LessonSidebar";
 import { LessonSidebarMobile } from "@/components/courses/LessonSidebarMobile";
 
@@ -15,6 +16,8 @@ export default async function LessonLayout({
   const { courseSlug, lessonSlug } = await params;
   const course = await getCourseBySlug(courseSlug);
   if (!course) notFound();
+
+  await requireCourseAccess(courseSlug);
 
   return (
     <main className="flex-1 bg-white dark:bg-gray-900">
