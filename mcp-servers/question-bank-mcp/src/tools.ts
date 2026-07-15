@@ -309,6 +309,7 @@ async function handleCreateQuestion(input: Record<string, unknown>): Promise<str
 
 async function handleUpdateQuestion(input: Record<string, unknown>): Promise<string> {
   const id = String(input.id);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { id: _id, ...body } = input;
 
   const current = (await callQuestionBankApi("GET", `/${id}`)) as {

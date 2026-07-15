@@ -5,9 +5,9 @@ export interface CodeRunResult {
 }
 
 export async function runCode(
-  language: string,
-  code: string,
-  input?: string
+  _language: string,
+  _code: string,
+  _input?: string
 ): Promise<CodeRunResult> {
   return { status: "disabled" };
 }
