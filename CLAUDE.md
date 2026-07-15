@@ -283,7 +283,7 @@ docs/
 
 | MCP               | Propósito                          | Estado     | System prompt                              |
 |-------------------|------------------------------------|------------|--------------------------------------------|
-| _(ninguno)_       | Aún no hay MCPs propios del proyecto | —        | —                                          |
+| `question-bank-mcp` | Cliente de la API `/api/questions/*` para que un agente docente liste, cree, actualice, elimine y publique preguntas del banco de evaluaciones (multiple_choice, open_text, code_snippet, code_write, coding_challenge). | Activo | `docs/mcps/question-bank-agent.system-prompt.md` |
 
 ### Reglas de gestión de MCPs
 

@@ -1,7 +1,8 @@
-# spec-005 — Banco de preguntas (schema + dominio + API HTTP + MCP)
+# spec-005 — [IN PROGRESS] Banco de preguntas (schema + dominio + API HTTP + MCP)
 
-> **Estado:** Planificado — pendiente de implementación. La implementación de referencia
-> existe en el tag `backup/feat-question-bank` y se portará al implementar este spec.
+> **Estado:** Implementación en progreso. Todas las 6 fases completadas.
+> La implementación incluye: schema de BD + migraciones RLS, dominio por actor,
+> API REST autenticada por API key, y primer MCP del proyecto.
 
 ---
 

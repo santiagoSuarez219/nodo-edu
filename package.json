@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "seed:teacher": "node --env-file-if-exists=.env.local scripts/seed-teacher.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",
