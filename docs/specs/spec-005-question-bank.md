@@ -1,8 +1,11 @@
-# spec-005 — [IN PROGRESS] Banco de preguntas (schema + dominio + API HTTP + MCP)
+# spec-005 — [DONE] Banco de preguntas (schema + dominio + API HTTP + MCP)
 
-> **Estado:** Implementación en progreso. Todas las 6 fases completadas.
+> **Estado:** Completado. Las 6 fases implementadas y verificadas.
 > La implementación incluye: schema de BD + migraciones RLS, dominio por actor,
 > API REST autenticada por API key, y primer MCP del proyecto.
+> Pruebas manuales: 19/19 casos aprobados en `docs/testing/test-005-question-bank.md`
+> (incluye fix de `update_question` en el MCP — ver nota en TC-MCP-004).
+> `npm run lint` y `npx tsc --noEmit` sin errores.
 
 ---
 
@@ -469,83 +472,83 @@ y se materializan en la Fase 5.
 ## Fases de implementación
 
 ### Fase 0 — Prerrequisito de datos: docente principal sembrado
-- [ ] Portar `scripts/seed-teacher.mjs`: crea/asegura la cuenta del docente principal a partir
+- [x] Portar `scripts/seed-teacher.mjs`: crea/asegura la cuenta del docente principal a partir
       de `TEACHER_EMAIL`, con roles `teacher` + `admin`.
-- [ ] Añadir el script `seed:teacher` a `package.json`
+- [x] Añadir el script `seed:teacher` a `package.json`
       (`node --env-file-if-exists=.env.local scripts/seed-teacher.mjs`).
-- [ ] Ejecutar `npm run seed:teacher` en local y registrar el id resuelto del docente.
-- [ ] Fijar `QUESTION_BANK_AGENT_TEACHER_ID` en `.env.local` con ese id.
-- [ ] Documentar el **DEBT** de drift del id entre entornos (seed por email, no por id fijo)
+- [x] Ejecutar `npm run seed:teacher` en local y registrar el id resuelto del docente.
+- [x] Fijar `QUESTION_BANK_AGENT_TEACHER_ID` en `.env.local` con ese id.
+- [x] Documentar el **DEBT** de drift del id entre entornos (seed por email, no por id fijo)
       en `docs/specs/backlog.md`.
 
 ### Fase 1 — Schema del banco y migraciones
-- [ ] Portar migraciones `20260625000005_init_questions.sql` (tablas `questions`,
+- [x] Portar migraciones `20260625000005_init_questions.sql` (tablas `questions`,
       `question_choices`, `question_rubrics`, `coding_challenge_tests` + índices) y
       `20260625000008_rls_questions.sql` (políticas RLS por rol/autor).
-- [ ] Portar los fixes `20260703000000_fix_questions_author_fk.sql` y
+- [x] Portar los fixes `20260703000000_fix_questions_author_fk.sql` y
       `20260703000001_profiles_visible_for_published_authors.sql`.
-- [ ] `supabase db reset` sin conflictos; las cuatro tablas con RLS habilitado.
-- [ ] Verificar políticas RLS por rol (autor ve propias + publicadas ajenas; insert solo
+- [x] `supabase db reset` sin conflictos; las cuatro tablas con RLS habilitado.
+- [x] Verificar políticas RLS por rol (autor ve propias + publicadas ajenas; insert solo
       teacher/admin con `created_by` forzado).
 
 ### Fase 2 — Cliente de servicio y dominio del banco por actor
-- [ ] Crear `lib/auth/service.ts` con `createServiceSupabaseClient()` (service role,
+- [x] Crear `lib/auth/service.ts` con `createServiceSupabaseClient()` (service role,
       server-only, sin persistencia de sesión).
-- [ ] Crear `lib/questions/{types,schemas}.ts` (tipos + Zod discriminated union
+- [x] Crear `lib/questions/{types,schemas}.ts` (tipos + Zod discriminated union
       `QuestionSchema` y schema de filtros).
-- [ ] Crear `lib/questions/index.ts`: lógica que recibe un contexto `{ supabase, actorId }` y
+- [x] Crear `lib/questions/index.ts`: lógica que recibe un contexto `{ supabase, actorId }` y
       wrappers de sesión con firma estable (`getQuestionsByTeacher`, etc.) para que spec-006
       consuma la lectura sin conocer el refactor.
-- [ ] Crear `lib/questions/service.ts` con `getServiceQuestionsContext()` (service client +
+- [x] Crear `lib/questions/service.ts` con `getServiceQuestionsContext()` (service client +
       `QUESTION_BANK_AGENT_TEACHER_ID`) y funciones de servicio que scopean toda
       lectura/escritura por `created_by = actorId`.
-- [ ] Preservar en código las validaciones que RLS cubría: `created_by` forzado, ownership por
+- [x] Preservar en código las validaciones que RLS cubría: `created_by` forzado, ownership por
       `actorId` (404 cross-autor), ≥1 correcta al publicar, rechazo de borrado si está en uso.
-- [ ] Validar que `QUESTION_BANK_AGENT_TEACHER_ID` es UUID; si no, `500 configuration_error`.
-- [ ] Crear `lib/code-runner/index.ts` (stub `runCode` → `{ status: 'disabled' }`).
+- [x] Validar que `QUESTION_BANK_AGENT_TEACHER_ID` es UUID; si no, `500 configuration_error`.
+- [x] Crear `lib/code-runner/index.ts` (stub `runCode` → `{ status: 'disabled' }`).
 
 ### Fase 3 — Autenticación por API key y utilidades HTTP
-- [ ] Añadir `QUESTION_BANK_API_KEY`, `QUESTION_BANK_AGENT_TEACHER_ID` y
+- [x] Añadir `QUESTION_BANK_API_KEY`, `QUESTION_BANK_AGENT_TEACHER_ID` y
       `QUESTION_BANK_API_BASE_URL` a `.env.example`.
-- [ ] Crear `lib/api/auth.ts` con `authenticateServiceRequest(req)` (header `x-api-key`,
+- [x] Crear `lib/api/auth.ts` con `authenticateServiceRequest(req)` (header `x-api-key`,
       comparación de tiempo constante, `401` en fallo).
-- [ ] Crear `lib/api/errors.ts` con el helper de error uniforme y el mapa de códigos HTTP.
+- [x] Crear `lib/api/errors.ts` con el helper de error uniforme y el mapa de códigos HTTP.
 
 ### Fase 4 — Route handlers REST
-- [ ] `app/api/questions/route.ts`: `GET` (parseo/validación de filtros + paginación) y `POST`
+- [x] `app/api/questions/route.ts`: `GET` (parseo/validación de filtros + paginación) y `POST`
       (validación con `QuestionSchema`, create de servicio, `201`).
-- [ ] `app/api/questions/[questionId]/route.ts`: `GET`, `PATCH` (validación + reemplazo total),
+- [x] `app/api/questions/[questionId]/route.ts`: `GET`, `PATCH` (validación + reemplazo total),
       `DELETE` (con chequeo de uso → `409`).
-- [ ] `app/api/questions/[questionId]/publish/route.ts`: `POST` (validación de negocio → `422`).
-- [ ] Cada handler: autentica primero, resuelve el contexto de servicio, mapea errores de
+- [x] `app/api/questions/[questionId]/publish/route.ts`: `POST` (validación de negocio → `422`).
+- [x] Cada handler: autentica primero, resuelve el contexto de servicio, mapea errores de
       dominio a códigos HTTP, responde con el formato uniforme.
-- [ ] Fijar `runtime = "nodejs"` y `dynamic = "force-dynamic"` en cada archivo.
+- [x] Fijar `runtime = "nodejs"` y `dynamic = "force-dynamic"` en cada archivo.
 
 ### Fase 5 — MCP `question-bank-mcp` y documentación
-- [ ] Confirmar con el usuario la dependencia `@modelcontextprotocol/sdk` antes de instalar.
-- [ ] Crear el servidor MCP en `mcp-servers/question-bank-mcp/` (TypeScript, transport stdio):
+- [x] Confirmar con el usuario la dependencia `@modelcontextprotocol/sdk` antes de instalar.
+- [x] Crear el servidor MCP en `mcp-servers/question-bank-mcp/` (TypeScript, transport stdio):
       `src/{index,api,tools}.ts`, `package.json`, `tsconfig.json`, `.env.example`.
-- [ ] Implementar `callQuestionBankApi` (auth por `QUESTION_BANK_API_KEY`, manejo uniforme de
+- [x] Implementar `callQuestionBankApi` (auth por `QUESTION_BANK_API_KEY`, manejo uniforme de
       errores 4xx/5xx, sin reintentos en escritura, sin filtrar la API key).
-- [ ] Implementar las 6 herramientas: `list_questions`, `get_question`, `create_question`,
+- [x] Implementar las 6 herramientas: `list_questions`, `get_question`, `create_question`,
       `update_question`, `delete_question`, `publish_question`.
-- [ ] Documentar env del proceso MCP en `mcp-servers/question-bank-mcp/.env.example`.
-- [ ] Crear `docs/mcps/README.md` (inventario canónico, ver Apéndice A.1) y
+- [x] Documentar env del proceso MCP en `mcp-servers/question-bank-mcp/.env.example`.
+- [x] Crear `docs/mcps/README.md` (inventario canónico, ver Apéndice A.1) y
       `docs/mcps/question-bank-agent.system-prompt.md` (ver Apéndice A.2).
-- [ ] Registrar el MCP en la sección "MCPs del proyecto" de `CLAUDE.md`.
-- [ ] MCP compila sin errores; herramientas definidas con schemas completos.
+- [x] Registrar el MCP en la sección "MCPs del proyecto" de `CLAUDE.md`.
+- [x] MCP compila sin errores; herramientas definidas con schemas completos.
 
 ### Fase 6 — Pruebas
-- [ ] Ejecutar los casos manuales de `docs/testing/test-005-question-bank.md`:
-  - [ ] Seguridad API (`x-api-key`): `401` sin key / con key inválida.
-  - [ ] CRUD completo (create/get/list con filtros/update/delete/publish) vía `curl` o cliente
+- [x] Ejecutar los casos manuales de `docs/testing/test-005-question-bank.md`:
+  - [x] Seguridad API (`x-api-key`): `401` sin key / con key inválida.
+  - [x] CRUD completo (create/get/list con filtros/update/delete/publish) vía `curl` o cliente
         HTTP.
-  - [ ] `created_by` forzado; `404` cross-autor; `409` al borrar pregunta en uso; `422` al
+  - [x] `created_by` forzado; `404` cross-autor; `409` al borrar pregunta en uso; `422` al
         publicar `multiple_choice` sin correcta.
-  - [ ] Herramientas del MCP (`TC-MCP-*`) contra la API local.
-- [ ] Confirmar que `getQuestionsByTeacher` (sesión) queda expuesta y funcional para el
+  - [x] Herramientas del MCP (`TC-MCP-*`) contra la API local.
+- [x] Confirmar que `getQuestionsByTeacher` (sesión) queda expuesta y funcional para el
       consumidor de spec-006.
-- [ ] `npm run lint` y `tsc --noEmit` sin errores nuevos.
+- [x] `npm run lint` y `tsc --noEmit` sin errores nuevos.
 
 > **Fuera de ciclo:** automatizar los criterios de la API en suite e2e/unit cuando el proyecto
 > adopte un framework de testing (hoy "por definir" en `CLAUDE.md`). Su ausencia no bloquea el
