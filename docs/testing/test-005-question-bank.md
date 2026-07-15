@@ -126,7 +126,19 @@
 **Precondición:** Pregunta existente
 **Input de prueba:** id + campos a actualizar
 **Output esperado:** Pregunta actualizada
-**Estado:** ❌ Fallido — Error intermitente del servidor (alterna entre "esquema inválido" y "API no disponible" con payloads idénticos)
+**Estado:** ✅ Aprobado
+
+**Nota de la investigación inicial:** el primer intento falló con errores alternantes
+("esquema inválido" / "API no disponible"). Causa raíz identificada y corregida en
+`mcp-servers/question-bank-mcp/src/tools.ts` (`handleUpdateQuestion`): el `GET` previo
+al merge devuelve `course_slug`/`lesson_slug`/`topic_title`/etc. como `null` (valor real
+en Postgres), pero el schema Zod de la API (`z.string().optional()`) solo acepta
+`string | undefined`, no `null` — el PATCH los rechazaba con `422`. Se corrigió filtrando
+también por valor (se omiten los `null` antes del merge), no solo por nombre de campo.
+El segundo error ("API no disponible") era un falso positivo del entorno: `next dev`
+reinicia el proceso al acercarse al umbral de memoria, cayendo requests durante ese
+reinicio — no ocurre en build de producción. Verificado con `curl` reproduciendo el
+payload exacto y luego confirmado end-to-end vía Claude Desktop.
 
 ### TC-MCP-005 — delete_question (eliminación)
 **Herramienta probada:** `delete_question` en `question-bank-mcp`

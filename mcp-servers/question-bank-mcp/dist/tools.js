@@ -305,8 +305,27 @@ async function handleUpdateQuestion(input) {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { id: _id, ...body } = input;
     const current = (await callQuestionBankApi("GET", `/${id}`));
+    // Filtrar solo los campos que la API acepta en PATCH.
+    // Los campos opcionales llegan como `null` desde la base de datos, pero el
+    // esquema Zod de la API espera `string` o `undefined` (no `null`), así que
+    // se omiten para no disparar un 422 de validación.
+    const allowedFields = [
+        "type",
+        "stem",
+        "difficulty",
+        "tags",
+        "course_slug",
+        "lesson_slug",
+        "topic_title",
+        "choices",
+        "rubric",
+        "code_snippet",
+        "code_language",
+        "challenge_tests",
+    ];
+    const filtered = Object.fromEntries(Object.entries(current.data).filter(([key, value]) => allowedFields.includes(key) && value !== null));
     const merged = {
-        ...current.data,
+        ...filtered,
         ...body,
     };
     const result = await callQuestionBankApi("PATCH", `/${id}`, merged);
