@@ -9,11 +9,14 @@ language plpgsql
 security definer
 set search_path = public
 as $$
+#variable_conflict use_column
 declare
   v_session_id uuid;
   v_course_id uuid;
   v_caller_id uuid;
   v_enrollment_status text;
+  v_inserted_at timestamptz;
+  v_marked_at timestamptz;
 begin
   v_caller_id := auth.uid();
 
@@ -44,28 +47,29 @@ begin
     and e.academic_course_id = v_course_id
   limit 1;
 
-  if v_enrollment_status != 'active' then
+  if v_enrollment_status is distinct from 'active' then
     return query select 'not_enrolled'::text, v_session_id, null::timestamptz;
     return;
   end if;
 
   -- 4. Insertar asistencia (idempotente: on conflict do nothing)
+  -- v_inserted_at solo se puebla si el insert ocurrió de verdad (no hubo conflicto)
   insert into attendance_records (session_id, student_id)
   values (v_session_id, v_caller_id)
-  on conflict (session_id, student_id) do nothing;
+  on conflict (session_id, student_id) do nothing
+  returning marked_at into v_inserted_at;
 
-  -- 5. Retornar resultado
-  return query
-  select
-    case
-      when exists (
-        select 1 from attendance_records
-        where session_id = v_session_id and student_id = v_caller_id
-      ) then 'marked'::text
-      else 'already_marked'::text
-    end,
-    v_session_id,
-    (select marked_at from attendance_records where session_id = v_session_id and student_id = v_caller_id);
+  if v_inserted_at is not null then
+    -- 5a. Insert nuevo: ya tenemos el marked_at
+    return query select 'marked'::text, v_session_id, v_inserted_at;
+  else
+    -- 5b. Ya existía: recuperar el marked_at original
+    select marked_at into v_marked_at
+    from attendance_records
+    where session_id = v_session_id and student_id = v_caller_id;
+
+    return query select 'already_marked'::text, v_session_id, v_marked_at;
+  end if;
 end;
 $$;
 
@@ -79,6 +83,7 @@ language plpgsql
 security definer
 set search_path = public
 as $$
+#variable_conflict use_column
 declare
   v_course_id uuid;
   v_session_id uuid;
