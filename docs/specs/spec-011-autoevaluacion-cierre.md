@@ -1,6 +1,6 @@
-# spec-011 — Autoevaluación formativa de cierre de lección
+# spec-011 — `[DONE]` Autoevaluación formativa de cierre de lección
 
-> **Estado:** `[TESTING]` — implementación completada, pendiente de pruebas manuales.
+> **Estado:** `[DONE]` — todas las pruebas manuales aprobadas.
 
 Este es el **tercero y último** de los tres specs que descomponen la "estructura
 interactiva de la lección" prometida en `spec-006-lecciones-privadas-navbar` y
