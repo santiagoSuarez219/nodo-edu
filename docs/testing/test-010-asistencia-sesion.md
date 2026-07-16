@@ -75,7 +75,7 @@ confirmación con la hora (`marked_at`) sin recarga manual.
 1. Ingresar un código que no corresponde a ninguna sesión abierta.
 **Resultado esperado:** mensaje "código no encontrado" (o equivalente); no se
 registra asistencia.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-010-07 — Código expirado
 **Precondición:** sesión de `estudianteMatriculado`; sesión cuyo `code_expires_at`
@@ -83,7 +83,7 @@ ya pasó (o forzada a expirar).
 **Pasos:**
 1. Ingresar el código de la sesión expirada.
 **Resultado esperado:** mensaje "el código expiró"; no se registra asistencia.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-010-08 — Código de sesión cerrada
 **Precondición:** sesión de `estudianteMatriculado`; el docente cerró la sesión
@@ -99,7 +99,7 @@ ya pasó (o forzada a expirar).
 1. Volver a la sección de asistencia (o reabrir la lección) e intentar marcar de nuevo.
 **Resultado esperado:** no se crea una segunda fila; se muestra la confirmación
 existente con la hora original; sin error.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado (verificado vía API/RPC en entorno aislado)
 
 ### TC-010-10 — Sin sesión abierta, la sección es pasiva
 **Precondición:** sesión de `estudianteMatriculado`; no hay sesión de asistencia
@@ -108,7 +108,7 @@ abierta en el curso.
 1. Abrir una lección del curso.
 **Resultado esperado:** la sección de asistencia informa "sin sesión de asistencia
 activa" y no muestra input de código.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ---
 
