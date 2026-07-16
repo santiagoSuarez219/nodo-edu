@@ -3,17 +3,21 @@
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { markLessonCompleted, markLessonUncompleted } from "@/lib/progress";
+import { AttendanceSection } from "@/components/courses/AttendanceSection";
+import type { StudentAttendanceState } from "@/lib/attendance/types";
 
 interface LessonClosureProps {
   courseSlug: string;
   lessonSlug: string;
   initialCompletedAt: string | null;
+  attendance?: StudentAttendanceState;
 }
 
 export function LessonClosure({
   courseSlug,
   lessonSlug,
   initialCompletedAt,
+  attendance,
 }: LessonClosureProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -88,6 +92,15 @@ export function LessonClosure({
           </div>
         )}
       </div>
+
+      {/* Sección de asistencia (solo para estudiantes matriculados) */}
+      {attendance && (
+        <AttendanceSection
+          courseSlug={courseSlug}
+          lessonSlug={lessonSlug}
+          attendanceState={attendance}
+        />
+      )}
     </section>
   );
 }
