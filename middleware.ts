@@ -1,17 +1,23 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { updateSupabaseSession } from "@/lib/auth/middleware";
 
-const PRIVATE_PREFIXES = ["/cuenta"];
 const ADMIN_PREFIXES = ["/admin"];
+const PUBLIC_PREFIXES = [
+  "/login",
+  "/registro",
+  "/recuperar-password",
+  "/auth/callback",
+  "/api", // rutas de servicio (MCP) — autenticadas con API key, no con sesión
+];
 
 export async function middleware(request: NextRequest) {
   const { supabaseResponse, user, supabase } = await updateSupabaseSession(request);
 
   const { pathname } = request.nextUrl;
 
-  // /cuenta — solo requiere sesión activa
-  const isPrivate = PRIVATE_PREFIXES.some((p) => pathname.startsWith(p));
-  if (isPrivate && !user) {
+  // Todo el sitio requiere sesión activa, salvo las rutas de auth
+  const isPublic = PUBLIC_PREFIXES.some((p) => pathname.startsWith(p));
+  if (!isPublic && !user) {
     const loginUrl = request.nextUrl.clone();
     loginUrl.pathname = "/login";
     loginUrl.searchParams.set("redirectTo", pathname);
