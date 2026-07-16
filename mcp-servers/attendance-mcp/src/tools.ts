@@ -88,11 +88,11 @@ export async function processToolCall(
     case "list_sessions":
       return await callAttendanceApi("GET", "/attendance/sessions", {
         courseId: String(toolInput.course_id),
-        ...(toolInput.from_date && { fromDate: String(toolInput.from_date) }),
-        ...(toolInput.to_date && { toDate: String(toolInput.to_date) }),
-        ...(toolInput.is_open !== undefined && { isOpen: String(toolInput.is_open) }),
-        ...(toolInput.limit && { limit: Number(toolInput.limit) }),
-        ...(toolInput.offset && { offset: Number(toolInput.offset) }),
+        ...(toolInput.from_date ? { fromDate: String(toolInput.from_date) } : {}),
+        ...(toolInput.to_date ? { toDate: String(toolInput.to_date) } : {}),
+        ...(toolInput.is_open !== undefined ? { isOpen: String(toolInput.is_open) } : {}),
+        ...(toolInput.limit ? { limit: Number(toolInput.limit) } : {}),
+        ...(toolInput.offset ? { offset: Number(toolInput.offset) } : {}),
       });
 
     case "get_session_attendance":
@@ -106,8 +106,8 @@ export async function processToolCall(
         "GET",
         `/attendance/courses/${toolInput.course_id}/summary`,
         {
-          ...(toolInput.from_date && { fromDate: String(toolInput.from_date) }),
-          ...(toolInput.to_date && { toDate: String(toolInput.to_date) }),
+          ...(toolInput.from_date ? { fromDate: String(toolInput.from_date) } : {}),
+          ...(toolInput.to_date ? { toDate: String(toolInput.to_date) } : {}),
         }
       );
 

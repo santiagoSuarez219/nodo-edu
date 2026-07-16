@@ -91,7 +91,7 @@ ya pasó (o forzada a expirar).
 **Pasos:**
 1. Ingresar el código de la sesión ya cerrada.
 **Resultado esperado:** mensaje "la sesión está cerrada"; no se registra asistencia.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-010-09 — Marcar dos veces es idempotente
 **Precondición:** sesión de `estudianteMatriculado`; ya marcó asistencia (TC-010-05).
@@ -121,7 +121,7 @@ conocido (obtenido fuera de banda).
 1. Intentar acceder a la lección / ingresar el código.
 **Resultado esperado:** el gate de acceso impide ver el cierre de estudiante; si por
 API se fuerza el RPC, responde `not_enrolled` y no registra asistencia.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-010-12 — Owner/admin no ven la sección de marcado
 **Precondición:** sesión de `docenteA` (owner) y luego `admin`.
@@ -129,7 +129,7 @@ API se fuerza el RPC, responde `not_enrolled` y no registra asistencia.
 1. Abrir una lección del curso como owner y como admin.
 **Resultado esperado:** se muestra la lección, pero **no** la sección de marcado de
 asistencia del estudiante (owner/admin gestionan asistencia solo desde el panel).
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-010-13 — Persistencia tras cerrar y reabrir sesión
 **Precondición:** sesión de `estudianteMatriculado`, con asistencia ya marcada.
@@ -139,16 +139,44 @@ asistencia del estudiante (owner/admin gestionan asistencia solo desde el panel)
 3. Abrir la lección (mientras la sesión de asistencia sigue abierta).
 **Resultado esperado:** la asistencia sigue mostrándose como registrada; no se
 duplica.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ---
 
 ## MCP `attendance-mcp` (solo lectura)
 
+**Precondición de configuración (Claude Desktop):** agregar el servidor al
+`claude_desktop_config.json` (sección `mcpServers`), apuntando al build de
+`mcp-servers/attendance-mcp/dist/index.js`, con las variables `API_BASE_URL`
+(ej. `http://localhost:3000/api`) y `API_KEY` configuradas. Reiniciar Claude
+Desktop después de guardar el archivo para que cargue el servidor.
+
+```json
+{
+  "mcpServers": {
+    "attendance-mcp": {
+      "command": "node",
+      "args": ["/ruta/absoluta/a/mcp-servers/attendance-mcp/dist/index.js"],
+      "env": {
+        "API_BASE_URL": "http://localhost:3000/api",
+        "API_KEY": "<valor de ATTENDANCE_API_KEY / QUESTION_BANK_API_KEY>"
+      }
+    }
+  }
+}
+```
+
+> Los prompts de cada caso usan el curso `estructura-de-datos`
+> (`course_id = 7bd3f233-c8e0-4e9e-bf2e-634b0a883756`) como referencia; ajustar
+> el UUID si se prueba con otro curso.
+
 ### TC-MCP-010-01 — Listar sesiones de un curso
 **Herramienta probada:** `list_sessions` en `attendance-mcp`.
 **Precondición:** API key de servicio válida; el curso tiene ≥1 sesión.
 **Input de prueba:** `{ "course_id": "<uuid del curso>" }`.
+**Prompt para Claude Desktop:**
+> Usando el MCP de asistencia, lista las sesiones de asistencia del curso con
+> id `7bd3f233-c8e0-4e9e-bf2e-634b0a883756`.
 **Output esperado:** lista de sesiones con `session_date`, `is_open`,
 `attendee_count`, sin campo `attendance_code`.
 **Estado:** ⬜ Pendiente
@@ -157,6 +185,10 @@ duplica.
 **Herramienta probada:** `get_session_attendance` en `attendance-mcp`.
 **Precondición:** sesión con al menos un asistente.
 **Input de prueba:** `{ "session_id": "<uuid de la sesión>" }`.
+**Prompt para Claude Desktop:**
+> Del curso `7bd3f233-c8e0-4e9e-bf2e-634b0a883756`, busca la sesión de
+> asistencia más reciente y dime qué estudiantes asistieron y a qué hora marcó
+> cada uno.
 **Output esperado:** objeto con `session`, `records[]` (`student_id`,
 `student_name`, `marked_at`) y `attendee_count`; sin `attendance_code`.
 **Estado:** ⬜ Pendiente
@@ -165,6 +197,10 @@ duplica.
 **Herramienta probada:** `get_course_attendance_summary` en `attendance-mcp`.
 **Precondición:** curso con varias sesiones y estudiantes.
 **Input de prueba:** `{ "course_id": "<uuid del curso>" }`.
+**Prompt para Claude Desktop:**
+> Dame el resumen de asistencia del curso `7bd3f233-c8e0-4e9e-bf2e-634b0a883756`:
+> cuántas sesiones ha habido en total y el porcentaje de asistencia de cada
+> estudiante.
 **Output esperado:** `total_sessions` y por estudiante `sessions_attended` +
 `attendance_pct`.
 **Estado:** ⬜ Pendiente
@@ -175,14 +211,24 @@ duplica.
 **Pasos:**
 1. Listar las herramientas disponibles del MCP.
 2. Inspeccionar los outputs de las 3 herramientas de lectura.
-**Resultado esperado:** no existen `open_session`, `close_session` ni
-`mark_attendance`; ningún output incluye `attendance_code`.
+**Prompt para Claude Desktop:**
+> ¿Qué herramientas tienes disponibles para gestionar la asistencia del curso
+> `7bd3f233-c8e0-4e9e-bf2e-634b0a883756`? ¿Puedes abrir una sesión de
+> asistencia, cerrarla, o marcarme presente en mi nombre?
+**Resultado esperado:** el agente lista únicamente `list_sessions`,
+`get_session_attendance` y `get_course_attendance_summary`; responde
+explícitamente que no puede abrir/cerrar sesiones ni marcar asistencia (no
+existen `open_session`, `close_session` ni `mark_attendance`); ningún output
+de las 3 herramientas incluye `attendance_code`.
 **Estado:** ⬜ Pendiente
 
 ### TC-MCP-010-05 — Input inválido / recurso inexistente
 **Herramienta probada:** `get_session_attendance` en `attendance-mcp`.
 **Precondición:** MCP registrado.
 **Input de prueba:** `{ "session_id": "00000000-0000-0000-0000-000000000000" }`.
+**Prompt para Claude Desktop:**
+> Dame el detalle de asistencia de la sesión con id
+> `00000000-0000-0000-0000-000000000000`.
 **Output esperado:** error claro (no encontrado / validación) sin filtrar datos de
 otras sesiones.
 **Estado:** ⬜ Pendiente
