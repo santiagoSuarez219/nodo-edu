@@ -110,29 +110,3 @@ export async function markLessonUncompleted(
   revalidatePath(`/${courseSlug}/${lessonSlug}`);
   revalidatePath("/cuenta/cursos");
 }
-
-export interface CourseProgressSummary {
-  completed: number;
-  total: number;
-}
-
-export async function getCourseProgressSummary(
-  courseSlug: string
-): Promise<CourseProgressSummary> {
-  const user = await getCurrentUser();
-  if (!user) return { completed: 0, total: 0 };
-
-  const supabase = await createServerSupabaseClient();
-  const { data: lessons } = await supabase
-    .from("lesson_progress")
-    .select("completed_at")
-    .eq("user_id", user.id)
-    .eq("course_slug", courseSlug);
-
-  if (!lessons) return { completed: 0, total: 0 };
-
-  const completed = lessons.filter((l) => l.completed_at !== null).length;
-  const total = lessons.length;
-
-  return { completed, total };
-}

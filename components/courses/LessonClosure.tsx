@@ -48,16 +48,16 @@ export function LessonClosure({
         </h2>
 
         {isCompleted ? (
-          <div className="flex items-start gap-4 p-4 rounded-lg bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800">
-            <svg className="w-5 h-5 text-green-700 dark:text-green-400 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+          <div className="flex items-start gap-4 p-4 rounded-lg bg-[#f3faf7] dark:bg-[#014737] border border-success/30 dark:border-success/40">
+            <svg className="w-5 h-5 text-success flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
             </svg>
             <div className="flex-1">
-              <p className="text-sm font-medium text-green-900 dark:text-green-100">
+              <p className="text-sm font-medium text-success">
                 Lección completada
               </p>
               {completedDate && (
-                <p className="text-xs text-green-700 dark:text-green-300 mt-1">
+                <p className="text-xs text-success/80 mt-1">
                   Completada el {completedDate}
                 </p>
               )}
@@ -65,14 +65,14 @@ export function LessonClosure({
             <button
               onClick={handleToggleCompletion}
               disabled={isPending}
-              className="px-3 py-1 text-sm font-medium text-green-700 dark:text-green-300 hover:bg-green-100 dark:hover:bg-green-900 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-3 py-1 text-sm font-medium text-success hover:bg-success/10 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isPending ? "Guardando..." : "Desmarcar"}
             </button>
           </div>
         ) : (
           <div className="flex items-center gap-4">
-            <svg className="w-5 h-5 text-gray-400 dark:text-gray-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 text-gray-400 dark:text-gray-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <circle cx="12" cy="12" r="9" strokeWidth="2" />
             </svg>
             <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -81,7 +81,7 @@ export function LessonClosure({
             <button
               onClick={handleToggleCompletion}
               disabled={isPending}
-              className="ml-auto px-4 py-2 text-sm font-medium text-white bg-blue-700 hover:bg-blue-800 dark:bg-blue-600 dark:hover:bg-blue-700 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="ml-auto px-4 py-2 text-sm font-medium text-white bg-brand hover:bg-brand-strong dark:bg-brand dark:hover:bg-brand-strong rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isPending ? "Guardando..." : "Completar lección"}
             </button>
