@@ -4,13 +4,16 @@ import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { markLessonCompleted, markLessonUncompleted } from "@/lib/progress";
 import { AttendanceSection } from "@/components/courses/AttendanceSection";
+import { SelfAssessmentSection } from "@/components/courses/SelfAssessmentSection";
 import type { StudentAttendanceState } from "@/lib/attendance/types";
+import type { SelfAssessmentQuestion } from "@/lib/self-assessment/types";
 
 interface LessonClosureProps {
   courseSlug: string;
   lessonSlug: string;
   initialCompletedAt: string | null;
   attendance?: StudentAttendanceState;
+  selfAssessment?: SelfAssessmentQuestion[];
 }
 
 export function LessonClosure({
@@ -18,6 +21,7 @@ export function LessonClosure({
   lessonSlug,
   initialCompletedAt,
   attendance,
+  selfAssessment,
 }: LessonClosureProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -99,6 +103,15 @@ export function LessonClosure({
           courseSlug={courseSlug}
           lessonSlug={lessonSlug}
           attendanceState={attendance}
+        />
+      )}
+
+      {/* Sección de autoevaluación (solo para estudiantes matriculados con preguntas publicadas) */}
+      {selfAssessment && selfAssessment.length > 0 && (
+        <SelfAssessmentSection
+          courseSlug={courseSlug}
+          lessonSlug={lessonSlug}
+          questions={selfAssessment}
         />
       )}
     </section>
