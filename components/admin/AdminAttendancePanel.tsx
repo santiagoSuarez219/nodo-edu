@@ -27,7 +27,6 @@ export function AdminAttendancePanel({
     initialSession?.attendanceCount ?? 0
   );
   const [isPending, startTransition] = useTransition();
-  const [showCodeInfo, setShowCodeInfo] = useState(false);
 
   // Polling para conteo en vivo (cada ~5 segundos mientras haya sesión abierta)
   useEffect(() => {
@@ -49,7 +48,6 @@ export function AdminAttendancePanel({
       if (result.success && result.session) {
         setSession(result.session);
         setAttendanceCount(result.session.attendanceCount);
-        setShowCodeInfo(true);
       } else {
         alert(`Error: ${result.error || 'No se pudo abrir la sesión'}`);
       }
@@ -69,7 +67,6 @@ export function AdminAttendancePanel({
       if (result.success) {
         setSession(null);
         setAttendanceCount(0);
-        setShowCodeInfo(false);
       } else {
         alert(`Error: ${result.error || 'No se pudo cerrar la sesión'}`);
       }
@@ -145,32 +142,30 @@ export function AdminAttendancePanel({
           </div>
 
           {/* Código */}
-          {showCodeInfo && (
-            <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-              <p className="text-xs text-blue-600 dark:text-blue-300 font-medium mb-2">
-                CÓDIGO DE ASISTENCIA
-              </p>
-              <div className="flex items-center justify-between gap-4">
-                <div className="flex-1">
-                  <p className="text-5xl font-mono font-bold text-blue-900 dark:text-blue-100 tracking-widest">
-                    {session.session.attendance_code}
-                  </p>
-                  <p className="text-xs text-blue-600 dark:text-blue-300 mt-2">
-                    Expira en:{' '}
-                    <span
-                      className={`font-bold ${
-                        timeRemaining === 'expirado'
-                          ? 'text-red-600 dark:text-red-400'
-                          : ''
-                      }`}
-                    >
-                      {timeRemaining}
-                    </span>
-                  </p>
-                </div>
+          <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+            <p className="text-xs text-blue-600 dark:text-blue-300 font-medium mb-2">
+              CÓDIGO DE ASISTENCIA
+            </p>
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex-1">
+                <p className="text-5xl font-mono font-bold text-blue-900 dark:text-blue-100 tracking-widest">
+                  {session.session.attendance_code}
+                </p>
+                <p className="text-xs text-blue-600 dark:text-blue-300 mt-2">
+                  Expira en:{' '}
+                  <span
+                    className={`font-bold ${
+                      timeRemaining === 'expirado'
+                        ? 'text-red-600 dark:text-red-400'
+                        : ''
+                    }`}
+                  >
+                    {timeRemaining}
+                  </span>
+                </p>
               </div>
             </div>
-          )}
+          </div>
 
           {/* Conteo */}
           <div className="grid grid-cols-1 gap-4">
