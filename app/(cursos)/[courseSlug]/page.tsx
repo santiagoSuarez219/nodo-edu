@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getCourseBySlug, getCourseSlugs } from "@/lib/courses";
+import { getCourseBySlug } from "@/lib/courses";
 import { getCourseWelcome } from "@/lib/courses/content";
+import { requireCourseAccess } from "@/lib/enrollments";
 import { CourseHeader } from "@/components/courses/CourseHeader";
 import { CourseSidebar } from "@/components/courses/CourseSidebar";
 import { MdxContent } from "@/components/mdx/MdxContent";
@@ -10,10 +11,7 @@ interface CoursePageProps {
   params: Promise<{ courseSlug: string }>;
 }
 
-export async function generateStaticParams() {
-  const slugs = await getCourseSlugs();
-  return slugs.map((courseSlug) => ({ courseSlug }));
-}
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
   params,
@@ -33,6 +31,7 @@ export async function generateMetadata({
 
 export default async function CoursePage({ params }: CoursePageProps) {
   const { courseSlug } = await params;
+
   const [course, welcome] = await Promise.all([
     getCourseBySlug(courseSlug),
     getCourseWelcome(courseSlug),
@@ -41,6 +40,8 @@ export default async function CoursePage({ params }: CoursePageProps) {
   if (!course) {
     notFound();
   }
+
+  await requireCourseAccess(courseSlug, `/${courseSlug}`);
 
   return (
     <main className="flex-1 bg-gray-50 dark:bg-gray-900">

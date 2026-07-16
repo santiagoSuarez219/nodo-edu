@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import {
-  getLessonBySlug,
-  getCourseLessonSlugPairs,
-} from "@/lib/courses";
+import { getLessonBySlug } from "@/lib/courses";
 import { getLessonArticle } from "@/lib/courses/content";
+import { requireCourseAccess } from "@/lib/enrollments";
 import { LessonArticle } from "@/components/courses/LessonArticle";
 import { LessonPagination } from "@/components/courses/LessonPagination";
 import { MdxContent } from "@/components/mdx/MdxContent";
@@ -14,9 +12,7 @@ interface LessonPageProps {
   params: Promise<{ courseSlug: string; lessonSlug: string }>;
 }
 
-export async function generateStaticParams() {
-  return await getCourseLessonSlugPairs();
-}
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
   params,
@@ -34,6 +30,8 @@ export default async function LessonPage({ params }: LessonPageProps) {
   const { courseSlug, lessonSlug } = await params;
   const ctx = await getLessonBySlug(courseSlug, lessonSlug);
   if (!ctx) notFound();
+
+  await requireCourseAccess(courseSlug, `/${courseSlug}/${lessonSlug}`);
 
   const { course, lesson, prev, next } = ctx;
   const article = lesson.articleSlug

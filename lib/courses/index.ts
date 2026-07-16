@@ -87,6 +87,7 @@ export async function getCourseBySlug(slug: string): Promise<Course | null> {
   return courses.find((c) => c.slug === slug) ?? null;
 }
 
+// Reserved for sitemap.ts (spec-005: routes are now dynamic, no consumers here).
 export async function getCourseSlugs(): Promise<string[]> {
   return courses.map((c) => c.slug);
 }
@@ -117,6 +118,7 @@ export async function getLessonBySlug(
   };
 }
 
+// Reserved for sitemap.ts (spec-005: routes are now dynamic, no consumers here).
 export async function getCourseLessonSlugPairs(): Promise<
   { courseSlug: string; lessonSlug: string }[]
 > {

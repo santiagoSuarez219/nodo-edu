@@ -8,9 +8,8 @@ import { UserMenu } from "./UserMenu";
 import Image from 'next/image'
 
 const sectionLinks = [
-  { href: "/estructuras-de-datos", label: "Estructuras de datos" },
-  { href: "/programacion-cientifica", label: "Programación científica" },
-  { href: "/analisis-de-algoritmos", label: "Análisis de algoritmos" },
+  { href: "/#cursos", label: "Cursos" },
+  { href: "/#docentes", label: "Docentes" },
 ] as const;
 
 export const Navbar = ({ profile }: { profile?: Profile | null }) => {
