@@ -6,6 +6,7 @@ import { requireCourseAccess } from "@/lib/enrollments";
 import { hasCourseAccess } from "@/lib/enrollments/access";
 import { markLessonViewed, getLessonProgress } from "@/lib/progress";
 import { getStudentAttendanceForCourse } from "@/lib/attendance";
+import { getSelfAssessmentForLesson } from "@/lib/self-assessment";
 import { LessonArticle } from "@/components/courses/LessonArticle";
 import { LessonPagination } from "@/components/courses/LessonPagination";
 import { LessonClosure } from "@/components/courses/LessonClosure";
@@ -47,8 +48,10 @@ export default async function LessonPage({ params }: LessonPageProps) {
     : null;
 
   let attendanceState = null;
+  let selfAssessment = null;
   if (access.ok && access.reason === "enrolled") {
     attendanceState = await getStudentAttendanceForCourse(courseSlug);
+    selfAssessment = await getSelfAssessmentForLesson(courseSlug, lessonSlug);
   }
 
   return (
@@ -74,6 +77,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
           lessonSlug={lessonSlug}
           initialCompletedAt={progress?.completed_at ?? null}
           attendance={attendanceState || undefined}
+          selfAssessment={selfAssessment || undefined}
         />
       )}
     </>
