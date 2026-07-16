@@ -5,6 +5,7 @@ import { getLessonArticle } from "@/lib/courses/content";
 import { requireCourseAccess } from "@/lib/enrollments";
 import { hasCourseAccess } from "@/lib/enrollments/access";
 import { markLessonViewed, getLessonProgress } from "@/lib/progress";
+import { getStudentAttendanceForCourse } from "@/lib/attendance";
 import { LessonArticle } from "@/components/courses/LessonArticle";
 import { LessonPagination } from "@/components/courses/LessonPagination";
 import { LessonClosure } from "@/components/courses/LessonClosure";
@@ -45,6 +46,11 @@ export default async function LessonPage({ params }: LessonPageProps) {
     ? await getLessonArticle(course.slug, lesson.articleSlug)
     : null;
 
+  let attendanceState = null;
+  if (access.ok && access.reason === "enrolled") {
+    attendanceState = await getStudentAttendanceForCourse(courseSlug);
+  }
+
   return (
     <>
       <LessonArticle
@@ -67,6 +73,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
           courseSlug={courseSlug}
           lessonSlug={lessonSlug}
           initialCompletedAt={progress?.completed_at ?? null}
+          attendance={attendanceState || undefined}
         />
       )}
     </>
