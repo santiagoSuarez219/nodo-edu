@@ -3,17 +3,23 @@
 import Link from "next/link";
 import { useState } from "react";
 import type { Profile } from "@/lib/students/types";
+import type { AppRole } from "@/lib/auth/session";
 import { signOut } from "@/lib/auth/actions";
 import { UserMenu } from "./UserMenu";
 import Image from 'next/image'
 
-const sectionLinks = [
-  { href: "/#cursos", label: "Cursos" },
-  { href: "/#docentes", label: "Docentes" },
-] as const;
 
-export const Navbar = ({ profile }: { profile?: Profile | null }) => {
+export const Navbar = ({
+  profile,
+  roles = [],
+}: {
+  profile?: Profile | null;
+  roles?: AppRole[];
+}) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const isTeacher = roles.includes("teacher") || roles.includes("admin");
+  const misCursosHref = isTeacher ? "/admin/courses" : "/cuenta/cursos";
 
   const toggleMenu = () => setIsMenuOpen((p) => !p);
   const closeMenu = () => setIsMenuOpen(false);
@@ -23,7 +29,7 @@ export const Navbar = ({ profile }: { profile?: Profile | null }) => {
       <nav className="w-full bg-white/90 dark:bg-gray-900/90 backdrop-blur border-b border-gray-200 dark:border-gray-700 transition-colors duration-300 ">
         <div className="flex items-center justify-between w-full mx-auto px-4 md:px-6 lg:px-18 py-3 lg:py-4">
           <Link
-            href="/"
+            href="/cuenta/cursos"
             className="bg-white rounded-lg py-1 px-2"
             aria-label="Inicio"
             onClick={closeMenu}
@@ -39,21 +45,21 @@ export const Navbar = ({ profile }: { profile?: Profile | null }) => {
 
 
           <ul className="hidden lg:flex gap-7 text-sm tracking-tight font-semibold text-gray-600 dark:text-gray-300">
-            {sectionLinks.map((l) => (
-              <li key={l.href}>
+            {profile && (
+              <li>
                 <Link
-                  href={l.href}
+                  href={misCursosHref}
                   className="transition-colors hover:text-blue-700 dark:hover:text-blue-400"
                 >
-                  {l.label}
+                  Mis cursos
                 </Link>
               </li>
-            ))}
+            )}
           </ul>
           <div className="flex gap-3 items-center">
             {profile ? (
               <div className="hidden lg:block">
-                <UserMenu profile={profile} />
+                <UserMenu profile={profile} misCursosHref={misCursosHref} />
               </div>
             ) : (
               <Link
@@ -109,23 +115,21 @@ export const Navbar = ({ profile }: { profile?: Profile | null }) => {
           }`}
       >
         <ul className="flex flex-col gap-1 px-6 py-4 text-base tracking-tight border-t border-gray-200 dark:border-gray-700">
-          {sectionLinks.map((l) => (
-            <li key={l.href}>
-              <Link
-                href={l.href}
-                onClick={closeMenu}
-                className="block py-3 text-gray-700 dark:text-gray-300 hover:text-blue-700 dark:hover:text-blue-400 transition-colors"
-              >
-                {l.label}
-              </Link>
-            </li>
-          ))}
           {profile ? (
             <>
               <li className="mt-2 border-t border-gray-100 dark:border-gray-700 pt-2">
                 <p className="px-1 py-1.5 text-xs font-semibold text-gray-500 dark:text-gray-400 truncate">
                   {profile.full_name}
                 </p>
+              </li>
+              <li>
+                <Link
+                  href={misCursosHref}
+                  onClick={closeMenu}
+                  className="block py-3 text-gray-700 dark:text-gray-300 hover:text-blue-700 dark:hover:text-blue-400 transition-colors"
+                >
+                  Mis cursos
+                </Link>
               </li>
               <li>
                 <Link

@@ -14,7 +14,13 @@ function getInitials(name: string): string {
     .join("");
 }
 
-export function UserMenu({ profile }: { profile: Profile }) {
+export function UserMenu({
+  profile,
+  misCursosHref,
+}: {
+  profile: Profile;
+  misCursosHref: string;
+}) {
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -93,6 +99,24 @@ export function UserMenu({ profile }: { profile: Profile }) {
 
           <Link
             ref={firstItemRef}
+            href={misCursosHref}
+            role="menuitem"
+            onClick={close}
+            className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors focus-visible:outline-none focus-visible:bg-gray-100 dark:focus-visible:bg-gray-700"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              className="size-4 text-gray-400 dark:text-gray-500"
+              aria-hidden="true"
+            >
+              <path d="M10.75 2.75a.75.75 0 0 0-1.5 0v.006L4.318 4.723A1.75 1.75 0 0 0 3 6.401v.933a.75.75 0 0 0 1.5 0v-.933a.25.25 0 0 1 .188-.242L10 4.25l5.312 1.909a.25.25 0 0 1 .188.242v6.85a.25.25 0 0 1-.188.242L10 15.402l-3.5-1.257v-2.417a.75.75 0 0 0-1.5 0v2.93c0 .32.2.606.5.712l4.25 1.528c.164.059.343.059.507 0l5.75-2.067a1.75 1.75 0 0 0 1.182-1.654V6.402a1.75 1.75 0 0 0-1.182-1.654L10.75 2.756v-.006Z" />
+            </svg>
+            Mis cursos
+          </Link>
+
+          <Link
             href="/cuenta"
             role="menuitem"
             onClick={close}

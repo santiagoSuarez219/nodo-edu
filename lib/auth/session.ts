@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { createServerSupabaseClient } from "./server";
 import type { Profile } from "@/lib/students/types";
 
-type AppRole = "student" | "teacher" | "admin";
+export type AppRole = "student" | "teacher" | "admin";
 
 export const getCurrentUser = cache(async () => {
   const supabase = await createServerSupabaseClient();
@@ -25,6 +25,19 @@ export const getCurrentProfile = cache(async (): Promise<Profile | null> => {
     .single();
 
   return data ?? null;
+});
+
+export const getCurrentRoles = cache(async (): Promise<AppRole[]> => {
+  const user = await getCurrentUser();
+  if (!user) return [];
+
+  const supabase = await createServerSupabaseClient();
+  const { data } = await supabase
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", user.id);
+
+  return (data ?? []).map((r) => r.role as AppRole);
 });
 
 export async function requireUser(redirectTo?: string) {

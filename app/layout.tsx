@@ -4,7 +4,7 @@ import Script from "next/script";
 import "./globals.css";
 import { AnnouncementBar } from "@/components/navbar/AnnouncementBar";
 import { Navbar } from "@/components/navbar/Navbar";
-import { getCurrentProfile } from "@/lib/auth/session";
+import { getCurrentProfile, getCurrentRoles } from "@/lib/auth/session";
 
 const jetbrainsMono = JetBrains_Mono({
   variable: "--font-jetbrains-mono",
@@ -38,6 +38,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const profile = await getCurrentProfile();
+  const roles = await getCurrentRoles();
 
   return (
     <html
@@ -53,7 +54,7 @@ export default async function RootLayout({
         />
         <div className="sticky top-0 left-0 w-full z-50">
           <AnnouncementBar />
-          <Navbar profile={profile} />
+          <Navbar profile={profile} roles={roles} />
         </div>
         {children}
       </body>
