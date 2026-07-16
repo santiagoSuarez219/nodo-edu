@@ -5,9 +5,14 @@ import { LessonSidebarItem } from "./LessonSidebarItem";
 interface LessonSidebarProps {
   course: Course;
   activeLessonSlug: string;
+  completedLessonSlugs?: Set<string>;
 }
 
-export function LessonSidebar({ course, activeLessonSlug }: LessonSidebarProps) {
+export function LessonSidebar({
+  course,
+  activeLessonSlug,
+  completedLessonSlugs = new Set(),
+}: LessonSidebarProps) {
   const ordered = [...course.lessons].sort((a, b) => a.order - b.order);
 
   return (
@@ -34,6 +39,7 @@ export function LessonSidebar({ course, activeLessonSlug }: LessonSidebarProps) 
             lesson={lesson}
             isActive={lesson.slug === activeLessonSlug}
             defaultExpanded={lesson.slug === activeLessonSlug}
+            isCompleted={completedLessonSlugs.has(lesson.slug)}
           />
         ))}
       </ol>
