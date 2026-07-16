@@ -26,7 +26,7 @@ arranca en estado ⬜ Pendiente.
 **Resultado esperado:** se genera y muestra un código de 4–6 dígitos con una cuenta
 atrás de expiración; el estado pasa a "sesión abierta"; el conteo de asistentes
 arranca en 0.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-010-02 — No se pueden abrir dos sesiones simultáneas
 **Precondición:** sesión de `docenteA`; con una sesión ya abierta (TC-010-01).
@@ -34,7 +34,7 @@ arranca en 0.
 1. Con la sesión abierta, intentar abrir otra (recargar / segundo intento).
 **Resultado esperado:** el sistema no crea una segunda sesión; muestra un mensaje
 "ya hay una sesión de asistencia abierta" y mantiene la existente.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-010-03 — El docente cierra la sesión
 **Precondición:** sesión de `docenteA`; con una sesión abierta.
@@ -42,7 +42,7 @@ arranca en 0.
 1. Pulsar "Cerrar sesión".
 **Resultado esperado:** la sesión pasa a cerrada (`is_open=false`); desaparece el
 código; se habilita abrir una nueva sesión.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-010-04 — El conteo de asistentes se actualiza en vivo
 **Precondición:** sesión de `docenteA` con sesión abierta; en paralelo,
@@ -52,7 +52,7 @@ código; se habilita abrir una nueva sesión.
 2. Que `estudianteMatriculado` ingrese el código en su lección.
 **Resultado esperado:** el conteo del panel docente se incrementa (polling ~5 s) sin
 recarga manual.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ---
 
@@ -67,7 +67,7 @@ código conocido.
 3. Enviar.
 **Resultado esperado:** la asistencia queda registrada; la sección muestra la
 confirmación con la hora (`marked_at`) sin recarga manual.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-010-06 — Código inexistente
 **Precondición:** sesión de `estudianteMatriculado`; sesión abierta.
