@@ -1,6 +1,6 @@
 # spec-009 — Progreso de lección y cierre ("completar lección")
 
-> **Estado:** `[IN PROGRESS]` — Fase 1 iniciada.
+> **Estado:** `[TESTING]` — Implementación completada. Todas las pruebas manuales aprobadas.
 
 Este es el **primero de tres specs** que descomponen la "estructura interactiva
 de la lección" prometida en la nota de continuidad de
