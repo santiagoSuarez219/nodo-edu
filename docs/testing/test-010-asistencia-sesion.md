@@ -179,7 +179,7 @@ Desktop después de guardar el archivo para que cargue el servidor.
 > id `7bd3f233-c8e0-4e9e-bf2e-634b0a883756`.
 **Output esperado:** lista de sesiones con `session_date`, `is_open`,
 `attendee_count`, sin campo `attendance_code`.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-MCP-010-02 — Roster de una sesión
 **Herramienta probada:** `get_session_attendance` en `attendance-mcp`.
@@ -191,7 +191,7 @@ Desktop después de guardar el archivo para que cargue el servidor.
 > cada uno.
 **Output esperado:** objeto con `session`, `records[]` (`student_id`,
 `student_name`, `marked_at`) y `attendee_count`; sin `attendance_code`.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-MCP-010-03 — Resumen de asistencia por curso
 **Herramienta probada:** `get_course_attendance_summary` en `attendance-mcp`.
@@ -203,7 +203,7 @@ Desktop después de guardar el archivo para que cargue el servidor.
 > estudiante.
 **Output esperado:** `total_sessions` y por estudiante `sessions_attended` +
 `attendance_pct`.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-MCP-010-04 — El MCP no expone acciones de mutación ni el código
 **Herramienta probada:** superficie de `attendance-mcp`.
@@ -220,7 +220,7 @@ Desktop después de guardar el archivo para que cargue el servidor.
 explícitamente que no puede abrir/cerrar sesiones ni marcar asistencia (no
 existen `open_session`, `close_session` ni `mark_attendance`); ningún output
 de las 3 herramientas incluye `attendance_code`.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-MCP-010-05 — Input inválido / recurso inexistente
 **Herramienta probada:** `get_session_attendance` en `attendance-mcp`.
@@ -231,4 +231,4 @@ de las 3 herramientas incluye `attendance_code`.
 > `00000000-0000-0000-0000-000000000000`.
 **Output esperado:** error claro (no encontrado / validación) sin filtrar datos de
 otras sesiones.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
