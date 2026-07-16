@@ -7,3 +7,4 @@ mismo directorio.
 | MCP | Propósito | Estado | System prompt | Código |
 |---|---|---|---|---|
 | `question-bank-mcp` | Cliente de la API `/api/questions/*` para que un agente docente liste, cree, actualice, elimine y publique preguntas del banco de evaluaciones (multiple_choice, open_text, code_snippet, code_write, coding_challenge). | Activo | `docs/mcps/question-bank-agent.system-prompt.md` | `mcp-servers/question-bank-mcp/` |
+| `attendance-mcp` | Cliente de solo lectura de la API `/api/attendance/*` para que un agente docente liste sesiones de asistencia, consulte roster y resúmenes de asistencia por estudiante. | Activo | `docs/mcps/attendance-agent.system-prompt.md` | `mcp-servers/attendance-mcp/` |
