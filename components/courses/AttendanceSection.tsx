@@ -141,7 +141,7 @@ export function AttendanceSection({
           </h2>
           <div className="flex items-start gap-3 p-4 rounded-lg bg-[#f3faf7] dark:bg-[#014737] border border-green-200 dark:border-green-900">
             <svg
-              className="w-5 h-5 text-success flex-shrink-0 mt-0.5"
+              className="w-5 h-5 text-success dark:text-green-300 flex-shrink-0 mt-0.5"
               fill="currentColor"
               viewBox="0 0 20 20"
               aria-hidden="true"
@@ -153,11 +153,11 @@ export function AttendanceSection({
               />
             </svg>
             <div>
-              <p className="text-sm font-medium text-success">
+              <p className="text-sm font-medium text-success dark:text-green-300">
                 Asistencia marcada
               </p>
               {markedDate && (
-                <p className="text-xs text-success/80 mt-1">
+                <p className="text-xs text-success/80 dark:text-green-300/80 mt-1">
                   Registrada el {markedDate}
                 </p>
               )}
@@ -188,8 +188,8 @@ export function AttendanceSection({
             <svg
               className={`w-5 h-5 flex-shrink-0 mt-0.5 ${
                 resultMessages[lastResult].type === 'success'
-                  ? 'text-success'
-                  : 'text-danger'
+                  ? 'text-success dark:text-green-300'
+                  : 'text-danger dark:text-red-300'
               }`}
               fill="currentColor"
               viewBox="0 0 20 20"
@@ -213,8 +213,8 @@ export function AttendanceSection({
               <p
                 className={`text-sm font-medium ${
                   resultMessages[lastResult].type === 'success'
-                    ? 'text-success'
-                    : 'text-danger'
+                    ? 'text-success dark:text-green-300'
+                    : 'text-danger dark:text-red-300'
                 }`}
               >
                 {resultMessages[lastResult].title}
@@ -222,8 +222,8 @@ export function AttendanceSection({
               <p
                 className={`text-xs mt-1 ${
                   resultMessages[lastResult].type === 'success'
-                    ? 'text-success/80'
-                    : 'text-danger/80'
+                    ? 'text-success/80 dark:text-green-300/80'
+                    : 'text-danger/80 dark:text-red-300/80'
                 }`}
               >
                 {resultMessages[lastResult].message}
