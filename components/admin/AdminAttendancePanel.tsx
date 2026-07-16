@@ -112,7 +112,7 @@ export function AdminAttendancePanel({
             <button
               onClick={handleOpenSession}
               disabled={isPending}
-              className="w-full bg-blue-700 hover:bg-blue-800 disabled:bg-blue-600 text-white font-medium py-2.5 px-4 rounded-lg transition-colors"
+              className="w-full bg-brand hover:bg-brand-strong dark:bg-brand dark:hover:bg-brand-strong disabled:opacity-50 text-white font-medium py-2.5 px-4 rounded-lg transition-colors"
             >
               {isPending ? 'Abriendo sesión...' : 'Abrir sesión de asistencia'}
             </button>
@@ -125,7 +125,7 @@ export function AdminAttendancePanel({
   return (
     <div className="flex flex-col gap-6">
       {/* Sesión abierta */}
-      <div className="bg-white dark:bg-gray-800 border border-green-200 dark:border-green-900 rounded-[var(--radius-base)] px-6 py-6">
+      <div className="bg-white dark:bg-gray-800 border border-success/30 dark:border-success/40 rounded-[var(--radius-base)] px-6 py-6">
         <div className="flex flex-col gap-4">
           {/* Info de sesión */}
           <div className="flex items-start justify-between">
@@ -134,29 +134,29 @@ export function AdminAttendancePanel({
                 Sesión abierta desde{' '}
                 {new Date(session.session.created_at).toLocaleTimeString('es-CO')}
               </p>
-              <div className="inline-flex items-center gap-2 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-3 py-1 rounded-lg text-sm font-medium w-fit">
-                <div className="w-2 h-2 rounded-full bg-green-600 dark:bg-green-400 animate-pulse" />
+              <div className="inline-flex items-center gap-2 bg-success/10 text-success dark:text-green-300 px-3 py-1 rounded-lg text-sm font-medium w-fit">
+                <div className="w-2 h-2 rounded-full bg-success dark:bg-green-400 animate-pulse" />
                 Sesión activa
               </div>
             </div>
           </div>
 
           {/* Código */}
-          <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-            <p className="text-xs text-blue-600 dark:text-blue-300 font-medium mb-2">
+          <div className="bg-brand-softer dark:bg-gray-700 border border-border-brand dark:border-brand/30 rounded-lg p-4">
+            <p className="text-xs text-brand dark:text-blue-300 font-medium mb-2">
               CÓDIGO DE ASISTENCIA
             </p>
             <div className="flex items-center justify-between gap-4">
               <div className="flex-1">
-                <p className="text-5xl font-mono font-bold text-blue-900 dark:text-blue-100 tracking-widest">
+                <p className="text-5xl font-mono font-bold text-brand-strong dark:text-blue-200 tracking-widest">
                   {session.session.attendance_code}
                 </p>
-                <p className="text-xs text-blue-600 dark:text-blue-300 mt-2">
+                <p className="text-xs text-brand dark:text-blue-300 mt-2">
                   Expira en:{' '}
                   <span
                     className={`font-bold ${
                       timeRemaining === 'expirado'
-                        ? 'text-red-600 dark:text-red-400'
+                        ? 'text-danger dark:text-red-300'
                         : ''
                     }`}
                   >
@@ -183,7 +183,7 @@ export function AdminAttendancePanel({
           <button
             onClick={handleCloseSession}
             disabled={isPending}
-            className="w-full bg-red-100 dark:bg-red-950 hover:bg-red-200 dark:hover:bg-red-900 disabled:opacity-50 text-red-800 dark:text-red-200 font-medium py-2.5 px-4 rounded-lg transition-colors"
+            className="w-full bg-danger/10 hover:bg-danger/20 dark:bg-danger/20 dark:hover:bg-danger/30 disabled:opacity-50 text-danger dark:text-red-300 font-medium py-2.5 px-4 rounded-lg transition-colors"
           >
             {isPending ? 'Cerrando...' : 'Cerrar sesión'}
           </button>

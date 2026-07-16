@@ -94,7 +94,13 @@ export function LessonClosure({
       </div>
 
       {/* Sección de asistencia (solo para estudiantes matriculados) */}
-      {attendance && <AttendanceSection courseSlug={courseSlug} attendanceState={attendance} />}
+      {attendance && (
+        <AttendanceSection
+          courseSlug={courseSlug}
+          lessonSlug={lessonSlug}
+          attendanceState={attendance}
+        />
+      )}
     </section>
   );
 }

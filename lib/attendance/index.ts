@@ -27,6 +27,13 @@ function getCodeExpiresAt(): Date {
   return expiresAt;
 }
 
+// Decisión 8: session_date en el día local del curso (America/Bogota), no UTC
+function getBogotaDateString(): string {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Bogota' }).format(
+    new Date()
+  );
+}
+
 export async function openSession(
   academicCourseId: string
 ): Promise<{ success: boolean; session?: OpenSessionSummary; error?: string }> {
@@ -43,7 +50,7 @@ export async function openSession(
         .from('class_sessions')
         .insert({
           academic_course_id: academicCourseId,
-          session_date: new Date().toISOString().split('T')[0],
+          session_date: getBogotaDateString(),
           attendance_code: code,
           code_expires_at: getCodeExpiresAt().toISOString(),
           is_open: true,
@@ -52,15 +59,15 @@ export async function openSession(
         .single();
 
       if (error) {
-        if (error.message?.includes('unique constraint')) {
-          // Colisión de código (muy raro) o ya hay sesión abierta
-          if (error.message?.includes('academic_course_id')) {
+        if (error.code === '23505') {
+          // Violación de unique constraint: distinguir por el índice afectado
+          if (error.message?.includes('class_sessions_academic_course_id_idx')) {
             return {
               success: false,
               error: 'Ya hay una sesión de asistencia abierta en este curso',
             };
           }
-          // Reintentar con nuevo código
+          // Colisión de código entre sesiones abiertas (class_sessions_attendance_code_idx): reintentar
           code = generateAttendanceCode();
           attempts++;
           continue;
@@ -171,6 +178,7 @@ export async function getSessionAttendanceCount(
 
 export async function markAttendanceByCode(
   courseSlug: string,
+  lessonSlug: string,
   code: string
 ): Promise<MarkAttendanceResult> {
   const supabase = await createServerSupabaseClient();
@@ -201,7 +209,7 @@ export async function markAttendanceByCode(
     }
 
     const result = data[0] as { status: string };
-    revalidatePath(`/${courseSlug}`);
+    revalidatePath(`/${courseSlug}/${lessonSlug}`);
     return (result.status as MarkAttendanceResult) || 'not_found';
   } catch (err) {
     console.error('Error marking attendance:', err);

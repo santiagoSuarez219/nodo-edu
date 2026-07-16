@@ -1,7 +1,8 @@
 -- Tablas para asistencia por sesión con código efímero
 -- Decisión 1: código único entre sesiones abiertas (índice parcial)
 -- Decisión 7: una sola sesión abierta por curso a la vez (índice único parcial)
--- Decisión 8: session_date en zona horaria America/Bogota (server-side en RPC)
+-- Decisión 8: session_date en zona horaria America/Bogota (server-side en
+-- la Server Action openSession, lib/attendance/index.ts)
 
 create table public.class_sessions (
   id               uuid        primary key default gen_random_uuid(),

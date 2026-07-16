@@ -14,6 +14,7 @@ import type {
 
 interface AttendanceSectionProps {
   courseSlug: string;
+  lessonSlug: string;
   attendanceState: StudentAttendanceState;
 }
 
@@ -60,6 +61,7 @@ const resultMessages: Record<MarkAttendanceResult, { title: string; message: str
 
 export function AttendanceSection({
   courseSlug,
+  lessonSlug,
   attendanceState,
 }: AttendanceSectionProps) {
   const router = useRouter();
@@ -79,7 +81,7 @@ export function AttendanceSection({
 
   const onSubmit = (data: CodeFormData) => {
     startTransition(async () => {
-      const result = await markAttendanceByCode(courseSlug, data.code);
+      const result = await markAttendanceByCode(courseSlug, lessonSlug, data.code);
       setLastResult(result);
       reset();
       if (result === 'marked' || result === 'already_marked') {
@@ -139,7 +141,7 @@ export function AttendanceSection({
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">
             Asistencia
           </h2>
-          <div className="flex items-start gap-3 p-4 rounded-lg bg-[#f3faf7] dark:bg-[#014737] border border-green-200 dark:border-green-900">
+          <div className="flex items-start gap-3 p-4 rounded-lg bg-[#f3faf7] dark:bg-[#014737] border border-success/30 dark:border-success/40">
             <svg
               className="w-5 h-5 text-success dark:text-green-300 flex-shrink-0 mt-0.5"
               fill="currentColor"
@@ -181,8 +183,8 @@ export function AttendanceSection({
           <div
             className={`mb-4 flex items-start gap-3 p-4 rounded-lg border ${
               resultMessages[lastResult].type === 'success'
-                ? 'bg-[#f3faf7] dark:bg-[#014737] border-green-200 dark:border-green-900'
-                : 'bg-[#fdf2f2] dark:bg-[#771d1d] border-red-200 dark:border-red-900'
+                ? 'bg-[#f3faf7] dark:bg-[#014737] border-success/30 dark:border-success/40'
+                : 'bg-[#fdf2f2] dark:bg-[#771d1d] border-danger/30 dark:border-danger/40'
             }`}
           >
             <svg

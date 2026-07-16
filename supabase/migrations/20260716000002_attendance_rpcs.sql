@@ -1,7 +1,6 @@
 -- RPCs security definer para asistencia
 -- Decisión 2: validación de expiración server-side
 -- Decisión 4: validación de matrícula activa sin abrir select general de tablas
--- Decisión 8: session_date en zona horaria America/Bogota
 
 create or replace function public.mark_attendance_by_code(p_code text)
 returns table (status text, session_id uuid, marked_at timestamptz)
