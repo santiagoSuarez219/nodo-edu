@@ -5,6 +5,24 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+## DEBT-004 — Sin acción de eliminar/desactivar curso en el panel admin
+
+**Origen:** Consulta del usuario sobre cómo eliminar un curso (2026-07-16)
+**Prioridad:** Media — no bloquea producción, pero es una operación admin básica ausente
+
+`AcademicCourseList.tsx` y el detalle de curso (`app/(admin)/admin/courses/[academicCourseId]/`)
+no exponen ningún botón de eliminar ni desactivar. Ya existe
+`deactivateCourseAction` en `lib/academic-courses/actions.ts` (soft delete vía
+`is_active: false`), pero no está conectado a ningún componente de la UI. No
+existe una acción de borrado definitivo (hard delete).
+
+**Acción:** Diseñar spec para exponer en la UI:
+1. Desactivar curso (usa `deactivateCourseAction` ya existente).
+2. Evaluar si además se requiere borrado definitivo, y si debe hacerse en
+   cascada (asistencia, notas, matrículas asociadas).
+
+---
+
 ## DEBT-003 — `course_slug` de `academic_courses` sin validación ni selector
 
 **Origen:** Revisión manual durante spec-006 (lecciones privadas)
