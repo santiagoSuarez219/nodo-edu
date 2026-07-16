@@ -1,6 +1,6 @@
-# spec-010 — [IN PROGRESS] Asistencia por sesión con código
+# spec-010 — [TESTING] Asistencia por sesión con código
 
-> **Estado:** [IN PROGRESS] — Implementación iniciada.
+> **Estado:** [TESTING] — Implementación completa, pendiente de pruebas manuales y e2e.
 > Al aprobarse e iniciar la Fase 1, este estado pasa a `[IN PROGRESS]`.
 >
 > **Rama:** `feat/asistencia-sesion`
