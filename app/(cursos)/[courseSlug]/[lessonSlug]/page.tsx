@@ -3,8 +3,11 @@ import { notFound } from "next/navigation";
 import { getLessonBySlug } from "@/lib/courses";
 import { getLessonArticle } from "@/lib/courses/content";
 import { requireCourseAccess } from "@/lib/enrollments";
+import { hasCourseAccess } from "@/lib/enrollments/access";
+import { markLessonViewed, getLessonProgress } from "@/lib/progress";
 import { LessonArticle } from "@/components/courses/LessonArticle";
 import { LessonPagination } from "@/components/courses/LessonPagination";
+import { LessonClosure } from "@/components/courses/LessonClosure";
 import { MdxContent } from "@/components/mdx/MdxContent";
 import { TopicList } from "@/components/courses/TopicList";
 
@@ -33,6 +36,10 @@ export default async function LessonPage({ params }: LessonPageProps) {
 
   await requireCourseAccess(courseSlug, `/${courseSlug}/${lessonSlug}`);
 
+  await markLessonViewed(courseSlug, lessonSlug);
+  const access = await hasCourseAccess(courseSlug);
+  const progress = await getLessonProgress(courseSlug, lessonSlug);
+
   const { course, lesson, prev, next } = ctx;
   const article = lesson.articleSlug
     ? await getLessonArticle(course.slug, lesson.articleSlug)
@@ -55,6 +62,13 @@ export default async function LessonPage({ params }: LessonPageProps) {
         )}
       </LessonArticle>
       <LessonPagination courseSlug={course.slug} prev={prev} next={next} />
+      {access.ok && access.reason === "enrolled" && (
+        <LessonClosure
+          courseSlug={courseSlug}
+          lessonSlug={lessonSlug}
+          initialCompletedAt={progress?.completed_at ?? null}
+        />
+      )}
     </>
   );
 }
