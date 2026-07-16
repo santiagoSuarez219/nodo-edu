@@ -108,6 +108,18 @@ export default async function AcademicCourseDetailPage({ params }: Props) {
         >
           Asistencia
         </Link>
+        <Link
+          href={`/admin/courses/${academicCourseId}/presentacion`}
+          className="px-4 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
+        >
+          Presentación del curso
+        </Link>
+        <Link
+          href={`/admin/courses/${academicCourseId}/contenido`}
+          className="px-4 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
+        >
+          Contenido del curso
+        </Link>
       </div>
 
       {/* Tabla de estudiantes */}
