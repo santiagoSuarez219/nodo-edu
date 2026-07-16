@@ -1,6 +1,6 @@
 # spec-009 — Progreso de lección y cierre ("completar lección")
 
-> **Estado:** `[TESTING]` — Implementación completada. Todas las pruebas manuales aprobadas.
+> **Estado:** `[DONE]` — Implementación completada, pruebas manuales aprobadas (TC-009-01 a TC-009-09), revisión de código ejecutada y hallazgos corregidos.
 
 Este es el **primero de tres specs** que descomponen la "estructura interactiva
 de la lección" prometida en la nota de continuidad de
