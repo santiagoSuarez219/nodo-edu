@@ -85,14 +85,17 @@ export async function getServiceSessions(
 
   if (error) throw error;
 
-  return (data || []).map((row: Record<string, unknown>) => ({
-    id: row.id,
-    session_date: row.session_date,
-    is_open: row.is_open,
-    code_expires_at: row.code_expires_at,
-    attendee_count: row.attendance_records?.[0]?.count ?? 0,
-    created_at: row.created_at,
-  }));
+  return (data || []).map((row: Record<string, unknown>) => {
+    const attendanceRecords = row.attendance_records as Array<{ count: number }> | undefined;
+    return {
+      id: row.id as string,
+      session_date: row.session_date as string,
+      is_open: row.is_open as boolean,
+      code_expires_at: row.code_expires_at as string,
+      attendee_count: attendanceRecords?.[0]?.count ?? 0,
+      created_at: row.created_at as string,
+    };
+  });
 }
 
 export async function getServiceSessionAttendance(
@@ -121,53 +124,47 @@ export async function getServiceSessionAttendance(
 
   const session = sessionData as Record<string, unknown>;
 
-  // Obtener los registros de asistencia con nombre del estudiante
+  // Obtener los registros de asistencia
   const { data: records, error: recordsError } = await supabase
     .from('attendance_records')
-    .select(
-      `
-      student_id,
-      marked_at,
-      auth_users:student_id(email)
-    `
-    )
+    .select('student_id, marked_at')
     .eq('session_id', sessionId)
     .order('marked_at', { ascending: true });
 
   if (recordsError) throw recordsError;
 
-  // Obtener los nombres de los estudiantes desde perfiles
+  // Obtener los nombres de los estudiantes desde perfiles (profiles.id = auth.users.id)
   const studentIds = (records || []).map((r: Record<string, unknown>) => r.student_id);
   let students: Record<string, string> = {};
 
   if (studentIds.length > 0) {
     const { data: profiles, error: profilesError } = await supabase
       .from('profiles')
-      .select('user_id, full_name')
-      .in('user_id', studentIds);
+      .select('id, full_name')
+      .in('id', studentIds);
 
     if (profilesError) throw profilesError;
 
     students = Object.fromEntries(
-      (profiles || []).map((p: Record<string, unknown>) => [p.user_id, p.full_name])
+      (profiles || []).map((p: Record<string, unknown>) => [p.id, p.full_name])
     );
   }
 
   const attendanceRecords = (records || []).map((r: Record<string, unknown>) => ({
-    student_id: r.student_id,
-    student_name: students[r.student_id as string] || (r.auth_users as Record<string, unknown>)?.email || 'Desconocido',
-    marked_at: r.marked_at,
+    student_id: r.student_id as string,
+    student_name: students[r.student_id as string] || 'Desconocido',
+    marked_at: r.marked_at as string,
   }));
 
   return {
     session: {
-      id: session.id,
-      academic_course_id: session.academic_course_id,
-      session_date: session.session_date,
-      code_expires_at: session.code_expires_at,
-      is_open: session.is_open,
-      created_at: session.created_at,
-      updated_at: session.updated_at,
+      id: session.id as string,
+      academic_course_id: session.academic_course_id as string,
+      session_date: session.session_date as string,
+      code_expires_at: session.code_expires_at as string,
+      is_open: session.is_open as boolean,
+      created_at: session.created_at as string,
+      updated_at: session.updated_at as string,
     },
     records: attendanceRecords,
     attendee_count: attendanceRecords.length,
@@ -227,16 +224,29 @@ export async function getServiceCourseAttendanceSummary(
   // Obtener todos los registros de asistencia
   const { data: records, error: recordsError } = await supabase
     .from('attendance_records')
-    .select(
-      `
-      student_id,
-      session_id,
-      profiles:student_id(full_name, user_id)
-    `
-    )
+    .select('student_id, session_id')
     .in('session_id', sessionIds);
 
   if (recordsError) throw recordsError;
+
+  // Obtener los nombres de los estudiantes involucrados (profiles.id = auth.users.id)
+  const uniqueStudentIds = Array.from(
+    new Set((records || []).map((r: Record<string, unknown>) => r.student_id as string))
+  );
+  let studentNames: Record<string, string> = {};
+
+  if (uniqueStudentIds.length > 0) {
+    const { data: profiles, error: profilesError } = await supabase
+      .from('profiles')
+      .select('id, full_name')
+      .in('id', uniqueStudentIds);
+
+    if (profilesError) throw profilesError;
+
+    studentNames = Object.fromEntries(
+      (profiles || []).map((p: Record<string, unknown>) => [p.id, p.full_name])
+    );
+  }
 
   // Agrupar por estudiante y contar sesiones asistidas
   const studentStats: Record<
@@ -245,8 +255,8 @@ export async function getServiceCourseAttendanceSummary(
   > = {};
 
   (records || []).forEach((r: Record<string, unknown>) => {
-    const studentId = r.student_id;
-    const studentName = r.profiles?.full_name || 'Desconocido';
+    const studentId = r.student_id as string;
+    const studentName = studentNames[studentId] || 'Desconocido';
 
     if (!studentStats[studentId]) {
       studentStats[studentId] = {
@@ -255,7 +265,7 @@ export async function getServiceCourseAttendanceSummary(
       };
     }
 
-    studentStats[studentId].sessionsAttended.add(r.session_id);
+    studentStats[studentId].sessionsAttended.add(r.session_id as string);
   });
 
   const students: StudentAttendanceSummary[] = Object.entries(studentStats).map(

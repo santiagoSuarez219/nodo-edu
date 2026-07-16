@@ -15,7 +15,7 @@ create policy "class_sessions_select_owner_or_admin" on public.class_sessions
       where ac.id = academic_course_id
         and ac.teacher_id = auth.uid()
     )
-    or exists (select 1 from public.profiles p where p.user_id = auth.uid() and p.role = 'admin')
+    or public.has_role(auth.uid(), 'admin')
   );
 
 -- class_sessions: insert/update/delete solo para docente dueño o admin
@@ -28,7 +28,7 @@ create policy "class_sessions_mutate_owner_or_admin" on public.class_sessions
       where ac.id = academic_course_id
         and ac.teacher_id = auth.uid()
     )
-    or exists (select 1 from public.profiles p where p.user_id = auth.uid() and p.role = 'admin')
+    or public.has_role(auth.uid(), 'admin')
   );
 
 create policy "class_sessions_insert_owner_or_admin" on public.class_sessions
@@ -40,7 +40,7 @@ create policy "class_sessions_insert_owner_or_admin" on public.class_sessions
       where ac.id = academic_course_id
         and ac.teacher_id = auth.uid()
     )
-    or exists (select 1 from public.profiles p where p.user_id = auth.uid() and p.role = 'admin')
+    or public.has_role(auth.uid(), 'admin')
   );
 
 create policy "class_sessions_delete_owner_or_admin" on public.class_sessions
@@ -52,7 +52,7 @@ create policy "class_sessions_delete_owner_or_admin" on public.class_sessions
       where ac.id = academic_course_id
         and ac.teacher_id = auth.uid()
     )
-    or exists (select 1 from public.profiles p where p.user_id = auth.uid() and p.role = 'admin')
+    or public.has_role(auth.uid(), 'admin')
   );
 
 -- attendance_records: select para propio, docente dueño o admin
@@ -67,7 +67,7 @@ create policy "attendance_records_select_own_or_teacher_or_admin" on public.atte
       where cs.id = session_id
         and ac.teacher_id = auth.uid()
     )
-    or exists (select 1 from public.profiles p where p.user_id = auth.uid() and p.role = 'admin')
+    or public.has_role(auth.uid(), 'admin')
   );
 
 -- attendance_records: delete solo para docente dueño o admin (correcciones manuales futuras)
@@ -81,7 +81,7 @@ create policy "attendance_records_delete_teacher_or_admin" on public.attendance_
       where cs.id = session_id
         and ac.teacher_id = auth.uid()
     )
-    or exists (select 1 from public.profiles p where p.user_id = auth.uid() and p.role = 'admin')
+    or public.has_role(auth.uid(), 'admin')
   );
 
 -- INTENCIONALMENTE: sin insert policy. Toda inserción de asistencia ocurre a través
