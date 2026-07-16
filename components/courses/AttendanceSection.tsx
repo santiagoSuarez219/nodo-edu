@@ -64,7 +64,6 @@ export function AttendanceSection({
 }: AttendanceSectionProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
-  const [submitResult, setSubmitResult] = useTransition();
   const [lastResult, setLastResult] = useState<MarkAttendanceResult | null>(
     null
   );
@@ -79,7 +78,7 @@ export function AttendanceSection({
   });
 
   const onSubmit = (data: CodeFormData) => {
-    submitResult(async () => {
+    startTransition(async () => {
       const result = await markAttendanceByCode(courseSlug, data.code);
       setLastResult(result);
       reset();

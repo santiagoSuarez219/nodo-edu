@@ -1,8 +1,6 @@
 'use client';
 
 import { useCallback, useEffect, useState, useTransition } from 'react';
-import { format } from 'date-fns';
-import { es } from 'date-fns/locale';
 
 import {
   closeSession,
@@ -11,7 +9,6 @@ import {
 } from '@/lib/attendance';
 import type {
   OpenSessionSummary,
-  MarkAttendanceResult,
 } from '@/lib/attendance/types';
 
 interface AdminAttendancePanelProps {
@@ -93,22 +90,18 @@ export function AdminAttendancePanel({
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   }, [session]);
 
-  const [timeRemaining, setTimeRemaining] = useState<string | null>(
-    getTimeRemaining()
-  );
+  const [timeRemaining, setTimeRemaining] = useState<string | null>(getTimeRemaining());
 
   useEffect(() => {
-    if (!session) {
-      setTimeRemaining(null);
-      return;
-    }
+    if (!session) return;
 
     const interval = setInterval(() => {
       setTimeRemaining(getTimeRemaining());
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [session, getTimeRemaining]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session]);
 
   if (!session) {
     return (
@@ -142,9 +135,7 @@ export function AdminAttendancePanel({
             <div className="flex flex-col gap-2">
               <p className="text-sm text-gray-500 dark:text-gray-400">
                 Sesión abierta desde{' '}
-                {format(new Date(session.session.created_at), 'HH:mm:ss', {
-                  locale: es,
-                })}
+                {new Date(session.session.created_at).toLocaleTimeString('es-CO')}
               </p>
               <div className="inline-flex items-center gap-2 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-3 py-1 rounded-lg text-sm font-medium w-fit">
                 <div className="w-2 h-2 rounded-full bg-green-600 dark:bg-green-400 animate-pulse" />

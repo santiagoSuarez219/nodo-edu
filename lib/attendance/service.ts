@@ -1,4 +1,4 @@
-import { createServiceClient } from '@/lib/auth/service';
+import { createServiceSupabaseClient } from '@/lib/auth/service';
 import type { ClassSession } from './types';
 
 interface ListSessionsOptions {
@@ -47,7 +47,7 @@ interface CourseAttendanceSummary {
 export async function getServiceSessions(
   options: ListSessionsOptions
 ): Promise<SessionWithAttendance[]> {
-  const supabase = createServiceClient();
+  const supabase = createServiceSupabaseClient();
 
   let query = supabase
     .from('class_sessions')
@@ -85,7 +85,7 @@ export async function getServiceSessions(
 
   if (error) throw error;
 
-  return (data || []).map((row: any) => ({
+  return (data || []).map((row: Record<string, unknown>) => ({
     id: row.id,
     session_date: row.session_date,
     is_open: row.is_open,
@@ -98,9 +98,9 @@ export async function getServiceSessions(
 export async function getServiceSessionAttendance(
   sessionId: string
 ): Promise<SessionAttendance> {
-  const supabase = createServiceClient();
+  const supabase = createServiceSupabaseClient();
 
-  const { data: session, error: sessionError } = await supabase
+  const { data: sessionData, error: sessionError } = await supabase
     .from('class_sessions')
     .select(
       `
@@ -117,7 +117,9 @@ export async function getServiceSessionAttendance(
     .single();
 
   if (sessionError) throw sessionError;
-  if (!session) throw new Error('Sesión no encontrada');
+  if (!sessionData) throw new Error('Sesión no encontrada');
+
+  const session = sessionData as Record<string, unknown>;
 
   // Obtener los registros de asistencia con nombre del estudiante
   const { data: records, error: recordsError } = await supabase
@@ -135,7 +137,7 @@ export async function getServiceSessionAttendance(
   if (recordsError) throw recordsError;
 
   // Obtener los nombres de los estudiantes desde perfiles
-  const studentIds = (records || []).map((r: any) => r.student_id);
+  const studentIds = (records || []).map((r: Record<string, unknown>) => r.student_id);
   let students: Record<string, string> = {};
 
   if (studentIds.length > 0) {
@@ -147,13 +149,13 @@ export async function getServiceSessionAttendance(
     if (profilesError) throw profilesError;
 
     students = Object.fromEntries(
-      (profiles || []).map((p: any) => [p.user_id, p.full_name])
+      (profiles || []).map((p: Record<string, unknown>) => [p.user_id, p.full_name])
     );
   }
 
-  const attendanceRecords = (records || []).map((r: any) => ({
+  const attendanceRecords = (records || []).map((r: Record<string, unknown>) => ({
     student_id: r.student_id,
-    student_name: students[r.student_id] || r.auth_users?.email || 'Desconocido',
+    student_name: students[r.student_id as string] || (r.auth_users as Record<string, unknown>)?.email || 'Desconocido',
     marked_at: r.marked_at,
   }));
 
@@ -176,7 +178,7 @@ export async function getServiceCourseAttendanceSummary(
   courseId: string,
   options?: { fromDate?: string; toDate?: string }
 ): Promise<CourseAttendanceSummary> {
-  const supabase = createServiceClient();
+  const supabase = createServiceSupabaseClient();
 
   // Contar sesiones del curso
   let sessionsQuery = supabase
@@ -212,7 +214,7 @@ export async function getServiceCourseAttendanceSummary(
   const { data: sessions, error: allSessionsError } = await allSessionsQuery;
   if (allSessionsError) throw allSessionsError;
 
-  const sessionIds = (sessions || []).map((s: any) => s.id);
+  const sessionIds = (sessions || []).map((s: Record<string, unknown>) => s.id);
 
   if (sessionIds.length === 0) {
     return {
@@ -242,7 +244,7 @@ export async function getServiceCourseAttendanceSummary(
     { name: string; sessionsAttended: Set<string> }
   > = {};
 
-  (records || []).forEach((r: any) => {
+  (records || []).forEach((r: Record<string, unknown>) => {
     const studentId = r.student_id;
     const studentName = r.profiles?.full_name || 'Desconocido';
 

@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
-import { createServerClient } from '@/lib/auth/server';
+import { createServerSupabaseClient } from '@/lib/auth/server';
 import type {
   ClassSession,
   MarkAttendanceResult,
@@ -30,17 +30,16 @@ function getCodeExpiresAt(): Date {
 export async function openSession(
   academicCourseId: string
 ): Promise<{ success: boolean; session?: OpenSessionSummary; error?: string }> {
-  const supabase = await createServerClient();
+  const supabase = await createServerSupabaseClient();
 
   // Intentar generar un código único (máximo 5 intentos)
   let code = generateAttendanceCode();
   let attempts = 0;
   let success = false;
-  let sessionId: string | null = null;
 
   while (attempts < 5 && !success) {
     try {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('class_sessions')
         .insert({
           academic_course_id: academicCourseId,
@@ -69,7 +68,6 @@ export async function openSession(
         throw error;
       }
 
-      sessionId = data.id;
       success = true;
     } catch (err) {
       console.error('Error opening session:', err);
@@ -97,7 +95,7 @@ export async function openSession(
 export async function closeSession(
   sessionId: string
 ): Promise<{ success: boolean; error?: string }> {
-  const supabase = await createServerClient();
+  const supabase = await createServerSupabaseClient();
 
   try {
     const { error } = await supabase
@@ -119,7 +117,7 @@ export async function closeSession(
 export async function getOpenSessionForCourse(
   academicCourseId: string
 ): Promise<OpenSessionSummary | null> {
-  const supabase = await createServerClient();
+  const supabase = await createServerSupabaseClient();
 
   try {
     const { data: session, error: sessionError } = await supabase
@@ -155,7 +153,7 @@ export async function getOpenSessionForCourse(
 export async function getSessionAttendanceCount(
   sessionId: string
 ): Promise<number> {
-  const supabase = await createServerClient();
+  const supabase = await createServerSupabaseClient();
 
   try {
     const { count, error } = await supabase
@@ -175,7 +173,7 @@ export async function markAttendanceByCode(
   courseSlug: string,
   code: string
 ): Promise<MarkAttendanceResult> {
-  const supabase = await createServerClient();
+  const supabase = await createServerSupabaseClient();
 
   // Validar formato del código: 4-6 dígitos
   const codeSchema = z
@@ -214,7 +212,7 @@ export async function markAttendanceByCode(
 export async function getStudentAttendanceForCourse(
   courseSlug: string
 ): Promise<StudentAttendanceState> {
-  const supabase = await createServerClient();
+  const supabase = await createServerSupabaseClient();
 
   try {
     const { data, error } = await supabase.rpc(
