@@ -5,6 +5,28 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+## DEBT-003 — `course_slug` de `academic_courses` sin validación ni selector
+
+**Origen:** Revisión manual durante spec-006 (lecciones privadas)
+**Prioridad:** Media — no bloquea producción, pero genera cursos "huérfanos"
+
+En `AcademicCourseForm` (`components/admin/AcademicCourseForm.tsx`), el campo
+`course_slug` es un input de texto libre: el docente debe escribir a mano el
+slug del curso de contenido MDX que quiere vincular. `AcademicCourseSchema`
+(`lib/academic-courses/schemas.ts`) no valida su formato ni su existencia, y
+no hay FK en base de datos (el contenido vive en `lib/courses/data/` + MDX en
+disco, fuera de Postgres — ver spec-003, línea 136). Si el docente teclea un
+slug inexistente o con un typo, el `academic_course` se crea igual, sin
+ningún error, y las lecciones del curso nunca se resuelven (404 vía el gate
+de spec-006).
+
+**Acción:** Reemplazar el input libre por un selector poblado con los slugs
+reales de `lib/courses/index.ts` (o al menos validar contra esa lista en el
+server action antes de persistir), para evitar cursos académicos sin
+contenido asociado.
+
+---
+
 ## DEBT-002 — Definir marca canónica: "Semillero SITAIM" vs "nodo"
 
 **Origen:** spec-004 (landing home)

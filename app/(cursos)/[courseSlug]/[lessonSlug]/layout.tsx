@@ -17,7 +17,7 @@ export default async function LessonLayout({
   const course = await getCourseBySlug(courseSlug);
   if (!course) notFound();
 
-  await requireCourseAccess(courseSlug);
+  await requireCourseAccess(courseSlug, `/${courseSlug}/${lessonSlug}`);
 
   return (
     <main className="flex-1 bg-white dark:bg-gray-900">

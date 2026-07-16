@@ -54,7 +54,10 @@ export const hasCourseAccess = cache(async (courseSlug: string): Promise<CourseA
   return { ok: false, reason: "not-enrolled" };
 });
 
-export async function requireCourseAccess(courseSlug: string): Promise<void> {
+export async function requireCourseAccess(
+  courseSlug: string,
+  currentPath: string = `/${courseSlug}`
+): Promise<void> {
   const access = await hasCourseAccess(courseSlug);
 
   if (access.ok) {
@@ -62,7 +65,6 @@ export async function requireCourseAccess(courseSlug: string): Promise<void> {
   }
 
   if (access.reason === "unauthenticated") {
-    const currentPath = window ? window.location.pathname : `/${courseSlug}`;
     redirect(`/login?redirectTo=${encodeURIComponent(currentPath)}`);
   }
 

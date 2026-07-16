@@ -31,7 +31,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
   const ctx = await getLessonBySlug(courseSlug, lessonSlug);
   if (!ctx) notFound();
 
-  await requireCourseAccess(courseSlug);
+  await requireCourseAccess(courseSlug, `/${courseSlug}/${lessonSlug}`);
 
   const { course, lesson, prev, next } = ctx;
   const article = lesson.articleSlug

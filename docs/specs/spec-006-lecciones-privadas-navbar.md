@@ -1,12 +1,12 @@
-# spec-005 — [TESTING] Lecciones privadas por matrícula + navbar reorientado
+# spec-006 — [DONE] Lecciones privadas por matrícula + navbar reorientado
 
 > Al aprobarse el paquete (spec + pruebas) e iniciar la Fase 1, este estado
 > pasa a `[IN PROGRESS]`.
 
-Este es el **Spec A** de una funcionalidad partida en dos (ver spec-006, aún
+Este es el **Spec A** de una funcionalidad partida en dos (ver spec-007, aún
 por redactar). Su alcance se limita al control de acceso al contenido y a la
 navegación; toda la estructura interactiva de la lección (preguntas, cierre,
-asistencia, progreso) vive en spec-006 y se apoyará en lo que aquí se define.
+asistencia, progreso) vive en spec-007 y se apoyará en lo que aquí se define.
 
 ---
 
@@ -50,7 +50,7 @@ dejar un único punto de entrada "Cursos".
 
 - Preguntas embebidas en MDX, formulario de cierre de lección, código de
   asistencia por sesión, botón "completar lección", tracking real de progreso
-  (`lesson_progress`), lista de asistencia del docente → **spec-006**.
+  (`lesson_progress`), lista de asistencia del docente → **spec-007**.
 - Página/ruta dedicada `/cursos` con catálogo navegable de cursos disponibles.
   El enlace "Cursos" apunta por ahora a una sección de la landing.
 - Refactor de la `Navbar` a tokens semánticos de `DESIGN.md` (deuda
@@ -189,7 +189,12 @@ export type CourseAccess =
 export const hasCourseAccess: (courseSlug: string) => Promise<CourseAccess>;
 
 // Guard que traduce el resultado a redirect()/notFound(). Usado en los SC.
-export const requireCourseAccess: (courseSlug: string) => Promise<void>;
+// `currentPath` lo arma cada call site (no se puede leer `window` en el
+// servidor) y es el destino que preserva el `redirectTo` del login.
+export const requireCourseAccess: (
+  courseSlug: string,
+  currentPath?: string
+) => Promise<void>;
 ```
 
 `hasCourseAccess` devuelve un resultado discriminado (sin redirigir) para poder
@@ -214,9 +219,9 @@ un join PostgREST filtrado por `course_slug` devolvería vacío para él.
 
 Trade-off frente a la alternativa (Opción B: nuevo RPC `security definer`
 `has_course_access(text) returns boolean`, un solo round-trip): la Opción B
-exige migración + despliegue en producción. Para spec-005 se prefiere la
+exige migración + despliegue en producción. Para spec-006 se prefiere la
 **Opción A** (cero cambios de esquema, menor blast radius, "cambios
-quirúrgicos"). La Opción B queda anotada por si spec-006 introduce chequeos
+quirúrgicos"). La Opción B queda anotada por si spec-007 introduce chequeos
 por-lección de alta frecuencia.
 
 ### Decisión 4 — SSG → dinámico
@@ -307,8 +312,12 @@ Orden de comprobaciones en el Server Component, para no filtrar información:
       prerender) y `npm run lint`.
   - Build: ✅ Compilado exitosamente. Rutas `/[courseSlug]` y `/[courseSlug]/[lessonSlug]` marcadas como dinámicas (ƒ).
   - Lint: ✅ Sin errores (solo warnings preexistentes).
-- [ ] Recorrer las pruebas manuales
-      `docs/testing/test-005-lecciones-privadas-navbar.md`.
+- [x] Recorrer las pruebas manuales
+      `docs/testing/test-006-lecciones-privadas-navbar.md`.
+
+**Verificación:** ✅ Los 14 casos (`TC-006-01` a `TC-006-14`) fueron aprobados
+por el usuario. Framework de pruebas automáticas aún "por definir" (ver
+`CLAUDE.md` → Testing); sin archivo e2e para este spec.
 
 > Las pruebas manuales (`test-005`) se redactan junto con este spec (test-first).
 > El framework e2e está "por definir" en `CLAUDE.md`: las pruebas automáticas se
@@ -340,8 +349,8 @@ Orden de comprobaciones en el Server Component, para no filtrar información:
 
 > Estos archivos se crean junto con el spec (enfoque test-first).
 
-- **Manuales:** `docs/testing/test-005-lecciones-privadas-navbar.md` — casos
-  `TC-005-*` (redirecciones por estado de sesión/matrícula, acceso de
+- **Manuales:** `docs/testing/test-006-lecciones-privadas-navbar.md` — casos
+  `TC-006-*` (redirecciones por estado de sesión/matrícula, acceso de
   owner/admin, 404 de slug inexistente, navbar desktop/móvil).
 - **Automáticas (e2e/unit):** `{{ubicación e2e por definir}}/e2e-005-lecciones-privadas-navbar.spec.ts`
   — un caso por criterio de aceptación, en rojo, cuando exista framework.
@@ -373,15 +382,15 @@ Orden de comprobaciones en el Server Component, para no filtrar información:
 
 Preguntas embebidas en MDX, formulario de cierre de lección, código de
 asistencia por sesión, botón "completar lección", tracking real con
-`lesson_progress`, y lista de asistencia del docente → **spec-006**. Ruta
+`lesson_progress`, y lista de asistencia del docente → **spec-007**. Ruta
 dedicada `/cursos` (catálogo navegable) y refactor de la navbar a tokens
 semánticos → specs posteriores.
 
 ---
 
-## Nota de continuidad hacia spec-006
+## Nota de continuidad hacia spec-007
 
-spec-006 se apoyará directamente en lo que aquí se define:
+spec-007 se apoyará directamente en lo que aquí se define:
 
 - El helper `hasCourseAccess`/`requireCourseAccess` de `lib/enrollments/access.ts`
   será el mismo candado que proteja las nuevas rutas de asistencia/progreso; su
@@ -389,8 +398,8 @@ spec-006 se apoyará directamente en lo que aquí se define:
   diferenciar la vista del estudiante (responder, marcar completada) de la del
   docente (ver asistencia).
 - El punto de gate ya establecido (Server Components de curso, con `cache()`) es
-  donde spec-006 colgará la lógica de "completar lección" y el registro de
+  donde spec-007 colgará la lógica de "completar lección" y el registro de
   asistencia sin reintroducir chequeos de autorización.
-- Si spec-006 introduce verificación por-lección de alta frecuencia, será el
+- Si spec-007 introduce verificación por-lección de alta frecuencia, será el
   momento de evaluar la **Opción B** (RPC `security definer` `has_course_access`)
   anotada en la Decisión 3.

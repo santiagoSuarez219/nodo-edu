@@ -1,6 +1,6 @@
-# test-005 — Lecciones privadas por matrícula + navbar reorientado
+# test-006 — Lecciones privadas por matrícula + navbar reorientado
 
-Casos de prueba manuales del spec-005. Solo flujos con UI. Cada caso encodifica
+Casos de prueba manuales del spec-006. Solo flujos con UI. Cada caso encodifica
 un criterio de aceptación y arranca en estado ⬜ Pendiente.
 
 **Precondiciones globales de datos:**
@@ -17,16 +17,16 @@ un criterio de aceptación y arranca en estado ⬜ Pendiente.
 
 ## Acceso al contenido
 
-### TC-005-01 — Visitante sin sesión es redirigido al login
+### TC-006-01 — Visitante sin sesión es redirigido al login
 **Precondición:** sesión cerrada.
 **Pasos:**
 1. Navegar a `/estructuras-de-datos`.
 2. Navegar a `/estructuras-de-datos/introduccion`.
 **Resultado esperado:** ambas rutas redirigen a `/login?redirectTo=…` con el
 path original en el query param. No se muestra en ningún momento el MDX.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
-### TC-005-02 — Estudiante sin matrícula es redirigido a "Mis cursos" con aviso
+### TC-006-02 — Estudiante sin matrícula es redirigido a "Mis cursos" con aviso
 **Precondición:** sesión de `estudianteSinMatricula`.
 **Pasos:**
 1. Navegar a `/estructuras-de-datos`.
@@ -34,9 +34,9 @@ path original en el query param. No se muestra en ningún momento el MDX.
 **Resultado esperado:** ambas redirigen a `/cuenta/cursos?sinAcceso=estructuras-de-datos`
 y se muestra el banner explicativo ("No estás matriculado en este curso; ingresa
 tu código de matrícula"). No se muestra el MDX.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
-### TC-005-03 — Estudiante matriculado accede al contenido
+### TC-006-03 — Estudiante matriculado accede al contenido
 **Precondición:** sesión de `estudianteMatriculado` (matrícula `active`).
 **Pasos:**
 1. Navegar a `/estructuras-de-datos`.
@@ -44,62 +44,62 @@ tu código de matrícula"). No se muestra el MDX.
 3. Navegar entre lecciones con la sidebar.
 **Resultado esperado:** la home del curso y las lecciones cargan con normalidad
 (HTTP 200), la sidebar lista las lecciones y el MDX se renderiza.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
-### TC-005-04 — Estudiante retirado NO accede
+### TC-006-04 — Estudiante retirado NO accede
 **Precondición:** sesión de `estudianteRetirado` (matrícula `withdrawn`).
 **Pasos:**
 1. Navegar a `/estructuras-de-datos/introduccion`.
 **Resultado esperado:** redirige a `/cuenta/cursos?sinAcceso=estructuras-de-datos`
 (igual que un estudiante sin matrícula). No se muestra el MDX.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
-### TC-005-05 — Docente dueño accede sin matrícula
+### TC-006-05 — Docente dueño accede sin matrícula
 **Precondición:** sesión de `docenteA` (dueño del `academic_course`), sin
 matrícula como estudiante.
 **Pasos:**
 1. Navegar a `/estructuras-de-datos` y a una lección.
 **Resultado esperado:** accede al contenido con normalidad.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
-### TC-005-06 — Docente ajeno NO accede
+### TC-006-06 — Docente ajeno NO accede
 **Precondición:** sesión de `docenteB` (no dueño de ese curso, sin matrícula).
 **Pasos:**
 1. Navegar a `/estructuras-de-datos/introduccion`.
 **Resultado esperado:** redirige a `/cuenta/cursos?sinAcceso=estructuras-de-datos`.
 No se muestra el MDX.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
-### TC-005-07 — Admin accede sin matrícula
+### TC-006-07 — Admin accede sin matrícula
 **Precondición:** sesión de `admin`.
 **Pasos:**
 1. Navegar a `/estructuras-de-datos` y a una lección.
 **Resultado esperado:** accede al contenido con normalidad.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
-### TC-005-08 — Slug de curso inexistente devuelve 404
+### TC-006-08 — Slug de curso inexistente devuelve 404
 **Precondición:** cualquier sesión con acceso (p. ej. `admin`).
 **Pasos:**
 1. Navegar a `/curso-que-no-existe`.
 2. Navegar a `/curso-que-no-existe/leccion-x`.
 **Resultado esperado:** se muestra la página 404 del grupo de cursos
 (`not-found`), no un redirect ni el banner de matrícula.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
-### TC-005-09 — Redirect preserva el destino tras iniciar sesión
+### TC-006-09 — Redirect preserva el destino tras iniciar sesión
 **Precondición:** sesión cerrada.
 **Pasos:**
 1. Navegar a `/estructuras-de-datos/introduccion`.
 2. En `/login`, iniciar sesión con `estudianteMatriculado`.
 **Resultado esperado:** tras el login se regresa a
 `/estructuras-de-datos/introduccion` (según `redirectTo`) y el contenido carga.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ---
 
 ## Navbar reorientada
 
-### TC-005-10 — Navbar desktop sin enlaces de curso
+### TC-006-10 — Navbar desktop sin enlaces de curso
 **Precondición:** viewport ≥ lg. Cualquier estado de sesión.
 **Pasos:**
 1. Abrir la home `/`.
@@ -108,9 +108,9 @@ No se muestra el MDX.
 científica" ni "Análisis de algoritmos". Aparecen "Cursos" y "Docentes". El
 bloque de sesión (UserMenu si hay sesión, botón "Iniciar sesión" si no) se ve
 correctamente.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
-### TC-005-11 — Enlaces de la navbar hacen scroll a las secciones
+### TC-006-11 — Enlaces de la navbar hacen scroll a las secciones
 **Precondición:** viewport ≥ lg, en la home `/`.
 **Pasos:**
 1. Clic en "Cursos".
@@ -118,16 +118,16 @@ correctamente.
 **Resultado esperado:** la página hace scroll a la sección de cursos
 (`#cursos`) y a la de docentes (`#docentes`) respectivamente; ninguna sección
 queda sin destino.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
-### TC-005-12 — Enlaces desde una ruta interna vuelven a la home y hacen scroll
+### TC-006-12 — Enlaces desde una ruta interna vuelven a la home y hacen scroll
 **Precondición:** sesión de `estudianteMatriculado`, en `/cuenta`.
 **Pasos:**
 1. Clic en "Cursos" en la navbar.
 **Resultado esperado:** navega a `/` y hace scroll a la sección de cursos.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
-### TC-005-13 — Navbar móvil reorientada
+### TC-006-13 — Navbar móvil reorientada
 **Precondición:** viewport < lg (móvil). Cualquier estado de sesión.
 **Pasos:**
 1. Abrir la home `/`.
@@ -136,17 +136,17 @@ queda sin destino.
 cursos antiguos); el bloque de sesión (Mi cuenta / Cerrar sesión, o "Iniciar
 sesión") funciona igual que antes. Al tocar un enlace, el menú se cierra y hace
 scroll a la sección.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ---
 
 ## Regresión
 
-### TC-005-14 — Rutas de cuenta y admin siguen funcionando
+### TC-006-14 — Rutas de cuenta y admin siguen funcionando
 **Precondición:** sesiones de `estudianteMatriculado` y `docenteA`.
 **Pasos:**
 1. Como estudiante: navegar a `/cuenta` y `/cuenta/cursos`.
 2. Como docente: navegar a `/admin/courses`.
 **Resultado esperado:** todas cargan sin regresiones; el middleware sigue
 protegiendo `/admin` y `/cuenta` como antes.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado

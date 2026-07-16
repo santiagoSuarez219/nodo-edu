@@ -41,7 +41,7 @@ export default async function CoursePage({ params }: CoursePageProps) {
     notFound();
   }
 
-  await requireCourseAccess(courseSlug);
+  await requireCourseAccess(courseSlug, `/${courseSlug}`);
 
   return (
     <main className="flex-1 bg-gray-50 dark:bg-gray-900">

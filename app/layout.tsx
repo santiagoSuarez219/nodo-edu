@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { JetBrains_Mono } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import { AnnouncementBar } from "@/components/navbar/AnnouncementBar";
 import { Navbar } from "@/components/navbar/Navbar";
@@ -44,10 +45,12 @@ export default async function RootLayout({
       className={`${jetbrainsMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
-      </head>
       <body suppressHydrationWarning className="min-h-full flex flex-col bg-white text-gray-900 dark:bg-gray-900 dark:text-white">
+        <Script
+          id="theme-init"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{ __html: themeInitScript }}
+        />
         <div className="sticky top-0 left-0 w-full z-50">
           <AnnouncementBar />
           <Navbar profile={profile} />
