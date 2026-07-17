@@ -3,8 +3,8 @@ import { TRANSVERSAL_CONDITIONS } from "./transversal";
 
 export const estructurasDatos: CoursePresentation = {
   name: "Estructuras de Datos",
-  desc: "Estudio sistemático de estructuras fundamentales para organizar y manipular información: pilas, colas, listas enlazadas, árboles y grafos. Implementación práctica en Java con análisis de complejidad algorítmica. Proyecto de aula incremental que integra todas las estructuras en una aplicación completa.",
-  program: "Ingeniería de Sistemas — 4.º semestre",
+  desc: "Estudio sistemático de estructuras fundamentales para organizar y manipular información: pilas, colas, listas enlazadas y árboles. Implementación práctica en Java con análisis de complejidad algorítmica. Proyecto de aula incremental que integra todas las estructuras en una aplicación completa.",
+  program: "Tecnología en Desarrollo de Software",
   level: "Intermedio",
   credits: 5,
   modality: "Presencial",
@@ -123,17 +123,6 @@ export const estructurasDatos: CoursePresentation = {
         "Aplicaciones: diccionarios, índices, autocompletado",
       ],
     },
-    {
-      n: 10,
-      week: "Opcional",
-      title: "Temas opcionales",
-      topics: [
-        "Tablas hash: función de dispersión y manejo de colisiones",
-        "Grafos: vértices, aristas, recorridos BFS/DFS",
-        "Algoritmos sobre grafos: Dijkstra, detección de ciclos",
-        "Aplicaciones: redes de transporte, dependencias, redes sociales",
-      ],
-    },
   ],
   evaluation: [
     {
@@ -141,20 +130,20 @@ export const estructurasDatos: CoursePresentation = {
       pct: 15,
     },
     {
-      name: "Momento 2: Estructuras lineales (listas, ordenamiento y archivos)",
+      name: "Momento 2: Listas",
       pct: 15,
     },
     {
-      name: "Momento 3: Pilas y colas",
+      name: "Momento 3: Manejo de archivos",
       pct: 15,
     },
     {
-      name: "Momento 4: Recursividad",
-      pct: 10,
+      name: "Momento 4: Pilas y colas",
+      pct: 15,
     },
     {
       name: "Momento 5: Proyecto final (árboles e integración)",
-      pct: 25,
+      pct: 20,
     },
     {
       name: "Seguimiento continuo",
@@ -164,12 +153,15 @@ export const estructurasDatos: CoursePresentation = {
   dates: [
     { date: "4 ago", label: "Inicio de clases" },
     { date: "4 sep", label: "Cierre Momento 1 (POO)" },
-    { date: "16 oct", label: "Cierre Momento 2 (Estructuras lineales)" },
-    { date: "30 oct", label: "Cierre Momento 3 (Pilas y colas)" },
+    { date: "9 oct", label: "Cierre Momento 2 (Listas)" },
+    { date: "16 oct", label: "Cierre Momento 3 (Manejo de archivos)" },
+    { date: "30 oct", label: "Cierre Momento 4 (Pilas y colas)" },
     { date: "1 nov", label: "Registro del 60 %" },
-    { date: "6 nov", label: "Cierre Momento 4 (Recursividad)" },
     { date: "22 nov", label: "Límite de cancelación de asignaturas" },
-    { date: "24-27 nov", label: "Sustentación y cierre Momento 5 (Proyecto final)" },
+    {
+      date: "24-27 nov",
+      label: "Evaluación final",
+    },
   ],
   conditions: TRANSVERSAL_CONDITIONS,
 };

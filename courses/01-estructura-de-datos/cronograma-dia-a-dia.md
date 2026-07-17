@@ -16,13 +16,13 @@ Dentro del periodo de clases, el único festivo que cae en un día de clase es e
 | Momento | Tema | Fecha de cierre | Peso |
 |---|---|---|---|
 | M1 | Programación orientada a objetos | Viernes 4 sep | 15% |
-| M2 | Estructuras lineales (listas, ordenamiento y archivos) | Viernes 16 oct | 15% |
-| M3 | Pilas y colas | Viernes 30 oct | 15% |
-| M4 | Recursividad | Viernes 6 nov | 10% |
+| M2 | Listas (listas enlazadas y ordenamiento) | Viernes 9 oct | 15% |
+| M3 | Manejo de archivos | Viernes 16 oct | 10% |
+| M4 | Pilas y colas | Viernes 30 oct | 15% |
 | M5 | Proyecto final (árboles e integración) | Sustentación 24–27 nov | 25% |
-| Seguimiento | Continuo | Todo el semestre | 20% |
+| Seguimiento (incluye recursividad) | Continuo | Todo el semestre | 20% |
 
-> Con este calendario, para el corte del **60 % registrado en el SIA (hasta el 1 de noviembre)** ya están cerrados M1 + M2 + M3 (45 %) más el seguimiento acumulado, lo que cubre el requisito institucional.
+> Con este calendario, para el corte del **60 % registrado en el SIA (hasta el 1 de noviembre)** ya están cerrados M1 + M2 + M3 + M4 (55 %) más el seguimiento acumulado, lo que cubre el requisito institucional.
 
 ---
 
@@ -106,15 +106,15 @@ Dentro del periodo de clases, el único festivo que cae en un día de clase es e
 |---|---|---|---|
 | 6 oct | Martes | T1 | Insertion sort y selection sort adaptados a listas enlazadas; complejidad. |
 | 8 oct | Jueves | T2 | Síntesis del módulo de listas: tabla de decisión simple/doble/circular. |
-| 9 oct | Viernes | **P ★** | **Lab evaluativo (M2, parte 1): Caso de estudio con listas** — diseño UML, código y una estrategia de ordenamiento. |
+| 9 oct | Viernes | **P ★** | **Lab evaluativo (M2): Caso de estudio con listas** — diseño UML, código y una estrategia de ordenamiento. **Cierre del Momento 2 — Listas (15 %).** |
 
-## Semana 11 — Manejo de archivos *(13–16 oct)* · Sprint 2 · ★ cierre M2
+## Semana 11 — Manejo de archivos *(13–16 oct)* · Sprint 2 · ★ M3
 
 | Fecha | Día | Sesión | Contenido |
 |---|---|---|---|
 | 13 oct | Martes | T1 | Fundamentos de archivos: texto vs. binario; streams; `File`, `FileReader`, `FileWriter`. |
 | 15 oct | Jueves | T2 | Lectura/escritura con `BufferedReader`/`BufferedWriter`; `IOException`; `try-with-resources`. |
-| 16 oct | Viernes | **P ★** | **Lab evaluativo (M2, parte 2): Persistencia de una lista** — guardar/cargar en `data/`. **Cierre del Momento 2 (15 %).** |
+| 16 oct | Viernes | **P ★** | **Lab evaluativo (M3): Persistencia de una lista** — guardar/cargar en `data/`. **Cierre del Momento 3 — Manejo de archivos (10 %).** |
 
 > *Hito institucional:* evaluaciones institucionales (16–20 oct).
 
@@ -126,23 +126,23 @@ Dentro del periodo de clases, el único festivo que cae en un día de clase es e
 | 22 oct | Jueves | T2 | Implementación propia con lista enlazada vs. `Stack<E>` del API. |
 | 23 oct | Viernes | P | Lab: aplicaciones de pilas — balanceo de símbolos, infija→postfija, evaluación postfija. |
 
-## Semana 13 — Colas *(27–30 oct)* · Sprint 3 · ★ M3
+## Semana 13 — Colas *(27–30 oct)* · Sprint 3 · ★ M4
 
 | Fecha | Día | Sesión | Contenido |
 |---|---|---|---|
 | 27 oct | Martes | T1 | TAD Cola (FIFO): `enqueue`, `dequeue`, `front`; aplicaciones reales. |
 | 29 oct | Jueves | T2 | Implementación propia vs. `Queue<E>`/`LinkedList<E>`; introducción a `PriorityQueue<E>`. |
-| 30 oct | Viernes | **P ★** | **Lab evaluativo (M3): Caso de estudio con pilas y colas** integradas vía `Service`. **Cierre del Momento 3 (15 %).** |
+| 30 oct | Viernes | **P ★** | **Lab evaluativo (M4): Caso de estudio con pilas y colas** integradas vía `Service`. **Cierre del Momento 4 — Pilas y colas (15 %).** |
 
 > *Hito institucional:* segunda evaluación de estudiantes a docentes (26 oct – 1 nov); registro del 60 % en el SIA (hasta 1 nov).
 
-## Semana 14 — Recursividad *(3–6 nov)* · Sprint 4 · ★ M4
+## Semana 14 — Recursividad *(3–6 nov)* · Sprint 4
 
 | Fecha | Día | Sesión | Contenido |
 |---|---|---|---|
 | 3 nov | Martes | T1 | Fundamentos: caso base y recursivo; call stack; prueba de escritorio paso a paso. |
 | 5 nov | Jueves | T2 | Recursivos clásicos: factorial, Fibonacci, Torres de Hanói; recursión vs. iteración. |
-| 6 nov | Viernes | **P ★** | **Lab evaluativo (M4): Caso de estudio recursivo** con prueba de escritorio y validación. **Cierre del Momento 4 (10 %).** |
+| 6 nov | Viernes | **P** | **Lab: Caso de estudio recursivo** con prueba de escritorio y validación. Se evalúa como parte del **Seguimiento continuo** (ya no es un momento evaluativo independiente). |
 
 ## Semana 15 — Árboles: árbol binario *(10–13 nov)* · Sprint 5
 

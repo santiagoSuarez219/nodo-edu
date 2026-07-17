@@ -12,14 +12,14 @@
 | Actividad                                                                 | Porcentaje | Momento                          |
 | ------------------------------------------------------------------------- | ---------- | -------------------------------- |
 | **Momento evaluativo 1:** Programación orientada a objetos (encapsulamiento, herencia, polimorfismo y UML) | 15%        | Semana 5 (XX de XX)              |
-| **Momento evaluativo 2:** Estructuras lineales — listas, ordenamiento y archivos | 15%        | Semana 11 (XX de XX)            |
-| **Momento evaluativo 3:** Pilas y colas                                   | 15%        | Semana 13 (XX de XX)            |
-| **Momento evaluativo 4:** Recursividad                                    | 10%        | Semana 14 (XX de XX)            |
+| **Momento evaluativo 2:** Listas — listas enlazadas y ordenamiento        | 15%        | Semana 10 (XX de XX)            |
+| **Momento evaluativo 3:** Manejo de archivos                              | 10%        | Semana 11 (XX de XX)            |
+| **Momento evaluativo 4:** Pilas y colas                                   | 15%        | Semana 13 (XX de XX)            |
 | **Momento evaluativo 5:** Proyecto final — árboles e integración          | 25%        | Semana 16 (XX de XX)            |
-| **Seguimiento**                                                           | 20%        | Durante todo el semestre          |
+| **Seguimiento** (incluye recursividad y actividades continuas)           | 20%        | Durante todo el semestre          |
 | **Total**                                                                 | **100%**   |                                  |
 
-> Cada momento evaluativo se cierra **después** de que su contenido se ha enseñado por completo, y su componente práctico es el laboratorio evaluativo (★) del tema correspondiente. No existe un sistema de evaluación paralelo: el laboratorio ★ *es* la parte práctica del momento.
+> Cada momento evaluativo se cierra **después** de que su contenido se ha enseñado por completo, y su componente práctico es el laboratorio evaluativo (★) del tema correspondiente. No existe un sistema de evaluación paralelo: el laboratorio ★ *es* la parte práctica del momento. La recursividad (Semana 14) ya no es un momento evaluativo independiente: su laboratorio se evalúa como parte del Seguimiento continuo.
 
 ### Estructura semanal
 
@@ -54,10 +54,10 @@
 | 8  | Listas | Lista simple enlazada | |
 | 9  | Listas | Lista doble y circular | |
 | 10 | Listas | Ordenamiento sobre listas enlazadas | ★ M2 |
-| 11 | Manejo de archivos | Persistencia en archivos de texto | ★ M2 |
+| 11 | Manejo de archivos | Persistencia en archivos de texto | ★ M3 |
 | 12 | Pilas y colas | Pilas (LIFO) | |
-| 13 | Pilas y colas | Colas (FIFO) | ★ M3 |
-| 14 | Recursividad | Algoritmos recursivos | ★ M4 |
+| 13 | Pilas y colas | Colas (FIFO) | ★ M4 |
+| 14 | Recursividad | Algoritmos recursivos (evaluado como Seguimiento) | |
 | 15 | Árboles | Árbol binario y recorridos | |
 | 16 | Árboles | BST + integración y sustentación del proyecto final | ★ M5 |
 
@@ -321,11 +321,11 @@ Cada archivo de proyecto detalla la evaluación de viabilidad, las entidades del
 - Tabla de decisión: cuándo usar cada tipo de lista
 - Integración con el modelo TAD y los diagramas UML del módulo anterior
 
-**P ★ — Laboratorio evaluativo (parte 1 del Momento 2): Caso de estudio con listas**
+**P ★ — Laboratorio evaluativo (Momento 2): Caso de estudio con listas**
 - Implementar una solución completa para un caso de estudio dado
 - La solución debe incluir diseño UML, código en Java y al menos una estrategia de ordenamiento
 - *Capas involucradas:* los algoritmos de ordenamiento van en el `Service`; la `View` recibe la lista ya ordenada y la muestra; el `Controller` coordina la interacción
-- Evaluación con rúbrica socializada previamente con el grupo
+- Evaluación con rúbrica socializada previamente con el grupo (cierre del **Momento evaluativo 2 — Listas**)
 
 ---
 
@@ -343,12 +343,12 @@ Cada archivo de proyecto detalla la evaluación de viabilidad, las entidades del
 - Manejo de excepciones: `IOException`, bloque `try-with-resources`
 - Lectura y escritura de datos estructurados (formato CSV-like)
 
-**P ★ — Laboratorio evaluativo (parte 2 del Momento 2): Persistencia de una lista enlazada**
+**P ★ — Laboratorio evaluativo (Momento 3): Persistencia de una lista enlazada**
 - Guardar el contenido de una lista enlazada en un archivo de texto
 - Leer el archivo y reconstruir la lista en memoria
 - Manejar correctamente errores de lectura, escritura y archivo inexistente
 - *Capas involucradas:* los métodos `guardar()` y `cargar()` van en el `Service`; los archivos `.txt` se almacenan en `data/`; ninguna otra capa accede directamente al sistema de archivos
-- Cierre del **Momento evaluativo 2 — Estructuras lineales** (listas, ordenamiento y archivos), con rúbrica socializada previamente
+- Cierre del **Momento evaluativo 3 — Manejo de archivos**, con rúbrica socializada previamente
 
 ---
 
@@ -384,15 +384,15 @@ Cada archivo de proyecto detalla la evaluación de viabilidad, las entidades del
 - Interface `Queue<E>` y clase `LinkedList<E>` del API de Java
 - Introducción a la cola de prioridad (`PriorityQueue<E>`)
 
-**P ★ — Laboratorio evaluativo (Momento 3): Caso de estudio con pilas y colas**
+**P ★ — Laboratorio evaluativo (Momento 4): Caso de estudio con pilas y colas**
 - Implementar una solución que combine pila y cola para un caso de estudio dado
 - Incluir diseño UML y código en Java
 - *Capas involucradas:* `Cola<T>` va en `model/structures/`; la solución debe mostrar `Pila<T>` y `Cola<T>` integradas a través del `Service`; `Controller` y `View` no conocen las estructuras directamente
-- Evaluación con rúbrica socializada previamente con el grupo (cierre del **Momento evaluativo 3 — Pilas y colas**)
+- Evaluación con rúbrica socializada previamente con el grupo (cierre del **Momento evaluativo 4 — Pilas y colas**)
 
 ---
 
-## Módulo 8 — Recursividad ★
+## Módulo 8 — Recursividad
 
 ### Semana 14 — Algoritmos recursivos
 
@@ -406,12 +406,12 @@ Cada archivo de proyecto detalla la evaluación de viabilidad, las entidades del
 - Torres de Hanói: planteamiento, solución recursiva y complejidad
 - ¿Cuándo preferir recursión sobre iteración? Ventajas y riesgos
 
-**P ★ — Laboratorio evaluativo (Momento 4): Caso de estudio recursivo**
+**P — Laboratorio: Caso de estudio recursivo**
 - Diseñar y documentar un algoritmo recursivo para un problema dado
 - Incluir prueba de escritorio para al menos dos casos
 - Implementar la solución en Java y validarla con casos de prueba
 - *Capas involucradas:* los métodos recursivos van en el `Service` si son lógica de negocio, o dentro de la propia estructura en `model/structures/` si son operaciones de recorrido
-- Evaluación con rúbrica socializada previamente con el grupo (cierre del **Momento evaluativo 4 — Recursividad**)
+- Evaluación con rúbrica socializada previamente con el grupo, computada como parte del **Seguimiento continuo** (ya no es un momento evaluativo independiente)
 
 ---
 

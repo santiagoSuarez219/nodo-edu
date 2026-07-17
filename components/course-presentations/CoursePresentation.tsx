@@ -67,9 +67,6 @@ export function CoursePresentation({ presentation, cta }: Props) {
 
           <div>{cta}</div>
 
-          <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
-            {presentation.spots} cupos disponibles.
-          </p>
         </div>
       </section>
 
