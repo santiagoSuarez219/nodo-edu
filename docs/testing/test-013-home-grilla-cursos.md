@@ -12,7 +12,7 @@
 1. Navegar directamente a `/`.
 **Resultado esperado:** Redirección automática a `/login?redirectTo=%2F`
 (comportamiento ya existente del middleware, no debe romperse).
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-002 — Usuario con sesión ve la grilla de cursos en `/`
 **Precondición:** Sesión activa (estudiante o docente).
@@ -23,7 +23,7 @@ catálogo (hoy: Estructuras de datos, Programación científica, Análisis de
 algoritmos). No aparece hero, carrusel ni sección de docente de la landing
 anterior. El footer se muestra al final de la página, sin cambios visuales
 respecto al que ya existía.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-003 — Contenido de cada card
 **Precondición:** Estar en `/` con sesión activa.
@@ -32,7 +32,7 @@ respecto al que ya existía.
 **Resultado esperado:** Cada card muestra al menos título, resumen (`summary`)
 y nivel (`level`) del curso, consistentes con los datos de
 `lib/courses/data/*.ts`.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-004 — Click en una card navega al curso
 **Precondición:** Estar en `/` con sesión activa y matrícula activa en al
@@ -41,7 +41,7 @@ menos un curso.
 1. Hacer clic en la card de un curso en el que el usuario está matriculado.
 **Resultado esperado:** Navega a `/[courseSlug]` y muestra el contenido del
 curso normalmente.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-005 — Click en una card sin matrícula redirige al gate existente
 **Precondición:** Estar en `/` con sesión activa, sin matrícula en un curso
@@ -51,7 +51,7 @@ del catálogo.
 **Resultado esperado:** Redirección a `/cuenta/cursos?sinAcceso={slug}`,
 mostrando el aviso de falta de matrícula (comportamiento ya existente de
 spec-006, no debe romperse).
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-006 — Navbar solo muestra logo + dropdown de usuario
 **Precondición:** Sesión activa, en cualquier página del sitio.
@@ -62,14 +62,14 @@ spec-006, no debe romperse).
 logo; a la derecha solo aparece el dropdown de usuario (avatar + nombre). En
 mobile, el menú desplegable no incluye un ítem "Mis cursos" fuera del bloque
 de perfil/"Mi cuenta"/"Cerrar sesión".
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-007 — Logo del navbar enlaza a `/`
 **Precondición:** Sesión activa, en cualquier página distinta de `/`.
 **Pasos:**
 1. Hacer clic en el logo del navbar.
 **Resultado esperado:** Navega a `/` y muestra la grilla de cursos.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-008 — Dropdown de usuario conserva "Mis cursos", "Mi cuenta" y "Cerrar sesión"
 **Precondición:** Sesión activa.
@@ -78,4 +78,4 @@ de perfil/"Mi cuenta"/"Cerrar sesión".
 **Resultado esperado:** Se listan "Mis cursos" (lleva a `/cuenta/cursos` para
 estudiante o `/admin/courses` para docente/admin), "Mi cuenta" (`/cuenta`) y
 "Cerrar sesión", sin cambios respecto al comportamiento previo.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado

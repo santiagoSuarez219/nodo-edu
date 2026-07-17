@@ -1,7 +1,7 @@
-# spec-013 — [TESTING] Home privada como grilla de cursos + limpieza de navbar
+# spec-013 — [DONE] Home privada como grilla de cursos + limpieza de navbar
 
-> Estado `[TESTING]`: implementación completada. Rama: `feat/spec-013-home-grilla-cursos`.
-> Pendiente de pruebas manuales (`TC-001` a `TC-008` en `docs/testing/test-013-home-grilla-cursos.md`).
+> Estado `[DONE]`: implementación completada y todas las pruebas manuales aprobadas.
+> Rama: `feat/spec-013-home-grilla-cursos`.
 
 ## Contexto
 
