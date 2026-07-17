@@ -13,7 +13,7 @@
 1. Hacer clic en la card "Estructuras de datos".
 **Resultado esperado:** Navega a `/estructuras-de-datos/presentacion` y
 muestra la presentación completa del curso.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-002 — Card de home navega a la presentación (Programación científica)
 **Precondición:** Sesión activa, en `/`.
@@ -22,7 +22,7 @@ muestra la presentación completa del curso.
 **Resultado esperado:** Navega a `/programacion-cientifica/presentacion` y
 muestra la presentación completa (no `notFound`), con temario derivado de
 las lecciones reales del curso.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-003 — Card de home navega a la presentación (Análisis de algoritmos)
 **Precondición:** Sesión activa, en `/`.
@@ -31,7 +31,7 @@ las lecciones reales del curso.
 **Resultado esperado:** Navega a `/analisis-de-algoritmos/presentacion` y
 muestra la presentación completa (no `notFound`), con temario derivado de
 las lecciones reales del curso.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-004 — La presentación muestra Navbar + Contenido + Footer
 **Precondición:** Estar en `/[courseSlug]/presentacion` de cualquier curso.
@@ -42,7 +42,7 @@ presentación (hero, prerrequisitos, temario, herramientas, evaluación,
 fechas, condiciones, CTA final) en el medio, y el footer (mismo diseño que
 en `/`) al final. En páginas cortas el footer no queda "flotando" a mitad de
 pantalla (se mantiene al fondo).
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-005 — CTA "Matricular este curso" para usuario sin matrícula
 **Precondición:** Sesión activa con un usuario SIN matrícula en el curso
@@ -52,7 +52,7 @@ visitado.
 2. Observar el CTA del hero y el CTA final.
 **Resultado esperado:** Ambos CTA dicen "Matricular este curso" y enlazan a
 `/cuenta/cursos`.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-006 — CTA "Ir al curso" para usuario matriculado
 **Precondición:** Sesión activa con un usuario matriculado (`status: active`)
@@ -63,7 +63,7 @@ en el curso visitado.
 **Resultado esperado:** Ambos CTA dicen "Ir al curso" y enlazan a
 `/[courseSlug]` (contenido). Al hacer clic, navega al contenido del curso
 correctamente.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-007 — CTA "Ir al curso" para docente dueño o admin
 **Precondición:** Sesión activa con un usuario docente dueño del curso
@@ -72,7 +72,7 @@ académico vinculado, o con rol admin.
 1. Navegar a `/[courseSlug]/presentacion` del curso correspondiente.
 **Resultado esperado:** El CTA dice "Ir al curso" (mismo criterio que
 matriculado: `hasCourseAccess` con `reason: "owner"` o `"admin"`).
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-008 — Vista previa admin sigue funcionando para los cursos nuevos
 **Precondición:** Sesión de docente/admin, con un curso académico cuyo
@@ -82,7 +82,7 @@ matriculado: `hasCourseAccess` con `reason: "owner"` o `"admin"`).
 **Resultado esperado:** Se muestra la vista previa completa de la
 presentación (ya no el estado vacío), con CTA no funcional (deshabilitado),
 igual que ya ocurría para "Estructuras de datos".
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-009 — Usuario sin sesión es redirigido a login
 **Precondición:** Sin sesión activa.
@@ -90,4 +90,4 @@ igual que ya ocurría para "Estructuras de datos".
 1. Navegar directamente a `/[courseSlug]/presentacion` de cualquier curso.
 **Resultado esperado:** Redirección a `/login?redirectTo=...` (comportamiento
 ya existente de `requireUser`, no debe romperse).
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado

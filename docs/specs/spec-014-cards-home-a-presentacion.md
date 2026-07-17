@@ -1,6 +1,6 @@
-# spec-014 — [IN PROGRESS] Cards de home enlazan a la presentación del curso
+# spec-014 — [TESTING] Cards de home enlazan a la presentación del curso
 
-> Estado `[IN PROGRESS]`: implementación iniciada.
+> Estado `[TESTING]`: implementación completa, todas las pruebas manuales aprobadas.
 
 ## Contexto
 
