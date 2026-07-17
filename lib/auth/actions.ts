@@ -32,14 +32,30 @@ export async function signIn(
   }
 
   const supabase = await createServerSupabaseClient();
-  const { error } = await supabase.auth.signInWithPassword(parsed.data);
+  const { data: authData, error } = await supabase.auth.signInWithPassword(parsed.data);
 
   if (error) {
     return { ok: false, error: "Correo o contraseña incorrectos." };
   }
 
   revalidatePath("/", "layout");
-  redirect(formData.get("redirectTo")?.toString() ?? "/");
+
+  const redirectTo = formData.get("redirectTo")?.toString();
+  if (redirectTo) {
+    redirect(redirectTo);
+  }
+
+  const { data: roles } = await supabase
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", authData.user?.id);
+
+  const hasStudentRole = roles?.some((r) => r.role === "student");
+  if (hasStudentRole) {
+    redirect("/cuenta/cursos");
+  }
+
+  redirect("/");
 }
 
 export async function signUp(
