@@ -20,7 +20,7 @@ function levelBadgeStyle(level: Course["level"]): string {
 
 export function HomeCourseCard({ course }: HomeCourseCardProps) {
   return (
-    <Link href={`/${course.slug}`}>
+    <Link href={`/${course.slug}/presentacion`}>
       <div className="w-full p-5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:shadow-lg dark:hover:shadow-gray-900/50 transition-shadow duration-200 cursor-pointer">
         <div className="mb-4">
           <span className={levelBadgeStyle(course.level)}>
