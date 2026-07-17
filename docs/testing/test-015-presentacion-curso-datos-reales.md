@@ -14,7 +14,7 @@ cualquier curso.
 **Resultado esperado:** Se muestran Créditos, Modalidad, Horas semanales y
 Horas de trabajo independiente. Ya NO aparecen Duración, Clases disponibles
 ni Cupos.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-002 — Card de matrícula sin fechas de inscripción, con prerrequisito
 **Precondición:** Estar en `/[courseSlug]/presentacion` de cualquier curso.
@@ -24,7 +24,7 @@ ni Cupos.
 inscripción". Se muestra el botón CTA (Matricular/Ir al curso) y el
 prerrequisito académico del curso (ej. "Lógica de Programación y
 Laboratorio" para Estructuras de Datos).
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-003 — No existe sección standalone "Prerrequisitos"
 **Precondición:** Estar en `/[courseSlug]/presentacion` de cualquier curso.
@@ -33,7 +33,7 @@ Laboratorio" para Estructuras de Datos).
    "Prerrequisitos".
 **Resultado esperado:** No existe esa sección independiente (el
 prerrequisito solo aparece en la card de matrícula, TC-002).
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-004 — Temario muestra la semana de cada unidad
 **Precondición:** Estar en `/[courseSlug]/presentacion` de cualquier curso.
@@ -42,7 +42,7 @@ prerrequisito solo aparece en la card de matrícula, TC-002).
 **Resultado esperado:** Cada unidad muestra su semana o rango de semanas
 (ej. "Semana 1", "Semanas 4-5", "Opcional") junto al número y título de la
 unidad.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-005 — Estructuras de Datos: temario completo con 9 módulos + opcionales
 **Precondición:** Estar en `/estructuras-de-datos/presentacion`.
@@ -53,7 +53,7 @@ POO clases/UML (Semanas 2-3), POO herencia/diseño avanzado (Semanas 4-5),
 Introducción a estructuras (Semanas 6-7), Listas (Semanas 8-10), Manejo de
 archivos (Semana 11), Pilas y colas (Semanas 12-13), Recursividad (Semana
 14), Árboles (Semanas 15-16), Temas opcionales (Opcional).
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-006 — Estructuras de Datos: evaluación suma 100% y fechas reales
 **Precondición:** Estar en `/estructuras-de-datos/presentacion`.
@@ -63,7 +63,7 @@ archivos (Semana 11), Pilas y colas (Semanas 12-13), Recursividad (Semana
 **Resultado esperado:** Los porcentajes de evaluación suman 100% (Momentos
 1-5 + Seguimiento). Las fechas importantes son reales de 2026 (ej. "4 ago —
 Inicio de clases", "4 sep — Cierre Momento 1...", etc.), no genéricas.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-007 — Estructuras de Datos: herramientas correctas (Java, no Python)
 **Precondición:** Estar en `/estructuras-de-datos/presentacion`.
@@ -71,7 +71,7 @@ Inicio de clases", "4 sep — Cierre Momento 1...", etc.), no genéricas.
 1. Revisar la sección "Herramientas y tecnologías".
 **Resultado esperado:** Se muestran herramientas de Java (Java JDK 21,
 Visual Studio Code, Git y GitHub). Ya NO aparece Python ni Jupyter Notebook.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-008 — Bloque de información del docente en los 3 cursos
 **Precondición:** Sesión activa, en `/[courseSlug]/presentacion` de
@@ -84,7 +84,7 @@ Santiago Suarez Cortes, formación académica, facultad/departamento, grupo
 de investigación (MIRP), correo electrónico y oficina. El mismo bloque
 aparece igual en los 3 cursos. El `LandingFooter` (enlaces + copyright)
 también sigue presente.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-009 — Condiciones del curso reflejan informacion-transversal.md
 **Precondición:** Estar en `/[courseSlug]/presentacion` de cualquier curso.
@@ -94,7 +94,7 @@ también sigue presente.
 (0.0 por >20% de inasistencias injustificadas), no habilitable, uso de
 dispositivos móviles, uso de IA como apoyo, plagio, ponderación 50/50
 teórico-práctico. Las mismas condiciones aparecen en los 3 cursos.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-010 — Vista previa admin sigue funcionando con el nuevo shape de datos
 **Precondición:** Sesión de docente/admin, con un curso académico vinculado
@@ -105,4 +105,4 @@ a cualquiera de los 3 `course_slug`.
 presentación con el nuevo hero, card, temario con semanas, etc. Sin bloque
 de información del docente (ese bloque es exclusivo de la ruta pública). CTA
 deshabilitado como ya ocurría antes.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado

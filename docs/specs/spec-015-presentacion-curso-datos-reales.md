@@ -1,4 +1,4 @@
-# spec-015 — [TESTING] Presentación de curso con datos reales y footer de docente
+# spec-015 — [DONE] Presentación de curso con datos reales y footer de docente
 
 > Estado `[DRAFT]`: paquete spec + pruebas manuales redactado, pendiente de
 > aprobación del usuario. Al aprobarse e iniciar la Fase 1, este estado pasa
