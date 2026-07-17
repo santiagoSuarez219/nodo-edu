@@ -5,6 +5,28 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+## DEBT-005 — MDX huérfanos en `estructuras-de-datos` sin lección asociada
+
+**Origen:** Fix ad-hoc durante spec-016 (redirect de curso a lección) — el
+usuario eliminó `bienvenida-al-curso.mdx` por no ser necesario, lo que expuso
+que 4 lecciones (`pilas-y-colas`, `arboles`, `tablas-hash`, `grafos`)
+referenciaban `articleSlug` sin archivo `.mdx` en disco, rompiendo el build.
+**Prioridad:** Baja — no bloquea producción
+
+Se quitó `articleSlug` de esas 4 lecciones (quedan como placeholder "Pronto"
+en el sidebar, sin `articleSlug`) para desbloquear el build. Además, existen
+3 archivos `.mdx` en `content/cursos/estructuras-de-datos/` que no están
+referenciados por ninguna lección: `configuracion-entorno-de-trabajo.mdx`,
+`java.mdx`, `poo-clases.mdx`.
+
+**Acción:** Decidir para cada `.mdx` huérfano si:
+1. Se redacta contenido real para `pilas-y-colas`, `arboles`, `tablas-hash` y
+   `grafos`, y se reincorpora `articleSlug` apuntando a un `.mdx` nuevo o a
+   uno de los huérfanos si el contenido coincide temáticamente.
+2. Se eliminan los `.mdx` huérfanos si no hay plan de usarlos.
+
+---
+
 ## DEBT-004 — Sin acción de eliminar/desactivar curso en el panel admin
 
 **Origen:** Consulta del usuario sobre cómo eliminar un curso (2026-07-16)
