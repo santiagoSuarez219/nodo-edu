@@ -1,4 +1,4 @@
-# spec-015 — [IN PROGRESS] Presentación de curso con datos reales y footer de docente
+# spec-015 — [TESTING] Presentación de curso con datos reales y footer de docente
 
 > Estado `[DRAFT]`: paquete spec + pruebas manuales redactado, pendiente de
 > aprobación del usuario. Al aprobarse e iniciar la Fase 1, este estado pasa
@@ -155,75 +155,62 @@ No se añade fase de MCP.
 ## Fases de implementación
 
 ### Fase 1 — Tipos y módulo transversal
-- [ ] Leer `DESIGN.md` (aplica por ser cambio de UI).
-- [ ] Actualizar `lib/course-presentations/types.ts`: `SyllabusUnit.week`,
+- [x] Leer `DESIGN.md` (aplica por ser cambio de UI).
+- [x] Actualizar `lib/course-presentations/types.ts`: `SyllabusUnit.week`,
       nuevos campos de `CoursePresentation` (`modality`, `weeklyHours`,
       `independentHours`), remoción de `hours`/`classesCount`/`startDate`/
       `enrollDeadline`, nueva interface `Instructor`.
-- [ ] Crear `lib/course-presentations/data/transversal.ts` con
+- [x] Crear `lib/course-presentations/data/transversal.ts` con
       `TRANSVERSAL_INSTRUCTOR` y `TRANSVERSAL_CONDITIONS` (contenido literal
       de `courses/informacion-transversal.md`).
-- [ ] Actualizar `lib/course-presentations/index.ts` para re-exportar
+- [x] Actualizar `lib/course-presentations/index.ts` para re-exportar
       `Instructor`.
 
 ### Fase 2 — Datos reales de Estructuras de Datos
-- [ ] Reescribir `lib/course-presentations/data/estructuras-de-datos.ts`:
-  - `program: "Ingeniería de Sistemas — 4.º semestre"`, `credits: 5`,
+- [x] Reescribir `lib/course-presentations/data/estructuras-de-datos.ts`:
+  - [x] `program: "Ingeniería de Sistemas — 4.º semestre"`, `credits: 5`,
     `modality: "Presencial"`, `weeklyHours: "6 h/semana presenciales"`,
     `independentHours: "9 h/semana independientes"` (144h / 16 semanas).
-  - `prereqs: ["Lógica de Programación y Laboratorio"]`.
-  - `tools`: corregir a `["Java JDK 21", "Visual Studio Code", "Git y GitHub"]`
-    (la lista actual con Python es incorrecta para este curso).
-  - `syllabus`: 10 unidades siguiendo el "Mapa general del curso" de
-    `info.md` — Git y GitHub (Semana 1), POO clases/UML básico (Semanas
-    2-3), POO herencia/polimorfismo/diseño avanzado (Semanas 4-5, ★ M1),
-    Introducción a estructuras + Big O (Semanas 6-7), Listas (Semanas
-    8-10, ★ M2 parte 1), Manejo de archivos (Semana 11, ★ cierre M2),
-    Pilas y colas (Semanas 12-13, ★ M3), Recursividad (Semana 14, ★ M4),
-    Árboles (Semanas 15-16, ★ M5), Temas opcionales — Hash y Grafos
-    (Opcional).
-  - `evaluation`: Momento 1 POO 15%, Momento 2 Estructuras lineales 15%,
+  - [x] `prereqs: ["Lógica de Programación y Laboratorio"]`.
+  - [x] `tools`: corregido a `["Java JDK 21", "Visual Studio Code", "Git y GitHub"]`.
+  - [x] `syllabus`: 10 unidades siguiendo el "Mapa general del curso" de
+    `info.md`.
+  - [x] `evaluation`: Momento 1 POO 15%, Momento 2 Estructuras lineales 15%,
     Momento 3 Pilas y colas 15%, Momento 4 Recursividad 10%, Momento 5
     Proyecto final 25%, Seguimiento continuo 20% (suma 100%).
-  - `dates`: fechas reales de `cronograma-dia-a-dia.md` — inicio de clases
-    (4 ago), cierre M1 (4 sep), cierre M2 (16 oct), cierre M3 (30 oct),
-    registro del 60% (1 nov), cierre M4 (6 nov), cancelación de
-    asignaturas (22 nov), sustentación/cierre M5 (24-27 nov).
-  - `conditions: TRANSVERSAL_CONDITIONS`.
+  - [x] `dates`: fechas reales de `cronograma-dia-a-dia.md`.
+  - [x] `conditions: TRANSVERSAL_CONDITIONS`.
 
 ### Fase 3 — Datos provisionales de Programación científica y Análisis de algoritmos
-- [ ] Agregar `week` estimada secuencial a cada `SyllabusUnit` existente en
-      ambos archivos (ej. bloques de 3 semanas por unidad).
-- [ ] Agregar `modality: "Presencial"`, `weeklyHours`, `independentHours`
-      con un comentario `// NOTE: datos provisionales, pendientes de
-      microdiseño real — actualizar en spec futuro` sobre cada bloque.
-- [ ] Quitar `hours`/`classesCount`/`startDate`/`enrollDeadline`.
-- [ ] `conditions: TRANSVERSAL_CONDITIONS` en ambos.
+- [x] Agregar `week` estimada secuencial a cada `SyllabusUnit` existente en
+      ambos archivos (bloques de 3 semanas por unidad).
+- [x] Agregar `modality: "Presencial"`, `weeklyHours`, `independentHours`
+      con comentario `// NOTE: datos provisionales...`.
+- [x] Quitar `hours`/`classesCount`/`startDate`/`enrollDeadline`.
+- [x] `conditions: TRANSVERSAL_CONDITIONS` en ambos.
 
 ### Fase 4 — Rediseño de `CoursePresentation.tsx`
-- [ ] Hero: reemplazar fila de `MetaItem` (Duración, Clases disponibles,
-      Cupos) por (Modalidad, Horas semanales, Horas de trabajo
+- [x] Hero: reemplazar fila de `MetaItem` por (Modalidad, Horas semanales, Horas de trabajo
       independiente), manteniendo Créditos.
-- [ ] Card de matrícula: quitar columnas Inicio/Cierre inscripción; agregar
-      bloque con el prerrequisito académico.
-- [ ] Eliminar la sección standalone "Prerrequisitos".
-- [ ] Temario: mostrar `unit.week` junto a número/título de cada unidad.
-- [ ] Verificar que "Herramientas", "Evaluación", "Fechas importantes",
-      "Condiciones" y el CTA final siguen renderizando correctamente con el
-      nuevo shape de datos.
+- [x] Card de matrícula: quitar Inicio/Cierre inscripción; agregar
+      bloque con prerrequisito académico.
+- [x] Eliminar la sección standalone "Prerrequisitos".
+- [x] Temario: mostrar `unit.week` junto a número/título de cada unidad.
+- [x] Verificar que "Herramientas", "Evaluación", "Fechas importantes",
+      "Condiciones" y el CTA final siguen renderizando correctamente.
 
 ### Fase 5 — Bloque de información del docente
-- [ ] Crear `components/course-presentations/InstructorFooter.tsx`.
-- [ ] Editar `app/(cursos)/[courseSlug]/presentacion/page.tsx` para
+- [x] Crear `components/course-presentations/InstructorFooter.tsx`.
+- [x] Editar `app/(cursos)/[courseSlug]/presentacion/page.tsx` para
       importar `TRANSVERSAL_INSTRUCTOR` y renderizar `InstructorFooter`
       junto a `LandingFooter`, sin modificar `LandingFooter` ni
       `FOOTER_LINKS`.
 
 ### Fase 6 — Verificación admin y build
-- [ ] Verificar manualmente `/admin/courses/[academicCourseId]/presentacion`
+- [x] Verificar manualmente `/admin/courses/[academicCourseId]/presentacion`
       para los 3 cursos vinculados por `course_slug`: sigue renderizando
       sin errores con el nuevo shape de datos (sin bloque de docente).
-- [ ] `npm run build` y `npm run lint` sin errores.
+- [x] `npm run build` y `npm run lint` sin errores.
 
 ## Criterios de aceptación
 
