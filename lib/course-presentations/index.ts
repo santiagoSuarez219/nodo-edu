@@ -1,8 +1,12 @@
 import { estructurasDatos } from "./data/estructuras-de-datos";
+import { programacionCientifica } from "./data/programacion-cientifica";
+import { analisisDeAlgoritmos } from "./data/analisis-de-algoritmos";
 import type { CoursePresentation } from "./types";
 
 const entries: readonly [string, CoursePresentation][] = [
   ["estructuras-de-datos", estructurasDatos],
+  ["programacion-cientifica", programacionCientifica],
+  ["analisis-de-algoritmos", analisisDeAlgoritmos],
 ];
 
 const presentationsBySlug = new Map<string, CoursePresentation>();
