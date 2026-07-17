@@ -87,12 +87,26 @@ export function AcademicCourseList({ courses }: Props) {
                   )}
                 </td>
                 <td className="px-5 py-4 text-right">
-                  <Link
-                    href={`/admin/courses/${course.id}`}
-                    className="text-sm font-medium text-blue-700 dark:text-blue-400 hover:underline"
-                  >
-                    Ver detalle
-                  </Link>
+                  <div className="flex items-center justify-end gap-2">
+                    <Link
+                      href={`/admin/courses/${course.id}`}
+                      className="text-sm font-medium text-blue-700 dark:text-blue-400 hover:underline"
+                    >
+                      Ver detalle
+                    </Link>
+                    <Link
+                      href={`/admin/courses/${course.id}/presentacion`}
+                      className="text-sm font-medium text-blue-700 dark:text-blue-400 hover:underline"
+                    >
+                      Presentación
+                    </Link>
+                    <Link
+                      href={`/admin/courses/${course.id}/contenido`}
+                      className="text-sm font-medium text-blue-700 dark:text-blue-400 hover:underline"
+                    >
+                      Contenido
+                    </Link>
+                  </div>
                 </td>
               </tr>
             ))}
