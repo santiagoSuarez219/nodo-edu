@@ -1,5 +1,5 @@
-import Link from "next/link";
 import type { AcademicCourse } from "@/lib/academic-courses/types";
+import { CourseActionsDropdown } from "./CourseActionsDropdown";
 
 const DAY_LABELS: Record<string, string> = {
   lunes: "Lun",
@@ -28,7 +28,7 @@ export function AcademicCourseList({ courses }: Props) {
         <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
           Crea tu primer curso para empezar a matricular estudiantes.
         </p>
-        <Link
+        <a
           href="/admin/courses/new"
           className="inline-flex items-center gap-2 rounded-lg bg-blue-700 hover:bg-blue-800 dark:bg-blue-600 dark:hover:bg-blue-700 text-white text-sm font-bold px-4 py-2.5 transition-colors"
         >
@@ -36,7 +36,7 @@ export function AcademicCourseList({ courses }: Props) {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
           </svg>
           Crear curso
-        </Link>
+        </a>
       </div>
     );
   }
@@ -87,26 +87,7 @@ export function AcademicCourseList({ courses }: Props) {
                   )}
                 </td>
                 <td className="px-5 py-4 text-right">
-                  <div className="flex items-center justify-end gap-2">
-                    <Link
-                      href={`/admin/courses/${course.id}`}
-                      className="text-sm font-medium text-blue-700 dark:text-blue-400 hover:underline"
-                    >
-                      Ver detalle
-                    </Link>
-                    <Link
-                      href={`/admin/courses/${course.id}/presentacion`}
-                      className="text-sm font-medium text-blue-700 dark:text-blue-400 hover:underline"
-                    >
-                      Presentación
-                    </Link>
-                    <Link
-                      href={`/admin/courses/${course.id}/contenido`}
-                      className="text-sm font-medium text-blue-700 dark:text-blue-400 hover:underline"
-                    >
-                      Contenido
-                    </Link>
-                  </div>
+                  <CourseActionsDropdown courseId={course.id} />
                 </td>
               </tr>
             ))}
