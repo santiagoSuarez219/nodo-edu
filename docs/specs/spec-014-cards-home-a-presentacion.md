@@ -1,6 +1,6 @@
-# spec-014 — [TESTING] Cards de home enlazan a la presentación del curso
+# spec-014 — [DONE] Cards de home enlazan a la presentación del curso
 
-> Estado `[TESTING]`: implementación completa, todas las pruebas manuales aprobadas.
+> Estado `[DONE]`: implementación completada y pruebas manuales aprobadas. Listo para merge.
 
 ## Contexto
 
