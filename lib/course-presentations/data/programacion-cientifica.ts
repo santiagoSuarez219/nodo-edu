@@ -1,4 +1,5 @@
 import type { CoursePresentation } from "../types";
+import { TRANSVERSAL_CONDITIONS } from "./transversal";
 
 export const programacionCientifica: CoursePresentation = {
   name: "Programación científica",
@@ -6,16 +7,17 @@ export const programacionCientifica: CoursePresentation = {
   program: "Ingeniería de Sistemas / Ciencia de Datos",
   level: "Introductorio",
   credits: 3,
-  hours: "15h de contenido",
-  classesCount: 20,
+  // NOTE: datos provisionales, pendientes de microdiseño real — actualizar en spec futuro
+  modality: "Presencial",
+  weeklyHours: "4 h/semana",
+  independentHours: "6 h/semana",
   spots: 15,
-  startDate: "18 ago 2026",
-  enrollDeadline: "11 ago 2026",
   prereqs: ["Programación I", "Álgebra lineal básica"],
   tools: ["Python", "NumPy", "Pandas", "Matplotlib", "Jupyter Notebook", "VS Code"],
   syllabus: [
     {
       n: 1,
+      week: "Semanas 1-3",
       title: "Entorno de trabajo y NumPy",
       topics: [
         "Entornos virtuales y gestión de dependencias",
@@ -26,6 +28,7 @@ export const programacionCientifica: CoursePresentation = {
     },
     {
       n: 2,
+      week: "Semanas 4-6",
       title: "Vectorización y operaciones numéricas",
       topics: [
         "Operaciones vectorizadas vs. bucles",
@@ -36,6 +39,7 @@ export const programacionCientifica: CoursePresentation = {
     },
     {
       n: 3,
+      week: "Semanas 7-9",
       title: "Álgebra lineal numérica",
       topics: [
         "Productos matriciales y normas",
@@ -46,6 +50,7 @@ export const programacionCientifica: CoursePresentation = {
     },
     {
       n: 4,
+      week: "Semanas 10-12",
       title: "Visualización y análisis de datos",
       topics: [
         "Matplotlib: figuras, ejes y gráficos 2D",
@@ -66,10 +71,5 @@ export const programacionCientifica: CoursePresentation = {
     { date: "29 sep", label: "Segunda entrega" },
     { date: "20 oct", label: "Proyecto final" },
   ],
-  conditions: [
-    "Se requiere acceso a Python 3.10+ y Jupyter en tu máquina local o en la nube.",
-    "Asistencia mínima del 75% para participar en evaluación final.",
-    "Las entregas atrasadas pierden 15% de puntuación por día, hasta 3 días.",
-    "Colaboración permitida con atribución clara de fuentes y contribuyentes.",
-  ],
+  conditions: TRANSVERSAL_CONDITIONS,
 };

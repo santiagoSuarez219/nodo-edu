@@ -1,4 +1,5 @@
 import type { CoursePresentation } from "../types";
+import { TRANSVERSAL_CONDITIONS } from "./transversal";
 
 export const analisisDeAlgoritmos: CoursePresentation = {
   name: "Análisis de algoritmos",
@@ -6,16 +7,17 @@ export const analisisDeAlgoritmos: CoursePresentation = {
   program: "Ingeniería en Sistemas / Ciencia de Datos",
   level: "Avanzado",
   credits: 4,
-  hours: "20h de contenido",
-  classesCount: 26,
+  // NOTE: datos provisionales, pendientes de microdiseño real — actualizar en spec futuro
+  modality: "Presencial",
+  weeklyHours: "5 h/semana",
+  independentHours: "7 h/semana",
   spots: 10,
-  startDate: "25 ago 2026",
-  enrollDeadline: "18 ago 2026",
   prereqs: ["Estructuras de Datos", "Matemática Discreta"],
   tools: ["Python", "Git", "Visualizadores de algoritmos", "Jupyter", "LaTeX (opcional)"],
   syllabus: [
     {
       n: 1,
+      week: "Semanas 1-3",
       title: "Complejidad computacional",
       topics: [
         "Modelo de cómputo y costo de operaciones",
@@ -26,6 +28,7 @@ export const analisisDeAlgoritmos: CoursePresentation = {
     },
     {
       n: 2,
+      week: "Semanas 4-6",
       title: "Divide y vencerás",
       topics: [
         "Ecuaciones de recurrencia y teorema maestro",
@@ -36,6 +39,7 @@ export const analisisDeAlgoritmos: CoursePresentation = {
     },
     {
       n: 3,
+      week: "Semanas 7-9",
       title: "Programación dinámica",
       topics: [
         "Subestructura óptima y solapamiento",
@@ -46,6 +50,7 @@ export const analisisDeAlgoritmos: CoursePresentation = {
     },
     {
       n: 4,
+      week: "Semanas 10-12",
       title: "Algoritmos voraces y grafos",
       topics: [
         "Criterio voraz y demostración de optimalidad",
@@ -56,6 +61,7 @@ export const analisisDeAlgoritmos: CoursePresentation = {
     },
     {
       n: 5,
+      week: "Semanas 13-15",
       title: "Complejidad P, NP y estrategias prácticas",
       topics: [
         "Clases P y NP, verificación polinomial",
@@ -77,11 +83,5 @@ export const analisisDeAlgoritmos: CoursePresentation = {
     { date: "13 oct", label: "Hito 1 del proyecto" },
     { date: "3 nov", label: "Entrega final del proyecto" },
   ],
-  conditions: [
-    "Asistencia mínima del 80% para optar a evaluación final.",
-    "Las pruebas se hacen bajo honor; cualquier violación resulta en descalificación inmediata.",
-    "Entregas atrasadas penalizan 12% por día, máximo 3 días.",
-    "Se permite discusión conceptual con compañeros, pero el código y análisis deben ser propios.",
-    "Uso de recursos externos debe citarse siempre.",
-  ],
+  conditions: TRANSVERSAL_CONDITIONS,
 };

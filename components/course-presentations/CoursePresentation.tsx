@@ -32,12 +32,12 @@ export function CoursePresentation({ presentation, cta }: Props) {
 
           <div className="flex flex-wrap gap-6 lg:gap-8 mt-2 text-sm">
             <MetaItem label="Créditos" value={String(presentation.credits)} />
-            <MetaItem label="Duración" value={presentation.hours} />
+            <MetaItem label="Modalidad" value={presentation.modality} />
+            <MetaItem label="Horas semanales" value={presentation.weeklyHours} />
             <MetaItem
-              label="Clases disponibles"
-              value={String(presentation.classesCount)}
+              label="Trabajo independiente"
+              value={presentation.independentHours}
             />
-            <MetaItem label="Cupos" value={String(presentation.spots)} />
           </div>
         </div>
 
@@ -47,46 +47,34 @@ export function CoursePresentation({ presentation, cta }: Props) {
             Matrícula abierta
           </span>
 
-          <div className="flex gap-6">
+          {presentation.prereqs.length > 0 && (
             <div>
-              <p className="text-xs text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-1">
-                Inicio
+              <p className="text-xs text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-2">
+                Prerrequisito académico
               </p>
-              <p className="text-sm font-bold">{presentation.startDate}</p>
+              <div className="space-y-2">
+                {presentation.prereqs.map((prereq) => (
+                  <p
+                    key={prereq}
+                    className="text-sm text-gray-900 dark:text-gray-100"
+                  >
+                    {prereq}
+                  </p>
+                ))}
+              </div>
             </div>
-            <div>
-              <p className="text-xs text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-1">
-                Cierre inscripción
-              </p>
-              <p className="text-sm font-bold">{presentation.enrollDeadline}</p>
-            </div>
-          </div>
+          )}
 
           <div>{cta}</div>
 
           <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed">
-            Requiere cumplir los prerrequisitos listados abajo.
+            {presentation.spots} cupos disponibles.
           </p>
         </div>
       </section>
 
       {/* Main content */}
       <main className="px-4 md:px-6 lg:px-16 py-8 lg:py-12 flex flex-col gap-12">
-        {/* Prerequisites */}
-        <section className="flex flex-col gap-4 pb-8 lg:pb-12 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-xl lg:text-2xl font-bold">Prerrequisitos</h2>
-          <div className="flex flex-wrap gap-2">
-            {presentation.prereqs.map((prereq) => (
-              <span
-                key={prereq}
-                className="text-sm bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-300 px-3 py-2 rounded-lg"
-              >
-                {prereq}
-              </span>
-            ))}
-          </div>
-        </section>
-
         {/* Syllabus */}
         <section className="flex flex-col gap-4 pb-8 lg:pb-12 border-b border-gray-200 dark:border-gray-700">
           <h2 className="text-xl lg:text-2xl font-bold">Temario</h2>
@@ -96,7 +84,7 @@ export function CoursePresentation({ presentation, cta }: Props) {
                 key={`unit-${unit.n}`}
                 className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 lg:p-6"
               >
-                <div className="flex items-center gap-3 mb-3">
+                <div className="flex items-center gap-3 mb-1">
                   <span className="text-sm font-bold text-blue-700 dark:text-blue-400">
                     {String(unit.n).padStart(2, "0")}
                   </span>
@@ -104,6 +92,9 @@ export function CoursePresentation({ presentation, cta }: Props) {
                     {unit.title}
                   </h3>
                 </div>
+                <p className="text-xs text-gray-600 dark:text-gray-400 mb-3">
+                  {unit.week}
+                </p>
                 <ul className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
                   {unit.topics.map((topic) => (
                     <li key={topic} className="ml-6 list-disc">

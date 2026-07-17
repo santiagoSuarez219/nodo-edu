@@ -3,8 +3,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/auth/session";
 import { getCoursePresentationBySlug } from "@/lib/course-presentations";
+import { TRANSVERSAL_INSTRUCTOR } from "@/lib/course-presentations/data/transversal";
 import { hasCourseAccess } from "@/lib/enrollments/access";
 import { CoursePresentation } from "@/components/course-presentations/CoursePresentation";
+import { InstructorFooter } from "@/components/course-presentations/InstructorFooter";
 import { LandingFooter } from "@/components/landing";
 import { FOOTER_LINKS } from "@/lib/landing";
 
@@ -55,6 +57,8 @@ export default async function CoursePresentationPage({ params }: Props) {
   return (
     <main className="flex-1 bg-white dark:bg-gray-900">
       <CoursePresentation presentation={presentation} cta={cta} />
+
+      <InstructorFooter instructor={TRANSVERSAL_INSTRUCTOR} />
 
       <div className="border-t border-gray-200 dark:border-gray-700" />
 

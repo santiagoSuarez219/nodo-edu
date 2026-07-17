@@ -1,21 +1,25 @@
 # Curso de Estructuras de Datos
 
-**Programa:** Tecnología en Desarrollo de Software  
+**Programa:** Ingeniería de Sistemas — 4.º semestre  
 **Créditos:** 5 | **Modalidad:** Presencial  
+**Duración:** 16 semanas (6 h presenciales/semana)  
 **Horas presenciales:** 96 h (48 sesiones de 2 h) | **Horas independientes:** 144 h  
 **Prerrequisito:** Lógica de Programación y Laboratorio
 
 
 ## **📝 Evaluación del curso**
 
-| Actividad                                                    | Porcentaje | Fecha                                 |
-| ------------------------------------------------------------ | ---------- | ------------------------------------- |
-| **Momento evaluativo 1:** Programación orientada a objetos   | 20%        | Semana 5 (XX de XX - XX de XX)  |
-| **Momento evaluativo 2** Listas enlazadas + Archivos         | 20%        | Semana 8 (XX de XX - XX de XX)  |
-| **Momento evaluativo 3:** Listas simples, pilas y colas      | 20%        | Semana 11 (XX de XX - XX de XX) |
-| **Momento evaluativo 4:** Listas dobles y manejo de archivos | 10%        | Semana 15 (XX de XX - XX de XX)   |
-| **Momento evaluativo 5:** Proyecto final                     | 20%        | Semana 17 (XX de XX - XX de XX) |
-| **Seguimiento**                                              | 20%        | Durante todo el semestre        
+| Actividad                                                                 | Porcentaje | Momento                          |
+| ------------------------------------------------------------------------- | ---------- | -------------------------------- |
+| **Momento evaluativo 1:** Programación orientada a objetos (encapsulamiento, herencia, polimorfismo y UML) | 15%        | Semana 5 (XX de XX)              |
+| **Momento evaluativo 2:** Estructuras lineales — listas, ordenamiento y archivos | 15%        | Semana 11 (XX de XX)            |
+| **Momento evaluativo 3:** Pilas y colas                                   | 15%        | Semana 13 (XX de XX)            |
+| **Momento evaluativo 4:** Recursividad                                    | 10%        | Semana 14 (XX de XX)            |
+| **Momento evaluativo 5:** Proyecto final — árboles e integración          | 25%        | Semana 16 (XX de XX)            |
+| **Seguimiento**                                                           | 20%        | Durante todo el semestre          |
+| **Total**                                                                 | **100%**   |                                  |
+
+> Cada momento evaluativo se cierra **después** de que su contenido se ha enseñado por completo, y su componente práctico es el laboratorio evaluativo (★) del tema correspondiente. No existe un sistema de evaluación paralelo: el laboratorio ★ *es* la parte práctica del momento.
 
 ### Estructura semanal
 
@@ -33,6 +37,29 @@
 - **Java JDK 21 LTS**: instalación y configuración en el entorno de desarrollo.
 - **Visual Studio Code**: instalación y configuración de extensiones para Java.
 - **Git y GitHub**: instalación, configuración y uso básico de control de versiones.
+
+---
+
+## Mapa general del curso (16 semanas)
+
+| Sem | Módulo | Foco de la semana | Evaluación |
+|-----|--------|-------------------|------------|
+| 1  | Git y GitHub | Control de versiones, ramas, estructura del proyecto | |
+| 2  | POO (parte 1) | Clases, objetos, encapsulamiento | |
+| 3  | POO (parte 1) | Métodos avanzados, `static`, UML básico | |
+| 4  | POO (parte 2) | Herencia y polimorfismo | |
+| 5  | POO (parte 2) | Composición/agregación, UML avanzado, diseño con TAD | ★ M1 |
+| 6  | Introducción a las estructuras | TAD y criterios de selección | |
+| 7  | Eficiencia algorítmica | Notación Big O y comparación de estructuras | |
+| 8  | Listas | Lista simple enlazada | |
+| 9  | Listas | Lista doble y circular | |
+| 10 | Listas | Ordenamiento sobre listas enlazadas | ★ M2 |
+| 11 | Manejo de archivos | Persistencia en archivos de texto | ★ M2 |
+| 12 | Pilas y colas | Pilas (LIFO) | |
+| 13 | Pilas y colas | Colas (FIFO) | ★ M3 |
+| 14 | Recursividad | Algoritmos recursivos | ★ M4 |
+| 15 | Árboles | Árbol binario y recorridos | |
+| 16 | Árboles | BST + integración y sustentación del proyecto final | ★ M5 |
 
 ---
 
@@ -87,6 +114,16 @@ Cada equipo selecciona uno de los siguientes casos de estudio al inicio del seme
 | 6 | [Liga de Fútbol](projects/06-liga-futbol.md) | Equipos, jugadores, fixture y tabla de posiciones |
 
 Cada archivo de proyecto detalla la evaluación de viabilidad, las entidades del dominio y el plan de sprints acumulativos alineado con los módulos del curso.
+
+### Ventanas de sprint
+
+| Sprint | Foco | Semanas |
+|--------|------|---------|
+| Sprint 1 | POO y arquitectura base | 1–5 |
+| Sprint 2 | Listas y persistencia | 6–11 |
+| Sprint 3 | Pilas y colas | 12–13 |
+| Sprint 4 | Recursividad | 14 |
+| Sprint 5 | Árboles e integración final | 15–16 |
 
 ---
 
@@ -151,52 +188,9 @@ Cada archivo de proyecto detalla la evaluación de viabilidad, las entidades del
 
 ---
 
-## Módulo 3 — Introducción a las estructuras de datos
+## Módulo 3 — Programación orientada a objetos (parte 2)
 
-*Incluye fundamentos de eficiencia algorítmica como criterio central para la selección de estructuras.*
-
-### Semana 4 — Panorama general y tipos abstractos de datos
-
-**T1 — Tipos abstractos de datos (TAD)**
-- ¿Qué es un tipo abstracto de datos?
-- Separación entre interfaz y representación interna
-- Panorama general de estructuras: arreglos, listas, pilas, colas, árboles, grafos, tablas hash
-
-**T2 — Criterios de selección de estructuras**
-- Ventajas y desventajas de cada estructura de datos
-- Preguntas clave para elegir una estructura: ¿cómo se accede?, ¿con qué frecuencia se inserta o elimina?, ¿importa el orden?
-- Relación entre el tipo de problema, los datos y la estructura adecuada
-
-**P — Laboratorio: Selección argumentada de estructuras**
-- Dado un conjunto de enunciados de problemas, identificar la estructura más adecuada para cada uno
-- Justificar la selección con criterios explícitos
-- Discusión grupal de las decisiones tomadas y revisión de alternativas
-- *Capas involucradas:* se consolida el entendimiento de que todas las estructuras del semestre vivirán en `model/structures/`
-
-### Semana 5 — Eficiencia algorítmica aplicada a estructuras
-
-**T1 — Notación Big O y análisis de complejidad**
-- Complejidad temporal y espacial
-- Notación Big O: definición e interpretación
-- Casos mejor, promedio y peor
-- Reglas básicas: constantes, término dominante, composición de operaciones
-
-**T2 — Comparación de estructuras por eficiencia**
-- Tabla comparativa de operaciones clave (acceso, búsqueda, inserción, eliminación) por estructura: O(1), O(log n), O(n), O(n²)
-- ¿Cuándo determina la eficiencia la elección de una estructura?
-- Conexión entre Big O y las decisiones de diseño que se tomarán en el curso
-
-**P — Laboratorio: Análisis de complejidad en Java**
-- Medir tiempos de ejecución con `System.nanoTime()`
-- Comparar operaciones de acceso y búsqueda en arreglo, lista enlazada y mapa
-- Tabular los resultados y contrastarlos con la teoría Big O
-- *Capas involucradas:* el código de medición va en el `Service`; la presentación de resultados va en la `View`
-
----
-
-## Módulo 4 — Programación orientada a objetos (parte 2)
-
-### Semana 6 — Herencia y polimorfismo
+### Semana 4 — Herencia y polimorfismo
 
 **T1 — Herencia**
 - Superclase y subclase: keyword `extends`
@@ -214,7 +208,7 @@ Cada archivo de proyecto detalla la evaluación de viabilidad, las entidades del
 - Probar el comportamiento polimórfico mediante arreglos de referencias
 - *Capas involucradas:* la jerarquía va en `model/domain/`; las interfaces compartidas pueden definirse en `model/` directamente
 
-### Semana 7 — Relaciones entre clases y UML avanzado
+### Semana 5 — Relaciones entre clases y UML avanzado
 
 **T1 — Composición, agregación y diagramas de paquetes**
 - Asociación, agregación y composición: diferencias conceptuales
@@ -226,10 +220,54 @@ Cada archivo de proyecto detalla la evaluación de viabilidad, las entidades del
 - Modelar el TAD de una estructura de datos con clases e interfaces
 - Puente entre el diseño OO y la implementación de estructuras de datos
 
-**P — Laboratorio: Diseño OO completo**
+**P ★ — Laboratorio evaluativo (Momento 1): Diseño OO completo**
 - Diseñar el diagrama UML completo del proyecto de aula, mostrando las cuatro capas, sus clases actuales y las relaciones entre ellas; este diagrama será el plano de referencia para el resto del semestre
-- Implementar el diseño en Java respetando el diagrama
+- Implementar el diseño en Java respetando el diagrama, aplicando encapsulamiento, herencia y polimorfismo
 - Revisión entre pares: ¿el código refleja fielmente el diseño?
+- Evaluación con rúbrica socializada previamente con el grupo (cierre del **Momento evaluativo 1 — POO**)
+
+---
+
+## Módulo 4 — Introducción a las estructuras de datos
+
+*Incluye fundamentos de eficiencia algorítmica como criterio central para la selección de estructuras.*
+
+### Semana 6 — Panorama general y tipos abstractos de datos
+
+**T1 — Tipos abstractos de datos (TAD)**
+- ¿Qué es un tipo abstracto de datos?
+- Separación entre interfaz y representación interna (conexión directa con las interfaces y clases abstractas vistas en el Módulo 3)
+- Panorama general de estructuras: arreglos, listas, pilas, colas, árboles, grafos, tablas hash
+
+**T2 — Criterios de selección de estructuras**
+- Ventajas y desventajas de cada estructura de datos
+- Preguntas clave para elegir una estructura: ¿cómo se accede?, ¿con qué frecuencia se inserta o elimina?, ¿importa el orden?
+- Relación entre el tipo de problema, los datos y la estructura adecuada
+
+**P — Laboratorio: Selección argumentada de estructuras**
+- Dado un conjunto de enunciados de problemas, identificar la estructura más adecuada para cada uno
+- Justificar la selección con criterios explícitos
+- Discusión grupal de las decisiones tomadas y revisión de alternativas
+- *Capas involucradas:* se consolida el entendimiento de que todas las estructuras del semestre vivirán en `model/structures/`
+
+### Semana 7 — Eficiencia algorítmica aplicada a estructuras
+
+**T1 — Notación Big O y análisis de complejidad**
+- Complejidad temporal y espacial
+- Notación Big O: definición e interpretación
+- Casos mejor, promedio y peor
+- Reglas básicas: constantes, término dominante, composición de operaciones
+
+**T2 — Comparación de estructuras por eficiencia**
+- Tabla comparativa de operaciones clave (acceso, búsqueda, inserción, eliminación) por estructura: O(1), O(log n), O(n), O(n²)
+- ¿Cuándo determina la eficiencia la elección de una estructura?
+- Conexión entre Big O y las decisiones de diseño que se tomarán en el curso
+
+**P — Laboratorio: Análisis de complejidad en Java**
+- Medir tiempos de ejecución con `System.nanoTime()`
+- Comparar operaciones de acceso y búsqueda en arreglo, lista enlazada y mapa
+- Tabular los resultados y contrastarlos con la teoría Big O
+- *Capas involucradas:* el código de medición va en el `Service`; la presentación de resultados va en la `View`
 
 ---
 
@@ -283,7 +321,7 @@ Cada archivo de proyecto detalla la evaluación de viabilidad, las entidades del
 - Tabla de decisión: cuándo usar cada tipo de lista
 - Integración con el modelo TAD y los diagramas UML del módulo anterior
 
-**P ★ — Laboratorio evaluativo: Caso de estudio con listas**
+**P ★ — Laboratorio evaluativo (parte 1 del Momento 2): Caso de estudio con listas**
 - Implementar una solución completa para un caso de estudio dado
 - La solución debe incluir diseño UML, código en Java y al menos una estrategia de ordenamiento
 - *Capas involucradas:* los algoritmos de ordenamiento van en el `Service`; la `View` recibe la lista ya ordenada y la muestra; el `Controller` coordina la interacción
@@ -293,7 +331,7 @@ Cada archivo de proyecto detalla la evaluación de viabilidad, las entidades del
 
 ## Módulo 6 — Manejo de archivos
 
-### Semana 11 — Archivos de texto en Java
+### Semana 11 — Archivos de texto en Java ★
 
 **T1 — Fundamentos de archivos**
 - Archivos de texto vs. archivos binarios: diferencias y casos de uso
@@ -305,11 +343,12 @@ Cada archivo de proyecto detalla la evaluación de viabilidad, las entidades del
 - Manejo de excepciones: `IOException`, bloque `try-with-resources`
 - Lectura y escritura de datos estructurados (formato CSV-like)
 
-**P — Laboratorio: Persistencia de una lista enlazada**
+**P ★ — Laboratorio evaluativo (parte 2 del Momento 2): Persistencia de una lista enlazada**
 - Guardar el contenido de una lista enlazada en un archivo de texto
 - Leer el archivo y reconstruir la lista en memoria
 - Manejar correctamente errores de lectura, escritura y archivo inexistente
 - *Capas involucradas:* los métodos `guardar()` y `cargar()` van en el `Service`; los archivos `.txt` se almacenan en `data/`; ninguna otra capa accede directamente al sistema de archivos
+- Cierre del **Momento evaluativo 2 — Estructuras lineales** (listas, ordenamiento y archivos), con rúbrica socializada previamente
 
 ---
 
@@ -345,11 +384,11 @@ Cada archivo de proyecto detalla la evaluación de viabilidad, las entidades del
 - Interface `Queue<E>` y clase `LinkedList<E>` del API de Java
 - Introducción a la cola de prioridad (`PriorityQueue<E>`)
 
-**P ★ — Laboratorio evaluativo: Caso de estudio con pilas y colas**
+**P ★ — Laboratorio evaluativo (Momento 3): Caso de estudio con pilas y colas**
 - Implementar una solución que combine pila y cola para un caso de estudio dado
 - Incluir diseño UML y código en Java
 - *Capas involucradas:* `Cola<T>` va en `model/structures/`; la solución debe mostrar `Pila<T>` y `Cola<T>` integradas a través del `Service`; `Controller` y `View` no conocen las estructuras directamente
-- Evaluación con rúbrica socializada previamente con el grupo
+- Evaluación con rúbrica socializada previamente con el grupo (cierre del **Momento evaluativo 3 — Pilas y colas**)
 
 ---
 
@@ -367,11 +406,12 @@ Cada archivo de proyecto detalla la evaluación de viabilidad, las entidades del
 - Torres de Hanói: planteamiento, solución recursiva y complejidad
 - ¿Cuándo preferir recursión sobre iteración? Ventajas y riesgos
 
-**P ★ — Laboratorio evaluativo: Caso de estudio recursivo**
+**P ★ — Laboratorio evaluativo (Momento 4): Caso de estudio recursivo**
 - Diseñar y documentar un algoritmo recursivo para un problema dado
 - Incluir prueba de escritorio para al menos dos casos
 - Implementar la solución en Java y validarla con casos de prueba
 - *Capas involucradas:* los métodos recursivos van en el `Service` si son lógica de negocio, o dentro de la propia estructura en `model/structures/` si son operaciones de recorrido
+- Evaluación con rúbrica socializada previamente con el grupo (cierre del **Momento evaluativo 4 — Recursividad**)
 
 ---
 
@@ -395,7 +435,7 @@ Cada archivo de proyecto detalla la evaluación de viabilidad, las entidades del
 - Visualizar por consola el resultado de cada recorrido sobre un árbol de prueba
 - *Capas involucradas:* `NodoArbol<T>` y `ArbolBinario<T>` van en `model/structures/`; los recorridos se exponen a través del `Service`; la `View` solo imprime los resultados
 
-### Semana 16 — Árbol binario de búsqueda (BST) ★
+### Semana 16 — Árbol binario de búsqueda (BST) e integración final ★
 
 **T1 — BST: búsqueda e inserción**
 - Propiedad de ordenamiento del BST
@@ -407,17 +447,17 @@ Cada archivo de proyecto detalla la evaluación de viabilidad, las entidades del
 - Aplicaciones de los BST: diccionarios, índices, autocompletado
 - Síntesis del curso: hilo conductor entre todos los módulos
 
-**P ★ — Laboratorio evaluativo: Caso de estudio final con árboles**
+**P ★ — Laboratorio evaluativo (Momento 5): Proyecto final con árboles**
 - Implementar un BST completo con inserción, búsqueda, eliminación y recorridos
 - Aplicarlo a un caso de estudio que integre al menos dos estructuras vistas en el curso
 - *Capas involucradas:* `BST<T>` va en `model/structures/`; el `Service` expone búsqueda, inserción y eliminación; la solución final debe demostrar que las cuatro capas están correctamente separadas
-- Evaluación con rúbrica socializada previamente con el grupo
+- Sustentación del proyecto de aula completo y evaluación con rúbrica socializada previamente (cierre del **Momento evaluativo 5 — Proyecto final**)
 
 ---
 
 ## Temas opcionales
 
-*No tienen semana asignada. Se abordan si el avance del curso lo permite, en el orden indicado a continuación.*
+*No tienen semana asignada. Se abordan como trabajo independiente o si el avance del curso lo permite, en el orden indicado a continuación.*
 
 ### Tablas Hash
 
@@ -437,5 +477,5 @@ Cada archivo de proyecto detalla la evaluación de viabilidad, las entidades del
 
 ---
 
-*Documento elaborado para el programa Tecnología en Desarrollo de Software.*  
+*Documento elaborado para el programa Ingeniería de Sistemas (4.º semestre).*  
 *Basado en el microdiseño curricular FDE 058 V5 (30-07-2024).*
