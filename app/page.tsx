@@ -18,7 +18,7 @@ export default async function Home() {
       <div className="w-full 2xl:max-w-7xl lg:px-18 mx-auto px-6 pb-6 lg:pb-16">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">
-            Tus cursos
+            Cursos
           </h1>
           <p className="mt-2 text-gray-600 dark:text-gray-300">
             Explora los cursos disponibles y continúa tu aprendizaje.
