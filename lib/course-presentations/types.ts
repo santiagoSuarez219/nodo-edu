@@ -1,6 +1,7 @@
 export interface SyllabusUnit {
   n: number;
   title: string;
+  week: string;
   topics: string[];
 }
 
@@ -14,17 +15,25 @@ export interface ImportantDate {
   label: string;
 }
 
+export interface Instructor {
+  name: string;
+  credentials: string;
+  department: string;
+  researchGroup: string;
+  email: string;
+  office: string;
+}
+
 export interface CoursePresentation {
   name: string;
   desc: string;
   program: string;
   level: string;
   credits: number;
-  hours: string;
-  classesCount: number;
+  modality: string;
+  weeklyHours: string;
+  independentHours: string;
   spots: number;
-  startDate: string;
-  enrollDeadline: string;
   prereqs: string[];
   tools: string[];
   syllabus: SyllabusUnit[];

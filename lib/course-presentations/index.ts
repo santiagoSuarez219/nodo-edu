@@ -23,4 +23,10 @@ export async function getCoursePresentationBySlug(
   return presentationsBySlug.get(slug) ?? null;
 }
 
-export type { CoursePresentation, SyllabusUnit, EvaluationItem, ImportantDate } from "./types";
+export type {
+  CoursePresentation,
+  SyllabusUnit,
+  EvaluationItem,
+  ImportantDate,
+  Instructor,
+} from "./types";
