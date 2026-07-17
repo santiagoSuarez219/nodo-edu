@@ -29,7 +29,7 @@ export const Navbar = ({
       <nav className="w-full bg-white/90 dark:bg-gray-900/90 backdrop-blur border-b border-gray-200 dark:border-gray-700 transition-colors duration-300 ">
         <div className="flex items-center justify-between w-full mx-auto px-4 md:px-6 lg:px-18 py-3 lg:py-4">
           <Link
-            href="/cuenta/cursos"
+            href="/"
             className="bg-white rounded-lg py-1 px-2"
             aria-label="Inicio"
             onClick={closeMenu}
@@ -44,18 +44,6 @@ export const Navbar = ({
           </Link>
 
 
-          <ul className="hidden lg:flex gap-7 text-sm tracking-tight font-semibold text-gray-600 dark:text-gray-300">
-            {profile && (
-              <li>
-                <Link
-                  href={misCursosHref}
-                  className="transition-colors hover:text-blue-700 dark:hover:text-blue-400"
-                >
-                  Mis cursos
-                </Link>
-              </li>
-            )}
-          </ul>
           <div className="flex gap-3 items-center">
             {profile ? (
               <div className="hidden lg:block">
@@ -121,15 +109,6 @@ export const Navbar = ({
                 <p className="px-1 py-1.5 text-xs font-semibold text-gray-500 dark:text-gray-400 truncate">
                   {profile.full_name}
                 </p>
-              </li>
-              <li>
-                <Link
-                  href={misCursosHref}
-                  onClick={closeMenu}
-                  className="block py-3 text-gray-700 dark:text-gray-300 hover:text-blue-700 dark:hover:text-blue-400 transition-colors"
-                >
-                  Mis cursos
-                </Link>
               </li>
               <li>
                 <Link
