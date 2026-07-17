@@ -1,49 +1,38 @@
-import { Metadata } from 'next';
-import {
-  Hero,
-  CourseScroller,
-  HowItWorks,
-  TeacherBar,
-  LandingFooter,
-} from '@/components/landing';
-import {
-  LANDING_COURSES,
-  RESUME_STATE,
-  ROADMAP_STEPS,
-  MAIN_TEACHER,
-  FOOTER_LINKS,
-} from '@/lib/landing';
+import type { Metadata } from "next";
+import { CourseGrid } from "@/components/home";
+import { LandingFooter } from "@/components/landing";
+import { FOOTER_LINKS } from "@/lib/landing";
+import { getAllCourses } from "@/lib/courses";
 
 export const metadata: Metadata = {
-  title: 'nodo — Plataforma educativa de programación e IA',
+  title: "Mis cursos — nodo",
   description:
-    'Aprende programación e inteligencia artificial con cursos diseñados para ingenieros de sistemas, electrónicos y ciencias de datos.',
+    "Accede a tus cursos de programación e inteligencia artificial en la plataforma nodo.",
 };
 
-export default function Home() {
+export default async function Home() {
+  const courses = await getAllCourses();
+
   return (
     <main className="bg-white dark:bg-gray-900 mt-19 pt-6 lg:pt-16">
-      <div className="w-full 2xl:max-w-7xl lg:px-18 mx-auto px-6  pb-6 lg:pb-16">
-        <Hero resumeState={RESUME_STATE} />
+      <div className="w-full 2xl:max-w-7xl lg:px-18 mx-auto px-6 pb-6 lg:pb-16">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">
+            Tus cursos
+          </h1>
+          <p className="mt-2 text-gray-600 dark:text-gray-300">
+            Explora los cursos disponibles y continúa tu aprendizaje.
+          </p>
+        </div>
+
+        <div className="mt-8">
+          <CourseGrid courses={courses} />
+        </div>
       </div>
+
       <div className="border-t border-gray-200 dark:border-gray-700" />
 
-      <div id="cursos" className="w-full 2xl:max-w-7xl lg:px-18 mx-auto px-6 ">
-        <CourseScroller courses={LANDING_COURSES} />
-      </div>
-      <div className="border-t border-gray-200 dark:border-gray-700" />
-
-      {/* <div className="w-full 2xl:max-w-7xl lg:px-18 mx-auto px-6 ">
-        <HowItWorks steps={ROADMAP_STEPS} />
-      </div>
-      <div className="border-t border-gray-200 dark:border-gray-700" /> */}
-
-      <div id="docentes" className="w-full 2xl:max-w-7xl lg:px-18 mx-auto px-6 ">
-        <TeacherBar teacher={MAIN_TEACHER} />
-      </div>
-      <div className="border-t border-gray-200 dark:border-gray-700" />
-
-      <div className="w-full 2xl:max-w-7xl lg:px-18 mx-auto px-6 ">
+      <div className="w-full 2xl:max-w-7xl lg:px-18 mx-auto px-6 py-8">
         <LandingFooter links={FOOTER_LINKS} />
       </div>
     </main>
