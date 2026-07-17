@@ -1,6 +1,7 @@
-# spec-013 — [IN PROGRESS] Home privada como grilla de cursos + limpieza de navbar
+# spec-013 — [TESTING] Home privada como grilla de cursos + limpieza de navbar
 
-> Estado `[IN PROGRESS]`: implementación en curso. Rama: `feat/spec-013-home-grilla-cursos`.
+> Estado `[TESTING]`: implementación completada. Rama: `feat/spec-013-home-grilla-cursos`.
+> Pendiente de pruebas manuales (`TC-001` a `TC-008` en `docs/testing/test-013-home-grilla-cursos.md`).
 
 ## Contexto
 
@@ -115,27 +116,27 @@ No se añade fase de MCP.
 
 ## Fases de implementación
 
-### Fase 1 — Limpieza de navbar
-- [ ] Editar `components/navbar/Navbar.tsx`: cambiar `href` del logo a `/`.
-- [ ] Eliminar el `<ul>` desktop "Mis cursos" (nivel superior).
-- [ ] Eliminar el `<li>` "Mis cursos" duplicado del menú mobile.
-- [ ] Confirmar que `UserMenu.tsx` sigue recibiendo `misCursosHref`
+### Fase 1 — Limpieza de navbar ✅
+- [x] Editar `components/navbar/Navbar.tsx`: cambiar `href` del logo a `/`.
+- [x] Eliminar el `<ul>` desktop "Mis cursos" (nivel superior).
+- [x] Eliminar el `<li>` "Mis cursos" duplicado del menú mobile.
+- [x] Confirmar que `UserMenu.tsx` sigue recibiendo `misCursosHref`
       correctamente sin cambios.
 
-### Fase 2 — Nueva home (grilla de cursos)
-- [ ] Crear `components/home/CourseGrid.tsx` y `components/home/HomeCourseCard.tsx`.
-- [ ] Reescribir `app/page.tsx` como server component: `getAllCourses()` +
+### Fase 2 — Nueva home (grilla de cursos) ✅
+- [x] Crear `components/home/CourseGrid.tsx` y `components/home/HomeCourseCard.tsx`.
+- [x] Reescribir `app/page.tsx` como server component: `getAllCourses()` +
       render de la grilla + `LandingFooter` al final.
-- [ ] Cada card enlaza a `/[courseSlug]`.
-- [ ] Actualizar `metadata` de `app/page.tsx`.
+- [x] Cada card enlaza a `/[courseSlug]`.
+- [x] Actualizar `metadata` de `app/page.tsx`.
 
-### Fase 3 — Retiro de la landing de marketing
-- [ ] Eliminar `components/landing/Hero.tsx`, `CourseScroller.tsx`,
+### Fase 3 — Retiro de la landing de marketing ✅
+- [x] Eliminar `components/landing/Hero.tsx`, `CourseScroller.tsx`,
       `HowItWorks.tsx`, `TeacherBar.tsx`, `CourseCard.tsx`, `LevelBadge.tsx`,
       `ProgressBar.tsx`, `ResumeCard.tsx`.
-- [ ] Eliminar `lib/landing/data.ts` y `lib/landing/types.ts` salvo
-      `FooterLink`/`FOOTER_LINKS`.
-- [ ] Ajustar `components/landing/index.ts` y `lib/landing/index.ts` para
+- [x] Eliminar datos de `lib/landing/data.ts` salvo `FOOTER_LINKS`.
+- [x] Eliminar tipos de `lib/landing/types.ts` salvo `FooterLink`.
+- [x] Ajustar `components/landing/index.ts` y `lib/landing/index.ts` para
       exportar solo `LandingFooter`/`FOOTER_LINKS`.
 
 ## Criterios de aceptación
