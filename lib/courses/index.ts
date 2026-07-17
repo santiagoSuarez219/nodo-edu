@@ -20,6 +20,7 @@ const RESERVED_LESSON_SLUGS = new Set([
   "recursos",
   "evaluaciones",
   "notebooks",
+  "presentacion",
 ]);
 
 (function validate() {
