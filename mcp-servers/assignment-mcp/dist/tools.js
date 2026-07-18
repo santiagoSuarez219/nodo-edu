@@ -310,7 +310,7 @@ export async function handleToolCall(toolName, toolInput) {
     }
 }
 async function handleListAcademicCourses() {
-    const result = await callAssignmentApi("GET", "/api/assignments/academic-courses");
+    const result = await callAssignmentApi("GET", "/academic-courses");
     return JSON.stringify(result, null, 2);
 }
 async function handleListAssignmentGroups(input) {
@@ -321,24 +321,24 @@ async function handleListAssignmentGroups(input) {
     if (input.is_published !== undefined) {
         params.append("is_published", String(input.is_published));
     }
-    const path = `/api/assignments/groups${params.toString() ? `?${params}` : ""}`;
+    const path = `/groups${params.toString() ? `?${params}` : ""}`;
     const result = await callAssignmentApi("GET", path);
     return JSON.stringify(result, null, 2);
 }
 async function handleGetAssignmentGroup(input) {
     const groupId = String(input.groupId);
-    const result = await callAssignmentApi("GET", `/api/assignments/groups/${groupId}`);
+    const result = await callAssignmentApi("GET", `/groups/${groupId}`);
     return JSON.stringify(result, null, 2);
 }
 async function handleCreateAssignmentGroup(input) {
-    const result = await callAssignmentApi("POST", "/api/assignments/groups", input);
+    const result = await callAssignmentApi("POST", "/groups", input);
     return JSON.stringify(result, null, 2);
 }
 async function handleUpdateAssignmentGroup(input) {
     const groupId = String(input.groupId);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { groupId: _groupId, ...body } = input;
-    const result = await callAssignmentApi("PATCH", `/api/assignments/groups/${groupId}`, body);
+    const result = await callAssignmentApi("PATCH", `/groups/${groupId}`, body);
     return JSON.stringify(result, null, 2);
 }
 async function handleReplaceVariantQuestions(input) {
@@ -346,21 +346,21 @@ async function handleReplaceVariantQuestions(input) {
     const assignmentId = String(input.assignmentId);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { groupId: _groupId, assignmentId: _assignmentId, ...body } = input;
-    const result = await callAssignmentApi("PATCH", `/api/assignments/groups/${groupId}/variants/${assignmentId}`, body);
+    const result = await callAssignmentApi("PATCH", `/groups/${groupId}/variants/${assignmentId}`, body);
     return JSON.stringify(result, null, 2);
 }
 async function handleDeleteAssignmentGroup(input) {
     const groupId = String(input.groupId);
-    const result = await callAssignmentApi("DELETE", `/api/assignments/groups/${groupId}`);
+    const result = await callAssignmentApi("DELETE", `/groups/${groupId}`);
     return JSON.stringify(result, null, 2);
 }
 async function handlePublishAssignmentGroup(input) {
     const groupId = String(input.groupId);
-    const result = await callAssignmentApi("POST", `/api/assignments/groups/${groupId}/publish`);
+    const result = await callAssignmentApi("POST", `/groups/${groupId}/publish`);
     return JSON.stringify(result, null, 2);
 }
 async function handleGetVariantAllocations(input) {
     const groupId = String(input.groupId);
-    const result = await callAssignmentApi("GET", `/api/assignments/groups/${groupId}/allocations`);
+    const result = await callAssignmentApi("GET", `/groups/${groupId}/allocations`);
     return JSON.stringify(result, null, 2);
 }

@@ -326,7 +326,7 @@ export async function handleToolCall(
 }
 
 async function handleListAcademicCourses(): Promise<string> {
-  const result = await callAssignmentApi("GET", "/api/assignments/academic-courses");
+  const result = await callAssignmentApi("GET", "/academic-courses");
   return JSON.stringify(result, null, 2);
 }
 
@@ -340,19 +340,19 @@ async function handleListAssignmentGroups(input: Record<string, unknown>): Promi
     params.append("is_published", String(input.is_published));
   }
 
-  const path = `/api/assignments/groups${params.toString() ? `?${params}` : ""}`;
+  const path = `/groups${params.toString() ? `?${params}` : ""}`;
   const result = await callAssignmentApi("GET", path);
   return JSON.stringify(result, null, 2);
 }
 
 async function handleGetAssignmentGroup(input: Record<string, unknown>): Promise<string> {
   const groupId = String(input.groupId);
-  const result = await callAssignmentApi("GET", `/api/assignments/groups/${groupId}`);
+  const result = await callAssignmentApi("GET", `/groups/${groupId}`);
   return JSON.stringify(result, null, 2);
 }
 
 async function handleCreateAssignmentGroup(input: Record<string, unknown>): Promise<string> {
-  const result = await callAssignmentApi("POST", "/api/assignments/groups", input);
+  const result = await callAssignmentApi("POST", "/groups", input);
   return JSON.stringify(result, null, 2);
 }
 
@@ -361,7 +361,7 @@ async function handleUpdateAssignmentGroup(input: Record<string, unknown>): Prom
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { groupId: _groupId, ...body } = input;
 
-  const result = await callAssignmentApi("PATCH", `/api/assignments/groups/${groupId}`, body);
+  const result = await callAssignmentApi("PATCH", `/groups/${groupId}`, body);
   return JSON.stringify(result, null, 2);
 }
 
@@ -375,7 +375,7 @@ async function handleReplaceVariantQuestions(
 
   const result = await callAssignmentApi(
     "PATCH",
-    `/api/assignments/groups/${groupId}/variants/${assignmentId}`,
+    `/groups/${groupId}/variants/${assignmentId}`,
     body
   );
   return JSON.stringify(result, null, 2);
@@ -383,7 +383,7 @@ async function handleReplaceVariantQuestions(
 
 async function handleDeleteAssignmentGroup(input: Record<string, unknown>): Promise<string> {
   const groupId = String(input.groupId);
-  const result = await callAssignmentApi("DELETE", `/api/assignments/groups/${groupId}`);
+  const result = await callAssignmentApi("DELETE", `/groups/${groupId}`);
   return JSON.stringify(result, null, 2);
 }
 
@@ -391,7 +391,7 @@ async function handlePublishAssignmentGroup(input: Record<string, unknown>): Pro
   const groupId = String(input.groupId);
   const result = await callAssignmentApi(
     "POST",
-    `/api/assignments/groups/${groupId}/publish`
+    `/groups/${groupId}/publish`
   );
   return JSON.stringify(result, null, 2);
 }
@@ -400,7 +400,7 @@ async function handleGetVariantAllocations(input: Record<string, unknown>): Prom
   const groupId = String(input.groupId);
   const result = await callAssignmentApi(
     "GET",
-    `/api/assignments/groups/${groupId}/allocations`
+    `/groups/${groupId}/allocations`
   );
   return JSON.stringify(result, null, 2);
 }
