@@ -147,8 +147,12 @@ export default function AssignmentGroupDetail({ group }: AssignmentGroupDetailPr
                       <span className="font-mono text-gray-600 dark:text-gray-400 min-w-fit">
                         {q.order_index + 1}.
                       </span>
-                      <span className="flex-1 text-gray-700 dark:text-gray-200 font-mono">
-                        P: {q.question_id.slice(0, 8)}...
+                      <span className="flex-1 text-gray-700 dark:text-gray-200">
+                        {q.question?.stem || (
+                          <span className="italic text-gray-400 dark:text-gray-500">
+                            Pregunta no encontrada ({q.question_id.slice(0, 8)}...)
+                          </span>
+                        )}
                       </span>
                       <span className="font-mono text-gray-600 dark:text-gray-400 min-w-fit">
                         {q.points} pts

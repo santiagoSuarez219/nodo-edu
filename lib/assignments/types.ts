@@ -38,6 +38,14 @@ export interface AssignmentQuestion {
   question_id: string;
   order_index: number;
   points: number;
+  // Presente solo cuando la query hace join con `questions` (ver
+  // _getGroupByIdForActor / getGroupDetail). Ver DEBT-007 en
+  // docs/specs/backlog.md para los paths que todavía no lo traen.
+  question?: {
+    id: string;
+    stem: string;
+    type: string;
+  };
 }
 
 export interface AssignmentGroupWithVariants extends AssignmentVariantGroup {

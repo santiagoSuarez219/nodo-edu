@@ -439,7 +439,7 @@ export async function getGroupDetail(
     (variants || []).map(async (variant) => {
       const { data: questions } = await supabase
         .from("assignment_questions")
-        .select("*")
+        .select("*, question:questions(id, stem, type)")
         .eq("assignment_id", variant.id)
         .order("order_index", { ascending: true });
 

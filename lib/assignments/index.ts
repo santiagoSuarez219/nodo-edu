@@ -54,7 +54,7 @@ async function _getGroupByIdForActor(
     (variants || []).map(async (variant) => {
       const { data: questions } = await supabase
         .from("assignment_questions")
-        .select("*")
+        .select("*, question:questions(id, stem, type)")
         .eq("assignment_id", variant.id)
         .order("order_index", { ascending: true });
 
@@ -74,6 +74,12 @@ async function _getGroupByIdForActor(
   };
 }
 
+// DEBT: _getActiveAssignmentsByEnrollmentForActor, _getStudentAssignmentForActor y
+// _getOrAllocateVariantForActor (más abajo) seleccionan assignment_questions con "*",
+// sin traer el stem/type de la pregunta vía join a questions. Es el mismo problema que
+// TC-003 detectó en la UI admin (ver _getGroupByIdForActor arriba), pero aquí afecta al
+// flujo de resolución de examen del estudiante — alcance de spec-019, no de spec-018.
+// Registrado en docs/specs/backlog.md.
 async function _getActiveAssignmentsByEnrollmentForActor(
   context: AssignmentContext,
   enrollmentId: string
