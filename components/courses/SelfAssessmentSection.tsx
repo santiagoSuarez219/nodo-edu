@@ -1,11 +1,12 @@
 'use client';
 
 import { useState, useTransition } from 'react';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 
-import { checkSelfAssessmentAnswer } from '@/lib/self-assessment';
+import { submitSelfAssessment } from '@/lib/self-assessment';
 import type { SelfAssessmentQuestion, QuestionFeedback } from '@/lib/self-assessment/types';
 
 interface SelfAssessmentSectionProps {
@@ -19,67 +20,75 @@ export function SelfAssessmentSection({
   lessonSlug,
   questions,
 }: SelfAssessmentSectionProps) {
+  const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [feedbackByQuestion, setFeedbackByQuestion] = useState<
     Record<string, QuestionFeedback>
   >({});
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [hasSubmitted, setHasSubmitted] = useState(false);
 
   const schemaObject: Record<string, z.ZodTypeAny> = {};
   questions.forEach((q) => {
     if (q.allowMultiple) {
-      schemaObject[q.id] = z.array(z.string()).optional();
+      schemaObject[q.id] = z.array(z.string().uuid()).min(1, 'Selecciona al menos una opción');
     } else {
-      schemaObject[q.id] = z.string().optional();
+      schemaObject[q.id] = z.string().uuid('Selecciona una opción');
     }
   });
 
   const formSchema = z.object(schemaObject);
   type FormInput = z.infer<typeof formSchema>;
 
-  const { register, handleSubmit, watch } = useForm<FormInput>({
+  const { register, handleSubmit, watch, formState: { errors } } = useForm<FormInput>({
     resolver: zodResolver(formSchema),
   });
 
   const onSubmit = async (data: FormInput) => {
     startTransition(async () => {
-      const newFeedback: Record<string, QuestionFeedback> = {};
+      setSubmitError(null);
 
+      const answers: Record<string, string[]> = {};
       for (const question of questions) {
         const selectedValue = data[question.id];
-
-        let selectedIds: string[] = [];
         if (Array.isArray(selectedValue)) {
-          selectedIds = selectedValue;
-        } else if (typeof selectedValue === 'string' && selectedValue) {
-          selectedIds = [selectedValue];
-        }
-
-        if (selectedIds.length === 0) {
-          continue;
-        }
-
-        const result = await checkSelfAssessmentAnswer(
-          courseSlug,
-          lessonSlug,
-          question.id,
-          selectedIds
-        );
-
-        if (result.ok) {
-          newFeedback[question.id] = {
-            questionId: question.id,
-            correct: result.correct,
-            correctChoiceIds: result.correctChoiceIds,
-            selectedCorrectIds: result.selectedCorrectIds,
-          };
+          answers[question.id] = selectedValue;
+        } else if (typeof selectedValue === 'string') {
+          answers[question.id] = [selectedValue];
         }
       }
 
-      setFeedbackByQuestion(newFeedback);
+      const result = await submitSelfAssessment(courseSlug, lessonSlug, answers);
+
+      if (result.ok) {
+        setFeedbackByQuestion(
+          result.feedback.reduce((acc, f) => {
+            acc[f.questionId] = f;
+            return acc;
+          }, {} as Record<string, QuestionFeedback>)
+        );
+        setHasSubmitted(true);
+        router.refresh();
+      } else {
+        const errorMessages: Record<string, string> = {
+          not_enrolled: 'No estás matriculado en este curso',
+          incomplete: 'Debes responder todas las preguntas',
+          no_questions: 'No hay preguntas disponibles',
+          error: 'Ocurrió un error al enviar. Intenta de nuevo.',
+        };
+        setSubmitError(errorMessages[result.reason] || 'Error desconocido');
+      }
     });
   };
 
   const formValues = watch();
+
+  const answeredCount = Object.values(formValues).filter(v => {
+    if (Array.isArray(v)) return v.length > 0;
+    return !!v;
+  }).length;
+  const missingCount = questions.length - answeredCount;
+  const canSubmit = missingCount === 0;
 
   return (
     <section className="mt-8 border-t border-gray-200 dark:border-gray-700 pt-8">
@@ -257,13 +266,65 @@ export function SelfAssessmentSection({
 
           {/* Pie con botón */}
           <div className="border-t border-gray-200 dark:border-gray-700 px-6 py-4">
-            <button
-              type="submit"
-              disabled={isPending}
-              className="w-full px-4 py-2.5 text-sm font-medium text-white bg-blue-700 hover:bg-blue-800 dark:bg-blue-600 dark:hover:bg-blue-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isPending ? 'Verificando...' : 'Enviar respuestas'}
-            </button>
+            {submitError && (
+              <div className="mb-4 flex items-start gap-3 p-3 rounded-lg border bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-700/50 text-red-800 dark:text-red-300 text-sm">
+                <svg
+                  className="w-4 h-4 flex-shrink-0 mt-0.5"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                  aria-hidden="true"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                <p>{submitError}</p>
+              </div>
+            )}
+
+            {hasSubmitted ? (
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-2 p-3 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700/50 text-green-800 dark:text-green-300 text-sm">
+                  <svg
+                    className="w-4 h-4 flex-shrink-0"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                    aria-hidden="true"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  <p className="font-medium">Autoevaluación enviada</p>
+                </div>
+                <button
+                  type="submit"
+                  disabled={isPending || !canSubmit}
+                  className="w-full px-4 py-2.5 text-sm font-medium text-white bg-blue-700 hover:bg-blue-800 dark:bg-blue-600 dark:hover:bg-blue-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isPending ? 'Reenviando...' : 'Reintentar'}
+                </button>
+              </div>
+            ) : (
+              <>
+                {missingCount > 0 && (
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                    Faltan {missingCount} {missingCount === 1 ? 'pregunta' : 'preguntas'} por responder
+                  </p>
+                )}
+                <button
+                  type="submit"
+                  disabled={isPending || !canSubmit}
+                  className="w-full px-4 py-2.5 text-sm font-medium text-white bg-blue-700 hover:bg-blue-800 dark:bg-blue-600 dark:hover:bg-blue-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isPending ? 'Verificando...' : 'Enviar respuestas'}
+                </button>
+              </>
+            )}
           </div>
         </form>
       </div>
