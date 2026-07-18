@@ -18,6 +18,65 @@
 - Un usuario **estudiante matriculado** en ese curso.
 - Un usuario **no matriculado** (o navegación anónima) para los casos de acceso.
 
+### Fixtures ya preparados (2026-07-18)
+
+> Todo lo siguiente ya está creado en la base de datos y en el contenido del
+> repo — no hace falta prepararlo de nuevo, solo iniciar sesión con las
+> cuentas indicadas y seguir los casos de prueba.
+
+**Curso:** `estructuras-de-datos` ("Estructuras de datos").
+
+**URL base:** `/estructuras-de-datos/<lessonSlug>`
+
+| Rol | Lección | Slug | Usado para |
+|---|---|---|---|
+| Lección A | Implementación de pilas en Java | `implementacion-de-pilas-en-java` | TC-001 a 015, 019-021, 023-024 |
+| Lección B | Implementación de colas en Java | `implementacion-de-colas-en-java` | TC-016 (sin preguntas publicadas) |
+| Lección C | TAD Pila | `tad-pila` | TC-017 (completada antes de la regla) |
+
+**Lección A** tiene:
+- Artículo con un bloque de código multilínea (`Pila<T>` completa), código
+  inline (`` `push()` ``, `` `pop()` ``…) y un bloque con una línea
+  intencionalmente larga (`Map.of(...)`) para TC-003.
+- 3 preguntas `multiple_choice` publicadas (disciplina LIFO, complejidad de
+  `push()`, excepción de `pop()` en pila vacía) — cubre el "al menos 3" de
+  TC-009.
+
+**Sesión de asistencia abierta** (para TC-008 y TC-020): código `24680`,
+expira ~6h después de su creación. Si ya expiró al momento de probar, pide
+que te genere uno nuevo o ábrela desde el panel docente.
+
+**Estudiantes de prueba** (contraseña para los tres: `TestPassword123!`,
+documentada originalmente en `test-016-curso-redirige-a-leccion.md`), todos
+ya matriculados (`status: active`) en `estructuras-de-datos`:
+
+| Cuenta | Estado pre-cargado | Úsala para |
+|---|---|---|
+| `test-student-c@example.com` | Limpia en las 32 lecciones vigentes (sus filas de `lesson_progress` antiguas apuntan a slugs ya retirados: `git-github`, `ramas-en-github`, `introduccion`, `arreglos-y-listas`, `pilas-y-colas` — no cuentan para el denominador actual, ver Decisión D6). Además tiene `tad-pila` completada con `completed_at` de 2026-07-10, **sin** intento de autoevaluación. | **Cuenta principal** para el recorrido secuencial TC-001 a TC-024 (excepto TC-025), y directamente para TC-017 (Lección C ya viene completada). |
+| `test-student-a@example.com` | Ya tiene un intento de autoevaluación registrado en Lección A (`self_assessment_attempts`, 3/3 correctas). | Lado "ya respondió" de **TC-025**. |
+| `test-student-b@example.com` | Completamente limpia en Lección A (sin intento). | Lado "no ha respondido" de **TC-025**. También sirve de estudiante no matriculado si se usa una cuenta distinta para TC-006. |
+
+**Orden sugerido de ejecución** para minimizar dependencias entre casos:
+1. TC-001 a TC-008 (código, orden, anchos) con `test-student-c`.
+2. TC-009 (botón bloqueado sin responder) con `test-student-c`.
+3. TC-010 (enviar y ver feedback) — responde **a propósito alguna
+   incorrecta**: esto deja lista de paso la comprobación de TC-015
+   ("el desbloqueo no depende de los aciertos").
+4. TC-011 (recargar conserva el envío), TC-012 (reintentar).
+5. TC-013 y TC-014 ya deberían observarse como consecuencia de los pasos
+   anteriores (bloqueado antes de TC-010, desbloqueado después).
+6. TC-016 con `test-student-c` en Lección B.
+7. TC-017 con `test-student-c` en Lección C (ya viene completada).
+8. TC-018 (desmarcar conserva el intento) con `test-student-c` en Lección A.
+9. TC-019 a TC-024 (barra de progreso, accesibilidad, teclado) en cualquier
+   lección con `test-student-c`.
+10. TC-025 al final: sesión como `test-student-b` (ve la autoevaluación sin
+    enviar) — no necesitas tocar `test-student-a`, su intento ya está
+    pre-cargado.
+
+Para TC-006 (usuario no matriculado), usa una ventana de incógnito sin
+sesión iniciada, o crea/usa una cuenta sin matrícula en este curso.
+
 ---
 
 ## Casos de prueba
