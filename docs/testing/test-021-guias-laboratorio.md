@@ -113,7 +113,7 @@ La URL final nunca es la de la guía.
 la guía, en el orden declarado, sin enlaces rotos ni saltos. Las tarjetas de
 prev/next hacia la guía muestran su título correctamente y son enlaces activos
 (no aparecen deshabilitadas/"Próximamente").
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-011 — La guía es visible en el sidebar móvil
 **Precondición:** Viewport móvil (< 1024 px), estudiante matriculado.
@@ -123,7 +123,7 @@ prev/next hacia la guía muestran su título correctamente y son enlaces activos
 **Resultado esperado:** La guía aparece en el drawer con la misma
 diferenciación visual que en escritorio, en su posición de orden, y al pulsarla
 navega a la guía y el drawer se cierra.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-012 — La guía es privada: sin matrícula no se accede
 **Precondición:** Sesión de un usuario **sin matrícula** en `estructuras-de-datos`
@@ -133,14 +133,14 @@ navega a la guía y el drawer se cierra.
 **Resultado esperado:** El acceso se deniega con el **mismo** comportamiento que
 una lección del curso (redirect al mismo destino que produce una lección
 protegida). No se filtra el contenido de la guía.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-013 — Visitante anónimo no accede a la guía
 **Precondición:** Sesión cerrada (usuario anónimo).
 **Pasos:**
 1. Navegar por URL directa a la ruta de la guía.
 **Resultado esperado:** Redirect al login, igual que con una lección.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-014 — Docente/admin ve la guía sin bloques de estudiante
 **Precondición:** Sesión de docente dueño del curso (o admin), **sin** matrícula.
@@ -149,7 +149,7 @@ protegida). No se filtra el contenido de la guía.
 **Resultado esperado:** El contenido de la guía se muestra completo. Igual que
 hoy ocurre con las lecciones para este rol, no aparecen asistencia,
 autoevaluación ni cierre.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-015 — Guía declarada sin archivo `.md` no rompe el curso
 **Precondición:** Declarar temporalmente en los datos del curso una guía cuyo
@@ -160,7 +160,7 @@ archivo `.md` **no** exista.
 nombra la guía y la ruta esperada del `.md` — el mismo trato que hoy recibe una
 lección con `articleSlug` sin artículo. No se sirve una página en blanco ni un
 error genérico en runtime.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-016 — Las lecciones normales no sufrieron regresión
 **Precondición:** Estudiante matriculado, sesión de asistencia abierta y lección
@@ -173,7 +173,7 @@ con autoevaluación publicada.
 igual que antes de spec-021: la sección de asistencia aparece, la autoevaluación
 bloquea el cierre si es obligatoria, el botón completa la lección y la barra de
 progreso avanza.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-017 — El check de completada no aparece en la guía
 **Precondición:** Estudiante matriculado con varias lecciones completadas.
@@ -181,7 +181,7 @@ progreso avanza.
 1. Observar el ítem de la guía en el sidebar.
 **Resultado esperado:** La guía nunca muestra el indicador de "completada"
 (check verde), independientemente del progreso del curso.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-018 — La guía no renumera las clases
 **Precondición:** Estudiante matriculado. La guía está intercalada entre dos
@@ -195,7 +195,7 @@ lecciones (no al principio ni al final del curso).
 saltando la guía, que no consume número. El número que muestra el header de una
 lección coincide exactamente con el que muestra su ítem en el sidebar. Insertar
 la guía no desplazó la numeración de las lecciones posteriores.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ---
 

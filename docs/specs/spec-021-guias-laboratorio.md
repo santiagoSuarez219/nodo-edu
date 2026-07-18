@@ -1,6 +1,6 @@
-# spec-021 — [TESTING] Guías de laboratorio y prácticas como nodo de contenido del curso
+# spec-021 — [DONE] Guías de laboratorio y prácticas como nodo de contenido del curso
 
-> **Estado:** `[TESTING]` — Implementación completada, pendiente de pruebas manuales.
+> **Estado:** `[DONE]` — Todas las pruebas manuales (TC-001 a TC-018) aprobadas. Listo para merge a `development`.
 
 ---
 
