@@ -65,9 +65,14 @@ Para ejecutar los casos `TC-MCP-001` a `TC-MCP-013`, configura Claude Desktop co
 **Herramienta probada:** `list_academic_courses` en `assignment-mcp`
 **Precondición:** El Docente A es dueño de al menos un curso académico.
 **Input de prueba:** invocación sin argumentos.
+**Prompt para el agente:**
+```
+Actúa como el Assignment Agent.
+Por favor, lista todos mis cursos académicos. Muestra id, name y code de cada uno.
+```
 **Output esperado:** Lista de los cursos del docente con `id`, `name` y `code`. No aparece
 ningún curso del Docente B.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ---
 
@@ -78,6 +83,22 @@ ningún curso del Docente B.
 `time_limit_minutes: 30`, `max_attempts: 1`, `show_feedback_on: "submit"`) + 3 variantes
 `A`, `B`, `C`, cada una con 5 preguntas **distintas** y puntos que sumen **el mismo total**
 en las tres (ej. 5 preguntas × 2 puntos = 10 en cada variante).
+**Prompt para el agente:**
+```
+Actúa como el Assignment Agent.
+
+Quiero crear una evaluación tipo "quiz" para el curso <academic_course_id>
+con el título "Quiz de prueba TC-MCP-002". Se abre hoy y cierra en 7 días,
+límite de tiempo 30 minutos, 1 intento permitido, feedback al enviar.
+
+Primero explora el banco de preguntas de ese curso (usa question-bank-mcp,
+list_questions) y arma 3 variantes (A, B, C) con 5 preguntas distintas cada
+una, de forma que las tres sumen el mismo puntaje total (por ejemplo, 5
+preguntas x 2 puntos = 10 puntos por variante). No repitas preguntas dentro
+de una misma variante.
+
+Crea el grupo con create_assignment_group.
+```
 **Output esperado:** La evaluación se crea con `is_published: false` y devuelve el grupo con
 sus 3 variantes, cada una con sus preguntas, puntos, `order_index` y `total_points` igual.
 **Estado:** ⬜ Pendiente
@@ -89,6 +110,21 @@ sus 3 variantes, cada una con sus preguntas, puntos, `order_index` y `total_poin
 **Precondición:** Ninguna evaluación creada en esta prueba.
 **Input de prueba:** payload con 3 variantes donde la variante `C` contiene un `question_id`
 inexistente (o `points: 6`, fuera de rango).
+**Prompt para el agente:**
+```
+Actúa como el Assignment Agent.
+
+Crea una evaluación "quiz" de prueba para el curso <academic_course_id> con
+3 variantes A, B y C, cada una con 5 preguntas del banco. Para esta prueba,
+en la variante C usa intencionalmente el question_id "00000000-0000-0000-
+0000-000000000000" (no existe en el banco) en una de las 5 preguntas.
+
+Intenta crear el grupo con create_assignment_group y muéstrame el error
+completo tal como lo devuelve la API, sin reinterpretarlo.
+
+Luego, usa list_assignment_groups filtrando por ese curso y confírmame si
+quedó algún grupo creado con este título.
+```
 **Output esperado:** Error de validación que **nombra la variante `C`** y el problema
 concreto. Verificar con `list_assignment_groups` que **no se creó ningún grupo**: no queda
 un grupo huérfano con las variantes `A` y `B`.
@@ -100,6 +136,14 @@ un grupo huérfano con las variantes `A` y `B`.
 **Herramienta probada:** `get_assignment_group` en `assignment-mcp`
 **Precondición:** Evaluación creada en `TC-MCP-002`.
 **Input de prueba:** el `group_id` devuelto.
+**Prompt para el agente:**
+```
+Actúa como el Assignment Agent.
+
+Muéstrame el detalle completo de la evaluación con group_id <group_id>:
+configuración compartida y, por cada variante (A, B, C), sus preguntas en
+orden con sus puntos y el total de puntos de la variante.
+```
 **Output esperado:** Config compartida + las 3 variantes con sus preguntas (enunciado, tipo,
 puntos, orden) y el `total_points` de cada una.
 **Estado:** ⬜ Pendiente
@@ -111,6 +155,17 @@ puntos, orden) y el `total_points` de cada una.
 **Precondición:** Evaluación de `TC-MCP-002`, sin publicar.
 **Input de prueba:** reemplazar el set completo de preguntas de la variante `B` por otras 5
 preguntas del banco, manteniendo el mismo total de puntos.
+**Prompt para el agente:**
+```
+Actúa como el Assignment Agent.
+
+En la evaluación group_id <group_id>, reemplaza completamente las preguntas
+de la variante B por otras 5 preguntas distintas del banco de ese curso,
+manteniendo el mismo puntaje total que las variantes A y C (usa
+replace_variant_questions).
+
+Después, consulta get_assignment_group y confírmame que A y C no cambiaron.
+```
 **Output esperado:** La variante `B` queda con las preguntas nuevas. Verificar con
 `get_assignment_group` que las variantes `A` y `C` **no cambiaron**.
 **Estado:** ⬜ Pendiente
@@ -122,6 +177,17 @@ preguntas del banco, manteniendo el mismo total de puntos.
 **Precondición:** Evaluación de `TC-MCP-002`.
 **Input de prueba:** actualización parcial: cambiar `title`, `max_attempts: 2` y vincular un
 `grade_item_id` del curso.
+**Prompt para el agente:**
+```
+Actúa como el Assignment Agent.
+
+Actualiza la evaluación group_id <group_id>: cambia el título a
+"Quiz de prueba TC-MCP-006", permite 2 intentos en vez de 1, y vincúlala
+al grade_item_id <grade_item_id> del curso. No toques las variantes.
+
+Después confírmame que el resto de la configuración y las 3 variantes
+quedaron intactas.
+```
 **Output esperado:** Los tres campos cambian; el resto de la config y las variantes quedan
 intactas. La config es única para las 3 variantes (no hay forma de que difieran).
 **Estado:** ⬜ Pendiente
@@ -133,6 +199,17 @@ intactas. La config es única para las 3 variantes (no hay forma de que difieran
 **Precondición:** Evaluación cuya variante `C` fue modificada para sumar 12 puntos mientras
 `A` y `B` suman 10.
 **Input de prueba:** el `group_id`.
+**Prompt para el agente:**
+```
+Actúa como el Assignment Agent.
+
+En la evaluación group_id <group_id>, usa replace_variant_questions para
+que la variante C sume 12 puntos totales (por ejemplo, añade una pregunta
+extra), mientras A y B se quedan sumando 10 cada una.
+
+Luego intenta publicar la evaluación con publish_assignment_group y
+muéstrame el error completo tal como lo devuelve la API.
+```
 **Output esperado:** Error `422` indicando que las variantes deben tener el mismo puntaje
 total y nombrando la variante desviada. El grupo sigue con `is_published: false`.
 **Estado:** ⬜ Pendiente
@@ -144,6 +221,20 @@ total y nombrando la variante desviada. El grupo sigue con `is_published: false`
 **Precondición:** (a) un grupo con una variante sin preguntas; (b) un grupo con una sola
 variante.
 **Input de prueba:** publicar cada uno.
+**Prompt para el agente:**
+```
+Actúa como el Assignment Agent.
+
+Caso (a): en la evaluación group_id <group_id_variante_vacia>, deja la
+variante C sin preguntas (usa replace_variant_questions con una lista
+vacía si la herramienta lo permite, o dime si no es posible desde el MCP
+y por qué). Luego intenta publicar con publish_assignment_group y
+muéstrame el error completo.
+
+Caso (b): dado el group_id <group_id_una_variante> que solo tiene la
+variante A creada, intenta publicarlo con publish_assignment_group y
+muéstrame el error completo.
+```
 **Output esperado:** En ambos casos error `422` con el motivo concreto (variante vacía /
 mínimo de 2 variantes). Ninguno queda publicado.
 **Estado:** ⬜ Pendiente
@@ -155,6 +246,17 @@ mínimo de 2 variantes). Ninguno queda publicado.
 **Precondición:** Evaluación con 3 variantes no vacías, mismo puntaje total y `closes_at`
 futuro.
 **Input de prueba:** el `group_id`.
+**Prompt para el agente:**
+```
+Actúa como el Assignment Agent.
+
+Antes de publicar, consulta get_assignment_group para el group_id
+<group_id> y confírmame que las 3 variantes están completas y con el
+mismo puntaje total.
+
+Si todo está en orden, publica la evaluación con publish_assignment_group
+y resume el resultado: estado final, variantes y puntaje.
+```
 **Output esperado:** El grupo pasa a `is_published: true`. La publicación **no** ocurrió
 automáticamente al crear (verificar que en `TC-MCP-002` quedó en borrador).
 **Estado:** ⬜ Pendiente
@@ -166,6 +268,13 @@ automáticamente al crear (verificar que en `TC-MCP-002` quedó en borrador).
 **Precondición:** Evaluación publicada y al menos 3 estudiantes que ya la abrieron
 (ver `TC-008`).
 **Input de prueba:** el `group_id`.
+**Prompt para el agente:**
+```
+Actúa como el Assignment Agent.
+
+Muéstrame el reparto de variantes de la evaluación group_id <group_id>:
+qué estudiante tiene qué variante y el conteo total por variante (A/B/C).
+```
 **Output esperado:** Lista de estudiante → variante asignada, más el conteo por variante.
 Es solo lectura: no existe herramienta para reasignar la variante de un estudiante.
 **Estado:** ⬜ Pendiente
@@ -177,6 +286,15 @@ Es solo lectura: no existe herramienta para reasignar la variante de un estudian
 **Precondición:** Evaluación publicada con al menos una submission de estudiante (requiere
 spec-019 implementado; si no lo está, marcar como bloqueado).
 **Input de prueba:** el `group_id`.
+**Prompt para el agente:**
+```
+Actúa como el Assignment Agent.
+
+Intenta eliminar la evaluación group_id <group_id> con
+delete_assignment_group. Sé que ya tiene intentos de estudiantes
+registrados; muéstrame el error completo tal como lo devuelve la API y
+explícame en tus palabras qué significa.
+```
 **Output esperado:** Error `409` indicando que la evaluación tiene intentos y no puede
 eliminarse. Los datos permanecen intactos.
 **Estado:** ⬜ Pendiente
@@ -187,6 +305,15 @@ eliminarse. Los datos permanecen intactos.
 **Herramienta probada:** superficie completa de `assignment-mcp`
 **Precondición:** MCP `assignment-mcp` conectado.
 **Input de prueba:** listar las herramientas disponibles del servidor.
+**Prompt para el agente:**
+```
+Actúa como el Assignment Agent.
+
+Lista todas las herramientas que tienes disponibles en assignment-mcp
+(sus nombres, no las ejecutes). Después dime explícitamente: ¿tienes
+alguna herramienta para crear, editar o eliminar preguntas del banco?
+Si no la tienes, ¿cómo consultas el banco de preguntas?
+```
 **Output esperado:** No existe ninguna herramienta de creación, edición o borrado de
 preguntas (`create_question`, `update_question`, `delete_question`). El agente solo puede
 leer el banco a través de `question-bank-mcp`.
@@ -199,6 +326,15 @@ leer el banco a través de `question-bank-mcp`.
 **Precondición:** App corriendo.
 **Input de prueba:** `GET /api/assignments/groups` (a) sin cabecera `x-api-key`;
 (b) con una `x-api-key` incorrecta.
+**Prompt para el agente:** No aplica — este caso se ejecuta directamente contra la API con
+`curl`, sin pasar por Claude Desktop ni por el agente:
+```bash
+# (a) sin x-api-key
+curl -i http://localhost:3000/api/assignments/groups
+
+# (b) con x-api-key incorrecta
+curl -i -H "x-api-key: clave-incorrecta" http://localhost:3000/api/assignments/groups
+```
 **Output esperado:** `401` en ambos casos, sin filtrar datos de evaluaciones ni el motivo
 exacto del rechazo.
 **Estado:** ⬜ Pendiente
