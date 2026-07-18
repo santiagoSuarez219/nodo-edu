@@ -1,288 +1,350 @@
-# test-006 — Creación de evaluaciones por el docente (autoría de asignaciones)
+# test-018 — Diseño de evaluaciones vía MCP con variantes aleatorias
+
+> Corresponde a [spec-018](../specs/spec-018-assignment-authoring.md).
+>
+> Esta versión **reemplaza** la anterior, que probaba un constructor de evaluaciones en el
+> panel admin (`NewAssignmentForm`). Ese constructor ya no existe: la autoría es 100% vía
+> MCP y la UI admin es de solo lectura + publicación.
+
+---
 
 ## Precondiciones generales
 
-- Supabase local corriendo (`supabase start`) con las migraciones de spec-018 aplicadas
-  (`assignments` y `assignment_questions` con RLS habilitada).
-- Banco de preguntas (spec-005) poblado con al menos una decena de preguntas del docente
-  de prueba, cubriendo varios tipos (`multiple_choice`, `open_text`, `code_snippet`,
-  `code_write`, `coding_challenge`), varias dificultades y varios tags.
-- Cuentas de prueba disponibles:
-  - **Docente A:** usuario con rol `teacher` puro, dueño de al menos un curso académico
-    con preguntas propias en el banco.
-  - **Docente B:** segundo usuario con rol `teacher` puro, dueño de otro curso académico
-    (para validar aislamiento). No usar la cuenta con rol `admin`, ya que un admin ve todo
-    por diseño de RLS y no prueba aislamiento.
-  - **Estudiante:** usuario con rol `student`, matriculado activo en el curso del Docente A.
-- Variables de entorno en `.env.local` apuntando al proyecto local.
+- Migraciones de spec-018 aplicadas: `assignment_variant_groups`, `assignments`,
+  `assignment_questions` y `assignment_variant_allocations`, todas con RLS habilitada.
+- Banco de preguntas (spec-005) poblado con al menos **30 preguntas** del docente de prueba,
+  cubriendo varios tipos (`multiple_choice`, `open_text`, `code_snippet`, `code_write`,
+  `coding_challenge`) y dificultades — suficientes para armar 3 variantes sin repetir.
+- Cuentas de prueba:
+  - **Docente A:** rol `teacher` puro, dueño de al menos un curso académico y de las
+    preguntas del banco. Es el docente de `QUESTION_BANK_AGENT_TEACHER_ID`.
+  - **Docente B:** segundo `teacher` puro, dueño de otro curso académico (aislamiento).
+    No usar la cuenta `admin`: un admin ve todo por diseño de RLS y no prueba aislamiento.
+  - **Estudiantes 1 a 7:** rol `student`, todos con matrícula `active` en el curso del
+    Docente A. Se necesitan varios para verificar el reparto balanceado de variantes.
+- Cliente MCP configurado con `assignment-mcp` (`ASSIGNMENT_API_BASE_URL` y
+  `ASSIGNMENT_API_KEY`) y con `question-bank-mcp` disponible para consultar el banco.
+- `npm run dev` levantado y `.env.local` apuntando al proyecto Supabase.
 
 ---
 
-## Casos de prueba
+## Casos de prueba — Autoría vía MCP
 
-### TC-001 — Acceso al listado de asignaciones de un curso
-**Precondición:** Sesión activa como Docente A, dueño de un curso académico.
+### TC-MCP-001 — Listar los cursos académicos del docente
+**Herramienta probada:** `list_academic_courses` en `assignment-mcp`
+**Precondición:** El Docente A es dueño de al menos un curso académico.
+**Input de prueba:** invocación sin argumentos.
+**Output esperado:** Lista de los cursos del docente con `id`, nombre y periodo. No aparece
+ningún curso del Docente B.
+**Estado:** ⬜ Pendiente
+
+---
+
+### TC-MCP-002 — Crear una evaluación con 3 variantes
+**Herramienta probada:** `create_assignment_group` en `assignment-mcp`
+**Precondición:** Banco poblado. `academic_course_id` obtenido de `TC-MCP-001`.
+**Input de prueba:** config compartida (`title`, `type: "quiz"`, `opens_at`, `closes_at`,
+`time_limit_minutes: 30`, `max_attempts: 1`, `show_feedback_on: "submit"`) + 3 variantes
+`A`, `B`, `C`, cada una con 5 preguntas **distintas** y puntos que sumen **el mismo total**
+en las tres (ej. 5 preguntas × 2 puntos = 10 en cada variante).
+**Output esperado:** La evaluación se crea con `is_published: false` y devuelve el grupo con
+sus 3 variantes, cada una con sus preguntas, puntos, `order_index` y `total_points` igual.
+**Estado:** ⬜ Pendiente
+
+---
+
+### TC-MCP-003 — Atomicidad: una variante inválida no crea nada
+**Herramienta probada:** `create_assignment_group` en `assignment-mcp`
+**Precondición:** Ninguna evaluación creada en esta prueba.
+**Input de prueba:** payload con 3 variantes donde la variante `C` contiene un `question_id`
+inexistente (o `points: 6`, fuera de rango).
+**Output esperado:** Error de validación que **nombra la variante `C`** y el problema
+concreto. Verificar con `list_assignment_groups` que **no se creó ningún grupo**: no queda
+un grupo huérfano con las variantes `A` y `B`.
+**Estado:** ⬜ Pendiente
+
+---
+
+### TC-MCP-004 — Consultar el detalle de una evaluación
+**Herramienta probada:** `get_assignment_group` en `assignment-mcp`
+**Precondición:** Evaluación creada en `TC-MCP-002`.
+**Input de prueba:** el `group_id` devuelto.
+**Output esperado:** Config compartida + las 3 variantes con sus preguntas (enunciado, tipo,
+puntos, orden) y el `total_points` de cada una.
+**Estado:** ⬜ Pendiente
+
+---
+
+### TC-MCP-005 — Corregir una sola variante
+**Herramienta probada:** `replace_variant_questions` en `assignment-mcp`
+**Precondición:** Evaluación de `TC-MCP-002`, sin publicar.
+**Input de prueba:** reemplazar el set completo de preguntas de la variante `B` por otras 5
+preguntas del banco, manteniendo el mismo total de puntos.
+**Output esperado:** La variante `B` queda con las preguntas nuevas. Verificar con
+`get_assignment_group` que las variantes `A` y `C` **no cambiaron**.
+**Estado:** ⬜ Pendiente
+
+---
+
+### TC-MCP-006 — Actualizar la configuración compartida
+**Herramienta probada:** `update_assignment_group` en `assignment-mcp`
+**Precondición:** Evaluación de `TC-MCP-002`.
+**Input de prueba:** actualización parcial: cambiar `title`, `max_attempts: 2` y vincular un
+`grade_item_id` del curso.
+**Output esperado:** Los tres campos cambian; el resto de la config y las variantes quedan
+intactas. La config es única para las 3 variantes (no hay forma de que difieran).
+**Estado:** ⬜ Pendiente
+
+---
+
+### TC-MCP-007 — Publicar rechaza variantes con puntaje distinto
+**Herramienta probada:** `publish_assignment_group` en `assignment-mcp`
+**Precondición:** Evaluación cuya variante `C` fue modificada para sumar 12 puntos mientras
+`A` y `B` suman 10.
+**Input de prueba:** el `group_id`.
+**Output esperado:** Error `422` indicando que las variantes deben tener el mismo puntaje
+total y nombrando la variante desviada. El grupo sigue con `is_published: false`.
+**Estado:** ⬜ Pendiente
+
+---
+
+### TC-MCP-008 — Publicar rechaza grupo con variante vacía o con menos de 2 variantes
+**Herramienta probada:** `publish_assignment_group` en `assignment-mcp`
+**Precondición:** (a) un grupo con una variante sin preguntas; (b) un grupo con una sola
+variante.
+**Input de prueba:** publicar cada uno.
+**Output esperado:** En ambos casos error `422` con el motivo concreto (variante vacía /
+mínimo de 2 variantes). Ninguno queda publicado.
+**Estado:** ⬜ Pendiente
+
+---
+
+### TC-MCP-009 — Publicar una evaluación válida
+**Herramienta probada:** `publish_assignment_group` en `assignment-mcp`
+**Precondición:** Evaluación con 3 variantes no vacías, mismo puntaje total y `closes_at`
+futuro.
+**Input de prueba:** el `group_id`.
+**Output esperado:** El grupo pasa a `is_published: true`. La publicación **no** ocurrió
+automáticamente al crear (verificar que en `TC-MCP-002` quedó en borrador).
+**Estado:** ⬜ Pendiente
+
+---
+
+### TC-MCP-010 — Consultar el reparto de variantes
+**Herramienta probada:** `get_variant_allocations` en `assignment-mcp`
+**Precondición:** Evaluación publicada y al menos 3 estudiantes que ya la abrieron
+(ver `TC-008`).
+**Input de prueba:** el `group_id`.
+**Output esperado:** Lista de estudiante → variante asignada, más el conteo por variante.
+Es solo lectura: no existe herramienta para reasignar la variante de un estudiante.
+**Estado:** ⬜ Pendiente
+
+---
+
+### TC-MCP-011 — Eliminar una evaluación con intentos ya realizados
+**Herramienta probada:** `delete_assignment_group` en `assignment-mcp`
+**Precondición:** Evaluación publicada con al menos una submission de estudiante (requiere
+spec-019 implementado; si no lo está, marcar como bloqueado).
+**Input de prueba:** el `group_id`.
+**Output esperado:** Error `409` indicando que la evaluación tiene intentos y no puede
+eliminarse. Los datos permanecen intactos.
+**Estado:** ⬜ Pendiente
+
+---
+
+### TC-MCP-012 — El agente de evaluaciones no puede mutar el banco
+**Herramienta probada:** superficie completa de `assignment-mcp`
+**Precondición:** MCP `assignment-mcp` conectado.
+**Input de prueba:** listar las herramientas disponibles del servidor.
+**Output esperado:** No existe ninguna herramienta de creación, edición o borrado de
+preguntas (`create_question`, `update_question`, `delete_question`). El agente solo puede
+leer el banco a través de `question-bank-mcp`.
+**Estado:** ⬜ Pendiente
+
+---
+
+### TC-MCP-013 — La API rechaza peticiones sin API key válida
+**Herramienta probada:** API `/api/assignments/*` (probar con `curl`, no vía MCP)
+**Precondición:** App corriendo.
+**Input de prueba:** `GET /api/assignments/groups` (a) sin cabecera `x-api-key`;
+(b) con una `x-api-key` incorrecta.
+**Output esperado:** `401` en ambos casos, sin filtrar datos de evaluaciones ni el motivo
+exacto del rechazo.
+**Estado:** ⬜ Pendiente
+
+---
+
+## Casos de prueba — UI admin (solo lectura + publicar)
+
+### TC-001 — Acceso al listado de evaluaciones de un curso
+**Precondición:** Sesión activa como Docente A, dueño de un curso con al menos una
+evaluación creada vía MCP.
 **Pasos:**
 1. Navegar al detalle del curso académico (`/admin/courses/[academicCourseId]`).
-2. Hacer clic en el enlace "Asignaciones".
-**Resultado esperado:** Se abre `/admin/courses/[academicCourseId]/assignments` mostrando
-el `AssignmentList` del curso (vacío si aún no hay asignaciones), con un botón para crear
-una nueva asignación.
+2. Hacer clic en el enlace "Evaluaciones".
+**Resultado esperado:** Se abre `/admin/courses/[academicCourseId]/assignments` con el
+`AssignmentGroupList`: cada evaluación muestra título, tipo, ventana, número de variantes y
+estado de publicación.
 **Estado:** ⬜ Pendiente
 
 ---
 
-### TC-002 — Entrar al constructor de asignación
-**Precondición:** Sesión activa como Docente A. Listado de asignaciones visible.
+### TC-002 — No existe ruta ni control de creación
+**Precondición:** Listado de evaluaciones visible como Docente A.
 **Pasos:**
-1. En el listado, hacer clic en "Nueva asignación".
-**Resultado esperado:** Se abre `/admin/courses/[academicCourseId]/assignments/new` con el
-`NewAssignmentForm` de dos paneles: panel izquierdo con el banco de preguntas y panel
-derecho vacío (sin preguntas añadidas todavía).
+1. Buscar en el listado cualquier botón de "Nueva evaluación" o similar.
+2. Navegar directamente a `/admin/courses/[academicCourseId]/assignments/new`.
+**Resultado esperado:** No hay ningún control de creación en la UI. La ruta `/new` devuelve
+**404**: la creación solo existe vía MCP.
 **Estado:** ⬜ Pendiente
 
 ---
 
-### TC-003 — El panel del banco es de solo lectura
-**Precondición:** Constructor de asignación abierto.
+### TC-003 — Detalle: las 3 variantes en solo lectura
+**Precondición:** Evaluación creada vía MCP con 3 variantes.
 **Pasos:**
-1. Observar el panel izquierdo (banco de preguntas).
-2. Buscar cualquier control para crear, editar o eliminar preguntas.
-**Resultado esperado:** El panel izquierdo solo permite visualizar y seleccionar preguntas
-existentes (alimentadas por `getQuestionsByTeacher()`). No hay botones de crear/editar/
-eliminar preguntas: el banco es de solo lectura.
+1. Desde el listado, abrir el detalle de la evaluación.
+**Resultado esperado:** Se muestra la config compartida (tipo, ventana, límite de tiempo,
+feedback, intentos, `grade_item` si lo hay) y, por cada variante `A`/`B`/`C`, sus preguntas
+en orden con sus puntos y el total de la variante. Los tres totales coinciden.
 **Estado:** ⬜ Pendiente
 
 ---
 
-### TC-004 — Filtrar el banco por tipo de pregunta
-**Precondición:** Constructor abierto con banco poblado con varios tipos.
+### TC-004 — El detalle no permite editar nada del contenido
+**Precondición:** Detalle de una evaluación abierto.
 **Pasos:**
-1. En el panel izquierdo, aplicar el filtro por tipo (ej. `multiple_choice`).
-**Resultado esperado:** El banco muestra únicamente preguntas del tipo seleccionado. Al
-limpiar el filtro vuelven a listarse todas.
+1. Buscar controles para añadir, quitar o reordenar preguntas.
+2. Buscar campos editables de puntos, título, ventana o intentos.
+**Resultado esperado:** No existe ningún control de edición: todo el contenido es texto de
+lectura. La única acción disponible es publicar.
 **Estado:** ⬜ Pendiente
 
 ---
 
-### TC-005 — Filtrar el banco por dificultad
-**Precondición:** Constructor abierto con banco de varias dificultades.
+### TC-005 — Publicar una evaluación desde el panel
+**Precondición:** Evaluación en borrador, válida (3 variantes no vacías, mismo puntaje).
 **Pasos:**
-1. Aplicar el filtro por dificultad.
-**Resultado esperado:** El banco muestra solo las preguntas de la dificultad elegida.
+1. En el detalle, hacer clic en `PublishAssignmentGroupButton` ("Publicar").
+**Resultado esperado:** La evaluación pasa a "Publicada" en el detalle y en el listado.
 **Estado:** ⬜ Pendiente
 
 ---
 
-### TC-006 — Filtrar el banco por tags
-**Precondición:** Constructor abierto con banco de preguntas con distintos tags.
+### TC-006 — Publicar una evaluación inválida muestra el motivo
+**Precondición:** Evaluación en borrador cuya variante `C` tiene puntaje total distinto.
 **Pasos:**
-1. Aplicar el filtro por uno o más tags.
-**Resultado esperado:** El banco muestra solo las preguntas que contienen el/los tag(s)
-seleccionados.
+1. Intentar publicarla desde el detalle.
+**Resultado esperado:** La publicación falla y la UI muestra un mensaje legible con el motivo
+(variantes con puntaje distinto, nombrando la variante). La evaluación sigue en borrador.
 **Estado:** ⬜ Pendiente
 
 ---
 
-### TC-007 — Filtrar el banco por curso
-**Precondición:** Constructor abierto. El docente tiene preguntas asociadas a más de un
-curso en el banco.
+### TC-007 — Tabla de reparto de variantes
+**Precondición:** Evaluación publicada que al menos 3 estudiantes ya abrieron.
 **Pasos:**
-1. Aplicar el filtro por curso.
-**Resultado esperado:** El banco muestra solo las preguntas asociadas al curso elegido.
-Los filtros son combinables (tipo + dificultad + tags + curso) y acotan el resultado.
+1. En el detalle, revisar el `VariantAllocationTable`.
+**Resultado esperado:** Se lista cada estudiante con la variante que le tocó y el conteo por
+variante. Los estudiantes que aún no la abrieron aparecen sin variante (o no aparecen).
 **Estado:** ⬜ Pendiente
 
 ---
 
-### TC-008 — Añadir preguntas al panel derecho
-**Precondición:** Constructor abierto con banco poblado.
+## Casos de prueba — Reparto de variantes (estudiante)
+
+### TC-008 — Al primer acceso se asigna una variante
+**Precondición:** Evaluación publicada y en ventana. Estudiante 1 con matrícula `active`,
+sin haberla abierto nunca.
 **Pasos:**
-1. Desde el panel izquierdo, añadir dos o más preguntas a la asignación.
-**Resultado esperado:** Las preguntas seleccionadas aparecen en el panel derecho en el
-orden en que se añadieron, cada una con su control de puntos.
+1. Iniciar sesión como Estudiante 1.
+2. Abrir la evaluación desde su listado de evaluaciones.
+**Resultado esperado:** Se le presenta una de las 3 variantes. En
+`assignment_variant_allocations` existe una fila para esa matrícula y esa evaluación.
+El estudiante no elige la variante en ningún momento.
 **Estado:** ⬜ Pendiente
 
 ---
 
-### TC-009 — Impedir preguntas duplicadas en la asignación
-**Precondición:** Al menos una pregunta ya añadida al panel derecho.
+### TC-009 — La variante es estable entre accesos y entre intentos
+**Precondición:** Estudiante 1 ya tiene variante asignada (`TC-008`). Evaluación con
+`max_attempts: 2`.
 **Pasos:**
-1. Intentar añadir de nuevo la misma pregunta desde el banco.
-**Resultado esperado:** La pregunta no se duplica en el panel derecho (queda deshabilitada,
-ya marcada, o se muestra un aviso). El panel derecho conserva una sola instancia.
+1. Recargar la evaluación tres veces y anotar las preguntas mostradas.
+2. Cerrar sesión, volver a entrar y abrirla de nuevo.
+3. Completar el primer intento e iniciar el segundo.
+**Resultado esperado:** En los cinco accesos se muestra **siempre la misma variante**. El
+segundo intento usa la misma variante que el primero. La fila de allocation no cambia.
 **Estado:** ⬜ Pendiente
 
 ---
 
-### TC-010 — Asignar puntos válidos por pregunta (0–5)
-**Precondición:** Preguntas añadidas al panel derecho.
+### TC-010 — El reparto es balanceado
+**Precondición:** Evaluación publicada con 3 variantes. Estudiantes 1 a 6 sin abrirla.
 **Pasos:**
-1. Asignar `2.5` puntos a una pregunta y `5` a otra.
-**Resultado esperado:** Los valores se aceptan y, si el formulario muestra el total de
-puntos, este se recalcula (suma de puntos).
+1. Que los seis estudiantes abran la evaluación, uno tras otro.
+2. Como Docente A, revisar el `VariantAllocationTable` (o `get_variant_allocations`).
+**Resultado esperado:** Los conteos por variante no difieren en más de 1 entre sí (con 6
+estudiantes, lo esperable es 2/2/2). No se admite un reparto tipo 5/1/0.
 **Estado:** ⬜ Pendiente
 
 ---
 
-### TC-011 — Validación de puntos fuera de rango
-**Precondición:** Al menos una pregunta añadida.
+### TC-011 — El estudiante no accede a las variantes que no le tocaron
+**Precondición:** Estudiante 1 con la variante `A` asignada. Se conocen los ids de las
+variantes `B` y `C`.
 **Pasos:**
-1. Ingresar `0` en el campo de puntos de una pregunta y salir del campo.
-2. Ingresar `6` en el campo de puntos y salir.
-**Resultado esperado:** Ambos valores se rechazan con error inline (rango válido 0–5,
-exclusivo en 0). El formulario no permite guardar hasta corregirlos.
+1. Como Estudiante 1, intentar abrir directamente la URL de la variante `B`.
+2. Consultar por API/DB si puede leer las preguntas de `B` o `C`.
+**Resultado esperado:** Acceso denegado o redirección a su propia variante (`404`/`403`
+según corresponda). El estudiante no puede leer las preguntas de las otras variantes ni
+saber qué variante le tocó a otro estudiante.
 **Estado:** ⬜ Pendiente
 
 ---
 
-### TC-012 — Reordenar las preguntas del panel derecho
-**Precondición:** Al menos dos preguntas añadidas.
+### TC-012 — Las evaluaciones no publicadas no son visibles para estudiantes
+**Precondición:** Evaluación en borrador en el curso del Docente A. Estudiante 1 matriculado
+activo en ese curso.
 **Pasos:**
-1. Cambiar el orden de las preguntas (mover una hacia arriba/abajo).
-**Resultado esperado:** El orden visible se actualiza y se refleja en el `order_index` que
-se guardará; el nuevo orden persiste al guardar y recargar.
+1. Iniciar sesión como Estudiante 1 y revisar sus evaluaciones disponibles.
+**Resultado esperado:** La evaluación en borrador no aparece y no se le asigna ninguna
+variante (no se crea fila en `assignment_variant_allocations`).
 **Estado:** ⬜ Pendiente
 
 ---
 
-### TC-013 — Configurar tipo y ventana de la asignación
-**Precondición:** Constructor abierto con al menos una pregunta añadida.
-**Pasos:**
-1. Completar título y (opcional) descripción.
-2. Seleccionar `type` (ej. `quiz`).
-3. Configurar `opens_at` y `closes_at` con `opens_at` anterior a `closes_at`.
-**Resultado esperado:** Los campos aceptan los valores. El selector de tipo ofrece
-`practice`, `quiz`, `exam` y `homework`.
-**Estado:** ⬜ Pendiente
+## Casos de prueba — Aislamiento y calidad
 
----
-
-### TC-014 — Configurar límite de tiempo, mezcla e intentos
-**Precondición:** Constructor abierto con datos válidos.
-**Pasos:**
-1. Establecer `time_limit_minutes` (ej. `30`).
-2. Activar `shuffle_questions` y/o `shuffle_choices`.
-3. Seleccionar `show_feedback_on` (ej. `submit`).
-4. Establecer `max_attempts` (ej. `2`).
-**Resultado esperado:** Todos los controles aceptan los valores. `show_feedback_on` ofrece
-`submit`, `close` y `never`. `max_attempts` no permite valores menores a 1 y
-`time_limit_minutes` no permite valores menores a 1.
-**Estado:** ⬜ Pendiente
-
----
-
-### TC-015 — Vincular opcionalmente a un ítem de calificación
-**Precondición:** El curso académico tiene al menos un `grade_item` creado (spec-003).
-**Pasos:**
-1. En el constructor, seleccionar un `grade_item` del selector de vínculo.
-2. Verificar además que la asignación puede guardarse sin vincular ningún `grade_item`.
-**Resultado esperado:** El vínculo a `grade_item` es opcional: puede seleccionarse un ítem
-o dejarse vacío, y en ambos casos el formulario es válido.
-**Estado:** ⬜ Pendiente
-
----
-
-### TC-016 — Guardar la asignación como borrador
-**Precondición:** Constructor con título, al menos una pregunta con puntos válidos y
-configuración completa.
-**Pasos:**
-1. Hacer clic en "Guardar" (borrador).
-**Resultado esperado:** La asignación se crea con `is_published = false`. Redirige al
-detalle (`/admin/courses/[academicCourseId]/assignments/[assignmentId]`) o al listado, y la
-asignación aparece con estado "Borrador"/"No publicada".
-**Estado:** ⬜ Pendiente
-
----
-
-### TC-017 — Validación: guardar sin preguntas o sin título
-**Precondición:** Constructor abierto.
-**Pasos:**
-1. Intentar guardar sin título.
-2. Intentar guardar sin ninguna pregunta añadida.
-**Resultado esperado:** El formulario muestra errores inline (título requerido; la
-asignación debe tener al menos una pregunta) y no se guarda.
-**Estado:** ⬜ Pendiente
-
----
-
-### TC-018 — Publicar una asignación
-**Precondición:** Asignación guardada como borrador, en su página de detalle.
-**Pasos:**
-1. Hacer clic en `PublishAssignmentButton` ("Publicar").
-**Resultado esperado:** La asignación pasa a `is_published = true`. El detalle y el listado
-la muestran con estado "Publicada".
-**Estado:** ⬜ Pendiente
-
----
-
-### TC-019 — Las asignaciones no publicadas no son visibles para estudiantes
-**Precondición:** Existe una asignación en borrador (no publicada) en el curso del
-Docente A. El estudiante está matriculado activo en ese curso.
-**Pasos:**
-1. Iniciar sesión como estudiante.
-2. Consultar las asignaciones disponibles del curso.
-**Resultado esperado:** La asignación en borrador no aparece para el estudiante. Solo las
-asignaciones publicadas serían visibles.
-**Estado:** ⬜ Pendiente
-
----
-
-### TC-020 — El listado muestra las asignaciones con su estado
-**Precondición:** El curso del Docente A tiene al menos una asignación publicada y una en
-borrador.
-**Pasos:**
-1. Como Docente A, navegar a `/admin/courses/[academicCourseId]/assignments`.
-**Resultado esperado:** El `AssignmentList` lista todas las asignaciones del curso,
-distinguiendo su estado ("Publicada" vs "Borrador") y ofreciendo acceso a su detalle/edición.
-**Estado:** ⬜ Pendiente
-
----
-
-### TC-021 — Editar una asignación existente
-**Precondición:** Asignación creada, en su página de detalle/edición.
-**Pasos:**
-1. Abrir el detalle de la asignación.
-2. Cambiar el título, ajustar los puntos de una pregunta y guardar.
-**Resultado esperado:** Los cambios se persisten y se reflejan al recargar el detalle y en
-el listado.
-**Estado:** ⬜ Pendiente
-
----
-
-### TC-022 — Aislamiento: el listado no muestra asignaciones de cursos ajenos
-**Precondición:** Docente A y Docente B, cada uno dueño de su propio curso con asignaciones.
+### TC-013 — Aislamiento: el listado no muestra evaluaciones de cursos ajenos
+**Precondición:** Docente A y Docente B, cada uno dueño de su curso con evaluaciones.
 **Pasos:**
 1. Iniciar sesión como Docente B.
-2. Navegar al listado de asignaciones de su propio curso.
-**Resultado esperado:** El Docente B solo ve las asignaciones de su curso; no aparece
-ninguna asignación del curso del Docente A.
+2. Navegar al listado de evaluaciones de su propio curso.
+**Resultado esperado:** El Docente B solo ve las evaluaciones de su curso; ninguna del curso
+del Docente A.
 **Estado:** ⬜ Pendiente
 
 ---
 
-### TC-023 — Aislamiento: acceso directo a asignaciones de un curso ajeno
-**Precondición:** Docente B con sesión activa. Se conoce el `academicCourseId` del curso del
-Docente A y el `assignmentId` de una de sus asignaciones.
+### TC-014 — Aislamiento: acceso directo a una evaluación ajena
+**Precondición:** Docente B con sesión activa. Se conocen el `academicCourseId` del Docente A
+y el `groupId` de una de sus evaluaciones.
 **Pasos:**
-1. Como Docente B, acceder directamente a
-   `/admin/courses/[academicCourseId-de-A]/assignments`.
-2. Acceder directamente al detalle
-   `/admin/courses/[academicCourseId-de-A]/assignments/[assignmentId-de-A]`.
-**Resultado esperado:** El acceso no revela ni permite editar las asignaciones del curso
-ajeno (404 o vacío por filtrado de RLS vía `academic_courses.teacher_id`). El Docente B no
-puede crear, editar ni listar asignaciones de cursos que no le pertenecen.
+1. Como Docente B, acceder a `/admin/courses/[academicCourseId-de-A]/assignments`.
+2. Acceder al detalle `/admin/courses/[academicCourseId-de-A]/assignments/[groupId-de-A]`.
+3. Intentar publicar esa evaluación ajena.
+**Resultado esperado:** El acceso no revela el contenido ni permite publicar (404 o vacío
+por filtrado de RLS vía `academic_courses.teacher_id`).
 **Estado:** ⬜ Pendiente
 
 ---
 
-### TC-024 — Modo claro/oscuro en las rutas de asignaciones
+### TC-015 — Modo claro/oscuro en las rutas de evaluaciones
 **Precondición:** Toggle de tema disponible en la navbar.
 **Pasos:**
 1. Activar modo oscuro y luego modo claro.
-2. Revisar visualmente: listado de asignaciones, constructor (`new`) y detalle/edición
-   (`[assignmentId]`).
-**Resultado esperado:** Todos los fondos, textos y bordes respetan la paleta definida en
-`DESIGN.md` en ambos modos. Tipografía JetBrains Mono. Sin textos ilegibles ni fondos
-blancos en modo oscuro.
+2. Revisar visualmente el listado y el detalle (incluida la tabla de reparto).
+**Resultado esperado:** Fondos, textos y bordes respetan los tokens de `DESIGN.md` en ambos
+modos. Tipografía JetBrains Mono. Sin textos ilegibles ni fondos blancos en modo oscuro.
 **Estado:** ⬜ Pendiente
