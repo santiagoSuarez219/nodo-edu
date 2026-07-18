@@ -4,6 +4,8 @@ import type { Course, Lesson } from "./types";
 import { estructurasDeDatos } from "./data/estructuras-de-datos";
 import { programacionCientifica } from "./data/programacion-cientifica";
 import { analisisDeAlgoritmos } from "./data/analisis-de-algoritmos";
+import { isGuide, isNavigable } from "./nodes";
+import { resolveArticlePath } from "./content";
 
 // Las firmas son async desde el inicio para que en Fase 2 (Payload + Postgres)
 // la implementación se pueda sustituir sin cambiar consumidores.
@@ -21,6 +23,7 @@ const RESERVED_LESSON_SLUGS = new Set([
   "evaluaciones",
   "notebooks",
   "presentacion",
+  "guias",
 ]);
 
 (function validate() {
@@ -54,17 +57,18 @@ const RESERVED_LESSON_SLUGS = new Set([
         );
       }
 
-      if (lesson.articleSlug && shouldValidateContentFiles()) {
-        const articlePath = path.join(
-          process.cwd(),
-          "content",
-          "cursos",
-          course.slug,
-          `${lesson.articleSlug}.mdx`,
+      // Validar que kind sea un valor válido
+      if (lesson.kind !== undefined && lesson.kind !== "lesson" && lesson.kind !== "guide") {
+        throw new Error(
+          `Invalid kind "${lesson.kind}" in lesson "${lesson.slug}" of course "${course.slug}". Must be "lesson" or "guide".`,
         );
+      }
+
+      if (lesson.articleSlug && shouldValidateContentFiles()) {
+        const articlePath = resolveArticlePath(course.slug, lesson.articleSlug, lesson.kind);
         if (!existsSync(articlePath)) {
           throw new Error(
-            `Missing MDX article "${articlePath}" referenced by lesson "${course.slug}/${lesson.slug}"`,
+            `Missing article file "${articlePath}" referenced by ${lesson.kind || "lesson"} "${course.slug}/${lesson.slug}"`,
           );
         }
       }
@@ -126,9 +130,9 @@ export async function getCourseLessonSlugPairs(): Promise<
   const pairs: { courseSlug: string; lessonSlug: string }[] = [];
   for (const course of courses) {
     for (const lesson of course.lessons) {
-      // Sólo pre-renderizar lecciones con artículo. Las demás se generan
-      // dinámicamente como placeholder.
-      if (lesson.articleSlug) {
+      // Sólo pre-renderizar lecciones con artículo (excluir guías).
+      // Las demás se generan dinámicamente como placeholder.
+      if (lesson.articleSlug && !isGuide(lesson)) {
         pairs.push({ courseSlug: course.slug, lessonSlug: lesson.slug });
       }
     }
@@ -142,7 +146,11 @@ export function resolveResumeLessonSlug(
 ): string | null {
   if (lessons.length === 0) return null;
 
-  const ordered = [...lessons].sort((a, b) => a.order - b.order);
+  // Filtrar solo lecciones (excluir guías)
+  const navigableLessons = lessons.filter((l) => !isGuide(l) && isNavigable(l));
+  if (navigableLessons.length === 0) return null;
+
+  const ordered = [...navigableLessons].sort((a, b) => a.order - b.order);
 
   // Primera lección sin completar
   for (const lesson of ordered) {
@@ -162,3 +170,10 @@ export type {
   CourseLevel,
   CourseAudience,
 } from "./types";
+export {
+  isGuide,
+  isNavigable,
+  buildCourseOutline,
+  countProgressibleLessons,
+} from "./nodes";
+export type { OutlineNode } from "./nodes";

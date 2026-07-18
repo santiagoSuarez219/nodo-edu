@@ -1,8 +1,13 @@
 import type { Course, Lesson } from "@/lib/courses/types";
 
+function isGuide(node: Lesson): boolean {
+  return node.kind === "guide";
+}
+
 interface LessonArticleProps {
   course: Course;
   lesson: Lesson;
+  classIndex?: number | null;
   updatedAt?: string;
   children: React.ReactNode;
 }
@@ -10,16 +15,18 @@ interface LessonArticleProps {
 export function LessonArticle({
   course,
   lesson,
+  classIndex,
   updatedAt,
   children,
 }: LessonArticleProps) {
-  const orderLabel = lesson.order.toString().padStart(2, "0");
+  const isGuideNode = isGuide(lesson);
+  const orderLabel = classIndex ? classIndex.toString().padStart(2, "0") : null;
 
   return (
     <article>
       <header className="border-b border-gray-200 dark:border-gray-700 pb-6 mb-6">
         <p className="text-sm font-medium text-blue-700 dark:text-blue-400">
-          {course.title} · Clase {orderLabel}
+          {course.title} · {isGuideNode ? "Guía" : `Clase ${orderLabel}`}
         </p>
         <h1 className="mt-2 text-3xl lg:text-4xl font-semibold tracking-tight text-gray-900 dark:text-white">
           {lesson.title}

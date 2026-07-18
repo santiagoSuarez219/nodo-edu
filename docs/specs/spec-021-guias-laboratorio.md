@@ -1,7 +1,6 @@
-# spec-021 — [DRAFT] Guías de laboratorio y prácticas como nodo de contenido del curso
+# spec-021 — [TESTING] Guías de laboratorio y prácticas como nodo de contenido del curso
 
-> **Estado:** `[DRAFT]` — paquete spec + pruebas manuales redactado, pendiente de
-> aprobación del usuario. Al aprobarse e iniciar la Fase 1, pasa a `[IN PROGRESS]`.
+> **Estado:** `[TESTING]` — Implementación completada, pendiente de pruebas manuales.
 
 ---
 

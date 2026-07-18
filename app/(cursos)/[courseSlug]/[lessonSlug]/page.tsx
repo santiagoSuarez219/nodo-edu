@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getLessonBySlug } from "@/lib/courses";
+import { getLessonBySlug, isGuide, buildCourseOutline } from "@/lib/courses";
 import { getLessonArticle } from "@/lib/courses/content";
 import { requireCourseAccess } from "@/lib/enrollments";
 import { hasCourseAccess } from "@/lib/enrollments/access";
@@ -30,8 +30,9 @@ export async function generateMetadata({
   const { courseSlug, lessonSlug } = await params;
   const ctx = await getLessonBySlug(courseSlug, lessonSlug);
   if (!ctx) return { title: "Lección no encontrada" };
+  const prefix = isGuide(ctx.lesson) ? "Guía — " : "";
   return {
-    title: `${ctx.lesson.title} — ${ctx.course.title}`,
+    title: `${prefix}${ctx.lesson.title} — ${ctx.course.title}`,
     description: ctx.lesson.summary ?? ctx.course.summary,
   };
 }
@@ -43,13 +44,23 @@ export default async function LessonPage({ params }: LessonPageProps) {
 
   await requireCourseAccess(courseSlug, `/${courseSlug}/${lessonSlug}`);
 
-  await markLessonViewed(courseSlug, lessonSlug);
-  const access = await hasCourseAccess(courseSlug);
-  const progress = await getLessonProgress(courseSlug, lessonSlug);
-
   const { course, lesson, prev, next } = ctx;
+  const isGuideNode = isGuide(lesson);
+
+  // Calcular classIndex para mostrar número de clase
+  const outline = buildCourseOutline(course);
+  const nodeOutline = outline.find((n) => n.slug === lesson.slug);
+  const classIndex = nodeOutline?.classIndex ?? null;
+
+  // Omitir tracking de progreso para guías
+  if (!isGuideNode) {
+    await markLessonViewed(courseSlug, lessonSlug);
+  }
+  const access = await hasCourseAccess(courseSlug);
+  const progress = !isGuideNode ? await getLessonProgress(courseSlug, lessonSlug) : null;
+
   const article = lesson.articleSlug
-    ? await getLessonArticle(course.slug, lesson.articleSlug)
+    ? await getLessonArticle(course.slug, lesson.articleSlug, lesson.kind)
     : null;
 
   let attendanceState = null;
@@ -60,7 +71,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
     requiresAttempt: false,
   };
 
-  if (access.ok && access.reason === "enrolled") {
+  if (access.ok && access.reason === "enrolled" && !isGuideNode) {
     attendanceState = await getStudentAttendanceForCourse(courseSlug);
     selfAssessment = await getSelfAssessmentForLesson(courseSlug, lessonSlug);
     selfAssessmentStatus = await getSelfAssessmentStatus(courseSlug, lessonSlug);
@@ -71,6 +82,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
       <LessonArticle
         course={course}
         lesson={lesson}
+        classIndex={classIndex}
         updatedAt={article?.frontmatter.updatedAt}
       >
         {article ? (
@@ -79,11 +91,12 @@ export default async function LessonPage({ params }: LessonPageProps) {
           <PreparationPlaceholder
             hasTopics={lesson.topics.length > 0}
             topics={lesson.topics}
+            kind={lesson.kind}
           />
         )}
       </LessonArticle>
 
-      {access.ok && access.reason === "enrolled" && (
+      {access.ok && access.reason === "enrolled" && !isGuideNode && (
         <LessonClosureFlow
           courseSlug={courseSlug}
           lessonSlug={lessonSlug}
@@ -115,18 +128,23 @@ export default async function LessonPage({ params }: LessonPageProps) {
 function PreparationPlaceholder({
   hasTopics,
   topics,
+  kind = "lesson",
 }: {
   hasTopics: boolean;
   topics: import("@/lib/courses/types").Topic[];
+  kind?: "lesson" | "guide";
 }) {
+  const isGuide = kind === "guide";
   return (
     <div>
       <div className="rounded-lg border border-dashed border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-6 text-center">
         <p className="text-sm font-medium text-gray-900 dark:text-white">
-          Apuntes en preparación
+          {isGuide ? "Guía en preparación" : "Apuntes en preparación"}
         </p>
         <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-          Los apuntes de esta clase aún no están publicados. Vuelve pronto.
+          {isGuide
+            ? "La guía de esta práctica aún no está publicada. Vuelve pronto."
+            : "Los apuntes de esta clase aún no están publicados. Vuelve pronto."}
         </p>
       </div>
       {hasTopics && (
