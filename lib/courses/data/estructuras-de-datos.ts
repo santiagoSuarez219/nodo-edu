@@ -9,20 +9,10 @@ export const estructurasDeDatos: Course = {
   level: "intermedio",
   lessons: [
     {
-      id: "bienvenida-al-curso",
-      slug: "bienvenida-al-curso",
-      articleSlug: "bienvenida-al-curso",
-      order: 1, // o el orden que quieras
-      title: "Bienvenidos al curso de Estructura de datos con Java",
-      summary:
-        "Visión general del curso y motivación desde problemas concretos.",
-      topics: [],
-    },
-    {
       id: "git-github",
       slug: "git-github",
       articleSlug: "git-github",
-      order: 2, // o el orden que quieras
+      order: 1, // o el orden que quieras
       title: "Git y GitHub: Sistemas de control de versiones",
       summary: "",
       topics: [],
@@ -57,7 +47,7 @@ export const estructurasDeDatos: Course = {
       id: "arreglos-y-listas",
       slug: "arreglos-y-listas",
       articleSlug: "arreglos-y-listas",
-      order: 3,
+      order: 4,
       title: "Arreglos y listas enlazadas",
       topics: [
         { title: "Arreglos estáticos y dinámicos" },
@@ -69,7 +59,7 @@ export const estructurasDeDatos: Course = {
     {
       id: "pilas-y-colas",
       slug: "pilas-y-colas",
-      order: 4,
+      order: 5,
       title: "Pilas y colas",
       topics: [
         { title: "Pila (LIFO) e implementaciones" },
@@ -81,7 +71,7 @@ export const estructurasDeDatos: Course = {
     {
       id: "arboles",
       slug: "arboles",
-      order: 4,
+      order: 6,
       title: "Árboles",
       topics: [
         { title: "Árboles binarios" },
@@ -93,7 +83,7 @@ export const estructurasDeDatos: Course = {
     {
       id: "tablas-hash",
       slug: "tablas-hash",
-      order: 5,
+      order: 7,
       title: "Tablas hash",
       topics: [
         { title: "Funciones hash y colisiones" },
@@ -105,7 +95,7 @@ export const estructurasDeDatos: Course = {
     {
       id: "grafos",
       slug: "grafos",
-      order: 6,
+      order: 8,
       title: "Grafos",
       topics: [
         { title: "Representaciones: matriz y lista de adyacencia" },

@@ -136,6 +136,25 @@ export async function getCourseLessonSlugPairs(): Promise<
   return pairs;
 }
 
+export function resolveResumeLessonSlug(
+  lessons: Lesson[],
+  completedLessonSlugs: Set<string>,
+): string | null {
+  if (lessons.length === 0) return null;
+
+  const ordered = [...lessons].sort((a, b) => a.order - b.order);
+
+  // Primera lección sin completar
+  for (const lesson of ordered) {
+    if (!completedLessonSlugs.has(lesson.slug)) {
+      return lesson.slug;
+    }
+  }
+
+  // Si todas están completas, última lección
+  return ordered[ordered.length - 1].slug;
+}
+
 export type {
   Course,
   Lesson,
