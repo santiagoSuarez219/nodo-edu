@@ -1,6 +1,6 @@
-# spec-016 — [TESTING] Redirect de `/[courseSlug]` a la lección de reanudación
+# spec-016 — [DONE] Redirect de `/[courseSlug]` a la lección de reanudación
 
-> Estado `[TESTING]`: implementación completa, pendiente de pruebas manuales e2e.
+> Estado `[DONE]`: implementación completada y todas las pruebas manuales aprobadas.
 
 ## Contexto
 
