@@ -101,7 +101,7 @@ Crea el grupo con create_assignment_group.
 ```
 **Output esperado:** La evaluación se crea con `is_published: false` y devuelve el grupo con
 sus 3 variantes, cada una con sus preguntas, puntos, `order_index` y `total_points` igual.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ---
 
@@ -128,7 +128,7 @@ quedó algún grupo creado con este título.
 **Output esperado:** Error de validación que **nombra la variante `C`** y el problema
 concreto. Verificar con `list_assignment_groups` que **no se creó ningún grupo**: no queda
 un grupo huérfano con las variantes `A` y `B`.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ---
 
@@ -146,7 +146,7 @@ orden con sus puntos y el total de puntos de la variante.
 ```
 **Output esperado:** Config compartida + las 3 variantes con sus preguntas (enunciado, tipo,
 puntos, orden) y el `total_points` de cada una.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ---
 
@@ -168,7 +168,7 @@ Después, consulta get_assignment_group y confírmame que A y C no cambiaron.
 ```
 **Output esperado:** La variante `B` queda con las preguntas nuevas. Verificar con
 `get_assignment_group` que las variantes `A` y `C` **no cambiaron**.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ---
 
@@ -190,7 +190,7 @@ quedaron intactas.
 ```
 **Output esperado:** Los tres campos cambian; el resto de la config y las variantes quedan
 intactas. La config es única para las 3 variantes (no hay forma de que difieran).
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ---
 
@@ -212,7 +212,7 @@ muéstrame el error completo tal como lo devuelve la API.
 ```
 **Output esperado:** Error `422` indicando que las variantes deben tener el mismo puntaje
 total y nombrando la variante desviada. El grupo sigue con `is_published: false`.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ---
 
@@ -237,7 +237,7 @@ muéstrame el error completo.
 ```
 **Output esperado:** En ambos casos error `422` con el motivo concreto (variante vacía /
 mínimo de 2 variantes). Ninguno queda publicado.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ---
 
@@ -259,7 +259,7 @@ y resume el resultado: estado final, variantes y puntaje.
 ```
 **Output esperado:** El grupo pasa a `is_published: true`. La publicación **no** ocurrió
 automáticamente al crear (verificar que en `TC-MCP-002` quedó en borrador).
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ---
 
@@ -277,7 +277,7 @@ qué estudiante tiene qué variante y el conteo total por variante (A/B/C).
 ```
 **Output esperado:** Lista de estudiante → variante asignada, más el conteo por variante.
 Es solo lectura: no existe herramienta para reasignar la variante de un estudiante.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ---
 
@@ -297,7 +297,7 @@ explícame en tus palabras qué significa.
 ```
 **Output esperado:** Error `409` indicando que la evaluación tiene intentos y no puede
 eliminarse. Los datos permanecen intactos.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ---
 
@@ -317,7 +317,7 @@ Si no la tienes, ¿cómo consultas el banco de preguntas?
 **Output esperado:** No existe ninguna herramienta de creación, edición o borrado de
 preguntas (`create_question`, `update_question`, `delete_question`). El agente solo puede
 leer el banco a través de `question-bank-mcp`.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ---
 
@@ -337,7 +337,7 @@ curl -i -H "x-api-key: clave-incorrecta" http://localhost:3000/api/assignments/g
 ```
 **Output esperado:** `401` en ambos casos, sin filtrar datos de evaluaciones ni el motivo
 exacto del rechazo.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ---
 
