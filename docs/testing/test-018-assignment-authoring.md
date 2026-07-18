@@ -352,7 +352,7 @@ evaluación creada vía MCP.
 **Resultado esperado:** Se abre `/admin/courses/[academicCourseId]/assignments` con el
 `AssignmentGroupList`: cada evaluación muestra título, tipo, ventana, número de variantes y
 estado de publicación.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ---
 
@@ -363,7 +363,7 @@ estado de publicación.
 2. Navegar directamente a `/admin/courses/[academicCourseId]/assignments/new`.
 **Resultado esperado:** No hay ningún control de creación en la UI. La ruta `/new` devuelve
 **404**: la creación solo existe vía MCP.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ---
 
@@ -374,7 +374,7 @@ estado de publicación.
 **Resultado esperado:** Se muestra la config compartida (tipo, ventana, límite de tiempo,
 feedback, intentos, `grade_item` si lo hay) y, por cada variante `A`/`B`/`C`, sus preguntas
 en orden con sus puntos y el total de la variante. Los tres totales coinciden.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ---
 
@@ -385,7 +385,7 @@ en orden con sus puntos y el total de la variante. Los tres totales coinciden.
 2. Buscar campos editables de puntos, título, ventana o intentos.
 **Resultado esperado:** No existe ningún control de edición: todo el contenido es texto de
 lectura. La única acción disponible es publicar.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ---
 
@@ -394,7 +394,7 @@ lectura. La única acción disponible es publicar.
 **Pasos:**
 1. En el detalle, hacer clic en `PublishAssignmentGroupButton` ("Publicar").
 **Resultado esperado:** La evaluación pasa a "Publicada" en el detalle y en el listado.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ---
 
@@ -404,7 +404,7 @@ lectura. La única acción disponible es publicar.
 1. Intentar publicarla desde el detalle.
 **Resultado esperado:** La publicación falla y la UI muestra un mensaje legible con el motivo
 (variantes con puntaje distinto, nombrando la variante). La evaluación sigue en borrador.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ---
 
@@ -414,7 +414,7 @@ lectura. La única acción disponible es publicar.
 1. En el detalle, revisar el `VariantAllocationTable`.
 **Resultado esperado:** Se lista cada estudiante con la variante que le tocó y el conteo por
 variante. Los estudiantes que aún no la abrieron aparecen sin variante (o no aparecen).
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ---
 
