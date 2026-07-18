@@ -1,4 +1,4 @@
-# spec-017 — [IN PROGRESS] Rediseño del cierre de lección y bloqueo por autoevaluación
+# spec-017 — [TESTING] Rediseño del cierre de lección y bloqueo por autoevaluación
 
 ## Contexto
 
