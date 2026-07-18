@@ -5,25 +5,44 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
-## DEBT-005 — MDX huérfanos en `estructuras-de-datos` sin lección asociada
+## DEBT-006 — Temas opcionales de los 3 cursos sin lección asignada
+
+**Origen:** Reorganización de `content/cursos/` a partir del contenido real de
+`courses/01-estructura-de-datos`, `courses/02-analisis-de-algoritmos` y
+`courses/03-programacion-cientifica` (2026-07-18). Decisión explícita del
+usuario: dejar fuera por ahora los temas sin semana asignada en el cronograma.
+**Prioridad:** Baja — no bloquea producción
+
+Cada curso tiene una sección "Temas opcionales" en su `info.md` sin semana
+asignada en el cronograma, que no se creó como lección:
+
+- **Estructuras de datos:** Tablas Hash, Grafos.
+- **Análisis de algoritmos:** Grafos, Análisis amortizado, Introducción a
+  NP-completitud.
+- **Programación científica:** Consumo de APIs de datos abiertos,
+  Introducción a scikit-learn.
+
+**Acción:** Si se decide incorporarlos, crear su `.mdx` en
+`content/cursos/<curso>/` y su entrada en `lib/courses/data/<curso>.ts` con
+`order` posterior a la última lección regular del curso.
+
+---
+
+## DEBT-005 — MDX huérfanos en `estructuras-de-datos` sin lección asociada [RESUELTO]
 
 **Origen:** Fix ad-hoc durante spec-016 (redirect de curso a lección) — el
 usuario eliminó `bienvenida-al-curso.mdx` por no ser necesario, lo que expuso
 que 4 lecciones (`pilas-y-colas`, `arboles`, `tablas-hash`, `grafos`)
 referenciaban `articleSlug` sin archivo `.mdx` en disco, rompiendo el build.
-**Prioridad:** Baja — no bloquea producción
 
-Se quitó `articleSlug` de esas 4 lecciones (quedan como placeholder "Pronto"
-en el sidebar, sin `articleSlug`) para desbloquear el build. Además, existen
-3 archivos `.mdx` en `content/cursos/estructuras-de-datos/` que no están
-referenciados por ninguna lección: `configuracion-entorno-de-trabajo.mdx`,
-`java.mdx`, `poo-clases.mdx`.
-
-**Acción:** Decidir para cada `.mdx` huérfano si:
-1. Se redacta contenido real para `pilas-y-colas`, `arboles`, `tablas-hash` y
-   `grafos`, y se reincorpora `articleSlug` apuntando a un `.mdx` nuevo o a
-   uno de los huérfanos si el contenido coincide temáticamente.
-2. Se eliminan los `.mdx` huérfanos si no hay plan de usarlos.
+**Resuelto el 2026-07-18:** la reorganización completa de `content/cursos/`
+reemplazó las lecciones genéricas de los 3 cursos (incluidas las que
+originaron este ítem) por la estructura real derivada de
+`courses/01-estructura-de-datos`, `courses/02-analisis-de-algoritmos` y
+`courses/03-programacion-cientifica`. Los `.mdx` huérfanos
+(`configuracion-entorno-de-trabajo.mdx`, `java.mdx`, `poo-clases.mdx`) se
+eliminaron por instrucción del usuario ("solo fueron una prueba"); toda
+lección nueva tiene su `.mdx` correspondiente.
 
 ---
 
