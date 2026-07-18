@@ -1,8 +1,5 @@
 import type { Course, Lesson } from "@/lib/courses/types";
-
-function isGuide(node: Lesson): boolean {
-  return node.kind === "guide";
-}
+import { isGuide } from "@/lib/courses";
 
 interface LessonArticleProps {
   course: Course;

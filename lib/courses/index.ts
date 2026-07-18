@@ -1,5 +1,4 @@
 import { existsSync } from "node:fs";
-import path from "node:path";
 import type { Course, Lesson } from "./types";
 import { estructurasDeDatos } from "./data/estructuras-de-datos";
 import { programacionCientifica } from "./data/programacion-cientifica";
@@ -36,6 +35,7 @@ const RESERVED_LESSON_SLUGS = new Set([
 
     const lessonIds = new Set<string>();
     const lessonSlugs = new Set<string>();
+    const lessonOrders = new Set<number>();
     for (const lesson of course.lessons) {
       if (lessonIds.has(lesson.id)) {
         throw new Error(
@@ -50,6 +50,14 @@ const RESERVED_LESSON_SLUGS = new Set([
         );
       }
       lessonSlugs.add(lesson.slug);
+
+      if (lessonOrders.has(lesson.order)) {
+        throw new Error(
+          `Duplicate order "${lesson.order}" in course "${course.slug}" (lesson "${lesson.slug}"). ` +
+            `Each lesson/guide must have a unique order value.`,
+        );
+      }
+      lessonOrders.add(lesson.order);
 
       if (RESERVED_LESSON_SLUGS.has(lesson.slug)) {
         throw new Error(

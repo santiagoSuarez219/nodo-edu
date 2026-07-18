@@ -127,7 +127,7 @@ export const estructurasDeDatos: Course = {
       id: "diseno-con-tad-y-orientacion-a-objetos",
       slug: "diseno-con-tad-y-orientacion-a-objetos",
       articleSlug: "diseno-con-tad-y-orientacion-a-objetos",
-      order: 12,
+      order: 11,
       title: "Diseño con TAD y orientación a objetos",
       topics: [
         { title: "Diagrama de clases con relaciones: lectura e implementación en Java" },
@@ -257,7 +257,7 @@ export const estructurasDeDatos: Course = {
       id: "sintesis-del-modulo-de-listas",
       slug: "sintesis-del-modulo-de-listas",
       articleSlug: "sintesis-del-modulo-de-listas",
-      order: 20,
+      order: 21,
       title: "Síntesis del módulo de listas",
       topics: [
         { title: "Comparación entre lista simple, doble y circular" },
@@ -269,7 +269,7 @@ export const estructurasDeDatos: Course = {
       id: "fundamentos-de-archivos",
       slug: "fundamentos-de-archivos",
       articleSlug: "fundamentos-de-archivos",
-      order: 21,
+      order: 22,
       title: "Fundamentos de archivos",
       topics: [
         { title: "Archivos de texto vs. archivos binarios" },
@@ -281,7 +281,7 @@ export const estructurasDeDatos: Course = {
       id: "lectura-escritura-y-modificacion",
       slug: "lectura-escritura-y-modificacion",
       articleSlug: "lectura-escritura-y-modificacion",
-      order: 22,
+      order: 23,
       title: "Lectura, escritura y modificación",
       topics: [
         { title: "BufferedReader y BufferedWriter: lectura y escritura eficiente" },
@@ -293,7 +293,7 @@ export const estructurasDeDatos: Course = {
       id: "tad-pila",
       slug: "tad-pila",
       articleSlug: "tad-pila",
-      order: 23,
+      order: 24,
       title: "TAD Pila",
       topics: [
         { title: "Concepto LIFO (Last In, First Out)" },
@@ -305,7 +305,7 @@ export const estructurasDeDatos: Course = {
       id: "implementacion-de-pilas-en-java",
       slug: "implementacion-de-pilas-en-java",
       articleSlug: "implementacion-de-pilas-en-java",
-      order: 24,
+      order: 25,
       title: "Implementación de pilas en Java",
       topics: [
         { title: "Implementación propia con lista enlazada simple" },
@@ -317,7 +317,7 @@ export const estructurasDeDatos: Course = {
       id: "tad-cola",
       slug: "tad-cola",
       articleSlug: "tad-cola",
-      order: 25,
+      order: 26,
       title: "TAD Cola",
       topics: [
         { title: "Concepto FIFO (First In, First Out)" },
@@ -329,7 +329,7 @@ export const estructurasDeDatos: Course = {
       id: "implementacion-de-colas-en-java",
       slug: "implementacion-de-colas-en-java",
       articleSlug: "implementacion-de-colas-en-java",
-      order: 26,
+      order: 27,
       title: "Implementación de colas en Java",
       topics: [
         { title: "Implementación propia con lista enlazada simple" },
@@ -341,7 +341,7 @@ export const estructurasDeDatos: Course = {
       id: "fundamentos-de-recursividad",
       slug: "fundamentos-de-recursividad",
       articleSlug: "fundamentos-de-recursividad",
-      order: 27,
+      order: 28,
       title: "Fundamentos de recursividad",
       topics: [
         { title: "Concepto de recursividad: caso base y caso recursivo" },
@@ -353,7 +353,7 @@ export const estructurasDeDatos: Course = {
       id: "algoritmos-recursivos-clasicos",
       slug: "algoritmos-recursivos-clasicos",
       articleSlug: "algoritmos-recursivos-clasicos",
-      order: 28,
+      order: 29,
       title: "Algoritmos recursivos clásicos",
       topics: [
         { title: "Factorial y Fibonacci: análisis y comparación con la versión iterativa" },
@@ -365,7 +365,7 @@ export const estructurasDeDatos: Course = {
       id: "conceptos-y-tad-arbol-binario",
       slug: "conceptos-y-tad-arbol-binario",
       articleSlug: "conceptos-y-tad-arbol-binario",
-      order: 29,
+      order: 30,
       title: "Conceptos y TAD árbol binario",
       topics: [
         { title: "Estructura de árbol: raíz, nodo, hoja, subárbol, nivel, altura" },
@@ -377,7 +377,7 @@ export const estructurasDeDatos: Course = {
       id: "insercion-y-recorridos",
       slug: "insercion-y-recorridos",
       articleSlug: "insercion-y-recorridos",
-      order: 30,
+      order: 31,
       title: "Inserción y recorridos",
       topics: [
         { title: "Inserción de nodos en un árbol binario" },
@@ -389,7 +389,7 @@ export const estructurasDeDatos: Course = {
       id: "bst-busqueda-e-insercion",
       slug: "bst-busqueda-e-insercion",
       articleSlug: "bst-busqueda-e-insercion",
-      order: 31,
+      order: 32,
       title: "BST: búsqueda e inserción",
       topics: [
         { title: "Propiedad de ordenamiento del BST" },
@@ -401,7 +401,7 @@ export const estructurasDeDatos: Course = {
       id: "eliminacion-en-bst-y-sintesis-del-curso",
       slug: "eliminacion-en-bst-y-sintesis-del-curso",
       articleSlug: "eliminacion-en-bst-y-sintesis-del-curso",
-      order: 32,
+      order: 33,
       title: "Eliminación en BST y síntesis del curso",
       topics: [
         { title: "Casos de eliminación: nodo hoja, nodo con un hijo, nodo con dos hijos" },

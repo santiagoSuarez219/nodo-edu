@@ -1,13 +1,6 @@
 import Link from "next/link";
 import type { Lesson } from "@/lib/courses/types";
-
-function isNavigable(node: Lesson): boolean {
-  return Boolean(node.articleSlug);
-}
-
-function isGuide(node: Lesson): boolean {
-  return node.kind === "guide";
-}
+import { isNavigable, isGuide } from "@/lib/courses";
 
 interface LessonPaginationProps {
   courseSlug: string;

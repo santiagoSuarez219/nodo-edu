@@ -280,9 +280,25 @@ alcance aquí, ver D-alcance), se reevaluará.
       secuencia única y la renumeración de `classIndex`.
 
 ### Fase 8 — Verificación y cierre
-- [ ] `npm run lint` y `npm run build` sin errores.
-- [ ] Ejecutar los casos manuales de `docs/testing/test-021-guias-laboratorio.md`.
-- [ ] Invocar `@reviewer` antes de marcar el spec como `[DONE]`.
+- [x] `npm run lint` y `npm run build` sin errores.
+- [x] Ejecutar los casos manuales de `docs/testing/test-021-guias-laboratorio.md`.
+- [x] Invocar `@reviewer` antes de marcar el spec como `[DONE]`.
+
+**Hallazgos de `@reviewer` y su resolución:**
+- 🔴 **Bloqueante corregido:** la secuencia de `order` en
+  `lib/courses/data/estructuras-de-datos.ts` había quedado con un hueco (11)
+  y dos duplicados (12, 20) al intercalar la guía manualmente. Se reindexó a
+  una secuencia contigua `1..33` sin duplicados.
+- 🟠 **Mayor corregido:** el validador de `lib/courses/index.ts` no
+  comprobaba unicidad de `order`. Se añadió esa verificación (falla temprano
+  y explícito ante una colisión futura); probado que atrapa el caso que
+  motivó el bloqueante.
+- 🟡 **Menor corregido:** `LessonPagination.tsx` y `LessonArticle.tsx` son
+  server components y no necesitaban duplicar `isGuide`/`isNavigable` inline
+  (esa duplicación solo es necesaria en `LessonSidebarItem.tsx`, el único
+  client component, por el import transitivo de `node:fs`). Se reconectaron
+  a `lib/courses/nodes.ts`.
+- Deuda técnica del spec registrada en `docs/specs/backlog.md` → DEBT-006.
 
 ---
 
