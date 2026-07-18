@@ -420,6 +420,16 @@ variante. Los estudiantes que aún no la abrieron aparecen sin variante (o no ap
 
 ## Casos de prueba — Reparto de variantes (estudiante)
 
+> 🚧 **Bloqueado por spec-019.** `lib/assignments/index.ts` ya implementa la
+> lógica de reparto (`_getOrAllocateVariantForActor`, `_getStudentAssignmentForActor`,
+> `_getActiveAssignmentsByEnrollmentForActor`), pero **no existe ninguna
+> página ni endpoint** que un estudiante pueda usar para acceder a una
+> evaluación — todas las rutas bajo `/api/assignments/*` son de servicio
+> (docente/MCP). El flujo "estudiante abre su evaluación" es el alcance de
+> **spec-019 (assignment-solving)**, aún no implementado. TC-008 a TC-012
+> quedan bloqueados hasta entonces (mismo criterio ya aplicado a
+> `TC-MCP-011`).
+
 ### TC-008 — Al primer acceso se asigna una variante
 **Precondición:** Evaluación publicada y en ventana. Estudiante 1 con matrícula `active`,
 sin haberla abierto nunca.
@@ -429,7 +439,7 @@ sin haberla abierto nunca.
 **Resultado esperado:** Se le presenta una de las 3 variantes. En
 `assignment_variant_allocations` existe una fila para esa matrícula y esa evaluación.
 El estudiante no elige la variante en ningún momento.
-**Estado:** ⬜ Pendiente
+**Estado:** 🚧 Bloqueado (spec-019)
 
 ---
 
@@ -442,7 +452,7 @@ El estudiante no elige la variante en ningún momento.
 3. Completar el primer intento e iniciar el segundo.
 **Resultado esperado:** En los cinco accesos se muestra **siempre la misma variante**. El
 segundo intento usa la misma variante que el primero. La fila de allocation no cambia.
-**Estado:** ⬜ Pendiente
+**Estado:** 🚧 Bloqueado (spec-019)
 
 ---
 
@@ -453,7 +463,7 @@ segundo intento usa la misma variante que el primero. La fila de allocation no c
 2. Como Docente A, revisar el `VariantAllocationTable` (o `get_variant_allocations`).
 **Resultado esperado:** Los conteos por variante no difieren en más de 1 entre sí (con 6
 estudiantes, lo esperable es 2/2/2). No se admite un reparto tipo 5/1/0.
-**Estado:** ⬜ Pendiente
+**Estado:** 🚧 Bloqueado (spec-019)
 
 ---
 
@@ -466,7 +476,7 @@ variantes `B` y `C`.
 **Resultado esperado:** Acceso denegado o redirección a su propia variante (`404`/`403`
 según corresponda). El estudiante no puede leer las preguntas de las otras variantes ni
 saber qué variante le tocó a otro estudiante.
-**Estado:** ⬜ Pendiente
+**Estado:** 🚧 Bloqueado (spec-019)
 
 ---
 
@@ -477,7 +487,7 @@ activo en ese curso.
 1. Iniciar sesión como Estudiante 1 y revisar sus evaluaciones disponibles.
 **Resultado esperado:** La evaluación en borrador no aparece y no se le asigna ninguna
 variante (no se crea fila en `assignment_variant_allocations`).
-**Estado:** ⬜ Pendiente
+**Estado:** 🚧 Bloqueado (spec-019)
 
 ---
 
