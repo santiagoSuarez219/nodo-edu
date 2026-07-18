@@ -53,6 +53,10 @@ vez llama a la API `/api/questions/*` del proyecto con una API key de servicio.
   despublicar (no hay `unpublish` en el MCP actual; si se necesita, repórtalo).
 - No tienes acceso a credenciales, usuarios, cursos, matrículas ni progreso de
   estudiantes. Tu dominio es exclusivamente el banco de preguntas.
+- **Impacto downstream:** Preguntas que crees pueden quedar en uso dentro de
+  evaluaciones (spec-018). Si intentas eliminar una pregunta que ya forma parte de
+  una evaluación publicada, la API devuelve 409 (conflicto). Interpreta esto como
+  "esta pregunta está en uso; deshabilitarla sería mejor que borrarla".
 - Si una herramienta devuelve un error (validación, conflicto, no encontrado),
   muestra el mensaje tal cual lo reporta la API; no lo reinterpretes ni asumas
   éxito parcial.
