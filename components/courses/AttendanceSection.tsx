@@ -95,7 +95,6 @@ export function AttendanceSection({
   if (!attendanceState.sessionOpen) {
     return (
       <section className="mt-8 border-t border-gray-200 dark:border-gray-700 pt-8">
-        <div className="max-w-2xl">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">
             Asistencia
           </h2>
@@ -118,7 +117,6 @@ export function AttendanceSection({
               Sin sesión de asistencia activa. Espera a que el docente abra una.
             </p>
           </div>
-        </div>
       </section>
     );
   }
@@ -137,33 +135,31 @@ export function AttendanceSection({
 
     return (
       <section className="mt-8 border-t border-gray-200 dark:border-gray-700 pt-8">
-        <div className="max-w-2xl">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">
-            Asistencia
-          </h2>
-          <div className="flex items-start gap-3 p-4 rounded-lg bg-[#f3faf7] dark:bg-[#014737] border border-success/30 dark:border-success/40">
-            <svg
-              className="w-5 h-5 text-success dark:text-green-300 flex-shrink-0 mt-0.5"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-              aria-hidden="true"
-            >
-              <path
-                fillRule="evenodd"
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                clipRule="evenodd"
-              />
-            </svg>
-            <div>
-              <p className="text-sm font-medium text-success dark:text-green-300">
-                Asistencia marcada
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">
+          Asistencia
+        </h2>
+        <div className="flex items-start gap-3 p-4 rounded-lg bg-[#f3faf7] dark:bg-[#014737] border border-success/30 dark:border-success/40">
+          <svg
+            className="w-5 h-5 text-success dark:text-green-300 flex-shrink-0 mt-0.5"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+            aria-hidden="true"
+          >
+            <path
+              fillRule="evenodd"
+              d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+              clipRule="evenodd"
+            />
+          </svg>
+          <div>
+            <p className="text-sm font-medium text-success dark:text-green-300">
+              Asistencia marcada
+            </p>
+            {markedDate && (
+              <p className="text-xs text-success/80 dark:text-green-300/80 mt-1">
+                Registrada el {markedDate}
               </p>
-              {markedDate && (
-                <p className="text-xs text-success/80 dark:text-green-300/80 mt-1">
-                  Registrada el {markedDate}
-                </p>
-              )}
-            </div>
+            )}
           </div>
         </div>
       </section>
@@ -173,20 +169,19 @@ export function AttendanceSection({
   // Caso 3: Sesión abierta, sin marcar
   return (
     <section className="mt-8 border-t border-gray-200 dark:border-gray-700 pt-8">
-      <div className="max-w-2xl">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">
-          Asistencia
-        </h2>
+      <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">
+        Asistencia
+      </h2>
 
-        {/* Mensajes de resultado */}
-        {lastResult && (
-          <div
-            className={`mb-4 flex items-start gap-3 p-4 rounded-lg border ${
-              resultMessages[lastResult].type === 'success'
-                ? 'bg-[#f3faf7] dark:bg-[#014737] border-success/30 dark:border-success/40'
-                : 'bg-[#fdf2f2] dark:bg-[#771d1d] border-danger/30 dark:border-danger/40'
-            }`}
-          >
+      {/* Mensajes de resultado */}
+      {lastResult && (
+        <div
+          className={`mb-4 flex items-start gap-3 p-4 rounded-lg border ${
+            resultMessages[lastResult].type === 'success'
+              ? 'bg-[#f3faf7] dark:bg-[#014737] border-success/30 dark:border-success/40'
+              : 'bg-[#fdf2f2] dark:bg-[#771d1d] border-danger/30 dark:border-danger/40'
+          }`}
+        >
             <svg
               className={`w-5 h-5 flex-shrink-0 mt-0.5 ${
                 resultMessages[lastResult].type === 'success'
@@ -234,40 +229,39 @@ export function AttendanceSection({
           </div>
         )}
 
-        {/* Formulario de código */}
-        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3">
-          <div>
-            <label
-              htmlFor="code"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-            >
-              Código de sesión (4-6 dígitos)
-            </label>
-            <input
-              id="code"
-              type="text"
-              inputMode="numeric"
-              placeholder="Ej. 12345"
-              {...register('code')}
-              className={`w-full px-4 py-2.5 text-center text-2xl font-mono tracking-widest rounded-lg border ${
-                errors.code
-                  ? 'border-danger bg-danger/5 dark:bg-danger/10'
-                  : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700'
-              } text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-brand/50`}
-            />
-            {errors.code && (
-              <p className="text-xs text-danger mt-1">{errors.code.message}</p>
-            )}
-          </div>
-          <button
-            type="submit"
-            disabled={isPending}
-            className="w-full px-4 py-2.5 text-sm font-medium text-white bg-brand hover:bg-brand-strong dark:bg-brand dark:hover:bg-brand-strong rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+      {/* Formulario de código */}
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3 items-center">
+        <div className="w-full max-w-xs">
+          <label
+            htmlFor="code"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 text-center"
           >
-            {isPending ? 'Registrando...' : 'Registrar asistencia'}
-          </button>
-        </form>
-      </div>
+            Código de sesión (4-6 dígitos)
+          </label>
+          <input
+            id="code"
+            type="text"
+            inputMode="numeric"
+            placeholder="Ej. 12345"
+            {...register('code')}
+            className={`w-full px-4 py-2.5 text-center text-2xl font-mono tracking-widest rounded-lg border ${
+              errors.code
+                ? 'border-danger bg-danger/5 dark:bg-danger/10'
+                : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700'
+            } text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-brand/50`}
+          />
+          {errors.code && (
+            <p className="text-xs text-danger mt-1 text-center">{errors.code.message}</p>
+          )}
+        </div>
+        <button
+          type="submit"
+          disabled={isPending}
+          className="px-4 py-2.5 text-sm font-medium text-white bg-brand hover:bg-brand-strong dark:bg-brand dark:hover:bg-brand-strong rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isPending ? 'Registrando...' : 'Registrar asistencia'}
+        </button>
+      </form>
     </section>
   );
 }

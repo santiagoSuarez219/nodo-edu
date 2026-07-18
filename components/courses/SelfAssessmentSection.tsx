@@ -6,19 +6,12 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 
 import { checkSelfAssessmentAnswer } from '@/lib/self-assessment';
-import type { SelfAssessmentQuestion } from '@/lib/self-assessment/types';
+import type { SelfAssessmentQuestion, QuestionFeedback } from '@/lib/self-assessment/types';
 
 interface SelfAssessmentSectionProps {
   courseSlug: string;
   lessonSlug: string;
   questions: SelfAssessmentQuestion[];
-}
-
-interface QuestionFeedback {
-  questionId: string;
-  correct: boolean;
-  correctChoiceIds: string[];
-  selectedCorrectIds: string[];
 }
 
 export function SelfAssessmentSection({
@@ -31,7 +24,6 @@ export function SelfAssessmentSection({
     Record<string, QuestionFeedback>
   >({});
 
-  // Construir el schema dinámicamente basado en preguntas
   const schemaObject: Record<string, z.ZodTypeAny> = {};
   questions.forEach((q) => {
     if (q.allowMultiple) {
@@ -55,7 +47,6 @@ export function SelfAssessmentSection({
       for (const question of questions) {
         const selectedValue = data[question.id];
 
-        // Convertir a array de IDs de opciones seleccionadas
         let selectedIds: string[] = [];
         if (Array.isArray(selectedValue)) {
           selectedIds = selectedValue;
@@ -63,7 +54,6 @@ export function SelfAssessmentSection({
           selectedIds = [selectedValue];
         }
 
-        // Si no hay selección, saltar
         if (selectedIds.length === 0) {
           continue;
         }
@@ -93,21 +83,22 @@ export function SelfAssessmentSection({
 
   return (
     <section className="mt-8 border-t border-gray-200 dark:border-gray-700 pt-8">
-      <div className="max-w-2xl">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">
-          Autoevaluación
-        </h2>
+      <div className="border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 overflow-hidden">
+        {/* Encabezado */}
+        <div className="border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+            Autoevaluación
+          </h2>
+        </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          {questions.map((question) => {
+        {/* Contenido */}
+        <form onSubmit={handleSubmit(onSubmit)} className="divide-y divide-gray-200 dark:divide-gray-700">
+          {questions.map((question, index) => {
             const feedback = feedbackByQuestion[question.id];
             const isAnswered = !!feedback;
 
             return (
-              <div
-                key={question.id}
-                className="p-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
-              >
+              <div key={question.id} className="px-6 py-6">
                 {/* Pregunta */}
                 <div className="mb-4">
                   {question.topic_title && (
@@ -146,10 +137,10 @@ export function SelfAssessmentSection({
                     if (isAnswered) {
                       if (isCorrect) {
                         choiceClassName +=
-                          'bg-[#f3faf7] dark:bg-[#014737] border-success/30 dark:border-success/40';
+                          'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-700/50';
                       } else if (wasSelected && !wasSelectedCorrectly) {
                         choiceClassName +=
-                          'bg-[#fdf2f2] dark:bg-[#771d1d] border-danger/30 dark:border-danger/40';
+                          'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-700/50';
                       } else {
                         choiceClassName +=
                           'border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700';
@@ -179,7 +170,7 @@ export function SelfAssessmentSection({
                         </span>
                         {isAnswered && isCorrect && (
                           <svg
-                            className="ml-auto w-5 h-5 text-success dark:text-green-300 flex-shrink-0"
+                            className="ml-auto w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0"
                             fill="currentColor"
                             viewBox="0 0 20 20"
                             aria-hidden="true"
@@ -193,7 +184,7 @@ export function SelfAssessmentSection({
                         )}
                         {isAnswered && wasSelected && !isCorrect && (
                           <svg
-                            className="ml-auto w-5 h-5 text-danger dark:text-red-300 flex-shrink-0"
+                            className="ml-auto w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0"
                             fill="currentColor"
                             viewBox="0 0 20 20"
                             aria-hidden="true"
@@ -215,8 +206,8 @@ export function SelfAssessmentSection({
                   <div
                     className={`mt-4 flex items-start gap-3 p-3 rounded-lg border text-sm ${
                       feedback.correct
-                        ? 'bg-[#f3faf7] dark:bg-[#014737] border-success/30 dark:border-success/40 text-success dark:text-green-300'
-                        : 'bg-[#fdf2f2] dark:bg-[#771d1d] border-danger/30 dark:border-danger/40 text-danger dark:text-red-300'
+                        ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-700/50 text-green-800 dark:text-green-300'
+                        : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-700/50 text-red-800 dark:text-red-300'
                     }`}
                   >
                     <svg
@@ -264,13 +255,16 @@ export function SelfAssessmentSection({
             );
           })}
 
-          <button
-            type="submit"
-            disabled={isPending}
-            className="w-full px-4 py-2.5 text-sm font-medium text-white bg-brand hover:bg-brand-strong dark:bg-brand dark:hover:bg-brand-strong rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isPending ? 'Verificando...' : 'Enviar respuestas'}
-          </button>
+          {/* Pie con botón */}
+          <div className="border-t border-gray-200 dark:border-gray-700 px-6 py-4">
+            <button
+              type="submit"
+              disabled={isPending}
+              className="w-full px-4 py-2.5 text-sm font-medium text-white bg-blue-700 hover:bg-blue-800 dark:bg-blue-600 dark:hover:bg-blue-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isPending ? 'Verificando...' : 'Enviar respuestas'}
+            </button>
+          </div>
         </form>
       </div>
     </section>
