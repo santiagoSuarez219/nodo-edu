@@ -13,7 +13,7 @@ export function CourseProgressBar({
 
   return (
     <div
-      className="mt-6 mb-4 px-2"
+      className="mt-2 mb-4 px-2"
       role="progressbar"
       aria-valuenow={percentage}
       aria-valuemin={0}
