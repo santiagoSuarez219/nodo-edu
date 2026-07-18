@@ -1,4 +1,4 @@
-# spec-006 — Creación de evaluaciones por el docente
+# spec-018 — Creación de evaluaciones por el docente
 
 > **Estado:** Planificado — pendiente de implementación. La implementación de referencia
 > existe en el tag `backup/feat-question-bank` y se portará al implementar este spec.
@@ -15,8 +15,8 @@ través de una API HTTP + MCP (preguntas de tipo `multiple_choice`, `open_text`,
 Este spec cubre el eslabón que convierte ese banco en evaluaciones concretas: el
 **docente compone asignaciones** tomando un subconjunto de preguntas del banco y las
 **publica para un curso académico**, con una ventana de tiempo, configuración de feedback
-e intentos. Una **asignación** es la unidad que un estudiante resolverá (spec-007) y que
-el docente revisará y calificará (spec-008).
+e intentos. Una **asignación** es la unidad que un estudiante resolverá (spec-019) y que
+el docente revisará y calificará (spec-020).
 
 El banco **no se edita** desde esta UI: el panel de banco del constructor de asignaciones
 es de **solo lectura**; alimenta la selección de preguntas leyendo el banco a través de
@@ -49,9 +49,9 @@ ocurre por la API + MCP de spec-005, nunca aquí.
 ### No incluye
 
 - **Resolución de asignaciones por el estudiante** (player, auto-save, feedback,
-  submissions, cálculo de `auto_score`): pertenece a **spec-007**.
+  submissions, cálculo de `auto_score`): pertenece a **spec-019**.
 - **Revisión y calificación manual** de respuestas abiertas por el docente: pertenece a
-  **spec-008**.
+  **spec-020**.
 - **Creación o edición de preguntas** del banco: se hace exclusivamente vía la API + MCP
   de **spec-005**. El banco aquí es de solo lectura.
 - Redefinición del schema de `questions`, `question_choices`, `question_rubrics` o
@@ -77,12 +77,12 @@ ocurre por la API + MCP de spec-005, nunca aquí.
 
 Consumidores aguas abajo (este spec habilita, no implementa):
 
-- **spec-007 (resolución por el estudiante)** — consume `assignments`/`assignment_questions`
+- **spec-019 (resolución por el estudiante)** — consume `assignments`/`assignment_questions`
   y la función `getActiveAssignmentsByEnrollment()` de `lib/assignments/index.ts`.
-- **spec-008 (revisión y calificación)** — revisa las submissions de las asignaciones
+- **spec-020 (revisión y calificación)** — revisa las submissions de las asignaciones
   creadas aquí.
 
-> Cadena de dependencias: `spec-003` → `spec-005` → **`spec-006`** → `spec-007` → `spec-008`.
+> Cadena de dependencias: `spec-003` → `spec-005` → **`spec-018`** → `spec-019` → `spec-020`.
 
 ---
 
@@ -123,7 +123,7 @@ Migración de referencia de las tablas: `supabase/migrations/20260625000006_init
 | `lib/assignments/actions.ts` | Server Actions: `createAssignmentAction`, `updateAssignmentAction`, `publishAssignmentAction`, `linkToGradeItemAction` |
 
 > `getActiveAssignmentsByEnrollment()` se define en este spec (vive en `lib/assignments/`)
-> pero su **consumidor** es spec-007. Se incluye aquí para mantener el dominio cohesionado.
+> pero su **consumidor** es spec-019. Se incluye aquí para mantener el dominio cohesionado.
 
 ### Componentes (`components/admin/`)
 
@@ -227,7 +227,7 @@ Restricción: `unique (assignment_id, question_id)` — una pregunta no se repit
 - [ ] Tokens semánticos de `DESIGN.md`, modo claro/oscuro y tipografía JetBrains Mono; Flowbite primero, shadcn/ui como complemento.
 
 ### Fase 4 — Pruebas
-- [ ] Generar y ejecutar los casos manuales de `docs/testing/test-006-assignment-authoring.md` (flujos con UI).
+- [ ] Generar y ejecutar los casos manuales de `docs/testing/test-018-assignment-authoring.md` (flujos con UI).
 - [ ] `npm run lint` y `tsc --noEmit` sin errores nuevos.
 
 ---
@@ -255,7 +255,7 @@ Restricción: `unique (assignment_id, question_id)` — una pregunta no se repit
 
 ## Pruebas asociadas
 
-- **Manuales (UI):** `docs/testing/test-006-assignment-authoring.md` — casos `TC-*` de los
+- **Manuales (UI):** `docs/testing/test-018-assignment-authoring.md` — casos `TC-*` de los
   flujos de autoría: creación del borrador, selección de preguntas del banco (solo lectura),
   asignación/reordenamiento de puntos, configuración de ventana/feedback/intentos, vínculo a
   `grade_item`, publicación, listado y aislamiento por curso (un docente no ve/gestiona

@@ -5,6 +5,30 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+## RESUELTO — Colisión de numeración en spec-006 (2026-07-18)
+
+**Origen:** `spec-006-lecciones-privadas-navbar.md` (`[DONE]`, creado 2026-07-10)
+y `spec-006-assignment-authoring.md` (planificado, creado 2026-07-15) compartían
+el número `006`. Este último arrastraba también a `spec-007-assignment-solving`
+y `spec-008-assignment-review` en la misma cadena de dependencias.
+
+**Resolución:** se renumeró el track de evaluaciones planificado, sin tocar el
+track de lecciones (ya `[DONE]`):
+- `spec-006-assignment-authoring.md` → `spec-018-assignment-authoring.md`
+- `spec-007-assignment-solving.md` → `spec-019-assignment-solving.md`
+- `spec-008-assignment-review.md` → `spec-020-assignment-review.md`
+- Sus `test-NNN` correspondientes se renombraron igual.
+- Se actualizaron las referencias cruzadas en `spec-005-question-bank.md`,
+  `spec-009-progreso-leccion.md` y `spec-011-autoevaluacion-cierre.md`.
+
+**Pendiente menor:** `spec-013-home-grilla-cursos.md` tiene una mención
+ambigua ("protegido por matrícula desde spec-006/007") que no se pudo
+atribuir con certeza al track de asignaciones (spec-007 nunca se implementó,
+por lo que no puede proveer protección de ruta); se dejó sin tocar. Revisar
+si es una errata y corregir a solo `spec-006` cuando se retome esa área.
+
+---
+
 ## DEBT-006 — Temas opcionales de los 3 cursos sin lección asignada
 
 **Origen:** Reorganización de `content/cursos/` a partir del contenido real de

@@ -2,7 +2,7 @@
 
 ## Precondiciones generales
 
-- Supabase local corriendo (`supabase start`) con las migraciones de spec-006 aplicadas
+- Supabase local corriendo (`supabase start`) con las migraciones de spec-018 aplicadas
   (`assignments` y `assignment_questions` con RLS habilitada).
 - Banco de preguntas (spec-005) poblado con al menos una decena de preguntas del docente
   de prueba, cubriendo varios tipos (`multiple_choice`, `open_text`, `code_snippet`,

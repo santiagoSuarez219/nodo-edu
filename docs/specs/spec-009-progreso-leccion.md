@@ -15,10 +15,14 @@ El "formulario de cierre de lección" se materializa aquí como un contenedor UI
 spec-010 y spec-011 le añadirán secciones (asistencia, autoevaluación) sin
 reescribirlo.
 
-> **Nota de numeración:** se numera `009` porque el track de evaluaciones ya
-> reservó 005–008 (`spec-005-question-bank` `[DONE]`, `spec-006/007/008-assignment-*`
-> planificados) y el track de lecciones ocupó el 006
-> (`spec-006-lecciones-privadas-navbar` `[DONE]`). 009 es el primer número libre.
+> **Nota de numeración:** se numeró `009` porque, al momento de redactar este spec, el
+> track de evaluaciones ya reservaba 005–008 (`spec-005-question-bank` `[DONE]`,
+> `spec-006/007/008-assignment-*` planificados) y el track de lecciones ocupó el 006
+> (`spec-006-lecciones-privadas-navbar` `[DONE]`), colisionando ambos en el número 006.
+> 009 fue el primer número libre en ese momento. Esa colisión se resolvió después
+> renumerando el track de evaluaciones planificado a `spec-018/019/020-assignment-*`
+> (ver `docs/specs/backlog.md`); esta nota se conserva como registro histórico de la
+> numeración original.
 
 ---
 
@@ -334,6 +338,6 @@ contador del hub.
   lectura (roster) — a evaluar con `@mcp-builder` en su redacción.
 - **spec-011 (preguntas embebidas)** añadirá una sección de autoevaluación al
   mismo contenedor; su decisión central es la frontera con el track de
-  evaluaciones (`spec-007-assignment-solving`): preguntas *formativas sin nota*
+  evaluaciones (`spec-019-assignment-solving`): preguntas *formativas sin nota*
   (reusar el banco de spec-005 en solo lectura) vs. *calificables* (track
   assignment). Definir esa frontera antes de implementar.

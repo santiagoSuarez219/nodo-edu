@@ -32,7 +32,7 @@ repaso personal, no un instrumento calificable.
 La frontera central que anticipó la nota de continuidad de spec-009 —"preguntas
 *formativas sin nota* (reusar el banco de spec-005 en solo lectura) vs.
 *calificables* (track assignment)"— se resuelve aquí a favor de lo **formativo**:
-el track calificable (spec-006/007/008) **no existe** en `development`, y acoplarse
+el track calificable (spec-018/019/020) **no existe** en `development`, y acoplarse
 a él quedaría fuera de alcance.
 
 ---
@@ -58,7 +58,7 @@ a él quedaría fuera de alcance.
 - **Persistencia** de respuestas, intentos o puntajes → **sin BD, sin migración,
   sin tabla**.
 - **Nota / calificación**: no toca `student_grades` ni el track calificable
-  (spec-006/007/008).
+  (spec-018/019/020).
 - **Tipos de pregunta** distintos de `multiple_choice` (`open_text`,
   `code_snippet`, `code_write`, `coding_challenge` de la misma lección **se
   ignoran**).

@@ -18,9 +18,9 @@ de preguntas maestras reutilizables de cinco tipos —selección múltiple, text
 ejercicios sobre fragmentos de código, escritura de código y —en fase futura— problemas de
 programación con pruebas automatizadas.
 
-Este spec es la **base** sobre la que se montan la creación de evaluaciones (**spec-006**),
-la resolución por el estudiante (**spec-007**) y la revisión manual del docente
-(**spec-008**). Aquí se define exclusivamente el banco: su schema, su capa de dominio, y el
+Este spec es la **base** sobre la que se montan la creación de evaluaciones (**spec-018**),
+la resolución por el estudiante (**spec-019**) y la revisión manual del docente
+(**spec-020**). Aquí se define exclusivamente el banco: su schema, su capa de dominio, y el
 mecanismo por el que se puebla.
 
 **Giro de producto — sin UI de creación.** El banco **no se poblará mediante formularios en
@@ -32,7 +32,7 @@ MCP para poblar y mantener el banco. Esto implica tres frentes:
 1. **Exponer el dominio de preguntas como API REST** autenticada con API key de servicio.
 2. **Crear el primer MCP del proyecto** (`question-bank-mcp`), cliente de esa API.
 3. **Preparar la lectura del banco desde sesión** (`getQuestionsByTeacher`) que consumirá el
-   selector del `NewAssignmentForm` de **spec-006** — único consumidor de lectura del banco
+   selector del `NewAssignmentForm` de **spec-018** — único consumidor de lectura del banco
    desde la app; aquí no se construye ninguna UI, solo se expone la función.
 
 El reto técnico central es que las funciones de dominio dependen de la **sesión** del
@@ -55,7 +55,7 @@ una decisión de infraestructura posterior, fuera del alcance de este spec.
   `coding_challenge_tests`, con políticas RLS y migraciones SQL.
 - **Capa de dominio TypeScript del banco:** `lib/questions/{types,schemas,index}.ts`
   refactorizado a **contexto por actor** `{ supabase, actorId }`, conservando wrappers de
-  sesión (`getQuestionsByTeacher`, etc.) para el consumidor de lectura de spec-006.
+  sesión (`getQuestionsByTeacher`, etc.) para el consumidor de lectura de spec-018.
 - **Cliente Supabase de servicio** server-only reutilizable (`lib/auth/service.ts`,
   `createServiceSupabaseClient()`).
 - **Contexto de servicio del banco:** `lib/questions/service.ts`
@@ -64,7 +64,7 @@ una decisión de infraestructura posterior, fuera del alcance de este spec.
 - **Utilidades HTTP:** helper de autenticación por API key (`lib/api/auth.ts`) y formato de
   error uniforme + mapa de códigos HTTP (`lib/api/errors.ts`).
 - **Stub `lib/code-runner/index.ts`** (`runCode` → `{ status: 'disabled' }`) para modelar
-  `coding_challenge` desde el inicio; lo consumirá spec-007.
+  `coding_challenge` desde el inicio; lo consumirá spec-019.
 - **API REST bajo `app/api/questions/`:** list, create, get, update, delete, publish, con
   validación por los Zod schemas del dominio y códigos HTTP consistentes.
 - **Primer MCP del proyecto** `question-bank-mcp` (servidor stdio, TypeScript) con 6
@@ -78,11 +78,11 @@ una decisión de infraestructura posterior, fuera del alcance de este spec.
 
 - **Cualquier UI de creación/edición de preguntas.** El banco no tiene UI: se puebla solo vía
   API + MCP. La única lectura desde la app es la función `getQuestionsByTeacher`, que el
-  selector del `NewAssignmentForm` de **spec-006** consumirá (ese componente pertenece a
-  spec-006, no a este spec).
+  selector del `NewAssignmentForm` de **spec-018** consumirá (ese componente pertenece a
+  spec-018, no a este spec).
 - **Asignaciones, submissions y revisión** — tablas `assignments`, `assignment_questions`,
-  `submissions`, `answers` y su dominio pertenecen a **spec-006**, **spec-007** y
-  **spec-008**. Aquí solo se referencian.
+  `submissions`, `answers` y su dominio pertenecen a **spec-018**, **spec-019** y
+  **spec-020**. Aquí solo se referencian.
 - **Ejecución automatizada de código** (`coding_challenge`): se modela en DB pero no se
   ejecuta (stub). La ejecución real es futura.
 - **Banco privado por docente:** todas las preguntas publicadas son visibles para todos los
@@ -110,13 +110,13 @@ una decisión de infraestructura posterior, fuera del alcance de este spec.
 
 Este spec es **prerrequisito** de la cadena de evaluaciones:
 
-- **spec-006 (assignment-authoring)** — consume la lectura del banco (`getQuestionsByTeacher`)
+- **spec-018 (assignment-authoring)** — consume la lectura del banco (`getQuestionsByTeacher`)
   para el selector del `NewAssignmentForm`.
-- **spec-007 (assignment-solving)** — consume el stub `lib/code-runner` y las preguntas del
+- **spec-019 (assignment-solving)** — consume el stub `lib/code-runner` y las preguntas del
   banco al renderizar/resolver.
-- **spec-008 (assignment-review)** — depende indirectamente vía spec-007.
+- **spec-020 (assignment-review)** — depende indirectamente vía spec-019.
 
-Cadena completa: `spec-003` → **spec-005** → spec-006 → spec-007 → spec-008.
+Cadena completa: `spec-003` → **spec-005** → spec-018 → spec-019 → spec-020.
 
 ---
 
@@ -153,7 +153,7 @@ dominio.
 | `app/api/questions/[questionId]/publish/route.ts` | `POST` | Publicar una pregunta |
 
 > No hay rutas bajo `app/admin/` en este spec: el banco no tiene UI. Las primeras rutas
-> admin de la feature aparecen en **spec-006**.
+> admin de la feature aparecen en **spec-018**.
 
 ### Módulos `lib/`
 
@@ -162,11 +162,11 @@ dominio.
 | `lib/auth/service.ts` | **Crear** | `createServiceSupabaseClient()` — cliente con `SUPABASE_SERVICE_ROLE_KEY`, server-only, sin persistencia de sesión. Bypasa RLS. |
 | `lib/questions/types.ts` | **Crear** | Tipos del dominio (`Question`, `QuestionWithDetails`, `QuestionType`, contexto `{ supabase, actorId }`). |
 | `lib/questions/schemas.ts` | **Crear** | Zod schemas — discriminated union `QuestionSchema` por `type`; schema de filtros de listado. |
-| `lib/questions/index.ts` | **Crear** | Lógica del dominio que recibe un **contexto `{ supabase, actorId }`**; expone wrappers de sesión con firma estable (`getQuestionsByTeacher`, etc.) para que spec-006 los consuma sin conocer el refactor. |
+| `lib/questions/index.ts` | **Crear** | Lógica del dominio que recibe un **contexto `{ supabase, actorId }`**; expone wrappers de sesión con firma estable (`getQuestionsByTeacher`, etc.) para que spec-018 los consuma sin conocer el refactor. |
 | `lib/questions/service.ts` | **Crear** | `getServiceQuestionsContext()` (service client + `QUESTION_BANK_AGENT_TEACHER_ID`) y funciones de servicio que scopean por `created_by = actorId`. |
 | `lib/api/auth.ts` | **Crear** | `authenticateServiceRequest(req)` — valida el header `x-api-key` con comparación de tiempo constante; `401` en fallo. |
 | `lib/api/errors.ts` | **Crear** | Helper de respuesta de error uniforme (`apiError(code, message, status, details?)`) + mapa de códigos HTTP. |
-| `lib/code-runner/index.ts` | **Crear** | Stub `runCode` → `{ status: 'disabled' }`. Consumido por spec-007. Ejecución real fuera de alcance. |
+| `lib/code-runner/index.ts` | **Crear** | Stub `runCode` → `{ status: 'disabled' }`. Consumido por spec-019. Ejecución real fuera de alcance. |
 
 > `SUPABASE_SERVICE_ROLE_KEY` solo se importa desde `lib/auth/service.ts` y se consume desde
 > route handlers / `lib/**` server-only. **Nunca** desde `components/` ni desde código con
@@ -175,7 +175,7 @@ dominio.
 ### Componentes
 
 Ninguno. Este spec no crea UI. El `NewAssignmentForm` que leerá el banco pertenece a
-**spec-006**.
+**spec-018**.
 
 ### Código del MCP (fuera de la app Next.js)
 
@@ -379,7 +379,7 @@ existe/no es del actor; `422` si el payload no valida.
 > colecciones anidadas es intencional y evita estados inconsistentes.
 
 **`DELETE /api/questions/{questionId}`** — `200` si se elimina; **`409 conflict`** si la
-pregunta está referenciada en `assignment_questions` (tabla de spec-006; preserva la
+pregunta está referenciada en `assignment_questions` (tabla de spec-018; preserva la
 validación de negocio); `404` si no existe/no es del actor.
 
 **`POST /api/questions/{questionId}/publish`** — `200` si publica; **`422`** si es
@@ -497,7 +497,7 @@ y se materializan en la Fase 5.
 - [x] Crear `lib/questions/{types,schemas}.ts` (tipos + Zod discriminated union
       `QuestionSchema` y schema de filtros).
 - [x] Crear `lib/questions/index.ts`: lógica que recibe un contexto `{ supabase, actorId }` y
-      wrappers de sesión con firma estable (`getQuestionsByTeacher`, etc.) para que spec-006
+      wrappers de sesión con firma estable (`getQuestionsByTeacher`, etc.) para que spec-018
       consuma la lectura sin conocer el refactor.
 - [x] Crear `lib/questions/service.ts` con `getServiceQuestionsContext()` (service client +
       `QUESTION_BANK_AGENT_TEACHER_ID`) y funciones de servicio que scopean toda
@@ -547,7 +547,7 @@ y se materializan en la Fase 5.
         publicar `multiple_choice` sin correcta.
   - [x] Herramientas del MCP (`TC-MCP-*`) contra la API local.
 - [x] Confirmar que `getQuestionsByTeacher` (sesión) queda expuesta y funcional para el
-      consumidor de spec-006.
+      consumidor de spec-018.
 - [x] `npm run lint` y `tsc --noEmit` sin errores nuevos.
 
 > **Fuera de ciclo:** automatizar los criterios de la API en suite e2e/unit cuando el proyecto
@@ -566,9 +566,9 @@ y se materializan en la Fase 5.
 - Se puede **leer**, **actualizar** (reemplazo de choices/rubric/tests) y **eliminar** una
   pregunta por id.
 - **Publicar** un `multiple_choice` sin opción correcta devuelve `422` con mensaje claro.
-- **Eliminar** una pregunta usada en `assignment_questions` (spec-006) devuelve `409`.
+- **Eliminar** una pregunta usada en `assignment_questions` (spec-018) devuelve `409`.
 - La función de lectura `getQuestionsByTeacher` queda **expuesta y funcional** para el selector
-  del `NewAssignmentForm` de spec-006.
+  del `NewAssignmentForm` de spec-018.
 
 ### Seguridad
 - Request **sin** header `x-api-key` → `401`. Request con API key **inválida** → `401`.

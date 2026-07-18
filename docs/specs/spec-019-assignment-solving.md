@@ -1,4 +1,4 @@
-# spec-007 — Resolución de evaluaciones por el estudiante
+# spec-019 — Resolución de evaluaciones por el estudiante
 
 > **Estado:** Planificado — pendiente de implementación. La implementación de referencia
 > existe en el tag `backup/feat-question-bank` y se portará al implementar este spec.
@@ -8,7 +8,7 @@
 ## Contexto
 
 La plataforma ya gestiona el ciclo académico básico (matrículas y calificaciones vía
-[spec-003](./spec-003-course-enrollment.md)) y, con [spec-006](./spec-006-assignment-authoring.md),
+[spec-003](./spec-003-course-enrollment.md)) y, con [spec-018](./spec-018-assignment-authoring.md),
 el docente compone **asignaciones** que toman preguntas del banco (definido en
 [spec-005](./spec-005-question-bank.md)) y las vinculan a un curso académico con ventana de
 tiempo, configuración de feedback y límite de intentos.
@@ -24,8 +24,8 @@ marca el intento como `submitted` y, si no hay preguntas de revisión manual, lo
 
 Las respuestas abiertas (`open_text`, `code_write`, `coding_challenge`) quedan a la espera
 de la **revisión manual del docente**, que es responsabilidad de
-[spec-008](./spec-008-assignment-review.md); este spec solo crea y persiste esas respuestas
-y las columnas que spec-008 consumirá (`answers.manual_score`, `answers.reviewer_notes`,
+[spec-020](./spec-020-assignment-review.md); este spec solo crea y persiste esas respuestas
+y las columnas que spec-020 consumirá (`answers.manual_score`, `answers.reviewer_notes`,
 `answers.reviewed_at`, `submissions.final_score`, `submissions.graded_at`).
 
 El tipo `coding_challenge` se modela en base de datos y se renderiza, pero **no se ejecuta**:
@@ -61,10 +61,10 @@ spec-005). La ejecución automatizada de código es una fase futura fuera de est
 
 - **Revisión y calificación manual del docente** (asignación de `manual_score`,
   `reviewer_notes` y finalización del `final_score`): pertenece a
-  [spec-008](./spec-008-assignment-review.md). Aquí solo se crean las columnas y se persisten
+  [spec-020](./spec-020-assignment-review.md). Aquí solo se crean las columnas y se persisten
   las respuestas abiertas sin calificar.
 - **Definición del schema de `assignments` / `assignment_questions`**: pertenece a
-  [spec-006](./spec-006-assignment-authoring.md); aquí solo se leen.
+  [spec-018](./spec-018-assignment-authoring.md); aquí solo se leen.
 - **Definición del schema de `questions` y derivadas** (`question_choices`,
   `question_rubrics`, `coding_challenge_tests`): pertenece a
   [spec-005](./spec-005-question-bank.md); aquí solo se leen a través de la asignación.
@@ -81,7 +81,7 @@ spec-005). La ejecución automatizada de código es una fase futura fuera de est
   `enrollments` (pertenencia estudiante↔curso, con `status`), `grade_items` y
   `student_grades` (propagación de la nota), el helper `requireUser()` de
   `lib/auth/session.ts` y el dashboard del estudiante en `app/cuenta/`.
-- **[spec-006](./spec-006-assignment-authoring.md) (assignment-authoring)** — provee las
+- **[spec-018](./spec-018-assignment-authoring.md) (assignment-authoring)** — provee las
   tablas `assignments` y `assignment_questions`, el dominio `lib/assignments/` (incluidas
   `getAssignmentById` y `getActiveAssignmentsByEnrollment`) y la configuración de la
   asignación (`opens_at`/`closes_at`, `time_limit_minutes`, `shuffle_*`, `show_feedback_on`,
@@ -91,7 +91,7 @@ spec-005). La ejecución automatizada de código es una fase futura fuera de est
   preguntas y el stub `lib/code-runner/index.ts` (`runCode` → `{ status: 'disabled' }`) que
   este spec consume para `coding_challenge`.
 
-> Cadena de dependencias: **spec-003 → spec-005 → spec-006 → spec-007 → spec-008**.
+> Cadena de dependencias: **spec-003 → spec-005 → spec-018 → spec-019 → spec-020**.
 > spec-005/006/007/008 conviven en la rama `feat/question-bank`; la integración a
 > `development` se coordina por separado.
 
@@ -140,9 +140,9 @@ a `submitSubmission`; error de dominio → `400`.
 
 | Archivo | Acción | Detalle |
 |---|---|---|
-| `lib/submissions/types.ts` | **Crear** | `Submission`, `Answer`, `SubmissionWithAnswers`, `SubmissionStatus`, y los tipos de revisión (`AnswerForReview`, `SubmissionForReview`) que spec-008 consume |
-| `lib/submissions/index.ts` | **Crear** | `createSubmission`, `saveAnswer`, `submitSubmission`, `getSubmissionByStudent`, `getSubmissionsByAssignment` + helper `propagateToGradeItem`. Las funciones de revisión (`getSubmissionForReview`, `gradeAnswer`, `finalizeGrading`) se ubican en este mismo módulo y las consume spec-008 |
-| `lib/submissions/actions.ts` | **Crear** | Server Actions envueltas en `requireUser()`: `createSubmissionAction`, `saveAnswerAction` (y las de revisión de spec-008) |
+| `lib/submissions/types.ts` | **Crear** | `Submission`, `Answer`, `SubmissionWithAnswers`, `SubmissionStatus`, y los tipos de revisión (`AnswerForReview`, `SubmissionForReview`) que spec-020 consume |
+| `lib/submissions/index.ts` | **Crear** | `createSubmission`, `saveAnswer`, `submitSubmission`, `getSubmissionByStudent`, `getSubmissionsByAssignment` + helper `propagateToGradeItem`. Las funciones de revisión (`getSubmissionForReview`, `gradeAnswer`, `finalizeGrading`) se ubican en este mismo módulo y las consume spec-020 |
+| `lib/submissions/actions.ts` | **Crear** | Server Actions envueltas en `requireUser()`: `createSubmissionAction`, `saveAnswerAction` (y las de revisión de spec-020) |
 
 > `submitSubmission` usa el cliente de servidor por sesión (`createServerSupabaseClient`); RLS
 > es la línea de defensa. La API `/submit` verifica además la pertenencia por `enrollment`
@@ -179,7 +179,7 @@ Un intento del estudiante en una asignación (una fila por `attempt_number`).
 - `submitted_at timestamptz` — null si aún no ha enviado.
 - `status text not null default 'in_progress' check (status in ('in_progress','submitted','graded','expired'))`
 - `auto_score numeric(5,2)` — calculado al submit (preguntas objetivas).
-- `final_score numeric(5,2)` — definitivo, incluye revisión manual (lo escribe spec-008; o el
+- `final_score numeric(5,2)` — definitivo, incluye revisión manual (lo escribe spec-020; o el
   propio submit cuando no hay respuestas abiertas).
 - `graded_at timestamptz`
 
@@ -198,9 +198,9 @@ Respuesta a una pregunta dentro de un intento (existe desde el inicio por el aut
 - `text_response text` — para `open_text`, `code_write` y `coding_challenge`.
 - `is_correct boolean` — calculado para `multiple_choice` al submit; null mientras espera revisión.
 - `auto_score numeric(5,2)` — puntaje automático.
-- `manual_score numeric(5,2)` — puntaje del docente en revisión (lo escribe spec-008).
-- `reviewer_notes text` — feedback del docente (lo escribe spec-008).
-- `reviewed_at timestamptz` — (lo escribe spec-008).
+- `manual_score numeric(5,2)` — puntaje del docente en revisión (lo escribe spec-020).
+- `reviewer_notes text` — feedback del docente (lo escribe spec-020).
+- `reviewed_at timestamptz` — (lo escribe spec-020).
 
 Restricción: `unique (submission_id, question_id)`.
 Índice: `(submission_id)`.
@@ -212,9 +212,9 @@ Restricción: `unique (submission_id, question_id)`.
     docente ve las de sus cursos (vía propiedad del `academic_course` de la asignación).
   - `insert`: solo el propio estudiante, sobre una matrícula suya.
   - `update`: por pertenencia (el estudiante actualiza su intento en progreso; el docente
-    en revisión — spec-008).
+    en revisión — spec-020).
 - **`answers`** — `select`/`insert`/`update` por pertenencia vía la `submission` asociada; el
-  docente actualiza `manual_score`/`reviewer_notes` en revisión (spec-008).
+  docente actualiza `manual_score`/`reviewer_notes` en revisión (spec-020).
 
 ---
 
@@ -233,7 +233,7 @@ Restricción: `unique (submission_id, question_id)`.
   suma y redondea a 2 decimales. Marca la submission como `submitted` con `submitted_at` y
   `auto_score`. Si **no** hay respuestas de tipo `open_text`/`code_write`/`coding_challenge`,
   cierra el intento como `graded` con `final_score = auto_score`, `graded_at`, y propaga a
-  `student_grades`. Si las hay, queda `submitted` a la espera de spec-008.
+  `student_grades`. Si las hay, queda `submitted` a la espera de spec-020.
 - **Propagación de nota (`propagateToGradeItem`)**: si la asignación tiene `grade_item_id`,
   hace upsert en `student_grades` con `onConflict (enrollment_id, grade_item_id)`.
 - **Feedback inmediato**: el `QuestionRenderer`/`SubmissionResult` muestran corrección de
@@ -255,7 +255,7 @@ Restricción: `unique (submission_id, question_id)`.
 
 ### Fase 2 — Capa de dominio `lib/submissions/`
 - [ ] Crear `lib/submissions/types.ts` (`Submission`, `Answer`, `SubmissionWithAnswers`,
-      `SubmissionStatus`; y `AnswerForReview`/`SubmissionForReview` que consume spec-008).
+      `SubmissionStatus`; y `AnswerForReview`/`SubmissionForReview` que consume spec-020).
 - [ ] Crear `lib/submissions/index.ts`: `createSubmission` (ventana + `max_attempts` +
       recuperación de intento en progreso), `saveAnswer` (upsert), `submitSubmission`
       (cálculo de `auto_score`, cierre condicional a `graded`, propagación), lecturas
@@ -287,7 +287,7 @@ Restricción: `unique (submission_id, question_id)`.
 - [ ] Tokens semánticos de `DESIGN.md`, JetBrains Mono, modo claro/oscuro; a11y de
       `AssignmentPlayer`/`QuestionRenderer` (foco, roles, teclado).
 - [ ] `npm run lint` y `tsc --noEmit` sin errores nuevos.
-- [ ] Crear `docs/testing/test-007-assignment-solving.md` y ejecutar los casos manuales de UI.
+- [ ] Crear `docs/testing/test-019-assignment-solving.md` y ejecutar los casos manuales de UI.
 
 ---
 
@@ -307,7 +307,7 @@ Restricción: `unique (submission_id, question_id)`.
   (`submit`/`close`/`never`).
 - Si la asignación no tiene respuestas de revisión manual, el intento pasa a `graded` y, si
   hay `grade_item_id`, la nota se propaga a `student_grades`; si las tiene, queda `submitted`
-  a la espera de la revisión del docente ([spec-008](./spec-008-assignment-review.md)).
+  a la espera de la revisión del docente ([spec-020](./spec-020-assignment-review.md)).
 - Se respeta `max_attempts`: agotados los intentos, no se crea uno nuevo.
 - **Aislamiento**: un estudiante no accede a asignaciones ni intentos de cursos no
   matriculados o de otros estudiantes (`404`/`403` según corresponda); RLS lo garantiza y la
@@ -321,7 +321,7 @@ Restricción: `unique (submission_id, question_id)`.
 
 ## Pruebas asociadas
 
-- **Manuales:** `docs/testing/test-007-assignment-solving.md` — casos `TC-*` de los flujos
+- **Manuales:** `docs/testing/test-019-assignment-solving.md` — casos `TC-*` de los flujos
   con UI del estudiante: listado de asignaciones activas, apertura/recuperación de intento,
   auto-save, countdown con submit automático, cálculo de `auto_score` y feedback inmediato,
   control de `max_attempts`, redirección a resultados y aislamiento entre estudiantes/cursos.

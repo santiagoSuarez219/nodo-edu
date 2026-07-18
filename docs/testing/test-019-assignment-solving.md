@@ -8,7 +8,7 @@
   - **Docente:** usuario con rol `teacher` en `user_roles`, dueño de al menos un curso académico.
   - **Estudiante A:** cuenta con rol `student`, con matrícula `active` en el curso del docente.
   - **Estudiante B:** segunda cuenta con rol `student`, usada para probar aislamiento.
-- El docente (spec-006) ha creado y **publicado** al menos una asignación vinculada al curso,
+- El docente (spec-018) ha creado y **publicado** al menos una asignación vinculada al curso,
   con preguntas de los tipos `multiple_choice`, `open_text`, `code_snippet`, `code_write` y
   `coding_challenge` en el banco (spec-005).
 - Se dispone de asignaciones configuradas para cubrir los distintos escenarios:
@@ -289,7 +289,7 @@ muestra el puntaje final en `SubmissionResult`.
 2. Revisar la vista de resultados.
 **Resultado esperado:** El intento queda en estado `submitted` (no `graded`): las `multiple_choice`
 muestran su `auto_score`, mientras las respuestas abiertas figuran pendientes de revisión del
-docente (spec-008). La nota final aún no se propaga.
+docente (spec-020). La nota final aún no se propaga.
 **Estado:** ⬜ Pendiente
 
 ---

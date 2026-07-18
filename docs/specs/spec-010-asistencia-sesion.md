@@ -480,7 +480,7 @@ mensaje adecuado; owner/admin no ven la sección.
 `spec-011` (preguntas embebidas / autoevaluación de cierre) añadirá **otra sección** al
 mismo `LessonClosure`, reutilizando el contrato "por secciones" que este spec consolida
 (hoy: completar + asistencia; mañana: autoevaluación). Su decisión central sigue siendo
-la **frontera con el track de evaluaciones** (`spec-005` banco / `spec-007`
+la **frontera con el track de evaluaciones** (`spec-005` banco / `spec-019`
 assignment-solving): preguntas *formativas sin nota* vs. *calificables*. La sección de
 asistencia y la de autoevaluación deben coexistir sin acoplarse; el `LessonClosure` no
 debe asumir orden ni presencia fija de secciones.

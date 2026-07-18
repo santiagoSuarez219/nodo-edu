@@ -1,4 +1,4 @@
-# spec-008 — Revisión y calificación manual del docente
+# spec-020 — Revisión y calificación manual del docente
 
 > **Estado:** Planificado — pendiente de implementación. La implementación de referencia
 > existe en el tag `backup/feat-question-bank` y se portará al implementar este spec.
@@ -7,7 +7,7 @@
 
 ## Contexto
 
-Cuando un estudiante envía una asignación (spec-007), el sistema calcula automáticamente
+Cuando un estudiante envía una asignación (spec-019), el sistema calcula automáticamente
 el `auto_score` de las preguntas **objetivas** (`multiple_choice`), pero las preguntas
 **abiertas** (`open_text`, `code_write`, `coding_challenge`) no pueden calificarse de forma
 automática: requieren el criterio del docente. Estas quedan a la espera de revisión manual.
@@ -21,7 +21,7 @@ propaga ese puntaje al `student_grade` correspondiente, cerrando el vínculo con
 de calificaciones académica.
 
 No se crean tablas ni columnas nuevas: todo el estado de revisión se persiste en columnas ya
-definidas en spec-007 (`answers.manual_score`, `answers.reviewer_notes`,
+definidas en spec-019 (`answers.manual_score`, `answers.reviewer_notes`,
 `answers.reviewed_at`, `submissions.final_score`, `submissions.status`,
 `submissions.graded_at`).
 
@@ -46,13 +46,13 @@ definidas en spec-007 (`answers.manual_score`, `answers.reviewer_notes`,
   fija `graded_at`, y **propaga** el `final_score` a `student_grades` (upsert por
   `enrollment_id + grade_item_id`) si la asignación tiene `grade_item_id` vinculado.
 - **Aislamiento por curso**: un docente solo lista y revisa envíos de asignaciones de sus
-  propios cursos académicos (garantizado por RLS de `submissions`/`answers` de spec-007 y
+  propios cursos académicos (garantizado por RLS de `submissions`/`answers` de spec-019 y
   por la protección de rol de las rutas `/admin`).
 
 ### No incluye
 
-- Cambios de esquema de base de datos: las tablas y columnas ya existen (spec-007).
-- Cálculo del `auto_score` ni la lógica de envío del estudiante: viven en spec-007
+- Cambios de esquema de base de datos: las tablas y columnas ya existen (spec-019).
+- Cálculo del `auto_score` ni la lógica de envío del estudiante: viven en spec-019
   (`app/api/submissions/[submissionId]/submit/route.ts`).
 - Ejecución automatizada de código para `coding_challenge`: el runner está deshabilitado
   (stub de spec-005); estas respuestas se califican **manualmente** como cualquier otra
@@ -60,25 +60,25 @@ definidas en spec-007 (`answers.manual_score`, `answers.reviewer_notes`,
 - Reapertura de un envío ya calificado, recalificación masiva, o notificaciones al
   estudiante al finalizar.
 - Estadísticas agregadas por pregunta o por asignación, exportación de resultados.
-- Cualquier UI de creación/edición de asignaciones (spec-006) o de resolución (spec-007).
+- Cualquier UI de creación/edición de asignaciones (spec-018) o de resolución (spec-019).
 
 ---
 
 ## Dependencias
 
-- **spec-007 (assignment-solving)** — provee las tablas `submissions` y `answers` con sus
+- **spec-019 (assignment-solving)** — provee las tablas `submissions` y `answers` con sus
   columnas de revisión (`manual_score`, `reviewer_notes`, `reviewed_at`, `final_score`,
   `status`, `graded_at`) y sus políticas RLS; la capa de dominio `lib/submissions/`
   (tipos y funciones de lectura de envíos); y el cálculo previo de `auto_score` al enviar.
   Este spec **consume** ese estado y añade solo las funciones de revisión y su UI.
-- **spec-006 (assignment-authoring)** — provee `assignments` y `assignment_questions`
+- **spec-018 (assignment-authoring)** — provee `assignments` y `assignment_questions`
   (de donde se lee `points`, el puntaje máximo por respuesta) y el vínculo opcional
   `grade_item_id`.
 - **spec-003 (course-enrollment)** — provee `academic_courses`, `enrollments`, `grade_items`
   y `student_grades` (destino de la propagación); el middleware de protección de `/admin`;
   y los helpers de sesión/rol en `lib/auth/session.ts` (`requireAnyRole`).
 
-> Cadena de dependencias: `spec-003` → `spec-005` → `spec-006` → `spec-007` → **spec-008**.
+> Cadena de dependencias: `spec-003` → `spec-005` → `spec-018` → `spec-019` → **spec-020**.
 
 ---
 
@@ -86,7 +86,7 @@ definidas en spec-007 (`answers.manual_score`, `answers.reviewer_notes`,
 
 ### Base de datos
 
-**Sin cambios de esquema.** Se leen y escriben columnas ya existentes (spec-007):
+**Sin cambios de esquema.** Se leen y escriben columnas ya existentes (spec-019):
 
 | Tabla | Columnas usadas en este spec | Uso |
 |---|---|---|
@@ -96,7 +96,7 @@ definidas en spec-007 (`answers.manual_score`, `answers.reviewer_notes`,
 | `assignments` | `grade_item_id` | Decide si se propaga a `student_grades` |
 | `student_grades` | `enrollment_id`, `grade_item_id`, `score` | Destino de la propagación (upsert) |
 
-> La propagación replica el mismo patrón que el submit del estudiante (spec-007): upsert
+> La propagación replica el mismo patrón que el submit del estudiante (spec-019): upsert
 > con `onConflict: "enrollment_id,grade_item_id"`. Si la asignación no tiene
 > `grade_item_id`, no se toca la libreta.
 
@@ -114,7 +114,7 @@ definidas en spec-007 (`answers.manual_score`, `answers.reviewer_notes`,
 
 | Archivo | Acción | Detalle |
 |---|---|---|
-| `lib/submissions/index.ts` | **Editar** | Añadir `getSubmissionForReview(submissionId)`, `gradeAnswer(answerId, score, notes)`, `finalizeGrading(submissionId)` y el helper interno `propagateToGradeItem(...)`. Reutiliza `getSubmissionsByAssignment(assignmentId)` (lectura de spec-007) para el listado. |
+| `lib/submissions/index.ts` | **Editar** | Añadir `getSubmissionForReview(submissionId)`, `gradeAnswer(answerId, score, notes)`, `finalizeGrading(submissionId)` y el helper interno `propagateToGradeItem(...)`. Reutiliza `getSubmissionsByAssignment(assignmentId)` (lectura de spec-019) para el listado. |
 | `lib/submissions/actions.ts` | **Editar** | Añadir Server Actions `gradeAnswerAction(...)` y `finalizeGradingAction(...)` que envuelven las funciones anteriores, verifican sesión (`requireUser`) y hacen `revalidatePath` de las rutas de revisión y detalle de la asignación. |
 | `lib/submissions/types.ts` | **Editar** | Añadir los tipos `SubmissionForReview` y `AnswerForReview` (respuesta + contexto de pregunta: `question_type`, `question_stem`, `question_code_snippet`, `question_code_language`, `question_choices`, `question_rubric`, `max_points`). |
 
@@ -194,7 +194,7 @@ Ninguna nueva.
 - [ ] Tokens semánticos de `DESIGN.md`, modo claro/oscuro, JetBrains Mono, sin valores crudos
       de paleta.
 - [ ] `npm run lint` y `tsc --noEmit` sin errores nuevos.
-- [ ] Crear/actualizar `docs/testing/test-008-assignment-review.md` con los casos manuales.
+- [ ] Crear/actualizar `docs/testing/test-020-assignment-review.md` con los casos manuales.
 
 ---
 
@@ -219,7 +219,7 @@ Ninguna nueva.
 
 ## Pruebas asociadas
 
-- **Manuales:** `docs/testing/test-008-assignment-review.md` — casos `TC-*` de los flujos con
+- **Manuales:** `docs/testing/test-020-assignment-review.md` — casos `TC-*` de los flujos con
   UI: listado de envíos (pendientes/calificados), revisión de respuestas abiertas con
   asignación de `manual_score`/`reviewer_notes`, validación del rango de puntaje,
   finalización con cálculo de `final_score`, propagación a `student_grades` cuando hay

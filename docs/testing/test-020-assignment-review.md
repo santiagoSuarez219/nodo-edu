@@ -14,7 +14,7 @@
     - Al menos una pregunta abierta de cada tipo relevante: `open_text`, `code_write`,
       `coding_challenge`, cada una con `points` definido y `rubric` opcional.
   - Al menos un envío del estudiante en estado `submitted` (con `auto_score` ya calculado
-    para las objetivas al enviar en spec-007).
+    para las objetivas al enviar en spec-019).
   - Para los casos de propagación: una asignación con `grade_item_id` vinculado y otra sin él.
 - Variables de entorno en `.env.local` apuntando al proyecto local.
 
