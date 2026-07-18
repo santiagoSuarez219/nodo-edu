@@ -65,7 +65,7 @@ Para ejecutar los casos `TC-MCP-001` a `TC-MCP-013`, configura Claude Desktop co
 **Herramienta probada:** `list_academic_courses` en `assignment-mcp`
 **Precondición:** El Docente A es dueño de al menos un curso académico.
 **Input de prueba:** invocación sin argumentos.
-**Output esperado:** Lista de los cursos del docente con `id`, nombre y periodo. No aparece
+**Output esperado:** Lista de los cursos del docente con `id`, `name` y `code`. No aparece
 ningún curso del Docente B.
 **Estado:** ⬜ Pendiente
 

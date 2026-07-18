@@ -532,7 +532,7 @@ export async function listAcademicCoursesForTeacher(): Promise<
   Array<{
     id: string;
     name: string;
-    period: string;
+    code: string;
   }>
 > {
   const context = getServiceAssignmentsContext();
@@ -540,7 +540,7 @@ export async function listAcademicCoursesForTeacher(): Promise<
 
   const { data: courses, error } = await supabase
     .from("academic_courses")
-    .select("id, name, period")
+    .select("id, name, code")
     .eq("teacher_id", actorId);
 
   if (error) {
