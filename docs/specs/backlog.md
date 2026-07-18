@@ -5,6 +5,32 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+## DEBT-006 — `course.lessons` mezcla dos tipos de nodo; guard de dominio en progreso
+
+**Origen:** spec-021 (guías de laboratorio)
+**Prioridad:** Baja — no bloquea, es limpieza estructural
+
+Tres deudas quedaron documentadas en spec-021 y no se abordaron por estar
+fuera de su alcance:
+
+1. **`course.lessons` contiene nodos de dos tipos** (`kind: "lesson" | "guide"`)
+   pese a llamarse `lessons`. Renombrar a `nodes` y migrar el `kind` opcional
+   a una unión discriminada (`type CourseNode = Lesson | Guide`) tocaría ~10
+   archivos sin beneficio funcional inmediato — se pospone a cuando llegue
+   Payload CMS (Fase 2 del proyecto), momento natural para remodelar el tipo.
+2. **`markLessonViewed` / `markLessonCompleted`** (`lib/progress/index.ts`) no
+   rechazan slugs que no correspondan a una lección navegable; confían en que
+   el llamador filtre guías antes de invocarlas. No hay FK de
+   `lesson_progress` al catálogo de contenido que lo impida en base de datos.
+3. **Código muerto:** `PreparationPlaceholder` y el estado "bloqueada /
+   Próximamente" del sidebar (`LessonSidebarItem.tsx`) no tienen ningún caso
+   real hoy — las 60+ lecciones/guías declaradas siempre tienen `articleSlug`.
+
+**Acción:** Revisar en el spec que introduzca Payload CMS o el siguiente que
+toque `lib/progress/`.
+
+---
+
 ## RESUELTO — Colisión de numeración en spec-006 (2026-07-18)
 
 **Origen:** `spec-006-lecciones-privadas-navbar.md` (`[DONE]`, creado 2026-07-10)

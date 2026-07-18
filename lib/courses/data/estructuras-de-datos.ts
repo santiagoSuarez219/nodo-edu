@@ -103,10 +103,19 @@ export const estructurasDeDatos: Course = {
       ],
     },
     {
+      id: "lab-01-listas-enlazadas",
+      slug: "lab-01-listas-enlazadas",
+      articleSlug: "lab-01-listas-enlazadas",
+      kind: "guide",
+      order: 9,
+      title: "Laboratorio 01 — Listas Enlazadas",
+      topics: [],
+    },
+    {
       id: "composicion-agregacion-y-diagramas-de-paquetes",
       slug: "composicion-agregacion-y-diagramas-de-paquetes",
       articleSlug: "composicion-agregacion-y-diagramas-de-paquetes",
-      order: 9,
+      order: 10,
       title: "Composición, agregación y diagramas de paquetes",
       topics: [
         { title: "Asociación, agregación y composición: diferencias conceptuales" },
@@ -118,7 +127,7 @@ export const estructurasDeDatos: Course = {
       id: "diseno-con-tad-y-orientacion-a-objetos",
       slug: "diseno-con-tad-y-orientacion-a-objetos",
       articleSlug: "diseno-con-tad-y-orientacion-a-objetos",
-      order: 10,
+      order: 11,
       title: "Diseño con TAD y orientación a objetos",
       topics: [
         { title: "Diagrama de clases con relaciones: lectura e implementación en Java" },
@@ -130,7 +139,7 @@ export const estructurasDeDatos: Course = {
       id: "tipos-abstractos-de-datos-tad",
       slug: "tipos-abstractos-de-datos-tad",
       articleSlug: "tipos-abstractos-de-datos-tad",
-      order: 11,
+      order: 12,
       title: "Tipos abstractos de datos (TAD)",
       topics: [
         { title: "Qué es un tipo abstracto de datos" },
@@ -145,7 +154,7 @@ export const estructurasDeDatos: Course = {
       id: "criterios-de-seleccion-de-estructuras",
       slug: "criterios-de-seleccion-de-estructuras",
       articleSlug: "criterios-de-seleccion-de-estructuras",
-      order: 12,
+      order: 13,
       title: "Criterios de selección de estructuras",
       topics: [
         { title: "Ventajas y desventajas de cada estructura de datos" },
@@ -160,7 +169,7 @@ export const estructurasDeDatos: Course = {
       id: "notacion-big-o-y-analisis-de-complejidad",
       slug: "notacion-big-o-y-analisis-de-complejidad",
       articleSlug: "notacion-big-o-y-analisis-de-complejidad",
-      order: 13,
+      order: 14,
       title: "Notación Big O y análisis de complejidad",
       topics: [
         { title: "Complejidad temporal y espacial" },
@@ -173,7 +182,7 @@ export const estructurasDeDatos: Course = {
       id: "comparacion-de-estructuras-por-eficiencia",
       slug: "comparacion-de-estructuras-por-eficiencia",
       articleSlug: "comparacion-de-estructuras-por-eficiencia",
-      order: 14,
+      order: 15,
       title: "Comparación de estructuras por eficiencia",
       topics: [
         {
@@ -188,7 +197,7 @@ export const estructurasDeDatos: Course = {
       id: "nodos-y-memoria-dinamica-en-java",
       slug: "nodos-y-memoria-dinamica-en-java",
       articleSlug: "nodos-y-memoria-dinamica-en-java",
-      order: 15,
+      order: 16,
       title: "Nodos y memoria dinámica en Java",
       topics: [
         { title: "Gestión de memoria dinámica y referencias en Java" },
@@ -200,7 +209,7 @@ export const estructurasDeDatos: Course = {
       id: "operaciones-sobre-la-lista-simple",
       slug: "operaciones-sobre-la-lista-simple",
       articleSlug: "operaciones-sobre-la-lista-simple",
-      order: 16,
+      order: 17,
       title: "Operaciones sobre la lista simple",
       topics: [
         { title: "Inserción al inicio, al final y en posición arbitraria" },
@@ -212,7 +221,7 @@ export const estructurasDeDatos: Course = {
       id: "eliminacion-en-lista-simple-y-comparacion-con-arreglos",
       slug: "eliminacion-en-lista-simple-y-comparacion-con-arreglos",
       articleSlug: "eliminacion-en-lista-simple-y-comparacion-con-arreglos",
-      order: 17,
+      order: 18,
       title: "Eliminación en lista simple y comparación con arreglos",
       topics: [
         { title: "Eliminación al inicio, al final y por valor en lista simple" },
@@ -224,7 +233,7 @@ export const estructurasDeDatos: Course = {
       id: "lista-doblemente-enlazada-y-lista-circular",
       slug: "lista-doblemente-enlazada-y-lista-circular",
       articleSlug: "lista-doblemente-enlazada-y-lista-circular",
-      order: 18,
+      order: 19,
       title: "Lista doblemente enlazada y lista circular",
       topics: [
         { title: "Nodo doble: referencia prev y next" },
@@ -236,7 +245,7 @@ export const estructurasDeDatos: Course = {
       id: "estrategias-de-ordenamiento-sobre-listas-enlazadas",
       slug: "estrategias-de-ordenamiento-sobre-listas-enlazadas",
       articleSlug: "estrategias-de-ordenamiento-sobre-listas-enlazadas",
-      order: 19,
+      order: 20,
       title: "Estrategias de ordenamiento sobre listas enlazadas",
       topics: [
         { title: "Insertion sort adaptado a lista enlazada: lógica y complejidad" },
@@ -248,7 +257,7 @@ export const estructurasDeDatos: Course = {
       id: "sintesis-del-modulo-de-listas",
       slug: "sintesis-del-modulo-de-listas",
       articleSlug: "sintesis-del-modulo-de-listas",
-      order: 20,
+      order: 21,
       title: "Síntesis del módulo de listas",
       topics: [
         { title: "Comparación entre lista simple, doble y circular" },
@@ -260,7 +269,7 @@ export const estructurasDeDatos: Course = {
       id: "fundamentos-de-archivos",
       slug: "fundamentos-de-archivos",
       articleSlug: "fundamentos-de-archivos",
-      order: 21,
+      order: 22,
       title: "Fundamentos de archivos",
       topics: [
         { title: "Archivos de texto vs. archivos binarios" },
@@ -272,7 +281,7 @@ export const estructurasDeDatos: Course = {
       id: "lectura-escritura-y-modificacion",
       slug: "lectura-escritura-y-modificacion",
       articleSlug: "lectura-escritura-y-modificacion",
-      order: 22,
+      order: 23,
       title: "Lectura, escritura y modificación",
       topics: [
         { title: "BufferedReader y BufferedWriter: lectura y escritura eficiente" },
@@ -284,7 +293,7 @@ export const estructurasDeDatos: Course = {
       id: "tad-pila",
       slug: "tad-pila",
       articleSlug: "tad-pila",
-      order: 23,
+      order: 24,
       title: "TAD Pila",
       topics: [
         { title: "Concepto LIFO (Last In, First Out)" },
@@ -296,7 +305,7 @@ export const estructurasDeDatos: Course = {
       id: "implementacion-de-pilas-en-java",
       slug: "implementacion-de-pilas-en-java",
       articleSlug: "implementacion-de-pilas-en-java",
-      order: 24,
+      order: 25,
       title: "Implementación de pilas en Java",
       topics: [
         { title: "Implementación propia con lista enlazada simple" },
@@ -308,7 +317,7 @@ export const estructurasDeDatos: Course = {
       id: "tad-cola",
       slug: "tad-cola",
       articleSlug: "tad-cola",
-      order: 25,
+      order: 26,
       title: "TAD Cola",
       topics: [
         { title: "Concepto FIFO (First In, First Out)" },
@@ -320,7 +329,7 @@ export const estructurasDeDatos: Course = {
       id: "implementacion-de-colas-en-java",
       slug: "implementacion-de-colas-en-java",
       articleSlug: "implementacion-de-colas-en-java",
-      order: 26,
+      order: 27,
       title: "Implementación de colas en Java",
       topics: [
         { title: "Implementación propia con lista enlazada simple" },
@@ -332,7 +341,7 @@ export const estructurasDeDatos: Course = {
       id: "fundamentos-de-recursividad",
       slug: "fundamentos-de-recursividad",
       articleSlug: "fundamentos-de-recursividad",
-      order: 27,
+      order: 28,
       title: "Fundamentos de recursividad",
       topics: [
         { title: "Concepto de recursividad: caso base y caso recursivo" },
@@ -344,7 +353,7 @@ export const estructurasDeDatos: Course = {
       id: "algoritmos-recursivos-clasicos",
       slug: "algoritmos-recursivos-clasicos",
       articleSlug: "algoritmos-recursivos-clasicos",
-      order: 28,
+      order: 29,
       title: "Algoritmos recursivos clásicos",
       topics: [
         { title: "Factorial y Fibonacci: análisis y comparación con la versión iterativa" },
@@ -356,7 +365,7 @@ export const estructurasDeDatos: Course = {
       id: "conceptos-y-tad-arbol-binario",
       slug: "conceptos-y-tad-arbol-binario",
       articleSlug: "conceptos-y-tad-arbol-binario",
-      order: 29,
+      order: 30,
       title: "Conceptos y TAD árbol binario",
       topics: [
         { title: "Estructura de árbol: raíz, nodo, hoja, subárbol, nivel, altura" },
@@ -368,7 +377,7 @@ export const estructurasDeDatos: Course = {
       id: "insercion-y-recorridos",
       slug: "insercion-y-recorridos",
       articleSlug: "insercion-y-recorridos",
-      order: 30,
+      order: 31,
       title: "Inserción y recorridos",
       topics: [
         { title: "Inserción de nodos en un árbol binario" },
@@ -380,7 +389,7 @@ export const estructurasDeDatos: Course = {
       id: "bst-busqueda-e-insercion",
       slug: "bst-busqueda-e-insercion",
       articleSlug: "bst-busqueda-e-insercion",
-      order: 31,
+      order: 32,
       title: "BST: búsqueda e inserción",
       topics: [
         { title: "Propiedad de ordenamiento del BST" },
@@ -392,7 +401,7 @@ export const estructurasDeDatos: Course = {
       id: "eliminacion-en-bst-y-sintesis-del-curso",
       slug: "eliminacion-en-bst-y-sintesis-del-curso",
       articleSlug: "eliminacion-en-bst-y-sintesis-del-curso",
-      order: 32,
+      order: 33,
       title: "Eliminación en BST y síntesis del curso",
       topics: [
         { title: "Casos de eliminación: nodo hoja, nodo con un hijo, nodo con dos hijos" },
