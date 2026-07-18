@@ -13,12 +13,14 @@ interface SelfAssessmentSectionProps {
   courseSlug: string;
   lessonSlug: string;
   questions: SelfAssessmentQuestion[];
+  onRetryingChange?: (isRetrying: boolean) => void;
 }
 
 export function SelfAssessmentSection({
   courseSlug,
   lessonSlug,
   questions,
+  onRetryingChange,
 }: SelfAssessmentSectionProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -40,7 +42,7 @@ export function SelfAssessmentSection({
   const formSchema = z.object(schemaObject);
   type FormInput = z.infer<typeof formSchema>;
 
-  const { register, handleSubmit, watch, formState: { errors } } = useForm<FormInput>({
+  const { register, handleSubmit, watch, reset, formState: { errors } } = useForm<FormInput>({
     resolver: zodResolver(formSchema),
   });
 
@@ -68,6 +70,7 @@ export function SelfAssessmentSection({
           }, {} as Record<string, QuestionFeedback>)
         );
         setHasSubmitted(true);
+        onRetryingChange?.(false);
         router.refresh();
       } else {
         const errorMessages: Record<string, string> = {
@@ -79,6 +82,14 @@ export function SelfAssessmentSection({
         setSubmitError(errorMessages[result.reason] || 'Error desconocido');
       }
     });
+  };
+
+  const handleRetry = () => {
+    reset();
+    setFeedbackByQuestion({});
+    setHasSubmitted(false);
+    setSubmitError(null);
+    onRetryingChange?.(true);
   };
 
   const formValues = watch();
@@ -302,11 +313,11 @@ export function SelfAssessmentSection({
                   <p className="font-medium">Autoevaluación enviada</p>
                 </div>
                 <button
-                  type="submit"
-                  disabled={isPending || !canSubmit}
-                  className="w-full px-4 py-2.5 text-sm font-medium text-white bg-blue-700 hover:bg-blue-800 dark:bg-blue-600 dark:hover:bg-blue-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  type="button"
+                  onClick={handleRetry}
+                  className="w-full px-4 py-2.5 text-sm font-medium text-white bg-blue-700 hover:bg-blue-800 dark:bg-blue-600 dark:hover:bg-blue-700 rounded-lg transition-colors"
                 >
-                  {isPending ? 'Reenviando...' : 'Reintentar'}
+                  Reintentar
                 </button>
               </div>
             ) : (

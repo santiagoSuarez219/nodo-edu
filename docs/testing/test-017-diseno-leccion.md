@@ -90,7 +90,7 @@ sesión iniciada, o crea/usa una cuenta sin matrícula en este curso.
 **Resultado esperado:** Se ve **un único** recuadro con borde y esquinas
 redondeadas. No hay un segundo fondo o borde interior rodeando al código. El
 `<code>` interno no tiene fondo, padding ni borde propios.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-017-002 — Tamaño de fuente del bloque de código
 **Precondición:** Lección A abierta en escritorio (viewport ≥ 768 px).
@@ -100,7 +100,7 @@ redondeadas. No hay un segundo fondo o borde interior rodeando al código. El
 **Resultado esperado:** En escritorio el código se lee a 16 px (`text-base`),
 notablemente más grande que antes y sin desbordar la columna. En móvil vuelve a
 14 px (`text-sm`) y el bloque sigue siendo legible.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-017-003 — Desbordamiento horizontal contenido
 **Precondición:** Lección A con un bloque que tenga una línea muy larga.
@@ -110,7 +110,7 @@ notablemente más grande que antes y sin desbordar la columna. En móvil vuelve 
 3. Intentar desplazar horizontalmente la página completa.
 **Resultado esperado:** El scroll horizontal ocurre **dentro** del bloque. La
 página no se desplaza lateralmente.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-017-004 — El código sigue siendo copiable
 **Precondición:** Lección A abierta.
@@ -120,7 +120,7 @@ página no se desplaza lateralmente.
 3. Repetir la selección usando solo el teclado (Shift + flechas).
 **Resultado esperado:** El texto se selecciona, se copia y se pega íntegro en
 ambos casos. No hay bloqueo de selección.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-017-005 — Orden vertical del cierre de lección
 **Precondición:** Sesión de estudiante matriculado en la Lección A.
@@ -129,7 +129,7 @@ ambos casos. No hay bloqueo de selección.
 **Resultado esperado:** El orden de arriba abajo es: contenido de la lección →
 **Autoevaluación** → **Asistencia** → **Finalizar lección** → navegación a la
 lección siguiente.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-017-006 — Usuario no matriculado no ve el cierre
 **Precondición:** Navegación anónima o usuario sin matrícula en el curso.
@@ -138,7 +138,7 @@ lección siguiente.
 2. Desplazarse hasta el final.
 **Resultado esperado:** No aparecen Autoevaluación, Asistencia ni Finalizar
 lección. La navegación a la lección siguiente **sí** se muestra.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-017-007 — La autoevaluación es un solo contenedor a ancho completo
 **Precondición:** Lección A con varias preguntas publicadas.
@@ -148,7 +148,7 @@ lección. La navegación a la lección siguiente **sí** se muestra.
 **Resultado esperado:** La autoevaluación se ve como **un** contenedor con
 bordes redondeados que ocupa **todo el ancho** de la columna de contenido. Cada
 pregunta es una división interna, sin tarjeta con borde propio.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-017-008 — Anchos coherentes entre las tres secciones de cierre
 **Precondición:** Lección A, con sesión de asistencia abierta por el docente.
@@ -156,7 +156,7 @@ pregunta es una división interna, sin tarjeta con borde propio.
 1. Observar los contenedores de Autoevaluación, Asistencia y Finalizar lección.
 **Resultado esperado:** Los tres comparten el mismo ancho y el mismo tratamiento
 visual (borde, radio, fondo). Ninguno queda visiblemente más estrecho.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-017-009 — Envío bloqueado hasta responder todas las preguntas
 **Precondición:** Lección A con al menos 3 preguntas, autoevaluación sin enviar.
@@ -166,7 +166,7 @@ visual (borde, radio, fondo). Ninguno queda visiblemente más estrecho.
 3. Responder el resto.
 **Resultado esperado:** El botón está deshabilitado en los pasos 1 y 2, e indica
 cuántas preguntas faltan. Se habilita únicamente cuando todas están respondidas.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-017-010 — Feedback tras enviar la autoevaluación
 **Precondición:** Lección A con todas las preguntas respondidas.
@@ -174,7 +174,7 @@ cuántas preguntas faltan. Se habilita únicamente cuando todas están respondid
 1. Pulsar "Enviar respuestas".
 **Resultado esperado:** Se muestra el feedback por pregunta (correcto/incorrecto
 y la respuesta correcta cuando falla). El intento queda registrado.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-017-011 — El intento sobrevive a la recarga
 **Precondición:** Autoevaluación de la Lección A ya enviada (TC-017-010).
@@ -183,7 +183,7 @@ y la respuesta correcta cuando falla). El intento queda registrado.
 2. Observar la sección Autoevaluación.
 **Resultado esperado:** La autoevaluación se muestra como **ya enviada** y ofrece
 reintentar. No vuelve al estado inicial sin responder.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-017-012 — Reintento de la autoevaluación
 **Precondición:** Autoevaluación de la Lección A ya enviada.
@@ -193,7 +193,13 @@ reintentar. No vuelve al estado inicial sin responder.
 **Resultado esperado:** El formulario se reactiva, admite nuevas respuestas y el
 nuevo envío muestra feedback actualizado. La lección permanece desbloqueada
 durante todo el proceso.
-**Estado:** ⬜ Pendiente
+**Estado:** ❌ Fallido → corregido — el botón "Reintentar" era `type="submit"`
+y reenviaba las mismas respuestas ya marcadas en el DOM (los inputs quedaban
+`disabled` pero conservaban su valor seleccionado, y `feedbackByQuestion`
+nunca se limpiaba). Se cambió a `type="button"` con un handler `handleRetry`
+que llama a `reset()` de react-hook-form y limpia `feedbackByQuestion`,
+`hasSubmitted` y `submitError`, reactivando el formulario en blanco.
+Reverificado — ✅ Aprobado.
 
 ### TC-017-013 — Completar lección bloqueado sin autoevaluación
 **Precondición:** Lección A **sin** autoevaluación enviada por este usuario.
@@ -203,7 +209,20 @@ durante todo el proceso.
 **Resultado esperado:** El botón está deshabilitado y acompañado de una
 explicación clara de que primero hay que completar la autoevaluación. La lección
 no se marca como completada.
-**Estado:** ⬜ Pendiente
+
+**Ajuste aplicado:** el bloqueo también debe reaparecer al pulsar "Reintentar"
+sobre una autoevaluación ya enviada, mientras el usuario no vuelva a enviarla
+— antes el botón "Completar lección" permanecía habilitado porque su estado
+dependía solo del intento ya persistido en la base de datos (`hasAttempt`),
+sin enterarse de que el formulario había vuelto a un estado sin responder.
+Se creó `components/courses/LessonClosureFlow.tsx`, un wrapper cliente que
+ahora orquesta `SelfAssessmentSection` + `AttendanceSection` + `LessonClosure`
+(antes render directo en `page.tsx`) y mantiene el estado `isRetrying`:
+`SelfAssessmentSection` lo notifica vía la nueva prop `onRetryingChange`
+(`true` al pulsar "Reintentar", `false` al reenviar con éxito), y mientras
+sea `true` fuerza `canComplete=false` y `blockedReason="self_assessment_pending"`
+en `LessonClosure`, independientemente del estado persistido en el servidor.
+**Estado:** ✅ Aprobado — reverificar junto con TC-017-012
 
 ### TC-017-014 — Desbloqueo inmediato tras enviar
 **Precondición:** Situación de TC-017-013.
@@ -212,7 +231,7 @@ no se marca como completada.
 2. Observar el botón "Completar lección" **sin** recargar la página.
 **Resultado esperado:** El botón queda habilitado automáticamente. Al pulsarlo,
 la lección se marca como completada.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-017-015 — El desbloqueo no depende de los aciertos
 **Precondición:** Lección A, autoevaluación sin enviar, usuario limpio.
@@ -222,7 +241,7 @@ la lección se marca como completada.
 3. Observar el botón "Completar lección".
 **Resultado esperado:** El feedback marca las respuestas como incorrectas, pero
 el botón "Completar lección" se habilita igualmente.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-017-016 — Lección sin preguntas se completa sin fricción
 **Precondición:** Lección B, sin preguntas publicadas.
@@ -231,7 +250,7 @@ el botón "Completar lección" se habilita igualmente.
 2. Pulsar "Completar lección".
 **Resultado esperado:** No se muestra sección de Autoevaluación. El botón está
 habilitado desde el inicio y la lección se marca como completada.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-017-017 — Lección completada antes de la regla no se rompe
 **Precondición:** Lección C, con `completed_at` previo a esta regla y sin intento
@@ -241,7 +260,7 @@ de autoevaluación registrado.
 2. Observar el estado de "Finalizar lección".
 **Resultado esperado:** Se muestra como **completada**, con su fecha. No se
 desmarca ni muestra error.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-017-018 — Desmarcar conserva el intento
 **Precondición:** Lección A completada y con autoevaluación enviada.
@@ -251,7 +270,7 @@ desmarca ni muestra error.
 **Resultado esperado:** La lección vuelve a estado no completada, la
 autoevaluación sigue registrada como enviada, y "Completar lección" permanece
 **habilitado** (no exige repetir la autoevaluación).
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-017-019 — Barra de progreso en escritorio
 **Precondición:** Sesión de estudiante matriculado, viewport ≥ 1024 px.
@@ -260,7 +279,7 @@ autoevaluación sigue registrada como enviada, y "Completar lección" permanece
 2. Observar la parte superior del sidebar.
 **Resultado esperado:** Se ve una barra de progreso con el texto `X de N · NN%`,
 coherente con las lecciones efectivamente completadas.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-017-020 — Barra de progreso en el drawer móvil
 **Precondición:** Viewport de 375 px.
@@ -268,7 +287,7 @@ coherente con las lecciones efectivamente completadas.
 1. Abrir una lección y desplegar el menú de lecciones.
 **Resultado esperado:** El drawer muestra la misma barra con el mismo porcentaje
 que en escritorio.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-017-021 — El progreso se actualiza al completar
 **Precondición:** Curso con al menos una lección pendiente; anotar el porcentaje
@@ -278,7 +297,7 @@ actual.
 2. Observar la barra del sidebar **sin** recargar.
 **Resultado esperado:** El porcentaje y el contador `X de N` suben en
 consecuencia, sin recarga manual.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-017-022 — El porcentaje nunca supera el 100 %
 **Precondición:** Curso donde exista un registro de `lesson_progress` completado
@@ -288,7 +307,7 @@ para una lección ya retirada o sin artículo publicado.
 2. Completar todas las lecciones con artículo publicado.
 **Resultado esperado:** El denominador cuenta solo lecciones con artículo. Al
 completarlas todas se muestra exactamente `100%`, nunca un valor superior.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-017-023 — Recorrido por teclado del cierre de lección
 **Precondición:** Lección A abierta, sin usar el ratón.
@@ -299,7 +318,7 @@ completarlas todas se muestra exactamente `100%`, nunca un valor superior.
 Finalizar lección → siguiente lección, siempre visible. Las opciones se pueden
 marcar y el formulario enviar sin ratón. El botón deshabilitado no captura el
 foco de forma confusa.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-017-024 — Barra de progreso accesible
 **Precondición:** Lección abierta con sesión de estudiante.
@@ -307,7 +326,7 @@ foco de forma confusa.
 1. Inspeccionar la barra de progreso en las devtools.
 **Resultado esperado:** Expone `role="progressbar"` con `aria-valuenow`,
 `aria-valuemin`, `aria-valuemax` y una etiqueta accesible que describe el avance.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-017-025 — Aislamiento entre estudiantes
 **Precondición:** Dos estudiantes matriculados, A y B. A ya envió la
@@ -316,7 +335,7 @@ autoevaluación de la Lección A; B no.
 1. Iniciar sesión como B y abrir la Lección A.
 **Resultado esperado:** B ve la autoevaluación **sin enviar** y el botón
 "Completar lección" deshabilitado. El intento de A no le afecta.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ---
 

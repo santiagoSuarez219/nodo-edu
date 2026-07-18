@@ -10,11 +10,11 @@ import {
   getSelfAssessmentForLesson,
   getSelfAssessmentStatus,
 } from "@/lib/self-assessment";
+import type { SelfAssessmentQuestion } from "@/lib/self-assessment/types";
 import { LessonArticle } from "@/components/courses/LessonArticle";
 import { LessonPagination } from "@/components/courses/LessonPagination";
-import { LessonClosure } from "@/components/courses/LessonClosure";
+import { LessonClosureFlow } from "@/components/courses/LessonClosureFlow";
 import { AttendanceSection } from "@/components/courses/AttendanceSection";
-import { SelfAssessmentSection } from "@/components/courses/SelfAssessmentSection";
 import { MdxContent } from "@/components/mdx/MdxContent";
 import { TopicList } from "@/components/courses/TopicList";
 
@@ -53,7 +53,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
     : null;
 
   let attendanceState = null;
-  let selfAssessment = null;
+  let selfAssessment: SelfAssessmentQuestion[] = [];
   let selfAssessmentStatus = {
     questionCount: 0,
     hasAttempt: false,
@@ -84,35 +84,27 @@ export default async function LessonPage({ params }: LessonPageProps) {
       </LessonArticle>
 
       {access.ok && access.reason === "enrolled" && (
-        <>
-          {selfAssessment && selfAssessment.length > 0 && (
-            <SelfAssessmentSection
-              courseSlug={courseSlug}
-              lessonSlug={lessonSlug}
-              questions={selfAssessment}
-            />
-          )}
-
-          {attendanceState && (
-            <AttendanceSection
-              courseSlug={courseSlug}
-              lessonSlug={lessonSlug}
-              attendanceState={attendanceState}
-            />
-          )}
-
-          <LessonClosure
-            courseSlug={courseSlug}
-            lessonSlug={lessonSlug}
-            initialCompletedAt={progress?.completed_at ?? null}
-            canComplete={!selfAssessmentStatus.requiresAttempt || selfAssessmentStatus.hasAttempt}
-            blockedReason={
-              selfAssessmentStatus.requiresAttempt && !selfAssessmentStatus.hasAttempt
-                ? "self_assessment_pending"
-                : undefined
-            }
-          />
-        </>
+        <LessonClosureFlow
+          courseSlug={courseSlug}
+          lessonSlug={lessonSlug}
+          questions={selfAssessment}
+          initialCompletedAt={progress?.completed_at ?? null}
+          canComplete={!selfAssessmentStatus.requiresAttempt || selfAssessmentStatus.hasAttempt}
+          blockedReason={
+            selfAssessmentStatus.requiresAttempt && !selfAssessmentStatus.hasAttempt
+              ? "self_assessment_pending"
+              : undefined
+          }
+          attendance={
+            attendanceState && (
+              <AttendanceSection
+                courseSlug={courseSlug}
+                lessonSlug={lessonSlug}
+                attendanceState={attendanceState}
+              />
+            )
+          }
+        />
       )}
 
       <LessonPagination courseSlug={course.slug} prev={prev} next={next} />
