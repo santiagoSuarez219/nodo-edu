@@ -1,6 +1,10 @@
 # spec-018 — Diseño de evaluaciones vía MCP con variantes aleatorias
 
-> **Estado:** [TESTING] — implementación completada, pendiente de pruebas manuales.
+> **Estado:** [DONE] — pruebas manuales aprobadas (23/28; 5 casos del "player" de
+> estudiante quedan diferidos a spec-019, ver `docs/testing/test-018-assignment-authoring.md`)
+> y revisión de código aprobada por `@reviewer` tras corregir 3 hallazgos mayores
+> (reparto balanceado ciego bajo RLS, RLS faltante en `assignments`, `.env.example`
+> del MCP con base URL incorrecta).
 >
 > **Nota de alcance (revisión 2026-07-18):** este spec cambió de dirección respecto a su
 > versión inicial. La autoría de evaluaciones **ya no tiene UI de creación**: se diseña
