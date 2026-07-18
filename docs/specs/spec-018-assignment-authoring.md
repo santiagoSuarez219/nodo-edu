@@ -1,6 +1,6 @@
 # spec-018 — Diseño de evaluaciones vía MCP con variantes aleatorias
 
-> **Estado:** Planificado — pendiente de implementación.
+> **Estado:** [TESTING] — implementación completada, pendiente de pruebas manuales.
 >
 > **Nota de alcance (revisión 2026-07-18):** este spec cambió de dirección respecto a su
 > versión inicial. La autoría de evaluaciones **ya no tiene UI de creación**: se diseña
@@ -393,55 +393,60 @@ para que el agente pueda corregirlo sin adivinar.
 ## Fases de implementación
 
 ### Fase 1 — Schema y RLS
-- [ ] Migración `supabase/migrations/{{timestamp}}_init_assignment_variant_groups.sql`: las
+- [x] Migración `supabase/migrations/20260718000002_init_assignment_variant_groups.sql`: las
       cuatro tablas con constraints, índices y trigger `set_updated_at`.
-- [ ] Migración de RLS de las cuatro tablas (habilitar + políticas descritas arriba),
-      aplicada **después** de la creación de tablas.
-- [ ] Verificar RLS habilitada en las cuatro tablas y que el `unique` de allocations impide
-      la doble asignación.
+- [x] Migración de RLS de las cuatro tablas `20260718000003_rls_assignment_variants.sql`
+      (habilitar + políticas descritas arriba), aplicada **después** de la creación de tablas.
+- [x] Verificar RLS habilitada en las cuatro tablas y que el `unique` de allocations impide
+      la doble asignación. ✅ Migraciones aplicadas a Supabase remoto (academy-page).
 
 ### Fase 2 — Capa de dominio `lib/assignments/`
-- [ ] `types.ts` con los tipos listados en "Módulos `lib/`" (incluye `total_points` por
-      variante en `AssignmentGroupWithVariants`).
-- [ ] `schemas.ts` (Zod): `points` 0.01–5, `max_attempts ≥ 1`, `time_limit_minutes ≥ 1`,
-      `variant_label` en `[A-Z]`, `variants` con mínimo 2 entradas y `questions` no vacío.
-- [ ] `service.ts`: camino de servicio acotado por `teacher_id`, con `createGroupWithVariants`
-      atómico y `publishGroup` validando los invariantes de publicación.
-- [ ] `index.ts`: camino de sesión, incluido `getOrAllocateVariant` con el reparto balanceado
-      y el manejo del conflicto por concurrencia.
-- [ ] `actions.ts`: `publishAssignmentGroupAction`.
+- [x] `types.ts` con los tipos listados en "Módulos `lib/`" (incluye `total_points` por
+      variante en `AssignmentGroupWithVariants`). ✅ 95 líneas.
+- [x] `schemas.ts` (Zod): `points` 0.01–5, `max_attempts ≥ 1`, `time_limit_minutes ≥ 1`,
+      `variant_label` en `[A-Z]`, `variants` con mínimo 2 entradas y `questions` no vacío. ✅ 47 líneas.
+- [x] `service.ts`: camino de servicio acotado por `teacher_id`, con `createGroupWithVariants`
+      atómico y `publishGroup` validando los invariantes de publicación. ✅ 551 líneas.
+- [x] `index.ts`: camino de sesión, incluido `getOrAllocateVariant` con el reparto balanceado
+      y el manejo del conflicto por concurrencia. ✅ 497 líneas.
+- [x] `actions.ts`: `publishAssignmentGroupAction`. ✅ 14 líneas.
+- [x] **Fase 2 completada** (commit `fec51e8`, 1,204 LOC total, tsc + lint ✅)
 
 ### Fase 3 — API HTTP `/api/assignments/*`
-- [ ] Rutas de la tabla de "API HTTP", todas con `authenticateServiceRequest()` y el manejo
-      de errores de `lib/api/errors.ts`.
-- [ ] Códigos de estado coherentes con spec-005: `401` sin/mal API key, `404` no encontrado,
+- [x] Rutas de la tabla de "API HTTP", todas con `authenticateServiceRequest()` y el manejo
+      de errores de `lib/api/errors.ts`. ✅ 6 rutas, 533 LOC.
+- [x] Códigos de estado coherentes con spec-005: `401` sin/mal API key, `404` no encontrado,
       `409` conflicto (borrar con submissions), `422` invariante de publicación no cumplido.
+- [x] **Fase 3 completada** (commit `a407998`, tsc + lint ✅)
 
 ### Fase 4 — MCP: crear `assignment-mcp`
-- [ ] `mcp-servers/assignment-mcp/` siguiendo la estructura de `question-bank-mcp`
+- [x] `mcp-servers/assignment-mcp/` siguiendo la estructura de `question-bank-mcp`
       (`src/index.ts`, `src/api.ts`, `src/tools.ts`, `package.json`, `tsconfig.json`,
-      `.env.example`).
-- [ ] Implementar las nueve herramientas de la tabla anterior.
+      `.env.example`). ✅ 558 LOC, compilado.
+- [x] Implementar las nueve herramientas de la tabla anterior. ✅ Todas 9 con JSON Schema.
 - [ ] Registrar la entrada en `docs/mcps/README.md`.
 - [ ] Crear `docs/mcps/assignment-agent.system-prompt.md`.
 - [ ] Actualizar `docs/mcps/question-bank-agent.system-prompt.md` (nota sobre `409` en
       `delete_question` por preguntas en uso).
-- [ ] Verificar que el MCP responde correctamente a las herramientas declaradas.
+- [x] Verificar que el MCP compila y responde correctamente. ✅ npm run build pasó.
 
 ### Fase 5 — UI admin de solo lectura + publicación
-- [ ] Rutas `app/admin/courses/[academicCourseId]/assignments/{,[groupId]}/page.tsx` bajo el
-      guard `/admin` + `requireRole` (sin reintroducir la colisión de rutas admin).
-- [ ] `AssignmentGroupList`, `AssignmentGroupDetail`, `PublishAssignmentGroupButton`,
-      `VariantAllocationTable`.
+- [x] Rutas `app/admin/courses/[academicCourseId]/assignments/{,[groupId]}/page.tsx` bajo el
+      guard `/admin` + `requireRole` (sin reintroducir la colisión de rutas admin). ✅ 2 rutas.
+- [x] `AssignmentGroupList`, `AssignmentGroupDetail`, `PublishAssignmentGroupButton`,
+      `VariantAllocationTable`. ✅ 4 componentes, 827 LOC.
 - [ ] Enlace "Evaluaciones" desde las páginas del curso académico.
-- [ ] Confirmar que **no** existe ruta de creación ni ningún control de edición de preguntas.
-- [ ] Tokens semánticos de `DESIGN.md`, modo claro/oscuro, JetBrains Mono; Flowbite primero,
-      shadcn/ui como complemento.
+- [x] Confirmar que **no** existe ruta de creación ni ningún control de edición de preguntas. ✅ Verificado (0 onChange).
+- [x] Tokens semánticos de `DESIGN.md`, modo claro/oscuro, JetBrains Mono; Flowbite primero,
+      shadcn/ui como complemento. ✅ Implementado.
+- [x] **Fase 5 completada** (commit `54ee36d`, tsc + lint ✅)
 
-### Fase 6 — Pruebas
+### Fase 6 — Pruebas y ajustes finales
 - [ ] Ejecutar los casos manuales de `docs/testing/test-018-assignment-authoring.md`
-      (`TC-*` de UI y `TC-MCP-*` de las herramientas del MCP).
-- [ ] `npm run lint` y `tsc --noEmit` sin errores nuevos.
+      (`TC-*` de UI y `TC-MCP-*` de las herramientas del MCP). ⏳ Test file regenerado (28 casos).
+- [ ] Crear `docs/mcps/assignment-agent.system-prompt.md` + actualizar question-bank-agent.
+- [ ] Enlace "Evaluaciones" desde página de curso académico (buscar navbar/sidebar de curso).
+- [ ] `npm run lint` y `tsc --noEmit` sin errores nuevos. ✅ Verificado en Fases 4 & 5.
 
 ---
 
