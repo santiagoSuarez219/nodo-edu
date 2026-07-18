@@ -474,6 +474,62 @@ export async function getOrAllocateVariant(
   return _getOrAllocateVariantForActor({ supabase, actorId: user.id }, enrollmentId, groupId);
 }
 
+async function _getAllocationsForActor(
+  context: AssignmentContext,
+  groupId: string
+): Promise<
+  Array<{
+    enrollment_id: string;
+    assignment_id: string;
+    variant_label: string;
+    allocated_at: string;
+    student_name?: string;
+  }>
+> {
+  const { supabase } = context;
+
+  const { data: allocations, error: allocationsError } = await supabase
+    .from("assignment_variant_allocations")
+    .select("enrollment_id, assignment_id, allocated_at")
+    .eq("variant_group_id", groupId);
+
+  if (allocationsError) throw new Error(allocationsError.message);
+
+  if (!allocations || allocations.length === 0) return [];
+
+  const assignmentIds = allocations.map((a) => a.assignment_id);
+
+  const { data: variants, error: variantsError } = await supabase
+    .from("assignments")
+    .select("id, variant_label")
+    .in("id", assignmentIds);
+
+  if (variantsError) throw new Error(variantsError.message);
+
+  const variantMap = new Map(
+    (variants || []).map((v) => [v.id, v.variant_label])
+  );
+
+  const { data: enrollments, error: enrollmentsError } = await supabase
+    .from("enrollments")
+    .select("id, student:students(full_name)")
+    .in("id", allocations.map((a) => a.enrollment_id));
+
+  if (enrollmentsError) throw new Error(enrollmentsError.message);
+
+  const enrollmentMap = new Map(
+    (enrollments || []).map((e) => [e.id, (e.student as { full_name?: string })?.full_name || "Desconocido"])
+  );
+
+  return allocations.map((a) => ({
+    enrollment_id: a.enrollment_id,
+    assignment_id: a.assignment_id,
+    variant_label: variantMap.get(a.assignment_id) || "Unknown",
+    allocated_at: a.allocated_at,
+    student_name: enrollmentMap.get(a.enrollment_id),
+  }));
+}
+
 export async function publishAssignmentGroup(
   groupId: string
 ): Promise<{ ok: true } | { ok: false; error: string }> {
@@ -487,6 +543,27 @@ export async function publishAssignmentGroup(
   return _publishAssignmentGroupForActor({ supabase, actorId: user.id }, groupId);
 }
 
+export async function getAllocations(
+  groupId: string
+): Promise<
+  Array<{
+    enrollment_id: string;
+    assignment_id: string;
+    variant_label: string;
+    allocated_at: string;
+    student_name?: string;
+  }>
+> {
+  const supabase = await createServerSupabaseClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return [];
+
+  return _getAllocationsForActor({ supabase, actorId: user.id }, groupId);
+}
+
 export {
   _getGroupsByAcademicCourseForActor,
   _getGroupByIdForActor,
@@ -494,4 +571,5 @@ export {
   _getStudentAssignmentForActor,
   _getOrAllocateVariantForActor,
   _publishAssignmentGroupForActor,
+  _getAllocationsForActor,
 };
