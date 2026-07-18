@@ -500,7 +500,7 @@ variante (no se crea fila en `assignment_variant_allocations`).
 2. Navegar al listado de evaluaciones de su propio curso.
 **Resultado esperado:** El Docente B solo ve las evaluaciones de su curso; ninguna del curso
 del Docente A.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ---
 
@@ -513,7 +513,7 @@ y el `groupId` de una de sus evaluaciones.
 3. Intentar publicar esa evaluación ajena.
 **Resultado esperado:** El acceso no revela el contenido ni permite publicar (404 o vacío
 por filtrado de RLS vía `academic_courses.teacher_id`).
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ---
 
@@ -524,4 +524,4 @@ por filtrado de RLS vía `academic_courses.teacher_id`).
 2. Revisar visualmente el listado y el detalle (incluida la tabla de reparto).
 **Resultado esperado:** Fondos, textos y bordes respetan los tokens de `DESIGN.md` en ambos
 modos. Tipografía JetBrains Mono. Sin textos ilegibles ni fondos blancos en modo oscuro.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
