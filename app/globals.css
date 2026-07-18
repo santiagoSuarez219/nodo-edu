@@ -70,8 +70,3 @@
   background-color: var(--shiki-dark-bg);
 }
 
-/* Inline code (rehype-pretty-code marca con data-inline-code) */
-.mdx-content code[data-inline-code] {
-  padding: 0.15rem 0.3rem;
-  border-radius: var(--radius-xs);
-}

@@ -6,10 +6,15 @@ import { requireCourseAccess } from "@/lib/enrollments";
 import { hasCourseAccess } from "@/lib/enrollments/access";
 import { markLessonViewed, getLessonProgress } from "@/lib/progress";
 import { getStudentAttendanceForCourse } from "@/lib/attendance";
-import { getSelfAssessmentForLesson } from "@/lib/self-assessment";
+import {
+  getSelfAssessmentForLesson,
+  getSelfAssessmentStatus,
+} from "@/lib/self-assessment";
 import { LessonArticle } from "@/components/courses/LessonArticle";
 import { LessonPagination } from "@/components/courses/LessonPagination";
 import { LessonClosure } from "@/components/courses/LessonClosure";
+import { AttendanceSection } from "@/components/courses/AttendanceSection";
+import { SelfAssessmentSection } from "@/components/courses/SelfAssessmentSection";
 import { MdxContent } from "@/components/mdx/MdxContent";
 import { TopicList } from "@/components/courses/TopicList";
 
@@ -49,9 +54,16 @@ export default async function LessonPage({ params }: LessonPageProps) {
 
   let attendanceState = null;
   let selfAssessment = null;
+  let selfAssessmentStatus = {
+    questionCount: 0,
+    hasAttempt: false,
+    requiresAttempt: false,
+  };
+
   if (access.ok && access.reason === "enrolled") {
     attendanceState = await getStudentAttendanceForCourse(courseSlug);
     selfAssessment = await getSelfAssessmentForLesson(courseSlug, lessonSlug);
+    selfAssessmentStatus = await getSelfAssessmentStatus(courseSlug, lessonSlug);
   }
 
   return (
@@ -70,16 +82,40 @@ export default async function LessonPage({ params }: LessonPageProps) {
           />
         )}
       </LessonArticle>
-      <LessonPagination courseSlug={course.slug} prev={prev} next={next} />
+
       {access.ok && access.reason === "enrolled" && (
-        <LessonClosure
-          courseSlug={courseSlug}
-          lessonSlug={lessonSlug}
-          initialCompletedAt={progress?.completed_at ?? null}
-          attendance={attendanceState || undefined}
-          selfAssessment={selfAssessment || undefined}
-        />
+        <>
+          {selfAssessment && selfAssessment.length > 0 && (
+            <SelfAssessmentSection
+              courseSlug={courseSlug}
+              lessonSlug={lessonSlug}
+              questions={selfAssessment}
+            />
+          )}
+
+          {attendanceState && (
+            <AttendanceSection
+              courseSlug={courseSlug}
+              lessonSlug={lessonSlug}
+              attendanceState={attendanceState}
+            />
+          )}
+
+          <LessonClosure
+            courseSlug={courseSlug}
+            lessonSlug={lessonSlug}
+            initialCompletedAt={progress?.completed_at ?? null}
+            canComplete={!selfAssessmentStatus.requiresAttempt || selfAssessmentStatus.hasAttempt}
+            blockedReason={
+              selfAssessmentStatus.requiresAttempt && !selfAssessmentStatus.hasAttempt
+                ? "self_assessment_pending"
+                : undefined
+            }
+          />
+        </>
       )}
+
+      <LessonPagination courseSlug={course.slug} prev={prev} next={next} />
     </>
   );
 }

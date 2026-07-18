@@ -7,6 +7,10 @@ function isInternal(href: string): boolean {
   return href.startsWith("/") || href.startsWith("#");
 }
 
+type CodeProps = ComponentPropsWithoutRef<"code"> & {
+  "data-inline-code"?: string;
+};
+
 export const mdxComponents: MDXComponents = {
   h1: (props: ComponentPropsWithoutRef<"h1">) => (
     <h1
@@ -125,14 +129,20 @@ export const mdxComponents: MDXComponents = {
   },
   pre: (props: ComponentPropsWithoutRef<"pre">) => (
     <pre
-      className="my-6 overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 p-4 text-sm leading-6"
+      className="my-6 overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 p-4 text-sm md:text-base leading-7"
       {...props}
     />
   ),
-  code: (props: ComponentPropsWithoutRef<"code">) => (
-    <code
-      className="rounded bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 text-[0.9em] text-gray-900 dark:text-gray-100"
-      {...props}
-    />
-  ),
+  code: (props: CodeProps) => {
+    const isInline = "data-inline-code" in props;
+    if (isInline) {
+      return (
+        <code
+          className="rounded bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 text-[0.9em] text-gray-900 dark:text-gray-100"
+          {...props}
+        />
+      );
+    }
+    return <code {...props} />;
+  },
 };

@@ -25,3 +25,26 @@ export type CheckAnswerResult =
       ok: false;
       error: string;
     };
+
+export type QuestionFeedback = {
+  questionId: string;
+  correct: boolean;
+  correctChoiceIds: string[];
+  selectedCorrectIds: string[];
+};
+
+export type SelfAssessmentStatus = {
+  questionCount: number;
+  hasAttempt: boolean;
+  requiresAttempt: boolean;
+};
+
+export type SubmitSelfAssessmentResult =
+  | {
+      ok: true;
+      feedback: QuestionFeedback[];
+    }
+  | {
+      ok: false;
+      reason: "not_enrolled" | "incomplete" | "no_questions" | "error";
+    };

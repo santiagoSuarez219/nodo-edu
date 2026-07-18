@@ -5,3 +5,12 @@ export interface LessonProgress {
   viewed_at: string;
   completed_at: string | null;
 }
+
+export type MarkLessonCompletedResult =
+  | {
+      ok: true;
+    }
+  | {
+      ok: false;
+      reason: "not_authenticated" | "not_enrolled" | "self_assessment_pending";
+    };
