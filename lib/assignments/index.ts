@@ -1,4 +1,5 @@
 import { createServerSupabaseClient } from "@/lib/auth/server";
+import { createServiceSupabaseClient } from "@/lib/auth/service";
 import type {
   AssignmentVariantGroup,
   AssignmentGroupWithVariants,
@@ -251,10 +252,19 @@ async function _getOrAllocateVariantForActor(
 
   if (!variants || variants.length === 0) return null;
 
+  // El conteo de asignaciones por variante necesita ver el reparto de TODOS los
+  // estudiantes del grupo para poder balancear, pero la RLS de
+  // assignment_variant_allocations (student_sees_own_allocation) solo expone las
+  // filas propias del estudiante — bajo el cliente de sesión, todo conteo daría
+  // siempre 0 en el primer acceso de cada estudiante, degenerando el balanceo a
+  // azar puro. Se usa el cliente de servicio solo para este agregado numérico
+  // (nunca se expone qué variante tiene cada estudiante, solo el total por
+  // variante), preservando la privacidad que la RLS protege para el resto del flujo.
+  const serviceSupabase = createServiceSupabaseClient();
   const allocationCounts: Record<string, number> = {};
 
   for (const variant of variants) {
-    const { count } = await supabase
+    const { count } = await serviceSupabase
       .from("assignment_variant_allocations")
       .select("id", { count: "exact", head: true })
       .eq("variant_group_id", groupId)
