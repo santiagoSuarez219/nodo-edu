@@ -24,11 +24,42 @@
     Docente A. Se necesitan varios para verificar el reparto balanceado de variantes.
 - Cliente MCP configurado con `assignment-mcp` (`ASSIGNMENT_API_BASE_URL` y
   `ASSIGNMENT_API_KEY`) y con `question-bank-mcp` disponible para consultar el banco.
+- **System prompt del Assignment Agent** disponible en `docs/mcps/assignment-agent.system-prompt.md`
+  para configurar en Claude Desktop. Ver sección "🔧 Configuración previa — Claude Desktop" abajo.
 - `npm run dev` levantado y `.env.local` apuntando al proyecto Supabase.
 
 ---
 
 ## Casos de prueba — Autoría vía MCP
+
+### 🔧 Configuración previa — Claude Desktop
+
+Para ejecutar los casos `TC-MCP-001` a `TC-MCP-013`, configura Claude Desktop con el Assignment Agent:
+
+1. **Obtén el system prompt:**
+   - Ruta: `docs/mcps/assignment-agent.system-prompt.md`
+   - Este archivo incluye el rol, las 9 capacidades del MCP, restricciones y el flujo típico de trabajo.
+
+2. **Crea una custom instruction en Claude Desktop:**
+   - Abre Claude Desktop settings → "Custom Instructions"
+   - Copia el contenido completo de `assignment-agent.system-prompt.md`
+   - Guarda.
+
+3. **Asegúrate que `assignment-mcp` esté disponible:**
+   - El servidor MCP debe estar corriendo en tu máquina (`mcp-servers/assignment-mcp/`).
+   - Configura la URL (`ASSIGNMENT_API_BASE_URL`) y la API key (`ASSIGNMENT_API_KEY`) en las variables de entorno.
+   - El servidor expone 9 herramientas: `list_academic_courses`, `list_assignment_groups`, `get_assignment_group`, `create_assignment_group`, `update_assignment_group`, `replace_variant_questions`, `delete_assignment_group`, `publish_assignment_group`, `get_variant_allocations`.
+
+4. **También necesitarás acceso a `question-bank-mcp`:**
+   - El Assignment Agent puede invocar `list_questions` y `get_question` del Question Bank MCP para explorar el banco antes de armar variantes.
+   - Asegúrate que `question-bank-mcp` esté también disponible.
+
+5. **Estructura de prueba:**
+   - Cada caso `TC-MCP-NNN` te pedirá que uses una herramienta específica.
+   - Copia la entrada de prueba, pásala al agente, y verifica que el output coincida con lo esperado.
+   - Marca el caso como ✅ Aprobado cuando pase.
+
+---
 
 ### TC-MCP-001 — Listar los cursos académicos del docente
 **Herramienta probada:** `list_academic_courses` en `assignment-mcp`
