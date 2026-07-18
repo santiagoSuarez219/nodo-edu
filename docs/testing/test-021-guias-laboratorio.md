@@ -22,7 +22,7 @@
 **Resultado esperado:** La guía `lab-01-listas-enlazadas` aparece como un ítem
 más del índice, **intercalada en la secuencia** según su `order` (entre las
 lecciones que la rodean), no agrupada al final ni en una sección aparte.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-002 — La guía se distingue visualmente de una lección
 **Precondición:** La misma de TC-001.
@@ -33,7 +33,7 @@ tipo distinto (icono/etiqueta propia en lugar del badge numérico de clase). La
 diferencia no depende solo del color: sigue siendo perceptible en escala de
 grises y el ítem expone su naturaleza al lector de pantalla (texto accesible
 tipo "Guía de laboratorio").
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-003 — Abrir la guía renderiza el contenido del `.md`
 **Precondición:** La misma de TC-001.
@@ -42,7 +42,7 @@ tipo "Guía de laboratorio").
 **Resultado esperado:** La página carga y muestra el contenido del archivo
 `.md`: títulos, listas, tablas y bloques de código con resaltado de sintaxis, con
 el mismo tratamiento tipográfico que un artículo de lección.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-004 — El header de la guía no la llama "Clase"
 **Precondición:** Estar en la página de la guía.
@@ -51,7 +51,7 @@ el mismo tratamiento tipográfico que un artículo de lección.
 **Resultado esperado:** El eyebrow del header identifica la pieza como guía
 (p. ej. "Estructuras de datos · Guía de laboratorio"), **no** como
 "Estructuras de datos · Clase NN".
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-005 — La guía no muestra sección de asistencia
 **Precondición:** Estudiante matriculado, **con una sesión de asistencia abierta**
@@ -62,7 +62,7 @@ en el curso (para que en una lección normal la sección sí aparezca).
 **Resultado esperado:** En la guía **no** aparece ningún bloque de asistencia:
 ni el formulario de código, ni el mensaje "sesión no abierta", ni "ya
 registraste asistencia".
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-006 — La guía no muestra autoevaluación
 **Precondición:** Estudiante matriculado.
@@ -72,7 +72,7 @@ registraste asistencia".
 2. Abrir la guía.
 **Resultado esperado:** En la guía **no** aparece la sección de autoevaluación
 ni ningún formulario de preguntas.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-007 — La guía no muestra el cierre ni el botón "completar"
 **Precondición:** Estudiante matriculado.
@@ -80,7 +80,7 @@ ni ningún formulario de preguntas.
 1. Desplazarse hasta el final de la página de la guía.
 **Resultado esperado:** No hay bloque de cierre de lección ni botón "Marcar como
 completada" / "Completar lección". El contenido termina en la paginación.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-008 — La guía no altera la barra de progreso
 **Precondición:** Estudiante matriculado. Anotar el porcentaje y el
@@ -91,7 +91,7 @@ completada" / "Completar lección". El contenido termina en la paginación.
 **Resultado esperado:** El denominador `N` **no** incluye la guía y el
 porcentaje no cambió por haberla visitado. El conteo es idéntico al anotado
 antes de la prueba.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-009 — La guía nunca es destino del redirect de reanudación
 **Precondición:** Estudiante matriculado cuyo punto de reanudación natural
@@ -101,7 +101,7 @@ guía**; es decir, completar todas las lecciones anteriores a la guía.
 1. Navegar a `/estructuras-de-datos`.
 **Resultado esperado:** El redirect cae en una **lección**, saltándose la guía.
 La URL final nunca es la de la guía.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
 
 ### TC-010 — Paginación anterior/siguiente atraviesa la guía
 **Precondición:** Estar en la lección inmediatamente anterior a la guía.
