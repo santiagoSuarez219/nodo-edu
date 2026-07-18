@@ -52,6 +52,16 @@
   --radius-lg: 16px;
 }
 
+/* Ocultar barra de scroll en todo el proyecto sin perder el scroll funcional
+   (rueda, teclado, touch, drag siguen operativos; solo se oculta el thumb visual) */
+* {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE y Edge legacy */
+}
+*::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Edge Chromium */
+}
+
 /* Shiki dual theme — rehype-pretty-code emite vars --shiki-light / --shiki-dark */
 .mdx-content code[data-theme],
 .mdx-content code[data-theme] span {
@@ -70,8 +80,3 @@
   background-color: var(--shiki-dark-bg);
 }
 
-/* Inline code (rehype-pretty-code marca con data-inline-code) */
-.mdx-content code[data-inline-code] {
-  padding: 0.15rem 0.3rem;
-  border-radius: var(--radius-xs);
-}

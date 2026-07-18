@@ -1,0 +1,78 @@
+---
+title: "Implementación de pilas en Java"
+summary: "Implementación de una pila (stack) genérica en Java usando un arreglo dinámico, con las operaciones fundamentales `push`, `pop` y `peek`."
+updatedAt: 2026-07-18
+---
+
+Una **pila** (o *stack*) es un TAD que sigue la disciplina LIFO
+(*Last In, First Out*): el último elemento en entrar es el primero en salir.
+En Java podemos implementarla apoyándonos en un arreglo dinámico interno o en
+una lista enlazada. Aquí usamos un arreglo dinámico por simplicidad y
+localidad de referencia.
+
+Las tres operaciones fundamentales son `push` (apilar), `pop` (desapilar) y
+`peek` (consultar el tope sin eliminarlo). Todas se resuelven en tiempo
+**O(1)** amortizado.
+
+```java
+public class Pila<T> {
+    private Object[] elementos;
+    private int tope;
+
+    public Pila(int capacidadInicial) {
+        this.elementos = new Object[capacidadInicial];
+        this.tope = -1;
+    }
+
+    public void push(T valor) {
+        if (tope + 1 == elementos.length) {
+            redimensionar();
+        }
+        elementos[++tope] = valor;
+    }
+
+    @SuppressWarnings("unchecked")
+    public T pop() {
+        if (estaVacia()) {
+            throw new IllegalStateException("La pila está vacía");
+        }
+        T valor = (T) elementos[tope];
+        elementos[tope--] = null;
+        return valor;
+    }
+
+    @SuppressWarnings("unchecked")
+    public T peek() {
+        if (estaVacia()) {
+            throw new IllegalStateException("La pila está vacía");
+        }
+        return (T) elementos[tope];
+    }
+
+    public boolean estaVacia() {
+        return tope == -1;
+    }
+
+    private void redimensionar() {
+        Object[] nuevo = new Object[elementos.length * 2];
+        System.arraycopy(elementos, 0, nuevo, 0, elementos.length);
+        elementos = nuevo;
+    }
+}
+```
+
+Nota cómo `redimensionar` duplica la capacidad cuando el arreglo se llena,
+en lugar de crecer de a uno: esto mantiene el costo **amortizado** de `push`
+en O(1) a pesar de que una redimensión individual cueste O(n).
+
+Un caso de uso clásico es la verificación de paréntesis balanceados, donde la
+línea de inicialización del validador —a propósito larga para efectos de esta
+nota— puede quedar así:
+
+```java
+Map<Character, Character> parPorApertura = Map.of('(', ')', '[', ']', '{', '}', '<', '>', '«', '»', '⟨', '⟩');
+```
+
+Al invocar `pila.push(elemento)` dentro de un bucle, cada apertura se apila y
+cada cierre se compara contra `pila.pop()`; si no coinciden, la expresión no
+está balanceada.

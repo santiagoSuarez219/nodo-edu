@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Course } from "@/lib/courses/types";
 import { LessonSidebarItem } from "./LessonSidebarItem";
+import { CourseProgressBar } from "./CourseProgressBar";
 
 interface LessonSidebarProps {
   course: Course;
@@ -14,6 +15,12 @@ export function LessonSidebar({
   completedLessonSlugs = new Set(),
 }: LessonSidebarProps) {
   const ordered = [...course.lessons].sort((a, b) => a.order - b.order);
+
+  const publishedLessons = course.lessons.filter((l) => l.articleSlug !== null);
+  const total = publishedLessons.length;
+  const completed = publishedLessons.filter((l) =>
+    completedLessonSlugs.has(l.slug)
+  ).length;
 
   return (
     <nav
@@ -31,6 +38,7 @@ export function LessonSidebar({
           {course.title}
         </Link>
       </div>
+      <CourseProgressBar completed={completed} total={total} />
       <ol className="list-none space-y-0.5">
         {ordered.map((lesson) => (
           <LessonSidebarItem

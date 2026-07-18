@@ -4,7 +4,8 @@ import { revalidatePath } from "next/cache";
 import { createServerSupabaseClient } from "@/lib/auth/server";
 import { getCurrentUser } from "@/lib/auth/session";
 import { hasCourseAccess } from "@/lib/enrollments/access";
-import type { LessonProgress } from "./types";
+import { getSelfAssessmentStatus } from "@/lib/self-assessment";
+import type { LessonProgress, MarkLessonCompletedResult } from "./types";
 
 export async function getLessonProgress(
   courseSlug: string,
@@ -64,12 +65,21 @@ export async function markLessonViewed(
 export async function markLessonCompleted(
   courseSlug: string,
   lessonSlug: string
-): Promise<void> {
+): Promise<MarkLessonCompletedResult> {
   const user = await getCurrentUser();
-  if (!user) return;
+  if (!user) {
+    return { ok: false, reason: "not_authenticated" };
+  }
 
   const access = await hasCourseAccess(courseSlug);
-  if (!access.ok || access.reason !== "enrolled") return;
+  if (!access.ok || access.reason !== "enrolled") {
+    return { ok: false, reason: "not_enrolled" };
+  }
+
+  const status = await getSelfAssessmentStatus(courseSlug, lessonSlug);
+  if (status.requiresAttempt && !status.hasAttempt) {
+    return { ok: false, reason: "self_assessment_pending" };
+  }
 
   const supabase = await createServerSupabaseClient();
   await supabase.from("lesson_progress").upsert(
@@ -84,6 +94,8 @@ export async function markLessonCompleted(
 
   revalidatePath(`/${courseSlug}/${lessonSlug}`);
   revalidatePath("/cuenta/cursos");
+
+  return { ok: true };
 }
 
 export async function markLessonUncompleted(

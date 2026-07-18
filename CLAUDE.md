@@ -208,13 +208,30 @@ npm run lint
 > ⚠️ Nunca escribas valores reales de variables de entorno en este archivo
 > ni en ningún archivo rastreado por git.
 
+> ⚠️ **Este proyecto no tiene un entorno local de Supabase separado.**
+> `NEXT_PUBLIC_SUPABASE_URL` en `.env.local` apunta directamente al proyecto
+> Supabase remoto (`academy-page`, ref `bgiimadnmqnoqmdbudpo`) — no a una
+> instancia local levantada con `supabase start`. Aunque exista un contenedor
+> Docker local (`supabase_db_...`), `npm run dev` **no** lo consume; verificar
+> el estado de una tabla contra ese contenedor dará falsos negativos. Ver
+> "Base de datos" para las implicaciones sobre migraciones.
+
 ---
 
 ## Base de datos
 
 - Proveedor: **Supabase Postgres**.
-- Cuando hagas modificaciones al esquema, crea siempre una migración para producción.
-- Nunca ejecutar migraciones en entornos distintos al local sin confirmación explícita.
+- Cuando hagas modificaciones al esquema, crea siempre una migración.
+- **Este proyecto usa un único entorno Supabase** (no hay local/producción
+  separados; ver "Variables de entorno"). `supabase db push` aplica las
+  migraciones pendientes a ese mismo proyecto — es el flujo normal de
+  desarrollo aquí, confirmado explícitamente por el usuario, y no debe
+  tratarse como un riesgo de "migración en producción sin confirmar".
+  Aun así, pedir confirmación antes de ejecutar `supabase db push` sigue
+  aplicando como buena práctica general (ver "Acciones prohibidas").
+- Para verificar que una migración se aplicó: `supabase migration list`
+  (columnas Local y Remote deben coincidir) o una consulta REST contra
+  `NEXT_PUBLIC_SUPABASE_URL` — no contra un contenedor Docker local.
 - Row Level Security habilitado; verificar políticas antes de añadir nuevas tablas.
 
 ---
@@ -696,6 +713,13 @@ development ──merge──▶ deploy/vX.Y.Z ──merge──▶ main ──p
 ---
 
 ### Migraciones de base de datos — Supabase
+
+> Nota: este proyecto usa un único proyecto Supabase para desarrollo y
+> producción (ver "Variables de entorno" y "Base de datos"), así que
+> `supabase db push` sin `--project-ref` ya apunta al proyecto correcto.
+> Los comandos con `--project-ref` explícito de abajo son para cuando se
+> gestionan migraciones desde una máquina sin el proyecto enlazado
+> (`supabase link`).
 
 - Proveedor PostgreSQL gestionado con Storage, Auth y Realtime integrados.
 - Las migraciones se gestionan con la CLI de Supabase:
