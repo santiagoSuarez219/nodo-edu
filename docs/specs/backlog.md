@@ -5,6 +5,36 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+## DEBT-007 — `assignment_questions` no trae el enunciado de la pregunta en el flujo de resolución del estudiante
+
+**Origen:** spec-018 (TC-003), detectado al probar la UI admin de solo lectura
+**Prioridad:** Alta — bloquea que un estudiante pueda resolver una evaluación
+
+Al probar `TC-003` en `test-018-assignment-authoring.md` se descubrió que
+`AssignmentGroupDetail.tsx` mostraba `question_id` truncado en vez del
+enunciado real de la pregunta. La causa: `_getGroupByIdForActor` en
+`lib/assignments/index.ts` (y su equivalente en `service.ts`,
+`getGroupDetail`) seleccionaban `assignment_questions` con `select("*")`, sin
+`join` a `questions` para traer `stem`/`type`. **Ya corregido** para el path
+admin (`_getGroupByIdForActor` y `getGroupDetail`) durante spec-018.
+
+Quedan sin corregir, mismo problema, en `lib/assignments/index.ts`:
+- `_getActiveAssignmentsByEnrollmentForActor`
+- `_getStudentAssignmentForActor`
+- `_getOrAllocateVariantForActor`
+
+Estas tres funciones alimentan el flujo de **resolución de examen del
+estudiante** (spec-019, aún no implementado), fuera del alcance de spec-018.
+Sin este fix, un estudiante vería IDs en vez de preguntas al intentar
+resolver una evaluación.
+
+**Acción:** Al implementar spec-019, aplicar el mismo `select("*, question:questions(id, stem, type)")`
+(o los campos adicionales que la UI de resolución necesite: `code_snippet`,
+`code_language`, choices vía `question_choices`, etc.) en las tres funciones
+listadas arriba antes de dar por completo el flujo de resolución.
+
+---
+
 ## DEBT-006 — `course.lessons` mezcla dos tipos de nodo; guard de dominio en progreso
 
 **Origen:** spec-021 (guías de laboratorio)

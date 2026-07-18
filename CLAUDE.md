@@ -301,6 +301,7 @@ docs/
 | MCP               | Propósito                          | Estado     | System prompt                              |
 |-------------------|------------------------------------|------------|--------------------------------------------|
 | `question-bank-mcp` | Cliente de la API `/api/questions/*` para que un agente docente liste, cree, actualice, elimine y publique preguntas del banco de evaluaciones (multiple_choice, open_text, code_snippet, code_write, coding_challenge). | Activo | `docs/mcps/question-bank-agent.system-prompt.md` |
+| `assignment-mcp` | Cliente de la API `/api/assignments/*` para que un agente docente diseñe evaluaciones formadas por 3 variantes (A/B/C) de preguntas distintas, publique con validación de invariantes, y monitoree el reparto aleatorio a estudiantes. | Activo | `docs/mcps/assignment-agent.system-prompt.md` |
 | `attendance-mcp` | Cliente de solo lectura de la API `/api/attendance/*` para que un agente docente liste sesiones de asistencia, consulte roster y resúmenes de asistencia por estudiante. | Activo | `docs/mcps/attendance-agent.system-prompt.md` |
 
 ### Reglas de gestión de MCPs
@@ -339,6 +340,100 @@ Descripción del agente: qué es, para quién trabaja y cuál es su objetivo.
 ## Tono y formato de respuesta
 {{Instrucciones de estilo: formal/informal, idioma, longitud de respuestas, etc.}}
 ```
+
+### Claude Desktop — Configuración de MCPs
+
+Para ejecutar agentes con MCPs locales en Claude Desktop:
+
+#### Ubicación del archivo de configuración
+- **Ruta:** `~/.claude/claude_desktop_config.json` (o en macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`)
+- Este archivo contiene las definiciones de todos los servidores MCP disponibles.
+- **Nunca commitear valores reales de API keys en este archivo.**
+
+#### Estructura de un MCP en `claude_desktop_config.json`
+
+```json
+{
+  "mcpServers": {
+    "{{nombre-mcp}}": {
+      "command": "node",
+      "args": [
+        "/ruta/absoluta/al/mcp-servers/{{nombre-mcp}}/dist/index.js"
+      ],
+      "env": {
+        "{{VAR_API_BASE_URL}}": "http://localhost:3000/api/{{ruta}}",
+        "{{VAR_API_KEY}}": "{{api-key-para-desarrollo}}"
+      }
+    }
+  }
+}
+```
+
+#### Configuración actual de MCPs locales
+
+| MCP | Comando | Variables de entorno |
+|-----|---------|----------------------|
+| `question-bank-mcp` | `node /path/to/mcp-servers/question-bank-mcp/dist/index.js` | `QUESTION_BANK_API_BASE_URL=http://localhost:3000/api/questions`, `QUESTION_BANK_API_KEY={{key}}` |
+| `assignment-mcp` | `node /path/to/mcp-servers/assignment-mcp/dist/index.js` | `ASSIGNMENT_API_BASE_URL=http://localhost:3000/api/assignments`, `ASSIGNMENT_API_KEY={{key}}` |
+| `attendance-mcp` | `node /path/to/mcp-servers/attendance-mcp/dist/index.js` | `API_BASE_URL=http://localhost:3000/api`, `API_KEY={{key}}` |
+
+#### Pasos para agregar un MCP a Claude Desktop
+
+1. **Compilar el servidor MCP** (si es necesario):
+   ```bash
+   cd mcp-servers/{{nombre-mcp}}
+   npm run build
+   ```
+
+2. **Obtener la ruta absoluta** del archivo compilado:
+   ```bash
+   pwd  # desde la carpeta del MCP
+   # Anota: /Users/santiagosuarez/Documents/03-Proyectos/02-Educational-Page/mcp-servers/{{nombre-mcp}}/dist/index.js
+   ```
+
+3. **Editar `claude_desktop_config.json`** y agregar una entrada en `mcpServers`:
+   ```json
+   "{{nombre-mcp}}": {
+     "command": "node",
+     "args": ["/ruta/absoluta/a/mcp-servers/{{nombre-mcp}}/dist/index.js"],
+     "env": {
+       "{{VAR1}}": "valor",
+       "{{VAR2}}": "valor"
+     }
+   }
+   ```
+
+4. **Reiniciar Claude Desktop** para que cargue la nueva configuración.
+
+5. **Verificar disponibilidad** en Claude Desktop:
+   - Abre una conversación.
+   - Busca las herramientas del MCP en la interfaz de MCPs.
+   - Prueba una herramienta simple (ej. `list_questions` para question-bank-mcp).
+
+#### Guía de seguridad
+
+- **Nunca commitear credenciales reales** en `claude_desktop_config.json` ni en archivos de configuración del proyecto.
+- Usar **API keys de desarrollo local** que sean diferentes de las de producción.
+- Si cambias una API key:
+  1. Actualiza `claude_desktop_config.json` localmente.
+  2. Reinicia Claude Desktop.
+  3. Verifica que los MCPs funcionen.
+  4. **Nunca** hagas commit de la clave.
+
+#### Validación de MCPs
+
+Para verificar que un MCP está correctamente configurado:
+
+1. **Desde Claude Desktop:**
+   - En una conversación, menciona el agente (ej. "actúa como Assignment Agent").
+   - Copia el system prompt desde `docs/mcps/{{nombre}}.system-prompt.md`.
+   - Intenta invocar una herramienta sencilla del MCP (ej. `list_academic_courses`).
+
+2. **Desde línea de comandos** (si el MCP expone stdio):
+   ```bash
+   node mcp-servers/{{nombre-mcp}}/dist/index.js 2>&1 | head -20
+   ```
+   Deberías ver un mensaje de inicialización o conexión.
 
 ---
 
