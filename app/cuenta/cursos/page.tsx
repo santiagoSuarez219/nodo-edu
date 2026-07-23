@@ -17,7 +17,7 @@ export default async function MisCursosPage({ searchParams }: MisCursosPageProps
   const noAccessCourse = params.sinAcceso;
 
   return (
-    <main className="flex-1 w-full max-w-2xl mx-auto px-4 md:px-6 pt-6 pb-14 flex flex-col gap-6">
+    <main className="flex-1 pt-6 pb-14 flex flex-col gap-6">
       <div>
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">
           Mis cursos

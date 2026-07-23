@@ -6,8 +6,8 @@ interface ResearchGroupHeroProps {
 
 export function ResearchGroupHero({ group }: ResearchGroupHeroProps) {
   return (
-    <section className="px-6 lg:px-18 py-12 lg:py-16 border-b border-gray-200 dark:border-gray-700">
-      <div className="w-full 2xl:max-w-7xl mx-auto flex flex-col gap-6">
+    <section className="px-4 md:px-6 lg:px-18 py-12 lg:py-16 border-b border-gray-200 dark:border-gray-700">
+      <div className="flex flex-col gap-6">
         <span className="inline-flex px-3 py-1.5 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-xs font-bold uppercase tracking-wide w-fit">
           Grupo de Investigación
         </span>

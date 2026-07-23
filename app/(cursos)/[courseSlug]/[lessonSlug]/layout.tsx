@@ -28,8 +28,8 @@ export default async function LessonLayout({
   );
 
   return (
-    <main className="flex-1 bg-white dark:bg-gray-900">
-      <div className="mx-auto w-full 2xl:max-w-7xl px-4 md:px-6 lg:px-18 py-6 lg:py-10 lg:grid lg:grid-cols-[280px_1fr] lg:gap-10">
+    <main className="flex-1 bg-white dark:bg-gray-900 w-full max-w-7xl mx-auto px-4 md:px-6 lg:px-18 py-6 lg:py-10">
+      <div className="lg:grid lg:grid-cols-[280px_1fr] lg:gap-10">
         <aside className="hidden lg:block lg:sticky lg:top-24 lg:self-start lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-3">
           <LessonSidebar
             course={course}

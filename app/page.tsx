@@ -14,8 +14,8 @@ export default async function Home() {
   const courses = await getAllCourses();
 
   return (
-    <main className="bg-white dark:bg-gray-900 mt-19 pt-6 lg:pt-16">
-      <div className="w-full 2xl:max-w-7xl lg:px-18 mx-auto px-6 pb-6 lg:pb-16">
+    <main className="bg-white dark:bg-gray-900 mt-19 pt-6 lg:pt-16 w-full max-w-7xl mx-auto">
+      <div className="px-4 md:px-6 lg:px-18 pb-6 lg:pb-16">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">
             Cursos
@@ -32,7 +32,7 @@ export default async function Home() {
 
       <div className="border-t border-gray-200 dark:border-gray-700" />
 
-      <div className="w-full 2xl:max-w-7xl lg:px-18 mx-auto px-6 py-8">
+      <div className="px-4 md:px-6 lg:px-18 py-8">
         <LandingFooter links={FOOTER_LINKS} />
       </div>
     </main>

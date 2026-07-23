@@ -1,7 +1,7 @@
 export function OtherSeedbedsCta() {
   return (
-    <section className="px-6 lg:px-18 py-12 lg:py-16">
-      <div className="w-full 2xl:max-w-7xl mx-auto">
+    <section className="px-4 md:px-6 lg:px-18 py-12 lg:py-16">
+      <div>
         <div className="flex justify-between items-center gap-6 p-7 bg-blue-100 dark:bg-blue-900/30 rounded-lg border border-blue-200 dark:border-blue-800">
           <div>
             <h2 className="text-lg font-bold text-blue-900 dark:text-blue-300 mb-1">
