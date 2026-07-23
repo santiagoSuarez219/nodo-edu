@@ -55,14 +55,14 @@ export default async function CoursePresentationPage({ params }: Props) {
   );
 
   return (
-    <main className="flex-1 bg-white dark:bg-gray-900">
+    <main className="flex-1 bg-white dark:bg-gray-900 w-full max-w-7xl mx-auto">
       <CoursePresentation presentation={presentation} cta={cta} />
 
       <InstructorFooter instructor={TRANSVERSAL_INSTRUCTOR} />
 
       <div className="border-t border-gray-200 dark:border-gray-700" />
 
-      <div className="w-full 2xl:max-w-7xl lg:px-18 mx-auto px-6 py-8">
+      <div className="px-4 md:px-6 lg:px-18 py-8">
         <LandingFooter links={FOOTER_LINKS} />
       </div>
     </main>
