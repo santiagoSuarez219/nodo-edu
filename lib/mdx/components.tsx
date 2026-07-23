@@ -5,6 +5,7 @@ import Image from "next/image";
 import { MermaidDiagram } from "@/components/mdx/MermaidDiagram";
 import { Callout } from "@/components/mdx/Callout";
 import { Tabs, Tab } from "@/components/mdx/Tabs";
+import { YouTubeEmbed } from "@/components/mdx/YouTubeEmbed";
 
 function isInternal(href: string): boolean {
   return href.startsWith("/") || href.startsWith("#");
@@ -158,4 +159,5 @@ export const mdxComponents: MDXComponents = {
   Callout,
   Tabs,
   Tab,
+  YouTubeEmbed,
 };
