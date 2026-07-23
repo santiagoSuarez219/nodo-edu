@@ -1,4 +1,4 @@
-# spec-023 — [IN PROGRESS] Sección pública del grupo de investigación
+# spec-023 — [DONE] Sección pública del grupo de investigación
 
 ## Contexto
 
