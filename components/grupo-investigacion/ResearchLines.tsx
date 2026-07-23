@@ -12,7 +12,7 @@ export function ResearchLines({ lines }: ResearchLinesProps) {
           Líneas de investigación
         </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2  gap-6">
           {lines.map((line, idx) => (
             <div
               key={idx}

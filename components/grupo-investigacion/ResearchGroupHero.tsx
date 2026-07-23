@@ -36,10 +36,7 @@ export function ResearchGroupHero({ group }: ResearchGroupHeroProps) {
             </h3>
             <div className="flex flex-col sm:flex-row gap-3 text-sm text-gray-600 dark:text-gray-400 mt-1">
               <span className="flex items-center gap-1 whitespace-nowrap">
-                ✉ {group.leader.email}
-              </span>
-              <span className="flex items-center gap-1 whitespace-nowrap">
-                ☎ {group.leader.phone}
+                {group.leader.email}
               </span>
             </div>
           </div>
