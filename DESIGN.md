@@ -115,20 +115,18 @@ Decisiones de diseño para la plataforma educativa. Stack visual: **Flowbite + T
 
 ### Implementación
 
-El toggle persiste en `localStorage` con clave `'color-theme'` (`'dark'` | `'light'`).
+No hay toggle manual: el tema sigue siempre la preferencia del sistema operativo
+(`prefers-color-scheme`), sin persistencia en `localStorage`.
 
 ```javascript
 // Pegar en el <head> antes del bundle para evitar FOUC
-if (
-  localStorage.getItem('color-theme') === 'dark' ||
-  (!('color-theme' in localStorage) &&
-    window.matchMedia('(prefers-color-scheme: dark)').matches)
-) {
-  document.documentElement.classList.add('dark');
-} else {
-  document.documentElement.classList.remove('dark');
-}
+var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+document.documentElement.classList.toggle('dark', prefersDark);
 ```
+
+Además, un componente cliente (`components/ThemeInit.tsx`) escucha el evento
+`change` de `matchMedia('(prefers-color-scheme: dark)')` para actualizar el
+tema en vivo si el usuario cambia la preferencia del sistema sin recargar la página.
 
 ```css
 /* globals.css — Tailwind v4 */

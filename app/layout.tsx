@@ -4,6 +4,7 @@ import Script from "next/script";
 import "./globals.css";
 import { AnnouncementBar } from "@/components/navbar/AnnouncementBar";
 import { Navbar } from "@/components/navbar/Navbar";
+import { ThemeInit } from "@/components/ThemeInit";
 import { getCurrentProfile, getCurrentRoles } from "@/lib/auth/session";
 
 const jetbrainsMono = JetBrains_Mono({
@@ -21,13 +22,8 @@ export const metadata: Metadata = {
 const themeInitScript = `
 (function () {
   try {
-    var stored = localStorage.getItem('color-theme');
     var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    if (stored === 'dark' || (!stored && prefersDark)) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
+    document.documentElement.classList.toggle('dark', prefersDark);
   } catch (_) {}
 })();
 `;
@@ -52,6 +48,7 @@ export default async function RootLayout({
           strategy="beforeInteractive"
           dangerouslySetInnerHTML={{ __html: themeInitScript }}
         />
+        <ThemeInit />
         <div className="sticky top-0 left-0 w-full z-50">
           <AnnouncementBar />
           <Navbar profile={profile} roles={roles} />

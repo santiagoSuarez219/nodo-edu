@@ -2,17 +2,20 @@
 
 import { useEffect } from "react";
 
+function applyTheme(prefersDark: boolean) {
+  try {
+    document.documentElement.classList.toggle("dark", prefersDark);
+  } catch (_) {}
+}
+
 export function ThemeInit() {
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem("color-theme");
-      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-      if (stored === "dark" || (!stored && prefersDark)) {
-        document.documentElement.classList.add("dark");
-      } else {
-        document.documentElement.classList.remove("dark");
-      }
-    } catch (_) {}
+    const media = window.matchMedia("(prefers-color-scheme: dark)");
+    applyTheme(media.matches);
+
+    const handleChange = (event: MediaQueryListEvent) => applyTheme(event.matches);
+    media.addEventListener("change", handleChange);
+    return () => media.removeEventListener("change", handleChange);
   }, []);
 
   return null;

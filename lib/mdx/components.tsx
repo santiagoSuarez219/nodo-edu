@@ -2,6 +2,9 @@ import type { MDXComponents } from "mdx/types";
 import type { ComponentPropsWithoutRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { MermaidDiagram } from "@/components/mdx/MermaidDiagram";
+import { Callout } from "@/components/mdx/Callout";
+import { Tabs, Tab } from "@/components/mdx/Tabs";
 
 function isInternal(href: string): boolean {
   return href.startsWith("/") || href.startsWith("#");
@@ -145,4 +148,14 @@ export const mdxComponents: MDXComponents = {
     }
     return <code {...props} />;
   },
+  div: (props: ComponentPropsWithoutRef<"div"> & { "data-mermaid-source"?: string }) => {
+    const source = props["data-mermaid-source"];
+    if (typeof source === "string") {
+      return <MermaidDiagram source={source} />;
+    }
+    return <div {...props} />;
+  },
+  Callout,
+  Tabs,
+  Tab,
 };
