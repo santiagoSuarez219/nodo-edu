@@ -121,6 +121,39 @@ export function CoursePresentation({ presentation, cta }: Props) {
           </div>
         </section>
 
+        {/* Bibliography */}
+        <section className="flex flex-col gap-4 pb-8 lg:pb-12 border-b border-gray-200 dark:border-gray-700">
+          <h2 className="text-xl lg:text-2xl font-bold">Bibliografía</h2>
+          <div className="space-y-3">
+            {presentation.bibliography.map((book, idx) => (
+              <div
+                key={idx}
+                className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4"
+              >
+                <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                  {book.title}
+                </p>
+                <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                  {book.author}
+                </p>
+                {book.edition && (
+                  <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                    {book.edition}
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+          <a
+            href="https://www.itm.edu.co/biblioteca/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm font-semibold text-blue-700 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors inline-block mt-2"
+          >
+            Visita la biblioteca del ITM →
+          </a>
+        </section>
+
         {/* Two columns: Evaluation & Dates */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 pb-8 lg:pb-12 border-b border-gray-200 dark:border-gray-700">
           {/* Evaluation */}
@@ -129,11 +162,16 @@ export function CoursePresentation({ presentation, cta }: Props) {
             <div className="space-y-4">
               {presentation.evaluation.map((item) => (
                 <div key={item.name} className="flex flex-col gap-2">
-                  <div className="flex justify-between text-sm font-semibold">
-                    <span className="text-gray-900 dark:text-gray-100">
-                      {item.name}
-                    </span>
-                    <span className="text-gray-700 dark:text-gray-300 text-xs lg:text-sm">
+                  <div className="flex justify-between items-start gap-4">
+                    <div className="flex-1">
+                      <div className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                        {item.name}
+                      </div>
+                      <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                        {item.week}
+                      </p>
+                    </div>
+                    <span className="text-gray-700 dark:text-gray-300 text-xs lg:text-sm font-semibold flex-shrink-0">
                       {item.pct}%
                     </span>
                   </div>
@@ -162,7 +200,7 @@ export function CoursePresentation({ presentation, cta }: Props) {
                   key={`${item.date}-${item.label}`}
                   className="flex gap-4 py-3 border-b border-gray-200 dark:border-gray-700 last:border-b-0 text-sm"
                 >
-                  <span className="font-bold text-blue-700 dark:text-blue-400 w-16 flex-shrink-0">
+                  <span className="font-bold text-blue-700 dark:text-blue-400 w-32 flex-shrink-0">
                     {item.date}
                   </span>
                   <span className="text-gray-700 dark:text-gray-300">
@@ -179,7 +217,7 @@ export function CoursePresentation({ presentation, cta }: Props) {
           <h2 className="text-xl lg:text-2xl font-bold">
             Condiciones del curso
           </h2>
-          <ul className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
+          <ul className="space-y-2 text-sm text-gray-700 dark:text-gray-300 text-justify">
             {presentation.conditions.map((condition) => (
               <li key={condition} className="ml-6 list-disc leading-relaxed">
                 {condition}

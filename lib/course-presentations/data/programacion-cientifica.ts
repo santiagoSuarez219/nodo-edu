@@ -107,26 +107,32 @@ export const programacionCientifica: CoursePresentation = {
     {
       name: "Momento 1: Programación con Python",
       pct: 15,
+      week: "Semanas 2-3",
     },
     {
       name: "Momento 2: Estructuras de datos + POO",
       pct: 15,
+      week: "Semanas 5-7",
     },
     {
       name: "Momento 3: NumPy",
       pct: 15,
+      week: "Semanas 9-10",
     },
     {
       name: "Momento 4: Pandas (proyecto integrador)",
       pct: 15,
+      week: "Semanas 12-13",
     },
     {
       name: "Momento 5: Matplotlib y Seaborn (portafolio + presentación final)",
       pct: 20,
+      week: "Semana 15",
     },
     {
       name: "Seguimiento continuo",
       pct: 20,
+      week: "A lo largo del curso",
     },
   ],
   dates: [
@@ -140,6 +146,17 @@ export const programacionCientifica: CoursePresentation = {
       label: "Cierre Momento 5 (Portafolio y presentación final)",
     },
     { date: "26 nov", label: "Exámenes finales" },
+  ],
+  bibliography: [
+    {
+      title: "Python for Data Analysis",
+      author: "Wes McKinney",
+      edition: "3rd Edition",
+    },
+    {
+      title: "Computational Physics with Python",
+      author: "Paul Gessler, Jeffrey Karp",
+    },
   ],
   conditions: TRANSVERSAL_CONDITIONS,
 };

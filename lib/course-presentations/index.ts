@@ -29,4 +29,5 @@ export type {
   EvaluationItem,
   ImportantDate,
   Instructor,
+  BibliographyItem,
 } from "./types";

@@ -28,7 +28,7 @@ export const Navbar = ({
     <>
       <nav className="w-full bg-white/90 dark:bg-gray-900/90 backdrop-blur border-b border-gray-200 dark:border-gray-700 transition-colors duration-300 ">
         <div className="flex items-center justify-between w-full mx-auto px-4 md:px-6 lg:px-18 py-3 lg:py-4">
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-6 flex-1">
             <Link
               href="/"
               className="bg-white rounded-lg py-1 px-2"
@@ -43,13 +43,15 @@ export const Navbar = ({
                 className="overflow-hidden"
               />
             </Link>
-            <Link
-              href="/grupo-investigacion"
-              onClick={closeMenu}
-              className="hidden lg:inline-flex text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-blue-700 dark:hover:text-blue-400 transition-colors"
-            >
-              Grupo de Investigación
-            </Link>
+            <div className="hidden lg:flex gap-6 items-center flex-1 justify-center">
+              <Link
+                href="/grupo-investigacion"
+                onClick={closeMenu}
+                className="hidden lg:inline-flex text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-blue-700 dark:hover:text-blue-400 transition-colors"
+              >
+                Grupo de Investigación
+              </Link>
+            </div>
           </div>
 
           <div className="flex gap-3 items-center">

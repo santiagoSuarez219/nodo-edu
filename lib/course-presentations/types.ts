@@ -8,6 +8,13 @@ export interface SyllabusUnit {
 export interface EvaluationItem {
   name: string;
   pct: number;
+  week: string;
+}
+
+export interface BibliographyItem {
+  title: string;
+  author: string;
+  edition?: string;
 }
 
 export interface ImportantDate {
@@ -39,5 +46,6 @@ export interface CoursePresentation {
   syllabus: SyllabusUnit[];
   evaluation: EvaluationItem[];
   dates: ImportantDate[];
+  bibliography: BibliographyItem[];
   conditions: string[];
 }

@@ -116,26 +116,32 @@ export const analisisDeAlgoritmos: CoursePresentation = {
     {
       name: "Laboratorio 1: Fundamentos, complejidad y recurrencias",
       pct: 15,
+      week: "Semanas 3-5",
     },
     {
       name: "Laboratorio 2: Dividir y vencer",
       pct: 15,
+      week: "Semanas 6-8",
     },
     {
       name: "Laboratorio 3: Algoritmos de ordenamiento",
       pct: 15,
+      week: "Semanas 9-11",
     },
     {
       name: "Laboratorio 4: Estructuras de datos",
       pct: 15,
+      week: "Semanas 12-13",
     },
     {
       name: "Laboratorio 5: Programación dinámica y algoritmos voraces",
       pct: 20,
+      week: "Semanas 14-16",
     },
     {
       name: "Seguimiento continuo",
       pct: 20,
+      week: "A lo largo del curso",
     },
   ],
   dates: [
@@ -159,6 +165,18 @@ export const analisisDeAlgoritmos: CoursePresentation = {
         "Cierre Laboratorio 5 y cierre del curso / Límite de cancelación de asignaturas",
     },
     { date: "23-29 nov", label: "Registro del 100 % evaluado" },
+  ],
+  bibliography: [
+    {
+      title: "Introduction to Algorithms",
+      author: "Thomas H. Cormen, Charles E. Leiserson, Ronald L. Rivest, Clifford Stein",
+      edition: "3rd Edition",
+    },
+    {
+      title: "Algorithm Design Manual",
+      author: "Steven S. Skiena",
+      edition: "2nd Edition",
+    },
   ],
   conditions: TRANSVERSAL_CONDITIONS,
 };

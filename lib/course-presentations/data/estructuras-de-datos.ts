@@ -128,39 +128,58 @@ export const estructurasDatos: CoursePresentation = {
     {
       name: "Momento 1: Programación orientada a objetos",
       pct: 15,
+      week: "Semana 5",
     },
     {
       name: "Momento 2: Listas",
       pct: 15,
+      week: "Semanas 10",
     },
     {
       name: "Momento 3: Manejo de archivos",
       pct: 15,
+      week: "Semana 11",
     },
     {
       name: "Momento 4: Pilas y colas",
       pct: 15,
+      week: "Semanas 13",
     },
     {
       name: "Momento 5: Proyecto final (árboles e integración)",
       pct: 20,
+      week: "Semanas 15-16",
     },
     {
       name: "Seguimiento continuo",
       pct: 20,
+      week: "A lo largo del curso",
     },
   ],
   dates: [
-    { date: "4 ago", label: "Inicio de clases" },
-    { date: "4 sep", label: "Cierre Momento 1 (POO)" },
-    { date: "9 oct", label: "Cierre Momento 2 (Listas)" },
-    { date: "16 oct", label: "Cierre Momento 3 (Manejo de archivos)" },
-    { date: "30 oct", label: "Cierre Momento 4 (Pilas y colas)" },
-    { date: "1 nov", label: "Registro del 60 %" },
-    { date: "22 nov", label: "Límite de cancelación de asignaturas" },
+    { date: "3 ago - 29 nov", label: "Desarrollo curricular" },
     {
-      date: "24-27 nov",
-      label: "Evaluación final",
+      date: "31 ago - 5 sep",
+      label: "Primera evaluación de estudiantes a docentes",
+    },
+    { date: "1 nov", label: "Registro del 60 %" },
+    {
+      date: "26 oct -  1 nov",
+      label: "Segunda evaluación de estudiantes a docentes",
+    },
+    { date: "23 nov - 29 nov", label: "Registro del 100 %" },
+    { date: "22 nov", label: "Límite de cancelación de asignaturas" },
+  ],
+  bibliography: [
+    {
+      title: "Introduction to Algorithms",
+      author: "Thomas H. Cormen, Charles E. Leiserson, Ronald L. Rivest, Clifford Stein",
+      edition: "3rd Edition",
+    },
+    {
+      title: "Data Structures and Algorithms in Java",
+      author: "Michael T. Goodrich, Roberto Tamassia",
+      edition: "6th Edition",
     },
   ],
   conditions: TRANSVERSAL_CONDITIONS,
