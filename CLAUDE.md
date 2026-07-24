@@ -14,7 +14,10 @@ Antes de cualquier tarea, Claude debe ejecutar estos pasos en orden:
 3. Revisar los subagentes disponibles en `/.claude/agents/` y las skills
    disponibles en `/.claude/skills/` para saber con qué capacidades cuenta
    antes de planificar la tarea.
-4. Listar los specs activos (`[IN PROGRESS]` o `[TESTING]`) en `docs/specs/`.
+4. Listar los specs de `docs/specs/` agrupados por estado: activos
+   (`[IN PROGRESS]` o `[TESTING]`) y pendientes de aprobación (`[NOT STARTED]`).
+   Si algún spec no tiene estado en el título, marcarlo como `[NOT STARTED]`
+   y reportarlo al usuario.
 5. Confirmar el repositorio activo y la rama actual con `git status`.
 6. Si hay contexto previo relevante (spec en curso, decisión de arquitectura,
    deuda técnica pendiente), pedirlo al usuario antes de proceder.
@@ -33,6 +36,12 @@ Antes de cualquier tarea, Claude debe ejecutar estos pasos en orden:
   riesgo de continuar sea alto (borrado de datos, cambios en producción, etc.).
 - Prefiere cambios quirúrgicos sobre refactors amplios no solicitados.
 - Para cualquier tarea que involucre UI, leer `DESIGN.md` antes de escribir código.
+- **Nunca inicies la implementación de un spec sin confirmación explícita del
+  usuario en esa misma sesión.** Redactar el spec y sus pruebas no autoriza a
+  escribir el código: son pasos distintos y cada uno requiere su aprobación.
+- **No abras ni controles el navegador** (navegación, automatización, capturas)
+  salvo que el usuario lo solicite explícitamente. Ver "Pruebas visuales y uso
+  del navegador".
 
 ---
 
@@ -468,6 +477,9 @@ Para verificar que un MCP está correctamente configurado:
 - Los tests e2e son responsabilidad de `@tester`, que los ejecuta como última
   fase de cada spec antes del merge a `development`; el archivo de test ya
   existe desde la redacción del spec.
+- La **ejecución** de las pruebas manuales la realiza el usuario sobre la UI;
+  Claude prepara los datos, guía el proceso y registra los hallazgos
+  (ver "Pruebas manuales asistidas por Claude").
 
 ---
 
@@ -484,13 +496,26 @@ Para verificar que un MCP está correctamente configurado:
 
 | Estado          | Significado                                                     |
 |-----------------|-----------------------------------------------------------------|
+| `[NOT STARTED]` | Spec redactado (con sus pruebas), sin implementación iniciada   |
 | `[IN PROGRESS]` | Implementación iniciada                                         |
 | `[TESTING]`     | Implementación completa, pendiente de pruebas manuales/e2e      |
 | `[DONE]`        | Pruebas superadas, listo para merge a `development`             |
 
+- **Todo spec que no esté en `[IN PROGRESS]`, `[TESTING]` o `[DONE]` debe estar
+  marcado explícitamente como `[NOT STARTED]`.** No existen specs sin estado en
+  el título: si Claude encuentra uno, debe marcarlo como `[NOT STARTED]` y
+  avisarlo al usuario.
+- Todo spec **nace en `[NOT STARTED]`**, junto con sus archivos de prueba. Ese
+  es su estado mientras espera la aprobación del usuario para implementarse.
+- Un spec puede permanecer en `[NOT STARTED]` indefinidamente (backlog, spec
+  planificado, spec pospuesto); eso no lo invalida ni autoriza a implementarlo.
+- Transición válida: `[NOT STARTED]` → `[IN PROGRESS]` → `[TESTING]` → `[DONE]`.
+  No saltarse estados ni retroceder sin avisar al usuario.
 - Los specs completados **no se borran**; se marcan con `[DONE]` en el título.
 - Solo specs en estado `[DONE]` con su archivo `test-NNN` correspondiente
   pueden hacer merge a `development`.
+- El paso de `[NOT STARTED]` a `[IN PROGRESS]` solo ocurre **después** de la
+  aprobación explícita del usuario para iniciar la implementación.
 
 ### Artefactos que acompañan al spec
 
@@ -520,7 +545,9 @@ Cada spec `spec-NNN-slug` nace junto con:
 ### Estructura mínima de un spec
 
 ```md
-# spec-NNN — [Estado] Título descriptivo
+# spec-NNN — [NOT STARTED] Título descriptivo
+> Estado inicial obligatorio: `[NOT STARTED]`.
+> Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.
 
 ## Contexto
 Por qué se necesita esta funcionalidad y qué problema resuelve.
@@ -571,6 +598,11 @@ no requiere exponer herramientas o datos a agentes.
 - **Manuales:** `docs/testing/test-NNN-slug.md` — casos `TC-NNN` (y `TC-MCP-NNN` si aplica).
 - **Automáticas (e2e/unit):** `{{ubicación e2e por definir}}/e2e-NNN-slug.spec.ts`
   — un caso por criterio de aceptación, en rojo desde el inicio (cuando exista framework).
+
+## Aprobación de implementación
+> Claude no escribe código de implementación hasta que esta sección esté marcada.
+- [ ] Paquete (spec + pruebas) aprobado por el usuario
+- **Fecha de aprobación:** {{fecha}}
 ```
 
 ---
@@ -594,10 +626,22 @@ no requiere exponer herramientas o datos a agentes.
      en rojo — cuando exista framework de testing (ver "Testing").
    - Invocar `@tester` para el diseño de los casos automáticos cuando aporte
      rigor al conjunto de pruebas.
-6. Guardar el spec en `docs/specs/` y los archivos de prueba en sus carpetas,
-   todos con la misma nomenclatura `NNN-slug`.
-7. Esperar aprobación del usuario del **paquete completo (spec + pruebas)**
-   antes de escribir el código de implementación.
+6. Guardar el spec en `docs/specs/` **con estado `[NOT STARTED]` en el título**
+   y los archivos de prueba en sus carpetas, todos con la misma nomenclatura
+   `NNN-slug`.
+7. **Detenerse y esperar la aprobación explícita del usuario del paquete
+   completo (spec + pruebas) antes de escribir una sola línea de código de
+   implementación.** Esta regla no admite excepciones:
+   - Aprobar el spec como documento **no** equivale a autorizar la implementación:
+     debe existir una instrucción clara del usuario en esa misma sesión
+     (ej. "procede con la implementación del spec-NNN").
+   - Ante cualquier ambigüedad, preguntar con `AskUserQuestion` en lugar de asumir.
+   - Mientras no exista esa aprobación, el spec permanece en `[NOT STARTED]`.
+   - Al recibir la aprobación, marcar la casilla de "Aprobación de implementación"
+     en el spec y recién entonces cambiar su estado de `[NOT STARTED]` a
+     `[IN PROGRESS]`.
+   - Si el usuario pide "avanzar" sin especificar, confirmar si se refiere a
+     redactar el spec o a implementarlo.
 
 ### Criterios para evaluar si una funcionalidad requiere MCP
 
@@ -616,7 +660,8 @@ Responder estas preguntas antes de diseñar el spec:
 ### Durante la implementación
 
 - Trabajar fase por fase según el spec; no saltarse pasos.
-- Al iniciar la Fase 1 de cualquier spec, cambiar su estado a `[IN PROGRESS]`.
+- Al iniciar la Fase 1 de cualquier spec —lo que solo ocurre tras la aprobación
+  explícita del usuario— cambiar su estado de `[NOT STARTED]` a `[IN PROGRESS]`.
 - Al completar cada fase, documentarla como completada en el propio spec.
 - La implementación consiste en poner en verde las pruebas ya escritas al
   redactar el spec; usarlas como guía de avance.
@@ -638,8 +683,11 @@ Responder estas preguntas antes de diseñar el spec:
    los criterios de aceptación finales; ajustarlos si el scope cambió durante la
    implementación (con la aprobación correspondiente).
 2. Cambiar el estado del spec a `[TESTING]`.
-3. El usuario ejecutará los casos manuales de `docs/testing/test-NNN` e indicará
-   cuáles pasan. Claude marcará cada caso como completado en el archivo de test.
+3. El usuario ejecutará los casos manuales de `docs/testing/test-NNN`. Si pide
+   apoyo, Claude lo acompaña siguiendo el protocolo de
+   "Pruebas manuales asistidas por Claude": prepara los datos vía API, guía
+   paso a paso, marca los hallazgos en el archivo de test y elimina los datos
+   al finalizar.
 4. Cuando todos los casos manuales estén aprobados, invocar `@tester` para
    ejecutar las pruebas automáticas ya definidas y confirmar que pasan en verde
    (cuando exista framework de testing).
@@ -658,15 +706,29 @@ Responder estas preguntas antes de diseñar el spec:
 ```md
 # test-NNN — Título descriptivo
 
+## Datos de prueba
+> Recursos creados vía API para poder ejecutar estos casos.
+> Deben eliminarse al cerrar la ronda de pruebas.
+
+| Recurso        | Endpoint de creación | Identificador | Eliminado |
+|----------------|----------------------|---------------|-----------|
+| {{recurso}}    | `POST /{{ruta}}`     | `{{id}}`      | ⬜ / ✅     |
+
+**Entorno de pruebas:** {{desarrollo}}
+**Fecha de la ronda:** {{fecha}}
+
 ## Casos de prueba
 
 ### TC-001 — Nombre del caso
 **Precondición:** ...
+**Datos de prueba usados:** `{{id}}` / `{{credenciales}}`
 **Pasos:**
 1. ...
 2. ...
 **Resultado esperado:** ...
 **Estado:** ⬜ Pendiente / ✅ Aprobado / ❌ Fallido
+**Hallazgos:** {{observaciones reportadas por el usuario: error, comportamiento
+inesperado, lentitud, detalle visual… o "sin observaciones"}}
 
 ### TC-MCP-001 — Nombre del caso MCP (si aplica)
 **Herramienta probada:** `{{nombre-herramienta}}` en `{{nombre-mcp}}`
@@ -674,7 +736,110 @@ Responder estas preguntas antes de diseñar el spec:
 **Input de prueba:** ...
 **Output esperado:** ...
 **Estado:** ⬜ Pendiente / ✅ Aprobado / ❌ Fallido
+**Hallazgos:** ...
+
+## Resumen de la ronda
+- Aprobados: {{n}} — Fallidos: {{n}} — Pendientes: {{n}}
+- Hallazgos escalados a `docs/specs/backlog.md`: {{lista o "ninguno"}}
+- Limpieza de datos de prueba: ⬜ Pendiente / ✅ Completada
 ```
+
+---
+
+## Pruebas manuales asistidas por Claude
+
+> Aplica cuando el usuario pide apoyo para **ejecutar** los casos de
+> `docs/testing/test-NNN-slug.md`. Claude actúa como copiloto: prepara los
+> datos, guía la ejecución y registra los hallazgos.
+> **Quien interactúa con la UI es siempre el usuario**, salvo instrucción
+> explícita en contrario.
+
+### 1. Preparación de datos vía API
+
+- Leer el archivo `test-NNN-slug.md` completo e identificar las precondiciones
+  de cada caso antes de crear nada.
+- Confirmar con el usuario el **entorno** contra el que se trabajará. Por
+  defecto, desarrollo. **Nunca crear datos de prueba en producción** sin
+  confirmación explícita en esa misma sesión (recordar que este proyecto usa
+  un único entorno Supabase; ver "Variables de entorno" y "Base de datos" —
+  esto hace aún más relevante confirmar el alcance antes de crear datos).
+- Crear **todo lo necesario para ejecutar las pruebas vía API**: usuarios,
+  autenticación, registros base, estados intermedios, relaciones y cualquier
+  precondición del caso. Usar los endpoints documentados en "Backend y APIs"
+  o las herramientas del MCP correspondiente.
+- No manipular la base de datos directamente para montar precondiciones
+  salvo que el usuario lo indique; si no existe endpoint para algo necesario,
+  reportarlo antes de improvisar.
+- Registrar **cada recurso creado** (recurso, endpoint, payload relevante e
+  identificador devuelto) en la sección "Datos de prueba" del archivo `test-NNN`.
+  Sin este registro no se puede garantizar la limpieza posterior.
+- Entregar al usuario, antes de empezar, el resumen de lo que quedó montado:
+  credenciales, IDs, estado inicial y qué caso cubre cada dato.
+
+### 2. Guía paso a paso durante la ejecución
+
+- Ejecutar **un caso de prueba a la vez**, en orden, sin adelantarse.
+- Para cada caso, indicarle al usuario de forma explícita:
+  - la precondición ya montada y con qué datos/credenciales,
+  - la pantalla o ruta desde la que debe partir,
+  - los pasos concretos a seguir, numerados,
+  - el resultado esperado y qué debe observar en detalle.
+- Esperar el reporte del usuario antes de pasar al siguiente caso.
+- Si el usuario reporta un fallo, pedir el mínimo detalle necesario para
+  documentarlo (mensaje de error, respuesta de red, comportamiento observado)
+  y ofrecer verificación por API del estado resultante del recurso.
+- **No dar por aprobado ningún caso que el usuario no haya confirmado**, ni
+  inferir resultados a partir de la respuesta de la API.
+
+### 3. Registro de hallazgos
+
+- Tras cada caso, actualizar `docs/testing/test-NNN-slug.md` inmediatamente:
+  - cambiar el campo **Estado** (✅ Aprobado / ❌ Fallido),
+  - completar el campo **Hallazgos** con lo observado, incluso si el caso pasó
+    (comportamientos raros, lentitud, detalles visuales, mensajes poco claros).
+- No esperar al final de la ronda para escribir: el archivo de test se actualiza
+  caso por caso.
+- Los hallazgos que impliquen bugs fuera del scope del spec se registran además
+  en `docs/specs/backlog.md`; **no se corrigen dentro de la sesión de pruebas**
+  sin aprobación explícita del usuario.
+- Al cerrar la ronda, completar la sección "Resumen de la ronda" del archivo.
+
+### 4. Limpieza de datos
+
+- Al terminar la ronda, **eliminar vía API todos los datos creados en el paso 1**,
+  en orden inverso a su creación para respetar dependencias.
+- Verificar que la eliminación fue efectiva (consultar el recurso y confirmar
+  `404` / lista vacía).
+- Marcar cada recurso como eliminado en la tabla "Datos de prueba" del archivo
+  `test-NNN` y marcar la limpieza como completada en el resumen.
+- Si algún recurso no puede eliminarse vía API, reportarlo al usuario con el
+  identificador exacto y el motivo; **nunca borrarlo directamente en base de
+  datos sin confirmación explícita**.
+- No cerrar la sesión de pruebas dejando datos huérfanos en el entorno.
+- Si el usuario pide conservar los datos para una segunda ronda, dejarlo
+  anotado en el archivo `test-NNN` junto con los IDs pendientes de limpieza.
+
+---
+
+## Pruebas visuales y uso del navegador
+
+- **Las pruebas visuales las ejecuta el usuario.** Claude no valida por su
+  cuenta apariencia, layout, responsive ni comportamiento visual, salvo que el
+  usuario le indique lo contrario de forma explícita.
+- **Claude no abre ni controla el navegador** —navegación, automatización,
+  capturas de pantalla, inspección del DOM— a menos que el usuario lo solicite
+  expresamente en esa misma sesión.
+- Si Claude considera que una verificación automatizada en navegador aportaría
+  valor (por ejemplo, reproducir un bug reportado), puede **proponerlo** y
+  esperar respuesta; nunca iniciarlo por su cuenta.
+- Cuando el usuario autorice el uso del navegador, limitarse al alcance
+  autorizado (entorno, rutas y casos indicados), no ejecutar acciones
+  destructivas ni sobre producción, y reportar lo observado sin ampliar el
+  alcance.
+- La autorización es puntual: vale para la petición concreta, no para toda la
+  sesión ni para sesiones futuras.
+- Los tests e2e automatizados que ejecuta `@tester` como fase del spec no
+  cuentan como "acceder al navegador" y siguen su flujo normal.
 
 ---
 
@@ -729,6 +894,8 @@ Ejecutar este checklist **antes de iniciar cualquier despliegue**:
 - [ ] El build local pasa sin errores (`npm run build`).
 - [ ] El linter pasa sin errores (`npm run lint`).
 - [ ] (Cuando exista framework de tests) los tests pasan en su totalidad.
+- [ ] Los datos de prueba de las rondas manuales fueron eliminados del
+      proyecto Supabase (ver "Pruebas manuales asistidas por Claude").
 - [ ] Se creó la rama `deploy/{{versión-o-descripción}}` desde `development`.
 
 ---
@@ -870,6 +1037,14 @@ Claude **nunca** debe:
 > Claude nunca debe realizar las siguientes acciones sin confirmación explícita
 > del usuario en esa misma sesión:
 
+- **Iniciar la implementación de un spec** (escribir código, crear archivos de
+  implementación, modificar módulos existentes) sin aprobación explícita del
+  paquete spec + pruebas.
+- **Abrir o controlar el navegador** para navegar, automatizar o verificar
+  visualmente la aplicación sin que el usuario lo haya solicitado.
+- Dar por aprobado un caso de prueba manual que el usuario no haya confirmado.
+- Crear datos de prueba en producción, o cerrar una ronda de pruebas manuales
+  dejando datos de prueba sin eliminar.
 - Borrar archivos o carpetas (salvo temporales generados por la propia tarea).
 - Ejecutar migraciones de base de datos en entornos distintos al local.
 - Hacer push a `main` o `development` directamente.
@@ -878,9 +1053,13 @@ Claude **nunca** debe:
 - Hacer commit de archivos `.env*` reales.
 - Editar el spec activo o sus archivos de prueba para ampliar su scope sin
   aprobación del usuario.
+- Dejar un spec sin estado en el título o cambiarlo de estado sin que se cumplan
+  las condiciones de la transición (ver "Specs de funcionalidades → Estados válidos").
 - Eliminar o reemplazar un MCP activo sin confirmar que ningún agente lo consume.
 - Modificar un system prompt en `docs/mcps/` fuera de una fase de MCP
   aprobada en el spec correspondiente.
+- Borrar datos directamente en base de datos cuando la limpieza vía API falle;
+  reportar al usuario en su lugar.
 
 ---
 
