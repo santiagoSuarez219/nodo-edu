@@ -121,39 +121,6 @@ export function CoursePresentation({ presentation, cta }: Props) {
           </div>
         </section>
 
-        {/* Bibliography */}
-        <section className="flex flex-col gap-4 pb-8 lg:pb-12 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-xl lg:text-2xl font-bold">Bibliografía</h2>
-          <div className="space-y-3">
-            {presentation.bibliography.map((book, idx) => (
-              <div
-                key={idx}
-                className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4"
-              >
-                <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-                  {book.title}
-                </p>
-                <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                  {book.author}
-                </p>
-                {book.edition && (
-                  <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-                    {book.edition}
-                  </p>
-                )}
-              </div>
-            ))}
-          </div>
-          <a
-            href="https://www.itm.edu.co/biblioteca/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm font-semibold text-blue-700 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors inline-block mt-2"
-          >
-            Visita la biblioteca del ITM →
-          </a>
-        </section>
-
         {/* Two columns: Evaluation & Dates */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 pb-8 lg:pb-12 border-b border-gray-200 dark:border-gray-700">
           {/* Evaluation */}
@@ -226,6 +193,39 @@ export function CoursePresentation({ presentation, cta }: Props) {
           </ul>
         </section>
 
+        {/* Bibliography */}
+        <section className="flex flex-col gap-4 pb-8 lg:pb-12 border-b border-gray-200 dark:border-gray-700">
+          <h2 className="text-xl lg:text-2xl font-bold">Bibliografía</h2>
+          <div className="space-y-3">
+            {presentation.bibliography.map((book, idx) => (
+              <div
+                key={idx}
+                className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4"
+              >
+                <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                  {book.title}
+                </p>
+                <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                  {book.author}
+                </p>
+                {book.edition && (
+                  <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                    {book.edition}
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+          <a
+            href="https://www.itm.edu.co/biblioteca/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm font-semibold text-blue-700 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors inline-block mt-2"
+          >
+            Visita la biblioteca del ITM →
+          </a>
+        </section>
+
         {/* Final CTA */}
         <section className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 py-8">
           <div>
@@ -238,6 +238,8 @@ export function CoursePresentation({ presentation, cta }: Props) {
           </div>
           <div className="flex-shrink-0">{cta}</div>
         </section>
+
+
       </main>
     </div>
   );

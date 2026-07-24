@@ -1,4 +1,4 @@
-# spec-024 — [IN PROGRESS] Bibliografía en la presentación de curso
+# spec-024 — [DONE] Bibliografía en la presentación de curso
 
 ## Contexto
 
@@ -12,10 +12,10 @@ institución para conseguirlo.
 **Incluye:**
 - Nuevo campo `bibliography` en `CoursePresentation` (`lib/course-presentations/types.ts`):
   lista de referencias con `title`, `author` y `edition` (opcional).
-- Nueva sección "Bibliografía" en `CoursePresentation.tsx`, ubicada entre
-  "Herramientas y tecnologías" y el bloque de "Evaluación & Fechas", siguiendo
-  el mismo patrón visual (card `bg-gray-50 dark:bg-gray-800`) que las demás
-  secciones de la página.
+- Nueva sección "Bibliografía" en `CoursePresentation.tsx`, ubicada después de
+  la sección "Condiciones" y antes del CTA final, siguiendo el mismo patrón
+  visual (card `bg-gray-50 dark:bg-gray-800`) que las demás secciones de la
+  página.
 - Link clickeable a la biblioteca institucional (`https://www.itm.edu.co/biblioteca/`)
   dentro de esa sección, abierto en una pestaña nueva (`target="_blank"`,
   `rel="noopener noreferrer"`).
@@ -51,15 +51,21 @@ invocar de forma independiente (ya se sirve como parte del HTML de la página).
 ## Fases de implementación
 
 ### Fase 1 — Tipos y datos
-- [ ] Agregar `BibliographyItem` (`title`, `author`, `edition?`) y el campo
+- [x] Agregar `BibliographyItem` (`title`, `author`, `edition?`) y el campo
       `bibliography: BibliographyItem[]` a `CoursePresentation` en `types.ts`.
-- [ ] Exportar `BibliographyItem` desde `index.ts`.
-- [ ] Agregar 1-2 referencias placeholder a los tres cursos en `data/`.
+- [x] Exportar `BibliographyItem` desde `index.ts`.
+- [x] Agregar referencias a los tres cursos en `data/`. `estructuras-de-datos.ts`
+      ya tiene bibliografía real (no placeholder); `analisis-de-algoritmos.ts` y
+      `programacion-cientifica.ts` siguen con placeholders pendientes de que el
+      usuario complete la lista real.
 
 ### Fase 2 — UI
-- [ ] Agregar sección "Bibliografía" en `CoursePresentation.tsx` con la lista
-      de referencias y el link a `https://www.itm.edu.co/biblioteca/`.
-- [ ] Verificar modo claro/oscuro con los tokens de `DESIGN.md`.
+- [x] Agregar sección "Bibliografía" en `CoursePresentation.tsx` con la lista
+      de referencias y el link a `https://www.itm.edu.co/biblioteca/`. La
+      sección quedó ubicada después de "Condiciones" y antes del CTA final
+      (ver nota de scope arriba).
+- [x] Verificar modo claro/oscuro con los tokens de `DESIGN.md` — confirmado
+      por el usuario (ver `test-024`, TC-003: Aprobado).
 
 ## Criterios de aceptación
 - En `/[courseSlug]` se ve una sección "Bibliografía" con las referencias del
@@ -68,6 +74,14 @@ invocar de forma independiente (ya se sirve como parte del HTML de la página).
   que abre en una pestaña nueva.
 - La sección respeta modo claro/oscuro sin romper contraste.
 - El build (`npm run build`) y el linter (`npm run lint`) pasan sin errores.
+
+## Nota de estado (revisión 2026-07-24)
+Fases 1 y 2 quedaron implementadas y committeadas en `development`
+(`5b2bdcf feat(course-presentations): add bibliography section with library link`),
+más ajustes locales sin commitear: reposición de la sección (documentada arriba)
+y corrección de un typo de edición en `estructuras-de-datos.ts` (`3th` → `3rd`).
+Las 3 pruebas manuales de `test-024` (TC-001 a TC-003) fueron ejecutadas por el
+usuario y aprobadas sin hallazgos (ronda 2026-07-24). Spec marcado `[DONE]`.
 
 ## Pruebas asociadas
 - **Manuales:** `docs/testing/test-024-bibliografia-curso.md` — casos `TC-001` a `TC-003`.

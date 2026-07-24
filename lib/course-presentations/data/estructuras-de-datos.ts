@@ -172,14 +172,15 @@ export const estructurasDatos: CoursePresentation = {
   ],
   bibliography: [
     {
-      title: "Introduction to Algorithms",
-      author: "Thomas H. Cormen, Charles E. Leiserson, Ronald L. Rivest, Clifford Stein",
+      title: "Estructura de Datos en Java",
+      author: "Luis J. Aguilar, Ignacio Z. Martínez",
       edition: "3rd Edition",
     },
     {
-      title: "Data Structures and Algorithms in Java",
-      author: "Michael T. Goodrich, Roberto Tamassia",
-      edition: "6th Edition",
+      title: "Introduction to Algorithms",
+      author:
+        "Thomas H. Cormen, Charles E. Leiserson, Ronald L. Rivest, Clifford Stein",
+      edition: "3rd Edition",
     },
   ],
   conditions: TRANSVERSAL_CONDITIONS,
