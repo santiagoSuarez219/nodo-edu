@@ -1,0 +1,75 @@
+export type SubmissionStatus = "in_progress" | "submitted" | "graded" | "expired";
+
+export interface Submission {
+  id: string;
+  assignment_id: string;
+  variant_group_id: string;
+  enrollment_id: string;
+  attempt_number: number;
+  started_at: string;
+  submitted_at: string | null;
+  status: SubmissionStatus;
+  auto_score: number | null;
+  final_score: number | null;
+  graded_at: string | null;
+}
+
+export interface Answer {
+  id: string;
+  submission_id: string;
+  question_id: string;
+  assignment_question_id: string;
+  selected_choice_ids: string[];
+  text_response: string | null;
+  is_correct: boolean | null;
+  auto_score: number | null;
+  manual_score: number | null;
+  reviewer_notes: string | null;
+  reviewed_at: string | null;
+}
+
+export interface SubmissionWithAnswers extends Submission {
+  answers: Answer[];
+  student_name?: string;
+}
+
+// Devuelto por la RPC `get_variant_question_details` (ver migración
+// 20260724000002_variant_question_content_rpcs.sql). `is_correct` viene ya
+// gateado por show_feedback_on/closes_at/estado del intento: es `null`
+// mientras no corresponda revelarlo.
+export interface QuestionChoiceDetail {
+  id: string;
+  body: string;
+  order_index: number;
+  is_correct: boolean | null;
+}
+
+export interface QuestionDetail {
+  assignment_question_id: string;
+  question_id: string;
+  order_index: number;
+  points: number;
+  type: string;
+  stem: string;
+  code_snippet: string | null;
+  code_language: string | null;
+  choices: QuestionChoiceDetail[];
+}
+
+export interface AnswerForReview extends Answer {
+  question_type: string;
+  question_stem: string;
+  question_code_snippet: string | null;
+  question_code_language: string | null;
+  question_choices: { id: string; body: string; is_correct: boolean }[];
+  question_rubric: {
+    criteria: { label: string; points: number; description: string }[];
+    max_score: number;
+  } | null;
+  max_points: number;
+}
+
+export interface SubmissionForReview extends Submission {
+  student_name: string;
+  answers: AnswerForReview[];
+}
