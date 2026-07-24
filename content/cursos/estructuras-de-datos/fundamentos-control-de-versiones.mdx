@@ -17,10 +17,6 @@ updatedAt: "2026-07-21"
 
 # Fundamentos de Control de Versiones
 
-## Objetivo de la sesión
-
-> Al terminar la clase, el estudiante entenderá **qué problema resuelve el control de versiones**, reconocerá los conceptos clave de Git (repositorio, commit, staging area, HEAD, historial) y ejecutará los comandos esenciales: `init`, `add`, `commit`, `status`, `log`, `diff`.
-
 ## El problema: proyectos sin memoria
 
 Imagina que estás escribiendo el código de tu proyecto de aula. Para "no perder nada", vas guardando copias:
@@ -36,9 +32,24 @@ proyectoAula_v2_final_YA_arreglado.java
 - ¿Cuál es la versión buena?
 - ¿Qué cambió exactamente entre una copia y la siguiente?
 - Si borraste sin querer una función que sí funcionaba ayer, ¿cómo la recuperas?
-- Ahora súmale un compañero de equipo que trabaja **al mismo tiempo** que tú sobre el mismo archivo, enviándolo por correo o USB.
+- Ahora súmale un compañero de equipo que trabaja **al mismo tiempo** que tú sobre el mismo archivo, enviándolo por correo o USB o por WhastApp.
 
 Esto no es un problema de programación: es un problema de **gestión de cambios en el tiempo**. Y es exactamente el problema que resuelve el control de versiones.
+
+## Más problemas que resuelve el control de versiones
+
+El ejemplo de las copias manuales es solo uno de varios escenarios donde la falta de control de versiones se convierte en un dolor de cabeza:
+
+**1. Un cambio nuevo rompe lo que ya funcionaba**
+Estás construyendo un proyecto con 5 funcionalidades. Terminaste las primeras tres, y funcionan bien. Al implementar la cuarta, algo sale mal: el código se daña y, sin darte cuenta, ese error también rompe las funcionalidades 1, 2 y 3. Sin un historial de cambios, no tienes forma de volver al punto exacto donde todo funcionaba — tocaría reescribir desde cero o depurar a ciegas.
+
+**2. Juntar el trabajo de dos personas**
+Tú y un compañero trabajan sobre el mismo proyecto al mismo tiempo. Cada uno edita partes distintas (o a veces las mismas) del código. Al final del día, ¿cómo combinan ambos trabajos sin que uno sobrescriba al otro? Copiar y pegar archivos a mano es lento y propenso a errores — casi siempre alguien termina perdiendo parte de su trabajo.
+
+**3. El cliente cambia de opinión**
+El profesor (o el cliente, en un proyecto real) te pide una función nueva. La construyes, la pruebas, todo bien. Una semana después te dice: "en realidad estaba mejor como estaba antes, revierte ese cambio". Sin un registro de versiones, "como estaba antes" es solo un recuerdo impreciso — no un estado real y recuperable del proyecto.
+
+Los tres problemas comparten algo: todos requieren poder **volver atrás** o **combinar cambios** de forma confiable, en vez de depender de la memoria o de archivos duplicados. Git resuelve el primero y el tercero con el historial de commits que vemos hoy (`git log`, y comandos como `checkout`/`revert` que se profundizan en el laboratorio); el segundo requiere además trabajar con **ramas** (`branch`, `merge`), tema de la sesión T2.
 
 ## La solución: un sistema que recuerda por ti
 
@@ -153,30 +164,8 @@ Las líneas con `-` son lo que había antes; las líneas con `+` son lo nuevo.
 
 ## Síntesis
 
-- El control de versiones resuelve un problema real: perder cambios, no saber qué cambió, o pisarse el trabajo entre compañeros.
+- El control de versiones resuelve problemas reales: perder cambios, no saber qué cambió, que un error nuevo rompa funcionalidades que ya andaban bien, pisarse el trabajo entre compañeros, o no poder volver a "como estaba antes" cuando el cliente cambia de opinión.
 - El **repositorio** (`.git/`) guarda todo el historial del proyecto.
 - Los cambios pasan por dos etapas antes de quedar permanentes: **directorio de trabajo → staging area (`git add`) → historial (`git commit`)**.
 - **HEAD** indica dónde estás parado en la historia; `git log` te muestra toda la historia.
 - `git diff` te deja ver exactamente qué cambió, línea por línea, antes de comprometerte con el cambio.
-
-## Notas para el docente
-
-- **Tiempos sugeridos (sesión de 50–60 min):** problema inicial y motivación (5 min) · repositorio (10 min) · staging/commit (15 min) · HEAD/historial (10 min) · diff (5 min) · resumen y preguntas (5–10 min).
-- **Pregunta para lanzar al grupo:** "¿Alguna vez han perdido una versión buena de un trabajo, o han recibido un archivo del compañero que sobrescribió lo que ustedes habían hecho?" — sirve para anclar el problema antes de nombrar Git.
-- **Demo en vivo recomendada:** ejecutar `git init`, `git status`, editar un archivo, `git add`, `git status` de nuevo (para mostrar el cambio de estado), `git commit`, `git log`. Ver el cambio de estado en tiempo real ayuda más que solo mostrar el comando.
-- **Variación si el grupo es más avanzado:** se puede adelantar la idea de que cada commit tiene un hash único (SHA-1), sin profundizar — se retoma en el laboratorio de la Semana 1.
-- Esta sesión es **T1** de la Semana 1. La sesión **T2** (jueves) continúa con GitHub, ramas (`branch`, `checkout`, `merge`) y resolución de conflictos — no adelantar esos comandos aquí para no saturar la clase.
-- El laboratorio del viernes 7 de agosto es festivo (Batalla de Boyacá): se realiza como trabajo independiente guiado, así que conviene dejar muy claros los comandos de esta sesión antes de cerrar la semana.
-
----
-
-✅ Material generado
-📘 Curso: Estructura de Datos — ED
-📄 Tipo: Apuntes teóricos
-💻 Lenguaje(s): Terminal (Bash) / Git
-🎯 Dificultad: Básico
-⏱ Tiempo est.: 50 minutos de clase
-📦 Ítems: 8 diapositivas (secciones ##)
-🎨 Visuales: 3 diagramas Mermaid, 0 fórmulas, 0 placeholders de imagen
-
----
