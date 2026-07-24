@@ -1,7 +1,16 @@
-# spec-020 — Revisión y calificación manual del docente
+# spec-020 — `[NOT STARTED]` Revisión y calificación manual del docente
 
-> **Estado:** Planificado — pendiente de implementación. La implementación de referencia
+> **Estado:** `[NOT STARTED]` — Planificado, pendiente de implementación. La implementación de referencia
 > existe en el tag `backup/feat-question-bank` y se portará al implementar este spec.
+>
+> **Estado de dependencias en `development` (revisión 2026-07-24):**
+> - **spec-018** está `[DONE]` y mergeado: `assignments`, `assignment_questions` (con `points`)
+>   y el vínculo `grade_item_id` (que vive en `assignment_variant_groups`) ya existen.
+> - **spec-005** (question-bank): tablas de `questions` y stub `lib/code-runner` ya integrados.
+> - **spec-019** (assignment-solving) sigue `[NOT STARTED]`: **este spec está bloqueado por él**,
+>   porque consume las tablas `submissions`/`answers`, sus columnas de revisión y el módulo
+>   `lib/submissions/` que spec-019 debe crear primero. No se puede implementar spec-020 hasta
+>   que spec-019 esté en `development`.
 
 ---
 
@@ -31,8 +40,9 @@ definidas en spec-019 (`answers.manual_score`, `answers.reviewer_notes`,
 
 ### Incluye
 
-- **Listado de envíos por asignación** para el docente dueño del curso, separando envíos
-  **pendientes de revisión** (`status = 'submitted'`) de los ya **calificados**
+- **Listado de envíos por evaluación** (grupo de variantes) para el docente dueño del curso:
+  reúne **todos** los envíos de la evaluación —repartidos entre sus variantes A/B/C— y separa
+  los **pendientes de revisión** (`status = 'submitted'`) de los ya **calificados**
   (`status = 'graded'`).
 - **Panel de revisión de un envío**: muestra cada respuesta del estudiante con el contexto
   de la pregunta (enunciado, código, opciones marcadas, rúbrica y puntaje máximo por
@@ -44,8 +54,8 @@ definidas en spec-019 (`answers.manual_score`, `answers.reviewer_notes`,
 - **Finalización de la calificación**: recalcula el `final_score` sumando, por respuesta, el
   `auto_score` (objetivas) o el `manual_score` (abiertas); marca el envío como `graded`,
   fija `graded_at`, y **propaga** el `final_score` a `student_grades` (upsert por
-  `enrollment_id + grade_item_id`) si la asignación tiene `grade_item_id` vinculado.
-- **Aislamiento por curso**: un docente solo lista y revisa envíos de asignaciones de sus
+  `enrollment_id + grade_item_id`) si la evaluación (grupo) tiene `grade_item_id` vinculado.
+- **Aislamiento por curso**: un docente solo lista y revisa envíos de evaluaciones de sus
   propios cursos académicos (garantizado por RLS de `submissions`/`answers` de spec-019 y
   por la protección de rol de las rutas `/admin`).
 
@@ -71,9 +81,10 @@ definidas en spec-019 (`answers.manual_score`, `answers.reviewer_notes`,
   `status`, `graded_at`) y sus políticas RLS; la capa de dominio `lib/submissions/`
   (tipos y funciones de lectura de envíos); y el cálculo previo de `auto_score` al enviar.
   Este spec **consume** ese estado y añade solo las funciones de revisión y su UI.
-- **spec-018 (assignment-authoring)** — provee `assignments` y `assignment_questions`
-  (de donde se lee `points`, el puntaje máximo por respuesta) y el vínculo opcional
-  `grade_item_id`.
+- **spec-018 (assignment-authoring)** — `[DONE]` en `development`. Provee `assignments`
+  (variantes) y `assignment_questions` (de donde se lee `points`, el puntaje máximo por
+  respuesta). El vínculo opcional `grade_item_id` **vive en `assignment_variant_groups`**
+  (el grupo/evaluación), no en `assignments`.
 - **spec-003 (course-enrollment)** — provee `academic_courses`, `enrollments`, `grade_items`
   y `student_grades` (destino de la propagación); el middleware de protección de `/admin`;
   y los helpers de sesión/rol en `lib/auth/session.ts` (`requireAnyRole`).
@@ -90,10 +101,10 @@ definidas en spec-019 (`answers.manual_score`, `answers.reviewer_notes`,
 
 | Tabla | Columnas usadas en este spec | Uso |
 |---|---|---|
-| `submissions` | `status`, `auto_score`, `final_score`, `graded_at`, `assignment_id`, `enrollment_id` | Filtrado pendiente/calificada; recálculo y cierre de la calificación |
+| `submissions` | `status`, `auto_score`, `final_score`, `graded_at`, `variant_group_id`, `assignment_id`, `enrollment_id` | Listado por evaluación (`variant_group_id`, a través de sus variantes); filtrado pendiente/calificada; recálculo y cierre de la calificación |
 | `answers` | `manual_score`, `reviewer_notes`, `reviewed_at`, `auto_score`, `is_correct` | Calificación manual de respuestas abiertas |
 | `assignment_questions` | `points` | Puntaje máximo por respuesta (cota superior de `manual_score`) |
-| `assignments` | `grade_item_id` | Decide si se propaga a `student_grades` |
+| `assignment_variant_groups` | `grade_item_id` | Decide si se propaga a `student_grades` (el vínculo vive en el grupo, no en la variante) |
 | `student_grades` | `enrollment_id`, `grade_item_id`, `score` | Destino de la propagación (upsert) |
 
 > La propagación replica el mismo patrón que el submit del estudiante (spec-019): upsert
@@ -104,17 +115,24 @@ definidas en spec-019 (`answers.manual_score`, `answers.reviewer_notes`,
 
 | Archivo | Propósito |
 |---|---|
-| `app/admin/courses/[academicCourseId]/assignments/[assignmentId]/review/page.tsx` | Lista de envíos de la asignación (pendientes + calificados), protegida con `requireAnyRole(["teacher","admin"])` |
-| `app/admin/courses/[academicCourseId]/assignments/[assignmentId]/review/[submissionId]/page.tsx` | Panel de revisión de un envío concreto |
+| `app/(admin)/admin/courses/[academicCourseId]/assignments/[groupId]/review/page.tsx` | Lista de envíos de la **evaluación** (todos, a través de sus variantes A/B/C; pendientes + calificados), protegida con `requireAnyRole(["teacher","admin"])` |
+| `app/(admin)/admin/courses/[academicCourseId]/assignments/[groupId]/review/[submissionId]/page.tsx` | Panel de revisión de un envío concreto |
 
-> Ambas rutas viven bajo `app/admin/...` (no en un route group `app/(admin)/`), coherente
-> con la resolución de la colisión de rutas admin/multi-rol ya aplicada en el proyecto.
+> Las rutas cuelgan de la página de detalle de evaluación ya existente en `development`
+> (`app/(admin)/admin/courses/[academicCourseId]/assignments/[groupId]/page.tsx`), dentro del
+> route group `(admin)` — la convención real del proyecto. El segmento dinámico es el
+> **`groupId`** del `assignment_variant_groups`, no un `assignmentId` de variante: así la
+> revisión abarca la evaluación completa y no una sola variante. El route group `(admin)` no
+> aparece en la URL; la ruta pública es
+> `/admin/courses/[academicCourseId]/assignments/[groupId]/review`. Las páginas usan
+> `requireAnyRole(["teacher","admin"])` y `params` asíncronos (Next 16), igual que las rutas
+> admin existentes.
 
 ### Módulos `lib/`
 
 | Archivo | Acción | Detalle |
 |---|---|---|
-| `lib/submissions/index.ts` | **Editar** | Añadir `getSubmissionForReview(submissionId)`, `gradeAnswer(answerId, score, notes)`, `finalizeGrading(submissionId)` y el helper interno `propagateToGradeItem(...)`. Reutiliza `getSubmissionsByAssignment(assignmentId)` (lectura de spec-019) para el listado. |
+| `lib/submissions/index.ts` | **Editar** | Añadir `getSubmissionForReview(submissionId)`, `gradeAnswer(answerId, score, notes)`, `finalizeGrading(submissionId)` y el helper interno `propagateToGradeItem(...)`. El listado usa una lectura **por grupo** `getSubmissionsByGroup(variantGroupId)` (todos los envíos de la evaluación, a través de sus 3 variantes). Ver "Alineación con spec-019" abajo. |
 | `lib/submissions/actions.ts` | **Editar** | Añadir Server Actions `gradeAnswerAction(...)` y `finalizeGradingAction(...)` que envuelven las funciones anteriores, verifican sesión (`requireUser`) y hacen `revalidatePath` de las rutas de revisión y detalle de la asignación. |
 | `lib/submissions/types.ts` | **Editar** | Añadir los tipos `SubmissionForReview` y `AnswerForReview` (respuesta + contexto de pregunta: `question_type`, `question_stem`, `question_code_snippet`, `question_code_language`, `question_choices`, `question_rubric`, `max_points`). |
 
@@ -126,6 +144,11 @@ definidas en spec-019 (`answers.manual_score`, `answers.reviewer_notes`,
 > `assignment_questions` (fallback 5). `finalizeGrading` decide, por respuesta, si suma el
 > `manual_score` (tipos `open_text`/`code_write`/`coding_challenge`) o el `auto_score`
 > (resto), redondea a 2 decimales, y solo entonces cierra el envío y propaga.
+>
+> **Alineación con spec-019:** el listado de revisión se indexa por **grupo**
+> (`variant_group_id`), no por variante, para no fragmentar el roster de la evaluación entre
+> A/B/C. spec-019 crea la lectura correspondiente `getSubmissionsByGroup(variantGroupId)` en
+> `lib/submissions/index.ts` (ver su tabla de módulos y Fase 2); este spec solo la consume.
 
 ### Componentes (`components/admin/`)
 
@@ -162,7 +185,7 @@ Ninguna nueva.
 - [ ] Implementar `finalizeGrading(submissionId)`: recorre las `answers`, suma
       `manual_score` (tipos abiertos) o `auto_score` (resto), redondea a 2 decimales, marca
       el envío `graded` con `final_score` y `graded_at`, y llama a `propagateToGradeItem`.
-- [ ] Implementar el helper interno `propagateToGradeItem(...)`: si la asignación tiene
+- [ ] Implementar el helper interno `propagateToGradeItem(...)`: si la evaluación (grupo) tiene
       `grade_item_id`, hace upsert en `student_grades` por `enrollment_id + grade_item_id`.
 
 ### Fase 2 — Server Actions
@@ -174,19 +197,19 @@ Ninguna nueva.
       `final_score` resultante.
 
 ### Fase 3 — Rutas y componentes de UI
-- [ ] Crear `SubmissionList` en `components/admin/` (tabla con estado, estudiante, fechas y
-      enlace a la revisión de cada envío).
+- [ ] Crear `SubmissionList` en `components/admin/` (tabla con estado, estudiante, **variante**,
+      fechas y enlace a la revisión de cada envío).
 - [ ] Crear `SubmissionReviewPanel` en `components/admin/` (`"use client"`): controles de
       `score`/`notes` por respuesta abierta que invocan `gradeAnswerAction`, respuestas
       objetivas en solo lectura, rúbrica como guía, y botón "Finalizar calificación"
       (`finalizeGradingAction`).
-- [ ] Crear la ruta `.../assignments/[assignmentId]/review/page.tsx`: `requireAnyRole`,
-      carga curso, asignación y `getSubmissionsByAssignment`, separa pendientes/calificadas y
-      renderiza `SubmissionList`.
-- [ ] Crear la ruta `.../review/[submissionId]/page.tsx`: `requireAnyRole`, carga curso,
-      asignación y `getSubmissionForReview`, y renderiza `SubmissionReviewPanel`.
-- [ ] Enlazar la revisión desde la página de detalle de la asignación
-      (`.../assignments/[assignmentId]`).
+- [ ] Crear la ruta `.../assignments/[groupId]/review/page.tsx`: `requireAnyRole(["teacher",
+      "admin"])`, carga curso y evaluación (`getAssignmentGroupById`) y los envíos con
+      `getSubmissionsByGroup(groupId)`, separa pendientes/calificadas y renderiza `SubmissionList`.
+- [ ] Crear la ruta `.../assignments/[groupId]/review/[submissionId]/page.tsx`: `requireAnyRole`,
+      carga curso, evaluación y `getSubmissionForReview`, y renderiza `SubmissionReviewPanel`.
+- [ ] Enlazar la revisión desde la página de detalle de la evaluación, ya existente
+      (`app/(admin)/admin/courses/[academicCourseId]/assignments/[groupId]/page.tsx`).
 
 ### Fase 4 — Pulido y validación
 - [ ] Verificar aislamiento por curso: un docente no lista ni abre envíos de cursos ajenos
@@ -200,15 +223,16 @@ Ninguna nueva.
 
 ## Criterios de aceptación
 
-- El docente dueño del curso ve, para cada asignación, la lista de envíos separada en
-  **pendientes de revisión** (`submitted`) y **calificados** (`graded`).
+- El docente dueño del curso ve, para cada **evaluación**, la lista de **todos** sus envíos
+  (a través de sus variantes A/B/C) separada en **pendientes de revisión** (`submitted`) y
+  **calificados** (`graded`).
 - Al abrir un envío, ve cada respuesta con el contexto de su pregunta; las respuestas
   objetivas aparecen resueltas y las abiertas (`open_text`, `code_write`,
   `coding_challenge`) exponen los controles de calificación con la rúbrica como guía.
 - El docente asigna `manual_score` (rechazado si queda fuera de `0..points`) y
   `reviewer_notes`; el sistema persiste `reviewed_at`.
 - Al **finalizar**, el `final_score` combina `auto_score` (objetivas) y `manual_score`
-  (abiertas), el envío pasa a `graded` con `graded_at`, y —si la asignación tiene
+  (abiertas), el envío pasa a `graded` con `graded_at`, y —si la evaluación (grupo) tiene
   `grade_item_id`— el puntaje se propaga a `student_grades` (upsert por
   `enrollment_id + grade_item_id`).
 - **Aislamiento:** un docente no lista ni revisa envíos de cursos que no le pertenecen.

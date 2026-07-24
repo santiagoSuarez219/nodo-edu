@@ -5,8 +5,27 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+## DEBT-008 — Saltos perceptibles entre modo claro/oscuro en algunos casos
+
+**Origen:** spec-019 (TC-034), detectado al probar el jugador de evaluaciones
+**Prioridad:** Baja — cosmético, no bloquea funcionalidad
+
+Durante la ronda de pruebas de `test-019-assignment-solving.md` (TC-034) se
+reportó que, en algunos casos, hay un salto/parpadeo perceptible al cambiar
+entre modo claro y oscuro. El mecanismo de tema (`app/layout.tsx` con un
+script inline `beforeInteractive` + `components/ThemeInit.tsx` que además
+escucha cambios en vivo de `prefers-color-scheme`) es compartido por **toda
+la app**, no algo introducido por spec-019 — fuera de su alcance.
+
+**Acción:** investigar el origen del salto (posible doble aplicación del
+tema entre el script inline y `ThemeInit` al hidratar, o ausencia de
+transición CSS) en una iteración dedicada a temas/DESIGN.md.
+
+---
+
 ## DEBT-007 — `assignment_questions` no trae el enunciado de la pregunta en el flujo de resolución del estudiante
 
+**Estado:** ✅ Resuelto en spec-019 (2026-07-24) — ver nota al final de este ítem.
 **Origen:** spec-018 (TC-003), detectado al probar la UI admin de solo lectura
 **Prioridad:** Alta — bloquea que un estudiante pueda resolver una evaluación
 
@@ -28,10 +47,27 @@ estudiante** (spec-019, aún no implementado), fuera del alcance de spec-018.
 Sin este fix, un estudiante vería IDs en vez de preguntas al intentar
 resolver una evaluación.
 
-**Acción:** Al implementar spec-019, aplicar el mismo `select("*, question:questions(id, stem, type)")`
-(o los campos adicionales que la UI de resolución necesite: `code_snippet`,
-`code_language`, choices vía `question_choices`, etc.) en las tres funciones
-listadas arriba antes de dar por completo el flujo de resolución.
+**Acción prevista:** aplicar el mismo `select("*, question:questions(id, stem, type)")`
+en las tres funciones listadas arriba.
+
+**Resolución real (2026-07-24):** el join propuesto no alcanzaba, porque además
+del `select("*")` había un problema más profundo: RLS de `questions`/
+`question_choices` (`created_by = auth.uid() OR is_published`) bloquea la fila
+completa cuando el estudiante no es el autor y la pregunta es un borrador del
+docente (`is_published` significa "compartida en el banco", no "usada en una
+evaluación" — spec-018 nunca lo exige al componer variantes). El mismo join
+también habría fallado silenciosamente para el cálculo de `auto_score` en
+`submitSubmission` (necesita `question_choices.is_correct`).
+En vez de tocar el join de las tres funciones de `lib/assignments/index.ts`
+(ni su RLS, fuera del alcance de spec-019), se resolvió con dos funciones
+`security definer` acotadas por `assignment_variant_allocations`, nuevas en
+spec-019 (`20260724000002_variant_question_content_rpcs.sql`):
+`get_variant_question_details` (contenido para renderizar, con `is_correct`
+gateado por `show_feedback_on`/estado del intento) y `get_variant_answer_key`
+(clave de respuestas sin gating, uso interno en `submitSubmission`). Las tres
+funciones originales de `lib/assignments/index.ts` quedan sin modificar —
+spec-019 las reemplaza para su propio flujo de lectura con
+`lib/submissions/getVariantQuestionDetails`.
 
 ---
 

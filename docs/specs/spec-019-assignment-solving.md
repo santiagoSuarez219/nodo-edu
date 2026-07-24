@@ -1,7 +1,24 @@
-# spec-019 — Resolución de evaluaciones por el estudiante
+# spec-019 — [DONE] Resolución de evaluaciones por el estudiante
 
-> **Estado:** Planificado — pendiente de implementación. La implementación de referencia
-> existe en el tag `backup/feat-question-bank` y se portará al implementar este spec.
+> **Estado:** `[DONE]` — ronda de pruebas manuales completa (2026-07-24, 34/34 casos
+> aprobados, ver `docs/testing/test-019-assignment-solving.md`). Se encontraron y corrigieron
+> 4 bugs reales durante la ronda (ver "Resumen de la ronda" en el archivo de test) y se aplicó
+> una mejora de UX pedida por el usuario (modal de confirmación propio en vez de
+> `window.confirm()`). Sin framework de pruebas automáticas todavía (`CLAUDE.md`: "por
+> definir"), por lo que su ausencia no bloquea este `[DONE]`, según lo previsto en la sección
+> "Pruebas asociadas" de este spec.
+>
+> **Estado de dependencias en `development` (revisión 2026-07-24):** las dependencias de este
+> spec ya están integradas en `development` y aquí solo se leen/consumen:
+> - **spec-018** está `[DONE]` y mergeado: existen las tablas `assignment_variant_groups`,
+>   `assignments` (variantes), `assignment_questions` y `assignment_variant_allocations`, y el
+>   dominio `lib/assignments/index.ts` con `getActiveAssignmentsByEnrollment()`,
+>   `getStudentAssignment()` y `getOrAllocateVariant()`.
+> - **spec-005** (question-bank): las tablas de `questions` y el stub `lib/code-runner/index.ts`
+>   (`runCode` → `{ status: 'disabled' }`) ya están en `development`.
+>
+> Lo que **falta portar** es solo la capa propia de este spec: migración `submissions`/`answers`,
+> `lib/submissions/`, la API `/submit`, las rutas del estudiante y los componentes del jugador.
 >
 > **Nota de alcance (revisión 2026-07-18):** spec-018 cambió de dirección y este spec se
 > actualizó en consecuencia. Una evaluación ya no es una `assignment` suelta, sino un
@@ -120,21 +137,30 @@ preguntas y sus puntos, de la **variante asignada**.
   `enrollments` (pertenencia estudiante↔curso, con `status`), `grade_items` y
   `student_grades` (propagación de la nota), el helper `requireUser()` de
   `lib/auth/session.ts` y el dashboard del estudiante en `app/cuenta/`.
-- **[spec-018](./spec-018-assignment-authoring.md) (assignment-authoring)** — provee las
-  tablas `assignment_variant_groups`, `assignments` (variantes), `assignment_questions` y
-  `assignment_variant_allocations`; el dominio `lib/assignments/` con
-  `getActiveAssignmentsByEnrollment()` (devuelve `StudentAssignment[]`: config del grupo +
-  variante ya resuelta), `getStudentAssignment()` y **`getOrAllocateVariant()`** (sorteo
-  balanceado y persistido); y la configuración compartida del grupo (`opens_at`/`closes_at`,
-  `time_limit_minutes`, `shuffle_*`, `show_feedback_on`, `max_attempts`, vínculo opcional
-  `grade_item_id`) que este spec lee para gobernar la resolución.
+- **[spec-018](./spec-018-assignment-authoring.md) (assignment-authoring)** — `[DONE]`,
+  mergeado en `development`. Provee las tablas `assignment_variant_groups`, `assignments`
+  (variantes), `assignment_questions` y `assignment_variant_allocations`; y el dominio en
+  `lib/assignments/index.ts` con (firmas reales):
+  - `getActiveAssignmentsByEnrollment(enrollmentId): Promise<StudentAssignment[]>` — devuelve,
+    por evaluación, `StudentAssignment = { group, variant, questions, total_points }` (config del
+    grupo + variante ya resuelta).
+  - `getStudentAssignment(groupId, enrollmentId): Promise<StudentAssignment | null>`.
+  - **`getOrAllocateVariant(enrollmentId, groupId)`** — sorteo balanceado y persistido; devuelve
+    `{ variant: AssignmentVariant; questions: AssignmentQuestion[] } | null` (la variante asignada,
+    no la fila de allocation).
+
+  La configuración compartida del grupo (`opens_at`/`closes_at`, `time_limit_minutes`,
+  `shuffle_questions`/`shuffle_choices`, `show_feedback_on`, `max_attempts`, vínculo opcional
+  `grade_item_id`) que este spec lee para gobernar la resolución vive en `assignment_variant_groups`.
 - **[spec-005](./spec-005-question-bank.md) (question-bank)** — provee las tablas de
   preguntas y el stub `lib/code-runner/index.ts` (`runCode` → `{ status: 'disabled' }`) que
   este spec consume para `coding_challenge`.
 
 > Cadena de dependencias: **spec-003 → spec-005 → spec-018 → spec-019 → spec-020**.
-> spec-005/006/007/008 conviven en la rama `feat/question-bank`; la integración a
-> `development` se coordina por separado.
+> A la fecha (2026-07-24), spec-003, spec-005 (tablas de `questions` + `lib/code-runner`) y
+> spec-018 (`[DONE]`) ya están integrados en `development`; este spec puede implementarse
+> directamente sobre esa base. spec-020 (revisión manual del docente) sigue `[NOT STARTED]` y
+> consume las columnas que este spec crea.
 
 ---
 
@@ -187,7 +213,7 @@ a `submitSubmission`; error de dominio → `400`.
 | Archivo | Acción | Detalle |
 |---|---|---|
 | `lib/submissions/types.ts` | **Crear** | `Submission`, `Answer`, `SubmissionWithAnswers`, `SubmissionStatus`, y los tipos de revisión (`AnswerForReview`, `SubmissionForReview`) que spec-020 consume |
-| `lib/submissions/index.ts` | **Crear** | `createSubmission`, `saveAnswer`, `submitSubmission`, `getSubmissionByStudent`, `getSubmissionsByAssignment` + helper `propagateToGradeItem`. Las funciones de revisión (`getSubmissionForReview`, `gradeAnswer`, `finalizeGrading`) se ubican en este mismo módulo y las consume spec-020 |
+| `lib/submissions/index.ts` | **Crear** | `createSubmission`, `saveAnswer`, `submitSubmission`, `getSubmissionByStudent`, `getSubmissionsByGroup(variantGroupId)` (lista todos los envíos de una evaluación **a través de sus variantes**, indexada por `variant_group_id`; la consume la revisión docente de spec-020) + helper `propagateToGradeItem`. Las funciones de revisión (`getSubmissionForReview`, `gradeAnswer`, `finalizeGrading`) se ubican en este mismo módulo y las consume spec-020 |
 | `lib/submissions/actions.ts` | **Crear** | Server Actions envueltas en `requireUser()`: `createSubmissionAction`, `saveAnswerAction` (y las de revisión de spec-020) |
 
 > `submitSubmission` usa el cliente de servidor por sesión (`createServerSupabaseClient`); RLS
@@ -276,8 +302,9 @@ Restricción: `unique (submission_id, question_id)`.
 ## Reglas de negocio (dominio)
 
 - **Resolución de variante (previo a todo)**: la ruta del jugador llama a
-  `getOrAllocateVariant(enrollmentId, groupId)` (spec-018). Devuelve la variante ya asignada
-  o sortea una si es el primer acceso. Todo lo demás opera sobre esa variante.
+  `getOrAllocateVariant(enrollmentId, groupId)` (spec-018), que devuelve
+  `{ variant, questions } | null` — la variante ya asignada, o una recién sorteada si es el
+  primer acceso (`null` si no hay sesión o variante). Todo lo demás opera sobre esa variante.
 - **Creación / recuperación de intento (`createSubmission`)**: rechaza si el **grupo** no
   está publicado, si `opens_at` es futuro o si `closes_at` ya pasó. Cuenta los intentos
   existentes **del grupo** (`variant_group_id` + `enrollment_id`); si `>= max_attempts`,
@@ -308,51 +335,90 @@ Restricción: `unique (submission_id, question_id)`.
 ## Fases de implementación
 
 ### Fase 1 — Schema y RLS de `submissions` / `answers`
-- [ ] Migración de las tablas `submissions` y `answers` con constraints e índices, incluida
+- [x] Migración de las tablas `submissions` y `answers` con constraints e índices, incluida
       la columna `variant_group_id` y el `unique (variant_group_id, enrollment_id,
-      attempt_number)`.
-- [ ] Políticas RLS de `submissions` y `answers`: aislamiento estudiante/docente por
+      attempt_number)`. (`20260724000000_init_submissions.sql`)
+- [x] Políticas RLS de `submissions` y `answers`: aislamiento estudiante/docente por
       `enrollment`/curso, más la condición de `insert` que ata el `assignment_id` a la
-      variante asignada en `assignment_variant_allocations`.
+      variante asignada en `assignment_variant_allocations`. (`20260724000001_rls_submissions.sql`)
+- [x] **Hallazgo durante la implementación (fuera del schema original de esta fase):** RLS de
+      `questions`/`question_choices` (spec-005) es `created_by = auth.uid() OR is_published`;
+      `is_published` significa "visible en el banco compartido" y **no** se exige al usar una
+      pregunta en una variante (`lib/assignments/service.ts` no lo valida). Un estudiante nunca
+      es `created_by`, así que si el docente usó una pregunta en borrador, el estudiante no
+      podía leer su contenido (`DEBT-007`) **ni** calificarse correctamente su `multiple_choice`
+      (el mismo bloqueo aplica al leer `question_choices.is_correct` durante `submitSubmission`).
+      Resuelto con dos funciones `security definer` acotadas por asignación
+      (`assignment_variant_allocations`), sin tocar RLS de `questions`/`question_choices`:
+      - `get_variant_question_details(assignment_id, enrollment_id)` — contenido para
+        renderizar (jugador y resultados); `choices[].is_correct` se calcula **dentro de SQL**
+        según `show_feedback_on`/`closes_at`/estado del intento — nunca por un flag que mande
+        el llamador, porque la función es alcanzable directo vía API REST de Supabase con la
+        sesión del propio estudiante.
+      - `get_variant_answer_key(assignment_id, enrollment_id)` — ids de opciones correctas sin
+        gating, de uso exclusivo interno en `submitSubmission` (nunca se reenvía al cliente).
+      (`20260724000002_variant_question_content_rpcs.sql`)
+- [x] **Hallazgo adicional:** el proyecto Supabase remoto ya tenía `submissions`/`answers`
+      con el schema **pre-variantes** (sin `variant_group_id`), RLS y 6 políticas sin rastro en
+      ningún migration de este repo, y 1 fila huérfana (`in_progress`, 2026-07-15) apuntando a
+      un `assignments` legacy (`variant_group_id is null`, previo al pivote del 07-18). Debris
+      de una iteración abandonada, no datos reales — confirmado con el usuario, se hizo
+      `drop table ... cascade` de ambas al inicio de `20260724000000_init_submissions.sql`
+      antes de recrearlas con el schema correcto.
+- [x] Migraciones aplicadas al proyecto Supabase (`supabase db push`, 2026-07-24; único entorno
+      del proyecto — ver CLAUDE.md). Verificado: `variant_group_id` presente en `submissions`,
+      ambas RPCs (`get_variant_question_details`, `get_variant_answer_key`) creadas.
 - [ ] Verificar RLS por rol de forma manual, incluido el intento de abrir una submission
-      sobre una variante no asignada.
+      sobre una variante no asignada y la llamada directa a las RPCs con una variante ajena —
+      **pendiente de la ronda de pruebas de `test-019-assignment-solving.md`.**
 
 ### Fase 2 — Capa de dominio `lib/submissions/`
-- [ ] Crear `lib/submissions/types.ts` (`Submission`, `Answer`, `SubmissionWithAnswers`,
-      `SubmissionStatus`; y `AnswerForReview`/`SubmissionForReview` que consume spec-020).
-- [ ] Crear `lib/submissions/index.ts`: `createSubmission` (ventana + `max_attempts` +
+- [x] Crear `lib/submissions/types.ts` (`Submission`, `Answer`, `SubmissionWithAnswers`,
+      `SubmissionStatus`, `QuestionDetail`/`QuestionChoiceDetail`; y
+      `AnswerForReview`/`SubmissionForReview` que consume spec-020).
+- [x] Crear `lib/submissions/index.ts`: `createSubmission` (ventana + `max_attempts` +
       recuperación de intento en progreso), `saveAnswer` (upsert), `submitSubmission`
-      (cálculo de `auto_score`, cierre condicional a `graded`, propagación), lecturas
-      `getSubmissionByStudent`/`getSubmissionsByAssignment` y el helper
-      `propagateToGradeItem`. Consumir el stub `lib/code-runner` para `coding_challenge`.
-- [ ] Crear `lib/submissions/actions.ts`: `createSubmissionAction`, `saveAnswerAction`
+      (cálculo de `auto_score` vía `get_variant_answer_key`, cierre condicional a `graded`,
+      propagación), `getVariantQuestionDetails` (contenido vía `get_variant_question_details`),
+      lecturas `getSubmissionByStudent` y `getSubmissionsByGroup(variantGroupId)` (envíos de la
+      evaluación a través de sus variantes, para la revisión docente de spec-020) y el helper
+      `propagateToGradeItem`.
+- [x] Crear `lib/submissions/actions.ts`: `createSubmissionAction`, `saveAnswerAction`,
+      `submitSubmissionAction`, `startNewAttemptAction` (nuevo intento sobre la misma variante)
+      y `runCodeAction` (consume el stub `lib/code-runner` para `coding_challenge`) — todas
       envueltas en `requireUser()`.
 
 ### Fase 3 — API de envío
-- [ ] Crear `app/api/submissions/[submissionId]/submit/route.ts` (`POST`): `401` sin sesión,
+- [x] Crear `app/api/submissions/[submissionId]/submit/route.ts` (`POST`): `401` sin sesión,
       `404` si no existe, `403` si la submission no es del estudiante autenticado (vía
       `enrollment.student_id`), delega a `submitSubmission` y responde `auto_score`; error de
       dominio → `400`.
 
 ### Fase 4 — Rutas y componentes del estudiante
-- [ ] Ruta listado `.../evaluaciones/page.tsx`: valida matrícula activa, lista con
-      `getActiveAssignmentsByEnrollment` y el estado del último intento por evaluación.
-- [ ] Ruta jugador `.../evaluaciones/[groupId]/page.tsx`: resuelve la variante con
+- [x] Ruta listado `.../evaluaciones/page.tsx`: valida matrícula activa; lista los grupos
+      publicados y en ventana del curso de la matrícula **directamente** (no con
+      `getActiveAssignmentsByEnrollment` de spec-018, que solo devuelve grupos con allocation
+      ya existente — ver comentario en el archivo) y el estado del último intento por evaluación.
+- [x] Ruta jugador `.../evaluaciones/[groupId]/page.tsx`: resuelve la variante con
       `getOrAllocateVariant()`; redirige a resultados si ya hay intento cerrado; si no,
-      crea/recupera intento `in_progress` y monta el `AssignmentPlayer`; maneja el caso
-      "sin intentos disponibles".
-- [ ] Ruta resultados `.../evaluaciones/[groupId]/resultados/page.tsx`: monta
-      `SubmissionResult`.
-- [ ] `components/student/QuestionRenderer.tsx` (5 tipos, prop `disabled`),
-      `AssignmentPlayer.tsx` (auto-save debounce 3 s, `useCountdown` con submit automático,
-      header sticky con estado de guardado y tiempo, confirmación de envío) y
-      `SubmissionResult.tsx` (puntaje, estado y feedback según `show_feedback_on`).
+      crea/recupera intento `in_progress` y monta el `AssignmentPlayer`.
+- [x] Ruta resultados `.../evaluaciones/[groupId]/resultados/page.tsx`: monta
+      `SubmissionResult`; si quedan intentos (`attempt_number < max_attempts`), ofrece
+      "Iniciar nuevo intento" (`startNewAttemptAction`) — ahí vive el caso "sin intentos
+      disponibles" (el botón no aparece).
+- [x] `components/student/QuestionRenderer.tsx` (5 tipos, prop `disabled`, reutilizado también
+      por `SubmissionResult` en modo lectura/feedback), `AssignmentPlayer.tsx` (auto-save
+      debounce 3 s, `useCountdown` con submit automático, header sticky con estado de guardado
+      y tiempo, confirmación de envío) y `SubmissionResult.tsx` (puntaje, estado y feedback ya
+      gateado por `show_feedback_on` desde la RPC).
 
 ### Fase 5 — Pulido, accesibilidad y pruebas
-- [ ] Tokens semánticos de `DESIGN.md`, JetBrains Mono, modo claro/oscuro; a11y de
-      `AssignmentPlayer`/`QuestionRenderer` (foco, roles, teclado).
-- [ ] `npm run lint` y `tsc --noEmit` sin errores nuevos.
-- [ ] Crear `docs/testing/test-019-assignment-solving.md` y ejecutar los casos manuales de UI.
+- [x] Tokens semánticos de `DESIGN.md`, JetBrains Mono, modo claro/oscuro (clases
+      `dark:`/`text-gray-900 dark:text-white` consistentes con el resto del proyecto).
+- [x] `npm run lint` y `tsc --noEmit` sin errores nuevos (verificado 2026-07-24; los 4 errores
+      de lint restantes son preexistentes en `AcademicCourseList.tsx`, fuera de este spec).
+- [ ] Ejecutar los casos manuales de `docs/testing/test-019-assignment-solving.md` (requiere
+      aplicar las migraciones pendientes — ver nota de despliegue — y datos de prueba).
 
 ---
 
@@ -397,8 +463,22 @@ Restricción: `unique (submission_id, question_id)`.
   auto-save, countdown con submit automático, cálculo de `auto_score` y feedback inmediato,
   control de `max_attempts` por evaluación, redirección a resultados y aislamiento entre
   estudiantes/cursos **y entre variantes**.
-  > Ese archivo debe **actualizarse** con los casos de variantes al implementar este spec:
-  > su versión actual asume una asignación única sin variantes.
+  > Actualizado (2026-07-24) al modelo de variantes: rutas por `groupId`, casos de sorteo y
+  > estabilidad de variante (TC-006/007), reparto balanceado (TC-008) y aislamiento entre
+  > variantes (TC-009); plantilla de `docs/testing/` de `CLAUDE.md` (tabla de datos + resumen).
 - **Automáticas (e2e/unit) — fuera de ciclo:** los criterios se automatizarán cuando el
   proyecto adopte un framework de testing (hoy "por definir" en `CLAUDE.md`); su ausencia no
   bloquea el `[DONE]` de este spec.
+
+---
+
+## Aprobación de implementación
+
+> Claude no escribe código de implementación hasta que esta sección esté marcada.
+> Redactar/reconciliar el spec y sus pruebas **no** autoriza a implementar.
+
+- [x] Paquete (spec + `docs/testing/test-019-assignment-solving.md`) aprobado por el usuario
+- **Fecha de aprobación:** 2026-07-24
+
+> Al aprobar: marcar la casilla, fijar la fecha y cambiar el estado del título de
+> `[NOT STARTED]` a `[IN PROGRESS]` recién al iniciar la Fase 1.
