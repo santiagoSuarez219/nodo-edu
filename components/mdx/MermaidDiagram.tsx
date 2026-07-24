@@ -36,6 +36,9 @@ export function MermaidDiagram({ source }: MermaidDiagramProps) {
         mermaid.initialize({
           startOnLoad: false,
           theme: dark ? "dark" : "default",
+          themeVariables: {
+            fontFamily: '"JetBrains Mono", monospace',
+          },
           securityLevel: "strict",
           suppressErrorRendering: true,
         });
