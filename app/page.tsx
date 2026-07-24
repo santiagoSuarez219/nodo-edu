@@ -3,6 +3,8 @@ import { CourseGrid } from "@/components/home";
 import { LandingFooter } from "@/components/landing";
 import { FOOTER_LINKS } from "@/lib/landing";
 import { getAllCourses } from "@/lib/courses";
+import { InstructorFooter } from "@/components/course-presentations/InstructorFooter";
+import { TRANSVERSAL_INSTRUCTOR } from "@/lib/course-presentations/data/transversal";
 
 export const metadata: Metadata = {
   title: "Mis cursos — nodo",
@@ -25,10 +27,14 @@ export default async function Home() {
           </p>
         </div>
 
-        <div className="mt-8">
+        <div className="mt-8 mb-24">
           <CourseGrid courses={courses} />
         </div>
       </div>
+
+
+
+      <InstructorFooter instructor={TRANSVERSAL_INSTRUCTOR} />
 
       <div className="border-t border-gray-200 dark:border-gray-700" />
 
