@@ -26,7 +26,6 @@ export const Navbar = ({
   const params = useParams();
 
   const isTeacher = roles.includes("teacher") || roles.includes("admin");
-  const misCursosHref = isTeacher ? null : "/cuenta/cursos";
   const academicCourseId = params.academicCourseId as string | undefined;
 
   const toggleMenu = () => setIsMenuOpen((p) => !p);
@@ -39,31 +38,30 @@ export const Navbar = ({
   return (
     <>
       <nav className="w-full bg-white/90 dark:bg-gray-900/90 backdrop-blur transition-colors duration-300">
-        <div className="flex items-center justify-between w-full mx-auto px-4 md:px-6 lg:px-18 py-3 lg:py-4">
-          <div className="flex items-center gap-6 flex-1">
-            <Link
-              href="/"
-              className="bg-white rounded-lg py-1 px-2"
-              aria-label="Inicio"
-              onClick={closeMenu}
-            >
-              <Image
-                src="/logo.png"
-                width={150}
-                height={70}
-                alt="logo"
-                className="overflow-hidden"
-              />
-            </Link>
+        <div className="flex lg:grid lg:grid-cols-[auto_1fr_auto] items-center justify-between w-full mx-auto px-4 md:px-6 lg:px-18 py-3 lg:py-4 lg:gap-6">
+          <Link
+            href="/"
+            className="bg-white rounded-lg py-1 px-2"
+            aria-label="Inicio"
+            onClick={closeMenu}
+          >
+            <Image
+              src="/logo.png"
+              width={150}
+              height={70}
+              alt="logo"
+              className="overflow-hidden"
+            />
+          </Link>
+
+          <div className="hidden lg:flex items-center justify-center gap-6">
             <NavLinkList links={navLinks} variant="desktop" />
-            {isTeacher && (
-              <CourseScopeSelect courses={teacherCourses} />
-            )}
+            {isTeacher && <CourseScopeSelect courses={teacherCourses} />}
           </div>
 
-          <div className="flex gap-3 items-center">
+          <div className="flex gap-3 items-center justify-end">
             <div className="hidden lg:block">
-              <UserMenu profile={profile} misCursosHref={misCursosHref} />
+              <UserMenu profile={profile} />
             </div>
 
             <button
@@ -133,17 +131,6 @@ export const Navbar = ({
               {profile.full_name}
             </p>
           </li>
-          {misCursosHref && (
-            <li>
-              <Link
-                href={misCursosHref}
-                onClick={closeMenu}
-                className="block py-3 text-gray-700 dark:text-gray-300 hover:text-blue-700 dark:hover:text-blue-400 transition-colors"
-              >
-                Mis cursos
-              </Link>
-            </li>
-          )}
           <li>
             <Link
               href="/cuenta"

@@ -8,6 +8,10 @@ export interface NavLink {
 export function getStudentNavLinks(): NavLink[] {
   return [
     {
+      label: "Mis cursos",
+      href: "/cuenta/cursos",
+    },
+    {
       label: "Grupo de Investigación",
       href: "/grupo-investigacion",
     },
