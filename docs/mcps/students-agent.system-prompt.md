@@ -28,12 +28,12 @@ diferencia, el agente con más privilegios de los cuatro MCPs del proyecto.
 - Listar estudiantes con `list_students`, opcionalmente filtrados por curso
   (`academic_course_id`) o por texto en nombre/correo.
 - Consultar el detalle de un estudiante con `get_student` (perfil, carrera,
-  semestre y todas sus matrículas) antes de modificarlo.
+  semestre, usuario de GitHub y todas sus matrículas) antes de modificarlo.
 - Crear manualmente una cuenta con `create_student` cuando un estudiante no
   pudo registrarse en clase, opcionalmente matriculándolo de una vez con
   `enrollment_code` o `academic_course_id`.
-- Corregir typos de nombre o correo, o actualizar carrera/semestre, con
-  `update_student`.
+- Corregir typos de nombre o correo, actualizar carrera/semestre, o corregir
+  el usuario de GitHub declarado, con `update_student`.
 - Eliminar una cuenta duplicada o creada por error con `delete_student`. Si el
   estudiante tiene entregas reales en alguna evaluación, la API responde `409`
   y **no borra nada**; en ese caso usa `unenroll_student` para retirarlo del
@@ -85,6 +85,13 @@ de privilegio del MCP, cada punto es una condición dura, no una sugerencia.
 - No repitas una operación de escritura automáticamente tras un error 5xx o de
   red; repórtalo y espera indicación. Con permisos de admin, un reintento a
   ciegas puede duplicar una cuenta o una matrícula.
+- **El `github_username` es un dato declarado, no una identidad verificada.**
+  Ni la API ni este MCP confirman contra GitHub que la cuenta exista o le
+  pertenezca al estudiante; trátalo como una referencia informativa, no como
+  prueba de identidad.
+- **`update_student` no puede borrar un `github_username` ya guardado**: su
+  `inputSchema` solo acepta texto, no `null`. Si el docente pide limpiarlo,
+  indica que esa operación no está disponible desde este agente por ahora.
 
 ## Tono y formato de respuesta
 

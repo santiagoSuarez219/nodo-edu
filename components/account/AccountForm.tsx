@@ -10,6 +10,8 @@ interface Props {
   student: Student | null;
 }
 
+const GITHUB_USERNAME_HELP_ID = "github-username-help";
+
 const initial: AuthResult = { ok: true };
 
 export function AccountForm({ profile, student }: Props) {
@@ -72,6 +74,34 @@ export function AccountForm({ profile, student }: Props) {
               {state.fieldErrors.full_name[0]}
             </p>
           )}
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <label
+            htmlFor="github_username"
+            className="text-sm font-semibold text-gray-700 dark:text-gray-300"
+          >
+            Usuario de GitHub{" "}
+            <span className="font-normal text-gray-400 dark:text-gray-500">
+              (opcional)
+            </span>
+          </label>
+          <input
+            id="github_username"
+            name="github_username"
+            type="text"
+            autoComplete="off"
+            defaultValue={profile.github_username ?? ""}
+            placeholder="Ej. octocat"
+            className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-700 focus:border-blue-700 dark:focus:border-blue-500 transition-colors"
+            aria-describedby={GITHUB_USERNAME_HELP_ID}
+          />
+          <p
+            id={GITHUB_USERNAME_HELP_ID}
+            className="text-xs text-gray-500 dark:text-gray-400"
+          >
+            Solo el usuario, sin &quot;@&quot; ni URL. No se verifica contra GitHub.
+          </p>
         </div>
 
         <div className="grid sm:grid-cols-2 gap-5">

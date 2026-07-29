@@ -2,6 +2,7 @@ export interface Profile {
   id: string;
   full_name: string;
   avatar_url: string | null;
+  github_username: string | null;
   last_seen_at: string | null;
   created_at: string;
   updated_at: string;
@@ -35,6 +36,7 @@ export interface AdminStudentSummary {
   full_name: string;
   career: string | null;
   semester: number | null;
+  github_username: string | null;
 }
 
 export interface AdminStudentDetail extends AdminStudentSummary {
@@ -47,6 +49,7 @@ export interface CreateStudentInput {
   password: string;
   career?: string;
   semester?: number;
+  github_username?: string;
   enrollment_code?: string;
   academic_course_id?: string;
 }
@@ -56,6 +59,7 @@ export interface UpdateStudentInput {
   email?: string;
   career?: string | null;
   semester?: number | null;
+  github_username?: string | null;
 }
 
 export interface DeleteStudentResult {
