@@ -213,6 +213,7 @@ npm run lint
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Clave pública de Supabase (nueva nomenclatura) |
 | `SUPABASE_SERVICE_ROLE_KEY` | Clave de servicio (solo server-side, nunca en cliente) |
 | `NEXT_PUBLIC_SITE_URL` | URL base del sitio (redirects OAuth y password recovery) |
+| `STUDENTS_ADMIN_API_KEY` | Clave de servicio del dominio de estudiantes (`/api/students/*`, `students-mcp`) — permisos de admin, distinta de `QUESTION_BANK_API_KEY` |
 
 > ⚠️ Nunca escribas valores reales de variables de entorno en este archivo
 > ni en ningún archivo rastreado por git.
@@ -312,6 +313,7 @@ docs/
 | `question-bank-mcp` | Cliente de la API `/api/questions/*` para que un agente docente liste, cree, actualice, elimine y publique preguntas del banco de evaluaciones (multiple_choice, open_text, code_snippet, code_write, coding_challenge). | Activo | `docs/mcps/question-bank-agent.system-prompt.md` |
 | `assignment-mcp` | Cliente de la API `/api/assignments/*` para que un agente docente diseñe evaluaciones formadas por 3 variantes (A/B/C) de preguntas distintas, publique con validación de invariantes, y monitoree el reparto aleatorio a estudiantes. | Activo | `docs/mcps/assignment-agent.system-prompt.md` |
 | `attendance-mcp` | Cliente de solo lectura de la API `/api/attendance/*` para que un agente docente liste sesiones de asistencia, consulte roster y resúmenes de asistencia por estudiante. | Activo | `docs/mcps/attendance-agent.system-prompt.md` |
+| `students-mcp` | Cliente de la API `/api/students/*` (permisos de admin, `service_role`) para que un agente docente liste, cree, corrija, elimine y (des)matricule estudiantes manualmente. Autenticado con `STUDENTS_ADMIN_API_KEY`, distinta de `QUESTION_BANK_API_KEY`. | Activo | `docs/mcps/students-agent.system-prompt.md` |
 
 ### Reglas de gestión de MCPs
 
@@ -385,6 +387,7 @@ Para ejecutar agentes con MCPs locales en Claude Desktop:
 | `question-bank-mcp` | `node /path/to/mcp-servers/question-bank-mcp/dist/index.js` | `QUESTION_BANK_API_BASE_URL=http://localhost:3000/api/questions`, `QUESTION_BANK_API_KEY={{key}}` |
 | `assignment-mcp` | `node /path/to/mcp-servers/assignment-mcp/dist/index.js` | `ASSIGNMENT_API_BASE_URL=http://localhost:3000/api/assignments`, `ASSIGNMENT_API_KEY={{key}}` |
 | `attendance-mcp` | `node /path/to/mcp-servers/attendance-mcp/dist/index.js` | `API_BASE_URL=http://localhost:3000/api`, `API_KEY={{key}}` |
+| `students-mcp` | `node /path/to/mcp-servers/students-mcp/dist/index.js` | `API_BASE_URL=http://localhost:3000/api/students`, `API_KEY={{STUDENTS_ADMIN_API_KEY}}` |
 
 #### Pasos para agregar un MCP a Claude Desktop
 

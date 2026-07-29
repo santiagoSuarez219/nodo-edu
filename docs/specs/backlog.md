@@ -5,6 +5,83 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+## DEBT-014 — `NEXT_PUBLIC_SITE_URL` sin ningún uso en el código
+
+**Origen:** Detectado por `@reviewer` en la 3ª pasada de spec-027 (ajeno a su
+alcance)
+**Prioridad:** Baja — configuración muerta, no rompe nada
+
+Tras eliminar `emailRedirectTo` de `signUp` (Fase 2) y todo el flujo de
+recuperación de contraseña (ampliación de scope de spec-027, `SITE_URL` salió
+de `lib/auth/actions.ts`), `NEXT_PUBLIC_SITE_URL` quedó **sin ninguna
+referencia** en `*.ts`/`*.tsx` (verificado por grep global). `.env.example` y
+`CLAUDE.md` la siguen describiendo como *"redirects OAuth y password
+recovery"* — ambos flujos inexistentes hoy.
+
+**Acción:** Decidir si se retira de `.env.example`/`CLAUDE.md`/Vercel, o se
+deja documentada como reservada para un futuro flujo de OAuth (spec-002 la
+tenía prevista, nunca implementada).
+
+---
+
+## DEBT-013 — `npm run lint` falla por `<a>` en vez de `<Link>` en AcademicCourseList
+
+**Origen:** Detectado por `@reviewer` durante la revisión de spec-027 (ajeno a
+su alcance)
+**Prioridad:** Media — bloquea que `npm run lint` termine en verde, condición
+del checklist pre-despliegue
+
+`components/admin/AcademicCourseList.tsx:31` usa un `<a>` nativo para navegar
+a `/admin/courses/new/` en vez de `<Link />` de `next/link`, lo que dispara
+`@next/next/no-html-link-for-pages` (5 veces, una por regla evaluada).
+
+**Acción:** Reemplazar el `<a>` por `<Link href="/admin/courses/new">` en ese
+archivo y verificar que `npm run lint` termina sin errores.
+
+---
+
+## DEBT-012 — Rotación/expiración de `enrollment_code`
+
+**Origen:** spec-027 (registro simplificado con código de curso)
+**Prioridad:** Alta — el código se convirtió en el único gate de registro
+
+Desde spec-027, el `enrollment_code` de `academic_courses` ya no es solo un
+dato de conveniencia para matricularse desde `/cuenta/cursos`: es el único
+mecanismo que evita que cualquier persona con correo inventado se registre en
+la plataforma (ver sección "Riesgos de seguridad" de spec-027). Hoy no existe
+forma de rotar o expirar un código sin romper la validación de matrículas ya
+hechas contra ese mismo valor, y el código se comparte en voz alta a grupos de
+~30 estudiantes, por lo que es fácil que circule más allá del grupo.
+
+**Acción:** Diseñar un spec para rotación/expiración de `enrollment_code`
+(ej. código con vigencia temporal, o posibilidad de invalidar el anterior y
+generar uno nuevo sin afectar matrículas existentes).
+
+---
+
+## DEBT-011 — Reintroducir recuperación de contraseña por correo cuando haya SMTP propio [ACTUALIZADO]
+
+**Origen:** spec-027 (registro simplificado con código de curso)
+**Prioridad:** Alta — bloqueante para cualquier estudiante que olvide su contraseña
+
+**Actualización (misma ronda manual, 2026-07-29):** este ítem nació anotando
+que `/recuperar-password` seguiría "rota" sin SMTP. Durante la ronda de
+pruebas el usuario decidió ir más allá: en vez de dejar la UI visible pero no
+funcional, se **eliminó por completo** el flujo (`/recuperar-password`,
+`/recuperar-password/confirmar`, `PasswordResetRequestForm`,
+`PasswordResetConfirmForm`, `requestPasswordReset`, `updatePassword`, los
+schemas asociados, y el enlace en `LoginForm`) — ver spec-027, sección
+"Incluye". Mientras no haya SMTP propio, el docente es el único canal real de
+recuperación de cuentas (vía `students-mcp` → `update_student` con nuevo
+`email`, o recreando la cuenta).
+
+**Acción:** Cuando exista SMTP propio (ver **[[DEBT-001]]**), diseñar un spec
+nuevo para **reconstruir** el flujo de recuperación de contraseña desde cero
+(la implementación anterior ya no existe en el código) — no es un simple
+"reactivar", hay que rehacer las rutas, formularios y Server Actions.
+
+---
+
 ## DEBT-010 — Error de consola "script tag while rendering" en el init de tema (Next 16)
 
 **Origen:** Reportado por el usuario durante la ronda de pruebas de `test-020-assignment-review.md`, ajeno al scope de spec-020
