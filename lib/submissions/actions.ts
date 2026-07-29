@@ -1,10 +1,11 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/auth/session";
 import { getOrAllocateVariant } from "@/lib/assignments";
 import { runCode, type CodeRunResult } from "@/lib/code-runner";
-import { createSubmission, saveAnswer, submitSubmission } from "./index";
+import { createSubmission, finalizeGrading, gradeAnswer, saveAnswer, submitSubmission } from "./index";
 import type { AuthResult } from "@/lib/auth/types";
 
 export async function createSubmissionAction(
@@ -65,4 +66,45 @@ export async function runCodeAction(
 ): Promise<CodeRunResult> {
   await requireUser();
   return runCode(language, code, input);
+}
+
+function reviewPaths(academicCourseId: string, groupId: string, submissionId: string) {
+  return [
+    `/admin/courses/${academicCourseId}/assignments/${groupId}/review`,
+    `/admin/courses/${academicCourseId}/assignments/${groupId}/review/${submissionId}`,
+    `/admin/courses/${academicCourseId}/assignments/${groupId}`,
+  ] as const;
+}
+
+export async function gradeAnswerAction(
+  answerId: string,
+  score: number,
+  notes: string | null,
+  submissionId: string,
+  academicCourseId: string,
+  groupId: string
+): Promise<AuthResult> {
+  await requireUser();
+  const result = await gradeAnswer(answerId, score, notes);
+  if (!result.ok) return result;
+
+  for (const path of reviewPaths(academicCourseId, groupId, submissionId)) {
+    revalidatePath(path);
+  }
+  return { ok: true };
+}
+
+export async function finalizeGradingAction(
+  submissionId: string,
+  academicCourseId: string,
+  groupId: string
+): Promise<AuthResult<{ final_score: number }>> {
+  await requireUser();
+  const result = await finalizeGrading(submissionId);
+  if (!result.ok) return result;
+
+  for (const path of reviewPaths(academicCourseId, groupId, submissionId)) {
+    revalidatePath(path);
+  }
+  return { ok: true, data: { final_score: result.final_score } };
 }

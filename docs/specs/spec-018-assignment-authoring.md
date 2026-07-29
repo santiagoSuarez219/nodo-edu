@@ -1,4 +1,4 @@
-# spec-018 — Diseño de evaluaciones vía MCP con variantes aleatorias
+# spec-018 — [DONE] Diseño de evaluaciones vía MCP con variantes aleatorias
 
 > **Estado:** [DONE] — pruebas manuales aprobadas (23/28; 5 casos del "player" de
 > estudiante quedan diferidos a spec-019, ver `docs/testing/test-018-assignment-authoring.md`)

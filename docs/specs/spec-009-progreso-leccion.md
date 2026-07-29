@@ -1,4 +1,4 @@
-# spec-009 — Progreso de lección y cierre ("completar lección")
+# spec-009 — [DONE] Progreso de lección y cierre ("completar lección")
 
 > **Estado:** `[DONE]` — Implementación completada, pruebas manuales aprobadas (TC-009-01 a TC-009-09), revisión de código ejecutada y hallazgos corregidos.
 
