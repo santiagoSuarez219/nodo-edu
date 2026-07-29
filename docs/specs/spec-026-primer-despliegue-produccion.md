@@ -11,7 +11,8 @@
 ## Contexto
 
 `main` nunca ha recibido un despliegue real: este es el **primer despliegue a
-producción** de Nodo. La rama `development` va **163 commits adelante de `main`**.
+producción** de Nodo. La rama `development` va **174 commits adelante de `main`**
+(verificado 2026-07-29).
 El objetivo es dejar el proyecto **verificado y listo para desplegar** (build,
 variables de entorno, configuración de proyecto, RLS, redirect URLs de Auth,
 checklist pre-despliegue completo), reservando el despliegue en sí como una fase
@@ -68,7 +69,7 @@ los flujos de autenticación se romperán en producción.
 - **Rutas y auth:** ninguna ruta nueva; se valida el comportamiento existente de
   `lib/auth/actions.ts` (redirects) y `middleware.ts` bajo el dominio de producción.
 - **Base de datos (Supabase remoto, ref `bgiimadnmqnoqmdbudpo`):** sin cambios de
-  esquema propios del spec; se **verifica** que las 25 migraciones estén aplicadas
+  esquema propios del spec; se **verifica** que las 31 migraciones estén aplicadas
   y que las políticas RLS de todas las tablas sean correctas.
 - **Auth/Storage (Supabase):** Site URL y Redirect URLs deben incluir el dominio
   de Vercel; revisión de buckets de Storage si se sirven imágenes/PDFs.
@@ -104,25 +105,37 @@ cambios de capacidad.
 ### Fase 1 — Precondiciones y bloqueadores (gate de entrada)
 > No produce cambios; **verifica** que se puede proceder. Si algo falla, el spec
 > se detiene aquí.
+>
+> **Estado a 2026-07-29: los bloqueantes originales están resueltos.** spec-020
+> pasó a `[DONE]` y se mergeó a `development` (commit `bdb120a`), y spec-024
+> también está en `[DONE]`. spec-026 es hoy el **único** spec fuera de `[DONE]`
+> (los 25 restantes están cerrados). Los checks siguen listados para
+> re-verificarse en el momento de ejecutar la fase.
 
-- [ ] Confirmar que **spec-020** está en `[DONE]` y mergeado a `development`
-      (hoy corregido a `[NOT STARTED]`; es bloqueante).
-- [ ] Confirmar que **spec-024** (`[IN PROGRESS]`) está en `[DONE]` y mergeado a
-      `development`.
-- [ ] Confirmar que no quedan otros specs `[IN PROGRESS]`/`[TESTING]` que deban
-      entrar en este release.
-- [ ] Confirmar rama activa `development` sincronizada con `origin/development`.
+- [x] **spec-020** en `[DONE]` y mergeado a `development` — verificado 2026-07-29.
+- [x] **spec-024** en `[DONE]` y mergeado a `development` — verificado 2026-07-29.
+- [x] No quedan specs `[IN PROGRESS]`/`[TESTING]` pendientes de entrar en este
+      release — verificado 2026-07-29 (spec-026 es el único `[NOT STARTED]`).
+- [ ] Confirmar rama activa `development` sincronizada con `origin/development`
+      (re-verificar al iniciar la fase).
 - **Archivos impactados:** lectura de `docs/specs/` (sin edición).
 
 ### Fase 2 — Verificación local de build, lint y migraciones
 - [ ] `npm run build` pasa sin errores.
 - [ ] `npm run lint` pasa sin errores.
 - [ ] `supabase migration list` muestra columnas Local y Remote **coincidentes**
-      (25 migraciones aplicadas al proyecto remoto).
+      (31 migraciones en `supabase/migrations/` a 2026-07-29; confirmar el número
+      vigente al ejecutar la fase).
 - [ ] Registrar en el spec cualquier warning de build relevante para producción.
 - **Archivos impactados:** ninguno (solo verificación).
 
 ### Fase 3 — Configuración de proyecto para producción
+> **Estado verificado a 2026-07-29:** `next.config.ts` es un stub vacío;
+> `vercel.json` **no existe**; `package.json` **no** declara `engines`
+> (Next `16.2.4`, React `19.2.4`); `.env.example` documenta 6 variables pero
+> **omite `TEACHER_EMAIL` y `TEACHER_PASSWORD`**, que sí se usan en el código
+> (script de seed). Todos los pasos de esta fase siguen vigentes.
+
 - [ ] Revisar `next.config.ts` (hoy stub vacío) y **evaluar** si producción
       requiere: `images.remotePatterns` para servir imágenes desde Supabase
       Storage (si el contenido las usa), headers de seguridad u otras opciones.
@@ -232,8 +245,9 @@ cambios de capacidad.
 
 ## Criterios de aceptación
 
-- spec-020 y spec-024 están en `[DONE]` y mergeados a `development` antes de
-  iniciar cualquier acción de despliegue.
+- Todos los specs del release están en `[DONE]` y mergeados a `development` antes
+  de iniciar cualquier acción de despliegue (spec-020 y spec-024 — bloqueantes
+  originales — ya cumplidos a 2026-07-29).
 - `npm run build` y `npm run lint` pasan sin errores; `supabase migration list`
   muestra Local == Remote.
 - `.env.example` documenta todas las variables reales, incluidas
