@@ -11,7 +11,7 @@ interface ResearchGroupPageProps {
 
 export function ResearchGroupPage({ group }: ResearchGroupPageProps) {
   return (
-    <div className="bg-white dark:bg-gray-900">
+    <div>
       <ResearchGroupHero group={group} />
       <ResearchLines lines={group.lines} />
       <ResearchSeedbeds seedbeds={group.seedbeds} />

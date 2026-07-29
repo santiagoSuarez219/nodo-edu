@@ -16,7 +16,7 @@ export default async function Home() {
   const courses = await getAllCourses();
 
   return (
-    <main className="bg-white dark:bg-gray-900 mt-19 pt-6 lg:pt-16 w-full max-w-7xl mx-auto">
+    <main className="mt-19 pt-6 lg:pt-16 w-full max-w-7xl mx-auto">
       <div className="px-4 md:px-6 lg:px-18 pb-6 lg:pb-16">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">

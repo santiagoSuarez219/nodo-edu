@@ -8,9 +8,9 @@ interface Props {
 
 export function CoursePresentation({ presentation, cta }: Props) {
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
+    <div className="min-h-screen text-gray-900 dark:text-white">
       {/* Hero Section */}
-      <section className="grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] gap-8 lg:gap-12 px-4 md:px-6 lg:px-16 py-8 lg:py-12 border-b border-gray-200 dark:border-gray-700">
+      <section className="grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] gap-8 lg:gap-12 px-4 md:px-6 lg:px-16 py-8 lg:py-12 ">
         {/* Left: Main info */}
         <div className="flex flex-col gap-4">
           <div className="flex gap-2 flex-wrap">
@@ -73,7 +73,7 @@ export function CoursePresentation({ presentation, cta }: Props) {
       {/* Main content */}
       <main className="px-4 md:px-6 lg:px-16 py-8 lg:py-12 flex flex-col gap-12">
         {/* Syllabus */}
-        <section className="flex flex-col gap-4 pb-8 lg:pb-12 border-b border-gray-200 dark:border-gray-700">
+        <section className="flex flex-col gap-4 pb-8 lg:pb-12 ">
           <h2 className="text-xl lg:text-2xl font-bold">Temario</h2>
           <div className="flex flex-col gap-4">
             {presentation.syllabus.map((unit) => (
@@ -105,7 +105,7 @@ export function CoursePresentation({ presentation, cta }: Props) {
         </section>
 
         {/* Tools */}
-        <section className="flex flex-col gap-4 pb-8 lg:pb-12 border-b border-gray-200 dark:border-gray-700">
+        <section className="flex flex-col gap-4 pb-8 lg:pb-12 ">
           <h2 className="text-xl lg:text-2xl font-bold">
             Herramientas y tecnologías
           </h2>
@@ -122,7 +122,7 @@ export function CoursePresentation({ presentation, cta }: Props) {
         </section>
 
         {/* Two columns: Evaluation & Dates */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 pb-8 lg:pb-12 border-b border-gray-200 dark:border-gray-700">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 pb-8 lg:pb-12 ">
           {/* Evaluation */}
           <section className="flex flex-col gap-4">
             <h2 className="text-xl lg:text-2xl font-bold">Evaluación</h2>
@@ -165,7 +165,7 @@ export function CoursePresentation({ presentation, cta }: Props) {
               {presentation.dates.map((item) => (
                 <div
                   key={`${item.date}-${item.label}`}
-                  className="flex gap-4 py-3 border-b border-gray-200 dark:border-gray-700 last:border-b-0 text-sm"
+                  className="flex gap-4 py-3  last:border-b-0 text-sm"
                 >
                   <span className="font-bold text-blue-700 dark:text-blue-400 w-32 flex-shrink-0">
                     {item.date}
@@ -180,7 +180,7 @@ export function CoursePresentation({ presentation, cta }: Props) {
         </div>
 
         {/* Conditions */}
-        <section className="flex flex-col gap-4 pb-8 lg:pb-12 border-b border-gray-200 dark:border-gray-700">
+        <section className="flex flex-col gap-4 pb-8 lg:pb-12 ">
           <h2 className="text-xl lg:text-2xl font-bold">
             Condiciones del curso
           </h2>
@@ -194,7 +194,7 @@ export function CoursePresentation({ presentation, cta }: Props) {
         </section>
 
         {/* Bibliography */}
-        <section className="flex flex-col gap-4 pb-8 lg:pb-12 border-b border-gray-200 dark:border-gray-700">
+        <section className="flex flex-col gap-4 pb-8 lg:pb-12">
           <h2 className="text-xl lg:text-2xl font-bold">Bibliografía</h2>
           <div className="space-y-3">
             {presentation.bibliography.map((book, idx) => (
@@ -226,18 +226,6 @@ export function CoursePresentation({ presentation, cta }: Props) {
           </a>
         </section>
 
-        {/* Final CTA */}
-        <section className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 py-8">
-          <div>
-            <h2 className="text-2xl lg:text-3xl font-bold mb-2">
-              ¿Listo para empezar?
-            </h2>
-            <p className="text-gray-600 dark:text-gray-400 text-sm">
-              Quedan {presentation.spots} cupos disponibles para este curso.
-            </p>
-          </div>
-          <div className="flex-shrink-0">{cta}</div>
-        </section>
 
 
       </main>

@@ -43,7 +43,8 @@ export default async function RootLayout({
       className={`${jetbrainsMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <body suppressHydrationWarning className="min-h-full flex flex-col bg-white text-gray-900 dark:bg-gray-900 dark:text-white">
+      <body suppressHydrationWarning className="relative min-h-full flex flex-col bg-white text-gray-900 dark:bg-gray-900 dark:text-white">
+        <div className="fixed inset-0 -z-10 h-screen w-screen [background:radial-gradient(125%_125%_at_50%_10%,var(--color-neutral-primary)_40%,var(--color-brand-medium)_100%)] dark:[background:radial-gradient(125%_125%_at_50%_10%,var(--color-gray-900)_40%,var(--color-brand-strong)_100%)]" />
         <Script
           id="theme-init"
           strategy="beforeInteractive"

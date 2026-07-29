@@ -6,7 +6,7 @@ interface Props {
 
 export function InstructorFooter({ instructor }: Props) {
   return (
-    <section className="bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+    <section className="">
       <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-16 py-12 lg:py-16">
         <div className="flex flex-col gap-8">
           <div>
