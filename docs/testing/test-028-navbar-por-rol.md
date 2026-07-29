@@ -12,7 +12,7 @@
 | Cuenta de estudiante matriculada en al menos un curso | reutilizar existente o UI `/registro` | ⬜ pendiente de confirmar con el usuario | ⬜ |
 
 **Entorno de pruebas:** desarrollo (proyecto Supabase único del repo)
-**Fecha de la ronda:** _pendiente_
+**Fecha de la ronda:** 2026-07-29
 
 ---
 
@@ -36,8 +36,8 @@
 2. Observar la parte superior de la página.
 **Resultado esperado:** no aparece navbar ni barra de anuncio
 (`AnnouncementBar`); no hay hueco vacío anómalo sobre el contenido.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** Sin observaciones — comportamiento exacto al esperado.
 
 ### TC-028-002 — Visitante anónimo no ve navbar en rutas públicas restantes
 **Precondición:** sin sesión iniciada.
@@ -217,6 +217,6 @@ en el dropdown de curso.
 **Hallazgos:**
 
 ## Resumen de la ronda
-- Aprobados: {{n}} — Fallidos: {{n}} — Pendientes: 16
-- Hallazgos escalados a `docs/specs/backlog.md`: {{lista o "ninguno"}}
-- Limpieza de datos de prueba: ⬜ Pendiente / ✅ Completada
+- Aprobados: 15 — Fallidos: 0 — Pendientes: 1 (TC-028-011 teórico, saltado)
+- Hallazgos escalados a `docs/specs/backlog.md`: ninguno
+- Limpieza de datos de prueba: ⬜ Pendiente (cuentas de prueba: docente-spec028-1785359286@test.edu.co, 2 cursos TEST-A y TEST-B)
