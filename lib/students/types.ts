@@ -17,3 +17,50 @@ export interface Student {
 export interface ProfileWithStudent extends Profile {
   student: Student | null;
 }
+
+// Tipos de la capa de servicio de administración (spec-027, students-mcp).
+// Deliberadamente sin enrollment_code ni password en ninguna salida.
+
+export interface AdminEnrollmentSummary {
+  id: string;
+  academic_course_id: string;
+  status: "active" | "withdrawn";
+  enrolled_at: string;
+  withdrawn_at: string | null;
+}
+
+export interface AdminStudentSummary {
+  id: string;
+  email: string;
+  full_name: string;
+  career: string | null;
+  semester: number | null;
+}
+
+export interface AdminStudentDetail extends AdminStudentSummary {
+  enrollments: AdminEnrollmentSummary[];
+}
+
+export interface CreateStudentInput {
+  full_name: string;
+  email: string;
+  password: string;
+  career?: string;
+  semester?: number;
+  enrollment_code?: string;
+  academic_course_id?: string;
+}
+
+export interface UpdateStudentInput {
+  full_name?: string;
+  email?: string;
+  career?: string | null;
+  semester?: number | null;
+}
+
+export interface DeleteStudentResult {
+  deleted_id: string;
+  email: string;
+  full_name: string;
+  enrollments_removed: number;
+}

@@ -1,6 +1,10 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
-let serviceClient: ReturnType<typeof createClient> | null = null;
+// SupabaseClient explícito, NO ReturnType<typeof createClient>: para una
+// función genérica, ReturnType<T> no resuelve los parámetros de tipo por
+// defecto igual que una invocación real, y termina tipando las filas de
+// .insert()/.update() como `never` en vez de `any`.
+let serviceClient: SupabaseClient | null = null;
 
 export function createServiceSupabaseClient() {
   if (!serviceClient) {
