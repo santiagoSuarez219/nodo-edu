@@ -17,6 +17,12 @@ export interface BibliographyItem {
   edition?: string;
 }
 
+export interface CourseDocument {
+  title: string;
+  url: string;
+  description?: string;
+}
+
 export interface ImportantDate {
   date: string;
   label: string;
@@ -47,5 +53,6 @@ export interface CoursePresentation {
   evaluation: EvaluationItem[];
   dates: ImportantDate[];
   bibliography: BibliographyItem[];
+  documents: CourseDocument[];
   conditions: string[];
 }

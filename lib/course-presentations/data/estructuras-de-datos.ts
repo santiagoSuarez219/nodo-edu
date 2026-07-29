@@ -183,5 +183,12 @@ export const estructurasDatos: CoursePresentation = {
       edition: "3rd Edition",
     },
   ],
+  documents: [
+    {
+      title: "Guía para el informe de laboratorio",
+      url: "/documentos/estructuras-de-datos/guia-informe-laboratorio.pdf",
+      description: "Estructura y formato esperado de los informes de laboratorio.",
+    },
+  ],
   conditions: TRANSVERSAL_CONDITIONS,
 };

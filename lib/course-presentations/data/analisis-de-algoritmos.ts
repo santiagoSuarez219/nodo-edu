@@ -155,5 +155,12 @@ export const analisisDeAlgoritmos: CoursePresentation = {
       edition: "3rd Edition",
     },
   ],
+  documents: [
+    {
+      title: "Guía para el informe de laboratorio",
+      url: "/documentos/analisis-de-algoritmos/guia-informe-laboratorio.pdf",
+      description: "Estructura y formato esperado de los informes de laboratorio.",
+    },
+  ],
   conditions: TRANSVERSAL_CONDITIONS,
 };

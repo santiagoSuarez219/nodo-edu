@@ -158,5 +158,12 @@ export const programacionCientifica: CoursePresentation = {
       author: "Paul Gessler, Jeffrey Karp",
     },
   ],
+  documents: [
+    {
+      title: "Guía para el informe de laboratorio",
+      url: "/documentos/programacion-cientifica/guia-informe-laboratorio.pdf",
+      description: "Estructura y formato esperado de los informes de laboratorio.",
+    },
+  ],
   conditions: TRANSVERSAL_CONDITIONS,
 };

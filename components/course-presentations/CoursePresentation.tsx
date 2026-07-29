@@ -226,7 +226,32 @@ export function CoursePresentation({ presentation, cta }: Props) {
           </a>
         </section>
 
-
+        {/* Documents */}
+        {presentation.documents.length > 0 && (
+          <section className="flex flex-col gap-4 pb-8 lg:pb-12">
+            <h2 className="text-xl lg:text-2xl font-bold">Documentos</h2>
+            <div className="space-y-3">
+              {presentation.documents.map((doc, idx) => (
+                <a
+                  key={idx}
+                  href={doc.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:border-blue-300 dark:hover:border-blue-700 transition-colors"
+                >
+                  <p className="text-sm font-semibold text-blue-700 dark:text-blue-400">
+                    {doc.title}
+                  </p>
+                  {doc.description && (
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                      {doc.description}
+                    </p>
+                  )}
+                </a>
+              ))}
+            </div>
+          </section>
+        )}
 
       </main>
     </div>

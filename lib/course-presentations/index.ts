@@ -30,4 +30,5 @@ export type {
   ImportantDate,
   Instructor,
   BibliographyItem,
+  CourseDocument,
 } from "./types";
