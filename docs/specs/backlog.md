@@ -5,6 +5,55 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+## DEBT-010 — Error de consola "script tag while rendering" en el init de tema (Next 16)
+
+**Origen:** Reportado por el usuario durante la ronda de pruebas de `test-020-assignment-review.md`, ajeno al scope de spec-020
+**Prioridad:** Media — error de consola en toda la app; relacionado con DEBT-008
+
+Next.js 16.2.4 (Turbopack) reporta en consola:
+
+```
+Console Error
+Encountered a script tag while rendering React component. Scripts inside React
+components are never executed when rendering on the client. Consider using
+template tag instead.
+    at script (<anonymous>:null:null)
+    at RootLayout (app/layout.tsx:47:9)
+```
+
+Apunta a `<Script id="theme-init" strategy="beforeInteractive" ...>` en
+`app/layout.tsx:47`, el mismo mecanismo de aplicación de tema documentado en
+**[[DEBT-008]]** (saltos perceptibles entre modo claro/oscuro). No se investigó
+la causa raíz todavía; podría deberse a un cambio de comportamiento de
+`next/script` con `strategy="beforeInteractive"` fuera de `<Head>` en Next 16,
+o a una interacción con Turbopack/Cache Components.
+
+**Acción:** Investigar en la misma iteración de temas/DESIGN.md prevista para
+DEBT-008 — revisar si `next/script` con `beforeInteractive` sigue siendo la
+API correcta en Next 16 para este caso, o si corresponde moverlo a
+`app/layout.tsx` `<head>` explícito o a un mecanismo distinto (ver skill
+`next-upgrade`).
+
+---
+
+## DEBT-009 — Redirigir al listado de envíos tras finalizar una calificación
+
+**Origen:** spec-020 (TC-009), reportado por el usuario durante la ronda de pruebas manuales
+**Prioridad:** Baja — mejora de UX, no bloquea funcionalidad
+
+Al finalizar la calificación de un envío en `SubmissionReviewPanel`, el panel
+permanece en la misma vista (con la calificación final mostrada arriba y los
+campos deshabilitados). El usuario propuso que, en su lugar, redirija
+automáticamente al listado de envíos (`.../review`), para no tener que
+navegar manualmente de vuelta y ver el envío ya reflejado en "calificados".
+
+**Acción:** Evaluar el cambio en `finalizeGrading`/`SubmissionReviewPanel.tsx`
+(`components/admin/SubmissionReviewPanel.tsx`) para redirigir tras un
+finalizado exitoso. Fuera del scope aprobado de spec-020; abordar como tarea
+propia o como ajuste de scope explícitamente aprobado en una próxima sesión.
+
+---
+
 ## DEBT-008 — Saltos perceptibles entre modo claro/oscuro en algunos casos
 
 **Origen:** spec-019 (TC-034), detectado al probar el jugador de evaluaciones

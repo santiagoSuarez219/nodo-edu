@@ -1,16 +1,34 @@
-# spec-020 — `[NOT STARTED]` Revisión y calificación manual del docente
+# spec-020 — [DONE] Revisión y calificación manual del docente
 
-> **Estado:** `[NOT STARTED]` — Planificado, pendiente de implementación. La implementación de referencia
-> existe en el tag `backup/feat-question-bank` y se portará al implementar este spec.
+> **Estado:** `[DONE]` — ronda de pruebas manuales completa (2026-07-29, 17/17 casos
+> aprobados, ver `docs/testing/test-020-assignment-review.md`). Se encontró y corrigió un
+> bug real durante la ronda (propagación de `final_score` a `student_grades`, ver TC-011 y
+> la nota de "Fix aplicado" más abajo) y se registraron dos ítems de backlog fuera de
+> scope (DEBT-009, DEBT-010). Sin framework de pruebas automáticas todavía (`CLAUDE.md`:
+> "por definir"), por lo que su ausencia no bloquea este `[DONE]`. Implementación completa
+> el 2026-07-24 (rama `feat/assignment-review`); la implementación de referencia existe en
+> el tag `backup/feat-question-bank`.
 >
 > **Estado de dependencias en `development` (revisión 2026-07-24):**
 > - **spec-018** está `[DONE]` y mergeado: `assignments`, `assignment_questions` (con `points`)
 >   y el vínculo `grade_item_id` (que vive en `assignment_variant_groups`) ya existen.
 > - **spec-005** (question-bank): tablas de `questions` y stub `lib/code-runner` ya integrados.
-> - **spec-019** (assignment-solving) sigue `[NOT STARTED]`: **este spec está bloqueado por él**,
->   porque consume las tablas `submissions`/`answers`, sus columnas de revisión y el módulo
->   `lib/submissions/` que spec-019 debe crear primero. No se puede implementar spec-020 hasta
->   que spec-019 esté en `development`.
+> - **spec-019** (assignment-solving) está `[DONE]` y mergeado (`24dd90d`): las tablas
+>   `submissions`/`answers` con sus columnas de revisión y el módulo `lib/submissions/` ya
+>   existen en `development`. **Este spec ya no está bloqueado** y puede implementarse.
+>
+> **Fix aplicado durante la ronda de pruebas manuales (2026-07-29, aprobado por el
+> usuario):** TC-011 encontró que `finalizeGrading` no propagaba el `final_score` a
+> `student_grades` cuando la asignación tenía `grade_item_id` vinculado.
+> `student_grades.score` exige escala 0-5 (misma escala de las notas manuales, ver
+> `lib/grades/index.ts`), pero `final_score` es la suma cruda de puntos de la variante
+> (puede superar 5 con facilidad — G2 sumó 6 sobre 8 posibles). El upsert violaba el
+> CHECK constraint y fallaba en silencio (`console.error`, sin propagar el error a la
+> UI). Corregido en `lib/submissions/index.ts` (`propagateFinalScoreToGradeItem` ahora
+> normaliza a escala 0-5 usando el total de puntos posibles de la variante, y devuelve
+> `{ ok:false, error }` si la propagación falla) y en el RPC `propagate_submission_grade`
+> de spec-019 (mismo root cause — `supabase/migrations/20260729000001_normalize_grade_propagation_scale.sql`).
+> Ver detalle en TC-011 y TC-013 de `docs/testing/test-020-assignment-review.md`.
 
 ---
 
@@ -18,8 +36,20 @@
 
 Cuando un estudiante envía una asignación (spec-019), el sistema calcula automáticamente
 el `auto_score` de las preguntas **objetivas** (`multiple_choice`), pero las preguntas
-**abiertas** (`open_text`, `code_write`, `coding_challenge`) no pueden calificarse de forma
-automática: requieren el criterio del docente. Estas quedan a la espera de revisión manual.
+**abiertas** (`open_text`, `code_snippet`, `code_write`, `coding_challenge`) no pueden
+calificarse de forma automática: requieren el criterio del docente. Estas quedan a la
+espera de revisión manual.
+
+> **Ajuste de scope (hallazgo durante la preparación de datos de prueba, aprobado por el
+> usuario):** la redacción original de este spec listaba solo `open_text`/`code_write`/
+> `coding_challenge` como tipos abiertos, omitiendo `code_snippet`. `submitSubmission`
+> (spec-019) ya trata como "abierto" a **cualquier** tipo que no sea `multiple_choice`
+> (ausencia en `get_variant_answer_key`, que solo cubre `multiple_choice`) — la lista de 3
+> tipos era una omisión, no una exclusión intencional. Se detectó al reutilizar el fixture
+> `G2` de `test-019` (incluye una pregunta `code_snippet`) para la ronda de pruebas de este
+> spec: sin el ajuste, esa respuesta quedaría fija en 0 puntos sin forma de calificarla. Se
+> corrigió `OPEN_QUESTION_TYPES`/`OPEN_TYPES` en `lib/submissions/index.ts` y
+> `components/admin/SubmissionReviewPanel.tsx` para incluir `code_snippet`.
 
 Este spec cubre el último tramo del ciclo de evaluación: el docente dueño del curso abre la
 lista de envíos de una asignación, revisa cada respuesta abierta apoyándose en la rúbrica de
@@ -47,7 +77,8 @@ definidas en spec-019 (`answers.manual_score`, `answers.reviewer_notes`,
 - **Panel de revisión de un envío**: muestra cada respuesta del estudiante con el contexto
   de la pregunta (enunciado, código, opciones marcadas, rúbrica y puntaje máximo por
   pregunta). Las respuestas objetivas se muestran ya resueltas; las abiertas
-  (`open_text`, `code_write`, `coding_challenge`) exponen los controles de calificación.
+  (`open_text`, `code_snippet`, `code_write`, `coding_challenge`) exponen los controles de
+  calificación.
 - **Calificación por respuesta**: el docente asigna `manual_score` (validado en el rango
   `0..points` de la pregunta en la asignación) y `reviewer_notes` opcionales; se persiste
   `reviewed_at`.
@@ -97,7 +128,8 @@ definidas en spec-019 (`answers.manual_score`, `answers.reviewer_notes`,
 
 ### Base de datos
 
-**Sin cambios de esquema.** Se leen y escriben columnas ya existentes (spec-019):
+**Sin cambios de esquema** (no se crean tablas ni columnas). Se leen y escriben columnas ya
+existentes (spec-019):
 
 | Tabla | Columnas usadas en este spec | Uso |
 |---|---|---|
@@ -107,9 +139,29 @@ definidas en spec-019 (`answers.manual_score`, `answers.reviewer_notes`,
 | `assignment_variant_groups` | `grade_item_id` | Decide si se propaga a `student_grades` (el vínculo vive en el grupo, no en la variante) |
 | `student_grades` | `enrollment_id`, `grade_item_id`, `score` | Destino de la propagación (upsert) |
 
-> La propagación replica el mismo patrón que el submit del estudiante (spec-019): upsert
-> con `onConflict: "enrollment_id,grade_item_id"`. Si la asignación no tiene
-> `grade_item_id`, no se toca la libreta.
+> La propagación a `student_grades` se hace con un **upsert directo** (no vía RPC): a
+> diferencia del cierre automático de spec-019 (que corre bajo la sesión del *estudiante*,
+> bloqueada por RLS), `finalizeGrading` corre bajo la sesión del *docente*, y la política
+> `student_grades: insert/update teacher or admin` ya lo autoriza directamente. Upsert con
+> `onConflict: "enrollment_id,grade_item_id"`. Si la evaluación no tiene `grade_item_id`, no
+> se toca la libreta.
+
+> **Ajuste de scope (hallazgo durante Fase 1, aprobado por el usuario):** la política RLS
+> `questions: select own or published` solo deja leer una pregunta al docente que la creó o
+> si está `is_published = true`. No hay validación que impida usar una pregunta en borrador
+> (de otro docente) dentro de una asignación (confirmado por inspección de
+> `lib/assignments/service.ts` y los system prompts de `assignment-mcp`/`question-bank-mcp`).
+> Sin una vía adicional, un docente revisor vería contenido `null` para preguntas ajenas no
+> publicadas — la misma clase de brecha que spec-019 resolvió para el estudiante con RPCs
+> `security definer` (DEBT-007, migración `20260724000002_variant_question_content_rpcs.sql`).
+> Este spec agrega una migración nueva en el mismo patrón — ver "Migraciones" abajo — que
+> **no** crea tablas ni columnas, solo una función.
+
+#### Migraciones
+
+| Migración | Contenido |
+|---|---|
+| `{{timestamp}}_submission_review_context_rpc.sql` | RPC `security definer` `get_submission_review_context(p_submission_id uuid)`: devuelve, por pregunta de la asignación del envío, `assignment_question_id`, `question_id`, `type`, `stem`, `code_snippet`, `code_language`, `points` (de `assignment_questions`), `choices` (jsonb) y `rubric` (jsonb). Autoriza solo si el llamante es el docente dueño del curso académico de la evaluación (`assignment_variant_groups.academic_course_id → academic_courses.teacher_id`) o admin; si no, no devuelve filas. |
 
 ### Rutas (admin)
 
@@ -142,7 +194,7 @@ definidas en spec-019 (`answers.manual_score`, `answers.reviewer_notes`,
 >
 > `gradeAnswer` valida en código que `0 ≤ score ≤ points`, donde `points` proviene de
 > `assignment_questions` (fallback 5). `finalizeGrading` decide, por respuesta, si suma el
-> `manual_score` (tipos `open_text`/`code_write`/`coding_challenge`) o el `auto_score`
+> `manual_score` (tipos `open_text`/`code_snippet`/`code_write`/`coding_challenge`) o el `auto_score`
 > (resto), redondea a 2 decimales, y solo entonces cierra el envío y propaga.
 >
 > **Alineación con spec-019:** el listado de revisión se indexa por **grupo**
@@ -171,53 +223,68 @@ Ninguna nueva.
 ## Fases de implementación
 
 ### Fase 1 — Tipos y funciones de dominio de revisión
-- [ ] En `lib/submissions/types.ts`, definir `AnswerForReview` (respuesta + contexto de la
+- [x] Crear la migración `20260724000004_submission_review_context_rpc.sql` con la RPC
+      `get_submission_review_context(p_submission_id)` (ver "Ajuste de scope" y "Migraciones"
+      arriba) y aplicarla.
+- [x] En `lib/submissions/types.ts`, definir `AnswerForReview` (respuesta + contexto de la
       pregunta: tipo, enunciado, snippet/lenguaje, opciones ordenadas, rúbrica, `max_points`)
       y `SubmissionForReview` (envío + estudiante + `answers: AnswerForReview[]`).
-- [ ] En `lib/submissions/index.ts`, implementar `getSubmissionForReview(submissionId)`:
+- [x] En `lib/submissions/index.ts`, implementar `getSubmissionForReview(submissionId)`:
       carga el envío con `enrollment → student(full_name)` y sus `answers` con el contexto de
       cada pregunta (`type`, `stem`, `code_snippet`, `code_language`, `choices`, `rubric`) y
-      el `points` de `assignment_questions`; normaliza la rúbrica (objeto único) y ordena las
-      opciones por `order_index`.
-- [ ] Implementar `gradeAnswer(answerId, score, notes)`: lee `points` de la
+      el `points` de `assignment_questions`, vía la RPC `get_submission_review_context`;
+      normaliza la rúbrica (objeto único) y respeta el orden que ya entrega la RPC.
+- [x] Implementar `gradeAnswer(answerId, score, notes)`: lee `points` de la
       `assignment_question` asociada, valida `0 ≤ score ≤ points` (error legible si no), y
       persiste `manual_score`, `reviewer_notes`, `reviewed_at`.
-- [ ] Implementar `finalizeGrading(submissionId)`: recorre las `answers`, suma
+- [x] Implementar `finalizeGrading(submissionId)`: recorre las `answers`, suma
       `manual_score` (tipos abiertos) o `auto_score` (resto), redondea a 2 decimales, marca
-      el envío `graded` con `final_score` y `graded_at`, y llama a `propagateToGradeItem`.
-- [ ] Implementar el helper interno `propagateToGradeItem(...)`: si la evaluación (grupo) tiene
-      `grade_item_id`, hace upsert en `student_grades` por `enrollment_id + grade_item_id`.
+      el envío `graded` con `final_score` y `graded_at`, y llama a `propagateFinalScoreToGradeItem`.
+- [x] Implementar el helper interno `propagateFinalScoreToGradeItem(...)`: si la evaluación
+      (grupo) tiene `grade_item_id`, hace upsert **directo** en `student_grades` por
+      `enrollment_id + grade_item_id` (autorizado por RLS al correr bajo la sesión del
+      docente; no requiere RPC — ver "Base de datos" arriba). **Corregido durante pruebas
+      manuales (TC-011):** normaliza el `final_score` a la escala 0-5 de `student_grades`
+      usando el total de puntos posibles de la variante, y propaga el error al llamador en
+      vez de tragarlo en silencio (ver nota de "Fix aplicado" al inicio del spec).
 
 ### Fase 2 — Server Actions
-- [ ] En `lib/submissions/actions.ts`, añadir `gradeAnswerAction(answerId, score, notes,
-      submissionId, academicCourseId, assignmentId)`: `requireUser`, llama a `gradeAnswer`,
-      y `revalidatePath` de las rutas `.../review` y `.../[assignmentId]`.
-- [ ] Añadir `finalizeGradingAction(submissionId, academicCourseId, assignmentId)`:
+- [x] En `lib/submissions/actions.ts`, añadir `gradeAnswerAction(answerId, score, notes,
+      submissionId, academicCourseId, groupId)`: `requireUser`, llama a `gradeAnswer`,
+      y `revalidatePath` de las rutas `.../review`, `.../review/[submissionId]` y
+      `.../assignments/[groupId]`.
+- [x] Añadir `finalizeGradingAction(submissionId, academicCourseId, groupId)`:
       `requireUser`, llama a `finalizeGrading`, revalida las mismas rutas y devuelve el
       `final_score` resultante.
 
 ### Fase 3 — Rutas y componentes de UI
-- [ ] Crear `SubmissionList` en `components/admin/` (tabla con estado, estudiante, **variante**,
+- [x] Crear `SubmissionList` en `components/admin/` (tabla con estado, estudiante, **variante**,
       fechas y enlace a la revisión de cada envío).
-- [ ] Crear `SubmissionReviewPanel` en `components/admin/` (`"use client"`): controles de
+- [x] Crear `SubmissionReviewPanel` en `components/admin/` (`"use client"`): controles de
       `score`/`notes` por respuesta abierta que invocan `gradeAnswerAction`, respuestas
       objetivas en solo lectura, rúbrica como guía, y botón "Finalizar calificación"
       (`finalizeGradingAction`).
-- [ ] Crear la ruta `.../assignments/[groupId]/review/page.tsx`: `requireAnyRole(["teacher",
+- [x] Crear la ruta `.../assignments/[groupId]/review/page.tsx`: `requireAnyRole(["teacher",
       "admin"])`, carga curso y evaluación (`getAssignmentGroupById`) y los envíos con
       `getSubmissionsByGroup(groupId)`, separa pendientes/calificadas y renderiza `SubmissionList`.
-- [ ] Crear la ruta `.../assignments/[groupId]/review/[submissionId]/page.tsx`: `requireAnyRole`,
+- [x] Crear la ruta `.../assignments/[groupId]/review/[submissionId]/page.tsx`: `requireAnyRole`,
       carga curso, evaluación y `getSubmissionForReview`, y renderiza `SubmissionReviewPanel`.
-- [ ] Enlazar la revisión desde la página de detalle de la evaluación, ya existente
+- [x] Enlazar la revisión desde la página de detalle de la evaluación, ya existente
       (`app/(admin)/admin/courses/[academicCourseId]/assignments/[groupId]/page.tsx`).
 
 ### Fase 4 — Pulido y validación
-- [ ] Verificar aislamiento por curso: un docente no lista ni abre envíos de cursos ajenos
-      (RLS + `requireAnyRole`).
-- [ ] Tokens semánticos de `DESIGN.md`, modo claro/oscuro, JetBrains Mono, sin valores crudos
-      de paleta.
-- [ ] `npm run lint` y `tsc --noEmit` sin errores nuevos.
-- [ ] Crear/actualizar `docs/testing/test-020-assignment-review.md` con los casos manuales.
+- [x] Verificar aislamiento por curso: un docente no lista ni abre envíos de cursos ajenos
+      (RLS + `requireAnyRole`). Hallazgo durante esta fase: `gradeAnswer`/`finalizeGrading`
+      hacían `update()` sin comprobar filas afectadas — si RLS bloqueaba el `update` de un
+      docente ajeno, Supabase no devuelve `error` (0 filas afectadas), lo que habría reportado
+      `ok: true` sin persistir nada. Corregido con `.select().maybeSingle()` tras el `update` y
+      rechazo explícito cuando no hay fila devuelta.
+- [x] Tokens semánticos de `DESIGN.md`, modo claro/oscuro, JetBrains Mono, sin valores crudos
+      de paleta (clases Tailwind + variantes `dark:`, mismo patrón que los componentes admin
+      existentes).
+- [x] `npm run lint` y `tsc --noEmit` sin errores nuevos.
+- [x] `docs/testing/test-020-assignment-review.md` actualizado (título y rutas `[groupId]`,
+      corregido antes de implementar).
 
 ---
 
@@ -227,7 +294,7 @@ Ninguna nueva.
   (a través de sus variantes A/B/C) separada en **pendientes de revisión** (`submitted`) y
   **calificados** (`graded`).
 - Al abrir un envío, ve cada respuesta con el contexto de su pregunta; las respuestas
-  objetivas aparecen resueltas y las abiertas (`open_text`, `code_write`,
+  objetivas aparecen resueltas y las abiertas (`open_text`, `code_snippet`, `code_write`,
   `coding_challenge`) exponen los controles de calificación con la rúbrica como guía.
 - El docente asigna `manual_score` (rechazado si queda fuera de `0..points`) y
   `reviewer_notes`; el sistema persiste `reviewed_at`.
@@ -249,3 +316,10 @@ Ninguna nueva.
   finalización con cálculo de `final_score`, propagación a `student_grades` cuando hay
   `grade_item` vinculado y ausencia de propagación cuando no lo hay, y verificación del
   aislamiento por curso. El archivo de test lo crea el orquestador, no este spec.
+
+---
+
+## Aprobación de implementación
+
+- [x] Paquete (spec + pruebas) aprobado por el usuario
+- **Fecha de aprobación:** 2026-07-24
