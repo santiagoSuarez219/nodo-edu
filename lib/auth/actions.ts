@@ -2,17 +2,16 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { createServerSupabaseClient } from "./server";
-import {
-  SignInSchema,
-  SignUpSchema,
-  PasswordResetRequestSchema,
-  PasswordResetConfirmSchema,
-} from "./schemas";
+import { SignInSchema, SignUpSchema } from "./schemas";
 import type { AuthResult } from "./types";
-
-const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+import {
+  resolveCourseForRegistration,
+  enrollNewUserInCourse,
+} from "@/lib/enrollments";
+import { checkRegistrationRateLimit } from "./rate-limit";
+import { ensureStudentAccountBootstrap } from "@/lib/students/service";
 
 export async function signIn(
   _prev: AuthResult,
@@ -67,6 +66,7 @@ export async function signUp(
     email: formData.get("email"),
     password: formData.get("password"),
     password_confirmation: formData.get("password_confirmation"),
+    enrollment_code: formData.get("enrollment_code"),
   });
 
   if (!parsed.success) {
@@ -77,21 +77,100 @@ export async function signUp(
     };
   }
 
+  // Límite por IP y por código (ver lib/auth/rate-limit.ts para las
+  // limitaciones conocidas de esta mitigación). El límite por código es
+  // deliberadamente más alto: esa clave la comparte TODO un salón (hasta 30
+  // estudiantes reales, más los typos que cuentan como intento aunque
+  // fallen), mientras que el límite por IP acota a un solo origen de red.
+  const ip = (await headers()).get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+  const withinIpLimit = checkRegistrationRateLimit(`signup:ip:${ip}`, 40);
+  const withinCodeLimit = checkRegistrationRateLimit(
+    `signup:code:${parsed.data.enrollment_code}`,
+    200
+  );
+  if (!withinIpLimit || !withinCodeLimit) {
+    return {
+      ok: false,
+      error: "Demasiados intentos de registro. Intenta de nuevo en unos minutos.",
+    };
+  }
+
+  // Resolver el código antes de crear el usuario: evita dejar cuentas
+  // huérfanas por un código mal escrito (el error más probable con ~120
+  // estudiantes tecleándolo en clase). El visitante aún es anónimo, por eso
+  // usa el cliente de servicio (ver resolveCourseForRegistration).
+  const courseResult = await resolveCourseForRegistration(
+    parsed.data.enrollment_code
+  );
+  if (!courseResult.ok) {
+    return {
+      ok: false,
+      error: "Revisa los campos del formulario.",
+      fieldErrors: { enrollment_code: [courseResult.error] },
+    };
+  }
+
   const supabase = await createServerSupabaseClient();
-  const { error } = await supabase.auth.signUp({
+  const { data: signUpData, error } = await supabase.auth.signUp({
     email: parsed.data.email,
     password: parsed.data.password,
     options: {
       data: { full_name: parsed.data.full_name },
-      emailRedirectTo: `${SITE_URL}/auth/callback`,
     },
   });
 
-  if (error) {
+  if (error || !signUpData.user) {
     return { ok: false, error: "No se pudo crear la cuenta. Intenta de nuevo." };
   }
 
-  redirect("/registro/confirmar");
+  // Si "Confirm email" llegara a reactivarse en el dashboard de Supabase
+  // (fuera del control de este código), signUp no devuelve sesión: el
+  // insert de matrícula correría como anónimo y RLS lo rechazaría en
+  // silencio. Fallar explícito aquí en vez de dejar al estudiante en un
+  // estado ambiguo con la cuenta creada pero sin matrícula ni sesión.
+  if (!signUpData.session) {
+    return {
+      ok: false,
+      error:
+        "Tu cuenta se creó pero no se pudo iniciar sesión automáticamente. Intenta iniciar sesión manualmente.",
+    };
+  }
+
+  // Si el correo ya existía sin confirmar (registro abandonado de antes de
+  // este spec), signUp() reactiva esa fila con un UPDATE y el trigger
+  // on_auth_user_created (AFTER INSERT) nunca dispara: la cuenta queda sin
+  // profiles/user_roles/students. Sin esto, el insert de matrícula de abajo
+  // fallaría contra RLS (el estudiante no tendría el rol 'student').
+  try {
+    await ensureStudentAccountBootstrap(signUpData.user.id, parsed.data.full_name);
+  } catch (bootstrapError) {
+    console.error(
+      `signUp: no se pudo inicializar perfil/rol para ${signUpData.user.id}:`,
+      bootstrapError
+    );
+    return {
+      ok: false,
+      error:
+        "Tu cuenta se creó pero no se pudo completar la configuración inicial. Contacta a tu docente.",
+    };
+  }
+
+  // Mismo cliente que hizo signUp: ya tiene la sesión recién creada en
+  // memoria, así que auth.uid() resuelve en este insert aunque las cookies
+  // de la request entrante todavía no la reflejen.
+  const enrollResult = await enrollNewUserInCourse(
+    supabase,
+    signUpData.user.id,
+    courseResult.academicCourseId
+  );
+  if (!enrollResult.ok) {
+    console.error(
+      `signUp: matrícula automática falló para user ${signUpData.user.id} en curso ${courseResult.academicCourseId}: ${enrollResult.error}`
+    );
+  }
+
+  revalidatePath("/", "layout");
+  redirect("/cuenta/cursos");
 }
 
 export async function signOut(): Promise<void> {
@@ -99,73 +178,4 @@ export async function signOut(): Promise<void> {
   await supabase.auth.signOut();
   revalidatePath("/", "layout");
   redirect("/");
-}
-
-export async function requestPasswordReset(
-  _prev: AuthResult,
-  formData: FormData
-): Promise<AuthResult> {
-  const parsed = PasswordResetRequestSchema.safeParse({
-    email: formData.get("email"),
-  });
-
-  if (!parsed.success) {
-    return {
-      ok: false,
-      error: "Ingresa un correo válido.",
-      fieldErrors: parsed.error.flatten().fieldErrors as Record<string, string[]>,
-    };
-  }
-
-  const supabase = await createServerSupabaseClient();
-  await supabase.auth.resetPasswordForEmail(parsed.data.email, {
-    redirectTo: `${SITE_URL}/recuperar-password/confirmar`,
-  });
-
-  // Mensaje genérico: no filtramos si el email existe o no
-  return { ok: true };
-}
-
-export async function updatePassword(
-  _prev: AuthResult,
-  formData: FormData
-): Promise<AuthResult> {
-  const parsed = PasswordResetConfirmSchema.safeParse({
-    password: formData.get("password"),
-    password_confirmation: formData.get("password_confirmation"),
-  });
-
-  if (!parsed.success) {
-    return {
-      ok: false,
-      error: "Revisa los campos del formulario.",
-      fieldErrors: parsed.error.flatten().fieldErrors as Record<string, string[]>,
-    };
-  }
-
-  const supabase = await createServerSupabaseClient();
-  const { error } = await supabase.auth.updateUser({
-    password: parsed.data.password,
-  });
-
-  if (error) {
-    return { ok: false, error: "No se pudo actualizar la contraseña. El enlace puede haber expirado." };
-  }
-
-  revalidatePath("/", "layout");
-  redirect("/login");
-}
-
-export async function resendConfirmation(
-  _prev: AuthResult,
-  formData: FormData
-): Promise<AuthResult> {
-  const email = formData.get("email")?.toString();
-  if (!email) return { ok: false, error: "Correo requerido." };
-
-  const supabase = await createServerSupabaseClient();
-  await supabase.auth.resend({ type: "signup", email });
-
-  // Mensaje genérico siempre
-  return { ok: true };
 }

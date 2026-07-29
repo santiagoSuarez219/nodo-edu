@@ -11,20 +11,10 @@ export const SignUpSchema = z
     email: z.string().email("Ingresa un correo válido"),
     password: z.string().min(8, "La contraseña debe tener al menos 8 caracteres"),
     password_confirmation: z.string().min(1, "Confirma tu contraseña"),
-  })
-  .refine((data) => data.password === data.password_confirmation, {
-    message: "Las contraseñas no coinciden",
-    path: ["password_confirmation"],
-  });
-
-export const PasswordResetRequestSchema = z.object({
-  email: z.string().email("Ingresa un correo válido"),
-});
-
-export const PasswordResetConfirmSchema = z
-  .object({
-    password: z.string().min(8, "La contraseña debe tener al menos 8 caracteres"),
-    password_confirmation: z.string().min(1, "Confirma tu contraseña"),
+    enrollment_code: z
+      .string()
+      .min(1, "Ingresa el código que te dio tu docente")
+      .transform((code) => code.trim().toUpperCase()),
   })
   .refine((data) => data.password === data.password_confirmation, {
     message: "Las contraseñas no coinciden",
@@ -45,6 +35,4 @@ export const UpdateProfileSchema = z.object({
 
 export type SignInInput = z.infer<typeof SignInSchema>;
 export type SignUpInput = z.infer<typeof SignUpSchema>;
-export type PasswordResetRequestInput = z.infer<typeof PasswordResetRequestSchema>;
-export type PasswordResetConfirmInput = z.infer<typeof PasswordResetConfirmSchema>;
 export type UpdateProfileInput = z.infer<typeof UpdateProfileSchema>;

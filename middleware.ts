@@ -5,8 +5,6 @@ const ADMIN_PREFIXES = ["/admin"];
 const PUBLIC_PREFIXES = [
   "/login",
   "/registro",
-  "/recuperar-password",
-  "/auth/callback",
   "/api", // rutas de servicio (MCP) — autenticadas con API key, no con sesión
 ];
 

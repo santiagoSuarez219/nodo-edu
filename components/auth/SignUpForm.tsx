@@ -40,6 +40,15 @@ const fields = [
     autoComplete: "new-password",
     placeholder: "Repite tu contraseña",
   },
+  {
+    id: "enrollment_code",
+    name: "enrollment_code",
+    label: "Código del curso",
+    type: "text",
+    autoComplete: "off",
+    placeholder: "Ej. AB12CD34",
+    help: "Te lo entrega tu docente en clase.",
+  },
 ] as const;
 
 export function SignUpForm() {
@@ -64,6 +73,9 @@ export function SignUpForm() {
           >
             {f.label}
           </label>
+          {"help" in f && f.help && (
+            <p className="text-xs text-gray-500 dark:text-gray-400">{f.help}</p>
+          )}
           <input
             id={f.id}
             name={f.name}

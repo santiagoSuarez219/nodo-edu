@@ -1,4 +1,6 @@
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { createServerSupabaseClient } from "@/lib/auth/server";
+import { createServiceSupabaseClient } from "@/lib/auth/service";
 import { getCurrentUser } from "@/lib/auth/session";
 import type { AcademicCoursePublic } from "@/lib/academic-courses/types";
 import type { Enrollment, EnrollmentWithCourse, EnrollmentWithStudent } from "./types";
@@ -52,28 +54,26 @@ export async function fetchStudentProfilesPublic(
   return new Map((data ?? []).map((p: { id: string; full_name: string }) => [p.id, p]));
 }
 
-export async function enrollByCode(
+async function resolveCourseByEnrollmentCode(
+  supabase: SupabaseClient,
   enrollmentCode: string
-): Promise<{ ok: true; enrollment: Enrollment } | { ok: false; error: string }> {
-  const user = await getCurrentUser();
-  if (!user) return { ok: false, error: "No autenticado." };
-
-  const supabase = await createServerSupabaseClient();
-
+): Promise<{ id: string; is_active: boolean } | null> {
   const { data: courses } = await supabase.rpc("find_course_by_enrollment_code", {
     p_enrollment_code: enrollmentCode,
   });
-  const course = courses?.[0];
+  return courses?.[0] ?? null;
+}
 
-  if (!course) return { ok: false, error: "Código no encontrado." };
-  if (!course.is_active)
-    return { ok: false, error: "El curso no está aceptando matrículas." };
-
+async function insertEnrollment(
+  supabase: SupabaseClient,
+  studentId: string,
+  academicCourseId: string
+): Promise<{ ok: true; enrollment: Enrollment } | { ok: false; error: string }> {
   const { data: existing } = await supabase
     .from("enrollments")
     .select("id, status")
-    .eq("student_id", user.id)
-    .eq("academic_course_id", course.id)
+    .eq("student_id", studentId)
+    .eq("academic_course_id", academicCourseId)
     .maybeSingle();
 
   if (existing)
@@ -81,12 +81,58 @@ export async function enrollByCode(
 
   const { data, error } = await supabase
     .from("enrollments")
-    .insert({ student_id: user.id, academic_course_id: course.id })
+    .insert({ student_id: studentId, academic_course_id: academicCourseId })
     .select()
     .single();
 
   if (error) return { ok: false, error: "No se pudo completar la matrícula." };
   return { ok: true, enrollment: data };
+}
+
+export async function enrollByCode(
+  enrollmentCode: string
+): Promise<{ ok: true; enrollment: Enrollment } | { ok: false; error: string }> {
+  const user = await getCurrentUser();
+  if (!user) return { ok: false, error: "No autenticado." };
+
+  const supabase = await createServerSupabaseClient();
+  const course = await resolveCourseByEnrollmentCode(supabase, enrollmentCode);
+
+  if (!course) return { ok: false, error: "Código no encontrado." };
+  if (!course.is_active)
+    return { ok: false, error: "El curso no está aceptando matrículas." };
+
+  return insertEnrollment(supabase, user.id, course.id);
+}
+
+// Se usa desde el registro (spec-027): el visitante aún es anónimo, así que
+// `find_course_by_enrollment_code` (grant solo a `authenticated`) no es
+// invocable con el cliente de sesión. El cliente de servicio bypasa RLS y no
+// depende de ese grant. Mensaje unificado a propósito para "no existe" y
+// "inactivo": no dar señal de enumeración sobre el espacio de códigos.
+export async function resolveCourseForRegistration(
+  enrollmentCode: string
+): Promise<{ ok: true; academicCourseId: string } | { ok: false; error: string }> {
+  const supabase = createServiceSupabaseClient();
+  const course = await resolveCourseByEnrollmentCode(supabase, enrollmentCode);
+
+  if (!course || !course.is_active) {
+    return { ok: false, error: "Código de curso inválido. Verifica con tu docente." };
+  }
+
+  return { ok: true, academicCourseId: course.id };
+}
+
+// Se usa desde el registro (spec-027) con el MISMO cliente que ejecutó
+// `supabase.auth.signUp`: ese cliente ya tiene la sesión recién creada en
+// memoria, así que `auth.uid()` resuelve correctamente en el insert pese a
+// que las cookies de la request entrante no la contengan todavía.
+export async function enrollNewUserInCourse(
+  supabase: SupabaseClient,
+  userId: string,
+  academicCourseId: string
+): Promise<{ ok: true; enrollment: Enrollment } | { ok: false; error: string }> {
+  return insertEnrollment(supabase, userId, academicCourseId);
 }
 
 export async function getEnrollmentsByStudent(): Promise<EnrollmentWithCourse[]> {
