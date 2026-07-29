@@ -7,7 +7,10 @@ const HEADER_SELECTOR = "[data-site-header]";
 export function HeaderHeightObserver() {
   useEffect(() => {
     const header = document.querySelector<HTMLElement>(HEADER_SELECTOR);
-    if (!header) return;
+    if (!header) {
+      document.documentElement.style.setProperty("--header-height", "0px");
+      return;
+    }
 
     const setHeight = () => {
       document.documentElement.style.setProperty(

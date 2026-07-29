@@ -5,6 +5,66 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+## DEBT-017 — Sin puntos de entrada visibles a `/login` para visitantes anónimos
+
+**Origen:** spec-028 (navbar por rol) — decisión explícita del usuario
+**Prioridad:** Baja — decisión de producto aceptada, no un bug
+
+Tras ocultar el navbar para visitantes sin sesión, la única forma de llegar a
+`/login` es escribiendo la URL directamente o siendo redirigido por un gate de
+autenticación (p. ej. `/grupo-investigacion`). El usuario decidió
+explícitamente aceptar esto en el alcance de spec-028 (ver sección "No
+incluye" del spec) en vez de agregar un enlace en el footer de la landing.
+
+**Acción:** Si en el futuro se detecta que usuarios reales no encuentran cómo
+iniciar sesión, agregar un enlace "Iniciar sesión" a `FOOTER_LINKS`
+(`lib/landing/data.ts`) o a la landing pública.
+
+---
+
+## DEBT-016 — Flash de `AnnouncementBar` por lectura de `localStorage` en el primer render
+
+**Origen:** spec-028 (navbar por rol), relacionado con **[[DEBT-010]]**
+**Prioridad:** Baja — cosmético, superficie reducida por spec-028
+
+`AnnouncementBar` decide su visibilidad inicial leyendo `localStorage` en el
+primer render del cliente, lo que puede producir un parpadeo perceptible al
+hidratar (el servidor no conoce la preferencia guardada). spec-028 no corrige
+este mecanismo, pero sí reduce su superficie: al ocultar el header completo
+para visitantes sin sesión, `AnnouncementBar` deja de montarse en las páginas
+públicas (`/`, `/grupo-investigacion`, `/login`, `/registro`).
+
+**Acción:** Abordar junto con **[[DEBT-010]]** en la iteración dedicada a
+temas — evaluar leer la preferencia desde una cookie (accesible en el
+servidor) en vez de `localStorage`, para eliminar el flash por completo.
+
+---
+
+## DEBT-015 — Navbar usa clases crudas de Tailwind en lugar de tokens semánticos (parcial)
+
+**Origen:** spec-028 (navbar por rol)
+**Prioridad:** Baja — cosmético, sin impacto funcional; heredado del código anterior
+
+`components/navbar/Navbar.tsx`, `UserMenu.tsx` y otros componentes del navbar
+usan clases crudas de Tailwind (`text-gray-700`, `bg-blue-700`, `hover:bg-gray-100`,
+etc.) en lugar de tokens semánticos del sistema de diseño (`--color-*` definidos
+en `DESIGN.md`). El código nuevo de spec-028 (`NavLinkList.tsx`,
+`CourseScopeSelect.tsx`) aplica tokens semánticos (`text-body`, `text-fg-brand`,
+`text-fg-disabled`, `bg-neutral-tertiary`, `border-border-default`, etc.) **solo
+para el modo claro**: el sistema de tokens de `DESIGN.md`/`globals.css` no
+define equivalentes para modo oscuro (no hay `--color-body` distinto bajo
+`.dark`), así que el modo oscuro de estos dos componentes sigue usando clases
+crudas con prefijo `dark:` (`dark:text-gray-300`, `dark:bg-gray-800`, etc.),
+igual que el resto del navbar heredado.
+
+**Acción:** En una iteración dedicada a UI/tokens, (1) definir tokens
+semánticos con variante oscura en `globals.css`/`DESIGN.md` y (2) refactorizar
+todos los estilos del navbar (heredados y nuevos) para consumirlos también en
+modo oscuro. Ver también **[[DEBT-008]]** (flash de tema claro/oscuro) — se
+beneficiará del mismo trabajo de tokens.
+
+---
+
 ## DEBT-014 — `NEXT_PUBLIC_SITE_URL` sin ningún uso en el código
 
 **Origen:** Detectado por `@reviewer` en la 3ª pasada de spec-027 (ajeno a su
