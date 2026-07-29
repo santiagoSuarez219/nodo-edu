@@ -1,0 +1,22 @@
+-- spec-029: agrega github_username a profiles (no a students) porque el
+-- campo aplica a los tres roles (admin, teacher, student), no solo a
+-- estudiantes. Nullable y sin default: el trigger handle_new_user() no
+-- necesita tocarse.
+--
+-- Sin restricción unique: el dato no está verificado contra GitHub (nadie
+-- confirma que la cuenta le pertenece al usuario), así que forzar unicidad
+-- no aporta ninguna garantía real y solo produciría errores 23505 opacos
+-- en los caminos de autoedición y admin. Duplicados quedan como riesgo
+-- aceptado (decisión confirmada con el usuario).
+--
+-- Sin validación de formato: solo se sanea en la capa de aplicación (trim,
+-- se quita '@' inicial). No se valida contra el patrón real de username de
+-- GitHub ni se verifica que la cuenta exista.
+--
+-- Exposición a tener en cuenta: la policy "profiles: select published
+-- question authors" (20260715000003_...) permite a cualquier teacher/admin
+-- leer todas las columnas del perfil de un docente con al menos una
+-- pregunta publicada, lo que incluye este campo. Se considera aceptable por
+-- ser un dato de naturaleza pública.
+alter table public.profiles
+  add column github_username text;

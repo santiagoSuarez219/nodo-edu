@@ -53,6 +53,10 @@ export const tools = [
                 },
                 career: { type: "string", description: "Carrera (opcional)" },
                 semester: { type: "integer", minimum: 1, maximum: 20, description: "Semestre (opcional)" },
+                github_username: {
+                    type: "string",
+                    description: "Usuario de GitHub (opcional, sin '@'). No se verifica contra GitHub: es un dato declarado por el docente/estudiante, no una identidad confirmada.",
+                },
                 enrollment_code: {
                     type: "string",
                     description: "Código de matrícula del curso (alternativa a academic_course_id)",
@@ -67,7 +71,7 @@ export const tools = [
     },
     {
         name: "update_student",
-        description: "Corrige nombre, correo, carrera o semestre de un estudiante existente.",
+        description: "Corrige nombre, correo, carrera, semestre o usuario de GitHub de un estudiante existente. Nota: para borrar el usuario de GitHub ya guardado, esta herramienta no admite enviar null — usa la API directamente con {\"github_username\": null} si hace falta limpiarlo.",
         inputSchema: {
             type: "object",
             properties: {
@@ -76,6 +80,10 @@ export const tools = [
                 email: { type: "string" },
                 career: { type: "string" },
                 semester: { type: "integer", minimum: 1, maximum: 20 },
+                github_username: {
+                    type: "string",
+                    description: "Usuario de GitHub (sin '@'). No se verifica contra GitHub: es un dato declarado, no una identidad confirmada.",
+                },
             },
             required: ["id"],
         },

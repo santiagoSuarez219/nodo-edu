@@ -17,6 +17,7 @@ export async function updateAccountAction(
     full_name: formData.get("full_name"),
     career: formData.get("career") || undefined,
     semester: formData.get("semester") || undefined,
+    github_username: formData.get("github_username") || undefined,
   });
 
   if (!parsed.success) {
@@ -31,7 +32,10 @@ export async function updateAccountAction(
 
   const { error: profileError } = await supabase
     .from("profiles")
-    .update({ full_name: parsed.data.full_name })
+    .update({
+      full_name: parsed.data.full_name,
+      github_username: parsed.data.github_username,
+    })
     .eq("id", user.id);
 
   if (profileError) {

@@ -125,7 +125,7 @@ export async function listServiceStudents(
 
   let query = supabase
     .from("profiles")
-    .select("id, full_name, students!inner(career, semester)")
+    .select("id, full_name, github_username, students!inner(career, semester)")
     .order("full_name", { ascending: true });
 
   if (studentIds) query = query.in("id", studentIds);
@@ -145,6 +145,7 @@ export async function listServiceStudents(
         full_name: p.full_name as string,
         career: (studentRow?.career as string | null) ?? null,
         semester: (studentRow?.semester as number | null) ?? null,
+        github_username: (p.github_username as string | null) ?? null,
         email: emails.get(p.id as string) ?? "",
       };
     });
@@ -173,7 +174,7 @@ export async function getServiceStudentById(
   // se exige el rol 'student' explícito vía fetchStudentRoleIds.
   const { data: profile } = await supabase
     .from("profiles")
-    .select("id, full_name, students!inner(career, semester)")
+    .select("id, full_name, github_username, students!inner(career, semester)")
     .eq("id", studentId)
     .maybeSingle();
 
@@ -193,6 +194,7 @@ export async function getServiceStudentById(
     full_name: profile.full_name as string,
     career: (studentRow?.career as string | null) ?? null,
     semester: (studentRow?.semester as number | null) ?? null,
+    github_username: (profile.github_username as string | null) ?? null,
     email: emails.get(profile.id as string) ?? "",
     enrollments,
   };
@@ -256,6 +258,13 @@ export async function createServiceStudent(
       .eq("profile_id", userId);
   }
 
+  if (input.github_username !== undefined) {
+    await supabase
+      .from("profiles")
+      .update({ github_username: input.github_username })
+      .eq("id", userId);
+  }
+
   // A diferencia de un console.error silencioso: si la matrícula falla, el
   // agente (y el docente) deben saberlo en la propia respuesta — de lo
   // contrario se reporta "creado y matriculado" cuando solo lo primero es
@@ -310,10 +319,15 @@ export async function updateServiceStudent(
     if (error) throw error;
   }
 
-  if (input.full_name !== undefined) {
+  if (input.full_name !== undefined || input.github_username !== undefined) {
     const { error } = await supabase
       .from("profiles")
-      .update({ full_name: input.full_name })
+      .update({
+        ...(input.full_name !== undefined && { full_name: input.full_name }),
+        ...(input.github_username !== undefined && {
+          github_username: input.github_username,
+        }),
+      })
       .eq("id", studentId);
     if (error) throw error;
   }

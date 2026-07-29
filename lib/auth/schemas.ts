@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { sanitizeGithubUsername } from "@/lib/students/github";
 
 export const SignInSchema = z.object({
   email: z.string().email("Ingresa un correo válido"),
@@ -31,6 +32,13 @@ export const UpdateProfileSchema = z.object({
     .max(20)
     .optional()
     .or(z.literal("")),
+  // Opcional, sin validación de formato (spec-029): el formulario de /cuenta
+  // siempre envía este campo (vacío si el usuario lo borró), así que se
+  // sanea directamente a string | null en vez de preservar "no tocar".
+  github_username: z
+    .string()
+    .optional()
+    .transform((value) => sanitizeGithubUsername(value ?? "")),
 });
 
 export type SignInInput = z.infer<typeof SignInSchema>;
