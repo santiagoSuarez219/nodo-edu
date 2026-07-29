@@ -3,9 +3,9 @@ import { TRANSVERSAL_CONDITIONS } from "./transversal";
 
 export const analisisDeAlgoritmos: CoursePresentation = {
   name: "Introducción al Análisis de Algoritmos",
-  desc: "Estudio de la complejidad computacional y las técnicas fundamentales de diseño de algoritmos siguiendo a Cormen et al.: recurrencias, divide y vencer, ordenamiento, estructuras de datos, programación dinámica y algoritmos voraces. Cinco laboratorios evaluativos documentados como informes en GitHub, con implementación práctica en Python.",
+  desc: "Estudio de la complejidad computacional y las técnicas fundamentales de diseño de algoritmos: recurrencias, divide y vencer, ordenamiento, estructuras de datos, programación dinámica y algoritmos voraces.",
   program: "Ingeniería de Sistemas",
-  level: "Intermedio",
+  level: "Intermedio - Avanzado",
   credits: 3,
   modality: "Virtual",
   weeklyHours: "4 h/semana sincrónicas",
@@ -100,41 +100,30 @@ export const analisisDeAlgoritmos: CoursePresentation = {
         "Estrategia voraz: selección de actividades y códigos de Huffman",
       ],
     },
-    {
-      n: 9,
-      week: "Opcional",
-      title: "Temas opcionales",
-      topics: [
-        "Grafos: representaciones, recorridos BFS/DFS y ordenamiento topológico",
-        "Árboles de expansión mínima: Kruskal y Prim",
-        "Caminos más cortos: Bellman-Ford y Dijkstra",
-        "Análisis amortizado e introducción a NP-completitud",
-      ],
-    },
   ],
   evaluation: [
     {
-      name: "Laboratorio 1: Fundamentos, complejidad y recurrencias",
+      name: "Momento evaluativo 1: Fundamentos, complejidad y recurrencias",
       pct: 15,
       week: "Semanas 3-5",
     },
     {
-      name: "Laboratorio 2: Dividir y vencer",
+      name: "Momento evaluativo 2: Dividir y vencer",
       pct: 15,
       week: "Semanas 6-8",
     },
     {
-      name: "Laboratorio 3: Algoritmos de ordenamiento",
+      name: "Momento evaluativo 3: Algoritmos de ordenamiento",
       pct: 15,
       week: "Semanas 9-11",
     },
     {
-      name: "Laboratorio 4: Estructuras de datos",
+      name: "Momento evaluativo 4: Estructuras de datos",
       pct: 15,
       week: "Semanas 12-13",
     },
     {
-      name: "Laboratorio 5: Programación dinámica y algoritmos voraces",
+      name: "Momento evaluativo 5: Programación dinámica y algoritmos voraces",
       pct: 20,
       week: "Semanas 14-16",
     },
@@ -145,37 +134,25 @@ export const analisisDeAlgoritmos: CoursePresentation = {
     },
   ],
   dates: [
-    { date: "3 ago", label: "Inicio de clases" },
+    { date: "3 ago - 29 nov", label: "Desarrollo curricular" },
     {
-      date: "7-13 sep",
-      label: "Cierre Laboratorio 1 (Fundamentos, complejidad y recurrencias)",
+      date: "31 ago - 5 sep",
+      label: "Primera evaluación de estudiantes a docentes",
     },
-    { date: "21-27 sep", label: "Cierre Laboratorio 2 (Dividir y vencer)" },
+    { date: "1 nov", label: "Registro del 60 %" },
     {
-      date: "12-18 oct",
-      label: "Cierre Laboratorio 3 (Algoritmos de ordenamiento)",
+      date: "26 oct -  1 nov",
+      label: "Segunda evaluación de estudiantes a docentes",
     },
-    {
-      date: "26 oct-1 nov",
-      label: "Cierre Laboratorio 4 (Estructuras de datos) / Registro del 60 %",
-    },
-    {
-      date: "16-22 nov",
-      label:
-        "Cierre Laboratorio 5 y cierre del curso / Límite de cancelación de asignaturas",
-    },
-    { date: "23-29 nov", label: "Registro del 100 % evaluado" },
+    { date: "23 nov - 29 nov", label: "Registro del 100 %" },
+    { date: "22 nov", label: "Límite de cancelación de asignaturas" },
   ],
   bibliography: [
     {
       title: "Introduction to Algorithms",
-      author: "Thomas H. Cormen, Charles E. Leiserson, Ronald L. Rivest, Clifford Stein",
+      author:
+        "Thomas H. Cormen, Charles E. Leiserson, Ronald L. Rivest, Clifford Stein",
       edition: "3rd Edition",
-    },
-    {
-      title: "Algorithm Design Manual",
-      author: "Steven S. Skiena",
-      edition: "2nd Edition",
     },
   ],
   conditions: TRANSVERSAL_CONDITIONS,
