@@ -6,7 +6,7 @@ interface ResearchSeedbedProps {
 
 export function ResearchSeedbeds({ seedbeds }: ResearchSeedbedProps) {
   return (
-    <section className="px-4 md:px-6 lg:px-18 py-12 lg:py-16 border-b border-gray-200 dark:border-gray-700">
+    <section className="px-4 md:px-6 lg:px-18 py-12 lg:py-16">
       <div className="flex flex-col gap-8">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
           Semilleros de investigación

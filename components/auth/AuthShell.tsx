@@ -6,7 +6,7 @@ interface AuthShellProps {
 
 export function AuthShell({ title, subtitle, children }: AuthShellProps) {
   return (
-    <div className="w-full max-w-md">
+    <div className="w-full max-w-xl">
       <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-[var(--radius-base)] px-8 py-10 shadow-sm">
         <div className="mb-7">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">
