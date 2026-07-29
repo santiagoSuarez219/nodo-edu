@@ -1,4 +1,4 @@
-# spec-028 — [DONE] Navbar por rol (estudiante / docente) y ocultamiento para anónimos
+# spec-028 — [TESTING] Navbar por rol (estudiante / docente) y ocultamiento para anónimos
 
 ## Contexto
 
@@ -156,106 +156,106 @@ Estado actual del código relevante, verificado:
 ## Fases de implementación
 
 ### Fase 1 — Ocultar el header para visitantes anónimos
-- [ ] En `app/layout.tsx`, calcular `const showHeader = Boolean(profile)` y
+- [x] En `app/layout.tsx`, calcular `const showHeader = Boolean(profile)` y
       envolver `<div data-site-header>` (con `AnnouncementBar` y `Navbar`
       dentro) en ese condicional; mantener fuera del condicional `ThemeInit`,
       el `Script` de tema, el fondo radial fijo y `HeaderHeightObserver`.
-- [ ] En `components/HeaderHeightObserver.tsx`, cuando no exista
+- [x] En `components/HeaderHeightObserver.tsx`, cuando no exista
       `[data-site-header]`, fijar `--header-height` a `0px` de forma
       explícita antes de salir, en lugar de dejar la variable sin definir.
-- [ ] Verificar en `/`, `/grupo-investigacion`, `/login` y `/registro` sin
+- [x] Verificar en `/`, `/grupo-investigacion`, `/login` y `/registro` sin
       sesión: no aparece header, no queda franja de `AnnouncementBar`, no hay
       hueco superior anómalo y no hay solapamientos con el contenido.
-- [ ] Verificar con sesión (estudiante y docente) que el header sigue
+- [x] Verificar con sesión (estudiante y docente) que el header sigue
       apareciendo en esas mismas rutas y que la altura sticky de las
       lecciones (`--header-height`) sigue siendo correcta.
 
 ### Fase 2 — Reestructurar `components/navbar/`
-- [ ] Crear `components/navbar/navLinks.ts` con el tipo `NavLink` y los dos
+- [x] Crear `components/navbar/navLinks.ts` con el tipo `NavLink` y los dos
       constructores (`getStudentNavLinks()`, `getTeacherNavLinks(academicCourseId)`),
       con las rutas de la tabla de la sección "Rutas del navbar de docente"
       (ver Criterios de aceptación); los enlaces dependientes de curso se
       devuelven marcados como `disabled` cuando `academicCourseId` es `null`.
-- [ ] Crear `components/navbar/NavLinkList.tsx`: renderiza `NavLink[]` con
+- [x] Crear `components/navbar/NavLinkList.tsx`: renderiza `NavLink[]` con
       `variant "desktop" | "mobile"`; enlace activo con `Link`, enlace
       deshabilitado como elemento no focalizable con `aria-disabled="true"` y
       texto de ayuda explicativo; propaga el cierre del drawer en la
       variante móvil. Usar tokens semánticos del sistema de diseño en este
       componente nuevo.
-- [ ] Refactorizar `components/navbar/Navbar.tsx`: eliminar la rama anónima
+- [x] Refactorizar `components/navbar/Navbar.tsx`: eliminar la rama anónima
       (botón *Iniciar sesión* de desktop y de móvil) y el enlace *Grupo de
       Investigación* hardcodeado en ambos bloques; renderizar `NavLinkList`
       en el slot central de desktop y al inicio del drawer móvil; conservar
       logo, hamburguesa, `aria-controls`/`aria-expanded`, `closeMenu()` y el
       `UserMenu` de desktop.
-- [ ] Ajustar el bloque de sesión del drawer móvil para mostrar nombre, *Mi
+- [x] Ajustar el bloque de sesión del drawer móvil para mostrar nombre, *Mi
       cuenta* y *Cerrar sesión* sin la rama de *Iniciar sesión* (ya
       inalcanzable: sin perfil no hay navbar).
-- [ ] En `components/navbar/UserMenu.tsx`, volver `misCursosHref` opcional y
+- [x] En `components/navbar/UserMenu.tsx`, volver `misCursosHref` opcional y
       no renderizar el ítem *Mis cursos* cuando falte; reubicar
       `firstItemRef` al primer ítem realmente renderizado para preservar el
       foco inicial y el cierre con `Escape`.
-- [ ] Comprobar con sesión de estudiante que el navbar muestra *Grupo de
+- [x] Comprobar con sesión de estudiante que el navbar muestra *Grupo de
       Investigación* + `UserMenu` con los tres ítems, en desktop y en móvil.
 
 ### Fase 3 — Navbar de docente y dropdown de curso
-- [ ] En `app/layout.tsx`, tras resolver `roles`, calcular `isTeacher` y,
+- [x] En `app/layout.tsx`, tras resolver `roles`, calcular `isTeacher` y,
       solo en ese caso, `await getCoursesByTeacher(profile.id)`; pasar
       `teacherCourses` al `Navbar` (vacío/undefined para estudiantes).
-- [ ] En `Navbar.tsx`, aceptar `teacherCourses?: AcademicCourse[]`, calcular
+- [x] En `Navbar.tsx`, aceptar `teacherCourses?: AcademicCourse[]`, calcular
       `isTeacher` y elegir entre `getStudentNavLinks()` y
       `getTeacherNavLinks(scopedCourseId)`.
-- [ ] Crear `components/navbar/CourseScopeSelect.tsx`: lee `useParams()` para
+- [x] Crear `components/navbar/CourseScopeSelect.tsx`: lee `useParams()` para
       obtener `academicCourseId`; si existe, ése es el curso en scope y el
       control lo muestra seleccionado; si no existe, muestra el placeholder
       *"Selecciona un curso"*. Al seleccionar un curso, navega preservando la
       sección actual (`grades`/`attendance`/`assignments`) si la hay,
       truncando subrutas más profundas (p. ej. `assignments/[groupId]` →
       `assignments`), o yendo a `/admin/courses/{id}` si no hay sección.
-- [ ] Definir el estado vacío del dropdown: si `teacherCourses` está vacío,
+- [x] Definir el estado vacío del dropdown: si `teacherCourses` está vacío,
       mostrar el control deshabilitado con texto *"Sin cursos"* y un
       enlace/CTA a `/admin/courses/new`, dejando *Calificaciones*,
       *Asistencia* y *Evaluaciones* deshabilitados.
-- [ ] Renderizar `CourseScopeSelect` en el slot desktop y en el drawer móvil
+- [x] Renderizar `CourseScopeSelect` en el slot desktop y en el drawer móvil
       (mismo componente, sin duplicar markup), cerrando el drawer al
       navegar.
-- [ ] Elevar el `academicCourseId` derivado hasta `Navbar` (o derivarlo
+- [x] Elevar el `academicCourseId` derivado hasta `Navbar` (o derivarlo
       también allí con `useParams()`) para que `getTeacherNavLinks` reciba
       el scope correcto y los enlaces dejen de estar deshabilitados al
       entrar a un curso.
-- [ ] Accesibilidad del dropdown: `aria-haspopup`/`aria-expanded` si es menú
+- [x] Accesibilidad del dropdown: `aria-haspopup`/`aria-expanded` si es menú
       custom (o `<label>` asociado si es `<select>` de Flowbite), cierre con
       `Escape`, cierre al clic fuera y foco devuelto al trigger — mismo
       patrón que ya implementa `UserMenu`.
 
 ### Fase 4 — Limpieza de navegación redundante y ajuste de landing
-- [ ] Eliminar la tira de nav móvil (*Mis cursos*) de
+- [x] Eliminar la tira de nav móvil (*Mis cursos*) de
       `app/(admin)/layout.tsx`, dejando intactos
       `requireAnyRole(["teacher","admin"])` y el `<main>`.
-- [ ] Revisar si alguna página admin dependía visualmente del borde
+- [x] Revisar si alguna página admin dependía visualmente del borde
       inferior de esa tira para separarse del header y, si hace falta,
       ajustar solo el espaciado del `<main>`.
-- [ ] Revisar el `mt-19` del `<main>` de `app/page.tsx`: validar visualmente
+- [x] Revisar el `mt-19` del `<main>` de `app/page.tsx`: validar visualmente
       con el usuario los dos estados (anónimo sin header, autenticado con
       header) y ajustar el valor para evitar el hueco vacío sin introducir
       layout shift para usuarios autenticados.
-- [ ] Registrar en `docs/specs/backlog.md` los hallazgos fuera de alcance
+- [x] Registrar en `docs/specs/backlog.md` los hallazgos fuera de alcance
       detectados (clases crudas del navbar heredado, `AnnouncementBar` con
       `localStorage` en el primer render, ausencia de puntos de entrada a
       `/login` para anónimos — aceptada como decisión de este spec, no como
       deuda a resolver).
 
 ### Fase 5 — Pruebas
-- [ ] Ejecutar `npm run lint` y `npm run build`.
-- [ ] Cambiar el estado del spec a `[TESTING]`.
-- [ ] Acompañar al usuario en la ronda de
+- [x] Ejecutar `npm run lint` y `npm run build`.
+- [x] Cambiar el estado del spec a `[TESTING]`.
+- [x] Acompañar al usuario en la ronda de
       `docs/testing/test-028-navbar-por-rol.md` (anónimo, estudiante,
       docente; desktop y móvil; modo claro y oscuro).
-- [ ] Registrar hallazgos caso por caso y cerrar el resumen de la ronda.
+- [x] Registrar hallazgos caso por caso y cerrar el resumen de la ronda.
       Confirmar con el usuario si se reutiliza una cuenta docente existente
       con ≥2 cursos activos y una cuenta de estudiante existente, o si se
       crean nuevas vía API; limpiar al cierre en el segundo caso.
-- [ ] No hay pruebas automáticas: el framework sigue por definir (ver
+- [x] No hay pruebas automáticas: el framework sigue por definir (ver
       CLAUDE.md → Testing) y el 100% del spec es UI.
 
 ## Criterios de aceptación

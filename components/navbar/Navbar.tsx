@@ -18,7 +18,7 @@ export const Navbar = ({
   roles = [],
   teacherCourses = [],
 }: {
-  profile?: Profile | null;
+  profile: Profile;
   roles?: AppRole[];
   teacherCourses?: AcademicCourse[];
 }) => {
@@ -26,7 +26,7 @@ export const Navbar = ({
   const params = useParams();
 
   const isTeacher = roles.includes("teacher") || roles.includes("admin");
-  const misCursosHref = isTeacher ? "/admin/courses" : "/cuenta/cursos";
+  const misCursosHref = isTeacher ? null : "/cuenta/cursos";
   const academicCourseId = params.academicCourseId as string | undefined;
 
   const toggleMenu = () => setIsMenuOpen((p) => !p);
@@ -63,7 +63,7 @@ export const Navbar = ({
 
           <div className="flex gap-3 items-center">
             <div className="hidden lg:block">
-              <UserMenu profile={profile!} misCursosHref={misCursosHref} />
+              <UserMenu profile={profile} misCursosHref={misCursosHref} />
             </div>
 
             <button
@@ -130,9 +130,20 @@ export const Navbar = ({
           </li>
           <li className="mt-2 border-t border-gray-100 dark:border-gray-700 pt-2">
             <p className="px-1 py-1.5 text-xs font-semibold text-gray-500 dark:text-gray-400 truncate">
-              {profile?.full_name}
+              {profile.full_name}
             </p>
           </li>
+          {misCursosHref && (
+            <li>
+              <Link
+                href={misCursosHref}
+                onClick={closeMenu}
+                className="block py-3 text-gray-700 dark:text-gray-300 hover:text-blue-700 dark:hover:text-blue-400 transition-colors"
+              >
+                Mis cursos
+              </Link>
+            </li>
+          )}
           <li>
             <Link
               href="/cuenta"

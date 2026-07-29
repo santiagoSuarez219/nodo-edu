@@ -19,40 +19,37 @@ export function NavLinkList({
 
   const itemClass =
     variant === "desktop"
-      ? "text-sm font-semibold text-gray-700 dark:text-gray-300 hover:text-blue-700 dark:hover:text-blue-400 transition-colors"
-      : "block py-3 text-gray-700 dark:text-gray-300 hover:text-blue-700 dark:hover:text-blue-400 transition-colors";
+      ? "text-sm font-semibold text-body dark:text-gray-300 hover:text-fg-brand dark:hover:text-blue-400 transition-colors"
+      : "block py-3 text-body dark:text-gray-300 hover:text-fg-brand dark:hover:text-blue-400 transition-colors";
 
   const disabledClass =
     variant === "desktop"
-      ? "text-sm font-semibold text-gray-400 dark:text-gray-600 cursor-not-allowed"
-      : "block py-3 text-gray-400 dark:text-gray-600 cursor-not-allowed";
+      ? "text-sm font-semibold text-fg-disabled dark:text-gray-600 cursor-not-allowed"
+      : "block py-3 text-fg-disabled dark:text-gray-600 cursor-not-allowed";
 
   return (
     <div className={containerClass}>
-      {links.map((link) => (
-        <div
-          key={link.label}
-          className={variant === "mobile" ? undefined : ""}
-        >
-          {link.disabled ? (
-            <span
-              className={disabledClass}
-              aria-disabled="true"
-              title={link.title}
-            >
-              {link.label}
-            </span>
-          ) : (
-            <Link
-              href={link.href || "#"}
-              onClick={onNavigate}
-              className={itemClass}
-            >
-              {link.label}
-            </Link>
-          )}
-        </div>
-      ))}
+      {links.map((link) =>
+        link.disabled ? (
+          <span
+            key={link.label}
+            className={disabledClass}
+            aria-disabled="true"
+          >
+            {link.label}
+            {link.title && <span className="sr-only"> ({link.title})</span>}
+          </span>
+        ) : (
+          <Link
+            key={link.label}
+            href={link.href || "#"}
+            onClick={onNavigate}
+            className={itemClass}
+          >
+            {link.label}
+          </Link>
+        )
+      )}
     </div>
   );
 }
