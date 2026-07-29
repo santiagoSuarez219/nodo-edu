@@ -11,8 +11,8 @@
 | Cuenta docente de prueba "Docente Test" (rol corregido manualmente a `teacher` tras signup) | `POST /auth/v1/signup` + `PATCH /rest/v1/user_roles` | `d4af82b0-1b90-4aea-839c-926ea0196648` | ✅ (`DELETE /auth/v1/admin/users/{id}`, `user_roles`, `profiles`) |
 | Curso académico "Test A" (`TEST-A`) | `POST /rest/v1/academic_courses` | `899dce0d-aa2e-40a1-bd20-64e0598e1754` | ✅ (`DELETE /rest/v1/academic_courses`) |
 | Curso académico "Test B" (`TEST-B`) | `POST /rest/v1/academic_courses` | `62a876be-3f04-483a-98ba-46c5639d292e` | ✅ (`DELETE /rest/v1/academic_courses`) |
-| Cuenta de estudiante matriculada en al menos un curso | pendiente de crear | — pendiente para TC-028-004/005 | ⬜ |
-| Cuenta docente sin cursos académicos | pendiente de crear | — pendiente para TC-028-011 | ⬜ |
+| Cuenta de estudiante ya existente (reutilizada, matriculada en al menos un curso) | preexistente, iniciada por el usuario | no aplica (cuenta real del usuario, no de prueba — no se elimina) | no aplica |
+| Cuenta docente sin cursos académicos "docente-sin-cursos-028" | `POST /auth/v1/signup` + `PATCH /rest/v1/user_roles` | `22fd4348-03c6-4183-b6cb-75f53037b468` | ✅ (`DELETE /auth/v1/admin/users/{id}`, `user_roles`, `profiles`) |
 
 **Entorno de pruebas:** desarrollo (proyecto Supabase único del repo)
 **Fecha de la ronda:** 2026-07-29
@@ -82,10 +82,9 @@ comportamiento correcto.
 **Resultado esperado:** la barra muestra *Grupo de Investigación* + el
 `UserMenu`; *Mis cursos* lleva a `/cuenta/cursos`, *Mi cuenta* a `/cuenta`,
 *Cerrar sesión* cierra la sesión y redirige según el flujo existente.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** No se ejecutó en la primera ronda (2026-07-29): la sesión de
-pruebas se centró en la cuenta docente y este caso quedó sin cubrir.
-Pendiente de ejecución con una cuenta de estudiante real.
+**Estado:** ✅ Aprobado
+**Hallazgos:** Ejecutado el 2026-07-29 con una cuenta de estudiante real ya
+existente. Sin observaciones.
 
 ### TC-028-005 — Navbar de estudiante en móvil
 **Precondición:** sesión de estudiante iniciada, viewport móvil.
@@ -97,10 +96,10 @@ Pendiente de ejecución con una cuenta de estudiante real.
 **Resultado esperado:** el drawer muestra los mismos elementos que desktop
 (incluido *Mis cursos*, agregado al drawer tras la corrección de
 CAMBIOS REQUERIDOS de code review); al navegar, el drawer se cierra.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** No se ejecutó en la primera ronda; pendiente de ejecución.
-El paso 2 se actualizó para incluir *Mis cursos*, que no se renderizaba en
-el drawer móvil antes de la corrección post-review.
+**Estado:** ✅ Aprobado
+**Hallazgos:** Ejecutado el 2026-07-29. *Mis cursos* aparece correctamente en
+el drawer (agregado tras la corrección post-review); el drawer cierra al
+navegar. Sin observaciones.
 
 ### TC-028-006 — Navbar de docente: enlaces base
 **Precondición:** sesión docente iniciada (`teacher` o `admin`), con ≥2
@@ -165,14 +164,20 @@ elegido).
 (o `admin` sin cursos asignados).
 **Pasos:**
 1. Observar el dropdown de curso.
-2. Verificar *Calificaciones*, *Asistencia*, *Evaluaciones*.
-**Resultado esperado:** el dropdown aparece deshabilitado con texto *"Sin
-cursos"* y un acceso a *Nuevo curso*; los tres enlaces dependientes de curso
-están deshabilitados.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** No se ejecutó en la primera ronda (la cuenta docente de
-prueba tenía cursos desde antes de llegar a este caso). Pendiente de
-ejecución con una cuenta docente sin `academic_courses` asociados.
+2. Click en el dropdown para abrirlo.
+3. Verificar *Calificaciones*, *Asistencia*, *Evaluaciones*.
+**Resultado esperado:** el dropdown se ve visualmente atenuado con texto
+*"Sin cursos"*, pero es clickeable y al abrirse muestra un mensaje y un
+acceso a *Crear nuevo curso*; los tres enlaces dependientes de curso están
+deshabilitados.
+**Estado:** ✅ Aprobado
+**Hallazgos:** **Bug encontrado y corregido durante la ejecución**: el botón
+del dropdown tenía el atributo HTML `disabled`, lo que impedía abrirlo por
+completo — el usuario no podía ver el mensaje ni el CTA "Crear nuevo curso"
+porque el `<button disabled>` no dispara `onClick`. Corregido en
+`CourseScopeSelect.tsx` quitando el atributo `disabled` del trigger (se
+mantiene el estilo visual atenuado vía className, pero el botón es
+clickeable para mostrar el estado vacío). Reprobado tras el fix: aprobado.
 
 ### TC-028-012 — Navbar de docente en móvil
 **Precondición:** sesión docente iniciada, viewport móvil.
@@ -232,23 +237,42 @@ sobre el contenido; con header, no hay layout shift ni superposición.
 **Resultado esperado:** contraste y legibilidad correctos en ambos navbars y
 en el dropdown de curso.
 **Estado:** ✅ Aprobado
-**Hallazgos:** Verificado con la cuenta docente. La verificación con cuenta
-de estudiante queda pendiente junto con TC-028-004/005.
+**Hallazgos:** Verificado con la cuenta docente en la primera ejecución y con
+una cuenta de estudiante real en la segunda ronda. Sin observaciones en
+ninguno de los dos roles.
 
-## Resumen de la ronda (2026-07-29, primera ejecución)
+## Resumen de la ronda
+
+### Primera ejecución (2026-07-29)
 - Aprobados: 11 — Fallidos: 0 — Pendientes: 3 (TC-028-004, TC-028-005,
   TC-028-011 — no se probó ninguna cuenta de estudiante ni el caso de
   docente sin cursos)
-- Hallazgos escalados a `docs/specs/backlog.md`: ninguno nuevo (DEBT-015,
-  DEBT-016, DEBT-017 ya registrados durante la implementación, no como
-  hallazgo de esta ronda)
-- Limpieza de datos de prueba: ✅ Completada — cuenta docente
-  `docente-spec028-1785359286@test.edu.co` (`d4af82b0-1b90-4aea-839c-926ea0196648`)
-  y cursos `TEST-A` (`899dce0d-aa2e-40a1-bd20-64e0598e1754`), `TEST-B`
-  (`62a876be-3f04-483a-98ba-46c5639d292e`) eliminados vía API tras la ronda
-  (`academic_courses`, `user_roles`, `profiles`, `auth.users`). Verificado
-  con consulta posterior: 0 registros restantes.
+- Limpieza parcial: cuenta docente `docente-spec028-1785359286@test.edu.co`
+  (`d4af82b0-1b90-4aea-839c-926ea0196648`) y cursos `TEST-A`
+  (`899dce0d-aa2e-40a1-bd20-64e0598e1754`), `TEST-B`
+  (`62a876be-3f04-483a-98ba-46c5639d292e`) eliminados.
 
-> **Nota:** El spec permanece en `[TESTING]` hasta ejecutar TC-028-004,
-> TC-028-005 y TC-028-011 con una cuenta de estudiante y una cuenta docente
-> sin cursos, respectivamente.
+### Segunda ejecución (2026-07-29, misma fecha — cierre de la ronda)
+- Se ejecutaron los 3 casos pendientes:
+  - **TC-028-004 y TC-028-005** con una cuenta de estudiante real del
+    usuario (no se creó dato de prueba; no requiere limpieza).
+  - **TC-028-011** con una cuenta docente de prueba sin cursos, creada
+    específicamente para este caso.
+- **Bug encontrado y corregido durante TC-028-011:** el botón trigger de
+  `CourseScopeSelect` tenía el atributo HTML `disabled` cuando el docente no
+  tenía cursos, impidiendo abrirlo para ver el estado vacío y el CTA "Crear
+  nuevo curso". Corregido quitando el atributo `disabled` (se conserva el
+  estilo visual atenuado). Reprobado tras el fix: aprobado.
+- Aprobados: **16 — Fallidos: 0 — Pendientes: 0**
+
+### Resultado final
+- **16/16 casos aprobados.**
+- Hallazgos escalados a `docs/specs/backlog.md`: ninguno nuevo (DEBT-015,
+  DEBT-016, DEBT-017 ya registrados durante la implementación; el bug de
+  `CourseScopeSelect` se corrigió en el mismo ciclo de pruebas, no quedó
+  como deuda).
+- Limpieza de datos de prueba: ✅ Completada — todas las cuentas y cursos de
+  prueba (docente con 2 cursos, docente sin cursos) eliminados vía API.
+  Verificado con consultas posteriores: 0 registros restantes en ambos
+  casos. La cuenta de estudiante usada era preexistente del usuario, no un
+  dato de prueba, y no requiere limpieza.

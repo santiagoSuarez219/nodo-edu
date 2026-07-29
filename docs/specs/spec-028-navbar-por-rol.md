@@ -1,4 +1,4 @@
-# spec-028 — [TESTING] Navbar por rol (estudiante / docente) y ocultamiento para anónimos
+# spec-028 — [DONE] Navbar por rol (estudiante / docente) y ocultamiento para anónimos
 
 ## Contexto
 

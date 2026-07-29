@@ -80,7 +80,6 @@ export function CourseScopeSelect({
         ref={triggerRef}
         type="button"
         onClick={() => setIsOpen((p) => !p)}
-        disabled={isDisabled}
         aria-haspopup="menu"
         aria-expanded={isOpen}
         aria-label="Seleccionar curso académico"
