@@ -5,6 +5,25 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+## DEBT-015 — Navbar usa clases crudas de Tailwind en lugar de tokens semánticos
+
+**Origen:** spec-028 (navbar por rol)
+**Prioridad:** Baja — cosmético, sin impacto funcional; heredado del código anterior
+
+`components/navbar/Navbar.tsx`, `UserMenu.tsx` y otros componentes del navbar
+usan clases crudas de Tailwind (`text-gray-700`, `bg-blue-700`, `hover:bg-gray-100`,
+etc.) en lugar de tokens semánticos del sistema de diseño (`--color-*` definidos
+en `DESIGN.md`). El nuevo código de spec-028 (`NavLinkList.tsx`) sí usa tokens
+semánticos como patrón para código nuevo, pero el navbar heredado no fue
+refactorizado por estar fuera del alcance.
+
+**Acción:** En una iteración dedicada a UI/tokens, refactorizar todos los
+estilos del navbar a tokens semánticos para consistencia visual. Ver también
+**[[DEBT-008]]** (flash de tema claro/oscuro) — se beneficiará del uso de
+tokens que heredan automáticamente los cambios de `prefers-color-scheme`.
+
+---
+
 ## DEBT-014 — `NEXT_PUBLIC_SITE_URL` sin ningún uso en el código
 
 **Origen:** Detectado por `@reviewer` en la 3ª pasada de spec-027 (ajeno a su
