@@ -12,42 +12,40 @@ slides_hint: "Cada sección ## es una diapositiva. Presentación sincrona."
 date: "2026-07-21"
 author: "Asistente de Docencia"
 summary: ""
-updatedAt: "2026-07-21"
+updatedAt: "2026-07-30"
 ---
-
-# Fundamentos de Control de Versiones
 
 ## El problema: proyectos sin memoria
 
-Imagina que estás escribiendo el código de tu proyecto de aula. Para "no perder nada", vas guardando copias:
+Imagina que estás implementando el algoritmo de ordenamiento que te piden en el primer laboratorio de este curso. Para "no perder nada", vas guardando copias del archivo:
 
 ```text
-proyectoAula.java
-proyectoAula_v2.java
-proyectoAula_v2_final.java
-proyectoAula_v2_final_YA.java
-proyectoAula_v2_final_YA_arreglado.java
+insertion_sort.py
+insertion_sort_v2.py
+insertion_sort_v2_final.py
+insertion_sort_v2_final_YA.py
+insertion_sort_v2_final_YA_arreglado.py
 ```
 
-- ¿Cuál es la versión buena?
-- ¿Qué cambió exactamente entre una copia y la siguiente?
-- Si borraste sin querer una función que sí funcionaba ayer, ¿cómo la recuperas?
-- Ahora súmale un compañero de equipo que trabaja **al mismo tiempo** que tú sobre el mismo archivo, enviándolo por correo o USB o por WhastApp.
+- ¿Cuál versión es la que realmente pasa todos los casos de prueba?
+- ¿Qué cambiaste exactamente entre una copia y la siguiente?
+- Si borraste sin querer una optimización que sí funcionaba ayer, ¿cómo la recuperas?
+- Ahora súmale un compañero de equipo que trabaja **al mismo tiempo** que tú sobre el mismo código, enviándolo por correo o USB o por WhatsApp.
 
-Esto no es un problema de programación: es un problema de **gestión de cambios en el tiempo**. Y es exactamente el problema que resuelve el control de versiones.
+Esto no es un problema de sintaxis ni de lógica del algoritmo: es un problema de **gestión de cambios en el tiempo**. Y es exactamente el problema que resuelve el control de versiones.
 
 ## Más problemas que resuelve el control de versiones
 
 El ejemplo de las copias manuales es solo uno de varios escenarios donde la falta de control de versiones se convierte en un dolor de cabeza:
 
 **1. Un cambio nuevo rompe lo que ya funcionaba**
-Estás construyendo un proyecto con 5 funcionalidades. Terminaste las primeras tres, y funcionan bien. Al implementar la cuarta, algo sale mal: el código se daña y, sin darte cuenta, ese error también rompe las funcionalidades 1, 2 y 3. Sin un historial de cambios, no tienes forma de volver al punto exacto donde todo funcionaba — tocaría reescribir desde cero o depurar a ciegas.
+Estás implementando el algoritmo de ordenamiento que te pide el laboratorio. Ya tienes tres casos de prueba pasando. Al intentar optimizar el algoritmo, algo sale mal: el cambio se daña y, sin darte cuenta, ese error también rompe los casos que ya funcionaban. Sin un historial de cambios, no tienes forma de volver al punto exacto donde todo funcionaba — tocaría reescribir desde cero o depurar a ciegas.
 
 **2. Juntar el trabajo de dos personas**
-Tú y un compañero trabajan sobre el mismo proyecto al mismo tiempo. Cada uno edita partes distintas (o a veces las mismas) del código. Al final del día, ¿cómo combinan ambos trabajos sin que uno sobrescriba al otro? Copiar y pegar archivos a mano es lento y propenso a errores — casi siempre alguien termina perdiendo parte de su trabajo.
+Tú y un compañero trabajan sobre el mismo repositorio al mismo tiempo. Cada uno edita partes distintas (o a veces las mismas) del código o del informe. Al final del día, ¿cómo combinan ambos trabajos sin que uno sobrescriba al otro? Copiar y pegar archivos a mano es lento y propenso a errores — casi siempre alguien termina perdiendo parte de su trabajo.
 
-**3. El cliente cambia de opinión**
-El profesor (o el cliente, en un proyecto real) te pide una función nueva. La construyes, la pruebas, todo bien. Una semana después te dice: "en realidad estaba mejor como estaba antes, revierte ese cambio". Sin un registro de versiones, "como estaba antes" es solo un recuerdo impreciso — no un estado real y recuperable del proyecto.
+**3. Cambias de opinión sobre tu propia solución**
+Implementaste una versión del algoritmo, la probaste y funciona bien. Una semana después, mientras revisas el enunciado del laboratorio, notas que tu primer enfoque era mejor que el que llevas ahora. Sin un registro de versiones, "como estaba antes" es solo un recuerdo impreciso — no un estado real y recuperable del proyecto.
 
 Los tres problemas comparten algo: todos requieren poder **volver atrás** o **combinar cambios** de forma confiable, en vez de depender de la memoria o de archivos duplicados. Git resuelve el primero y el tercero con el historial de commits que vemos hoy (`git log`, y comandos como `checkout`/`revert` que se profundizan en el laboratorio); el segundo requiere además trabajar con **ramas** (`branch`, `merge`), tema de la sesión T2.
 
@@ -57,7 +55,7 @@ En vez de copias manuales, un **sistema de control de versiones** guarda automá
 
 ```mermaid
 flowchart LR
-  A["❌ Antes:\nproyecto_v1.java\nproyecto_v2_final.java\nproyecto_v2_final_YA.java"] --> B["✅ Con Git:\nun solo archivo\n+ historial completo de cambios"]
+  A["❌ Antes:\ninsertion_sort.py\ninsertion_sort_v2_final.py\ninsertion_sort_v2_final_YA.py"] --> B["✅ Con Git:\nun solo archivo\n+ historial completo de cambios"]
 ```
 
 **Git** es el sistema de control de versiones más usado en la industria. Es **distribuido**: cada persona tiene una copia completa del historial del proyecto en su propia máquina, no depende de un único servidor central.
@@ -78,26 +76,30 @@ Esto crea una carpeta oculta `.git/` que contiene **todo** el historial del proy
 
 ```mermaid
 flowchart TB
-  subgraph proyecto-aula/
+  subgraph curso-analisis-algoritmos/
     direction TB
     git[".git/  ← aquí vive todo el historial"]
-    src["src/  ← tu código"]
+    labs["laboratorios/  ← tus 5 informes evaluativos"]
+    ejer["ejercicios-clase/  ← código de las sesiones practicas"]
+    bench["benchmarks/  ← scripts de medicion de tiempos"]
     readme["README.md"]
   end
 ```
+
+Este es el repositorio que vas a crear en el laboratorio de hoy: **uno solo para todo el curso**, con esas mismas carpetas.
 
 > **Repositorio (repo):** carpeta cuyo contenido es rastreado por Git. Contiene el proyecto actual **y** toda su historia de cambios.
 > ⚠️ Si borras la carpeta `.git/`, pierdes todo el historial — el código actual queda, pero la memoria del proyecto desaparece.
 
 ## De "guardar el archivo" a "guardar un cambio": el staging area
 
-**Situación:** modificaste tres archivos, pero solo dos de esos cambios pertenecen a la misma idea (por ejemplo, "agregué validación de edad"). El tercero es un cambio suelto que aún no quieres registrar. ¿Cómo le dices a Git "guarda solo estos dos, juntos, como una unidad"?
+**Situación:** modificaste tres archivos, pero solo dos de esos cambios pertenecen a la misma idea (por ejemplo, "documenté el análisis de complejidad del Laboratorio 1"). El tercero es un cambio suelto en un ejercicio de clase que aún no quieres registrar. ¿Cómo le dices a Git "guarda solo estos dos, juntos, como una unidad"?
 
 **En la práctica**, Git separa el proceso en dos pasos:
 
 ```bash
-git add Cliente.java Cuenta.java   # 1. Preparar (staging)
-git commit -m "Agrega validacion de edad del cliente"   # 2. Guardar en la historia
+git add laboratorios/lab1-fundamentos-complejidad-recurrencias/README.md laboratorios/lab1-fundamentos-complejidad-recurrencias/graficas/tiempos.png   # 1. Preparar (staging)
+git commit -m "Documenta analisis de complejidad del lab 1"   # 2. Guardar en la historia
 ```
 
 ```mermaid
@@ -124,7 +126,7 @@ git log --oneline  # versión resumida, un commit por línea
 
 ```mermaid
 flowchart LR
-  c1["commit 1\nInit proyecto"] --> c2["commit 2\nAgrega Cliente"] --> c3["commit 3\nValida edad"]
+  c1["commit 1\nInit repositorio"] --> c2["commit 2\nAgrega README"] --> c3["commit 3\nDocumenta lab 1"]
   c3 -.-> HEAD["HEAD\n(donde estás ahora)"]
 ```
 
@@ -133,7 +135,7 @@ flowchart LR
 
 ## Ver el cambio exacto: git diff
 
-**Situación:** antes de hacer `commit`, quieres confirmar _línea por línea_ qué modificaste, no solo recordar "creo que cambié algo en el constructor".
+**Situación:** antes de hacer `commit`, quieres confirmar _línea por línea_ qué modificaste, no solo recordar "creo que cambié algo en el README".
 
 **En la práctica:**
 
@@ -142,9 +144,11 @@ git diff
 ```
 
 ```text
-- public Cliente(String nombre) {
-+ public Cliente(String nombre, int edad) {
-+     if (edad < 0) throw new IllegalArgumentException("Edad invalida");
+- ## Resultados
+- Insertion sort tarda mas que merge sort.
++ ## Resultados
++ Insertion sort crece de forma cuadratica; merge sort, en n log n.
++ Ver grafica en graficas/tiempos.png.
 ```
 
 Las líneas con `-` son lo que había antes; las líneas con `+` son lo nuevo.
@@ -162,10 +166,93 @@ Las líneas con `-` son lo que había antes; las líneas con `+` son lo nuevo.
 | `git log`                 | Muestra el historial de commits                     | Para revisar qué se ha hecho                       |
 | `git diff`                | Muestra los cambios línea por línea                 | Antes de un `add` o `commit`, para revisar         |
 
+## Compartir el historial: repositorios remotos
+
+**Situación:** todo lo que has visto hasta ahora vive únicamente en el disco de tu computador. Si se daña o lo pierdes, el historial completo desaparece con él. Y aunque no se dañe, ¿cómo entrega el docente acceso a tus cinco informes de laboratorio sin que le envíes una carpeta comprimida por correo cada vez?
+
+**En la práctica**, Git puede sincronizar tu repositorio local con una copia alojada en un servidor — el **repositorio remoto**. GitHub es el servicio más usado para alojar esa copia. Cuatro comandos gobiernan la relación entre tu copia local y la remota:
+
+```bash
+git clone <url>    # descarga un repositorio remoto completo, con todo su historial
+git push origin main  # sube tus commits locales al remoto
+git fetch origin      # trae los commits nuevos del remoto, SIN aplicarlos todavía
+git pull origin main   # trae los commits nuevos del remoto Y los aplica de una vez
+```
+
+```mermaid
+flowchart LR
+  A["Repositorio local\n(tu computador)"] -->|"git push"| B["Repositorio remoto\n(GitHub)"]
+  B -->|"git fetch"| A
+  B -->|"git pull = fetch + merge"| A
+  B -->|"git clone"| C["Nueva copia local\n(otra maquina)"]
+```
+
+`git fetch` es la operación prudente: te deja revisar qué trajo el remoto antes de mezclarlo con tu trabajo. `git pull` hace ambas cosas de una sola vez — cómodo, pero puede generar un conflicto de fusión de inmediato (ver la sección siguiente).
+
+> **Repositorio remoto:** copia del repositorio alojada en un servidor (típicamente GitHub), que sincroniza su historial con una o varias copias locales mediante `push`, `pull`, `fetch` y `clone`.
+
+Este es exactamente el mecanismo detrás de la entrega de cada uno de tus cinco laboratorios evaluativos: subes tu informe con `git push` a tu repositorio en GitHub, y ese es el estado que el docente revisa.
+
+## Experimentar sin romper lo que funciona: ramas
+
+**Situación:** tu `README.md` principal ya documenta bien la estructura del repositorio del curso, y quieres probar una forma distinta de organizarlo — con más secciones, otro orden. Si editas directamente el archivo que ya funciona y la nueva organización resulta peor, no hay vuelta atrás fácil sin revisar el historial commit por commit.
+
+**En la práctica**, Git permite abrir una **línea de trabajo paralela** llamada **rama (branch)**, que parte del estado actual sin afectar la rama principal (`main`) hasta que decides fusionarla:
+
+```bash
+git branch reorganizar-readme     # crea la rama, sin cambiarte a ella
+git checkout reorganizar-readme   # te mueves a la rama nueva
+git checkout -b reorganizar-readme   # crea y cambia en un solo paso
+# ... haces commits solo en esta rama ...
+git checkout main                 # vuelves a la rama principal
+git merge reorganizar-readme      # incorporas esos commits a main
+```
+
+```mermaid
+flowchart LR
+  m1["main: commit A"] --> m2["main: commit B"]
+  m2 --> f1["rama: commit C"]
+  f1 --> f2["rama: commit D"]
+  m2 --> m3["main: commit E"]
+  f2 --> merge["merge"]
+  m3 --> merge
+```
+
+Este patrón — crear una rama para cada cambio que quieres probar, y fusionarla a `main` solo cuando funciona — se conoce como **flujo tipo feature branch**. Es la forma estándar de trabajar en equipo sin pisarse el trabajo entre sí, y la usarás desde el laboratorio de hoy para cada informe.
+
+> **Rama (branch):** puntero móvil e independiente sobre una secuencia de commits, que permite desarrollar y probar cambios sin afectar la rama principal hasta que se fusionan explícitamente con `git merge`.
+
+## Cuando dos cambios chocan: el conflicto de fusión
+
+**Situación:** tú y tu rama `main` modificaron la **misma línea** del mismo archivo mientras trabajabas en paralelo — por ejemplo, la sección de resultados de un informe. Al hacer `git merge`, Git no tiene forma de adivinar cuál versión es la correcta.
+
+**En la práctica**, Git detiene el merge y marca el archivo afectado con tres delimitadores:
+
+```text
+<<<<<<< HEAD
+Insertion sort es mas eficiente para este caso de prueba.
+=======
+Merge sort es mas eficiente para este caso de prueba.
+>>>>>>> reorganizar-readme
+```
+
+Todo lo que está entre `<<<<<<< HEAD` y `=======` es tu versión actual; todo entre `=======` y `>>>>>>> reorganizar-readme` es la versión que intentas fusionar. Resolverlo significa editar el archivo a mano hasta dejar el contenido correcto, borrar los tres delimitadores, y cerrar el merge con un commit:
+
+```bash
+git add README.md
+git commit -m "Resuelve conflicto en seccion de resultados"
+```
+
+> **Conflicto de fusión:** situación en la que Git no puede combinar automáticamente dos cambios porque afectan la misma parte de un archivo; requiere intervención manual antes de completar el `merge`.
+> Un conflicto no es un error — es una señal normal de que dos personas (o dos versiones de ti mismo) tocaron lo mismo. En el laboratorio de hoy vas a provocar uno a propósito y resolverlo, para que la primera vez que aparezca en un laboratorio evaluativo ya sepas exactamente qué hacer.
+
 ## Síntesis
 
-- El control de versiones resuelve problemas reales: perder cambios, no saber qué cambió, que un error nuevo rompa funcionalidades que ya andaban bien, pisarse el trabajo entre compañeros, o no poder volver a "como estaba antes" cuando el cliente cambia de opinión.
+- El control de versiones resuelve problemas reales: perder cambios, no saber qué cambió, que un error nuevo rompa lo que ya funcionaba, pisarse el trabajo entre compañeros, o no poder volver a "como estaba antes".
 - El **repositorio** (`.git/`) guarda todo el historial del proyecto.
 - Los cambios pasan por dos etapas antes de quedar permanentes: **directorio de trabajo → staging area (`git add`) → historial (`git commit`)**.
 - **HEAD** indica dónde estás parado en la historia; `git log` te muestra toda la historia.
 - `git diff` te deja ver exactamente qué cambió, línea por línea, antes de comprometerte con el cambio.
+- Los **repositorios remotos** (`push`, `pull`, `fetch`, `clone`) sincronizan tu historial local con una copia en GitHub — el mecanismo detrás de la entrega de cada informe de laboratorio.
+- Las **ramas** (`branch`, `checkout`, `merge`) te permiten probar cambios en paralelo sin arriesgar lo que ya funciona en `main`; el flujo tipo feature branch es la forma estándar de organizar ese trabajo.
+- Un **conflicto de fusión** aparece cuando dos cambios tocan la misma línea del mismo archivo — no es un error, es parte normal del trabajo colaborativo, y se resuelve editando el archivo a mano.

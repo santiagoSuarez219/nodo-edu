@@ -5,6 +5,83 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+## DEBT-023 — `TeacherAttendanceControl`: parpadeo del grupo/código equivocado antes de restaurar la selección guardada
+
+**Origen:** `@reviewer` en la revisión de spec-031
+**Prioridad:** Media — puede inducir al docente a dictar en clase el código de un grupo equivocado
+
+Con más de un grupo y una elección guardada en `localStorage`, el primer pintado del cliente monta `AdminAttendancePanel` con `courses[0]` (y su sesión, si tiene una abierta); el `useEffect` post-montaje cambia después a la selección restaurada, remontando el panel (por el `key={selectedCourse.id}`). Si el grupo por defecto (`courses[0]`) tiene una sesión abierta, el docente ve un instante el código de **otro** grupo antes de que aparezca el correcto — riesgoso si la pantalla está proyectada en clase.
+
+**Acción:** Persistir la elección en una cookie legible desde el server component (para que el HTML inicial ya venga con el grupo correcto), o no renderizar `AdminAttendancePanel` hasta que la restauración desde `localStorage` haya corrido.
+
+---
+
+## DEBT-022 — `getAnswerKeyForLesson` duplica la consulta de `getSelfAssessmentForLesson`
+
+**Origen:** `@reviewer` en la revisión de spec-031
+**Prioridad:** Baja — riesgo de divergencia futura, no un bug actual
+
+`lib/self-assessment/index.ts` tiene dos funciones (`getSelfAssessmentForLesson` y `getAnswerKeyForLesson`) con el mismo `select`, mismos filtros y mismo `order('created_at')`, que solo difieren en si propagan `is_correct`. El criterio de aceptación de spec-031 exige que el orden de la clave de respuestas del docente coincida exactamente con el que ve el estudiante — hoy esa garantía depende de que ambas consultas se mantengan sincronizadas manualmente.
+
+**Acción:** Extraer un helper privado (ej. `fetchLessonQuestionRows(courseSlug, lessonSlug)`) del que ambas funciones exportadas deriven su resultado, propagando o no `is_correct` según corresponda. De paso, añadir `.order('order_index', { referencedTable: 'question_choices' })` en ambas — hoy el orden de `choices` coincide en la práctica porque es la misma consulta, pero PostgREST no lo garantiza para recursos embebidos.
+
+---
+
+## DEBT-021 — `TeacherAnswerKey`: no distingue "sin preguntas" de "error al cargar"
+
+**Origen:** `@reviewer` en la revisión de spec-031
+**Prioridad:** Baja
+
+`getAnswerKeyForLesson` devuelve `[]` tanto si la lección no tiene preguntas publicadas como si la consulta falló (`catch` → log → `[]`). `TeacherLessonPanel` omite el bloque de clave de respuestas en ambos casos por igual (`answerKey.length > 0`), así que el docente no puede distinguir "esta lección no tiene autoevaluación" de "no se pudo cargar la clave" en medio de una clase.
+
+**Acción:** Devolver un resultado discriminado (ej. `{ ok: true, questions } | { ok: false }`) en vez de `[]` para ambos casos, y que `TeacherLessonPanel` muestre un mensaje de error cuando `ok` sea `false`.
+
+---
+
+## DEBT-020 — Accesibilidad y tokens crudos en los componentes nuevos de la vista docente (spec-031)
+
+**Origen:** `@reviewer` en la revisión de spec-031
+**Prioridad:** Baja
+
+Dos hallazgos menores en los componentes nuevos de spec-031:
+1. `TeacherAnswerKey.tsx` usa tokens crudos de paleta (`bg-green-50`, `border-green-200`, `text-green-600`, `text-gray-500/900`) en vez de los semánticos de `DESIGN.md` (`--color-success`, etc.) — consistente con lo que ya hace `SelfAssessmentSection.tsx` (que el spec pedía imitar), así que no es una regresión nueva, pero propaga la deuda.
+2. Los toggles "Revelar"/"Revelar todas" son `<button>` sin `aria-expanded` ni `aria-pressed`, y el resaltado de la respuesta correcta se comunica solo por color + un ícono `aria-hidden`, sin texto accesible equivalente.
+
+**Acción:** En una iteración de UI/accesibilidad, migrar `TeacherAnswerKey.tsx` (y de paso `SelfAssessmentSection.tsx`) a tokens semánticos, añadir `aria-expanded` a los toggles y un `<span className="sr-only">` junto al ícono de respuesta correcta.
+
+---
+
+## DEBT-019 — `AdminAttendancePanel`: el botón "Cerrar sesión" parpadea a "Cerrando..." cada ~5s
+
+**Origen:** test-031 (TC-009), reportado por el usuario durante la ronda de pruebas manuales
+**Prioridad:** Media — molesto en uso real (el docente ve el botón "temblar" durante toda la clase), no bloquea funcionalidad
+
+`AdminAttendancePanel.tsx` usa un único `isPending` de `useTransition()` compartido entre tres operaciones: abrir sesión, cerrar sesión, y el polling del conteo de asistentes cada 5 segundos (`useEffect` con `setInterval` → `startTransition(async () => { getSessionAttendanceCount(...) })`). Como las tres comparten el mismo `isPending`, cada vez que el polling dispara su transición, el botón "Cerrar sesión" cambia brevemente a "Cerrando..." y se deshabilita, aunque nadie esté cerrando nada — un parpadeo cada ~5s mientras la sesión está abierta. Preexistente desde spec-010 (el componente original), pero mucho más visible ahora que spec-031 lo embebe en la vista de lección donde el docente lo tiene a la vista durante toda la clase.
+
+**Acción:** Usar un `useTransition()` (o simple `useState<boolean>`) independiente para el polling de conteo, separado del que gobierna los botones de abrir/cerrar sesión, para que el polling nunca afecte su estado visual.
+
+---
+
+## DEBT-018 — `AdminAttendancePanel` usa `alert()`/`confirm()` nativos
+
+**Origen:** spec-031 (vista docente en la página de lección)
+**Prioridad:** Baja — cosmético, sin impacto funcional
+
+`AdminAttendancePanel.tsx` (líneas 52 y 60-62) usa `alert()` para reportar
+errores y `confirm()` para confirmar el cierre de sesión. Es aceptable en el
+panel admin (`/admin/courses/<id>/attendance`), pero spec-031 reutiliza este
+mismo componente embebido dentro de la página de lección, donde el docente
+puede estar proyectando la pantalla en clase — un `alert()`/`confirm()`
+nativo del navegador ahí se ve pobre. Fuera de alcance de spec-031 (que
+reutiliza el componente tal cual, sin modificarlo, para no arriesgar la ruta
+admin ya `[DONE]`).
+
+**Acción:** En una iteración de UI, reemplazar `alert()`/`confirm()` por un
+toast/modal propio del sistema de diseño, y verificar ambos puntos de montaje
+(`/admin/courses/<id>/attendance` y la vista docente de lección).
+
+---
+
 ## DEBT-017 — Sin puntos de entrada visibles a `/login` para visitantes anónimos
 
 **Origen:** spec-028 (navbar por rol) — decisión explícita del usuario

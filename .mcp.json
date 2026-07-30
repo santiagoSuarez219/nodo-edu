@@ -1,0 +1,20 @@
+{
+  "mcpServers": {
+    "question-bank-mcp": {
+      "command": "./mcp-servers/run-local-mcp.sh",
+      "args": ["question-bank-mcp"]
+    },
+    "assignment-mcp": {
+      "command": "./mcp-servers/run-local-mcp.sh",
+      "args": ["assignment-mcp"]
+    },
+    "attendance-mcp": {
+      "command": "./mcp-servers/run-local-mcp.sh",
+      "args": ["attendance-mcp"]
+    },
+    "students-mcp": {
+      "command": "./mcp-servers/run-local-mcp.sh",
+      "args": ["students-mcp"]
+    }
+  }
+}

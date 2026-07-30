@@ -7,6 +7,7 @@ import { getCurrentUser } from '@/lib/auth/session';
 import { hasCourseAccess } from '@/lib/enrollments/access';
 import type {
   SelfAssessmentQuestion,
+  AnswerKeyQuestion,
   CheckAnswerResult,
   QuestionFeedback,
   SelfAssessmentStatus,
@@ -79,6 +80,73 @@ export async function getSelfAssessmentForLesson(
     return questions;
   } catch (error) {
     console.error('Error getting self-assessment questions:', error);
+    return [];
+  }
+}
+
+// Vista docente (spec-031): misma consulta y mismo orden que
+// getSelfAssessmentForLesson, pero propaga is_correct en vez de descartarlo.
+// Solo el docente dueño o un admin pueden obtener esta clave de respuestas;
+// el gate vive aquí (no solo en la página) porque es una Server Action
+// invocable directamente.
+export async function getAnswerKeyForLesson(
+  courseSlug: string,
+  lessonSlug: string
+): Promise<AnswerKeyQuestion[]> {
+  const access = await hasCourseAccess(courseSlug);
+  if (!access.ok || (access.reason !== 'owner' && access.reason !== 'admin')) {
+    return [];
+  }
+
+  const supabase = await createServerSupabaseClient();
+
+  try {
+    const { data, error } = await supabase
+      .from('questions')
+      .select(
+        `
+        id,
+        stem,
+        code_snippet,
+        code_language,
+        topic_title,
+        choices:question_choices(id, body, order_index, is_correct)
+      `
+      )
+      .eq('course_slug', courseSlug)
+      .eq('lesson_slug', lessonSlug)
+      .eq('type', 'multiple_choice')
+      .eq('is_published', true)
+      .order('created_at', { ascending: true });
+
+    if (error) throw error;
+
+    const questions: AnswerKeyQuestion[] = (data as QuestionRow[] | null || []).map(
+      (row: QuestionRow) => {
+        const correctCount = (row.choices || []).filter(
+          (c) => c.is_correct
+        ).length;
+
+        return {
+          id: row.id,
+          stem: row.stem,
+          code_snippet: row.code_snippet,
+          code_language: row.code_language,
+          topic_title: row.topic_title,
+          allowMultiple: correctCount > 1,
+          choices: (row.choices || []).map((c) => ({
+            id: c.id,
+            body: c.body,
+            order_index: c.order_index,
+            is_correct: c.is_correct,
+          })),
+        };
+      }
+    );
+
+    return questions;
+  } catch (error) {
+    console.error('Error getting answer key questions:', error);
     return [];
   }
 }

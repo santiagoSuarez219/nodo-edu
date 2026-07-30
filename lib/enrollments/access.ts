@@ -29,15 +29,19 @@ export const hasCourseAccess = cache(async (courseSlug: string): Promise<CourseA
     return { ok: true, reason: "admin" };
   }
 
-  // Check if user is the course owner
-  const { data: ownedCourse } = await supabase
+  // Check if user is the course owner. Un docente puede tener varios
+  // academic_courses con el mismo course_slug (distintos grupos/semestres,
+  // ver spec-031) — .maybeSingle() falla con más de una fila (PGRST116) y
+  // dejaba al docente sin acceso, así que solo comprobamos que exista al
+  // menos una.
+  const { data: ownedCourses } = await supabase
     .from("academic_courses")
     .select("id")
     .eq("course_slug", courseSlug)
     .eq("teacher_id", user.id)
-    .maybeSingle();
+    .limit(1);
 
-  if (ownedCourse) {
+  if (ownedCourses && ownedCourses.length > 0) {
     return { ok: true, reason: "owner" };
   }
 

@@ -56,6 +56,10 @@ del agente antes de invocarlo. No improvisar su comportamiento.
 | `@reviewer`   | Revisión de código antes de marcar un spec como `[DONE]`                     |
 | `@tester`     | Generación y ejecución de casos de prueba e2e                                 |
 | `@mcp-builder`| Evaluación, diseño, creación y actualización de MCPs y sus system prompts     |
+| `@lesson-designer`   | Orquestar la producción del material de una lección: lee microdiseño y cronograma, calibra al nivel del curso, produce el plan y delega |
+| `@lesson-writer`     | Redactar la lección teórica `.mdx` publicable y su registro en `lib/courses/data/`                                    |
+| `@lab-designer`      | Diseñar la guía de laboratorio del docente (privada, con soluciones) y la del estudiante (publicada, con rúbrica)     |
+| `@assessment-builder`| Crear el cuestionario de cierre y los quices A/B/C vía `question-bank-mcp` y `assignment-mcp`                         |
 
 > Si en `/.claude/agents/` existen agentes adicionales específicos del proyecto,
 > tienen precedencia sobre la tabla anterior.
@@ -80,6 +84,7 @@ procedimientos para un tipo de tarea concreto.
 
 | Skill                       | Cuándo aplicarla                                              |
 |-----------------------------|--------------------------------------------------------------|
+| `lesson-authoring`          | Escribir lecciones, guías de laboratorio y evaluaciones de un curso |
 | `frontend-design`           | Construir UI de alta calidad: componentes, páginas, layouts  |
 | `tailwind-css-patterns`     | Estilar con Tailwind CSS (responsive, grid/flex, tokens)     |
 | `react-best-practices`      | Rendimiento y patrones en React/Next.js                      |
@@ -354,6 +359,40 @@ Descripción del agente: qué es, para quién trabaja y cuál es su objetivo.
 ## Tono y formato de respuesta
 {{Instrucciones de estilo: formal/informal, idioma, longitud de respuestas, etc.}}
 ```
+
+### Claude Code — Configuración de MCPs (`.mcp.json`)
+
+Los MCPs del proyecto están registrados en `.mcp.json` (versionado), de modo que
+están disponibles en cualquier sesión de Claude Code sin configuración manual:
+
+```json
+{
+  "mcpServers": {
+    "question-bank-mcp": {
+      "command": "./mcp-servers/run-local-mcp.sh",
+      "args": ["question-bank-mcp"]
+    }
+  }
+}
+```
+
+Los servidores de `mcp-servers/` **no usan dotenv**: leen `process.env` y hacen
+`exit(1)` si falta una variable. El wrapper `mcp-servers/run-local-mcp.sh`
+resuelve eso:
+
+- Carga `.env.local` (que nunca se commitea) antes de ejecutar el servidor.
+- Deriva el origen de la app (`http://localhost:<puerto>`) desde
+  `QUESTION_BANK_API_BASE_URL`, así que **no hardcodea el puerto de `npm run dev`**.
+- Mapea los nombres de variable que espera cada servidor:
+  `ASSIGNMENT_API_KEY` reutiliza `QUESTION_BANK_API_KEY` (las rutas de
+  `/api/assignments` autentican con esa clave por defecto), y `attendance-mcp` /
+  `students-mcp` reciben los genéricos `API_BASE_URL` / `API_KEY`.
+
+> ⚠️ Los MCPs son clientes HTTP: **requieren `npm run dev` corriendo** y fallan
+> con "API no disponible" sin reintentar. Comprobar un servidor de forma aislada:
+> ```bash
+> ./mcp-servers/run-local-mcp.sh question-bank-mcp </dev/null
+> ```
 
 ### Claude Desktop — Configuración de MCPs
 
