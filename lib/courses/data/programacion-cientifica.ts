@@ -18,7 +18,10 @@ export const programacionCientifica: Course = {
       articleSlug: "fundamentos-de-control-de-versiones-colab-y-diagnostico",
       order: 1,
       title: "Fundamentos de control de versiones (Colab) y diagnóstico",
+      summary:
+        "Por qué un análisis de datos necesita historial: repositorio, commit y el Flujo A de GitHub desde Colab, con diagnóstico inicial de nivel.",
       topics: [
+        { title: "Diagnóstico inicial: cuestionario de autoevaluación y reto breve de lógica" },
         { title: "Qué es el control de versiones y por qué importa en proyectos de datos" },
         { title: "Conceptos clave: repositorio, commit, historial" },
         { title: "Comandos esenciales desde la interfaz de Colab: add, commit, status, log, push, pull" },
