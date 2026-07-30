@@ -8,6 +8,7 @@ import { z } from 'zod';
 
 import { submitSelfAssessment } from '@/lib/self-assessment';
 import type { SelfAssessmentQuestion, QuestionFeedback } from '@/lib/self-assessment/types';
+import { QuestionStem } from '@/components/courses/QuestionStem';
 
 interface SelfAssessmentSectionProps {
   courseSlug: string;
@@ -120,23 +121,11 @@ export function SelfAssessmentSection({
             return (
               <div key={question.id} className="px-6 py-6">
                 {/* Pregunta */}
-                <div className="mb-4">
-                  {question.topic_title && (
-                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wide">
-                      {question.topic_title}
-                    </p>
-                  )}
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">
-                    {question.stem}
-                  </p>
-                  {question.code_snippet && (
-                    <pre className="mt-2 p-3 rounded bg-gray-100 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 overflow-x-auto">
-                      <code className="text-xs font-mono text-gray-700 dark:text-gray-300">
-                        {question.code_snippet}
-                      </code>
-                    </pre>
-                  )}
-                </div>
+                <QuestionStem
+                  topicTitle={question.topic_title}
+                  stem={question.stem}
+                  codeSnippet={question.code_snippet}
+                />
 
                 {/* Opciones */}
                 <div className="space-y-2">

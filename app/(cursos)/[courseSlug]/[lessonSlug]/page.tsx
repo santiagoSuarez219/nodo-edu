@@ -5,16 +5,21 @@ import { getLessonArticle } from "@/lib/courses/content";
 import { requireCourseAccess } from "@/lib/enrollments";
 import { hasCourseAccess } from "@/lib/enrollments/access";
 import { markLessonViewed, getLessonProgress } from "@/lib/progress";
-import { getStudentAttendanceForCourse } from "@/lib/attendance";
+import { getStudentAttendanceForCourse, getOpenSessionForCourse } from "@/lib/attendance";
 import {
   getSelfAssessmentForLesson,
   getSelfAssessmentStatus,
+  getAnswerKeyForLesson,
 } from "@/lib/self-assessment";
-import type { SelfAssessmentQuestion } from "@/lib/self-assessment/types";
+import type { SelfAssessmentQuestion, AnswerKeyQuestion } from "@/lib/self-assessment/types";
+import { resolveAcademicCoursesBySlug } from "@/lib/academic-courses";
+import type { AcademicCourse } from "@/lib/academic-courses/types";
+import type { OpenSessionSummary } from "@/lib/attendance/types";
 import { LessonArticle } from "@/components/courses/LessonArticle";
 import { LessonPagination } from "@/components/courses/LessonPagination";
 import { LessonClosureFlow } from "@/components/courses/LessonClosureFlow";
 import { AttendanceSection } from "@/components/courses/AttendanceSection";
+import { TeacherLessonPanel } from "@/components/courses/TeacherLessonPanel";
 import { MdxContent } from "@/components/mdx/MdxContent";
 import { TopicList } from "@/components/courses/TopicList";
 
@@ -77,6 +82,31 @@ export default async function LessonPage({ params }: LessonPageProps) {
     selfAssessmentStatus = await getSelfAssessmentStatus(courseSlug, lessonSlug);
   }
 
+  // Vista docente (spec-031): rama independiente de la de "enrolled" — un
+  // owner/admin nunca tiene reason "enrolled", así que ambos bloques son
+  // mutuamente excluyentes por construcción.
+  let teacherAnswerKey: AnswerKeyQuestion[] = [];
+  let teacherCourses: AcademicCourse[] = [];
+  let teacherSessionsByCourseId: Record<string, OpenSessionSummary | null> = {};
+
+  if (access.ok && (access.reason === "owner" || access.reason === "admin")) {
+    const [answerKey, academicCourses] = await Promise.all([
+      isGuideNode
+        ? Promise.resolve([] as AnswerKeyQuestion[])
+        : getAnswerKeyForLesson(courseSlug, lessonSlug),
+      resolveAcademicCoursesBySlug(courseSlug, access),
+    ]);
+    teacherAnswerKey = answerKey;
+    teacherCourses = academicCourses;
+
+    const sessions = await Promise.all(
+      academicCourses.map((course) => getOpenSessionForCourse(course.id))
+    );
+    teacherSessionsByCourseId = Object.fromEntries(
+      academicCourses.map((course, i) => [course.id, sessions[i]])
+    );
+  }
+
   return (
     <>
       <LessonArticle
@@ -117,6 +147,15 @@ export default async function LessonPage({ params }: LessonPageProps) {
               />
             )
           }
+        />
+      )}
+
+      {access.ok && (access.reason === "owner" || access.reason === "admin") && (
+        <TeacherLessonPanel
+          courseSlug={courseSlug}
+          answerKey={teacherAnswerKey}
+          academicCourses={teacherCourses}
+          initialSessionsByCourseId={teacherSessionsByCourseId}
         />
       )}
 

@@ -5,6 +5,26 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+## DEBT-018 — `AdminAttendancePanel` usa `alert()`/`confirm()` nativos
+
+**Origen:** spec-031 (vista docente en la página de lección)
+**Prioridad:** Baja — cosmético, sin impacto funcional
+
+`AdminAttendancePanel.tsx` (líneas 52 y 60-62) usa `alert()` para reportar
+errores y `confirm()` para confirmar el cierre de sesión. Es aceptable en el
+panel admin (`/admin/courses/<id>/attendance`), pero spec-031 reutiliza este
+mismo componente embebido dentro de la página de lección, donde el docente
+puede estar proyectando la pantalla en clase — un `alert()`/`confirm()`
+nativo del navegador ahí se ve pobre. Fuera de alcance de spec-031 (que
+reutiliza el componente tal cual, sin modificarlo, para no arriesgar la ruta
+admin ya `[DONE]`).
+
+**Acción:** En una iteración de UI, reemplazar `alert()`/`confirm()` por un
+toast/modal propio del sistema de diseño, y verificar ambos puntos de montaje
+(`/admin/courses/<id>/attendance` y la vista docente de lección).
+
+---
+
 ## DEBT-017 — Sin puntos de entrada visibles a `/login` para visitantes anónimos
 
 **Origen:** spec-028 (navbar por rol) — decisión explícita del usuario

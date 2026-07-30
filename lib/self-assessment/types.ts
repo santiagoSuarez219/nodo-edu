@@ -14,6 +14,16 @@ export type SelfAssessmentQuestion = {
   choices: SelfAssessmentChoice[];
 };
 
+// Vista docente: mismo contrato que SelfAssessmentQuestion, pero con
+// is_correct visible por opción (clave de respuestas, spec-031).
+export type AnswerKeyChoice = SelfAssessmentChoice & {
+  is_correct: boolean;
+};
+
+export type AnswerKeyQuestion = Omit<SelfAssessmentQuestion, "choices"> & {
+  choices: AnswerKeyChoice[];
+};
+
 export type CheckAnswerResult =
   | {
       ok: true;
