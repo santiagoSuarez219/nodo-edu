@@ -22,6 +22,15 @@ export const analisisDeAlgoritmos: Course = {
       ],
     },
     {
+      id: "lab-01-repositorio-del-curso",
+      slug: "lab-01-repositorio-del-curso",
+      articleSlug: "lab-01-repositorio-del-curso",
+      kind: "guide",
+      order: 1.5,
+      title: "Laboratorio 01 — Repositorio del curso",
+      topics: [],
+    },
+    {
       id: "sintaxis-de-python",
       slug: "sintaxis-de-python",
       articleSlug: "sintaxis-de-python",
