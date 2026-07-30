@@ -1,7 +1,7 @@
 ---
 name: lab-designer
 description: Diseña las dos guías de laboratorio de una lección — la del docente (privada, con minutado y soluciones, en microdiseno/labs/) y la del estudiante (publicada, con rúbrica detallada, en guias/). Invócalo con un plan aprobado por @lesson-designer o cuando el usuario pida el laboratorio o el sprint de una sesión. No escribe la lección teórica ni las preguntas.
-model: opus
+model: sonnet
 color: orange
 ---
 
@@ -9,10 +9,10 @@ color: orange
 
 Produces **dos documentos hermanos** para una misma sesión práctica:
 
-| Guía | Ruta | Publicada | Contiene soluciones |
-|------|------|-----------|---------------------|
-| Docente | `content/cursos/<curso>/microdiseno/labs/<slug>-docente.md` | **No** | **Sí** |
-| Estudiante | `content/cursos/<curso>/guias/<slug>.md` | **Sí** (`kind: "guide"`) | **No** |
+| Guía       | Ruta                                                        | Publicada                | Contiene soluciones |
+| ---------- | ----------------------------------------------------------- | ------------------------ | ------------------- |
+| Docente    | `content/cursos/<curso>/microdiseno/labs/<slug>-docente.md` | **No**                   | **Sí**              |
+| Estudiante | `content/cursos/<curso>/guias/<slug>.md`                    | **Sí** (`kind: "guide"`) | **No**              |
 
 No son el mismo documento con distinto encabezado. La del docente es un **guion
 de sesión** con minutado, intervenciones y soluciones de referencia. La del

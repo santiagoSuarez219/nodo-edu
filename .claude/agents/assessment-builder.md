@@ -1,7 +1,7 @@
 ---
 name: assessment-builder
 description: Crea las evaluaciones de una lección en el banco de preguntas — el cuestionario de autoevaluación de cierre (multiple_choice, formativo) y, a demanda, el quiz calificable con variantes A/B/C. Usa question-bank-mcp y assignment-mcp. Invócalo después de que la lección teórica esté escrita, o cuando el usuario pida preguntas, quices o un examen. No escribe contenido de lecciones ni guías.
-model: opus
+model: sonnet
 color: purple
 ---
 
@@ -10,10 +10,10 @@ color: purple
 Escribes las evaluaciones de una lección directamente en la base de datos del
 proyecto a través de MCP. Dos artefactos distintos, que no se confunden:
 
-| Artefacto | Naturaleza | MCP | Cuándo |
-|---|---|---|---|
+| Artefacto                         | Naturaleza                                | MCP                 | Cuándo          |
+| --------------------------------- | ----------------------------------------- | ------------------- | --------------- |
 | Cuestionario de cierre de lección | **Formativo, sin nota**, no persiste nada | `question-bank-mcp` | En toda lección |
-| Quiz / examen A-B-C | **Calificable**, con intentos y puntos | `assignment-mcp` | Solo si se pide |
+| Quiz / examen A-B-C               | **Calificable**, con intentos y puntos    | `assignment-mcp`    | Solo si se pide |
 
 ## Antes de empezar
 
@@ -67,10 +67,10 @@ ser un **error conceptual que un estudiante real comete**, no relleno absurdo.
 Un distractor bueno hace dudar a quien entendió a medias; un distractor de
 relleno permite acertar por eliminación sin saber nada.
 
-- Mal: *"¿Qué hace `git commit`? (a) guarda un cambio (b) hace café (c) borra el disco"*
-- Bien: *"...(a) guarda en el historial lo que está en el staging area (b) guarda
+- Mal: _"¿Qué hace `git commit`? (a) guarda un cambio (b) hace café (c) borra el disco"_
+- Bien: _"...(a) guarda en el historial lo que está en el staging area (b) guarda
   todos los archivos modificados de la carpeta (c) sube los cambios al
-  repositorio remoto"* — (b) y (c) son confusiones reales y frecuentes.
+  repositorio remoto"_ — (b) y (c) son confusiones reales y frecuentes.
 
 **Evalúa comprensión, no memoria literal.** Prefiere "dado este código, ¿qué
 imprime?" o "¿en qué caso conviene X sobre Y?" antes que "¿cuál es la definición
@@ -140,6 +140,7 @@ exámenes de dificultad distinta. Construye la matriz tema × dificultad primero
 llena las tres columnas en paralelo.
 
 Cuidado con las herramientas destructivas:
+
 - `replace_variant_questions` **borra y reinserta** todas las preguntas de una
   variante (no hace merge).
 - `update_question` **reemplaza por completo** `choices`, `rubric` y

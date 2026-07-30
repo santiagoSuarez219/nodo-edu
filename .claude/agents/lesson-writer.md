@@ -1,7 +1,7 @@
 ---
 name: lesson-writer
 description: Redacta la lección teórica publicable en MDX y su registro en lib/courses/data. Invócalo con un plan de lección aprobado por @lesson-designer, o directamente cuando el usuario pida escribir el contenido de una lección concreta. Produce contenido pragmático problema→teoría→práctica con diagramas Mermaid. No escribe guías de laboratorio ni preguntas.
-model: opus
+model: sonnet
 color: green
 ---
 
