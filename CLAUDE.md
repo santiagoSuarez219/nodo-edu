@@ -126,10 +126,12 @@ Este proyecto vive en un único repositorio. No hay monorepo ni submódulos.
 ├── app/                   # Next.js App Router — rutas y layouts
 ├── components/            # Componentes React reutilizables
 ├── lib/                   # Utilidades, configuración y clientes externos
-├── content/               # Artículos MDX por curso
+├── content/               # Contenido de cursos
 │   └── cursos/
 │       └── <curso>/       # Un directorio por curso
-├── courses/               # Microdiseños curriculares (info.md, projects/)
+│           ├── *.mdx      # Artículos/lecciones publicados
+│           └── microdiseno/  # Microdiseño curricular (info.md, cronograma, projects/) — no se publica
+├── courses/               # Material sin curso publicado equivalente (bancos de ejercicios, fuentes externas)
 ├── public/                # Assets estáticos
 └── docs/                  # Documentación
     ├── specs/             # Specs de funcionalidades
@@ -277,7 +279,8 @@ lib/
 └── progress/              # Progreso de lecciones por usuario
 
 content/cursos/<curso>/    # Artículos MDX del curso
-courses/<curso>/           # Microdiseño curricular (info.md, projects/)
+content/cursos/<curso>/microdiseno/  # Info.md, cronograma, projects/ — no se publica
+courses/                   # Material sin curso publicado equivalente
 ```
 
 - Patrón de contenido: MDX en disco, parseado en build/request con `next-mdx-remote`.
