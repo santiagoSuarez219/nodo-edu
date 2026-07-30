@@ -6,21 +6,21 @@
 - **Semana / sesión:** Semana 1 (3–9 de agosto de 2026), Sesión 2 (P) — laboratorio práctico
 - **Duración:** 2 horas
 - **Momento evaluativo:** Ninguno. No hay ★ esta semana; el primer laboratorio evaluativo (★ Laboratorio 1) es en la Semana 6. Esta sesión alimenta únicamente la nota de **Seguimiento** (consistencia de commits desde el día 1).
-- **Lección teórica de la que depende:** "Fundamentos de control de versiones y flujo de trabajo" (Sesión 1 T, misma semana) — repositorio, staging area, commit, HEAD, `git diff`, remotos (`push`/`pull`/`fetch`/`clone`) y ramas (`branch`/`checkout`/`merge`, conflicto de fusión).
+- **Lección teórica de la que depende:** "Fundamentos de control de versiones y flujo de trabajo" (Sesión 1 T, misma semana) — terminal y línea de comandos, repositorio, `.gitignore`, `README.md`, staging area, commit (y buenas prácticas de mensaje), HEAD, `git diff`, remotos (`push`/`pull`/`fetch`/`clone`), ramas (`branch`/`checkout`/`merge`, convención `main`/`development`/`feature`/`bug`/`hotfix`) y conflicto de fusión.
 - **Sprint del proyecto:** No aplica — este curso no tiene proyecto de aula. En su lugar, esta sesión funda el **único repositorio** que el estudiante usará todo el semestre para sus 5 informes de laboratorio evaluativos (Semanas 6, 8, 11, 13, 16).
 
 ## Objetivo de la sesión
 
 Al salir del aula, el estudiante debe poder:
 
-- Crear un repositorio Git local con la estructura de carpetas exacta que usará durante los 17 semanas del curso (`laboratorios/`, `ejercicios-clase/`, `benchmarks/`, `README.md`).
+- Crear un repositorio Git local con la estructura de carpetas exacta que usará durante los 17 semanas del curso (`laboratorios/`, `ejercicios-clase/`, `benchmarks/`, `README.md`, `.gitignore`).
 - Vincular ese repositorio a GitHub y sincronizarlo con `push`.
 - Redactar un `README.md` correcto en Markdown, con la misma sintaxis que usará en cada informe de laboratorio.
-- Provocar un conflicto de fusión a propósito, leer el mensaje de Git y resolverlo manualmente sin pánico.
+- Crear una rama con el prefijo `feature/` (siguiendo la convención de ramas vista en teoría), provocar un conflicto de fusión a propósito, leer el mensaje de Git y resolverlo manualmente sin pánico.
 
 ## Conexión con la teoría
 
-La sesión T de hoy instaló el vocabulario (repositorio, staging, commit, HEAD, `diff`, remotos, ramas, conflicto) pero solo en abstracto — nadie ha tocado una terminal todavía. Este laboratorio es la primera vez que el estudiante ejecuta la secuencia completa `init → add → commit → remote → push → branch → merge → conflicto` sobre un repositorio que **no es un ejercicio desechable**: es el mismo que abrirá en la Semana 6 para el primer informe evaluado.
+La sesión T de hoy instaló el vocabulario (terminal, repositorio, `.gitignore`, `README.md`, staging, commit y sus buenas prácticas, HEAD, `diff`, remotos, ramas y su convención de nombres, conflicto) pero solo en abstracto — nadie ha tocado una terminal todavía. Este laboratorio es la primera vez que el estudiante ejecuta la secuencia completa `init → add → commit → remote → push → branch → merge → conflicto` sobre un repositorio que **no es un ejercicio desechable**: es el mismo que abrirá en la Semana 6 para el primer informe evaluado.
 
 Pregunta de apertura para el grupo: *"Si perdieran ahora mismo la carpeta de este repositorio, ¿qué perderían exactamente — el código, el historial, o ambos? ¿Y si solo perdieran el `.git/`?"* (Respuesta esperada: perderían el historial completo pero no necesariamente el código actual; y sin repositorio remoto, perderían también el código si el disco local falla.)
 
@@ -29,7 +29,7 @@ Pregunta de apertura para el grupo: *"Si perdieran ahora mismo la carpeta de est
 | Tiempo | Bloque | Qué hace el docente | Qué hace el estudiante |
 |---|---|---|---|
 | 0:00 – 0:05 | Apertura | Plantea la pregunta de conexión con la teoría. Anuncia que el repositorio de hoy es el que usarán los 17 semanas del curso — no es un ejercicio de una sola sesión. | Responde la pregunta de apertura. Abre terminal y editor. |
-| 0:05 – 0:30 | Bloque 1 — `init` + estructura + primer commit | Proyecta la estructura de carpetas exacta del `info.md`. Guía la creación paso a paso. Circula verificando `git status` de cada estudiante antes de dejarlos avanzar al primer `commit`. | Ejecuta `git init`, crea las 4 carpetas/archivos, hace `add` + primer `commit`. |
+| 0:05 – 0:30 | Bloque 1 — `init` + estructura + `.gitignore` + primer commit | Proyecta la estructura de carpetas exacta del `info.md`. Guía la creación paso a paso, incluyendo el `.gitignore`. Circula verificando `git status` de cada estudiante antes de dejarlos avanzar al primer `commit`. | Ejecuta `git init`, crea las carpetas/archivos y el `.gitignore`, hace `add` + primer `commit`. |
 | 0:30 – 1:00 | Bloque 2 — Vincular a GitHub + push | Demuestra en su propia pantalla: crear repo vacío en GitHub, `git remote add origin`, primer `push`. Resuelve en vivo el problema de autenticación (token, no contraseña). | Crea su cuenta/repo en GitHub (si no lo tenía), vincula, hace `push`. Verifica en el navegador que el código apareció. |
 | 1:00 – 1:30 | Bloque 3 — README + rama + commits en paralelo | Explica el propósito del `README.md` como plantilla de los futuros informes. Introduce `git branch` / `git checkout -b`. Pide un cambio en la MISMA línea en `main` y en la rama. | Redacta el `README.md` con la sintaxis pedida. Crea la rama, hace commits en ambas líneas de trabajo sobre la misma línea del archivo. |
 | 1:30 – 1:50 | Bloque 4 — Conflicto simulado + resolución | Guía el intento de `merge`, la lectura del mensaje de conflicto y la edición manual de los marcadores `<<<<<<<` / `=======` / `>>>>>>>`. Verifica que cada estudiante complete el `commit` de cierre del merge. | Ejecuta el `merge`, lee el conflicto, lo resuelve a mano, hace `git add` + `commit`. |
@@ -39,7 +39,7 @@ Suma: 2 h 00 min.
 
 ## Desarrollo paso a paso
 
-### Paso 1 — `git init` y estructura de carpetas (0:05–0:30)
+### Paso 1 — `git init`, estructura de carpetas y `.gitignore` (0:05–0:30)
 
 Enunciado para el grupo: "Van a crear la carpeta que va a vivir con ustedes todo el semestre. Ábranla, entren, y conviértanla en un repositorio Git."
 
@@ -51,12 +51,21 @@ cd curso-analisis-algoritmos
 git init
 
 mkdir laboratorios ejercicios-clase benchmarks
-touch README.md
+touch README.md .gitignore
 
 git status
 ```
 
 `git status` en este punto debe mostrar las tres carpetas como "untracked" — recordar que **Git no versiona carpetas vacías**, solo archivos. Para que `laboratorios/`, `ejercicios-clase/` y `benchmarks/` queden registradas desde ya, dejar un archivo `.gitkeep` (vacío) dentro de cada una, o simplemente esperar a que reciban contenido real más adelante en el semestre. Para esta sesión basta con que las carpetas existan en disco; no es necesario forzar su registro con `.gitkeep` si el docente prefiere simplificar.
+
+Antes del primer commit, pedir que abran el `.gitignore` y agreguen los patrones típicos que van a generar sus propios scripts y editores durante el semestre:
+
+```text
+__pycache__/
+*.pyc
+.vscode/
+resultados_temporales/
+```
 
 ```bash
 git add .
@@ -64,7 +73,7 @@ git commit -m "Estructura inicial del repositorio del curso"
 git log --oneline
 ```
 
-Punto de control: verificar que `git log --oneline` muestra exactamente un commit y que `git status` queda limpio ("nothing to commit, working tree clean").
+Punto de control: verificar que `git log --oneline` muestra exactamente un commit, que el `.gitignore` quedó incluido en ese commit (`git show --stat HEAD`), y que `git status` queda limpio ("nothing to commit, working tree clean").
 
 ### Paso 2 — Vincular a GitHub y primer `push` (0:30–1:00)
 
@@ -88,7 +97,7 @@ Punto de control (minuto ~55): cada estudiante debe poder mostrar en el navegado
 
 ### Paso 3 — README.md, rama y commits en paralelo (1:00–1:30)
 
-Enunciado: "Escriban el `README.md` que van a usar de plantilla en cada uno de sus cinco informes. Después vamos a trabajar dos líneas de desarrollo al tiempo: una en `main`, otra en una rama nueva."
+Enunciado: "Escriban el `README.md` que van a usar de plantilla en cada uno de sus cinco informes. Después vamos a trabajar dos líneas de desarrollo al tiempo: una en `main`, otra en una rama nueva — nómbrenla con el prefijo `feature/` de la convención de ramas vista en teoría."
 
 Solución de referencia del `README.md` (contenido mínimo esperado, practicando la sintaxis):
 
@@ -126,7 +135,7 @@ git push
 Ahora la rama y el conflicto simulado a propósito:
 
 ```bash
-git checkout -b agrega-seccion-contacto
+git checkout -b feature/agrega-seccion-contacto
 ```
 
 En la rama, el estudiante edita **una línea específica** del `README.md` — por ejemplo la línea `## Autor` la cambia a `## Autor y contacto` y agrega su correo debajo.
@@ -158,7 +167,7 @@ Enunciado: "Intenten fusionar la rama en `main`. Van a ver un conflicto — es e
 Solución de referencia:
 
 ```bash
-git merge agrega-seccion-contacto
+git merge feature/agrega-seccion-contacto
 ```
 
 Salida esperada (aproximada):
@@ -180,7 +189,7 @@ Nombre del estudiante — Ingeniería de Sistemas. Semestre 2026-2.
 ## Autor y contacto
 
 Nombre del estudiante — Ingeniería de Sistemas. correo@ejemplo.com
->>>>>>> agrega-seccion-contacto
+>>>>>>> feature/agrega-seccion-contacto
 ```
 
 Resolución manual de referencia — combinar ambos cambios y borrar los tres marcadores (`<<<<<<<`, `=======`, `>>>>>>>`):
@@ -198,7 +207,7 @@ Cierre del merge:
 git add README.md
 git commit -m "Resuelve conflicto: combina contacto y semestre en README"
 git push
-git branch -d agrega-seccion-contacto
+git branch -d feature/agrega-seccion-contacto
 ```
 
 Punto de control final: `git log --oneline --graph --all` debe mostrar el commit de merge uniendo las dos ramas, y GitHub debe reflejar el mismo historial tras el `push`.

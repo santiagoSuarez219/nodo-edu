@@ -10,20 +10,22 @@ updatedAt: "2026-07-30"
 Cree el repositorio de Git que usará durante **todo el semestre** para entregar sus cinco informes de laboratorio evaluativos, y practique el flujo básico de trabajo con Git y GitHub que va a repetir en cada sesión práctica del curso.
 
 Competencias esperadas:
-- Crear un repositorio local con `git init` y una estructura de carpetas fija.
+- Crear un repositorio local con `git init`, una estructura de carpetas fija y un `.gitignore` inicial.
 - Vincular un repositorio local a GitHub y sincronizarlo con `push`.
 - Redactar un `README.md` correcto en Markdown.
-- Realizar una secuencia de commits descriptivos.
-- Crear una rama, provocar un conflicto de fusión a propósito y resolverlo manualmente.
+- Realizar una secuencia de commits descriptivos, siguiendo buenas prácticas de mensaje.
+- Crear una rama siguiendo la convención de nombres del curso, provocar un conflicto de fusión a propósito y resolverlo manualmente.
 
 ## Requisitos Previos
 
 Antes de comenzar, debe dominar los conceptos de la lección "Fundamentos de control de versiones y flujo de trabajo" (Sesión 1, Semana 1):
+- Cómo moverse por carpetas y archivos desde la terminal (`pwd`, `ls`, `cd`, `mkdir`).
 - Qué es un repositorio y qué guarda la carpeta `.git/`.
-- El flujo directorio de trabajo → staging area (`git add`) → historial (`git commit`).
+- Para qué sirve un `.gitignore` y cómo documentar un proyecto con un `README.md`.
+- El flujo directorio de trabajo → staging area (`git add`) → historial (`git commit`), y qué hace bueno a un mensaje de commit.
 - Qué es `HEAD` y cómo consultar el historial con `git log`.
 - Qué hace `git diff`.
-- Los comandos de repositorios remotos (`push`, `pull`, `fetch`, `clone`) y de ramas (`branch`, `checkout`, `merge`), aunque hoy es la primera vez que los ejecuta.
+- Los comandos de repositorios remotos (`push`, `pull`, `fetch`, `clone`) y de ramas (`branch`, `checkout`, `merge`), y la convención de nombres de ramas (`main`, `development`, `feature/`, `bug/`, `hotfix/`), aunque hoy es la primera vez que los ejecuta.
 
 También necesita:
 - Git instalado en su equipo (`git --version` debe responder sin error).
@@ -41,7 +43,8 @@ curso-analisis-algoritmos/
 ├── laboratorios/
 ├── ejercicios-clase/
 ├── benchmarks/
-└── README.md
+├── README.md
+└── .gitignore
 ```
 
 Estas carpetas son las que usará durante todo el semestre:
@@ -49,10 +52,12 @@ Estas carpetas son las que usará durante todo el semestre:
 - `laboratorios/`: aquí irá, más adelante, una carpeta por cada uno de los cinco informes de laboratorio evaluativos.
 - `ejercicios-clase/`: código de las sesiones prácticas no evaluativas, incluyendo los ejercicios de Python de la Semana 2.
 - `benchmarks/`: scripts compartidos de medición de tiempos y graficación que usará en los laboratorios evaluativos.
+- `.gitignore`: patrones de archivos que no quiere versionar (por ejemplo, `__pycache__/`, `.vscode/`).
 
 **Requisitos:**
 - El repositorio debe iniciarse con `git init` dentro de la carpeta del proyecto (no en una carpeta superior).
-- Las tres carpetas y el archivo `README.md` deben quedar registrados en al menos un commit.
+- Las tres carpetas, el archivo `README.md` y el `.gitignore` deben quedar registrados en al menos un commit.
+- El `.gitignore` debe excluir al menos dos patrones típicos de este curso (por ejemplo `__pycache__/` y `.vscode/`).
 - Verifique con `git status` que no queda ningún archivo sin rastrear antes de pasar a la siguiente parte.
 
 ### Parte 2 — Repositorio remoto en GitHub
@@ -91,7 +96,7 @@ Esta es la parte central del laboratorio. Debe crear una rama nueva, provocar **
 
 Pasos a seguir:
 
-1. Cree una rama nueva a partir de `main`.
+1. Cree una rama nueva a partir de `main`, nombrada con el prefijo `feature/` (por ejemplo, `feature/actualiza-readme`), siguiendo la convención de ramas vista en la lección.
 2. En esa rama, modifique una línea específica de su `README.md` (por ejemplo, la sección donde firma como autor) y haga un commit.
 3. Regrese a la rama `main` **sin haber dejado cambios sin confirmar** en la rama anterior.
 4. En `main`, modifique **esa misma línea** del `README.md` de una forma distinta, y haga un commit.
@@ -102,7 +107,7 @@ Pasos a seguir:
 9. Suba el resultado final a GitHub.
 
 **Requisitos:**
-- Debe existir al menos una rama distinta de `main` en el historial.
+- Debe existir al menos una rama distinta de `main` en el historial, nombrada con el prefijo `feature/`.
 - El conflicto debe producirse porque dos ramas modificaron **la misma línea** del mismo archivo, no líneas distintas.
 - El archivo final no debe contener ningún marcador de conflicto residual.
 - El historial final (`git log`) debe mostrar el commit de fusión.
@@ -120,7 +125,8 @@ curso-analisis-algoritmos/
 ├── laboratorios/
 ├── ejercicios-clase/
 ├── benchmarks/
-└── README.md
+├── README.md
+└── .gitignore
 ```
 
 Junto con el enlace, incluya en un comentario o mensaje aparte:
@@ -144,7 +150,7 @@ Salida esperada (los mensajes y hashes serán distintos en su caso):
 ```text
 *   a1b2c3d (HEAD -> main) Resuelve conflicto: combina cambios en README
 |\
-| * e4f5g6h (rama-nueva) Modifica seccion de autor en rama
+| * e4f5g6h (feature/actualiza-readme) Modifica seccion de autor en rama
 * | h7i8j9k Modifica seccion de autor en main
 |/
 * k1l2m3n Agrega README inicial con estructura del repositorio
@@ -159,10 +165,10 @@ Esta sesión **no es evaluativa** (no hay ★ esta semana), pero se retroaliment
 
 | Criterio | Puntos | Descripción |
 |---|---|---|
-| **Estructura de carpetas** | 20 | Existen exactamente `laboratorios/`, `ejercicios-clase/`, `benchmarks/` y `README.md` en la raíz del repositorio, y quedan registrados en el historial de Git. |
+| **Estructura de carpetas** | 20 | Existen exactamente `laboratorios/`, `ejercicios-clase/`, `benchmarks/`, `README.md` y `.gitignore` en la raíz del repositorio, y quedan registrados en el historial de Git; el `.gitignore` excluye al menos dos patrones reales del curso. |
 | **Calidad del README.md** | 25 | El archivo usa correctamente Markdown: al menos un encabezado principal, dos encabezados de segundo nivel, una lista y un bloque de código; el contenido describe el propósito real de cada carpeta. |
 | **Calidad y frecuencia de los commits** | 25 | Existen al menos cuatro commits con mensajes descriptivos y específicos (no genéricos), distribuidos a lo largo del proceso y no concentrados en uno solo. |
-| **Rama, conflicto y resolución** | 30 | Existe una rama distinta de `main` fusionada correctamente; el conflicto se produjo sobre la misma línea en ambas ramas; el archivo final no contiene marcadores de conflicto residuales. |
+| **Rama, conflicto y resolución** | 30 | Existe una rama distinta de `main`, nombrada con el prefijo `feature/`, fusionada correctamente; el conflicto se produjo sobre la misma línea en ambas ramas; el archivo final no contiene marcadores de conflicto residuales. |
 | **TOTAL** | **100** | |
 
 ## Dificultades Comunes

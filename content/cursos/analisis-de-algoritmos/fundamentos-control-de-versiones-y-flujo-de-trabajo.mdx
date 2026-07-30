@@ -62,6 +62,30 @@ flowchart LR
 
 > Definición formal: el **control de versiones** es la práctica de registrar los cambios realizados sobre uno o varios archivos a lo largo del tiempo, de modo que se pueda recuperar cualquier versión anterior cuando se necesite.
 
+## Material adicional: descarga e instalación de Git
+
+Antes de crear tu primer repositorio necesitas tener Git instalado en tu máquina. El siguiente video cubre la descarga e instalación paso a paso en los distintos sistemas operativos:
+
+<YouTubeEmbed id="jdXKwLNUfmg" title="Descarga e instalación de Git" />
+
+## La terminal: donde vas a escribir todo esto
+
+**Situación:** cada comando de Git que verás de aquí en adelante (`git init`, `git add`, `git commit`...) no se hace haciendo clic en botones — se escribe. Necesitas saber dónde escribirlo.
+
+**En la práctica**, la **terminal** (o línea de comandos) es una ventana de texto donde escribes instrucciones y el sistema operativo las ejecuta directamente, sin pasar por menús gráficos. Antes de usar Git necesitas moverte por carpetas y archivos desde ahí:
+
+| Comando | ¿Qué hace? |
+| --- | --- |
+| `pwd` | Muestra la carpeta en la que estás parado ahora mismo |
+| `ls` (`dir` en Windows) | Lista los archivos y carpetas del directorio actual |
+| `cd <carpeta>` | Entra a esa carpeta |
+| `cd ..` | Sube un nivel, a la carpeta contenedora |
+| `mkdir <nombre>` | Crea una carpeta nueva |
+| `touch <archivo>` (o `type nul > archivo` en Windows) | Crea un archivo vacío |
+| `clear` (`cls` en Windows) | Limpia el texto acumulado en la pantalla |
+
+> **Terminal:** interfaz de texto para dar instrucciones al sistema operativo mediante comandos, en vez de clics. Es el lugar donde ejecutarás **todos** los comandos de Git de esta lección.
+
 ## El repositorio: la memoria del proyecto
 
 **Situación:** para que Git pueda "recordar" los cambios, primero necesita un lugar donde guardar esa historia.
@@ -90,6 +114,52 @@ Este es el repositorio que vas a crear en el laboratorio de hoy: **uno solo para
 
 > **Repositorio (repo):** carpeta cuyo contenido es rastreado por Git. Contiene el proyecto actual **y** toda su historia de cambios.
 > ⚠️ Si borras la carpeta `.git/`, pierdes todo el historial — el código actual queda, pero la memoria del proyecto desaparece.
+
+## Lo que no debe entrar al historial: `.gitignore`
+
+**Situación:** tu carpeta de `benchmarks/` genera archivos pesados de resultados (`.csv`, gráficas temporales) y tu editor crea carpetas propias (`.vscode/`, `__pycache__/`). Ninguno de esos archivos aporta al proyecto — son ruido generado, no código fuente — pero un `git add .` sin cuidado los sube igual.
+
+**En la práctica**, un archivo `.gitignore` en la raíz del repositorio le dice a Git qué rutas ignorar por completo: ni aparecen en `git status`, ni se pueden agregar por accidente.
+
+```text
+# .gitignore
+__pycache__/
+*.pyc
+.vscode/
+resultados_temporales/
+*.log
+```
+
+Cada línea es un patrón: una carpeta, una extensión (`*.pyc`) o un nombre exacto. Se agrega **una sola vez**, al iniciar el proyecto — antes de que esos archivos lleguen a quedar rastreados.
+
+> **`.gitignore`:** archivo de texto en la raíz del repositorio que le indica a Git qué archivos y carpetas nunca debe rastrear. No borra nada del disco — solo lo excluye del historial.
+> ⚠️ Si un archivo ya fue commiteado antes de agregarlo al `.gitignore`, seguirá rastreado: hay que quitarlo explícitamente con `git rm --cached <archivo>`.
+
+## La carta de presentación del proyecto: `README.md`
+
+**Situación:** un compañero (o el docente) clona tu repositorio por primera vez. No sabe qué hace el proyecto, cómo ejecutarlo, ni qué contiene cada carpeta. Sin un punto de entrada, tiene que adivinar leyendo el código.
+
+**En la práctica**, el archivo `README.md` en la raíz del repositorio es lo primero que GitHub muestra al entrar al proyecto, y responde justamente esas preguntas:
+
+````markdown
+# Curso de Análisis de Algoritmos
+
+Repositorio con laboratorios, ejercicios de clase y benchmarks del curso.
+
+## Estructura
+- `laboratorios/` — los 5 informes evaluativos
+- `ejercicios-clase/` — código de las sesiones prácticas
+- `benchmarks/` — scripts de medición de tiempos
+
+## Cómo ejecutar
+```bash
+python benchmarks/comparar_ordenamientos.py
+```
+````
+
+Está escrito en **Markdown** (de ahí la extensión `.md`), el mismo lenguaje de formato liviano que usas para tus informes de laboratorio.
+
+> **`README.md`:** archivo en Markdown, ubicado en la raíz del repositorio, que documenta de qué trata el proyecto, cómo está organizado y cómo usarlo. Es lo primero que ve cualquiera que llega al repositorio.
 
 ## De "guardar el archivo" a "guardar un cambio": el staging area
 
@@ -155,6 +225,27 @@ Las líneas con `-` son lo que había antes; las líneas con `+` son lo nuevo.
 
 > `git diff` compara el directorio de trabajo contra la staging area. `git diff --staged` compara la staging area contra el último commit.
 
+## Buenas prácticas al escribir un mensaje de commit
+
+**Situación:** revisas el `git log --oneline` de un compañero y encuentras mensajes como `cambios`, `arreglo`, `asdf`. Seis meses después, nadie — ni siquiera quien los escribió — recuerda qué significaban. El historial existe, pero no sirve como memoria del proyecto.
+
+**En la práctica**, un buen mensaje de commit sigue unas pocas reglas simples:
+
+- **Un commit, un cambio lógico.** Si el mensaje necesita un "y" para describirlo ("arregla el bug y refactoriza el main"), probablemente son dos commits.
+- **Modo imperativo, presente:** "Agrega validación de edad", no "Agregado" ni "Agregando".
+- **Máximo ~50 caracteres en la primera línea.** Si hace falta más detalle, una línea en blanco y luego el cuerpo explicando el _por qué_, no el _qué_ — el `git diff` ya muestra el qué.
+- **Sin mensajes vacíos de contenido:** `wip`, `cambios`, `fix` no dicen nada sobre el proyecto.
+
+```text
+✅ "Corrige desborde de pila en insercion con lista vacia"
+❌ "fix"
+
+✅ "Documenta analisis de complejidad del lab 1"
+❌ "cambios varios"
+```
+
+> **Mensaje de commit:** la explicación de _por qué_ existe un cambio, dirigida a tu yo del futuro o a un compañero que nunca vio el código. Un buen mensaje ahorra minutos de arqueología cada vez que alguien revisa `git log`.
+
 ## Comandos esenciales — resumen
 
 | Comando                   | ¿Qué hace?                                          | ¿Cuándo se usa?                                    |
@@ -193,6 +284,12 @@ flowchart LR
 
 Este es exactamente el mecanismo detrás de la entrega de cada uno de tus cinco laboratorios evaluativos: subes tu informe con `git push` a tu repositorio en GitHub, y ese es el estado que el docente revisa.
 
+## Material adicional: configuración de claves SSH para Git y GitHub
+
+Para autenticarte contra GitHub sin escribir usuario y contraseña en cada `push` o `pull`, se configura una **clave SSH** asociada a tu cuenta. El siguiente video muestra el proceso completo de generación y configuración:
+
+<YouTubeEmbed id="akuG7eRtaXc" title="Cómo configurar claves SSH para Git y GitHub" />
+
 ## Experimentar sin romper lo que funciona: ramas
 
 **Situación:** tu `README.md` principal ya documenta bien la estructura del repositorio del curso, y quieres probar una forma distinta de organizarlo — con más secciones, otro orden. Si editas directamente el archivo que ya funciona y la nueva organización resulta peor, no hay vuelta atrás fácil sin revisar el historial commit por commit.
@@ -222,6 +319,56 @@ Este patrón — crear una rama para cada cambio que quieres probar, y fusionarl
 
 > **Rama (branch):** puntero móvil e independiente sobre una secuencia de commits, que permite desarrollar y probar cambios sin afectar la rama principal hasta que se fusionan explícitamente con `git merge`.
 
+## Convención de ramas: nombrar y organizar el trabajo en equipo
+
+**Situación:** el flujo anterior sirve para un cambio aislado tuyo, pero en un equipo real hay varias personas abriendo ramas al mismo tiempo — funcionalidades nuevas, corrección de errores, parches urgentes. Sin una convención de nombres y de hacia dónde se fusiona cada una, nadie sabe qué rama corresponde a qué.
+
+**En la práctica**, un esquema muy usado en la industria separa dos grupos: ramas **permanentes** (viven todo el proyecto) y ramas **temporales** (se crean para un cambio puntual y se eliminan al fusionarse):
+
+| Rama | Tipo | ¿De dónde parte? | ¿Hacia dónde se fusiona? | ¿Cuándo se usa? |
+| --- | --- | --- | --- | --- |
+| `main` | Permanente | — | — | Código estable, listo para entregar o desplegar |
+| `development` | Permanente | `main` | — | Integración: donde se juntan los cambios ya terminados |
+| `feature/<nombre>` | Temporal | `development` | `development` | Una funcionalidad nueva, ej. `feature/ordenamiento-por-mezcla` |
+| `bug/<nombre>` | Temporal | `development` | `development` | Corregir un error detectado, ej. `bug/desborde-en-pila` |
+| `hotfix/<nombre>` | Temporal | `main` | `main` **y** `development` | Un error crítico en producción que no puede esperar al ciclo normal |
+
+```mermaid
+gitGraph
+  commit id: "a3f82c1"
+  branch development
+  checkout development
+  commit id: "b7e41d9"
+  commit id: "c9d52e4"
+  checkout main
+  merge development id: "d4e8f3a"
+  commit id: "e1b6c90"
+  branch feature
+  checkout feature
+  commit id: "f2a8d17"
+  commit id: "a8c3f54"
+  checkout main
+  merge feature id: "b9d7e21"
+  checkout development
+  branch bug
+  checkout bug
+  commit id: "c2e91a6"
+  checkout development
+  merge bug id: "d3f04b7"
+  checkout main
+  branch hotfix
+  checkout hotfix
+  commit id: "e4a15c8"
+  checkout main
+  merge hotfix id: "f5b26d9"
+  checkout development
+  merge hotfix id: "a6c37ea"
+```
+
+Cada rama temporal se elimina inmediatamente después de fusionarse: dejarla viva no aporta nada y ensucia el repositorio.
+
+> **Convención de ramas:** acuerdo de equipo sobre cómo nombrar cada rama según su propósito (`feature/`, `bug/`, `hotfix/`) y con qué rama permanente debe fusionarse. No es una regla de Git — es una disciplina que el equipo decide y respeta.
+
 ## Cuando dos cambios chocan: el conflicto de fusión
 
 **Situación:** tú y tu rama `main` modificaron la **misma línea** del mismo archivo mientras trabajabas en paralelo — por ejemplo, la sección de resultados de un informe. Al hacer `git merge`, Git no tiene forma de adivinar cuál versión es la correcta.
@@ -249,10 +396,14 @@ git commit -m "Resuelve conflicto en seccion de resultados"
 ## Síntesis
 
 - El control de versiones resuelve problemas reales: perder cambios, no saber qué cambió, que un error nuevo rompa lo que ya funcionaba, pisarse el trabajo entre compañeros, o no poder volver a "como estaba antes".
+- La **terminal** es donde se escribe todo comando de Git — no hay menús ni clics; `pwd`, `ls`, `cd` y `mkdir` son la base para moverte por el proyecto.
 - El **repositorio** (`.git/`) guarda todo el historial del proyecto.
+- El `.gitignore` mantiene fuera del historial lo que no aporta (archivos generados, configuración del editor); el `README.md` es la carta de presentación que documenta de qué trata el proyecto y cómo usarlo.
 - Los cambios pasan por dos etapas antes de quedar permanentes: **directorio de trabajo → staging area (`git add`) → historial (`git commit`)**.
 - **HEAD** indica dónde estás parado en la historia; `git log` te muestra toda la historia.
 - `git diff` te deja ver exactamente qué cambió, línea por línea, antes de comprometerte con el cambio.
+- Un buen **mensaje de commit** explica el _por qué_ de un cambio, no el _qué_ — imperativo, presente, corto y con contenido real; es lo que hace útil el historial meses después.
 - Los **repositorios remotos** (`push`, `pull`, `fetch`, `clone`) sincronizan tu historial local con una copia en GitHub — el mecanismo detrás de la entrega de cada informe de laboratorio.
 - Las **ramas** (`branch`, `checkout`, `merge`) te permiten probar cambios en paralelo sin arriesgar lo que ya funciona en `main`; el flujo tipo feature branch es la forma estándar de organizar ese trabajo.
+- Una **convención de ramas** (`main`, `development`, `feature/`, `bug/`, `hotfix/`) define de dónde parte cada rama y hacia dónde se fusiona, para que un equipo completo trabaje sin pisarse.
 - Un **conflicto de fusión** aparece cuando dos cambios tocan la misma línea del mismo archivo — no es un error, es parte normal del trabajo colaborativo, y se resuelve editando el archivo a mano.
