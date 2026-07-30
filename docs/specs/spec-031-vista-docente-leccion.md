@@ -92,16 +92,20 @@ No se crean ni modifican MCPs. No se toca `docs/mcps/README.md` ni ningún syste
 - [x] No modificar el comportamiento de `markLessonViewed` para el docente — sigue llamándose igual que hoy; es ruido inocuo, se registra como nota en backlog si aplica, sin actuar.
 
 ### Fase 6 — Pruebas
-- [ ] Ejecutar los casos manuales de `docs/testing/test-031-vista-docente-leccion.md`.
+- [x] Ejecutar los casos manuales de `docs/testing/test-031-vista-docente-leccion.md`. **Resultado: 20/20 aprobados** (ronda del 2026-07-30). Datos de prueba limpiados y verificados; ver tabla "Datos de prueba" del archivo de test.
 - [ ] Pruebas automáticas: pendientes del framework de testing (ver CLAUDE.md → "Testing"); los criterios de aceptación quedan descritos abajo y el archivo `e2e-031-vista-docente-leccion.spec.ts` se crea cuando exista el framework.
-- [ ] Invocar `@reviewer` antes de marcar el spec como `[DONE]`.
+- [ ] Invocar `@reviewer` antes de marcar el spec como `[DONE]` — **pendiente:** el subagente `@reviewer` no está disponible en esta sesión; queda para cuando se pueda invocar.
 
 **Nota de implementación:** `npx tsc --noEmit`, `npm run build` y `npm run lint`
 pasan sin errores nuevos (los 5 errores de `no-html-link-for-pages` en
 `AcademicCourseList.tsx` son deuda preexistente, ver `DEBT-013` en
-`docs/specs/backlog.md`, ajena a este spec). Fases 1-5 completas — queda
-pendiente la Fase 6 (pruebas manuales `test-031` y revisión de `@reviewer`)
-antes de pasar a `[DONE]`.
+`docs/specs/backlog.md`, ajena a este spec). Fases 1-5 completas. Durante la
+ronda de pruebas manuales se corrigió además un bug de hidratación en
+`TeacherAttendanceControl` (lectura de `localStorage` en el inicializador de
+`useState`, ejecutada también en SSR) y se detectó `DEBT-019` (parpadeo
+preexistente de "Cerrar sesión" en `AdminAttendancePanel`, fuera de alcance).
+Queda pendiente únicamente la revisión de `@reviewer` antes de pasar a
+`[DONE]`.
 
 ## Criterios de aceptación
 

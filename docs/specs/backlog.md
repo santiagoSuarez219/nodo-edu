@@ -5,6 +5,17 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+## DEBT-019 — `AdminAttendancePanel`: el botón "Cerrar sesión" parpadea a "Cerrando..." cada ~5s
+
+**Origen:** test-031 (TC-009), reportado por el usuario durante la ronda de pruebas manuales
+**Prioridad:** Media — molesto en uso real (el docente ve el botón "temblar" durante toda la clase), no bloquea funcionalidad
+
+`AdminAttendancePanel.tsx` usa un único `isPending` de `useTransition()` compartido entre tres operaciones: abrir sesión, cerrar sesión, y el polling del conteo de asistentes cada 5 segundos (`useEffect` con `setInterval` → `startTransition(async () => { getSessionAttendanceCount(...) })`). Como las tres comparten el mismo `isPending`, cada vez que el polling dispara su transición, el botón "Cerrar sesión" cambia brevemente a "Cerrando..." y se deshabilita, aunque nadie esté cerrando nada — un parpadeo cada ~5s mientras la sesión está abierta. Preexistente desde spec-010 (el componente original), pero mucho más visible ahora que spec-031 lo embebe en la vista de lección donde el docente lo tiene a la vista durante toda la clase.
+
+**Acción:** Usar un `useTransition()` (o simple `useState<boolean>`) independiente para el polling de conteo, separado del que gobierna los botones de abrir/cerrar sesión, para que el polling nunca afecte su estado visual.
+
+---
+
 ## DEBT-018 — `AdminAttendancePanel` usa `alert()`/`confirm()` nativos
 
 **Origen:** spec-031 (vista docente en la página de lección)

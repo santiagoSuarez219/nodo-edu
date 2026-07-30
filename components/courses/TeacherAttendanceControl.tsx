@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { AdminAttendancePanel } from '@/components/admin/AdminAttendancePanel';
 import type { AcademicCourse } from '@/lib/academic-courses/types';
@@ -21,15 +21,27 @@ export function TeacherAttendanceControl({
   courses,
   initialSessionsByCourseId,
 }: TeacherAttendanceControlProps) {
-  // Lazy initializer (no efecto): la sesión pertenece al curso académico, no
-  // a esta lección, así que si el docente ya eligió un grupo en otra clase,
-  // se respeta esa elección al montar.
-  const [selectedId, setSelectedId] = useState<string | null>(() => {
-    if (typeof window === 'undefined') return courses[0]?.id ?? null;
+  // Inicializar siempre con el mismo valor en servidor y cliente (courses[0]):
+  // localStorage no existe durante SSR, así que leerlo en el inicializador de
+  // useState produce un árbol distinto entre servidor y la primera hidratación
+  // (el server ve "sin sesión" y el cliente "con sesión" del grupo restaurado,
+  // o viceversa) — un mismatch de hidratación real, no solo un warning.
+  const [selectedId, setSelectedId] = useState<string | null>(
+    courses[0]?.id ?? null
+  );
+
+  // Restaurar la elección de grupo guardada DESPUÉS de montar (post-hidratación):
+  // en este punto un cambio de estado ya no compara contra el HTML del server,
+  // así que no hay riesgo de mismatch — solo un re-render normal del cliente.
+  useEffect(() => {
+    if (courses.length <= 1) return;
     const stored = window.localStorage.getItem(storageKey(courseSlug));
-    if (stored && courses.some((c) => c.id === stored)) return stored;
-    return courses[0]?.id ?? null;
-  });
+    if (stored && stored !== courses[0]?.id && courses.some((c) => c.id === stored)) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- sincroniza con localStorage, no disponible durante SSR; corre una sola vez al montar.
+      setSelectedId(stored);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [courseSlug]);
 
   const handleSelect = (id: string) => {
     setSelectedId(id);
