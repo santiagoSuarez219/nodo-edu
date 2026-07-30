@@ -13,6 +13,8 @@
 | Pregunta temporal con **varias respuestas correctas** (para TC-004), publicada en la lección real | `question-bank-mcp` `create_question` + `publish_question` (borrada vía `DELETE /api/questions/:id`, directo por API tras desconexión del MCP) | `7f414d86-657e-4bc7-ba78-71d2c122bdb6` | ✅ |
 | Lección real usada en las pruebas | contenido existente, sin crear | `analisis-de-algoritmos` / `fundamentos-control-de-versiones-y-flujo-de-trabajo` | N/A |
 | Guía de laboratorio real usada en TC-018 | contenido existente (traído a esta rama vía cherry-pick) | `analisis-de-algoritmos` / `lab-01-repositorio-del-curso` | N/A |
+| Usuario **docente `teacher` puro** (sin `admin`), para TC-021 | Supabase Auth `admin.createUser` + `user_roles` — inserción directa autorizada por el usuario | `0b4ea407-f7c6-4042-820b-8a238901f31f` — `test-teacher-tc021@nodo.test` | ✅ |
+| Cursos académicos **Grupo C** y **Grupo D** (mismo `course_slug`, mismo docente `teacher` puro), para TC-021 | Inserción directa autorizada por el usuario | `5881bf59-9b27-4ca6-a0ef-62bd6a79ea1d` (Grupo C) y `2e06b460-5ca9-4fba-8056-defe2c7070c5` (Grupo D) | ✅ |
 
 **Entorno de pruebas:** único entorno Supabase (desarrollo = producción, ver CLAUDE.md). Grupo A y la lección/guía son contenido **real**, no datos de prueba — no se eliminan al cerrar la ronda.
 **Fecha de la ronda:** 2026-07-30
@@ -146,8 +148,17 @@
 **Estado:** ✅ Aprobado
 **Hallazgos:** Sin observaciones — layout usable en viewport móvil.
 
+### TC-021 — Docente con rol `teacher` (sin `admin`) y dos cursos con el mismo `course_slug` conserva el acceso
+**Origen:** hallazgo bloqueante de `@reviewer` — `hasCourseAccess` usaba `.maybeSingle()`, que devuelve `null` cuando hay más de un `academic_course` con el mismo `course_slug` y `teacher_id`, dejando sin acceso a un docente sin rol `admin` en el escenario multi-grupo que este spec habilita. Corregido en `lib/enrollments/access.ts` (Fase 7 del spec).
+**Precondición:** un usuario con **solo** rol `teacher` (sin `admin`) que sea `teacher_id` de dos `academic_courses` activos con el mismo `course_slug`.
+**Pasos:** Iniciar sesión con ese usuario; navegar a una lección de ese `course_slug`.
+**Resultado esperado:** `access.reason === "owner"` (no redirigido a `/cuenta/cursos?sinAcceso=...`); ve el panel docente completo, incluido el selector de grupo con ambos cursos.
+**Estado:** ✅ Aprobado
+**Hallazgos:** Sin observaciones — el docente `teacher` puro (sin `admin`), dueño de Grupo C y Grupo D (mismo `course_slug`), accedió sin redirección y vio el selector con ambos grupos. Confirma que el fix de `hasCourseAccess` (`.limit(1)` en vez de `.maybeSingle()`) resuelve el hallazgo bloqueante de `@reviewer`.
+
 ## Resumen de la ronda
-- Aprobados: 20 — Fallidos: 0 — Pendientes: 0
-- Hallazgos escalados a `docs/specs/backlog.md`: DEBT-019 (parpadeo de "Cerrar sesión" cada ~5s en `AdminAttendancePanel`, ya existente antes de spec-031, más visible al embeberlo en la lección)
+- Aprobados: 21 — Fallidos: 0 — Pendientes: 0
+- Hallazgos escalados a `docs/specs/backlog.md`: DEBT-019 (parpadeo de "Cerrar sesión" cada ~5s en `AdminAttendancePanel`, ya existente antes de spec-031), DEBT-020 (accesibilidad + tokens crudos en `TeacherAnswerKey`), DEBT-021 (`getAnswerKeyForLesson` no distingue "sin preguntas" de "error"), DEBT-022 (duplicación de consulta con `getSelfAssessmentForLesson`), DEBT-023 (parpadeo de grupo/código equivocado antes de restaurar `localStorage`)
 - Bug corregido durante la ronda (no escalado a backlog, ya resuelto): mismatch de hidratación en `TeacherAttendanceControl` por lectura de `localStorage` en el inicializador de `useState` — corregido moviendo la restauración a un `useEffect` post-montaje.
-- Limpieza de datos de prueba: ✅ Completada (2026-07-30) — Grupo B, usuario admin de prueba, estudiante de prueba y pregunta temporal eliminados; sesiones de asistencia abiertas en Grupo A y Grupo B cerradas antes de borrar. Grupo A (curso real) y la lección/guía reales quedan intactos, como corresponde.
+- Bug bloqueante corregido tras revisión de `@reviewer` (ver TC-021): `hasCourseAccess` con `.maybeSingle()` dejaba sin acceso a un docente `teacher` (no `admin`) con dos cursos del mismo `course_slug`.
+- Limpieza de datos de prueba: ✅ Completada (2026-07-30) — Grupo B, usuario admin de prueba, estudiante de prueba, pregunta temporal, y (tras TC-021) el usuario docente `teacher` puro y los Grupos C/D, todos eliminados y verificados. Grupo A (curso real) y la lección/guía reales quedan intactos, como corresponde.

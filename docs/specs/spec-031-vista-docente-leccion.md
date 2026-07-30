@@ -1,4 +1,4 @@
-# spec-031 — [TESTING] Vista docente en la página de lección
+# spec-031 — [DONE] Vista docente en la página de lección
 
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.
@@ -46,9 +46,9 @@ Este spec unifica ambas necesidades **dentro de la misma vista de lección**, si
 | `components/admin/AdminAttendancePanel.tsx` | Sin cambios — se reutiliza tal cual |
 | `app/(cursos)/[courseSlug]/[lessonSlug]/page.tsx` | Modificar — rama condicional nueva para owner/admin, sin tocar la de `enrolled` |
 | `lib/attendance/index.ts` | Sin cambios |
-| `lib/enrollments/access.ts` | Sin cambios |
+| `lib/enrollments/access.ts` | **Modificar** (ampliación de alcance aprobada tras revisión de `@reviewer`, ver Fase 7) — corrige `hasCourseAccess` para reconocer al owner cuando tiene más de un `academic_course` con el mismo `course_slug` |
 | `supabase/migrations/` | Sin cambios |
-| `docs/specs/backlog.md` | Modificar — registrar deuda técnica identificada (ver Fase 4) |
+| `docs/specs/backlog.md` | Modificar — registrar deuda técnica identificada (Fase 4 y Fase 7) |
 
 ## Evaluación MCP
 
@@ -94,7 +94,22 @@ No se crean ni modifican MCPs. No se toca `docs/mcps/README.md` ni ningún syste
 ### Fase 6 — Pruebas
 - [x] Ejecutar los casos manuales de `docs/testing/test-031-vista-docente-leccion.md`. **Resultado: 20/20 aprobados** (ronda del 2026-07-30). Datos de prueba limpiados y verificados; ver tabla "Datos de prueba" del archivo de test.
 - [ ] Pruebas automáticas: pendientes del framework de testing (ver CLAUDE.md → "Testing"); los criterios de aceptación quedan descritos abajo y el archivo `e2e-031-vista-docente-leccion.spec.ts` se crea cuando exista el framework.
-- [ ] Invocar `@reviewer` antes de marcar el spec como `[DONE]` — **pendiente:** el subagente `@reviewer` no está disponible en esta sesión; queda para cuando se pueda invocar.
+- [x] Invocar `@reviewer` antes de marcar el spec como `[DONE]`. **Veredicto inicial: CAMBIOS REQUERIDOS** (ver Fase 7) — corregido y sin re-invocación formal por decisión del usuario (fixes verificados por typecheck/lint/build).
+
+### Fase 7 — Correcciones de la revisión de `@reviewer`
+> Ampliación de alcance aprobada explícitamente por el usuario tras el veredicto CAMBIOS REQUERIDOS de la primera revisión.
+
+- [x] **Bloqueante corregido** — `lib/enrollments/access.ts`: `hasCourseAccess` usaba `.maybeSingle()` para detectar la propiedad del curso, que devuelve `null` (no un error manejado) cuando el docente tiene **más de un** `academic_course` con el mismo `course_slug` — exactamente el escenario multi-grupo que este spec habilita. Un docente con rol `teacher` (sin `admin`) en esa situación perdía el acceso a la lección. Cambiado a `.limit(1)` + comprobar `data.length > 0`: ya no importa cuántas filas coincidan, solo que exista al menos una.
+- [x] `components/courses/TeacherAttendanceControl.tsx`: acceso a `localStorage` (lectura y escritura) envuelto en `try/catch` — antes podía lanzar `SecurityError` en Safari/modo privado/políticas corporativas y romper el island completo.
+- [x] `enrollment_code` ya no viaja al cliente sin necesidad: se introdujo el tipo `AttendanceGroup` (`Pick<AcademicCourse, "id" | "name" | "code">`) en `TeacherAttendanceControl.tsx`, y `page.tsx`/`TeacherLessonPanel.tsx` lo usan en vez de `AcademicCourse` completo.
+- [x] Variable `course` sombreada renombrada a `academicCourse` en el bloque de vista docente de `page.tsx` (distinta de `course` = curso de contenido, ya destructurado de `ctx`).
+- [ ] Hallazgos menores restantes, registrados como deuda técnica (no bloqueantes, decisión explícita del usuario de posponerlos): `DEBT-020` (accesibilidad + tokens crudos en `TeacherAnswerKey`), `DEBT-021` (`getAnswerKeyForLesson` no distingue "sin preguntas" de "error"), `DEBT-022` (duplicación de consulta entre `getAnswerKeyForLesson` y `getSelfAssessmentForLesson`), `DEBT-023` (parpadeo del grupo/código equivocado antes de restaurar la selección guardada).
+- [x] `npx tsc --noEmit`, `npm run lint` (solo archivos tocados) y `npm run build` verificados sin errores nuevos tras los fixes.
+
+**Cierre (2026-07-30):** tras la corrección de la Fase 7, se ejecutó `TC-021`
+(regresión específica del bug bloqueante: docente con rol `teacher` puro,
+dueño de dos cursos académicos con el mismo `course_slug`) — **✅ Aprobado**.
+Ronda manual final: 21/21 casos aprobados. Spec marcado como `[DONE]`.
 
 **Nota de implementación:** `npx tsc --noEmit`, `npm run build` y `npm run lint`
 pasan sin errores nuevos (los 5 errores de `no-html-link-for-pages` en

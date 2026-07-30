@@ -18,7 +18,7 @@ export function LessonPagination({
   return (
     <nav
       aria-label="Paginación de lecciones"
-      className="mt-12 grid gap-3 sm:grid-cols-2 border-t border-gray-200 dark:border-gray-700 pt-6"
+      className="mt-12 grid gap-3 sm:grid-cols-2 pt-6"
     >
       {prev && isNavigable(prev) ? (
         <Link

@@ -1,13 +1,13 @@
 import { TeacherAnswerKey } from '@/components/courses/TeacherAnswerKey';
 import { TeacherAttendanceControl } from '@/components/courses/TeacherAttendanceControl';
+import type { AttendanceGroup } from '@/components/courses/TeacherAttendanceControl';
 import type { AnswerKeyQuestion } from '@/lib/self-assessment/types';
-import type { AcademicCourse } from '@/lib/academic-courses/types';
 import type { OpenSessionSummary } from '@/lib/attendance/types';
 
 interface TeacherLessonPanelProps {
   courseSlug: string;
   answerKey: AnswerKeyQuestion[];
-  academicCourses: AcademicCourse[];
+  academicCourses: AttendanceGroup[];
   initialSessionsByCourseId: Record<string, OpenSessionSummary | null>;
 }
 
@@ -18,7 +18,7 @@ export function TeacherLessonPanel({
   initialSessionsByCourseId,
 }: TeacherLessonPanelProps) {
   return (
-    <section className="mt-8 border-t border-gray-200 dark:border-gray-700 pt-8">
+    <section className="mt-12 pt-8">
       <div className="mb-6 flex items-center gap-2">
         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-brand-softer dark:bg-blue-900/20 text-brand dark:text-blue-300">
           Vista docente

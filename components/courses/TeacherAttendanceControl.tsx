@@ -6,9 +6,13 @@ import { AdminAttendancePanel } from '@/components/admin/AdminAttendancePanel';
 import type { AcademicCourse } from '@/lib/academic-courses/types';
 import type { OpenSessionSummary } from '@/lib/attendance/types';
 
+// Solo lo que la UI necesita — evita serializar enrollment_code (dato
+// sensible del docente) al cliente sin necesidad.
+export type AttendanceGroup = Pick<AcademicCourse, 'id' | 'name' | 'code'>;
+
 interface TeacherAttendanceControlProps {
   courseSlug: string;
-  courses: AcademicCourse[];
+  courses: AttendanceGroup[];
   initialSessionsByCourseId: Record<string, OpenSessionSummary | null>;
 }
 
@@ -35,17 +39,27 @@ export function TeacherAttendanceControl({
   // así que no hay riesgo de mismatch — solo un re-render normal del cliente.
   useEffect(() => {
     if (courses.length <= 1) return;
-    const stored = window.localStorage.getItem(storageKey(courseSlug));
-    if (stored && stored !== courses[0]?.id && courses.some((c) => c.id === stored)) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- sincroniza con localStorage, no disponible durante SSR; corre una sola vez al montar.
-      setSelectedId(stored);
+    try {
+      const stored = window.localStorage.getItem(storageKey(courseSlug));
+      if (stored && stored !== courses[0]?.id && courses.some((c) => c.id === stored)) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- sincroniza con localStorage, no disponible durante SSR; corre una sola vez al montar.
+        setSelectedId(stored);
+      }
+    } catch {
+      // localStorage bloqueado (Safari/modo privado, políticas corporativas):
+      // se queda con courses[0], ya elegido por el estado inicial.
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- solo se restaura una vez al montar; no reaccionar a cambios de `courses`.
   }, [courseSlug]);
 
   const handleSelect = (id: string) => {
     setSelectedId(id);
-    window.localStorage.setItem(storageKey(courseSlug), id);
+    try {
+      window.localStorage.setItem(storageKey(courseSlug), id);
+    } catch {
+      // localStorage bloqueado: la selección sigue funcionando en esta
+      // sesión, solo no persiste entre recargas.
+    }
   };
 
   if (courses.length === 0) {

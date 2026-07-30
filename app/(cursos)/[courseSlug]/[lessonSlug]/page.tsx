@@ -13,11 +13,11 @@ import {
 } from "@/lib/self-assessment";
 import type { SelfAssessmentQuestion, AnswerKeyQuestion } from "@/lib/self-assessment/types";
 import { resolveAcademicCoursesBySlug } from "@/lib/academic-courses";
-import type { AcademicCourse } from "@/lib/academic-courses/types";
 import type { OpenSessionSummary } from "@/lib/attendance/types";
 import { LessonArticle } from "@/components/courses/LessonArticle";
 import { LessonPagination } from "@/components/courses/LessonPagination";
 import { LessonClosureFlow } from "@/components/courses/LessonClosureFlow";
+import type { AttendanceGroup } from "@/components/courses/TeacherAttendanceControl";
 import { AttendanceSection } from "@/components/courses/AttendanceSection";
 import { TeacherLessonPanel } from "@/components/courses/TeacherLessonPanel";
 import { MdxContent } from "@/components/mdx/MdxContent";
@@ -86,7 +86,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
   // owner/admin nunca tiene reason "enrolled", así que ambos bloques son
   // mutuamente excluyentes por construcción.
   let teacherAnswerKey: AnswerKeyQuestion[] = [];
-  let teacherCourses: AcademicCourse[] = [];
+  let teacherCourses: AttendanceGroup[] = [];
   let teacherSessionsByCourseId: Record<string, OpenSessionSummary | null> = {};
 
   if (access.ok && (access.reason === "owner" || access.reason === "admin")) {
@@ -97,13 +97,19 @@ export default async function LessonPage({ params }: LessonPageProps) {
       resolveAcademicCoursesBySlug(courseSlug, access),
     ]);
     teacherAnswerKey = answerKey;
-    teacherCourses = academicCourses;
+    // Solo id/name/code viajan al cliente — evita serializar enrollment_code
+    // (dato sensible del docente) en el payload RSC sin necesidad.
+    teacherCourses = academicCourses.map((academicCourse) => ({
+      id: academicCourse.id,
+      name: academicCourse.name,
+      code: academicCourse.code,
+    }));
 
     const sessions = await Promise.all(
-      academicCourses.map((course) => getOpenSessionForCourse(course.id))
+      academicCourses.map((academicCourse) => getOpenSessionForCourse(academicCourse.id))
     );
     teacherSessionsByCourseId = Object.fromEntries(
-      academicCourses.map((course, i) => [course.id, sessions[i]])
+      academicCourses.map((academicCourse, i) => [academicCourse.id, sessions[i]])
     );
   }
 
