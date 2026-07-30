@@ -44,7 +44,6 @@ export const analisisDeAlgoritmos: CoursePresentation = {
         "Algoritmos como tecnología: por qué importa la eficiencia",
         "Insertion sort y prueba de corrección por invariante de ciclo",
         "Análisis del peor caso, mejor caso y caso promedio",
-        "Introducción a divide y vencer con merge sort",
       ],
     },
     {
@@ -64,29 +63,23 @@ export const analisisDeAlgoritmos: CoursePresentation = {
       topics: [
         "Resolución de recurrencias: sustitución, árbol de recursión, método maestro",
         "El problema del subarreglo máximo",
-        "Algoritmo de Strassen para multiplicación de matrices",
-        "Síntesis del paradigma divide y vencer",
+        "Merge sort",
       ],
     },
     {
       n: 6,
       week: "Semanas 9-11",
       title: "Ordenamiento",
-      topics: [
-        "Heaps, heapsort y colas de prioridad",
-        "Quicksort determinista y aleatorizado",
-        "Cota inferior Ω(n log n) del ordenamiento por comparaciones",
-        "Ordenamiento en tiempo lineal: counting, radix y bucket sort",
-      ],
+      topics: ["Heaps, heapsort y colas de prioridad", "Quicksort"],
     },
     {
       n: 7,
       week: "Semanas 12-13",
       title: "Estructuras de datos",
       topics: [
-        "Selección y medianas en tiempo lineal esperado",
         "Pilas, colas y listas enlazadas",
         "Tablas hash: funciones hash y manejo de colisiones",
+        "Árboles binarios de búsqueda y recorridos",
       ],
     },
     {
@@ -103,14 +96,14 @@ export const analisisDeAlgoritmos: CoursePresentation = {
   ],
   evaluation: [
     {
-      name: "Momento evaluativo 1: Fundamentos, complejidad y recurrencias",
+      name: "Momento evaluativo 1: Fundamentos del análisis de algoritmos",
       pct: 15,
-      week: "Semanas 3-5",
+      week: "Semanas 5",
     },
     {
       name: "Momento evaluativo 2: Dividir y vencer",
       pct: 15,
-      week: "Semanas 6-8",
+      week: "Semanas 7",
     },
     {
       name: "Momento evaluativo 3: Algoritmos de ordenamiento",
@@ -157,9 +150,9 @@ export const analisisDeAlgoritmos: CoursePresentation = {
   ],
   documents: [
     {
-      title: "Guía para el informe de laboratorio",
-      url: "/documentos/analisis-de-algoritmos/guia-informe-laboratorio.pdf",
-      description: "Estructura y formato esperado de los informes de laboratorio.",
+      title: "01-Compromiso academico",
+      url: "/documentos/analisis-de-algoritmos/compromiso.pdf",
+      description: "Documento con las políticas y normas académicas del curso.",
     },
   ],
   conditions: TRANSVERSAL_CONDITIONS,
