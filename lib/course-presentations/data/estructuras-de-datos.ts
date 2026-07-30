@@ -126,27 +126,27 @@ export const estructurasDatos: CoursePresentation = {
   ],
   evaluation: [
     {
-      name: "Momento 1: Programación orientada a objetos",
+      name: "Momento evaluativo 1: Programación orientada a objetos",
       pct: 15,
       week: "Semana 5",
     },
     {
-      name: "Momento 2: Listas",
+      name: "Momento evaluativo 2: Listas",
       pct: 15,
-      week: "Semanas 10",
+      week: "Semanas 9",
     },
     {
-      name: "Momento 3: Manejo de archivos",
+      name: "Momento evaluativo 3: Manejo de archivos",
       pct: 15,
       week: "Semana 11",
     },
     {
-      name: "Momento 4: Pilas y colas",
+      name: "Momento evaluativo 4: Pilas y colas",
       pct: 15,
       week: "Semanas 13",
     },
     {
-      name: "Momento 5: Proyecto final (árboles e integración)",
+      name: "Momento evaluativo 5: Arboles y recursividad",
       pct: 20,
       week: "Semanas 15-16",
     },
@@ -187,7 +187,8 @@ export const estructurasDatos: CoursePresentation = {
     {
       title: "Guía para el informe de laboratorio",
       url: "/documentos/estructuras-de-datos/guia-informe-laboratorio.pdf",
-      description: "Estructura y formato esperado de los informes de laboratorio.",
+      description:
+        "Estructura y formato esperado de los informes de laboratorio.",
     },
   ],
   conditions: TRANSVERSAL_CONDITIONS,
