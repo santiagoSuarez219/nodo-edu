@@ -45,10 +45,10 @@ usuario; los de estudiante, cuentas de prueba desechables.
 
 | # | Recurso | Cómo se crea | Identificador | Eliminado |
 |---|---------|--------------|---------------|-----------|
-| 1 | Curso académico de prueba (opcional, si no se usa uno real) | `AcademicCourseForm` en `/admin/courses/new` | `{{academicCourseId}}` / código `{{ENROLLMENT_CODE_TEST}}` | ⬜ |
-| 2 | Estudiante de prueba A | Registro desde la UI (`/registro`) — **es el caso TC-026-001** | `{{studentId_A}}` / `{{email_A}}` | ⬜ |
-| 3 | Estudiante de prueba B (no matriculado) | `students-mcp` → `create_student` | `{{studentId_B}}` / `{{email_B}}` | ⬜ |
-| 4 | Sesión de asistencia de prueba | UI docente (vista de lección o `/admin/courses/<id>/attendance`) | `{{sessionId}}` | ⬜ |
+| 1 | Curso académico de prueba | No usado — se reutilizaron los cursos reales del semestre (`estructuras-de-datos`, `analisis-de-algoritmos`) | N/A | N/A |
+| 2 | Estudiante de prueba A | Registro desde la UI (`/registro`) — **es el caso TC-026-001** | `ca5f768f-b53a-41ac-b20b-23df90f8d2ac` / `spec026-smoke-a@nodo-test.local` | ✅ (`delete_student`, 2 matrículas removidas; verificado: `auth.users` en producción queda con 1 sola cuenta, la del docente) |
+| 3 | Estudiante de prueba B (no matriculado) | `students-mcp` → `create_student` | `ff999b82-ba39-4900-b0aa-009e78a92bb4` / `spec026-smoke-b@nodo-test.local` | ✅ (`delete_student`) |
+| 4 | Sesión de asistencia de prueba | UI docente, lección `implementacion-de-pilas-en-java` | N/A | ✅ (eliminada en cascada al borrar el Estudiante A / cerrada por el docente en el caso) |
 | 5 | Pregunta de banco de prueba (bloque H) | `question-bank-mcp` → `create_question` | `{{questionId}}` | ⬜ |
 | 6 | Grupo de evaluación de prueba (bloque G) | `assignment-mcp` → `create_assignment_group` | `{{groupId}}` | ⬜ |
 
@@ -161,19 +161,20 @@ segundo curso `0YQPYZSY` (Análisis de algoritmos).
 2. Autenticarse con las credenciales del estudiante A.
 **Resultado esperado:** Login exitoso y redirección a `/cuenta/cursos` con sus
 cursos matriculados. El navbar muestra la variante de **estudiante** (spec-028).
-**Estado:** ❌ Fallido → 🔧 Corregido → pendiente de reintentar
+**Estado:** ✅ Aprobado (tras fix)
 **Hallazgos:** **Bug encontrado (2026-07-31):** el usuario llegó a `/login` vía
 `nod0.dev` → middleware → `/login?redirectTo=%2F` (el caso más común: un
 estudiante escribe el dominio pelado, no `/login` directo). En
-`lib/auth/actions.ts:42-45`, si `formData.redirectTo` viene con cualquier
-valor truthy (incluido `"/"`), el login redirige ahí **antes** de evaluar el
+`lib/auth/actions.ts:42-45`, si `formData.redirectTo` venía con cualquier
+valor truthy (incluido `"/"`), el login redirigía ahí **antes** de evaluar el
 rol — así que el estudiante terminaba en `/` (grilla general de cursos) en
-vez de `/cuenta/cursos`. No es un crash ni un error de seguridad, pero
-incumple el resultado esperado del caso, declarado crítico para el día 1.
-**Fix aplicado** (ampliación de scope aprobada por el usuario): se excluyó
+vez de `/cuenta/cursos`. No era un crash ni un error de seguridad, pero
+incumplía el resultado esperado del caso, declarado crítico para el día 1.
+**Fix desplegado** (ampliación de scope aprobada por el usuario, commit
+`15a50bd` en `development`, mergeado a `main` en `1393ba8`): se excluyó
 `"/"` del `redirectTo` honrado, dejando que ese caso caiga en el redirect por
-rol (`lib/auth/actions.ts`). Build y lint verdes tras el cambio. Pendiente:
-desplegar y reintentar este caso.
+rol. Reintentado tras el redeploy de Vercel: **confirmado por el usuario,
+funciona correctamente.**
 
 ### TC-026-006 — Login del docente y acceso al panel admin
 **Precondición:** Cuenta real del usuario con rol `teacher`/`admin` en
@@ -185,13 +186,15 @@ desplegar y reintentar este caso.
 3. Abrir un curso y revisar sus pestañas (contenido, asistencia, calificaciones).
 **Resultado esperado:** Acceso concedido; el navbar muestra la variante de
 **docente**; el panel admin carga sin errores de consola.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
+**Hallazgos:** Sin observaciones.
 **Hallazgos:** {{observaciones}}
 
 ### TC-026-014 — Gate de acceso: anónimo y estudiante sin matrícula
 **Precondición:** Estudiante B creado vía `students-mcp` y **sin matricular** en
 el curso a probar.
-**Datos de prueba usados:** `{{email_B}}` / `{{password_B}}`; una URL de lección.
+**Datos de prueba usados:** `spec026-smoke-b@nodo-test.local` /
+`SmokeTestB2026!`; lección `estructuras-de-datos/implementacion-de-pilas-en-java`.
 **Pasos:**
 1. En incógnito (sin sesión), abrir `{{url-prod}}/` y luego una URL de lección.
 2. Observar la redirección.
@@ -203,6 +206,8 @@ el curso a probar.
 - Paso 3: el contenido del curso **no** es accesible sin matrícula (gate de
   spec-006).
 - Paso 4: redirección a `/` — sin acceso al panel admin.
+**Estado:** ✅ Aprobado
+**Hallazgos:** Sin observaciones.
 **Estado:** ⬜ Pendiente
 **Hallazgos:** {{observaciones}}
 
@@ -213,7 +218,8 @@ el curso a probar.
 ### TC-026-008 — Lección MDX con Mermaid, KaTeX, YouTube y código
 **Precondición:** Estudiante A matriculado; identificar una lección real que use
 los cuatro elementos (Claude la localiza antes del caso).
-**Datos de prueba usados:** lección `{{courseSlug}}/{{lessonSlug}}`.
+**Datos de prueba usados:** lección
+`analisis-de-algoritmos/fundamentos-control-de-versiones-y-flujo-de-trabajo`.
 **Pasos:**
 1. Abrir la lección como estudiante A.
 2. Verificar el render del **diagrama Mermaid**.
@@ -225,27 +231,33 @@ los cuatro elementos (Claude la localiza antes del caso).
 producción; sin errores críticos de consola. Prestar atención a diferencias con
 local: Mermaid y Shiki son los candidatos más probables a fallar en build de
 producción.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{observaciones}}
+**Estado:** ✅ Aprobado (KaTeX no verificado — sin contenido)
+**Hallazgos:** Verificado al 2026-07-31: **ninguna lección publicada usa
+KaTeX** hoy (`grep` sobre `content/cursos/*/*.mdx` sin resultados de `$...$`).
+Se probaron Mermaid, YouTube y Shiki en la lección indicada — sin
+observaciones. KaTeX queda como capacidad técnica sin uso real todavía (no
+bloquea el arranque; ningún curso la necesita por ahora). Decisión del
+usuario: no forzar una prueba con contenido temporal.
 
 ### TC-026-009 — Navegación del curso: sidebar, guías y presentación
 **Precondición:** Estudiante A matriculado.
-**Datos de prueba usados:** `{{courseSlug}}`.
+**Datos de prueba usados:** `estructuras-de-datos`.
 **Pasos:**
-1. Abrir `{{url-prod}}/{{courseSlug}}` y confirmar el redirect a la lección de
+1. Abrir `{{url-prod}}/estructuras-de-datos` y confirmar el redirect a la lección de
    reanudación (spec-016).
 2. Navegar por el sidebar entre varias lecciones.
 3. Abrir una **guía de laboratorio** (nodo `kind: "guide"`, spec-021).
-4. Abrir `/{{courseSlug}}/presentacion` y verificar bibliografía y documentos PDF
+4. Abrir `/estructuras-de-datos/presentacion` y verificar bibliografía y documentos PDF
    (spec-024 / spec-030).
-**Resultado esperado:** Toda la navegación funciona; las guías abren; los PDFs de
-Supabase Storage descargan/visualizan correctamente en producción.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{observaciones}}
+**Resultado esperado:** Toda la navegación funciona; las guías abren; los PDFs
+(estáticos desde `public/documentos/`, **no** Supabase Storage — corregido en
+Fase 5) descargan/visualizan correctamente en producción.
+**Estado:** ✅ Aprobado
+**Hallazgos:** Sin observaciones.
 
 ### TC-026-010 — Progreso de lección persiste
 **Precondición:** Estudiante A en una lección.
-**Datos de prueba usados:** lección `{{courseSlug}}/{{lessonSlug}}`.
+**Datos de prueba usados:** lección de `estructuras-de-datos`.
 **Pasos:**
 1. Abrir una lección y marcarla como completada (según el flujo de spec-009/017).
 2. Recargar la página.
@@ -253,8 +265,8 @@ Supabase Storage descargan/visualizan correctamente en producción.
 4. Cerrar sesión, volver a entrar y verificar de nuevo.
 **Resultado esperado:** El progreso persiste tras recargar y tras reiniciar
 sesión; el avance del curso refleja la lección completada.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{observaciones}}
+**Estado:** ✅ Aprobado
+**Hallazgos:** Sin observaciones.
 
 ---
 
@@ -264,7 +276,10 @@ sesión; el avance del curso refleja la lección completada.
 **Precondición:** Una lección con preguntas de autoevaluación **publicadas** en
 el banco (verificar antes con `question-bank-mcp` → `list_questions`, o con la
 clave de respuestas de la vista docente). Estudiante A matriculado.
-**Datos de prueba usados:** lección `{{courseSlug}}/{{lessonSlug}}`.
+**Datos de prueba usados:** lección `estructuras-de-datos/implementacion-de-pilas-en-java`
+(3 preguntas publicadas, verificadas por `question-bank-mcp`); también se
+detectó actividad de prueba en `estructuras-de-datos/github-flujo-de-trabajo-con-ramas`
+y `estructuras-de-datos/fundamentos-control-de-versiones`.
 **Pasos:**
 1. Como estudiante A, abrir la lección y bajar hasta la autoevaluación.
 2. Responder todas las preguntas y enviar.
@@ -280,8 +295,23 @@ persiste y la clave docente coincide.
 > Advertencia conocida (**[[DEBT-021]]**): si la clave de respuestas no aparece,
 > puede ser "sin preguntas publicadas" **o** un error de carga — hoy no se
 > distinguen. Verificar por MCP antes de reportarlo como fallo.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{observaciones}}
+**Estado:** ❌ Fallido
+**Hallazgos:** Dos hallazgos:
+1. **[[DEBT-029]]:** en las 3 preguntas publicadas de
+   `implementacion-de-pilas-en-java`, la opción correcta está siempre en la
+   posición 0 (primera) y no hay aleatorización de opciones. Registrado en
+   el backlog.
+2. **Bug funcional confirmado (`DEBT-028`):** el estado "ya respondida" **no
+   persiste** tras recargar. Verificado con datos reales: el estudiante A
+   generó **dos intentos** distintos para la misma lección
+   (`github-flujo-de-trabajo-con-ramas`, 14:17 y 14:18 UTC, `correct_count`
+   6 y luego 4) porque la UI no reflejaba el intento previo y permitió
+   reenviar. Causa raíz: `getSelfAssessmentStatus().hasAttempt` se calcula
+   bien en el servidor y se usa correctamente para desbloquear "marcar
+   lección completada", pero **nunca se pasa** a `SelfAssessmentSection`.
+   No bloquea el desbloqueo de cierre de lección (eso sí funciona), pero sí
+   incumple el resultado esperado de este caso. Decisión del usuario: no
+   corregir en esta sesión, solo registrar en el backlog (`DEBT-028`).
 
 ---
 
@@ -290,7 +320,8 @@ persiste y la clave docente coincide.
 ### TC-026-012 — Ciclo completo de asistencia por sesión
 **Precondición:** Docente autenticado; estudiante A matriculado en ese curso; dos
 navegadores/perfiles abiertos (docente y estudiante).
-**Datos de prueba usados:** `{{sessionId}}`, código generado en el momento.
+**Datos de prueba usados:** lección `estructuras-de-datos/implementacion-de-pilas-en-java`,
+estudiante A (`spec026-smoke-a@nodo-test.local`), código generado en el momento.
 **Pasos:**
 1. **Docente:** abrir una lección del curso y, en el control de asistencia
    embebido (spec-031), **abrir una sesión**.
@@ -316,7 +347,8 @@ navegadores/perfiles abiertos (docente y estudiante).
 > `confirm()` nativos (**[[DEBT-018]]**), y con **más de un grupo** puede
 > mostrarse por un instante el código del grupo equivocado al cargar
 > (**[[DEBT-023]]** — ⚠️ relevante si se proyecta la pantalla en clase).
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
+**Hallazgos:** Sin observaciones nuevas.
 **Hallazgos:** {{observaciones}}
 
 ---
@@ -472,31 +504,48 @@ herramientas de escritura o borrado durante la ronda** salvo las previstas en
 > Ejecutar en **orden inverso** a la creación. Verificar cada borrado
 > (consulta → `404` / lista vacía) y marcarlo en la tabla "Datos de prueba".
 
-- [ ] Eliminar el grupo de evaluación de prueba (`assignment-mcp` →
-      `delete_assignment_group`).
-- [ ] Eliminar las preguntas de prueba (`question-bank-mcp` →
-      `delete_question`).
-- [ ] Cerrar/eliminar la sesión de asistencia de prueba y su registro.
-      ⚠️ `attendance-mcp` es **solo lectura**: si no hay endpoint de borrado,
-      reportarlo al usuario con el `{{sessionId}}` exacto en vez de tocar la base
-      de datos directamente.
-- [ ] Desmatricular y eliminar al estudiante B (`students-mcp` →
-      `unenroll_student` → `delete_student`).
-- [ ] Desmatricular y eliminar al estudiante A, incluyendo su progreso de lección
-      y su intento de autoevaluación.
-- [ ] Eliminar el curso académico de prueba, si se creó uno.
-      ⚠️ **[[DEBT-004]]**: no hay acción de borrado en la UI admin; solo existe
-      `deactivateCourseAction` sin conectar. Si no se puede eliminar, dejarlo
-      **desactivado** y registrarlo aquí.
-- [ ] Confirmar con `students-mcp` → `list_students` que no queda ninguna cuenta
-      de prueba en producción antes de la primera clase.
+- [x] Eliminar el grupo de evaluación de prueba — **N/A**, no se creó
+      (bloque G diferido a Fase 8).
+- [x] Eliminar las preguntas de prueba — **N/A**, no se crearon preguntas de
+      prueba; se usaron preguntas reales ya publicadas (`implementacion-de-pilas-en-java`).
+- [x] Cerrar/eliminar la sesión de asistencia de prueba y su registro —
+      sesión cerrada por el docente en `TC-026-012`; el registro de
+      asistencia se eliminó en cascada al borrar el Estudiante A.
+- [x] Desmatricular y eliminar al estudiante B (`students-mcp` →
+      `delete_student`) — eliminado, `enrollments_removed: 0` (nunca tuvo).
+- [x] Desmatricular y eliminar al estudiante A, incluyendo su progreso de lección
+      y su intento de autoevaluación — eliminado directo con `delete_student`
+      (`enrollments_removed: 2`), sin bloqueo 409 pese a tener
+      `self_assessment_attempts`/`attendance_records`/`lesson_progress`
+      (el guard de 409 solo mira `submissions`, no estos datos).
+- [x] Eliminar el curso académico de prueba, si se creó uno — **N/A**, no se
+      creó ninguno; se reutilizaron los 3 cursos reales del semestre.
+- [x] Confirmar que no queda ninguna cuenta de prueba en producción —
+      verificado directo contra `auth.users` (Admin API): **1 sola cuenta**,
+      la del docente real (`santiago8628@gmail.com`).
 
 ---
 
 ## Resumen de la ronda
 
-- **Bloqueantes del día 1 (A–F):** Aprobados: {{n}} / 13 — Fallidos: {{n}} — Pendientes: 13
-- **Diferidos (G–H):** Aprobados: {{n}} / 8 — Fallidos: {{n}} — Pendientes: 8
-- **Veredicto de arranque:** ⬜ Listo para clases / ⬜ Bloqueado por: {{motivo}}
-- Hallazgos escalados a `docs/specs/backlog.md`: {{lista o "ninguno"}}
-- Limpieza de datos de prueba: ⬜ Pendiente / ✅ Completada
+- **Bloqueantes del día 1 (A–F):** Aprobados: 13 / 14 — Fallidos: 1
+  (`TC-026-011`) — Pendientes: 0
+- **Diferidos (G–H):** Aprobados: 0 / 8 — Fallidos: 0 — Pendientes: 8 (Fase 8,
+  post-arranque)
+- **Veredicto de arranque:** ✅ **Listo para clases**, con un riesgo conocido
+  y aceptado explícitamente por el usuario: `TC-026-011` (la autoevaluación
+  no bloquea el reintento tras recargar, `DEBT-028`) no impide que los
+  estudiantes accedan, respondan ni avancen — solo genera intentos
+  duplicados en el registro. No bloquea el 2026-08-03.
+- **Bug encontrado y corregido durante la ronda:** `TC-026-005` falló en el
+  primer intento (login redirigía a `/` en vez de `/cuenta/cursos` cuando el
+  estudiante entraba por la raíz del dominio) — corregido en
+  `lib/auth/actions.ts` (commit `15a50bd`, desplegado en `1393ba8`),
+  reintentado y aprobado.
+- Hallazgos escalados a `docs/specs/backlog.md`: **DEBT-024** (mitigado),
+  **DEBT-026** (mensaje de error genérico en registro duplicado),
+  **DEBT-027** (claridad de mensajes de validación, pendiente de detalle),
+  **DEBT-028** (persistencia de autoevaluación, alta prioridad),
+  **DEBT-029** (orden de respuestas en autoevaluación).
+- Limpieza de datos de prueba: ✅ Completada — verificado, `auth.users` en
+  producción queda con 1 sola cuenta (la del docente real).
