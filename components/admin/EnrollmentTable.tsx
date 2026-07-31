@@ -37,9 +37,9 @@ export function EnrollmentTable({ enrollments, academicCourseId }: Props) {
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 ">
       {/* Estudiantes activos */}
-      <div className="rounded-[var(--radius-base)] border border-gray-200 dark:border-gray-700 overflow-hidden">
+      <div className="rounded-[var(--radius-base)] border border-gray-200 dark:border-gray-700 overflow-hidden ">
         <div className="px-5 py-3 bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-600 flex items-center justify-between">
           <h2 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
             Activos

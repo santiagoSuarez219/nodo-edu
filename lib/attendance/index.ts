@@ -95,7 +95,6 @@ export async function openSession(
     return { success: false, error: 'Error al recuperar la sesión creada' };
   }
 
-  revalidatePath(`/admin/courses/${academicCourseId}/attendance`);
   return { success: true, session: summary };
 }
 

@@ -18,42 +18,11 @@ export function getStudentNavLinks(): NavLink[] {
   ];
 }
 
-export function getTeacherNavLinks(
-  academicCourseId: string | null
-): NavLink[] {
-  const disabled = !academicCourseId;
-  const courseHrefBase = academicCourseId
-    ? `/admin/courses/${academicCourseId}`
-    : "";
-
+export function getTeacherNavLinks(): NavLink[] {
   return [
     {
       label: "Mis cursos",
       href: "/admin/courses",
-    },
-    {
-      label: "Calificaciones",
-      href: disabled ? undefined : `${courseHrefBase}/grades`,
-      disabled,
-      title: disabled
-        ? "Selecciona un curso para ver calificaciones"
-        : undefined,
-    },
-    {
-      label: "Asistencia",
-      href: disabled ? undefined : `${courseHrefBase}/attendance`,
-      disabled,
-      title: disabled
-        ? "Selecciona un curso para ver asistencia"
-        : undefined,
-    },
-    {
-      label: "Evaluaciones",
-      href: disabled ? undefined : `${courseHrefBase}/assignments`,
-      disabled,
-      title: disabled
-        ? "Selecciona un curso para ver evaluaciones"
-        : undefined,
     },
     {
       label: "Grupo de Investigación",
