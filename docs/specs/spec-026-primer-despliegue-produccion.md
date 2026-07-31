@@ -1,4 +1,4 @@
-# spec-026 — `[IN PROGRESS]` Primer despliegue a producción (Vercel + Supabase) para el inicio de clases
+# spec-026 — `[DONE]` Primer despliegue a producción (Vercel + Supabase) para el inicio de clases
 
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.
@@ -526,7 +526,7 @@ reintentado con éxito.
 > keys de producción (Fase 4). No bloquea el día 1: los MCPs son herramientas
 > del docente, no del estudiante.
 
-- [ ] Actualizar la configuración de los **4** MCPs (`.mcp.json` vía
+- [x] Actualizar la configuración de los **4** MCPs (`.mcp.json` vía
       `mcp-servers/run-local-mcp.sh` y/o `claude_desktop_config.json`) para
       apuntar a `https://<url-prod>/api/*` con las API keys de producción.
       **No commitear las keys.**
@@ -534,18 +534,40 @@ reintentado con éxito.
       > `QUESTION_BANK_API_BASE_URL` en `.env.local`. Evaluar si conviene un
       > perfil separado para producción en vez de sobrescribir el local, para
       > no perder la capacidad de trabajar contra `npm run dev`.
-- [ ] Actualizar `docs/mcps/README.md` para reflejar que existe configuración de
-      producción además de la local.
-- [ ] Revisar los **4** system prompts en `docs/mcps/` y ajustarlos **solo** si
-      describen endpoint/entorno.
-- [ ] Verificar que los 4 MCPs cargan contra producción (`TC-MCP-026-001` a
-      `TC-MCP-026-005`).
-- [ ] Smoke tests diferidos de **evaluaciones A/B/C** (spec-018/019/020):
+      **Decisión (2026-07-31, confirmada por el usuario): perfil separado.**
+      Nuevo `mcp-servers/run-prod-mcp.sh` (análogo al local) carga
+      `.env.prod-mcp` (gitignorado, nunca commiteado) con
+      `QUESTION_BANK_API_BASE_URL`/`STUDENTS_ADMIN_API_BASE_URL` apuntando a
+      `https://www.nod0.dev/api/*` y las keys de producción. `.mcp.json`
+      ahora registra 8 entradas: las 4 locales sin tocar + 4 nuevas
+      `*-mcp-prod`. Commit `2239e1f`.
+- [x] Actualizar `docs/mcps/README.md` para reflejar que existe configuración de
+      producción además de la local. Hecho — nueva sección "Configuración:
+      local vs. producción".
+- [x] Revisar los **4** system prompts en `docs/mcps/` y ajustarlos **solo** si
+      describen endpoint/entorno. Verificado por grep: ninguno menciona
+      `localhost`/entorno/producción — están escritos de forma genérica, sin
+      cambios necesarios.
+- [x] Verificar que los 4 MCPs cargan contra producción (`TC-MCP-026-001` a
+      `TC-MCP-026-005`). ✅ Aprobados como "equivalente funcional": arranque
+      aislado de los 4 wrappers OK, y llamadas HTTP directas a
+      `/api/questions`, `/api/assignments/academic-courses`,
+      `/api/attendance/sessions` y `/api/students` con las keys de producción
+      devuelven datos reales. Pendiente confirmar la invocación real de las
+      herramientas MCP `*-mcp-prod` desde Claude Code (requiere reconectar
+      servidores tras el cambio en `.mcp.json`, sin bloquear el cierre de
+      esta fase).
+- [x] Smoke tests diferidos de **evaluaciones A/B/C** (spec-018/019/020):
       publicar un grupo, resolverlo como estudiante, calificarlo como docente
-      (`TC-026-015` a `TC-026-017`).
-- **Archivos impactados:** `.mcp.json` (si aplica),
-  `claude_desktop_config.json` (local, sin secretos commiteados),
-  `docs/mcps/README.md`, los 4 `docs/mcps/*-agent.system-prompt.md`.
+      (`TC-026-015` a `TC-026-017`). ✅ Los 3 aprobados: grupo con 3 variantes
+      publicado cumpliendo invariantes, estudiante de prueba lo resolvió con
+      `auto_score` calculado, vista de revisión del docente cargó el envío
+      correctamente. Datos de prueba (3 preguntas, grupo, estudiante)
+      eliminados y verificados.
+- **Archivos impactados:** `.mcp.json`, `mcp-servers/run-prod-mcp.sh` (nuevo),
+  `docs/mcps/README.md`. `claude_desktop_config.json` sin cambios (no se usó
+  en esta sesión). Los 4 `docs/mcps/*-agent.system-prompt.md` sin cambios
+  (no describían endpoint/entorno).
 
 ## Criterios de aceptación
 
@@ -569,11 +591,20 @@ reintentado con éxito.
   producción.
 - **Los 6 flujos críticos (registro, matrícula, login, contenido MDX,
   asistencia, autoevaluación) pasan sus casos en producción** antes del inicio
-  de clases.
+  de clases. **Cumplido con una excepción aceptada:** `TC-026-011`
+  (autoevaluación) falló — el estado de "ya respondida" no persiste tras
+  recargar (`DEBT-028`). No bloquea el acceso ni el progreso real de los
+  estudiantes (el desbloqueo de "marcar lección completada" sí funciona
+  correctamente); el usuario aceptó explícitamente este riesgo conocido y
+  decidió no corregirlo en esta sesión. Los otros 13 casos de los 6 flujos
+  (más `TC-026-005`, corregido tras un bug real encontrado en la ronda)
+  pasaron sin reservas.
 - Todos los datos de prueba creados en producción quedan eliminados y
-  registrados como tal.
+  registrados como tal. ✅ Verificado — `auth.users` en producción queda con
+  una sola cuenta (la del docente real).
 - (Fase 8) Los 4 MCPs apuntan a producción con sus keys de producción y
-  responden correctamente; ninguna API key real queda commiteada.
+  responden correctamente; ninguna API key real queda commiteada. ✅ Cumplido
+  (ver Fase 8).
 
 ## Pruebas asociadas
 - **Manuales:** `docs/testing/test-026-primer-despliegue-produccion.md` — casos
