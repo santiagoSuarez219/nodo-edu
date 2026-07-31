@@ -434,17 +434,41 @@ reintentó el borrado, exitoso en los 5 casos. **Verificado tras la limpieza:**
 > **Cada subpaso de merge/push/migración requiere confirmación explícita del
 > usuario en la misma sesión.**
 
-- [ ] Completar el **Checklist pre-despliegue** de `CLAUDE.md`.
-- [ ] Crear rama `deploy/v1.0.0` desde `development`.
-- [ ] **[GATE 🔒]** Aplicar migraciones a producción si aplica
-      (`supabase db push`).
-- [ ] **[GATE 🔒]** Merge `deploy/v1.0.0` → `main` (`--no-ff`).
-- [ ] **[GATE 🔒]** Push a `main` → Vercel dispara el build.
-- [ ] Verificar que el build terminó sin errores y capturar la **URL de
-      producción final**. Si difiere de la asumida en Fase 4, actualizar
-      `NEXT_PUBLIC_SITE_URL` y el Site URL de Supabase antes de continuar.
-- [ ] Limpiar la rama `deploy/v1.0.0` tras confirmar el despliegue.
+- [x] Completar el **Checklist pre-despliegue** de `CLAUDE.md` — build/lint
+      verdes, `development` sincronizada con `origin/development`
+      (commit `c8b8ad1`, ver Fase 1).
+- [x] Crear rama `deploy/v1.0.0` desde `development`.
+- [x] **[GATE 🔒]** Aplicar migraciones a producción si aplica — **no aplica**:
+      34 migraciones ya sincronizadas (Local == Remote), sin cambios de
+      esquema en este spec.
+- [x] **[GATE 🔒]** Merge `deploy/v1.0.0` → `main` (`--no-ff`) — confirmado
+      por el usuario 2026-07-31, commit `fc24335`. Primer merge real de
+      Nodo a `main` (207+ commits de `development`, sin conflictos).
+- [x] **[GATE 🔒]** Push a `main` → Vercel dispara el build — confirmado por
+      el usuario, push exitoso (`a8d383b..fc24335`).
+- [x] Verificar que el build terminó sin errores y capturar la **URL de
+      producción final**. **Proyecto Vercel creado por el usuario tras el
+      push** (no existía antes — corrección respecto a la premisa de Fase 4,
+      que asumía un proyecto ya conectado). URL asignada:
+      `https://nodo-edu.vercel.app` — verificado por HTTP: `200`, redirige
+      correctamente a `/login?redirectTo=%2F` para un visitante anónimo
+      (middleware funcionando, adelanta parte de `TC-026-014`).
+      **Ampliación de alcance confirmada por el usuario:** se conectó
+      además el dominio propio **`nod0.dev`** (comprado directamente desde
+      Vercel, DNS gestionado automáticamente) — fuera del alcance original
+      del spec ("No incluye: Configurar dominio custom"), aprobado
+      explícitamente en esta sesión. Vercel dejó `https://www.nod0.dev`
+      como dominio canónico (`nod0.dev` redirige a `www.nod0.dev`), también
+      verificado por HTTP: `200`.
+      **`NEXT_PUBLIC_SITE_URL` actualizada** en Vercel a
+      `https://www.nod0.dev` y redeployada; **Site URL y Redirect URLs de
+      Supabase Auth** actualizados a `https://www.nod0.dev` (+ `nod0.dev/**`
+      y `www.nod0.dev/**` en Redirect URLs) — ambos confirmados por el
+      usuario.
+- [x] Limpiar la rama `deploy/v1.0.0` tras confirmar el despliegue.
 - **Archivos impactados:** historial git (`main`), sin cambios de código.
+  Fuera de lo previsto en el spec original: dominio `nod0.dev` conectado en
+  Vercel (ampliación de alcance aprobada en sesión).
 
 ### Fase 7 — Smoke tests críticos del día 1 🔒
 > Los 6 flujos que el usuario declaró críticos, sobre la URL de producción.
