@@ -1,4 +1,4 @@
-# spec-033 — [TESTING] Autoevaluación de cierre: persistir el estado de "ya respondida" tras recargar
+# spec-033 — [DONE] Autoevaluación de cierre: persistir el estado de "ya respondida" tras recargar
 
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.

@@ -235,7 +235,7 @@ guardadas (a diferencia de `assignment_variant_groups`, que sí tiene un flag
 
 ---
 
-## DEBT-028 — La autoevaluación de cierre no persiste su estado de "ya respondida" tras recargar la página
+## DEBT-028 — La autoevaluación de cierre no persiste su estado de "ya respondida" tras recargar la página — ✅ Alcance 1 resuelto (spec-033, 2026-07-31)
 
 **Origen:** `TC-026-011` (spec-026, smoke test de producción, 2026-07-31)
 **Prioridad:** ~~Alta~~ → **Media** — reclasificado el 2026-07-31 al redactar
@@ -296,8 +296,20 @@ después de un reload con el esquema actual.
    `attempt_id`, `question_id`, `selected_choice_ids`), migración incluida,
    para poder reconstruir el feedback exacto por pregunta tras un reload.
 
-**Spec asociado:** `spec-033-autoevaluacion-estado-persistente.md`
-(alcance 1, el fix mínimo) — `[NOT STARTED]`.
+**Resolución (alcance 1, 2026-07-31):** implementado y probado en
+`spec-033-autoevaluacion-estado-persistente.md` — `[DONE]`. El servidor ahora
+expone `lastAttempt` (conteos + fecha del intento más reciente, con
+`order by submitted_at desc` para evitar devolver un intento arbitrario) y
+`SelfAssessmentSection` muestra un resumen en vez del formulario cuando ya
+existe un intento sin feedback en memoria, conservando "Reintentar" intacto.
+Ronda manual `test-033` (7 casos) aprobada sin hallazgos nuevos — el único
+defecto real de esta iteración (el resumen se agregaba junto al formulario en
+vez de en su lugar) lo detectó `@reviewer` en la revisión de código previa a
+la ronda y se corrigió antes de que el usuario probara.
+
+El **alcance 2** (persistir la respuesta elegida por pregunta, con migración,
+para reconstruir el feedback detallado tras un reload) sigue abierto — ver
+"Limitación adicional" arriba.
 
 ---
 
