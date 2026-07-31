@@ -5,6 +5,47 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+## DEBT-031 — El historial de migraciones no reconstruye producción desde cero
+
+**Origen:** Detectado al armar el entorno de desarrollo local en `mirp-lab`
+(2026-07-31, post-spec-026) — `supabase start` con las migraciones del repo
+falló
+**Prioridad:** Alta — es un riesgo de recuperación ante desastres, no solo un
+problema de este entorno de dev
+
+La tabla `assignments` existe en producción (verificado por el schema
+OpenAPI de PostgREST) pero **ninguna migración la crea**. La migración
+`20260718000002_init_assignment_variant_groups.sql` la asume existente — su
+propio comentario dice *"table may already exist from prior integration"* —
+y solo le agrega columnas (`variant_group_id`, `variant_label`) vía
+`ALTER TABLE`. No hay ningún commit que borre una migración anterior que la
+creara: se creó fuera de git en algún momento (probablemente a mano en el
+SQL Editor de Supabase), antes de que existiera esa migración.
+
+Consecuencia: reconstruir producción desde cero solo con
+`supabase/migrations/` **falla** en ese punto. Esto no bloqueó el
+despliegue original (spec-026 nunca reconstruyó el esquema desde cero,
+solo verificó que las 34 migraciones ya aplicadas coincidían Local==Remote),
+pero sí es un riesgo real para una recuperación ante desastres futura, y ya
+bloqueó armar un entorno de desarrollo espejo.
+
+**Mitigación temporal (2026-07-31):** se agregó una migración
+`20260717000000_local_only_missing_assignments_table.sql`, pero **solo en
+la copia del repo que vive en `mirp-lab`** (`/home/sosagro4c/proyectos/nodo-dev-db/`),
+con la estructura real de `assignments` tomada del schema de producción. No
+se commiteó al repo principal — ver decisión del usuario de no tocar el
+historial de migraciones de producción sin evaluarlo aparte.
+
+**Acción:** Decidir junto con el usuario si conviene: (a) agregar esa misma
+migración (con timestamp anterior a `20260718000002`) al repo principal y
+usar `supabase migration repair` para marcarla como ya aplicada en
+producción sin re-ejecutarla ahí, cerrando el hueco de forma permanente; o
+(b) dejarlo documentado como limitación conocida. Mientras tanto, cualquier
+reset de la base local en `mirp-lab` necesita esa migración local presente
+para no fallar en el mismo punto.
+
+---
+
 ## DEBT-030 — El ícono de la aplicación no aparece en la pestaña del navegador
 
 **Origen:** Reportado por el usuario (2026-07-31), post-despliegue de spec-026

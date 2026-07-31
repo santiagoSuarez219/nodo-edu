@@ -225,13 +225,15 @@ npm run lint
 > ⚠️ Nunca escribas valores reales de variables de entorno en este archivo
 > ni en ningún archivo rastreado por git.
 
-> ⚠️ **Este proyecto no tiene un entorno local de Supabase separado.**
-> `NEXT_PUBLIC_SUPABASE_URL` en `.env.local` apunta directamente al proyecto
-> Supabase remoto (`academy-page`, ref `bgiimadnmqnoqmdbudpo`) — no a una
-> instancia local levantada con `supabase start`. Aunque exista un contenedor
-> Docker local (`supabase_db_...`), `npm run dev` **no** lo consume; verificar
-> el estado de una tabla contra ese contenedor dará falsos negativos. Ver
-> "Base de datos" para las implicaciones sobre migraciones.
+> ⚠️ **Desde el 2026-07-31 existe un entorno de desarrollo separado de
+> producción** (spec-026 quedó `[DONE]` con la app ya en producción real, lo
+> que hizo necesario dejar de probar directo ahí). `.env.local` apunta a una
+> instancia de Supabase local (`supabase start`) corriendo en la workstation
+> de laboratorio `mirp-lab` (host SSH configurado en `~/.ssh/config`,
+> `/home/sosagro4c/proyectos/nodo-dev-db/`), accesible desde esta Mac vía
+> túnel SSH. Los valores reales de producción quedaron respaldados en
+> `.env.local.prod-backup` (gitignorado). Ver "Base de datos" para el
+> procedimiento completo de arranque/reconexión.
 
 ---
 
@@ -239,17 +241,60 @@ npm run lint
 
 - Proveedor: **Supabase Postgres**.
 - Cuando hagas modificaciones al esquema, crea siempre una migración.
-- **Este proyecto usa un único entorno Supabase** (no hay local/producción
-  separados; ver "Variables de entorno"). `supabase db push` aplica las
-  migraciones pendientes a ese mismo proyecto — es el flujo normal de
-  desarrollo aquí, confirmado explícitamente por el usuario, y no debe
-  tratarse como un riesgo de "migración en producción sin confirmar".
-  Aun así, pedir confirmación antes de ejecutar `supabase db push` sigue
-  aplicando como buena práctica general (ver "Acciones prohibidas").
-- Para verificar que una migración se aplicó: `supabase migration list`
-  (columnas Local y Remote deben coincidir) o una consulta REST contra
-  `NEXT_PUBLIC_SUPABASE_URL` — no contra un contenedor Docker local.
+- **Dos entornos desde el 2026-07-31:**
+  - **Producción:** proyecto Supabase remoto `academy-page`
+    (ref `bgiimadnmqnoqmdbudpo`). Variables reales respaldadas en
+    `.env.prod` / `.env.prod-mcp` (gitignorados, nunca commitear).
+    `supabase db push`/`supabase migration list` **sin** `--project-ref`
+    (o con `bgiimadnmqnoqmdbudpo` explícito) operan contra este proyecto —
+    requiere confirmación explícita del usuario antes de aplicar
+    migraciones (ver "Acciones prohibidas").
+  - **Desarrollo:** instancia local (`supabase start`) en `mirp-lab`
+    (`/home/sosagro4c/proyectos/nodo-dev-db/`), con su propia copia de
+    `supabase/migrations/` sincronizada manualmente desde este repo (no
+    hay symlink ni CI que las mantenga alineadas — si agregás una
+    migración nueva acá, hay que `rsync`earla a `mirp-lab` y correr
+    `supabase db reset` allá para probarla antes de aplicarla a prod).
+    `.env.local` apunta acá por defecto.
+
+  **Para reconectar el entorno de desarrollo en una sesión nueva:**
+  1. Túnel SSH (si no está activo —
+     `pgrep -f "ssh.*-L 54321.*mirp-lab"` para chequear):
+     ```bash
+     ssh -f -N -L 54321:localhost:54321 -L 54322:localhost:54322 \
+       -L 54323:localhost:54323 -L 54324:localhost:54324 mirp-lab
+     ```
+  2. Confirmar que el stack sigue corriendo en `mirp-lab` (si se reinició la
+     máquina, hay que levantarlo de nuevo):
+     ```bash
+     ssh mirp-lab "cd /home/sosagro4c/proyectos/nodo-dev-db && \
+       NODE_OPTIONS='--dns-result-order=ipv4first' npx supabase status"
+     # si no está corriendo:
+     ssh mirp-lab "cd /home/sosagro4c/proyectos/nodo-dev-db && \
+       NODE_OPTIONS='--dns-result-order=ipv4first' npx supabase start"
+     ```
+  3. `.env.local` ya apunta a `http://localhost:54321` vía el túnel — solo
+     hace falta que `npm run dev` esté corriendo (reiniciarlo si venía de
+     antes de este cambio, para que recargue el `.env.local` nuevo).
+  4. Docente de desarrollo ya sembrado: `dev@nodo.local` / `DevLocal2026!`
+     (`npm run seed:teacher` para recrearlo si se resetea la base).
+  > ⚠️ **Nota de mantenimiento del CLI:** esta instancia local (CLI
+  > `2.111.0`) no otorgó automáticamente los `GRANT`s estándar de
+  > `anon`/`authenticated`/`service_role` sobre `public` al aplicar las
+  > migraciones desde cero — tuvieron que ejecutarse a mano
+  > (`GRANT ALL ON ALL TABLES/SEQUENCES/FUNCTIONS IN SCHEMA public TO
+  > anon, authenticated, service_role` + `ALTER DEFAULT PRIVILEGES`
+  > equivalente). Si se vuelve a resetear esta base desde cero
+  > (`supabase db reset`) y algo empieza a fallar con
+  > `permission denied for table ...`, repetir esos `GRANT`s.
+- Para verificar que una migración se aplicó en **producción**:
+  `supabase migration list --project-ref bgiimadnmqnoqmdbudpo` (columnas
+  Local y Remote deben coincidir) o una consulta REST contra
+  `NEXT_PUBLIC_SUPABASE_URL` de `.env.prod`.
 - Row Level Security habilitado; verificar políticas antes de añadir nuevas tablas.
+- **[[DEBT-031]]**: el historial de migraciones no reconstruye producción
+  desde cero — la tabla `assignments` se creó fuera de git en algún momento
+  y ninguna migración la declara. Ver `docs/specs/backlog.md`.
 
 ---
 
@@ -804,10 +849,12 @@ inesperado, lentitud, detalle visual… o "sin observaciones"}}
 - Leer el archivo `test-NNN-slug.md` completo e identificar las precondiciones
   de cada caso antes de crear nada.
 - Confirmar con el usuario el **entorno** contra el que se trabajará. Por
-  defecto, desarrollo. **Nunca crear datos de prueba en producción** sin
-  confirmación explícita en esa misma sesión (recordar que este proyecto usa
-  un único entorno Supabase; ver "Variables de entorno" y "Base de datos" —
-  esto hace aún más relevante confirmar el alcance antes de crear datos).
+  defecto, desarrollo (`.env.local` → instancia local en `mirp-lab`, ver
+  "Base de datos"). **Nunca crear datos de prueba en producción** sin
+  confirmación explícita en esa misma sesión — desde el 2026-07-31 sí existen
+  entornos separados, pero la confirmación de alcance sigue aplicando igual:
+  algunas verificaciones (ej. probar un fix ya desplegado) legítimamente
+  necesitan producción.
 - Crear **todo lo necesario para ejecutar las pruebas vía API**: usuarios,
   autenticación, registros base, estados intermedios, relaciones y cualquier
   precondición del caso. Usar los endpoints documentados en "Backend y APIs"
@@ -1021,12 +1068,12 @@ development ──merge──▶ deploy/vX.Y.Z ──merge──▶ main ──p
 
 ### Migraciones de base de datos — Supabase
 
-> Nota: este proyecto usa un único proyecto Supabase para desarrollo y
-> producción (ver "Variables de entorno" y "Base de datos"), así que
-> `supabase db push` sin `--project-ref` ya apunta al proyecto correcto.
-> Los comandos con `--project-ref` explícito de abajo son para cuando se
-> gestionan migraciones desde una máquina sin el proyecto enlazado
-> (`supabase link`).
+> Nota: desde el 2026-07-31 desarrollo y producción son proyectos Supabase
+> **separados** (ver "Base de datos") — `supabase db push`/`migration list`
+> sin `--project-ref` aplican sobre el proyecto que esté enlazado
+> (`supabase link`) en la máquina donde se ejecuten; usar
+> `--project-ref bgiimadnmqnoqmdbudpo` explícito para apuntar a producción
+> sin ambigüedad, como en los comandos de abajo.
 
 - Proveedor PostgreSQL gestionado con Storage, Auth y Realtime integrados.
 - Las migraciones se gestionan con la CLI de Supabase:
