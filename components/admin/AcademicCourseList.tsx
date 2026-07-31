@@ -1,6 +1,5 @@
 import Link from "next/link";
 import type { AcademicCourse } from "@/lib/academic-courses/types";
-import { CourseActionsDropdown } from "./CourseActionsDropdown";
 
 const DAY_LABELS: Record<string, string> = {
   lunes: "Lun",
@@ -53,14 +52,21 @@ export function AcademicCourseList({ courses }: Props) {
               <th className="px-5 py-3">Horario</th>
               <th className="px-5 py-3">Código matrícula</th>
               <th className="px-5 py-3">Estado</th>
-              <th className="px-5 py-3 text-right">Acciones</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100 dark:divide-gray-700 bg-white dark:bg-gray-800">
             {courses.map((course) => (
-              <tr key={course.id}>
-                <td className="px-5 py-4 font-medium text-gray-900 dark:text-white">
-                  {course.name}
+              <tr
+                key={course.id}
+                className="relative hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+              >
+                <td className="px-5 py-4 font-medium text-gray-900 dark:text-white relative z-10">
+                  <Link
+                    href={`/admin/courses/${course.id}`}
+                    className="after:absolute after:inset-0 after:-z-10 hover:underline"
+                  >
+                    {course.name}
+                  </Link>
                 </td>
                 <td className="px-5 py-4 text-gray-600 dark:text-gray-300 font-mono text-xs">
                   {course.code}
@@ -86,9 +92,6 @@ export function AcademicCourseList({ courses }: Props) {
                       Inactivo
                     </span>
                   )}
-                </td>
-                <td className="px-5 py-4 text-right">
-                  <CourseActionsDropdown courseId={course.id} />
                 </td>
               </tr>
             ))}

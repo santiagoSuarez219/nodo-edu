@@ -2,37 +2,30 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { useParams } from "next/navigation";
 import type { Profile } from "@/lib/students/types";
 import type { AppRole } from "@/lib/auth/session";
-import type { AcademicCourse } from "@/lib/academic-courses/types";
 import { signOut } from "@/lib/auth/actions";
 import { UserMenu } from "./UserMenu";
 import { NavLinkList } from "./NavLinkList";
-import { CourseScopeSelect } from "./CourseScopeSelect";
 import { getStudentNavLinks, getTeacherNavLinks } from "./navLinks";
 import Image from "next/image";
 
 export const Navbar = ({
   profile,
   roles = [],
-  teacherCourses = [],
 }: {
   profile: Profile;
   roles?: AppRole[];
-  teacherCourses?: AcademicCourse[];
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const params = useParams();
 
   const isTeacher = roles.includes("teacher") || roles.includes("admin");
-  const academicCourseId = params.academicCourseId as string | undefined;
 
   const toggleMenu = () => setIsMenuOpen((p) => !p);
   const closeMenu = () => setIsMenuOpen(false);
 
   const navLinks = isTeacher
-    ? getTeacherNavLinks(academicCourseId || null)
+    ? getTeacherNavLinks()
     : getStudentNavLinks();
 
   return (
@@ -56,7 +49,6 @@ export const Navbar = ({
 
           <div className="hidden lg:flex items-center justify-center gap-6">
             <NavLinkList links={navLinks} variant="desktop" />
-            {isTeacher && <CourseScopeSelect courses={teacherCourses} />}
           </div>
 
           <div className="flex gap-3 items-center justify-end">
@@ -111,14 +103,6 @@ export const Navbar = ({
         }`}
       >
         <ul className="flex flex-col gap-1 px-6 py-4 text-base tracking-tight border-t border-gray-200 dark:border-gray-700">
-          {isTeacher && (
-            <li className="mb-2 pb-2 border-b border-gray-200 dark:border-gray-700">
-              <CourseScopeSelect
-                courses={teacherCourses}
-                onNavigate={closeMenu}
-              />
-            </li>
-          )}
           <li>
             <NavLinkList
               links={navLinks}

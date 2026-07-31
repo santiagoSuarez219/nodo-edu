@@ -7,7 +7,6 @@ import { Navbar } from "@/components/navbar/Navbar";
 import { ThemeInit } from "@/components/ThemeInit";
 import { HeaderHeightObserver } from "@/components/HeaderHeightObserver";
 import { getCurrentProfile, getCurrentRoles } from "@/lib/auth/session";
-import { getCoursesByTeacher } from "@/lib/academic-courses";
 
 const jetbrainsMono = JetBrains_Mono({
   variable: "--font-jetbrains-mono",
@@ -38,9 +37,6 @@ export default async function RootLayout({
   const profile = await getCurrentProfile();
   const roles = await getCurrentRoles();
 
-  const isTeacher = roles.includes("teacher") || roles.includes("admin");
-  const teacherCourses = isTeacher && profile ? await getCoursesByTeacher(profile.id) : [];
-
   return (
     <html
       lang="es"
@@ -59,7 +55,7 @@ export default async function RootLayout({
         {profile && (
           <div data-site-header className="sticky top-0 left-0 w-full z-50">
             <AnnouncementBar />
-            <Navbar profile={profile} roles={roles} teacherCourses={teacherCourses} />
+            <Navbar profile={profile} roles={roles} />
           </div>
         )}
         {children}
