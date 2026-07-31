@@ -238,9 +238,23 @@ guardadas (a diferencia de `assignment_variant_groups`, que sí tiene un flag
 ## DEBT-028 — La autoevaluación de cierre no persiste su estado de "ya respondida" tras recargar la página
 
 **Origen:** `TC-026-011` (spec-026, smoke test de producción, 2026-07-31)
-**Prioridad:** Alta — permite reintentos silenciosos y datos inconsistentes en
-uno de los 6 flujos declarados críticos, aunque no bloquea el desbloqueo de
-"marcar lección completada"
+**Prioridad:** ~~Alta~~ → **Media** — reclasificado el 2026-07-31 al redactar
+spec-033 (ver "Corrección de la premisa" más abajo): no hay corrupción de
+datos, es una regresión de UX en uno de los 6 flujos declarados críticos
+
+> **Corrección de la premisa (2026-07-31).** Este ítem se redactó afirmando que
+> el bug "permite reintentos silenciosos y datos inconsistentes". **Eso es
+> falso.** La migración que crea la tabla la define explícitamente como
+> *"una bitácora append-only de intentos completados por estudiante"*
+> (Decisión D1 de spec-017), y `SelfAssessmentSection` expone un botón
+> **"Reintentar"** deliberado que limpia el estado y permite reenviar. Varias
+> filas por estudiante/lección son **el diseño esperado**, no un defecto: las
+> dos filas citadas abajo como evidencia son exactamente lo que ese log debe
+> registrar tras dos intentos. `hasAttempt` solo evalúa `length > 0`, así que
+> los reintentos tampoco alteran el desbloqueo de "marcar lección completada".
+> Lo que queda es un bug real pero acotado y sin impacto en los datos: tras
+> recargar, el estudiante pierde el feedback y la UI no refleja que ya
+> respondió.
 
 `components/courses/SelfAssessmentSection.tsx` mantiene el estado "ya
 respondida" (`hasSubmitted`, `feedbackByQuestion`) **solo en memoria del
@@ -254,12 +268,14 @@ usa bien para desbloquear "marcar lección completada"
 preguntas vuelve a mostrarse como si nunca se hubiera respondido, permitiendo
 reenviar respuestas.
 
-Confirmado en producción con datos reales: el estudiante de prueba
-`spec026-smoke-a@nodo-test.local` generó **dos filas** en
+Observado en producción: el estudiante de prueba
+`spec026-smoke-a@nodo-test.local` generó dos filas en
 `self_assessment_attempts` para la misma lección
 (`estructuras-de-datos/github-flujo-de-trabajo-con-ramas`, 14:17 y 14:18 UTC
-del 2026-07-31) con distinto `correct_count` (6 y 4), porque recargó entre
-medio y la UI no reflejaba el intento previo.
+del 2026-07-31) con distinto `correct_count` (6 y 4). Se interpretó como
+evidencia del bug, pero —según la corrección de arriba— es el
+comportamiento esperado del log: dos intentos, dos filas. El síntoma real es
+que la UI no mostraba el intento previo tras la recarga.
 
 **Limitación adicional para el fix completo:** la tabla
 `self_assessment_attempts` (`supabase/migrations/20260718000000_init_self_assessment_attempts.sql`)
@@ -269,15 +285,19 @@ posible reconstruir el detalle por pregunta (qué elegiste, qué era correcto)
 después de un reload con el esquema actual.
 
 **Acción:** Dos alcances posibles:
-1. **Fix mínimo (sin migración):** pasar `hasAttempt` (y los conteos
-   agregados) desde `page.tsx` → `LessonClosureFlow` → `SelfAssessmentSection`,
-   y si ya hay intento, mostrar un resumen ("Ya completaste esta
-   autoevaluación: X/Y correctas") sin permitir reenviar, en vez de
-   reiniciar el formulario.
+1. **Fix mínimo (sin migración):** pasar el último intento (conteos agregados
+   y `submitted_at`) desde `page.tsx` → `LessonClosureFlow` →
+   `SelfAssessmentSection`, y si ya hay intento, mostrar un resumen ("Ya
+   completaste esta autoevaluación: X/Y correctas") en vez de reiniciar el
+   formulario. **Conservando el botón "Reintentar"**, que es una función
+   deliberada y no debe eliminarse.
 2. **Fix completo:** agregar una tabla/columna que guarde la respuesta
    seleccionada por pregunta (ej. `self_assessment_answers` con
    `attempt_id`, `question_id`, `selected_choice_ids`), migración incluida,
    para poder reconstruir el feedback exacto por pregunta tras un reload.
+
+**Spec asociado:** `spec-033-autoevaluacion-estado-persistente.md`
+(alcance 1, el fix mínimo) — `[NOT STARTED]`.
 
 ---
 
