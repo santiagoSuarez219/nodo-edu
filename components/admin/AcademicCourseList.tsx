@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { AcademicCourse } from "@/lib/academic-courses/types";
 import { CourseActionsDropdown } from "./CourseActionsDropdown";
 
@@ -28,7 +29,7 @@ export function AcademicCourseList({ courses }: Props) {
         <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
           Crea tu primer curso para empezar a matricular estudiantes.
         </p>
-        <a
+        <Link
           href="/admin/courses/new"
           className="inline-flex items-center gap-2 rounded-lg bg-blue-700 hover:bg-blue-800 dark:bg-blue-600 dark:hover:bg-blue-700 text-white text-sm font-bold px-4 py-2.5 transition-colors"
         >
@@ -36,7 +37,7 @@ export function AcademicCourseList({ courses }: Props) {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
           </svg>
           Crear curso
-        </a>
+        </Link>
       </div>
     );
   }

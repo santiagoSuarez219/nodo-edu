@@ -5,6 +5,31 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+## DEBT-024 — No existe ninguna vía en la plataforma para reponer la contraseña de un estudiante
+
+**Origen:** Revisión de spec-026 previa al primer despliegue (2026-07-30)
+**Prioridad:** Alta — con ~30 estudiantes, ocurrirá en las primeras semanas de clase
+
+spec-027 eliminó el flujo de recuperación de contraseña por correo
+(**[[DEBT-011]]**), asumiendo que el docente sería el canal de recuperación vía
+`students-mcp`. **Esa suposición es falsa:** `update_student`
+(`mcp-servers/students-mcp/src/tools.ts`) acepta `full_name`, `email`, `career`,
+`semester` y `github_username` — **no acepta `password`**. Solo `create_student`
+recibe contraseña, y `delete_student` es destructivo (borra matrículas,
+asistencia y calificaciones, y devuelve `409` si hay entregas).
+
+Resultado: hoy un estudiante que olvide su contraseña **no puede recuperarla por
+ningún camino dentro de la plataforma**. La única salida es el Supabase Dashboard
+/ Admin API (`auth.admin.updateUserById({ password })`), fuera de la app.
+
+**Acción:** Para el arranque, documentar el reset manual vía Supabase Dashboard
+(spec-026, Fase 5). Después, diseñar un spec que añada `reset_student_password`
+a `/api/students/*` y a `students-mcp`, con las salvaguardas del dominio de
+admin (`STUDENTS_ADMIN_API_KEY`). Se resuelve por completo con
+**[[DEBT-001]]** + **[[DEBT-011]]** si se reconstruye la recuperación por correo.
+
+---
+
 ## DEBT-023 — `TeacherAttendanceControl`: parpadeo del grupo/código equivocado antes de restaurar la selección guardada
 
 **Origen:** `@reviewer` en la revisión de spec-031
@@ -142,7 +167,7 @@ beneficiará del mismo trabajo de tokens.
 
 ---
 
-## DEBT-014 — `NEXT_PUBLIC_SITE_URL` sin ningún uso en el código
+## DEBT-014 — `NEXT_PUBLIC_SITE_URL` sin ningún uso en el código — ✅ Resuelto documentalmente (spec-026, Fase 3)
 
 **Origen:** Detectado por `@reviewer` en la 3ª pasada de spec-027 (ajeno a su
 alcance)
@@ -159,9 +184,14 @@ recovery"* — ambos flujos inexistentes hoy.
 deja documentada como reservada para un futuro flujo de OAuth (spec-002 la
 tenía prevista, nunca implementada).
 
+**Resolución (2026-07-30):** decisión del usuario — se deja **reservada**.
+Se carga en Vercel Production con la URL de producción (Fase 4) por si un
+futuro flujo (OAuth, `metadataBase`) la requiere. Se corrigió la descripción
+en `.env.example` y `CLAUDE.md` para no mencionar flujos inexistentes.
+
 ---
 
-## DEBT-013 — `npm run lint` falla por `<a>` en vez de `<Link>` en AcademicCourseList
+## DEBT-013 — `npm run lint` falla por `<a>` en vez de `<Link>` en AcademicCourseList — ✅ Resuelto (spec-026, Fase 0)
 
 **Origen:** Detectado por `@reviewer` durante la revisión de spec-027 (ajeno a
 su alcance)
@@ -174,6 +204,10 @@ a `/admin/courses/new/` en vez de `<Link />` de `next/link`, lo que dispara
 
 **Acción:** Reemplazar el `<a>` por `<Link href="/admin/courses/new">` en ese
 archivo y verificar que `npm run lint` termina sin errores.
+
+**Resolución (2026-07-30):** reemplazado por `<Link>` de `next/link` en
+`components/admin/AcademicCourseList.tsx`. `npm run lint` termina con
+0 errores, 10 warnings.
 
 ---
 
@@ -384,7 +418,10 @@ si es una errata y corregir a solo `spec-006` cuando se retome esa área.
 
 ---
 
-## DEBT-006 — Temas opcionales de los 3 cursos sin lección asignada
+## DEBT-025 — Temas opcionales de los 3 cursos sin lección asignada
+
+> Renumerado de `DEBT-006` a `DEBT-025` el 2026-07-30: compartía número con
+> "`course.lessons` mezcla dos tipos de nodo", que conserva el `DEBT-006`.
 
 **Origen:** Reorganización de `content/cursos/` a partir del contenido real de
 `courses/01-estructura-de-datos`, `courses/02-analisis-de-algoritmos` y

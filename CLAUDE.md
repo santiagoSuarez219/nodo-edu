@@ -219,7 +219,7 @@ npm run lint
 | `NEXT_PUBLIC_SUPABASE_URL` | URL del proyecto Supabase |
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Clave pública de Supabase (nueva nomenclatura) |
 | `SUPABASE_SERVICE_ROLE_KEY` | Clave de servicio (solo server-side, nunca en cliente) |
-| `NEXT_PUBLIC_SITE_URL` | URL base del sitio (redirects OAuth y password recovery) |
+| `NEXT_PUBLIC_SITE_URL` | URL base del sitio. Reservada: sin uso actual en el código (no hay OAuth ni recuperación de contraseña implementados); se carga por si un flujo futuro la requiere (ver DEBT-014 en `docs/specs/backlog.md`) |
 | `STUDENTS_ADMIN_API_KEY` | Clave de servicio del dominio de estudiantes (`/api/students/*`, `students-mcp`) — permisos de admin, distinta de `QUESTION_BANK_API_KEY` |
 
 > ⚠️ Nunca escribas valores reales de variables de entorno en este archivo
