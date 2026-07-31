@@ -5,7 +5,46 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
-## DEBT-032 — Tokens semánticos pendientes en componentes de administración de curso
+## DEBT-033 — Políticas RLS legacy conviven con las del diseño de variantes en `assignments` y `assignment_questions`
+
+**Origen:** Detectado al resolver **[[DEBT-031]]** (2026-07-31), al comparar el
+esquema real de producción contra el que reconstruyen las migraciones
+**Prioridad:** Baja — hoy inocuo, pero es superficie de RLS que nadie diseñó a
+propósito y que puede volverse peligrosa si el modelo de datos cambia
+
+Producción arrastra **8 políticas RLS legacy** creadas fuera de git, del diseño
+original en que una fila de `assignments` era la evaluación completa y no una
+variante A/B/C:
+
+- `assignments`: `"assignments: select"`, `": insert teacher or admin"`,
+  `": update teacher or admin"`, `": delete teacher or admin"`
+- `assignment_questions`: las cuatro equivalentes
+
+DEBT-031 las incorporó a las migraciones
+(`20260717000000`, `20260717000001`) **para que el esquema reconstruido fuera
+fiel al real**, no porque se hayan validado. Conviven con las que sí declaran
+`20260718000003` y `20260718000005` (`inherits_group_select`,
+`inherits_variant_select`, `teacher_manages_own_*`).
+
+**El riesgo:** Postgres combina las políticas permisivas de un mismo comando con
+`OR`, así que la política legacy **amplía** el acceso más allá de lo que
+`20260718000005` pretendía acotar (su propio comentario dice que `assignments`
+debe heredar la visibilidad del grupo padre). Hoy no tiene efecto práctico
+porque las filas de variante tienen `academic_course_id` en `NULL` —desde que
+`20260718000004` relajó ese `NOT NULL`—, así que el `EXISTS` de la política
+legacy nunca da verdadero. Es decir: **la contención depende de un dato nulo,
+no de la política**. Si alguna vez se vuelve a poblar `academic_course_id` en
+las filas de variante, las políticas legacy se activan y exponen metadata de
+variantes (`variant_label`, `description`) y el contenido de
+`assignment_questions` a cualquier estudiante matriculado en el curso, saltándose
+la cascada del grupo.
+
+**Acción:** Auditar si las 8 políticas legacy siguen cumpliendo alguna función.
+Si no —lo más probable, dado que todo el acceso de sesión a estas tablas es de
+solo lectura y las escrituras van por `service_role` en
+`lib/assignments/service.ts`— eliminarlas con una migración nueva
+(`drop policy`), aplicada tanto en dev como en producción. Verificar antes que
+ningún flujo de estudiante o docente dependa de ellas.
 
 **Origen:** spec-032 (navegación admin de curso), hallazgo de `@reviewer`
 **Prioridad:** Baja — impacto visual/mantenibilidad, no funcional
@@ -87,6 +126,9 @@ constraints, índices, triggers y políticas RLS.
 La migración `20260717000000_local_only_missing_assignments_table.sql` de
 `mirp-lab` se eliminó: ya no hace falta, la copia de allá está sincronizada
 con el repo.
+
+Las 8 políticas RLS legacy se reprodujeron por fidelidad con el esquema real,
+sin validarlas — quedaron registradas aparte como **[[DEBT-033]]**.
 
 **Nota de mantenimiento (reconfirmada):** tras cada `supabase db reset` en
 `mirp-lab` hay que reaplicar a mano los `GRANT` de `anon`/`authenticated`/
