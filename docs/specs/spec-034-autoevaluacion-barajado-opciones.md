@@ -1,4 +1,4 @@
-# spec-034 — [IN PROGRESS] Autoevaluación de cierre: barajar el orden de las opciones por estudiante
+# spec-034 — [TESTING] Autoevaluación de cierre: barajar el orden de las opciones por estudiante
 
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.
