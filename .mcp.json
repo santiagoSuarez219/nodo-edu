@@ -15,6 +15,22 @@
     "students-mcp": {
       "command": "./mcp-servers/run-local-mcp.sh",
       "args": ["students-mcp"]
+    },
+    "question-bank-mcp-prod": {
+      "command": "./mcp-servers/run-prod-mcp.sh",
+      "args": ["question-bank-mcp"]
+    },
+    "assignment-mcp-prod": {
+      "command": "./mcp-servers/run-prod-mcp.sh",
+      "args": ["assignment-mcp"]
+    },
+    "attendance-mcp-prod": {
+      "command": "./mcp-servers/run-prod-mcp.sh",
+      "args": ["attendance-mcp"]
+    },
+    "students-mcp-prod": {
+      "command": "./mcp-servers/run-prod-mcp.sh",
+      "args": ["students-mcp"]
     }
   }
 }
