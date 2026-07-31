@@ -40,9 +40,10 @@ export async function getSelfAssessmentForLesson(
   lessonSlug: string
 ): Promise<SelfAssessmentQuestion[]> {
   const supabase = await createServerSupabaseClient();
-  const user = await getCurrentUser();
 
   try {
+    const user = await getCurrentUser();
+
     const { data, error } = await supabase
       .from('questions')
       .select(
@@ -70,8 +71,8 @@ export async function getSelfAssessmentForLesson(
           (c) => c.is_correct
         ).length;
 
-        // Barajar opciones con semilla determinista por estudiante y pregunta.
-        // Sin sesión, usa solo el ID de la pregunta (igual para todos).
+        // Sembrado por (usuario, pregunta): estable para ese estudiante en esa
+        // pregunta entre recargas y router.refresh(); distinto entre estudiantes.
         const seed = user ? `${user.id}:${row.id}` : row.id;
         const shuffledChoices = seededShuffle(row.choices || [], seed);
 
@@ -131,6 +132,7 @@ export async function getAnswerKeyForLesson(
       .eq('lesson_slug', lessonSlug)
       .eq('type', 'multiple_choice')
       .eq('is_published', true)
+      .order('order_index', { referencedTable: 'question_choices', ascending: true })
       .order('created_at', { ascending: true });
 
     if (error) throw error;

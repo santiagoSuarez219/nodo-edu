@@ -1,6 +1,7 @@
 import { createHash } from 'crypto';
 
-// Mulberry32 PRNG: determinista, fast, buen distribute. No cryptographic.
+// No es criptográfico: no importa acá, solo necesitamos que sea determinista
+// y esté bien distribuido, no impredecible frente a un atacante.
 function mulberry32(seed: number): () => number {
   let a = seed;
   return () => {
@@ -12,12 +13,10 @@ function mulberry32(seed: number): () => number {
 }
 
 export function seededShuffle<T>(items: T[], seed: string): T[] {
-  // Derivar número desde el hash del seed (primeros 8 chars hex → número)
   const hash = createHash('sha256').update(seed).digest('hex');
   const seedNumber = parseInt(hash.substring(0, 8), 16);
   const rng = mulberry32(seedNumber);
 
-  // Fisher-Yates: shuffle en una copia, sin mutar original
   const shuffled = [...items];
   for (let i = shuffled.length - 1; i > 0; i--) {
     const j = Math.floor(rng() * (i + 1));

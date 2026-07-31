@@ -127,9 +127,36 @@ lectura para un agente. `question-bank-mcp` sigue viendo y escribiendo
       correspondencia de orden queda superseded por este spec
 
 ### Fase 4 — Verificación final
-- [ ] `npm run lint` sin errores nuevos
-- [ ] `npm run build` en verde
-- [ ] Ejecutar la ronda manual de `docs/testing/test-034-autoevaluacion-barajado-opciones.md` (pendiente prueba manual)
+- [x] `npm run lint` sin errores nuevos
+- [x] `npm run build` en verde
+- [ ] Ejecutar la ronda manual de `docs/testing/test-034-autoevaluacion-barajado-opciones.md`
+
+### Revisión de `@reviewer` (2026-07-31)
+
+Veredicto: ✅ APROBADO (con 1 hallazgo Mayor recomendado antes del merge).
+
+Verificó empíricamente `seededShuffle` con 5000 semillas: determinista, puro
+(no muta el array de entrada), distribución uniforme sobre la posición de la
+opción correcta, las 24 permutaciones de 4 elementos aparecen, Fisher-Yates
+sin sesgo, `mulberry32` idéntico a la referencia canónica. Confirmó que
+`getAnswerKeyForLesson()` no fue tocada, que `submitSelfAssessment()` compara
+por ID (independiente del orden), y que no hay migraciones ni cambios a
+`order_index` en la base.
+
+- 🟠 Mayor — **corregido**: `getAnswerKeyForLesson()` no tenía
+  `.order('order_index', { referencedTable: 'question_choices' })`, así que el
+  "orden canónico" de la clave del docente (criterio 5) quedaba sostenido por
+  el comportamiento no garantizado de PostgREST, no por contrato — el mismo
+  argumento que motivó agregarlo en `getSelfAssessmentForLesson()` aplicaba
+  ahí también. Se agregó el mismo `.order()` a ambas consultas.
+- 🟡 Menores — **corregidos**: comentarios que narraban el código línea a línea
+  en `shuffle.ts` (violaban CLAUDE.md → solo comentar el *por qué*), y
+  `getCurrentUser()` fuera del `try/catch` de `getSelfAssessmentForLesson()`
+  (rompía la simetría del manejo de errores del archivo).
+- 🔵 Sugerencias — no aplicadas por quedar fuera de alcance: overflow de `a`
+  en `mulberry32` sin truncar a int32 (irrelevante a esta escala de uso;
+  anotado para si `seededShuffle` se reutiliza en DEBT-034 sobre secuencias
+  largas), espacio de semillas acotado a 2^32 (suficiente para este caso).
 
 ## Criterios de aceptación
 
