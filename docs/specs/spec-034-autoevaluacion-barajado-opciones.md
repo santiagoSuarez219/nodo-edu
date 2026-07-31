@@ -1,4 +1,4 @@
-# spec-034 — [NOT STARTED] Autoevaluación de cierre: barajar el orden de las opciones por estudiante
+# spec-034 — [IN PROGRESS] Autoevaluación de cierre: barajar el orden de las opciones por estudiante
 
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.
@@ -101,35 +101,35 @@ lectura para un agente. `question-bank-mcp` sigue viendo y escribiendo
 ## Fases de implementación
 
 ### Fase 1 — Helper de barajado determinista
-- [ ] Crear `lib/self-assessment/shuffle.ts` con `seededShuffle<T>(items: T[], seed: string): T[]`
-- [ ] Derivar la semilla numérica de un hash del string (`crypto.createHash('sha256')`),
+- [x] Crear `lib/self-assessment/shuffle.ts` con `seededShuffle<T>(items: T[], seed: string): T[]`
+- [x] Derivar la semilla numérica de un hash del string (`crypto.createHash('sha256')`),
       no de `Math.random()`
-- [ ] Implementar Fisher-Yates con un PRNG determinista (ej. mulberry32)
-- [ ] La función debe ser pura: misma entrada → misma salida, sin mutar el array original
+- [x] Implementar Fisher-Yates con un PRNG determinista (ej. mulberry32)
+- [x] La función debe ser pura: misma entrada → misma salida, sin mutar el array original
 
 ### Fase 2 — Aplicarlo en la consulta de autoevaluación
-- [ ] En `getSelfAssessmentForLesson()`, añadir
+- [x] En `getSelfAssessmentForLesson()`, añadir
       `.order('order_index', { referencedTable: 'question_choices' })` para fijar
       la entrada del barajado
-- [ ] Obtener el usuario actual con `getCurrentUser()`
-- [ ] Barajar las opciones de cada pregunta con semilla `${userId}:${questionId}`
-- [ ] Definir el fallback sin sesión: sembrar solo con `questionId` (determinista,
+- [x] Obtener el usuario actual con `getCurrentUser()`
+- [x] Barajar las opciones de cada pregunta con semilla `${userId}:${questionId}`
+- [x] Definir el fallback sin sesión: sembrar solo con `questionId` (determinista,
       igual para todos) — la sección no se renderiza para anónimos, pero la
       función es invocable y no debe romper
 
 ### Fase 3 — Verificación de no regresión
-- [ ] Confirmar que `submitSelfAssessment()` sigue calificando bien: compara
+- [x] Confirmar que `submitSelfAssessment()` sigue calificando bien: compara
       **IDs** de opción, no posiciones
       ([lib/self-assessment/index.ts:354-360](../../lib/self-assessment/index.ts#L354-L360)),
       así que es independiente del orden — verificar que sigue siendo cierto
-- [ ] Confirmar que `getAnswerKeyForLesson()` **no** baraja y mantiene orden canónico
-- [ ] Anotar en `spec-031-vista-docente-leccion.md` que su criterio de
+- [x] Confirmar que `getAnswerKeyForLesson()` **no** baraja y mantiene orden canónico
+- [x] Anotar en `spec-031-vista-docente-leccion.md` que su criterio de
       correspondencia de orden queda superseded por este spec
 
 ### Fase 4 — Verificación final
 - [ ] `npm run lint` sin errores nuevos
 - [ ] `npm run build` en verde
-- [ ] Ejecutar la ronda manual de `docs/testing/test-034-autoevaluacion-barajado-opciones.md`
+- [ ] Ejecutar la ronda manual de `docs/testing/test-034-autoevaluacion-barajado-opciones.md` (pendiente prueba manual)
 
 ## Criterios de aceptación
 
@@ -178,5 +178,5 @@ lectura para un agente. `question-bank-mcp` sigue viendo y escribiendo
 
 > Claude no escribe código de implementación hasta que esta sección esté marcada.
 
-- [ ] Paquete (spec + pruebas) aprobado por el usuario
-- **Fecha de aprobación:** {{pendiente}}
+- [x] Paquete (spec + pruebas) aprobado por el usuario
+- **Fecha de aprobación:** 2026-07-31 ("Implementa el spec34", instrucción explícita en esta sesión)
