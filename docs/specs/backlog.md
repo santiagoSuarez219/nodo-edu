@@ -5,6 +5,49 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+## DEBT-034 — `shuffle_choices` / `shuffle_questions` son flags decorativos: nada los implementa
+
+**Origen:** Detectado al investigar **[[DEBT-029]]** (2026-07-31)
+**Prioridad:** Media — la UI le promete al docente un comportamiento que no
+ocurre; no rompe nada, pero invalida una decisión pedagógica que él cree haber
+tomado
+
+`assignment_variant_groups` tiene las columnas `shuffle_questions` y
+`shuffle_choices` (`20260718000002_init_assignment_variant_groups.sql:12-13`).
+Están en el esquema, en los tipos (`lib/assignments/types.ts:18`), en los
+schemas de validación (`lib/assignments/schemas.ts:32`), se persisten
+(`lib/assignments/service.ts:47`), se exponen por API
+(`app/api/assignments/groups/[groupId]/route.ts:33`) y **se le muestran al
+docente** en el panel admin como "Sí"/"No"
+(`components/admin/AssignmentGroupDetail.tsx:109`).
+
+**Ningún código las lee para barajar nada.** El RPC que sirve las preguntas al
+estudiante ordena siempre por posición almacenada:
+`order by c.order_index` para las opciones y `order by aq.order_index` para las
+preguntas (`20260724000002_variant_question_content_rpcs.sql:93,104`), sin
+consultar los flags. Verificado además por grep: no hay ninguna función de
+barajado en `lib/assignments/` ni en `lib/submissions/`.
+
+Consecuencia: un docente que activa "barajar opciones" en una evaluación
+formal A/B/C cree haber mitigado el copieteo entre estudiantes contiguos, y no
+lo hizo. Es peor que no tener el flag, porque induce una falsa sensación de
+control.
+
+**Relación con [[DEBT-029]]:** ese ítem contrastaba la autoevaluación (sin
+barajado) con las evaluaciones formales, *"que sí tiene un flag
+`shuffle_choices`"* — dando a entender que ahí funcionaba. No funciona. El spec
+que resuelva DEBT-029 debería decidir si comparte el helper de barajado con
+este caso.
+
+**Acción:** Dos frentes:
+1. **Implementar** el barajado en el flujo de resolución (respetando los flags
+   por grupo), con orden estable por estudiante para que recargar no reordene
+   el examen a mitad de intento.
+2. O, si se decide no implementarlo por ahora, **quitar los flags de la UI
+   admin** para no seguir prometiendo algo que no ocurre.
+
+---
+
 ## DEBT-033 — Políticas RLS legacy conviven con las del diseño de variantes en `assignments` y `assignment_questions`
 
 **Origen:** Detectado al resolver **[[DEBT-031]]** (2026-07-31), al comparar el
@@ -232,6 +275,18 @@ guardadas (a diferencia de `assignment_variant_groups`, que sí tiene un flag
    `SelfAssessmentSection` (barajar en el cliente o servidor al momento de
    mostrar, sin alterar `order_index` en la base), para no depender de que
    cada autor de preguntas varíe el orden manualmente.
+
+**Spec asociado (frente 2):** `spec-034-autoevaluacion-barajado-opciones.md`
+— `[NOT STARTED]`. Baraja en el servidor de forma **determinista sembrada por
+`(user_id, question_id)`**: cada estudiante ve un orden distinto pero estable
+entre recargas, `router.refresh()` y reintentos (un `Math.random()` por request
+haría saltar las opciones mientras el estudiante lee su feedback).
+
+> **Corrección menor de la premisa (2026-07-31).** Este ítem contrastaba la
+> autoevaluación con las evaluaciones formales A/B/C, *"que sí tiene un flag
+> `shuffle_choices`"*. El flag existe, pero **ningún código lo implementa**:
+> ver **[[DEBT-034]]**. El contraste no era válido — ninguno de los dos flujos
+> baraja hoy.
 
 ---
 
@@ -517,22 +572,54 @@ archivo y verificar que `npm run lint` termina sin errores.
 
 ---
 
-## DEBT-012 — Rotación/expiración de `enrollment_code`
+## DEBT-012 — Expiración automática de `enrollment_code`
+
+> Retitulado el 2026-07-31: era "Rotación/expiración". **La rotación ya
+> existe** — ver "Corrección de la premisa".
 
 **Origen:** spec-027 (registro simplificado con código de curso)
-**Prioridad:** Alta — el código se convirtió en el único gate de registro
+**Prioridad:** ~~Alta~~ → **Media** — reclasificado el 2026-07-31: la mitad
+del problema que lo hacía Alta no existe
 
 Desde spec-027, el `enrollment_code` de `academic_courses` ya no es solo un
 dato de conveniencia para matricularse desde `/cuenta/cursos`: es el único
 mecanismo que evita que cualquier persona con correo inventado se registre en
-la plataforma (ver sección "Riesgos de seguridad" de spec-027). Hoy no existe
-forma de rotar o expirar un código sin romper la validación de matrículas ya
-hechas contra ese mismo valor, y el código se comparte en voz alta a grupos de
-~30 estudiantes, por lo que es fácil que circule más allá del grupo.
+la plataforma (ver sección "Riesgos de seguridad" de spec-027). El código se
+comparte en voz alta a grupos de ~30 estudiantes, por lo que es fácil que
+circule más allá del grupo.
 
-**Acción:** Diseñar un spec para rotación/expiración de `enrollment_code`
-(ej. código con vigencia temporal, o posibilidad de invalidar el anterior y
-generar uno nuevo sin afectar matrículas existentes).
+> **Corrección de la premisa (2026-07-31).** Este ítem afirmaba que *"no existe
+> forma de rotar o expirar un código sin romper la validación de matrículas ya
+> hechas contra ese mismo valor"*. **Las dos mitades son falsas:**
+>
+> 1. **La rotación ya existe y funciona.**
+>    `/admin/courses/[academicCourseId]/edit` renderiza `AcademicCourseForm`,
+>    que incluye un botón de generar código nuevo
+>    (`setValue("enrollment_code", generateCode())`,
+>    `components/admin/AcademicCourseForm.tsx:56`), y `updateCourseAction`
+>    (`lib/academic-courses/actions.ts:67`) lo persiste. El docente puede rotar
+>    un código filtrado hoy mismo, sin código nuevo.
+> 2. **Rotar no rompe ninguna matrícula.** `enrollments` referencia
+>    `academic_course_id` (FK uuid a `academic_courses`), **no** el código
+>    (`20260625000001_init_enrollments.sql:4`). El `enrollment_code` solo se usa
+>    para *resolver* el curso en el registro y en `/cuenta/cursos`; una vez
+>    creada la fila de matrícula es independiente del valor del código.
+>
+> Lo que sí falta —y es todo lo que queda de este ítem— es **expiración
+> automática**: un código filtrado sigue siendo válido indefinidamente hasta
+> que alguien se acuerde de rotarlo a mano.
+
+**Mitigación existente:** `lib/auth/rate-limit.ts` limita intentos de registro
+por IP (40) y por código (200) en ventanas de 10 min. Su propio comentario
+advierte que es "una mitigación mínima, no una defensa robusta": en Vercel
+(serverless, múltiples instancias) el conteo **no es global**, y la clave por IP
+depende de `x-forwarded-for`, que controla el cliente.
+
+**Acción:** Diseñar un spec para **expiración** de `enrollment_code` (ej.
+vigencia temporal configurable por el docente, o un `valid_until` en
+`academic_courses` que el gate de registro verifique). La rotación manual ya
+está cubierta; documentarla en la guía del docente puede ser suficiente como
+paso intermedio.
 
 ---
 
