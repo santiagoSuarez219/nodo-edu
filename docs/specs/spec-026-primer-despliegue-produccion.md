@@ -208,11 +208,11 @@ cambios de capacidad.
       previo a la numeración de specs, **no un spec**. Confirmado con el
       usuario 2026-07-30: se deja como está; no bloquea el despliegue.
 - [x] Confirmar rama activa `development` sincronizada con `origin/development`
-      — **hallazgo:** `development` local está **4 commits adelante** de
-      `origin/development` (sin pushear), además de los cambios sin commitear
-      de esta sesión (Fase 0). No bloquea continuar el spec, pero debe
-      resolverse (push a `origin/development`) antes de la Fase 6 (rama
-      `deploy/v1.0.0` se crea desde `development`).
+      — **hallazgo (2026-07-30):** `development` local estaba 4 commits
+      adelante de `origin/development` sin pushear. **Resuelto en Fase 6
+      (2026-07-31):** commiteados los cambios de las Fases 0-5
+      (`c8b8ad1`) y pusheado — `development` ahora sincronizada con
+      `origin/development`.
 - **Archivos impactados:** lectura de `docs/specs/` (sin edición).
 
 ### Fase 2 — Verificación local de build, lint y migraciones
