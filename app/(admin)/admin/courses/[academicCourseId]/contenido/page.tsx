@@ -7,7 +7,7 @@ export default async function CourseContentPage() {
   await requireAnyRole(["teacher", "admin"]);
 
   return (
-    <div className="flex flex-col gap-6 max-w-5xl">
+    <div className="flex flex-col gap-6 max-w-7xl">
       {/* Placeholder */}
       <div className="rounded-[var(--radius-base)] border border-dashed border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-8 py-16 text-center">
         <p className="text-sm font-semibold text-gray-900 dark:text-white mb-1">

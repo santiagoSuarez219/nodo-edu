@@ -18,7 +18,7 @@ export default async function EditCoursePage({ params }: Props) {
   if (!course) notFound();
 
   return (
-    <div className="flex flex-col gap-6 max-w-2xl">
+    <div className="flex flex-col gap-6 w-full max-w-7xl mx-auto">
       <AcademicCourseForm course={course} />
     </div>
   );

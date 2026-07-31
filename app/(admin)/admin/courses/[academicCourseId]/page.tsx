@@ -16,7 +16,7 @@ export default async function AcademicCourseDetailPage({ params }: Props) {
   const enrollments = await getEnrollmentsByAcademicCourse(academicCourseId);
 
   return (
-    <div className="flex flex-col gap-6 max-w-5xl">
+    <div className="flex flex-col gap-6 max-w-7xl">
       <EnrollmentTable
         enrollments={enrollments}
         academicCourseId={academicCourseId}

@@ -1,4 +1,4 @@
-# spec-032 — [TESTING] Navegación del docente: layout único de administración de curso
+# spec-032 — [DONE] Navegación del docente: layout único de administración de curso
 
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.
