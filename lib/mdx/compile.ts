@@ -7,6 +7,7 @@ import rehypePrettyCode, {
 } from "rehype-pretty-code";
 import type { ReactElement } from "react";
 import { mdxComponents } from "./components";
+import { rehypeMermaidBlock } from "./rehype-mermaid-block";
 
 const prettyCodeOptions: PrettyCodeOptions = {
   theme: {
@@ -26,6 +27,7 @@ export async function renderMdx(source: string): Promise<ReactElement> {
       mdxOptions: {
         remarkPlugins: [remarkGfm, remarkMath],
         rehypePlugins: [
+          rehypeMermaidBlock,
           [rehypePrettyCode, prettyCodeOptions],
           rehypeKatex,
         ],

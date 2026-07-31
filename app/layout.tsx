@@ -1,7 +1,13 @@
 import type { Metadata } from "next";
 import { JetBrains_Mono } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
+import { AnnouncementBar } from "@/components/navbar/AnnouncementBar";
 import { Navbar } from "@/components/navbar/Navbar";
+import { ThemeInit } from "@/components/ThemeInit";
+import { HeaderHeightObserver } from "@/components/HeaderHeightObserver";
+import { getCurrentProfile, getCurrentRoles } from "@/lib/auth/session";
+import { getCoursesByTeacher } from "@/lib/academic-courses";
 
 const jetbrainsMono = JetBrains_Mono({
   variable: "--font-jetbrains-mono",
@@ -18,33 +24,44 @@ export const metadata: Metadata = {
 const themeInitScript = `
 (function () {
   try {
-    var stored = localStorage.getItem('color-theme');
     var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    if (stored === 'dark' || (!stored && prefersDark)) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
+    document.documentElement.classList.toggle('dark', prefersDark);
   } catch (_) {}
 })();
 `;
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const profile = await getCurrentProfile();
+  const roles = await getCurrentRoles();
+
+  const isTeacher = roles.includes("teacher") || roles.includes("admin");
+  const teacherCourses = isTeacher && profile ? await getCoursesByTeacher(profile.id) : [];
+
   return (
     <html
       lang="es"
       className={`${jetbrainsMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
-      </head>
-      <body className="min-h-full flex flex-col pt-16 lg:pt-20 bg-white text-gray-900 dark:bg-gray-900 dark:text-white">
-        <Navbar />
+      <body suppressHydrationWarning className="relative min-h-full flex flex-col bg-white text-gray-900 dark:bg-gray-900 dark:text-white">
+        <div className="fixed inset-0 -z-10 h-screen w-screen [background:radial-gradient(125%_125%_at_50%_10%,var(--color-neutral-primary)_40%,var(--color-brand-medium)_100%)] dark:[background:radial-gradient(125%_125%_at_50%_10%,var(--color-gray-900)_40%,var(--color-brand-strong)_100%)]" />
+        <Script
+          id="theme-init"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{ __html: themeInitScript }}
+        />
+        <ThemeInit />
+        <HeaderHeightObserver />
+        {profile && (
+          <div data-site-header className="sticky top-0 left-0 w-full z-50">
+            <AnnouncementBar />
+            <Navbar profile={profile} roles={roles} teacherCourses={teacherCourses} />
+          </div>
+        )}
         {children}
       </body>
     </html>

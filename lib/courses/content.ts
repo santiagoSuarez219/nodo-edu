@@ -20,19 +20,23 @@ export interface LessonArticle {
 
 const CONTENT_ROOT = path.join(process.cwd(), "content", "cursos");
 
-const WELCOME_SLUG = "bienvenida-al-curso";
-
-export async function getCourseWelcome(
+export function resolveArticlePath(
   courseSlug: string,
-): Promise<LessonArticle | null> {
-  return getLessonArticle(courseSlug, WELCOME_SLUG);
+  articleSlug: string,
+  kind: "lesson" | "guide" = "lesson",
+): string {
+  if (kind === "guide") {
+    return path.join(CONTENT_ROOT, courseSlug, "guias", `${articleSlug}.md`);
+  }
+  return path.join(CONTENT_ROOT, courseSlug, `${articleSlug}.mdx`);
 }
 
 export async function getLessonArticle(
   courseSlug: string,
   articleSlug: string,
+  kind: "lesson" | "guide" = "lesson",
 ): Promise<LessonArticle | null> {
-  const filePath = path.join(CONTENT_ROOT, courseSlug, `${articleSlug}.mdx`);
+  const filePath = resolveArticlePath(courseSlug, articleSlug, kind);
   try {
     const file = await fs.readFile(filePath, "utf8");
     const { data, content } = matter(file);

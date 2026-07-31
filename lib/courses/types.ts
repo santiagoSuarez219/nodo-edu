@@ -20,9 +20,12 @@ export interface Lesson {
   topics: Topic[];
   durationMinutes?: number;
   publishedAt?: string;
+  // Discriminante: "lesson" (clase/artículo MDX) o "guide" (guía .md).
+  // Ausente ⇒ "lesson". Es `kind` quien decide cómo se resuelve `articleSlug`.
+  kind?: "lesson" | "guide";
   // Clave opaca al cuerpo del artículo. En Fase 1 corresponde al nombre del
-  // archivo MDX en content/cursos/<courseSlug>/. En Fase 2 será el ID del
-  // documento Payload. El frontend nunca asume su forma.
+  // archivo MDX (lecciones) o .md (guías) en content/cursos/<courseSlug>/.
+  // En Fase 2 será el ID del documento Payload. El frontend nunca asume su forma.
   articleSlug?: string;
 }
 

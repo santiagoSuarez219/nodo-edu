@@ -52,6 +52,16 @@
   --radius-lg: 16px;
 }
 
+/* Ocultar barra de scroll en todo el proyecto sin perder el scroll funcional
+   (rueda, teclado, touch, drag siguen operativos; solo se oculta el thumb visual) */
+* {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE y Edge legacy */
+}
+*::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Edge Chromium */
+}
+
 /* Shiki dual theme — rehype-pretty-code emite vars --shiki-light / --shiki-dark */
 .mdx-content code[data-theme],
 .mdx-content code[data-theme] span {
@@ -70,8 +80,54 @@
   background-color: var(--shiki-dark-bg);
 }
 
-/* Inline code (rehype-pretty-code marca con data-inline-code) */
-.mdx-content code[data-inline-code] {
-  padding: 0.15rem 0.3rem;
-  border-radius: var(--radius-xs);
+/* Numeración de líneas tipo editor — rehype-pretty-code emite cada línea como
+   <span data-line> dentro de un <code style="display:grid">, así que basta CSS:
+   un contador con ::before crea el canalón (gutter) sin tocar el pipeline MDX. */
+
+/* El padding vertical se mueve del <pre> al <code> para que el separador
+   (dibujado como fondo de <code>) llegue de borde a borde del contenedor. */
+.mdx-content pre[data-theme] {
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 0.75rem; /* hueco número → borde del contenedor */
 }
+.mdx-content pre[data-theme] code {
+  counter-reset: line;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  /* separador vertical continuo: 1px de alto completo en el borde del canalón.
+     Al vivir en <code> se desplaza junto a los números si hay scroll horizontal. */
+  background-image: linear-gradient(
+    var(--color-border-default),
+    var(--color-border-default)
+  );
+  background-repeat: no-repeat;
+  /* la línea cae justo tras el número (3ch) + el hueco número→línea (0.6rem) */
+  background-position: calc(3ch + 0.6rem) 0;
+  background-size: 1px 100%;
+}
+.mdx-content pre[data-theme] code > [data-line]::before {
+  counter-increment: line;
+  content: counter(line);
+  display: inline-block;
+  /* content-box: que width:3ch sea SOLO el ancho del número (Tailwind aplica
+     border-box global, que metería el padding dentro de los 3ch). */
+  box-sizing: content-box;
+  width: 3ch; /* alinea hasta 999 líneas sin desfasar el separador */
+  padding-right: 0.6rem; /* hueco número → línea vertical */
+  margin-right: 1rem; /* hueco línea vertical → código */
+  text-align: right;
+  color: var(--color-fg-disabled);
+  user-select: none;
+  -webkit-user-select: none;
+}
+:where(.dark) .mdx-content pre[data-theme] code {
+  background-image: linear-gradient(
+    var(--color-gray-700),
+    var(--color-gray-700)
+  );
+}
+:where(.dark) .mdx-content pre[data-theme] code > [data-line]::before {
+  color: var(--color-gray-500);
+}
+

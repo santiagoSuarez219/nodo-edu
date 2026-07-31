@@ -1,30 +1,44 @@
-export default function Home() {
+import type { Metadata } from "next";
+import { CourseGrid } from "@/components/home";
+import { LandingFooter } from "@/components/landing";
+import { FOOTER_LINKS } from "@/lib/landing";
+import { getAllCourses } from "@/lib/courses";
+import { InstructorFooter } from "@/components/course-presentations/InstructorFooter";
+import { TRANSVERSAL_INSTRUCTOR } from "@/lib/course-presentations/data/transversal";
+
+export const metadata: Metadata = {
+  title: "Mis cursos — nodo",
+  description:
+    "Accede a tus cursos de programación e inteligencia artificial en la plataforma nodo.",
+};
+
+export default async function Home() {
+  const courses = await getAllCourses();
+
   return (
-    <main className="flex flex-1 items-center justify-center bg-gray-50 dark:bg-gray-900 px-6 py-24">
-      <section className="w-full max-w-3xl rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-10 shadow-sm">
-        <p className="text-sm font-medium text-blue-700 dark:text-blue-400">
-          Educational Page
-        </p>
-        <h1 className="mt-2 text-3xl font-semibold tracking-tight text-gray-900 dark:text-white">
-          Plataforma educativa de programación e IA
-        </h1>
-        <p className="mt-4 text-base leading-7 text-gray-600 dark:text-gray-300">
-          Material académico para ingenieros de sistemas, electrónicos y de
-          ciencias de datos. Cursos, artículos y, más adelante, evaluaciones y
-          videos.
-        </p>
-        <div className="mt-8 flex flex-wrap gap-3">
-          <span className="inline-flex items-center rounded-md bg-blue-100 px-3 py-1 text-xs font-medium text-blue-800 dark:bg-blue-900 dark:text-blue-300">
-            Next.js 15
-          </span>
-          <span className="inline-flex items-center rounded-md bg-green-100 px-3 py-1 text-xs font-medium text-green-800 dark:bg-green-900 dark:text-green-300">
-            Tailwind CSS 4
-          </span>
-          <span className="inline-flex items-center rounded-md bg-purple-100 px-3 py-1 text-xs font-medium text-purple-800 dark:bg-purple-900 dark:text-purple-300">
-            JetBrains Mono
-          </span>
+    <main className="pt-6 lg:pt-16 w-full max-w-7xl mx-auto">
+      <div className="px-4 md:px-6 lg:px-18 pb-6 lg:pb-16">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">
+            Cursos
+          </h1>
+          <p className="mt-2 text-gray-600 dark:text-gray-300">
+            Explora los cursos disponibles y continúa tu aprendizaje.
+          </p>
         </div>
-      </section>
+
+        <div className="mt-8 mb-24">
+          <CourseGrid courses={courses} />
+        </div>
+      </div>
+
+
+
+      <InstructorFooter instructor={TRANSVERSAL_INSTRUCTOR} />
+
+      <div className="px-4 md:px-6 lg:px-18 py-8">
+        <LandingFooter links={FOOTER_LINKS} />
+      </div>
     </main>
   );
 }

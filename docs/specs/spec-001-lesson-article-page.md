@@ -1,4 +1,30 @@
-# Análisis Técnico: Página de Lección con Artículo MDX y Sidebar de Navegación
+# spec-001 — [DONE] Página de Lección con Artículo MDX y Sidebar de Navegación
+
+> **Nota de formato:** este spec se redactó antes de adoptarse la convención
+> actual de `docs/specs/` (secciones `Contexto` / `Alcance` / `Impacto en el
+> sistema` / `Evaluación MCP` / `Fases de implementación` / `Criterios de
+> aceptación` / `Pruebas asociadas`, ver `CLAUDE.md`). Se conserva su
+> estructura original de análisis técnico (Fases A–F en vez de Fase 1–N) para
+> no reescribir el registro histórico; solo se actualiza el encabezado y se
+> declara su estado real.
+>
+> **Estado:** `[DONE]` — la página `/<courseSlug>/<lessonSlug>`, el pipeline
+> MDX (`next-mdx-remote` + Shiki + KaTeX), la sidebar de navegación y la
+> paginación descritos aquí están implementados y en producción. La
+> funcionalidad se extendió después en **spec-009** (progreso/cierre de
+> lección), **spec-010** (asistencia), **spec-011** (autoevaluación) y
+> **spec-017** (rediseño del cierre y bloqueo por autoevaluación), que
+> añadieron secciones al mismo contenedor sin reescribir lo que este spec
+> estableció.
+>
+> **Evaluación MCP:** No aplica — expone únicamente contenido de lectura
+> pública (artículos MDX de curso); no hay acción ni dato de interés para un
+> agente que no esté ya cubierto por specs posteriores.
+>
+> **Pruebas:** no existe `docs/testing/test-001-*` — este spec predata el
+> requisito de pruebas manuales por spec. No se retrofitea aquí para no
+> fabricar un historial de pruebas que nunca se ejecutó; su cobertura de facto
+> quedó validada por los specs posteriores que dependen de esta página.
 
 ## Problema
 

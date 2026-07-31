@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function CourseNotFound() {
   return (
-    <main className="flex flex-1 items-center justify-center bg-gray-50 dark:bg-gray-900 px-6 py-24">
+    <main className="flex flex-1 items-center justify-center px-6 py-24">
       <section className="w-full max-w-xl rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-10 shadow-sm text-center">
         <p className="text-sm font-medium text-blue-700 dark:text-blue-400">
           404

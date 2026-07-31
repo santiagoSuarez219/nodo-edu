@@ -1,14 +1,26 @@
 import Link from "next/link";
 import type { Course } from "@/lib/courses/types";
 import { LessonSidebarItem } from "./LessonSidebarItem";
+import { CourseProgressBar } from "./CourseProgressBar";
+import { countProgressibleLessons, buildCourseOutline } from "@/lib/courses";
 
 interface LessonSidebarProps {
   course: Course;
   activeLessonSlug: string;
+  completedLessonSlugs?: Set<string>;
 }
 
-export function LessonSidebar({ course, activeLessonSlug }: LessonSidebarProps) {
-  const ordered = [...course.lessons].sort((a, b) => a.order - b.order);
+export function LessonSidebar({
+  course,
+  activeLessonSlug,
+  completedLessonSlugs = new Set(),
+}: LessonSidebarProps) {
+  const outline = buildCourseOutline(course);
+  const progressibleLessons = countProgressibleLessons(course);
+  const total = progressibleLessons.length;
+  const completed = progressibleLessons.filter((l) =>
+    completedLessonSlugs.has(l.slug)
+  ).length;
 
   return (
     <nav
@@ -26,14 +38,17 @@ export function LessonSidebar({ course, activeLessonSlug }: LessonSidebarProps) 
           {course.title}
         </Link>
       </div>
+      <CourseProgressBar completed={completed} total={total} />
       <ol className="list-none space-y-0.5">
-        {ordered.map((lesson) => (
+        {outline.map((node) => (
           <LessonSidebarItem
-            key={lesson.id}
+            key={node.id}
             courseSlug={course.slug}
-            lesson={lesson}
-            isActive={lesson.slug === activeLessonSlug}
-            defaultExpanded={lesson.slug === activeLessonSlug}
+            lesson={node}
+            classIndex={node.classIndex}
+            isActive={node.slug === activeLessonSlug}
+            defaultExpanded={node.slug === activeLessonSlug}
+            isCompleted={node.kind !== "guide" && completedLessonSlugs.has(node.slug)}
           />
         ))}
       </ol>

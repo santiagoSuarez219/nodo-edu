@@ -2,54 +2,67 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useParams } from "next/navigation";
+import type { Profile } from "@/lib/students/types";
+import type { AppRole } from "@/lib/auth/session";
+import type { AcademicCourse } from "@/lib/academic-courses/types";
+import { signOut } from "@/lib/auth/actions";
+import { UserMenu } from "./UserMenu";
+import { NavLinkList } from "./NavLinkList";
+import { CourseScopeSelect } from "./CourseScopeSelect";
+import { getStudentNavLinks, getTeacherNavLinks } from "./navLinks";
+import Image from "next/image";
 
-const sectionLinks = [
-  { href: "/estructuras-de-datos", label: "Estructuras de datos" },
-  { href: "/programacion-cientifica", label: "Programación científica" },
-  { href: "/analisis-de-algoritmos", label: "Análisis de algoritmos" },
-] as const;
-
-export const Navbar = () => {
+export const Navbar = ({
+  profile,
+  roles = [],
+  teacherCourses = [],
+}: {
+  profile: Profile;
+  roles?: AppRole[];
+  teacherCourses?: AcademicCourse[];
+}) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const params = useParams();
+
+  const isTeacher = roles.includes("teacher") || roles.includes("admin");
+  const academicCourseId = params.academicCourseId as string | undefined;
 
   const toggleMenu = () => setIsMenuOpen((p) => !p);
   const closeMenu = () => setIsMenuOpen(false);
 
+  const navLinks = isTeacher
+    ? getTeacherNavLinks(academicCourseId || null)
+    : getStudentNavLinks();
+
   return (
     <>
-      <nav className="fixed top-0 left-0 w-full z-50 bg-white/90 dark:bg-gray-900/90 backdrop-blur border-b border-gray-200 dark:border-gray-700 transition-colors duration-300">
-        <div className="flex items-center justify-between w-full mx-auto px-4 md:px-6 lg:px-8 py-3 lg:py-4">
+      <nav className="w-full bg-white/90 dark:bg-gray-900/90 backdrop-blur transition-colors duration-300">
+        <div className="flex lg:grid lg:grid-cols-[auto_1fr_auto] items-center justify-between w-full mx-auto px-4 md:px-6 lg:px-18 py-3 lg:py-4 lg:gap-6">
           <Link
             href="/"
-            className="flex gap-3 items-center text-gray-900 dark:text-white transition-colors duration-300"
-            aria-label="Inicio — Semillero SITAIM"
+            className="bg-white rounded-lg py-1 px-2"
+            aria-label="Inicio"
             onClick={closeMenu}
           >
-            <span className="text-lg lg:text-xl font-bold tracking-tight">
-              Semillero SITAIM
-            </span>
+            <Image
+              src="/logo.png"
+              width={150}
+              height={70}
+              alt="logo"
+              className="overflow-hidden"
+            />
           </Link>
 
-          <ul className="hidden lg:flex gap-7 text-sm tracking-tight font-semibold text-gray-600 dark:text-gray-300">
-            {sectionLinks.map((l) => (
-              <li key={l.href}>
-                <Link
-                  href={l.href}
-                  className="transition-colors hover:text-blue-700 dark:hover:text-blue-400"
-                >
-                  {l.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <div className="hidden lg:flex items-center justify-center gap-6">
+            <NavLinkList links={navLinks} variant="desktop" />
+            {isTeacher && <CourseScopeSelect courses={teacherCourses} />}
+          </div>
 
-          <div className="flex gap-3 items-center">
-            <Link
-              href="/login"
-              className="hidden lg:inline-flex items-center px-4 py-2 rounded-lg bg-blue-700 hover:bg-blue-800 dark:bg-blue-600 dark:hover:bg-blue-700 text-white text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-200 dark:focus-visible:ring-blue-700 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-gray-900"
-            >
-              Iniciar sesión
-            </Link>
+          <div className="flex gap-3 items-center justify-end">
+            <div className="hidden lg:block">
+              <UserMenu profile={profile} />
+            </div>
 
             <button
               type="button"
@@ -98,25 +111,44 @@ export const Navbar = () => {
         }`}
       >
         <ul className="flex flex-col gap-1 px-6 py-4 text-base tracking-tight border-t border-gray-200 dark:border-gray-700">
-          {sectionLinks.map((l) => (
-            <li key={l.href}>
-              <Link
-                href={l.href}
-                onClick={closeMenu}
-                className="block py-3 text-gray-700 dark:text-gray-300 hover:text-blue-700 dark:hover:text-blue-400 transition-colors"
-              >
-                {l.label}
-              </Link>
+          {isTeacher && (
+            <li className="mb-2 pb-2 border-b border-gray-200 dark:border-gray-700">
+              <CourseScopeSelect
+                courses={teacherCourses}
+                onNavigate={closeMenu}
+              />
             </li>
-          ))}
-          <li className="mt-2">
+          )}
+          <li>
+            <NavLinkList
+              links={navLinks}
+              variant="mobile"
+              onNavigate={closeMenu}
+            />
+          </li>
+          <li className="mt-2 border-t border-gray-100 dark:border-gray-700 pt-2">
+            <p className="px-1 py-1.5 text-xs font-semibold text-gray-500 dark:text-gray-400 truncate">
+              {profile.full_name}
+            </p>
+          </li>
+          <li>
             <Link
-              href="/login"
+              href="/cuenta"
               onClick={closeMenu}
-              className="block w-full rounded-lg bg-blue-700 hover:bg-blue-800 dark:bg-blue-600 dark:hover:bg-blue-700 py-3 text-center text-sm font-bold text-white transition-colors"
+              className="block py-3 text-gray-700 dark:text-gray-300 hover:text-blue-700 dark:hover:text-blue-400 transition-colors"
             >
-              Iniciar sesión
+              Mi cuenta
             </Link>
+          </li>
+          <li>
+            <form action={signOut}>
+              <button
+                type="submit"
+                className="block w-full text-left py-3 text-gray-700 dark:text-gray-300 hover:text-blue-700 dark:hover:text-blue-400 transition-colors"
+              >
+                Cerrar sesión
+              </button>
+            </form>
           </li>
         </ul>
       </div>
