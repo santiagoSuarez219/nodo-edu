@@ -1,4 +1,4 @@
-# spec-032 — [IN PROGRESS] Navegación del docente: layout único de administración de curso
+# spec-032 — [TESTING] Navegación del docente: layout único de administración de curso
 
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.
@@ -127,67 +127,67 @@ En particular, **`attendance-mcp` no se ve afectado** por eliminar la página
 ## Fases de implementación
 
 ### Fase 1 — Navbar del docente sin scope de curso
-- [ ] Simplificar `getTeacherNavLinks()` en `components/navbar/navLinks.ts`:
+- [x] Simplificar `getTeacherNavLinks()` en `components/navbar/navLinks.ts`:
       sin parámetro, sin `disabled`, sin `title`; devuelve "Mis cursos" y
       "Grupo de Investigación".
-- [ ] En `components/navbar/Navbar.tsx`: eliminar el render de `CourseScopeSelect`
+- [x] En `components/navbar/Navbar.tsx`: eliminar el render de `CourseScopeSelect`
       en escritorio y en el menú móvil, la prop `teacherCourses` y el `useParams()`
       si queda sin uso.
-- [ ] En `app/layout.tsx`: eliminar la llamada a `getCoursesByTeacher()` y la prop
+- [x] En `app/layout.tsx`: eliminar la llamada a `getCoursesByTeacher()` y la prop
       `teacherCourses`; retirar el import si queda huérfano.
-- [ ] Eliminar `components/navbar/CourseScopeSelect.tsx` (confirmar antes de borrar).
-- [ ] Verificar que el navbar del estudiante no cambió.
+- [x] Eliminar `components/navbar/CourseScopeSelect.tsx` (confirmar antes de borrar).
+- [x] Verificar que el navbar del estudiante no cambió.
 
 ### Fase 2 — Tabla de cursos con filas clickeables
-- [ ] En `components/admin/AcademicCourseList.tsx`: eliminar la columna "Acciones"
+- [x] En `components/admin/AcademicCourseList.tsx`: eliminar la columna "Acciones"
       del `<thead>` y del `<tbody>`, y el import de `CourseActionsDropdown`.
-- [ ] Hacer la fila navegable a `/admin/courses/<id>` con *stretched link*:
+- [x] Hacer la fila navegable a `/admin/courses/<id>` con *stretched link*:
       `<tr className="relative …">` + `<Link className="… after:absolute after:inset-0">`
       envolviendo el nombre del curso. Mantiene HTML válido, foco por teclado y
       un solo destino accesible por fila.
-- [ ] Añadir affordance visual de fila clickeable (`hover:bg-…`, `cursor-pointer`)
+- [x] Añadir affordance visual de fila clickeable (`hover:bg-…`, `cursor-pointer`)
       según los tokens de `DESIGN.md`.
-- [ ] Eliminar `components/admin/CourseActionsDropdown.tsx` (confirmar antes de borrar).
+- [x] Eliminar `components/admin/CourseActionsDropdown.tsx` (confirmar antes de borrar).
 
 ### Fase 3 — Layout persistente de administración de curso
-- [ ] Crear `components/admin/CourseHeader.tsx` (server component de presentación)
+- [x] Crear `components/admin/CourseHeader.tsx` (server component de presentación)
       con el contenido de cabecera que hoy vive en `[academicCourseId]/page.tsx`
       (líneas 41-92): breadcrumb "Mis cursos", nombre, badge de estado, código,
       horario, código de matrícula. Añadir los botones "Contenido",
       "Presentación" y "Editar curso".
-- [ ] Crear `components/admin/CourseTabs.tsx` (`"use client"`): tabs Estudiantes ·
+- [x] Crear `components/admin/CourseTabs.tsx` (`"use client"`): tabs Estudiantes ·
       Calificaciones · Evaluaciones; activo por `usePathname()` — "Estudiantes"
       con coincidencia exacta de `/admin/courses/<id>`, los otros dos por prefijo
       de su segmento. Marcar el activo con `aria-current="page"`.
-- [ ] Crear `app/(admin)/admin/courses/[academicCourseId]/layout.tsx`:
+- [x] Crear `app/(admin)/admin/courses/[academicCourseId]/layout.tsx`:
       `requireAnyRole(["teacher","admin"])`, `getAcademicCourseById()`,
       `notFound()` si no existe, y render de `CourseHeader` + `CourseTabs` +
       `{children}` dentro del contenedor de ancho actual.
 
 ### Fase 4 — Limpieza de las páginas hijas
-- [ ] `page.tsx`: eliminar breadcrumb, cabecera, tabs y el `<Link>` vacío hacia
+- [x] `page.tsx`: eliminar breadcrumb, cabecera, tabs y el `<Link>` vacío hacia
       `presentacion`; dejar solo `EnrollmentTable`. Quitar los imports y las
       constantes (`DAY_LABELS`, formateo de horario) que migraron a `CourseHeader`,
       y la carga del curso si ya no se usa.
-- [ ] `grades/page.tsx`: eliminar breadcrumb, bloque de título y tabs propios.
-- [ ] `assignments/page.tsx`: eliminar el botón "Volver".
-- [ ] `contenido/page.tsx`: eliminar breadcrumb y la barra de tabs propia (que aún
+- [x] `grades/page.tsx`: eliminar breadcrumb, bloque de título y tabs propios.
+- [x] `assignments/page.tsx`: eliminar el botón "Volver".
+- [x] `contenido/page.tsx`: eliminar breadcrumb y la barra de tabs propia (que aún
       apunta a `attendance`).
-- [ ] `presentacion/page.tsx` y `edit/page.tsx`: eliminar el breadcrumb.
-- [ ] Conservar el `export const metadata` propio de cada página.
+- [x] `presentacion/page.tsx` y `edit/page.tsx`: eliminar el breadcrumb.
+- [x] Conservar el `export const metadata` propio de cada página.
 
 ### Fase 5 — Eliminar la página de asistencia del panel
-- [ ] Eliminar `app/(admin)/admin/courses/[academicCourseId]/attendance/page.tsx`
+- [x] Eliminar `app/(admin)/admin/courses/[academicCourseId]/attendance/page.tsx`
       (confirmar antes de borrar).
-- [ ] Verificar con `grep` que no queda ningún enlace a `/attendance` bajo `/admin`
+- [x] Verificar con `grep` que no queda ningún enlace a `/attendance` bajo `/admin`
       en `app/`, `components/` ni `docs/mcps/`.
-- [ ] Confirmar que `components/admin/AdminAttendancePanel.tsx` y `lib/attendance/`
+- [x] Confirmar que `components/admin/AdminAttendancePanel.tsx` y `lib/attendance/`
       siguen intactos y que el panel docente de la lección (spec-031) no se rompe.
 
 ### Fase 6 — Verificación
-- [ ] `npm run lint` sin errores.
-- [ ] `npm run build` sin errores (detecta imports rotos por los archivos eliminados).
-- [ ] Cambiar el estado del spec a `[TESTING]` y recorrer `docs/testing/test-032-navegacion-admin-curso.md`.
+- [x] `npm run lint` sin errores.
+- [x] `npm run build` sin errores (detecta imports rotos por los archivos eliminados).
+- [x] Cambiar el estado del spec a `[TESTING]` y recorrer `docs/testing/test-032-navegacion-admin-curso.md`.
 
 ## Criterios de aceptación
 
