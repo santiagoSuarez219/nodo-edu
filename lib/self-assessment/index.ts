@@ -28,6 +28,12 @@ type QuestionRow = {
   }>;
 };
 
+type AttemptRow = {
+  question_count: number;
+  correct_count: number;
+  submitted_at: string;
+};
+
 export async function getSelfAssessmentForLesson(
   courseSlug: string,
   lessonSlug: string
@@ -271,7 +277,9 @@ export async function getSelfAssessmentStatus(
       .eq('course_slug', courseSlug)
       .eq('lesson_slug', lessonSlug)
       .order('submitted_at', { ascending: false })
-      .limit(1);
+      .order('id', { ascending: false })
+      .limit(1)
+      .returns<AttemptRow[]>();
 
     if (aError) throw aError;
     const attempt = attempts?.[0];

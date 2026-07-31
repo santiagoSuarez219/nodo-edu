@@ -15,7 +15,7 @@ interface SelfAssessmentSectionProps {
   lessonSlug: string;
   questions: SelfAssessmentQuestion[];
   onRetryingChange?: (isRetrying: boolean) => void;
-  lastAttempt?: SelfAssessmentAttemptSummary | null;
+  lastAttempt: SelfAssessmentAttemptSummary | null;
 }
 
 export function SelfAssessmentSection({
@@ -104,6 +104,12 @@ export function SelfAssessmentSection({
   const missingCount = questions.length - answeredCount;
   const canSubmit = missingCount === 0;
 
+  // Post-recarga: hay un intento previo pero todavía no se respondió en esta
+  // sesión (sin feedback en memoria) — se muestra el resumen agregado en vez
+  // del formulario, para no dejar preguntas respondibles sin botón de envío.
+  const showAttemptSummary =
+    hasSubmitted && Object.keys(feedbackByQuestion).length === 0 && !!lastAttempt;
+
   return (
     <section className="mt-8 border-t border-gray-200 dark:border-gray-700 pt-8">
       <div className="border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 overflow-hidden">
@@ -116,7 +122,35 @@ export function SelfAssessmentSection({
 
         {/* Contenido */}
         <form onSubmit={handleSubmit(onSubmit)} className="divide-y divide-gray-200 dark:divide-gray-700">
-          {questions.map((question, index) => {
+          {showAttemptSummary && (
+            <div className="px-6 py-6 flex items-center gap-2 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700/50 text-green-800 dark:text-green-300 text-sm">
+              <svg
+                className="w-4 h-4 shrink-0"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                aria-hidden="true"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              <div>
+                <p className="font-medium">Ya completaste esta autoevaluación</p>
+                <p className="text-xs opacity-90">
+                  {lastAttempt.correctCount}/{lastAttempt.questionCount} correctas
+                  {' · '}
+                  {new Date(lastAttempt.submittedAt).toLocaleString('es-CO', {
+                    dateStyle: 'medium',
+                    timeStyle: 'short',
+                  })}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {!showAttemptSummary && questions.map((question, index) => {
             const feedback = feedbackByQuestion[question.id];
             const isAnswered = !!feedback;
 
@@ -288,28 +322,7 @@ export function SelfAssessmentSection({
 
             {hasSubmitted ? (
               <div className="flex flex-col gap-2">
-                {Object.keys(feedbackByQuestion).length === 0 && lastAttempt ? (
-                  <div className="flex items-center gap-2 p-3 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700/50 text-green-800 dark:text-green-300 text-sm">
-                    <svg
-                      className="w-4 h-4 shrink-0"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                      aria-hidden="true"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                    <div>
-                      <p className="font-medium">Ya completaste esta autoevaluación</p>
-                      <p className="text-xs opacity-90">
-                        {lastAttempt.correctCount}/{lastAttempt.questionCount} correctas
-                      </p>
-                    </div>
-                  </div>
-                ) : (
+                {!showAttemptSummary && (
                   <div className="flex items-center gap-2 p-3 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700/50 text-green-800 dark:text-green-300 text-sm">
                     <svg
                       className="w-4 h-4 shrink-0"
