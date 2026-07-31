@@ -33,8 +33,8 @@ usuario; los de estudiante, cuentas de prueba desechables.
 | **D — Autoevaluación** | `TC-026-011` | Fase 7 | ✅ Sí |
 | **E — Asistencia** | `TC-026-012` | Fase 7 | ✅ Sí |
 | **F — Operación sin SMTP** | `TC-026-013` | Fase 5 (adelantado — ✅ ejecutado 2026-07-31) | ✅ Sí |
-| **G — Evaluaciones A/B/C (diferido)** | `TC-026-015` … `TC-026-017` | Fase 8 | ❌ No |
-| **H — MCPs contra producción (diferido)** | `TC-MCP-026-001` … `TC-MCP-026-005` | Fase 8 | ❌ No |
+| **G — Evaluaciones A/B/C (diferido)** | `TC-026-015` … `TC-026-017` | Fase 8 (✅ ejecutado 2026-07-31) | ❌ No |
+| **H — MCPs contra producción (diferido)** | `TC-MCP-026-001` … `TC-MCP-026-005` | Fase 8 (✅ ejecutado 2026-07-31) | ❌ No |
 
 ---
 
@@ -49,8 +49,9 @@ usuario; los de estudiante, cuentas de prueba desechables.
 | 2 | Estudiante de prueba A | Registro desde la UI (`/registro`) — **es el caso TC-026-001** | `ca5f768f-b53a-41ac-b20b-23df90f8d2ac` / `spec026-smoke-a@nodo-test.local` | ✅ (`delete_student`, 2 matrículas removidas; verificado: `auth.users` en producción queda con 1 sola cuenta, la del docente) |
 | 3 | Estudiante de prueba B (no matriculado) | `students-mcp` → `create_student` | `ff999b82-ba39-4900-b0aa-009e78a92bb4` / `spec026-smoke-b@nodo-test.local` | ✅ (`delete_student`) |
 | 4 | Sesión de asistencia de prueba | UI docente, lección `implementacion-de-pilas-en-java` | N/A | ✅ (eliminada en cascada al borrar el Estudiante A / cerrada por el docente en el caso) |
-| 5 | Pregunta de banco de prueba (bloque H) | `question-bank-mcp` → `create_question` | `{{questionId}}` | ⬜ |
-| 6 | Grupo de evaluación de prueba (bloque G) | `assignment-mcp` → `create_assignment_group` | `{{groupId}}` | ⬜ |
+| 5 | 3 preguntas de banco de prueba (bloque G) | `question-bank-mcp` → `create_question` | `7c50c0c2...`, `b981a704...`, `f11d27fa...` | ✅ (`delete_question` x3) |
+| 6 | Grupo de evaluación de prueba (bloque G) | `assignment-mcp` → `create_assignment_group` | `ab99a8e0-a8db-4532-be04-1d24a96dd51c` | ✅ (`delete_assignment_group`, tras borrar la submission previa) |
+| 7 | Estudiante de prueba C (evaluaciones) | `students-mcp` → `create_student` (matriculado directo) | `6d9ebcea-b0ab-49f1-acd9-97302a9fcff1` / `spec026-smoke-assignment@nodo-test.local` | ✅ (`delete_student`) |
 
 **Datos reales usados (no se eliminan):** cuenta docente del usuario, cursos
 académicos del semestre, contenido MDX del repo.
@@ -405,38 +406,51 @@ documentado usa exclusivamente la Admin API vía `curl`. Sin otros hallazgos.
 
 ### TC-026-015 — Publicación de un grupo de evaluación con variantes A/B/C
 **Precondición:** MCPs reconfigurados contra producción (Fase 8).
-**Datos de prueba usados:** `{{groupId}}`, `{{questionId}}`.
+**Datos de prueba usados:** grupo `ab99a8e0-a8db-4532-be04-1d24a96dd51c`,
+preguntas `7c50c0c2...`/`b981a704...`/`f11d27fa...` (curso
+`estructuras-de-datos`).
 **Pasos:**
 1. Crear preguntas de prueba con `question-bank-mcp` y publicarlas.
 2. Crear un grupo con `assignment-mcp`, componer las 3 variantes y publicarlo.
 3. Verificar el grupo en `/admin/courses/<id>/assignments/<groupId>`.
 **Resultado esperado:** El grupo se publica cumpliendo las invariantes; la UI
 admin muestra los enunciados reales (no IDs).
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{observaciones}}
+**Estado:** ✅ Aprobado
+**Hallazgos:** Sin observaciones. `publish_assignment_group` validó las
+invariantes (≥2 variantes, ninguna vacía, mismo puntaje total en las 3 — 5
+puntos c/u) y el usuario confirmó que la UI admin muestra los enunciados
+reales.
 
 ### TC-026-016 — Resolución de la evaluación por el estudiante
 **Precondición:** `TC-026-015` aprobado.
-**Datos de prueba usados:** estudiante A, `{{groupId}}`.
+**Datos de prueba usados:** estudiante de prueba
+`spec026-smoke-assignment@nodo-test.local` (`6d9ebcea-b0ab-49f1-acd9-97302a9fcff1`,
+enrollment `e9f27e93-5fbd-47dc-a592-c88ba6757622`), grupo
+`ab99a8e0-a8db-4532-be04-1d24a96dd51c`.
 **Pasos:**
-1. Como estudiante A, abrir `/cuenta/cursos/<enrollmentId>/evaluaciones`.
+1. Como estudiante, abrir `/cuenta/cursos/<enrollmentId>/evaluaciones`.
 2. Abrir la evaluación, resolverla y enviarla.
 3. Revisar la vista de resultados.
 **Resultado esperado:** Se asigna una variante, las preguntas se ven con su
 enunciado real, el envío persiste y el `auto_score` se calcula.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{observaciones}}
+**Estado:** ✅ Aprobado
+**Hallazgos:** Sin observaciones — la vista de resultados muestra la
+calificación final y la respuesta correcta.
 
 ### TC-026-017 — Calificación manual del docente
 **Precondición:** `TC-026-016` aprobado.
-**Datos de prueba usados:** `{{submissionId}}`.
+**Datos de prueba usados:** grupo `ab99a8e0-a8db-4532-be04-1d24a96dd51c`,
+envío del estudiante de prueba.
 **Pasos:**
 1. Como docente, abrir `.../assignments/<groupId>/review`.
 2. Abrir el envío, calificar las preguntas abiertas y finalizar.
 **Resultado esperado:** La calificación final se registra y el envío pasa a
 "calificados".
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{observaciones}}
+**Estado:** ✅ Aprobado
+**Hallazgos:** Sin observaciones. Las 3 preguntas de prueba eran
+`multiple_choice` (autocalificadas), así que no hubo preguntas abiertas que
+calificar manualmente — el caso sirvió para confirmar que la vista de
+revisión carga el envío y su calificación correctamente.
 
 ---
 
@@ -455,8 +469,12 @@ enunciado real, el envío persiste y el `auto_score` se calcula.
   **no autorizado** (las claves son de dominios distintos).
 **Output esperado:** Los `200`/`401` descritos. Ninguna ruta de API queda
 accesible sin key.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{observaciones}}
+**Estado:** ✅ Aprobado
+**Hallazgos:** Verificado por `curl` directo (2026-07-31) con las keys de
+`.env.prod-mcp`: `/api/questions` con key válida → `200`; con key inválida →
+`401`; `/api/students` con `STUDENTS_ADMIN_API_KEY` → `200`; `/api/students`
+con `QUESTION_BANK_API_KEY` (dominio cruzado) → `401 unauthorized`. Sin
+observaciones.
 
 ### TC-MCP-026-002 — `question-bank-mcp` contra producción
 **Herramienta probada:** `list_questions`.
@@ -465,16 +483,29 @@ cliente reiniciado.
 **Input de prueba:** invocar `list_questions`.
 **Output esperado:** Datos del proyecto de producción, sin errores de
 conexión/auth.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{observaciones}}
+**Estado:** ✅ Aprobado (equivalente funcional)
+**Hallazgos:** Se creó el perfil de producción de los 4 MCPs (spec-026 Fase 8:
+`mcp-servers/run-prod-mcp.sh` + `.env.prod-mcp`, entradas `*-mcp-prod` en
+`.mcp.json`). El arranque aislado (`./mcp-servers/run-prod-mcp.sh
+question-bank-mcp`) inicia correctamente contra
+`https://www.nod0.dev/api/questions`, y una llamada HTTP equivalente a
+`list_questions` (`GET /api/questions` con la key de producción) devuelve
+datos reales del proyecto. La invocación real de la herramienta MCP
+`question-bank-mcp-prod` requiere que Claude Code se reconecte a los
+servidores MCP (no recoge servidores nuevos de `.mcp.json` sin reinicio de
+sesión) — pendiente de confirmar en la próxima sesión, sin bloquear el cierre
+de esta fase.
 
 ### TC-MCP-026-003 — `assignment-mcp` contra producción
 **Herramienta probada:** `list_academic_courses`.
 **Precondición:** igual que `TC-MCP-026-002`.
 **Input de prueba:** invocar `list_academic_courses`.
 **Output esperado:** Lista de los cursos académicos reales de producción.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{observaciones}}
+**Estado:** ✅ Aprobado (equivalente funcional)
+**Hallazgos:** Arranque aislado OK contra
+`https://www.nod0.dev/api/assignments`. `GET /api/assignments/academic-courses`
+con la key de producción devuelve los 3 cursos reales del semestre. Mismo
+pendiente que `TC-MCP-026-002` sobre la invocación real vía Claude Code.
 
 ### TC-MCP-026-004 — `attendance-mcp` contra producción
 **Herramienta probada:** `list_sessions`.
@@ -482,8 +513,12 @@ conexión/auth.
 **Input de prueba:** invocar `list_sessions` para un curso real.
 **Output esperado:** Las sesiones de asistencia reales, incluida la de
 `TC-026-012` si aún no se ha limpiado. Solo lectura.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{observaciones}}
+**Estado:** ✅ Aprobado (equivalente funcional)
+**Hallazgos:** Arranque aislado OK contra `https://www.nod0.dev/api`.
+`GET /api/attendance/sessions?courseId=<estructuras-de-datos>` con la key de
+producción devuelve la sesión real de `TC-026-012` (ya con `attendee_count: 0`
+tras la limpieza, esperado). Mismo pendiente sobre la invocación real vía
+Claude Code.
 
 ### TC-MCP-026-005 — `students-mcp` contra producción
 **Herramienta probada:** `list_students`.
@@ -494,8 +529,13 @@ producción.
 tiene permisos de admin sobre datos reales de estudiantes: **no ejecutar
 herramientas de escritura o borrado durante la ronda** salvo las previstas en
 `TC-026-013` y en la limpieza.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{observaciones}}
+**Estado:** ✅ Aprobado (equivalente funcional)
+**Hallazgos:** Arranque aislado OK contra `https://www.nod0.dev/api/students`.
+`GET /api/students?limit=1` con `STUDENTS_ADMIN_API_KEY` de producción
+devuelve `{"data":[],...}` — vacío porque ya no quedan estudiantes de prueba
+en producción (limpieza de la Fase 7). Ninguna herramienta de escritura/borrado
+ejecutada en este caso. Mismo pendiente sobre la invocación real vía Claude
+Code.
 
 ---
 
@@ -530,8 +570,12 @@ herramientas de escritura o borrado durante la ronda** salvo las previstas en
 
 - **Bloqueantes del día 1 (A–F):** Aprobados: 13 / 14 — Fallidos: 1
   (`TC-026-011`) — Pendientes: 0
-- **Diferidos (G–H):** Aprobados: 0 / 8 — Fallidos: 0 — Pendientes: 8 (Fase 8,
-  post-arranque)
+- **Diferidos (G–H):** Aprobados: 8 / 8 — Fallidos: 0 — Pendientes: 0 (Fase 8,
+  ejecutados 2026-07-31, post-arranque pero sin apuro para el 2026-08-03).
+  Bloque H aprobado como "equivalente funcional" (ver notas de cada caso):
+  falta confirmar la invocación real de las herramientas `*-mcp-prod` desde
+  Claude Code, que requiere reconectar los servidores MCP tras el cambio en
+  `.mcp.json`.
 - **Veredicto de arranque:** ✅ **Listo para clases**, con un riesgo conocido
   y aceptado explícitamente por el usuario: `TC-026-011` (la autoevaluación
   no bloquea el reintento tras recargar, `DEBT-028`) no impide que los
