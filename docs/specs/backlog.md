@@ -31,7 +31,7 @@ la pena unificar el `max-w-*` en el layout tras la ronda de pruebas manuales
 
 ---
 
-## DEBT-031 — El historial de migraciones no reconstruye producción desde cero
+## DEBT-031 — El historial de migraciones no reconstruye producción desde cero — ✅ Resuelto (2026-07-31)
 
 **Origen:** Detectado al armar el entorno de desarrollo local en `mirp-lab`
 (2026-07-31, post-spec-026) — `supabase start` con las migraciones del repo
@@ -62,13 +62,37 @@ con la estructura real de `assignments` tomada del schema de producción. No
 se commiteó al repo principal — ver decisión del usuario de no tocar el
 historial de migraciones de producción sin evaluarlo aparte.
 
-**Acción:** Decidir junto con el usuario si conviene: (a) agregar esa misma
-migración (con timestamp anterior a `20260718000002`) al repo principal y
-usar `supabase migration repair` para marcarla como ya aplicada en
-producción sin re-ejecutarla ahí, cerrando el hueco de forma permanente; o
-(b) dejarlo documentado como limitación conocida. Mientras tanto, cualquier
-reset de la base local en `mirp-lab` necesita esa migración local presente
-para no fallar en el mismo punto.
+**Resolución (2026-07-31, opción (a)):** se extrajo el DDL real de producción
+con `supabase db dump --linked --schema public` y se commitearon dos
+migraciones nuevas, ambas con timestamp anterior a `20260718000002`:
+
+- `20260717000000_init_assignments_legacy_table.sql`
+- `20260717000001_init_assignment_questions_legacy_table.sql`
+
+Al hacerlo se descubrió que **`assignment_questions` tenía el mismo problema
+que `assignments`**, no detectado cuando se redactó este ítem: también se creó
+fuera de git, por lo que el `create table if not exists` de `20260718000002`
+nunca se ejecutó en producción y el esquema real conserva nombres legacy
+(constraint `assignment_questions_unique` en vez de `unique_question_per_variant`,
+más un índice legacy `assignment_questions_assignment_id_order_index_idx`
+*adicional* al que crea esa migración). Ambas tablas arrastraban además 4
+políticas RLS legacy cada una (`"<tabla>: select/insert/update/delete teacher
+or admin"`) que ninguna migración declaraba.
+
+**Verificación:** `supabase db reset` desde cero en `mirp-lab` seguido de
+`supabase db dump --local`, comparado línea a línea contra el dump de
+producción → **conjunto de sentencias idéntico**, incluidos nombres de
+constraints, índices, triggers y políticas RLS.
+
+La migración `20260717000000_local_only_missing_assignments_table.sql` de
+`mirp-lab` se eliminó: ya no hace falta, la copia de allá está sincronizada
+con el repo.
+
+**Nota de mantenimiento (reconfirmada):** tras cada `supabase db reset` en
+`mirp-lab` hay que reaplicar a mano los `GRANT` de `anon`/`authenticated`/
+`service_role` sobre `public` (ver CLAUDE.md → "Base de datos"). Es el único
+punto en que el esquema local diverge del real, y es un quirk del CLI local,
+no del historial de migraciones.
 
 ---
 
