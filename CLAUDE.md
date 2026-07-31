@@ -292,9 +292,15 @@ npm run lint
   Local y Remote deben coincidir) o una consulta REST contra
   `NEXT_PUBLIC_SUPABASE_URL` de `.env.prod`.
 - Row Level Security habilitado; verificar políticas antes de añadir nuevas tablas.
-- **[[DEBT-031]]**: el historial de migraciones no reconstruye producción
-  desde cero — la tabla `assignments` se creó fuera de git en algún momento
-  y ninguna migración la declara. Ver `docs/specs/backlog.md`.
+- **[[DEBT-031]] resuelta (2026-07-31)**: el historial de migraciones ahora
+  **sí** reconstruye producción desde cero. Las tablas `assignments` y
+  `assignment_questions` se habían creado fuera de git; se agregaron
+  `20260717000000_init_assignments_legacy_table.sql` y
+  `20260717000001_init_assignment_questions_legacy_table.sql` con el DDL real
+  extraído de producción, y se marcaron como aplicadas allá con
+  `supabase migration repair` (no ejecutan DDL en producción). Verificado:
+  `db reset` en `mirp-lab` produce un esquema idéntico al de producción.
+  Ver `docs/specs/backlog.md`.
 
 ---
 
