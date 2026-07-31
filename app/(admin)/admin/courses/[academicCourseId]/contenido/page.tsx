@@ -3,12 +3,7 @@ import { requireAnyRole } from "@/lib/auth/session";
 
 export const metadata: Metadata = { title: "Contenido del curso — Panel docente" };
 
-interface Props {
-  params: Promise<{ academicCourseId: string }>;
-}
-
-export default async function CourseContentPage({ params }: Props) {
-  await params;
+export default async function CourseContentPage() {
   await requireAnyRole(["teacher", "admin"]);
 
   return (

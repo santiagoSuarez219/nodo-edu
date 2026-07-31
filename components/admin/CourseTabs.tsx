@@ -14,7 +14,8 @@ export function CourseTabs({ academicCourseId }: Props) {
     if (segment === null) {
       return pathname === `/admin/courses/${academicCourseId}`;
     }
-    return pathname.startsWith(`/admin/courses/${academicCourseId}/${segment}`);
+    const base = `/admin/courses/${academicCourseId}/${segment}`;
+    return pathname === base || pathname.startsWith(`${base}/`);
   };
 
   return (

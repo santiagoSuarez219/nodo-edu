@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { createServerSupabaseClient } from "@/lib/auth/server";
 import { getCurrentUser } from "@/lib/auth/session";
 import type { CourseAccess } from "@/lib/enrollments/access";
@@ -37,7 +38,7 @@ export async function getCoursesByTeacher(
   return data ?? [];
 }
 
-export async function getAcademicCourseById(
+export const getAcademicCourseById = cache(async function getAcademicCourseById(
   courseId: string
 ): Promise<AcademicCourse | null> {
   const supabase = await createServerSupabaseClient();
@@ -47,7 +48,7 @@ export async function getAcademicCourseById(
     .eq("id", courseId)
     .single();
   return data ?? null;
-}
+});
 
 export async function createAcademicCourse(
   input: AcademicCourseInput & { teacher_id: string }

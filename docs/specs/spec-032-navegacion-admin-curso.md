@@ -227,5 +227,5 @@ En particular, **`attendance-mcp` no se ve afectado** por eliminar la página
 
 > Claude no escribe código de implementación hasta que esta sección esté marcada.
 
-- [ ] Paquete (spec + pruebas) aprobado por el usuario
-- **Fecha de aprobación:** {{fecha}}
+- [x] Paquete (spec + pruebas) aprobado por el usuario
+- **Fecha de aprobación:** 2026-07-31

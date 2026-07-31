@@ -60,10 +60,10 @@ export function AcademicCourseList({ courses }: Props) {
                 key={course.id}
                 className="relative hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer"
               >
-                <td className="px-5 py-4 font-medium text-gray-900 dark:text-white relative z-10">
+                <td className="px-5 py-4 font-medium text-gray-900 dark:text-white">
                   <Link
                     href={`/admin/courses/${course.id}`}
-                    className="after:absolute after:inset-0 after:-z-10 hover:underline"
+                    className="after:absolute after:inset-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-200 dark:focus-visible:ring-blue-700 hover:underline"
                   >
                     {course.name}
                   </Link>

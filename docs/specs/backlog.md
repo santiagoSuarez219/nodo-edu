@@ -5,6 +5,32 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+## DEBT-032 — Tokens semánticos pendientes en componentes de administración de curso
+
+**Origen:** spec-032 (navegación admin de curso), hallazgo de `@reviewer`
+**Prioridad:** Baja — impacto visual/mantenibilidad, no funcional
+
+`components/admin/CourseHeader.tsx` y `components/admin/CourseTabs.tsx` (nuevos
+en spec-032, contenido movido verbatim desde las páginas que reemplazaron) usan
+clases crudas de la paleta Tailwind (`text-gray-900`, `text-blue-700`,
+`bg-green-100`, `border-gray-200`) en lugar de los tokens semánticos que exige
+`DESIGN.md` y CLAUDE.md → "Convenciones de código". Mismo problema que
+**DEBT-015** (navbar), que documenta que el sistema de tokens actual no tiene
+variante `dark:`, lo que hace inviable migrar hoy sin abordar antes esa
+limitación.
+
+**Acción:** Ampliar el alcance de DEBT-015 para cubrir también
+`components/admin/`, o resolverla junto con esa deuda cuando el sistema de
+tokens soporte modo oscuro.
+
+**Relacionado:** también se detectaron anchos de contenedor inconsistentes
+entre las pestañas del curso (`max-w-5xl`, `max-w-2xl`, `max-w-7xl`, sin límite)
+ahora que comparten un header y tabs comunes en `layout.tsx`. Revisar si vale
+la pena unificar el `max-w-*` en el layout tras la ronda de pruebas manuales
+(`test-032`, TC-005).
+
+---
+
 ## DEBT-031 — El historial de migraciones no reconstruye producción desde cero
 
 **Origen:** Detectado al armar el entorno de desarrollo local en `mirp-lab`
