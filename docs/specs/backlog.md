@@ -56,6 +56,80 @@ este correo. Iniciá sesión en su lugar."
 
 ---
 
+## DEBT-029 — Preguntas de autoevaluación con la respuesta correcta siempre en la primera posición
+
+**Origen:** `TC-026-011` (spec-026, smoke test de producción, 2026-07-31),
+reportado por el usuario
+**Prioridad:** Media — no es un bug de la plataforma sino un patrón en el
+contenido/orden de captura de las preguntas, pero le resta valor pedagógico a
+la autoevaluación (un estudiante puede aprender a elegir siempre la primera
+opción sin leer)
+
+Las 3 preguntas publicadas de `estructuras-de-datos/implementacion-de-pilas-en-java`
+tienen la opción correcta en `order_index = 0` (primera posición) en las
+tres. Ni `lib/self-assessment/index.ts` ni
+`components/courses/SelfAssessmentSection.tsx` aleatorizan el orden de las
+opciones al mostrarlas: se renderizan siempre en `order_index` tal como están
+guardadas (a diferencia de `assignment_variant_groups`, que sí tiene un flag
+`shuffle_choices` para las evaluaciones formales A/B/C).
+
+**Acción:** Dos frentes, no excluyentes:
+1. **Contenido:** revisar las preguntas existentes en el banco y variar la
+   posición de la opción correcta al autorarlas (`question-bank-mcp` →
+   `update_question`/`create_question`).
+2. **Plataforma:** aleatorizar el orden de despliegue de `choices` en
+   `SelfAssessmentSection` (barajar en el cliente o servidor al momento de
+   mostrar, sin alterar `order_index` en la base), para no depender de que
+   cada autor de preguntas varíe el orden manualmente.
+
+---
+
+## DEBT-028 — La autoevaluación de cierre no persiste su estado de "ya respondida" tras recargar la página
+
+**Origen:** `TC-026-011` (spec-026, smoke test de producción, 2026-07-31)
+**Prioridad:** Alta — permite reintentos silenciosos y datos inconsistentes en
+uno de los 6 flujos declarados críticos, aunque no bloquea el desbloqueo de
+"marcar lección completada"
+
+`components/courses/SelfAssessmentSection.tsx` mantiene el estado "ya
+respondida" (`hasSubmitted`, `feedbackByQuestion`) **solo en memoria del
+cliente** (`useState`), inicializado siempre en `false`/`{}`. El servidor sí
+sabe si ya existe un intento — `getSelfAssessmentStatus()`
+(`lib/self-assessment/index.ts:239`) calcula `hasAttempt` correctamente y se
+usa bien para desbloquear "marcar lección completada"
+(`app/(cursos)/[courseSlug]/[lessonSlug]/page.tsx:141-143`) — pero ese
+`hasAttempt` **nunca se pasa** a `SelfAssessmentSection` /
+`LessonClosureFlow`. Resultado: tras cualquier recarga, el widget de
+preguntas vuelve a mostrarse como si nunca se hubiera respondido, permitiendo
+reenviar respuestas.
+
+Confirmado en producción con datos reales: el estudiante de prueba
+`spec026-smoke-a@nodo-test.local` generó **dos filas** en
+`self_assessment_attempts` para la misma lección
+(`estructuras-de-datos/github-flujo-de-trabajo-con-ramas`, 14:17 y 14:18 UTC
+del 2026-07-31) con distinto `correct_count` (6 y 4), porque recargó entre
+medio y la UI no reflejaba el intento previo.
+
+**Limitación adicional para el fix completo:** la tabla
+`self_assessment_attempts` (`supabase/migrations/20260718000000_init_self_assessment_attempts.sql`)
+solo guarda conteos agregados (`question_count`, `answered_count`,
+`correct_count`) — **no** qué opción se eligió en cada pregunta. No es
+posible reconstruir el detalle por pregunta (qué elegiste, qué era correcto)
+después de un reload con el esquema actual.
+
+**Acción:** Dos alcances posibles:
+1. **Fix mínimo (sin migración):** pasar `hasAttempt` (y los conteos
+   agregados) desde `page.tsx` → `LessonClosureFlow` → `SelfAssessmentSection`,
+   y si ya hay intento, mostrar un resumen ("Ya completaste esta
+   autoevaluación: X/Y correctas") sin permitir reenviar, en vez de
+   reiniciar el formulario.
+2. **Fix completo:** agregar una tabla/columna que guarde la respuesta
+   seleccionada por pregunta (ej. `self_assessment_answers` con
+   `attempt_id`, `question_id`, `selected_choice_ids`), migración incluida,
+   para poder reconstruir el feedback exacto por pregunta tras un reload.
+
+---
+
 ## DEBT-027 — Revisar claridad de los mensajes de validación del formulario de registro
 
 **Origen:** `TC-026-004` (spec-026, smoke test de producción, 2026-07-31) —

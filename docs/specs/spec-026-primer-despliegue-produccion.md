@@ -476,26 +476,47 @@ reintentó el borrado, exitoso en los 5 casos. **Verificado tras la limpieza:**
 > datos vía API/MCP, guía caso por caso y registra hallazgos.
 > Casos detallados en `docs/testing/test-026-primer-despliegue-produccion.md`.
 
-- [ ] **Registro** con código de curso válido → cuenta creada, sesión iniciada,
-      matrícula automática (`TC-026-001` a `TC-026-004`).
-- [ ] **Login** y redirección por rol: estudiante → `/cuenta/cursos`, docente →
-      `/` (`TC-026-005`, `TC-026-006`).
-- [ ] **Matrícula manual** en un segundo curso desde `/cuenta/cursos`
-      (`TC-026-007`).
-- [ ] **Contenido MDX**: lección con Mermaid, KaTeX, YouTube, código con Shiki;
-      sidebar y guía de laboratorio (`TC-026-008`, `TC-026-009`).
-- [ ] **Progreso de lección** persiste tras recargar (`TC-026-010`).
-- [ ] **Autoevaluación** de cierre: responder, enviar, ver feedback, y que el
-      estado persista (`TC-026-011`).
-- [ ] **Asistencia**: docente abre sesión y comparte código; estudiante lo
-      registra; docente ve el conteo (`TC-026-012`).
-- [ ] **Recuperación de cuenta sin SMTP** vía `students-mcp` (`TC-026-013`).
-- [ ] **Gate de acceso**: usuario anónimo es redirigido a `/login`; estudiante
-      no matriculado no ve el contenido del curso (`TC-026-014`).
-- [ ] Eliminar **todos** los datos de prueba creados en producción y dejar
-      constancia en el archivo de test.
-- [ ] Registrar hallazgos; los bugs fuera de scope van a
-      `docs/specs/backlog.md`.
+- [x] **Registro** con código de curso válido → cuenta creada, sesión iniciada,
+      matrícula automática (`TC-026-001` a `TC-026-004`). ✅ Los 4 aprobados
+      (`TC-026-003`/`004` con observaciones menores de UX, `DEBT-026`/`DEBT-027`).
+- [x] **Login** y redirección por rol: estudiante → `/cuenta/cursos`, docente →
+      `/` (`TC-026-005`, `TC-026-006`). **`TC-026-005` falló en el primer
+      intento** — bug real encontrado y corregido en la misma sesión (ver
+      abajo). Ambos ✅ aprobados tras el fix.
+- [x] **Matrícula manual** en un segundo curso desde `/cuenta/cursos`
+      (`TC-026-007`). ✅ Aprobado.
+- [x] **Contenido MDX**: lección con Mermaid, KaTeX, YouTube, código con Shiki;
+      sidebar y guía de laboratorio (`TC-026-008`, `TC-026-009`). ✅ Aprobados
+      — **corrección de precondición:** no había ninguna lección con KaTeX
+      publicada; se probaron los otros 3 elementos y se dejó constancia.
+- [x] **Progreso de lección** persiste tras recargar (`TC-026-010`). ✅ Aprobado.
+- [x] **Autoevaluación** de cierre: responder, enviar, ver feedback, y que el
+      estado persista (`TC-026-011`). **❌ Fallido** — el estado de "ya
+      respondida" no persiste tras recargar (`DEBT-028`, prioridad alta).
+      No bloquea el desbloqueo de "marcar lección completada" (eso sí
+      funciona). **Decisión del usuario: riesgo aceptado, no bloquea el
+      arranque de clases**, se corrige en una sesión aparte.
+- [x] **Asistencia**: docente abre sesión y comparte código; estudiante lo
+      registra; docente ve el conteo (`TC-026-012`). ✅ Aprobado.
+- [x] **Recuperación de cuenta sin SMTP** vía `students-mcp` (`TC-026-013`). ✅
+      Aprobado — ejecutado adelantado en Fase 5 (ver esa fase).
+- [x] **Gate de acceso**: usuario anónimo es redirigido a `/login`; estudiante
+      no matriculado no ve el contenido del curso (`TC-026-014`). ✅ Aprobado.
+- [x] Eliminar **todos** los datos de prueba creados en producción y dejar
+      constancia en el archivo de test. Estudiantes A y B eliminados vía
+      `students-mcp`; verificado contra `auth.users`: 1 sola cuenta en
+      producción (la del docente real).
+- [x] Registrar hallazgos; los bugs fuera de scope van a
+      `docs/specs/backlog.md`. **DEBT-024** (mitigado), **DEBT-026**,
+      **DEBT-027**, **DEBT-028**, **DEBT-029** registrados.
+
+**Bug encontrado y corregido durante la Fase 7 (ampliación de scope aprobada
+por el usuario):** `TC-026-005` reveló que `lib/auth/actions.ts` honraba
+`redirectTo=/` antes de evaluar el rol del usuario, mandando a los
+estudiantes que entraban por `nod0.dev` (el caso más común) a la grilla
+general de cursos en vez de `/cuenta/cursos`. Corregido, build/lint
+verificados, desplegado (`development` `15a50bd` → `main` `1393ba8`) y
+reintentado con éxito.
 - **Archivos impactados:**
   `docs/testing/test-026-primer-despliegue-produccion.md`,
   `docs/specs/backlog.md`.
