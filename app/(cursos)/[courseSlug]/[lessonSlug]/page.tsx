@@ -11,7 +11,7 @@ import {
   getSelfAssessmentStatus,
   getAnswerKeyForLesson,
 } from "@/lib/self-assessment";
-import type { SelfAssessmentQuestion, AnswerKeyQuestion } from "@/lib/self-assessment/types";
+import type { SelfAssessmentQuestion, AnswerKeyQuestion, SelfAssessmentStatus } from "@/lib/self-assessment/types";
 import { resolveAcademicCoursesBySlug } from "@/lib/academic-courses";
 import type { OpenSessionSummary } from "@/lib/attendance/types";
 import { LessonArticle } from "@/components/courses/LessonArticle";
@@ -70,10 +70,11 @@ export default async function LessonPage({ params }: LessonPageProps) {
 
   let attendanceState = null;
   let selfAssessment: SelfAssessmentQuestion[] = [];
-  let selfAssessmentStatus = {
+  let selfAssessmentStatus: SelfAssessmentStatus = {
     questionCount: 0,
     hasAttempt: false,
     requiresAttempt: false,
+    lastAttempt: null,
   };
 
   if (access.ok && access.reason === "enrolled" && !isGuideNode) {
@@ -144,6 +145,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
               ? "self_assessment_pending"
               : undefined
           }
+          lastAttempt={selfAssessmentStatus.lastAttempt}
           attendance={
             attendanceState && (
               <AttendanceSection
