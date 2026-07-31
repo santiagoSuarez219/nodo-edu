@@ -260,28 +260,39 @@ export async function getSelfAssessmentStatus(
         questionCount,
         hasAttempt: false,
         requiresAttempt: questionCount > 0,
+        lastAttempt: null,
       };
     }
 
     const { data: attempts, error: aError } = await supabase
       .from('self_assessment_attempts')
-      .select('id')
+      .select('question_count, correct_count, submitted_at')
       .eq('user_id', user.id)
       .eq('course_slug', courseSlug)
       .eq('lesson_slug', lessonSlug)
+      .order('submitted_at', { ascending: false })
       .limit(1);
 
     if (aError) throw aError;
-    const hasAttempt = (attempts || []).length > 0;
+    const attempt = attempts?.[0];
+    const hasAttempt = !!attempt;
+    const lastAttempt = attempt
+      ? {
+          correctCount: attempt.correct_count,
+          questionCount: attempt.question_count,
+          submittedAt: attempt.submitted_at,
+        }
+      : null;
 
     return {
       questionCount,
       hasAttempt,
       requiresAttempt: questionCount > 0,
+      lastAttempt,
     };
   } catch (error) {
     console.error('Error getting self-assessment status:', error);
-    return { questionCount: 0, hasAttempt: false, requiresAttempt: false };
+    return { questionCount: 0, hasAttempt: false, requiresAttempt: false, lastAttempt: null };
   }
 }
 

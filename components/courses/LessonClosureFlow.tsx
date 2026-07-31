@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { SelfAssessmentSection } from "@/components/courses/SelfAssessmentSection";
 import { LessonClosure } from "@/components/courses/LessonClosure";
-import type { SelfAssessmentQuestion } from "@/lib/self-assessment/types";
+import type { SelfAssessmentQuestion, SelfAssessmentAttemptSummary } from "@/lib/self-assessment/types";
 
 interface LessonClosureFlowProps {
   courseSlug: string;
@@ -13,6 +13,7 @@ interface LessonClosureFlowProps {
   initialCompletedAt: string | null;
   canComplete: boolean;
   blockedReason?: "self_assessment_pending";
+  lastAttempt: SelfAssessmentAttemptSummary | null;
 }
 
 export function LessonClosureFlow({
@@ -23,6 +24,7 @@ export function LessonClosureFlow({
   initialCompletedAt,
   canComplete,
   blockedReason,
+  lastAttempt,
 }: LessonClosureFlowProps) {
   const [isRetrying, setIsRetrying] = useState(false);
 
@@ -34,6 +36,7 @@ export function LessonClosureFlow({
           lessonSlug={lessonSlug}
           questions={questions}
           onRetryingChange={setIsRetrying}
+          lastAttempt={lastAttempt}
         />
       )}
 

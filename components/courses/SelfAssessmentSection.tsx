@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 
 import { submitSelfAssessment } from '@/lib/self-assessment';
-import type { SelfAssessmentQuestion, QuestionFeedback } from '@/lib/self-assessment/types';
+import type { SelfAssessmentQuestion, QuestionFeedback, SelfAssessmentAttemptSummary } from '@/lib/self-assessment/types';
 import { QuestionStem } from '@/components/courses/QuestionStem';
 
 interface SelfAssessmentSectionProps {
@@ -15,6 +15,7 @@ interface SelfAssessmentSectionProps {
   lessonSlug: string;
   questions: SelfAssessmentQuestion[];
   onRetryingChange?: (isRetrying: boolean) => void;
+  lastAttempt?: SelfAssessmentAttemptSummary | null;
 }
 
 export function SelfAssessmentSection({
@@ -22,6 +23,7 @@ export function SelfAssessmentSection({
   lessonSlug,
   questions,
   onRetryingChange,
+  lastAttempt,
 }: SelfAssessmentSectionProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -29,7 +31,7 @@ export function SelfAssessmentSection({
     Record<string, QuestionFeedback>
   >({});
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const [hasSubmitted, setHasSubmitted] = useState(false);
+  const [hasSubmitted, setHasSubmitted] = useState(!!lastAttempt);
 
   const schemaObject: Record<string, z.ZodTypeAny> = {};
   questions.forEach((q) => {
@@ -172,14 +174,14 @@ export function SelfAssessmentSection({
                           })}
                           value={choice.id}
                           disabled={isAnswered}
-                          className="mt-1 flex-shrink-0 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                          className="mt-1 shrink-0 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
                         />
                         <span className="text-sm text-gray-800 dark:text-gray-200">
                           {choice.body}
                         </span>
                         {isAnswered && isCorrect && (
                           <svg
-                            className="ml-auto w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0"
+                            className="ml-auto w-5 h-5 text-green-600 dark:text-green-400 shrink-0"
                             fill="currentColor"
                             viewBox="0 0 20 20"
                             aria-hidden="true"
@@ -193,7 +195,7 @@ export function SelfAssessmentSection({
                         )}
                         {isAnswered && wasSelected && !isCorrect && (
                           <svg
-                            className="ml-auto w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0"
+                            className="ml-auto w-5 h-5 text-red-600 dark:text-red-400 shrink-0"
                             fill="currentColor"
                             viewBox="0 0 20 20"
                             aria-hidden="true"
@@ -220,7 +222,7 @@ export function SelfAssessmentSection({
                     }`}
                   >
                     <svg
-                      className="w-4 h-4 flex-shrink-0 mt-0.5"
+                      className="w-4 h-4 shrink-0 mt-0.5"
                       fill="currentColor"
                       viewBox="0 0 20 20"
                       aria-hidden="true"
@@ -269,7 +271,7 @@ export function SelfAssessmentSection({
             {submitError && (
               <div className="mb-4 flex items-start gap-3 p-3 rounded-lg border bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-700/50 text-red-800 dark:text-red-300 text-sm">
                 <svg
-                  className="w-4 h-4 flex-shrink-0 mt-0.5"
+                  className="w-4 h-4 shrink-0 mt-0.5"
                   fill="currentColor"
                   viewBox="0 0 20 20"
                   aria-hidden="true"
@@ -286,21 +288,44 @@ export function SelfAssessmentSection({
 
             {hasSubmitted ? (
               <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-2 p-3 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700/50 text-green-800 dark:text-green-300 text-sm">
-                  <svg
-                    className="w-4 h-4 flex-shrink-0"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                    aria-hidden="true"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  <p className="font-medium">Autoevaluación enviada</p>
-                </div>
+                {Object.keys(feedbackByQuestion).length === 0 && lastAttempt ? (
+                  <div className="flex items-center gap-2 p-3 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700/50 text-green-800 dark:text-green-300 text-sm">
+                    <svg
+                      className="w-4 h-4 shrink-0"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                      aria-hidden="true"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    <div>
+                      <p className="font-medium">Ya completaste esta autoevaluación</p>
+                      <p className="text-xs opacity-90">
+                        {lastAttempt.correctCount}/{lastAttempt.questionCount} correctas
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2 p-3 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700/50 text-green-800 dark:text-green-300 text-sm">
+                    <svg
+                      className="w-4 h-4 shrink-0"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                      aria-hidden="true"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    <p className="font-medium">Autoevaluación enviada</p>
+                  </div>
+                )}
                 <button
                   type="button"
                   onClick={handleRetry}

@@ -43,10 +43,17 @@ export type QuestionFeedback = {
   selectedCorrectIds: string[];
 };
 
+export type SelfAssessmentAttemptSummary = {
+  correctCount: number;
+  questionCount: number;
+  submittedAt: string;
+};
+
 export type SelfAssessmentStatus = {
   questionCount: number;
   hasAttempt: boolean;
   requiresAttempt: boolean;
+  lastAttempt: SelfAssessmentAttemptSummary | null;
 };
 
 export type SubmitSelfAssessmentResult =
