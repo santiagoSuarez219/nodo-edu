@@ -908,22 +908,22 @@ paso de deploy propio más allá de aplicar migraciones de esquema.
 | Campo                | Valor                                                   |
 |----------------------|---------------------------------------------------------|
 | Proveedor            | `Supabase` (Postgres gestionado + Auth + Storage)       |
-| Proyecto             | `{{nombre del proyecto en Supabase}}`                   |
-| Project ref          | `{{project-ref}}`                                        |
-| Región               | `{{región de producción}}`                              |
+| Proyecto             | `academy-page`                                          |
+| Project ref          | `bgiimadnmqnoqmdbudpo`                                  |
+| Región               | `us-west-2`                                             |
 | Variables de conexión| `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`  |
-| Panel de control     | `https://supabase.com/dashboard/project/{{project-ref}}`|
+| Panel de control     | `https://supabase.com/dashboard/project/bgiimadnmqnoqmdbudpo`|
 
 #### Frontend (Vercel)
 
 | Campo              | Valor                                          |
 |--------------------|------------------------------------------------|
 | Proveedor          | `Vercel`                                       |
-| Proyecto           | `{{nombre del proyecto en Vercel}}`            |
+| Proyecto           | `nodo-edu`                                     |
 | Rama de producción | `main`                                         |
-| URL producción     | `{{url del proyecto desplegado}}`              |
+| URL producción     | `https://www.nod0.dev` (también `https://nod0.dev` y `https://nodo-edu.vercel.app`) |
 | Deploy trigger     | `push a main → auto-deploy`                     |
-| Panel de control   | `https://vercel.com/{{equipo}}/{{proyecto}}`   |
+| Panel de control   | `https://vercel.com/santiago-suarez-cortes-projects/nodo-edu`   |
 
 ---
 
@@ -964,10 +964,10 @@ development ──merge──▶ deploy/vX.Y.Z ──merge──▶ main ──p
    > ⚠️ Requiere confirmación explícita del usuario antes de ejecutar.
    ```bash
    # Aplicar migraciones pendientes en producción:
-   supabase db push --project-ref {{project-ref}}
+   supabase db push --project-ref bgiimadnmqnoqmdbudpo
 
    # Ver estado de migraciones:
-   supabase migration list --project-ref {{project-ref}}
+   supabase migration list --project-ref bgiimadnmqnoqmdbudpo
    ```
    - Verificar los cambios en `Table Editor` del panel de Supabase antes de continuar.
    - Si el proyecto usa Row Level Security (RLS), validar que las nuevas tablas
@@ -1006,7 +1006,7 @@ development ──merge──▶ deploy/vX.Y.Z ──merge──▶ main ──p
 6. **Verificar el despliegue en Vercel**
    - Confirmar que el build terminó sin errores en el panel de Vercel
      (`Deployments → último deployment`).
-   - Navegar a `{{url de producción}}` y verificar que la aplicación carga.
+   - Navegar a `https://www.nod0.dev` y verificar que la aplicación carga.
    - Revisar la consola del navegador en busca de errores críticos.
    - Validar un flujo con Supabase (login/lectura de contenido) para confirmar
      la conexión con la base de datos.
@@ -1032,15 +1032,15 @@ development ──merge──▶ deploy/vX.Y.Z ──merge──▶ main ──p
 - Las migraciones se gestionan con la CLI de Supabase:
   ```bash
   # Aplicar migraciones pendientes en producción:
-  supabase db push --project-ref {{project-ref}}
+  supabase db push --project-ref bgiimadnmqnoqmdbudpo
 
   # Ver estado de migraciones:
-  supabase migration list --project-ref {{project-ref}}
+  supabase migration list --project-ref bgiimadnmqnoqmdbudpo
   ```
 - Verificar cambios en `Table Editor` del panel antes de confirmar.
 - Si el proyecto usa Row Level Security (RLS), validar que las nuevas
   tablas o columnas tienen las políticas correctas aplicadas.
-- Panel: `https://supabase.com/dashboard/project/{{project-ref}}`
+- Panel: `https://supabase.com/dashboard/project/bgiimadnmqnoqmdbudpo`
 
 ---
 

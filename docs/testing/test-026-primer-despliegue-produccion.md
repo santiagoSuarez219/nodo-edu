@@ -67,10 +67,10 @@ académicos del semestre, contenido MDX del repo.
 **Precondición:** Deploy completado. "Confirm email" **desactivado** y "Allow new
 users to sign up" **activado** en Supabase Auth (verificado en Fase 5). Existe un
 curso académico con `enrollment_code` conocido.
-**Datos de prueba usados:** `{{email_A}}`, contraseña `{{password_A}}`, código
-`{{ENROLLMENT_CODE_TEST}}`.
+**Datos de prueba usados:** `spec026-smoke-a@nodo-test.local`, contraseña
+`SmokeTest2026!`, código `5RSENUWM` (curso real "Estructuras de datos").
 **Pasos:**
-1. Abrir `{{url-prod}}/registro` en una ventana de incógnito.
+1. Abrir `https://www.nod0.dev/registro` en una ventana de incógnito.
 2. Diligenciar nombre completo, correo, contraseña y su confirmación.
 3. Ingresar el código de matrícula del curso.
 4. Enviar el formulario.
@@ -82,12 +82,14 @@ curso académico con `enrollment_code` conocido.
 - **No** aparece el mensaje "Tu cuenta se creó pero no se pudo iniciar sesión
   automáticamente" — si aparece, "Confirm email" sigue activo: **detener la ronda
   y corregir la configuración de Supabase antes de continuar.**
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{observaciones}}
+**Estado:** ✅ Aprobado
+**Hallazgos:** Sin observaciones — registro, sesión automática y matrícula
+funcionaron como se esperaba.
 
 ### TC-026-002 — Registro con código de matrícula inválido
 **Precondición:** ninguna.
-**Datos de prueba usados:** código inexistente, p. ej. `XXXX-NO-EXISTE`.
+**Datos de prueba usados:** `spec026-smoke-invalid@nodo-test.local`, código
+inexistente `XXXX-NO-EXISTE`.
 **Pasos:**
 1. En `/registro`, diligenciar datos válidos con un correo **nuevo**.
 2. Ingresar un código de matrícula inexistente.
@@ -95,19 +97,23 @@ curso académico con `enrollment_code` conocido.
 **Resultado esperado:** Error de validación en el campo del código; **no se crea
 ninguna cuenta** (el código se resuelve antes del `signUp`). Verificar por
 `students-mcp` → `list_students` que ese correo no quedó registrado.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{observaciones}}
+**Estado:** ✅ Aprobado
+**Hallazgos:** Sin observaciones — error de validación claro, sin crear cuenta.
 
 ### TC-026-003 — Registro con correo ya existente
 **Precondición:** `TC-026-001` aprobado (el estudiante A ya existe).
-**Datos de prueba usados:** `{{email_A}}` y código válido.
+**Datos de prueba usados:** `spec026-smoke-a@nodo-test.local` y código válido.
 **Pasos:**
-1. En incógnito, intentar registrarse de nuevo con `{{email_A}}`.
+1. En incógnito, intentar registrarse de nuevo con `spec026-smoke-a@nodo-test.local`.
 **Resultado esperado:** Mensaje de error claro; no se duplica la cuenta ni la
 matrícula. Verificar en `students-mcp` que sigue existiendo **una sola** fila
 para ese correo.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{observaciones}}
+**Estado:** ✅ Aprobado (con observación)
+**Hallazgos:** El mensaje de error es genérico ("No se pudo crear la cuenta.
+Intenta de nuevo") en vez de indicar específicamente que el correo ya está
+registrado. Lo funcional/seguro está correcto: **no** duplica la cuenta.
+Aprobado por el usuario porque no bloquea el arranque de clases; hallazgo de
+UX escalado a `docs/specs/backlog.md` como nuevo ítem de deuda técnica.
 
 ### TC-026-004 — Validación del formulario de registro
 **Precondición:** ninguna.
@@ -118,13 +124,17 @@ para ese correo.
 3. Enviar con un correo con formato inválido.
 **Resultado esperado:** En cada intento, mensajes de error por campo, en español,
 sin errores de consola ni pantalla en blanco.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{observaciones}}
+**Estado:** ✅ Aprobado (con observación)
+**Hallazgos:** Funciona en los tres casos (errores por campo, sin pantalla en
+blanco). El usuario pidió mejorar la claridad de los mensajes de campos
+vacíos/formato inválido — escalado a `docs/specs/backlog.md` como mejora de
+UX, no bloqueante.
 
 ### TC-026-007 — Matrícula manual en un segundo curso desde `/cuenta/cursos`
 **Precondición:** Estudiante A autenticado; existe un **segundo** curso académico
 con su propio `enrollment_code`.
-**Datos de prueba usados:** `{{email_A}}`, código del segundo curso.
+**Datos de prueba usados:** `spec026-smoke-a@nodo-test.local`, código del
+segundo curso `0YQPYZSY` (Análisis de algoritmos).
 **Pasos:**
 1. Ir a `/cuenta/cursos`.
 2. En "Matricularse en un curso", ingresar el código del segundo curso.
@@ -136,8 +146,8 @@ con su propio `enrollment_code`.
 - Segundo intento: error controlado por matrícula duplicada, sin romper la vista.
 - El código se acepta indistintamente en mayúsculas o minúsculas (el formulario
   hace `toUpperCase()`).
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{observaciones}}
+**Estado:** ✅ Aprobado
+**Hallazgos:** Sin observaciones.
 
 ---
 
@@ -145,14 +155,25 @@ con su propio `enrollment_code`.
 
 ### TC-026-005 — Login de estudiante y redirección a `/cuenta/cursos`
 **Precondición:** Estudiante A existente.
-**Datos de prueba usados:** `{{email_A}}` / `{{password_A}}`.
+**Datos de prueba usados:** `spec026-smoke-a@nodo-test.local` / `SmokeTest2026!`.
 **Pasos:**
 1. Cerrar sesión y abrir `{{url-prod}}/login`.
 2. Autenticarse con las credenciales del estudiante A.
 **Resultado esperado:** Login exitoso y redirección a `/cuenta/cursos` con sus
 cursos matriculados. El navbar muestra la variante de **estudiante** (spec-028).
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{observaciones}}
+**Estado:** ❌ Fallido → 🔧 Corregido → pendiente de reintentar
+**Hallazgos:** **Bug encontrado (2026-07-31):** el usuario llegó a `/login` vía
+`nod0.dev` → middleware → `/login?redirectTo=%2F` (el caso más común: un
+estudiante escribe el dominio pelado, no `/login` directo). En
+`lib/auth/actions.ts:42-45`, si `formData.redirectTo` viene con cualquier
+valor truthy (incluido `"/"`), el login redirige ahí **antes** de evaluar el
+rol — así que el estudiante terminaba en `/` (grilla general de cursos) en
+vez de `/cuenta/cursos`. No es un crash ni un error de seguridad, pero
+incumple el resultado esperado del caso, declarado crítico para el día 1.
+**Fix aplicado** (ampliación de scope aprobada por el usuario): se excluyó
+`"/"` del `redirectTo` honrado, dejando que ese caso caiga en el redirect por
+rol (`lib/auth/actions.ts`). Build y lint verdes tras el cambio. Pendiente:
+desplegar y reintentar este caso.
 
 ### TC-026-006 — Login del docente y acceso al panel admin
 **Precondición:** Cuenta real del usuario con rol `teacher`/`admin` en

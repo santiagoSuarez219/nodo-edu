@@ -39,8 +39,13 @@ export async function signIn(
 
   revalidatePath("/", "layout");
 
+  // "/" no es un destino específico: es a donde el middleware manda a
+  // cualquier visitante no autenticado que entra por la raíz del sitio. Si lo
+  // honráramos igual que un redirectTo real (ej. una lección puntual), un
+  // estudiante que abre nod0.dev y luego inicia sesión terminaría en la
+  // grilla general de cursos en vez de /cuenta/cursos.
   const redirectTo = formData.get("redirectTo")?.toString();
-  if (redirectTo) {
+  if (redirectTo && redirectTo !== "/") {
     redirect(redirectTo);
   }
 

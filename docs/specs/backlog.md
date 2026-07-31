@@ -5,7 +5,7 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
-## DEBT-024 — No existe ninguna vía en la plataforma para reponer la contraseña de un estudiante
+## DEBT-024 — No existe ninguna vía en la plataforma para reponer la contraseña de un estudiante — ✅ Mitigado (spec-026, Fase 5)
 
 **Origen:** Revisión de spec-026 previa al primer despliegue (2026-07-30)
 **Prioridad:** Alta — con ~30 estudiantes, ocurrirá en las primeras semanas de clase
@@ -27,6 +27,55 @@ ningún camino dentro de la plataforma**. La única salida es el Supabase Dashbo
 a `/api/students/*` y a `students-mcp`, con las salvaguardas del dominio de
 admin (`STUDENTS_ADMIN_API_KEY`). Se resuelve por completo con
 **[[DEBT-001]]** + **[[DEBT-011]]** si se reconstruye la recuperación por correo.
+
+**Resolución (2026-07-31):** el botón "Reset password" del Supabase Dashboard
+**no sirve** (solo envía correo, sin SMTP no llega). La vía real, documentada y
+probada (`TC-026-013`, ver `test-026`), es la **Admin API vía `curl`** con
+`SUPABASE_SERVICE_ROLE_KEY` (`PUT /auth/v1/admin/users/{id}` con
+`{"password": "..."}`). El spec propio de `reset_student_password` en
+`students-mcp` sigue pendiente como mejora futura, no bloqueante.
+
+---
+
+## DEBT-026 — Mensaje de error genérico al registrarse con un correo ya existente
+
+**Origen:** `TC-026-003` (spec-026, smoke test de producción, 2026-07-31)
+**Prioridad:** Baja — el comportamiento de seguridad es correcto (no duplica
+la cuenta), es solo un problema de claridad del mensaje
+
+Al intentar registrarse con un correo que ya tiene cuenta, `/registro` muestra
+"No se pudo crear la cuenta. Intenta de nuevo" — un mensaje genérico que no le
+dice al usuario que el correo ya está registrado (y por lo tanto no lo guía a
+usar "Iniciar sesión" en su lugar). Verificado que no duplica la cuenta ni la
+matrícula: el problema es puramente de UX/mensaje.
+
+**Acción:** En el server action de registro (`lib/auth/actions.ts`), detectar
+el caso de correo duplicado (Supabase Auth normalmente lo señala en el error
+de `signUp`) y devolver un mensaje específico, p. ej. "Ya existe una cuenta con
+este correo. Iniciá sesión en su lugar."
+
+---
+
+## DEBT-027 — Revisar claridad de los mensajes de validación del formulario de registro
+
+**Origen:** `TC-026-004` (spec-026, smoke test de producción, 2026-07-31) —
+pedido explícito del usuario tras aprobar el caso
+**Prioridad:** Baja — la validación funciona (campos vacíos, formato de
+correo inválido y contraseñas que no coinciden se bloquean correctamente,
+sin pantalla en blanco); es una mejora de claridad de mensaje, no un bug
+funcional
+
+El usuario pidió mejorar los mensajes de error de campos vacíos y formato
+inválido en `/registro`. El esquema de validación vive en
+`lib/auth/schemas.ts` (`SignUpSchema`): ya tiene mensajes personalizados por
+campo ("Ingresa un correo válido", "La contraseña debe tener al menos 8
+caracteres", etc.) — falta precisar **qué mensaje concreto** resultó confuso
+en la prueba (¿el de campo vacío en `full_name`/`enrollment_code`, el de
+formato de correo, u otro) antes de tocar el esquema.
+
+**Acción:** En una próxima sesión, pedir al usuario el mensaje exacto que le
+pareció poco claro (o repetir la prueba con capturas) y ajustar el `message`
+correspondiente en `SignUpSchema`.
 
 ---
 
