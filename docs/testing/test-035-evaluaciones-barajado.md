@@ -24,7 +24,17 @@
 | Variante A (5 preguntas, 5 pts) | `assignment-mcp` → `create_assignment_group` | `a3f14d43-4dd1-4775-becd-df0b0eea353b` | ⬜ |
 | Variante B (5 preguntas, 5 pts) | `assignment-mcp` → `create_assignment_group` | `7e8573c4-a352-4a73-9831-c5c2a56bdb10` | ⬜ |
 | Variante C (5 preguntas, 5 pts) | `assignment-mcp` → `create_assignment_group` | `7ffcabcf-cf71-46ba-b3cc-ba31f7fa4b7c` | ⬜ |
+| Estudiante C (par de comparación — variante A) | `students-mcp` → `create_student` | `24b99038-9cc6-4d0d-84a7-56cf1b10c02d` (`spec035-c@nodo-test.local` / `Test035Pass!`), matrícula `0ce3b4b0-a850-4a6b-9278-3e4670b37a03` | ⬜ |
+| Estudiante D (par de comparación — variante A) | `students-mcp` → `create_student` | `9f81dfa7-72aa-4635-b05b-3deca6ff34a2` (`spec035-d@nodo-test.local` / `Test035Pass!`), matrícula `a8c0e340-823c-43a0-bdb0-ce0c84b28321` | ⬜ |
 | Envíos generados en la ronda | (generados al resolver en la UI) | `{{a completar durante la ronda}}` | ⬜ |
+
+> **Nota — descarte de A y B para el par de comparación:** Estudiante A cayó en
+> variante B y Estudiante B cayó en variante C (sorteo aleatorio de
+> `getOrAllocateVariant`, no controlable). Se creó C y luego D hasta lograr una
+> coincidencia: **C y D cayeron ambos en variante A** y son el par usado en
+> TC-035-001, TC-035-002, TC-035-003, TC-035-006 (comparaciones entre dos
+> estudiantes de la misma variante). A y B quedan con su intento `in_progress`
+> huérfano — se eliminan igual en la limpieza final.
 
 **Entorno de pruebas:** desarrollo (instancia local en `mirp-lab` vía túnel SSH — ver CLAUDE.md → "Base de datos"). **Nunca producción.**
 **Fecha de la ronda:** 2026-08-01
