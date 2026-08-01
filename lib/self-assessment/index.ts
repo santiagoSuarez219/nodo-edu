@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { createServerSupabaseClient } from '@/lib/auth/server';
 import { getCurrentUser } from '@/lib/auth/session';
 import { hasCourseAccess } from '@/lib/enrollments/access';
+import { seededShuffle } from './shuffle';
 import type {
   SelfAssessmentQuestion,
   AnswerKeyQuestion,
@@ -41,6 +42,8 @@ export async function getSelfAssessmentForLesson(
   const supabase = await createServerSupabaseClient();
 
   try {
+    const user = await getCurrentUser();
+
     const { data, error } = await supabase
       .from('questions')
       .select(
@@ -57,6 +60,7 @@ export async function getSelfAssessmentForLesson(
       .eq('lesson_slug', lessonSlug)
       .eq('type', 'multiple_choice')
       .eq('is_published', true)
+      .order('order_index', { referencedTable: 'question_choices', ascending: true })
       .order('created_at', { ascending: true });
 
     if (error) throw error;
@@ -67,6 +71,11 @@ export async function getSelfAssessmentForLesson(
           (c) => c.is_correct
         ).length;
 
+        // Sembrado por (usuario, pregunta): estable para ese estudiante en esa
+        // pregunta entre recargas y router.refresh(); distinto entre estudiantes.
+        const seed = user ? `${user.id}:${row.id}` : row.id;
+        const shuffledChoices = seededShuffle(row.choices || [], seed);
+
         return {
           id: row.id,
           stem: row.stem,
@@ -74,7 +83,7 @@ export async function getSelfAssessmentForLesson(
           code_language: row.code_language,
           topic_title: row.topic_title,
           allowMultiple: correctCount > 1,
-          choices: (row.choices || []).map((c) => ({
+          choices: shuffledChoices.map((c) => ({
             id: c.id,
             body: c.body,
             order_index: c.order_index,
@@ -123,6 +132,7 @@ export async function getAnswerKeyForLesson(
       .eq('lesson_slug', lessonSlug)
       .eq('type', 'multiple_choice')
       .eq('is_published', true)
+      .order('order_index', { referencedTable: 'question_choices', ascending: true })
       .order('created_at', { ascending: true });
 
     if (error) throw error;

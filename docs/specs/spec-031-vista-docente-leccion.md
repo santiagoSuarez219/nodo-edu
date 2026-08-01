@@ -126,6 +126,7 @@ Queda pendiente únicamente la revisión de `@reviewer` antes de pasar a
 
 **Clave de respuestas**
 1. El docente dueño del curso, al abrir una lección con autoevaluación publicada, ve todas sus preguntas en el mismo orden en que las ve el estudiante.
+   - > **Superseded por spec-034 (2026-07-31).** Con el barajado por estudiante implementado en spec-034, el orden que ve cada estudiante es distinto (sembrado por `(user_id, question_id)`). La clave del docente se muestra en orden canónico (`order_index`) para mantener una vista estable donde dictar la clase. La correspondencia con el estudiante se verifica por contenido de la opción, no por posición.
 2. Las respuestas correctas están ocultas al cargar la página.
 3. El toggle por pregunta revela y vuelve a ocultar la(s) opción(es) correcta(s) de esa pregunta, sin afectar a las demás.
 4. El toggle global revela y oculta todas a la vez.
