@@ -5,6 +5,57 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+## DEBT-042 — El middleware cierra la sesión de todos los usuarios ante cualquier caída de Supabase Auth
+
+**Origen:** Detectado durante la ronda manual de `test-037-manejo-de-errores.md`
+(`TC-037-004`, 2026-08-01), al recargar la página con el túnel a `mirp-lab`
+cortado
+**Prioridad:** Alta — bloquea el sitio **completo** (no un dominio puntual) y,
+mientras dura el fallo, impide incluso volver a iniciar sesión
+
+`middleware.ts:18` hace `if (!isPublic && !user) redirect a /login` para
+prácticamente cualquier ruta del sitio (el `matcher` de `middleware.ts:52-54`
+cubre todo salvo estáticos). `user` viene de `updateSupabaseSession()`
+(`lib/auth/middleware.ts:28-30`), que llama `supabase.auth.getUser()` **sin
+ningún `try/catch`**. Cuando Supabase Auth es inalcanzable, esa llamada no
+lanza (el SDK la atrapa internamente) pero **resuelve `user: null`** —
+indistinguible de "no hay sesión". El middleware trata ambos casos igual:
+redirige a `/login`.
+
+Consecuencia observada en vivo: con el túnel cortado, una simple recarga de
+página —de un estudiante, un docente, cualquier rol, en cualquier ruta—
+expulsa a la sesión activa a `/login`. Y como el propio login también
+necesita a Supabase Auth, **nadie puede volver a entrar hasta que el servicio
+se restaure**. Es el mismo antipatrón que motivó **[[DEBT-037]]**
+(infraestructura leída como caso de negocio) y que sistematiza
+**[[DEBT-040]]**/**[[DEBT-041]]**, pero con un radio de impacto mayor que
+cualquiera de esos dos: no es una función de un dominio (asistencia,
+autoevaluación), es el **gate de autenticación de toda la aplicación**.
+
+**No se corrigió en spec-037**: `middleware.ts` y `lib/auth/middleware.ts` no
+estaban en su tabla de "Impacto en el sistema", y el hallazgo apareció
+después de la implementación, durante la ronda de pruebas. Además de
+distinguir "sin sesión" de "no se pudo verificar", el fix probablemente deba
+decidir **qué hacer** ante lo segundo — dejar pasar la request de todos
+modos (con el riesgo de que páginas protegidas rendericen sin verificación
+real) es una opción tan delicada como bloquear a todo el sitio; ver
+**Acción**.
+
+**Acción:** Diseñar un spec dedicado (no una extensión de spec-037). Como
+mínimo: (1) envolver `supabase.auth.getUser()` en `updateSupabaseSession()`
+en un `try/catch` que distinga la excepción/fallo de red de "no hay sesión",
+y (2) decidir el comportamiento ante ese tercer caso — candidatos: dejar
+pasar la request con una advertencia degradada (arriesga exponer una ruta que
+debía estar protegida, si el fallo es transitorio y la sesión real no
+existe), mostrar una página de "servicio no disponible" en vez de redirigir a
+`/login` (evita el bucle de "no puedo entrar porque no puedo verificar, y no
+puedo verificar porque el servicio está caído"), o cachear brevemente el
+último `user` válido conocido para tolerar caídas cortas. Evaluar también si
+`/admin` (que además consulta `user_roles` sin manejo de error en
+`middleware.ts:35-39`) necesita su propio tratamiento.
+
+---
+
 ## DEBT-041 — `createServerSupabaseClient()` fuera del `try` en módulos no cubiertos por spec-037
 
 **Origen:** Detectado al implementar **[[DEBT-037]]** (spec-037, 2026-08-01):

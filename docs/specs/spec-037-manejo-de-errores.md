@@ -1,4 +1,4 @@
-# spec-037 — [TESTING] Manejo de errores: boundaries y señalización honesta de fallos de infraestructura
+# spec-037 — [DONE] Manejo de errores: boundaries y señalización honesta de fallos de infraestructura
 
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.
