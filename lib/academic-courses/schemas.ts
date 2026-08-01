@@ -30,6 +30,9 @@ export const AcademicCourseSchema = z
       .regex(/^[A-Z0-9]+$/, "Solo letras mayúsculas y números")
       .optional()
       .or(z.literal("")),
+    // La existencia del slug se valida en la server action (D3 de spec-036):
+    // depende de lib/courses, que no puede importarse desde este esquema
+    // compartido con el cliente (arrastraría node:fs al bundle del navegador).
     course_slug: z.string().optional().or(z.literal("")),
   })
   .refine((data) => data.class_time_end > data.class_time_start, {

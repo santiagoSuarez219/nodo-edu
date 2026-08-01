@@ -24,9 +24,10 @@ function generateCode(): string {
 
 interface Props {
   course?: AcademicCourse;
+  availableCourses: Array<{ slug: string; name: string }>;
 }
 
-export function AcademicCourseForm({ course }: Props) {
+export function AcademicCourseForm({ course, availableCourses }: Props) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [serverError, setServerError] = useState<string | null>(null);
@@ -55,6 +56,13 @@ export function AcademicCourseForm({ course }: Props) {
   function handleGenerate() {
     setValue("enrollment_code", generateCode(), { shouldValidate: true });
   }
+
+  // D2: si el curso editado apunta a un slug que ya no existe en el contenido
+  // real, se agrega como opción "fantasma" — seleccionada y marcada como
+  // inválida — para que el docente la vea sin que guardar sin tocarla la borre.
+  const isOrphanSlug =
+    !!course?.course_slug &&
+    !availableCourses.some((c) => c.slug === course.course_slug);
 
   const onSubmit = (data: AcademicCourseSchemaInput) => {
     setServerError(null);
@@ -219,24 +227,41 @@ export function AcademicCourseForm({ course }: Props) {
           )}
         </div>
 
-        {/* Slug de contenido (opcional) */}
+        {/* Curso de contenido (opcional) */}
         <div className="flex flex-col gap-1.5">
           <label htmlFor="course_slug" className={labelClass}>
-            Slug de contenido{" "}
+            Curso de contenido{" "}
             <span className="font-normal text-gray-400 dark:text-gray-500">
               (opcional)
             </span>
           </label>
-          <input
+          <select
             id="course_slug"
-            type="text"
-            placeholder="Ej. estructuras-de-datos"
             className={inputClass}
             {...register("course_slug")}
-          />
+          >
+            <option value="">— Sin vincular —</option>
+            {availableCourses.map((c) => (
+              <option key={c.slug} value={c.slug}>
+                {c.name} ({c.slug})
+              </option>
+            ))}
+            {isOrphanSlug && (
+              <option value={course!.course_slug!}>
+                {course!.course_slug} (no existe — corrígelo o desvincula)
+              </option>
+            )}
+          </select>
           <p className="text-xs text-gray-400 dark:text-gray-500">
             Vincula este curso al material MDX publicado en la plataforma.
           </p>
+          {isOrphanSlug && !errors.course_slug && (
+            <p className="text-xs text-amber-600 dark:text-amber-400">
+              Este curso apunta a un contenido que ya no existe. Guardar sin
+              cambiar este campo conserva el valor; corrígelo o elige
+              &quot;— Sin vincular —&quot;.
+            </p>
+          )}
           {errors.course_slug && (
             <p className={errorClass}>{errors.course_slug.message}</p>
           )}

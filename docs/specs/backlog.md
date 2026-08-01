@@ -5,6 +5,82 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+## DEBT-039 — `<Script id="theme-init">` en el layout raíz genera un error de hidratación en consola
+
+**Origen:** Ronda manual de `test-036-admin-curso-slug-y-ciclo-de-vida.md`
+(TC-036-012, 2026-08-01), detectado incidentalmente — no tiene relación con
+`spec-036`
+**Prioridad:** Media — no rompe la funcionalidad observada, pero contamina la
+consola en cada carga y pudo causar el colgado transitorio reportado en
+TC-036-012 (indicador de dev de Next.js atascado)
+
+`app/layout.tsx:48` monta `<Script id="theme-init" strategy="beforeInteractive"
+dangerouslySetInnerHTML={{ __html: themeInitScript }} />` dentro del `<body>`.
+En Next.js 16.2.4 / React 19 esto dispara el error de consola:
+
+```
+Console Error
+Encountered a script tag while rendering React component. Scripts inside
+React components are never executed when rendering on the client. Consider
+using template tag instead.
+    at script (<anonymous>:null:null)
+    at RootLayout (app/layout.tsx:48:9)
+```
+
+Se reprodujo primero indirectamente durante TC-036-012 (la pestaña de prueba
+quedó colgada en el indicador "Rendering..." de Next.js sin peticiones ni
+errores propios de la app en curso), y se confirmó luego navegando
+directamente: el error de hidratación aparece en cualquier página que use el
+layout raíz, no solo en el panel admin.
+
+**Acción:** Revisar si `next/script` con `strategy="beforeInteractive"` sigue
+siendo la forma correcta de inyectar este script en Next 16 (parece requerir
+`<template>` o un mecanismo distinto para scripts inline tempranos, según el
+propio mensaje de error), o mover la lógica de tema inicial a un mecanismo que
+no dispare esta advertencia (por ejemplo, un atributo `data-*` leído por CSS,
+o `suppressHydrationWarning` combinado con otro patrón de inyección).
+
+---
+
+## DEBT-038 — El diálogo de confirmación accesible está copiado literalmente en cada componente que lo necesita
+
+**Origen:** Revisión de `spec-036` (2026-08-01), al detectar que su
+`CourseLifecycleActions` sería la **tercera** copia del mismo diálogo
+**Prioridad:** Media — no hay bug hoy; el riesgo es que las copias diverjan
+
+`components/student/AssignmentPlayer.tsx:262` y
+`components/admin/AdminAttendancePanel.tsx:239` contienen el mismo diálogo de
+confirmación **carácter por carácter**: overlay `<button>` a pantalla completa
+con `aria-label`, contenedor con `role="dialog"` + `aria-modal="true"` +
+`aria-labelledby`/`aria-describedby`, tarjeta `max-w-sm`, y un `useEffect` que
+cierra con `Escape` y enfoca el botón de confirmar vía `confirmButtonRef`.
+Solo cambian los `id` y el texto.
+
+El patrón en sí es **correcto** —accesibilidad razonable, sin `confirm()`
+nativo, que es justo lo que arregló **[[DEBT-018]]** copiando el diálogo de
+`AssignmentPlayer` al panel de asistencia—; el problema es que vive duplicado. Cualquier mejora futura (trampa de foco real, que hoy no tiene
+ninguno de los dos; restaurar el foco al cerrar; `aria-live` para el error)
+hay que aplicarla N veces, y basta con que se olvide una para que un flujo
+quede menos accesible que los demás sin que nadie lo note.
+
+`components/courses/LessonSidebarMobile.tsx:72` también usa
+`role="dialog"`/`aria-modal`, pero es un **drawer** de navegación, no una
+confirmación: comparte las primitivas ARIA, no la forma. Si se extrae un
+componente, conviene que sea `<ConfirmDialog>` (título, descripción, acción
+destructiva o no, callbacks) y no un `<Modal>` genérico que intente cubrir
+también el drawer.
+
+**Acción:** Extraer un `components/ui/ConfirmDialog.tsx` y migrar los dos
+consumidores actuales (más el que agregue spec-036). Al hacerlo, aprovechar
+para añadir lo que hoy falta en las tres copias: trampa de foco dentro del
+diálogo y devolución del foco al elemento que lo abrió.
+
+> **spec-036 no resuelve esta deuda**: agregará una tercera copia siguiendo el
+> mismo patrón, deliberadamente, para no inventar un cuarto diálogo distinto y
+> dejar la extracción más difícil. Decisión registrada en el propio spec.
+
+---
+
 ## DEBT-037 — La app no tiene ningún error boundary: un server action que lanza deja al usuario sin mensaje útil
 
 **Origen:** `TC-007` de `docs/testing/test-fix-attendance-panel-flicker.md`
@@ -172,6 +248,14 @@ solo lectura y las escrituras van por `service_role` en
 `lib/assignments/service.ts`— eliminarlas con una migración nueva
 (`drop policy`), aplicada tanto en dev como en producción. Verificar antes que
 ningún flujo de estudiante o docente dependa de ellas.
+
+---
+
+## DEBT-032 — Tokens crudos de Tailwind en los componentes nuevos del panel admin de curso
+
+> Título restaurado el 2026-08-01: esta entrada había perdido su encabezado y su
+> separador, quedando pegada al final de **[[DEBT-033]]** — era invisible al leer
+> el índice del backlog y su número no aparecía en la numeración.
 
 **Origen:** spec-032 (navegación admin de curso), hallazgo de `@reviewer`
 **Prioridad:** Baja — impacto visual/mantenibilidad, no funcional
