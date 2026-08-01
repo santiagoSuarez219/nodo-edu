@@ -462,21 +462,23 @@ no del historial de migraciones.
 
 ---
 
-## DEBT-030 — El ícono de la aplicación no aparece en la pestaña del navegador
+## DEBT-030 — El ícono de la aplicación no aparece en la pestaña del navegador — ✅ Resuelto (2026-08-01)
 
 **Origen:** Reportado por el usuario (2026-07-31), post-despliegue de spec-026
-**Prioridad:** Baja — cosmético, sin impacto funcional
+**Prioridad:** ~~Baja~~ → **Resuelto**
 
 `public/icono.png` existe pero no está conectado: no hay `app/icon.*` ni
 `app/favicon.ico` (las convenciones de App Router que Next.js detecta
 automáticamente), y `app/layout.tsx` no declara `metadata.icons`. Sin ninguna
 de las dos vías, el navegador no tiene de dónde tomar el favicon.
 
-**Acción:** Elegir una vía: (a) renombrar/copiar `public/icono.png` a
-`app/icon.png` (Next.js lo sirve automáticamente como favicon), o (b)
-agregar `icons: { icon: "/icono.png" }` al objeto `metadata` de
-`app/layout.tsx`. Verificar en varios navegadores (el ícono a veces queda
-cacheado agresivamente).
+**Resolución (2026-08-01, rama `fix/favicon-icon-tab`):** se optó por la vía
+(a) — se copió `public/icono.png` a `app/icon.png`, convención de App Router
+que Next.js sirve automáticamente sin tocar código ni `metadata`. Verificado
+con el servidor de desarrollo: `GET /icon.png` responde `200 OK`. Pendiente
+la verificación visual en el navegador (el ícono a veces queda cacheado
+agresivamente), fuera del alcance de este cambio por la restricción de no
+abrir el navegador sin solicitud explícita.
 
 ---
 
