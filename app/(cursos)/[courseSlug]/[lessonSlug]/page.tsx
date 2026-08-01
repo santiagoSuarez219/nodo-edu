@@ -16,6 +16,10 @@ import {
   getSelfAssessmentStatus,
   getAnswerKeyForLesson,
 } from "@/lib/self-assessment";
+import {
+  ANSWER_KEY_COOKIE_NAME,
+  resolveStoredAnswerKeyExpanded,
+} from "@/lib/self-assessment/answer-key-preference";
 import type { SelfAssessmentQuestion, AnswerKeyQuestion, SelfAssessmentStatus } from "@/lib/self-assessment/types";
 import { resolveAcademicCoursesBySlug } from "@/lib/academic-courses";
 import type { OpenSessionResult, StudentAttendanceState } from "@/lib/attendance/types";
@@ -112,6 +116,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
   let teacherCourses: AttendanceGroup[] = [];
   let teacherSessionsByCourseId: Record<string, OpenSessionResult> = {};
   let teacherAttendanceGroupId: string | null = null;
+  let teacherAnswerKeyExpanded = false;
 
   if (access.ok && (access.reason === "owner" || access.reason === "admin")) {
     const [answerKey, academicCourses] = await Promise.all([
@@ -142,6 +147,9 @@ export default async function LessonPage({ params }: LessonPageProps) {
     teacherAttendanceGroupId = resolveStoredAttendanceGroup(
       cookieStore.get(attendanceGroupCookieName(courseSlug))?.value,
       teacherCourses.map((group) => group.id)
+    );
+    teacherAnswerKeyExpanded = resolveStoredAnswerKeyExpanded(
+      cookieStore.get(ANSWER_KEY_COOKIE_NAME)?.value
     );
   }
 
@@ -197,6 +205,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
           academicCourses={teacherCourses}
           initialSessionsByCourseId={teacherSessionsByCourseId}
           initialAttendanceGroupId={teacherAttendanceGroupId}
+          initialAnswerKeyExpanded={teacherAnswerKeyExpanded}
         />
       )}
 

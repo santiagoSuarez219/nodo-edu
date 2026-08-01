@@ -1,4 +1,4 @@
-# spec-038 — [NOT STARTED] Ocultar/mostrar la clave de respuestas en la vista docente
+# spec-038 — [TESTING] Ocultar/mostrar la clave de respuestas en la vista docente
 
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.
@@ -198,66 +198,66 @@ tabla no contemple.
 
 ### Fase 1 — Módulo de preferencia
 
-- [ ] Crear `lib/self-assessment/answer-key-preference.ts`, con el mismo estilo
+- [x] Crear `lib/self-assessment/answer-key-preference.ts`, con el mismo estilo
       de doc-comment que `lib/attendance/group-preference.ts` y **sin** importar
       `next/headers` (lo consumen cliente y server):
-  - [ ] `ANSWER_KEY_COOKIE_NAME = "nodo_teacher_answer_key"` (D2).
-  - [ ] `ANSWER_KEY_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 12` (D5), con comentario
+  - [x] `ANSWER_KEY_COOKIE_NAME = "nodo_teacher_answer_key"` (D2).
+  - [x] `ANSWER_KEY_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 12` (D5), con comentario
         explicando por qué diverge del año de `TeacherAttendanceControl`.
-  - [ ] `resolveStoredAnswerKeyExpanded(storedValue: string | undefined): boolean`
+  - [x] `resolveStoredAnswerKeyExpanded(storedValue: string | undefined): boolean`
         → `true` solo si el valor es exactamente `"1"`; todo lo demás `false`
         (D3, D4).
 
 ### Fase 2 — Lectura en el server component
 
-- [ ] En `app/(cursos)/[courseSlug]/[lessonSlug]/page.tsx`, declarar
+- [x] En `app/(cursos)/[courseSlug]/[lessonSlug]/page.tsx`, declarar
       `let teacherAnswerKeyExpanded = false;` junto a las demás variables del
       bloque docente (líneas 111-114).
-- [ ] Dentro del `if (access.ok && (access.reason === "owner" || access.reason
+- [x] Dentro del `if (access.ok && (access.reason === "owner" || access.reason
       === "admin"))`, reutilizar el `cookieStore` que ya se obtiene en la línea
       141 para resolver `teacherAnswerKeyExpanded`. **No** añadir una segunda
       llamada a `cookies()`.
-- [ ] Pasar `initialAnswerKeyExpanded={teacherAnswerKeyExpanded}` a
+- [x] Pasar `initialAnswerKeyExpanded={teacherAnswerKeyExpanded}` a
       `TeacherLessonPanel` (línea 193-201).
 
 ### Fase 3 — Propagación en el panel
 
-- [ ] `TeacherLessonPanel.tsx`: añadir `initialAnswerKeyExpanded: boolean` a
+- [x] `TeacherLessonPanel.tsx`: añadir `initialAnswerKeyExpanded: boolean` a
       `TeacherLessonPanelProps` y propagarlo a `TeacherAnswerKey`. El panel
       sigue siendo server component y sigue sin renderizar `TeacherAnswerKey`
       cuando `answerKey.length === 0` (línea 35) — sin regresión.
 
 ### Fase 4 — UI del plegado
 
-- [ ] Antes de escribir markup: leer `DESIGN.md` completo y las skills
+- [x] Antes de escribir markup: leer `DESIGN.md` completo y las skills
       `frontend-design`, `tailwind-css-patterns` y `accessibility`.
-- [ ] `TeacherAnswerKey.tsx`: añadir prop `initialExpanded: boolean` y estado
+- [x] `TeacherAnswerKey.tsx`: añadir prop `initialExpanded: boolean` y estado
       `const [expanded, setExpanded] = useState(initialExpanded)`.
-- [ ] Envolver el cuerpo (el `<div className="divide-y …">`, líneas 52-117) en
+- [x] Envolver el cuerpo (el `<div className="divide-y …">`, líneas 52-117) en
       un contenedor con `id` estable y atributo `hidden={!expanded}` (D7).
-- [ ] Mover el botón "Revelar todas / Ocultar todas" dentro del contenedor
+- [x] Mover el botón "Revelar todas / Ocultar todas" dentro del contenedor
       plegable, o condicionarlo a `expanded` (D7).
-- [ ] Añadir el control de plegado en la cabecera, con `aria-expanded={expanded}`
+- [x] Añadir el control de plegado en la cabecera, con `aria-expanded={expanded}`
       y `aria-controls` apuntando al `id` del contenedor — mismo patrón que
       `LessonSidebarItem.tsx:91-92` (`panelId` definido en la línea 33, aplicado
       al panel en la línea 118). Etiqueta **visible** en texto ("Mostrar" /
       "Ocultar"), no solo un chevron.
-- [ ] Cuando está plegado, la cabecera indica cuántas preguntas hay
+- [x] Cuando está plegado, la cabecera indica cuántas preguntas hay
       (p. ej. `Clave de respuestas · 5 preguntas`), para que el docente sepa que
       el bloque existe y no está vacío. Singular/plural correctos.
-- [ ] Al alternar, escribir la cookie desde el cliente (D4, D9):
+- [x] Al alternar, escribir la cookie desde el cliente (D4, D9):
       al desplegar `…=1; path=/; max-age=<12h>; SameSite=Lax`; al plegar el
       mismo nombre con `max-age=0`.
-- [ ] Al plegar, `setRevealedIds(new Set())` (D8).
-- [ ] Verificar que el foco permanece en el botón de plegado tras alternar (no
+- [x] Al plegar, `setRevealedIds(new Set())` (D8).
+- [x] Verificar que el foco permanece en el botón de plegado tras alternar (no
       se pierde al ocultarse el contenido) y que el control es operable con
       teclado (`Enter` / `Espacio`).
-- [ ] Estilos según D10; no ampliar **[[DEBT-032]]** con clases fuera de la
+- [x] Estilos según D10; no ampliar **[[DEBT-032]]** con clases fuera de la
       tabla de `DESIGN.md`.
 
 ### Fase 5 — Verificación
 
-- [ ] `npm run lint` y `npm run build` sin errores.
+- [x] `npm run lint` y `npm run build` sin errores.
 - [ ] Ejecutar los casos manuales de `docs/testing/test-038-clave-respuestas-ocultable.md`
       siguiendo el protocolo de "Pruebas manuales asistidas por Claude".
 - [ ] Invocar `@reviewer` antes de marcar `[DONE]`.
@@ -306,5 +306,5 @@ tabla no contemple.
 
 > Claude no escribe código de implementación hasta que esta sección esté marcada.
 
-- [ ] Paquete (spec + pruebas) aprobado por el usuario
-- **Fecha de aprobación:** {{pendiente}}
+- [x] Paquete (spec + pruebas) aprobado por el usuario
+- **Fecha de aprobación:** 2026-08-01

@@ -11,6 +11,7 @@ interface TeacherLessonPanelProps {
   academicCourses: AttendanceGroup[];
   initialSessionsByCourseId: Record<string, OpenSessionResult>;
   initialAttendanceGroupId: string | null;
+  initialAnswerKeyExpanded: boolean;
 }
 
 export function TeacherLessonPanel({
@@ -19,6 +20,7 @@ export function TeacherLessonPanel({
   academicCourses,
   initialSessionsByCourseId,
   initialAttendanceGroupId,
+  initialAnswerKeyExpanded,
 }: TeacherLessonPanelProps) {
   return (
     <section className="mt-12 pt-8">
@@ -32,7 +34,12 @@ export function TeacherLessonPanel({
       </div>
 
       <div className="flex flex-col gap-6">
-        {answerKey.length > 0 && <TeacherAnswerKey questions={answerKey} />}
+        {answerKey.length > 0 && (
+          <TeacherAnswerKey
+            questions={answerKey}
+            initialExpanded={initialAnswerKeyExpanded}
+          />
+        )}
 
         <div className="border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 overflow-hidden">
           <div className="border-b border-gray-200 dark:border-gray-700 px-6 py-4">
