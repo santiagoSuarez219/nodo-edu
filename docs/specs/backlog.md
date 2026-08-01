@@ -5,6 +5,33 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+## DEBT-036 — CLAUDE.md declara Flowbite y shadcn/ui, pero ninguno está instalado
+
+**Origen:** Detectado al resolver **[[DEBT-018]]** (2026-08-01), al buscar un
+componente de modal/toast del sistema de diseño para reemplazar los
+`alert()`/`confirm()` nativos
+**Prioridad:** Baja — no rompe nada hoy, pero desvía cada decisión de UI
+
+CLAUDE.md → "Stack tecnológico" declara **Flowbite** ("componentes UI sobre
+Tailwind; usar primero") y **shadcn/ui** ("complementarios cuando Flowbite no
+cubra"), y "Convenciones de código" repite la regla ("Flowbite primero,
+shadcn/ui como complemento"). **Ninguno de los dos está en `package.json`**:
+las dependencias de UI son solo `tailwindcss`, `react-hook-form` y `zod`. No
+hay `components/ui/` ni `components.json`.
+
+En la práctica los componentes se escriben a mano con Tailwind, y los
+primitivos se van reinventando por archivo: el diálogo modal de
+`AssignmentPlayer` (spec-019) es el único patrón accesible existente, y
+DEBT-018 lo copió a `AdminAttendancePanel` en vez de importarlo.
+
+**Acción:** Decidir cuál de las dos realidades vale, y alinear la otra:
+(a) instalar Flowbite/shadcn/ui y adoptarlos donde ya hay primitivos a mano, o
+(b) corregir CLAUDE.md para reflejar que los componentes son propios, y extraer
+los primitivos repetidos (empezando por el diálogo de confirmación, hoy
+duplicado en dos archivos) a un `components/ui/` propio.
+
+---
+
 ## DEBT-035 — Barajado de evaluaciones A/B/C: orden estable entre intentos, no congelado en el `submission`
 
 **Origen:** Decisión D1 de spec-035 (2026-08-01), hallazgo de `@reviewer` al revisar el spec
@@ -504,10 +531,10 @@ cerrada.
 
 ---
 
-## DEBT-018 — `AdminAttendancePanel` usa `alert()`/`confirm()` nativos
+## DEBT-018 — `AdminAttendancePanel` usa `alert()`/`confirm()` nativos — ✅ Resuelto (2026-08-01)
 
 **Origen:** spec-031 (vista docente en la página de lección)
-**Prioridad:** Baja — cosmético, sin impacto funcional
+**Prioridad:** ~~Baja~~ → **Resuelto**
 
 `AdminAttendancePanel.tsx` (líneas 52 y 60-62) usa `alert()` para reportar
 errores y `confirm()` para confirmar el cierre de sesión. Es aceptable en el
@@ -521,6 +548,16 @@ admin ya `[DONE]`).
 **Acción:** En una iteración de UI, reemplazar `alert()`/`confirm()` por un
 toast/modal propio del sistema de diseño, y verificar ambos puntos de montaje
 (`/admin/courses/<id>/attendance` y la vista docente de lección).
+
+**Resolución (2026-08-01, rama `fix/attendance-panel-flicker`):** los `alert()`
+se reemplazaron por un banner inline con `role="alert"` y botón de descarte
+(estado `error` local), y el `confirm()` por un diálogo modal que reutiliza
+**verbatim el patrón ya existente** en `AssignmentPlayer` (spec-019):
+`role="dialog"` + `aria-modal` + `aria-labelledby`/`aria-describedby`, cierre
+con Escape, foco al botón de confirmar al abrir y `overflow: hidden` en el
+body. No se agregó ninguna dependencia — el proyecto no tiene Flowbite ni
+shadcn/ui instalados hoy, pese a lo que declara CLAUDE.md → "Stack tecnológico"
+(ver **[[DEBT-036]]**).
 
 ---
 
