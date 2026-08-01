@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { createServerSupabaseClient } from '@/lib/auth/server';
 import { getCurrentUser } from '@/lib/auth/session';
 import { hasCourseAccess } from '@/lib/enrollments/access';
-import { seededShuffle } from './shuffle';
+import { seededShuffle } from '@/lib/shuffle';
 import type {
   SelfAssessmentQuestion,
   AnswerKeyQuestion,

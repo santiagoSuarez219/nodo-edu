@@ -1,4 +1,4 @@
-# spec-035 — [NOT STARTED] Evaluaciones A/B/C: implementar `shuffle_questions` y `shuffle_choices`
+# spec-035 — [IN PROGRESS] Evaluaciones A/B/C: implementar `shuffle_questions` y `shuffle_choices`
 
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.

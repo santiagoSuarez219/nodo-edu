@@ -99,6 +99,11 @@ export default function AssignmentGroupDetail({ group }: AssignmentGroupDetailPr
             <p className="mt-1 text-sm font-medium text-gray-900 dark:text-white">
               {group.shuffle_questions ? "Sí" : "No"}
             </p>
+            {group.shuffle_questions && (
+              <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+                Cada estudiante ve las preguntas en un orden distinto. La numeración de esta ficha no coincide con la que ellos ven.
+              </p>
+            )}
           </div>
 
           <div>

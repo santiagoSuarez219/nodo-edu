@@ -5,46 +5,28 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
-## DEBT-034 — `shuffle_choices` / `shuffle_questions` son flags decorativos: nada los implementa
+## DEBT-034 — `shuffle_choices` / `shuffle_questions` son flags decorativos: nada los implementa — ✅ Resuelto (spec-035, 2026-08-01)
 
 **Origen:** Detectado al investigar **[[DEBT-029]]** (2026-07-31)
-**Prioridad:** Media — la UI le promete al docente un comportamiento que no
-ocurre; no rompe nada, pero invalida una decisión pedagógica que él cree haber
-tomado
+**Prioridad:** ~~Media~~ → **Resuelto** (frente 1 implementado)
 
 `assignment_variant_groups` tiene las columnas `shuffle_questions` y
-`shuffle_choices` (`20260718000002_init_assignment_variant_groups.sql:12-13`).
-Están en el esquema, en los tipos (`lib/assignments/types.ts:18`), en los
-schemas de validación (`lib/assignments/schemas.ts:32`), se persisten
-(`lib/assignments/service.ts:47`), se exponen por API
-(`app/api/assignments/groups/[groupId]/route.ts:33`) y **se le muestran al
-docente** en el panel admin como "Sí"/"No"
-(`components/admin/AssignmentGroupDetail.tsx:109`).
+`shuffle_choices` que atraviesan el sistema (esquema, tipos, API, panel admin).
+**Ningún código las leía para barajar** hasta spec-035.
 
-**Ningún código las lee para barajar nada.** El RPC que sirve las preguntas al
-estudiante ordena siempre por posición almacenada:
-`order by c.order_index` para las opciones y `order by aq.order_index` para las
-preguntas (`20260724000002_variant_question_content_rpcs.sql:93,104`), sin
-consultar los flags. Verificado además por grep: no hay ninguna función de
-barajado en `lib/assignments/` ni en `lib/submissions/`.
+**Resolución (2026-08-01):** implementado el barajado en el servidor con orden
+estable por estudiante (spec-035). El helper de barajado (`seededShuffle`) se
+movió de `lib/self-assessment/` a `lib/shuffle.ts` (módulo transversal).
+`getVariantQuestionDetails()` ahora lee `shuffle_questions` y `shuffle_choices`
+del grupo, aplica Fisher-Yates con semilla `(enrollment_id, assignment_id/question_id)`,
+y devuelve las preguntas/opciones barajadas. El orden es estable entre recargas
+durante el intento, y coincide exactamente entre el jugador y la página de
+resultados — garantizado por construcción, no por convención entre dos páginas.
+La vista del docente sigue mostrando orden canónico. Panel admin ahora advierte
+con una nota que `shuffle_questions` rompe la numeración compartida en clase.
 
-Consecuencia: un docente que activa "barajar opciones" en una evaluación
-formal A/B/C cree haber mitigado el copieteo entre estudiantes contiguos, y no
-lo hizo. Es peor que no tener el flag, porque induce una falsa sensación de
-control.
-
-**Relación con [[DEBT-029]]:** ese ítem contrastaba la autoevaluación (sin
-barajado) con las evaluaciones formales, *"que sí tiene un flag
-`shuffle_choices`"* — dando a entender que ahí funcionaba. No funciona. El spec
-que resuelva DEBT-029 debería decidir si comparte el helper de barajado con
-este caso.
-
-**Acción:** Dos frentes:
-1. **Implementar** el barajado en el flujo de resolución (respetando los flags
-   por grupo), con orden estable por estudiante para que recargar no reordene
-   el examen a mitad de intento.
-2. O, si se decide no implementarlo por ahora, **quitar los flags de la UI
-   admin** para no seguir prometiendo algo que no ocurre.
+**Frente 2 (quitar los flags de la UI):** descartado. Los flags son verdaderos
+ahora y funcionan correctamente.
 
 ---
 
