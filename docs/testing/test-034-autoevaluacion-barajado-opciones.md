@@ -9,16 +9,21 @@ Casos manuales de `spec-034-autoevaluacion-barajado-opciones.md`.
 
 | Recurso | Endpoint / herramienta de creación | Identificador | Eliminado |
 |---|---|---|---|
-| Curso académico de prueba | ⚠️ `INSERT` directo en `academic_courses` de dev (ver nota) | `{{id}}` / código `{{code}}` | ⬜ |
-| Estudiante A | `students-mcp` → `create_student` | `{{id}}` / `{{email}}` / `{{password}}` | ⬜ |
-| Estudiante B | `students-mcp` → `create_student` | `{{id}}` / `{{email}}` / `{{password}}` | ⬜ |
-| Estudiante C | `students-mcp` → `create_student` | `{{id}}` / `{{email}}` / `{{password}}` | ⬜ |
-| Pregunta con 5 opciones | `question-bank-mcp` → `create_question` + `publish_question` | `{{id}}` | ⬜ |
-| Pregunta con 4 opciones | `question-bank-mcp` → `create_question` + `publish_question` | `{{id}}` | ⬜ |
-| Pregunta con 4 opciones (2 correctas) | `question-bank-mcp` → `create_question` + `publish_question` | `{{id}}` | ⬜ |
+| Curso académico de prueba | ⚠️ `INSERT` directo en `academic_courses` de dev (ver nota) | `214f3ab1-ac80-4afc-8b90-720caed5c52d` (código `SPEC034TEST`) | ✅ |
+| Estudiante A | `students-mcp` → `create_student` (`enrollment_code: SPEC034TEST`) | `77a115b3-18a4-4ab7-9c61-49f1e7b100d0` / `spec034-a@nodo-test.local` / `Spec034Test!` | ✅ |
+| Estudiante B | `students-mcp` → `create_student` (`enrollment_code: SPEC034TEST`) | `2de7997e-9ca3-482c-a72c-f0a8fbd031cf` / `spec034-b@nodo-test.local` / `Spec034Test!` | ✅ |
+| Estudiante C | `students-mcp` → `create_student` (`enrollment_code: SPEC034TEST`) | `7a9cd948-eb6b-4870-9b23-c28ca372fc0f` / `spec034-c@nodo-test.local` / `Spec034Test!` | ✅ |
+| Pregunta con 5 opciones | `question-bank-mcp` → `create_question` + `publish_question` | `20c3eddb-b48a-4c6e-8f25-eb1b9346c267` — `github-flujo-de-trabajo-con-ramas` | ✅ |
+| Pregunta con 4 opciones | `question-bank-mcp` → `create_question` + `publish_question` | `8aaea503-e12a-429c-b776-8d0d0f3b0573` — `github-flujo-de-trabajo-con-ramas` | ✅ |
+| Pregunta con 4 opciones (2 correctas) | `question-bank-mcp` → `create_question` + `publish_question` | `258e64a7-4c17-4e78-a87a-da688b26fa83` — `github-flujo-de-trabajo-con-ramas` | ✅ |
 
 **Entorno de pruebas:** desarrollo (instancia local en `mirp-lab`, ver CLAUDE.md → "Base de datos")
-**Fecha de la ronda:** {{pendiente}}
+**Fecha de la ronda:** 2026-07-31
+
+> ⚠️ **Desviación del protocolo:** igual que en `test-033`, crear el curso
+> académico no tiene API ni MCP — solo Server Action del formulario admin. El
+> usuario autorizó explícitamente el `INSERT`/`DELETE` directo en la base de
+> **desarrollo** para esta ronda. No se tocó producción.
 
 > ⚠️ **Tres estudiantes, no dos.** Con 2 estudiantes y pocas opciones, que
 > coincidan en el mismo orden por azar es perfectamente posible y haría fallar
@@ -47,8 +52,8 @@ Casos manuales de `spec-034-autoevaluacion-barajado-opciones.md`.
 4. Comparar las tres secuencias.
 **Resultado esperado:** al menos dos de los tres estudiantes ven las opciones en
 orden distinto. **No** deben verse las 5 opciones en el mismo orden en los tres.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** los tres estudiantes vieron órdenes distintos entre sí (mejor que el mínimo exigido de "al menos dos").
 
 ---
 
@@ -60,8 +65,8 @@ orden distinto. **No** deben verse las 5 opciones en el mismo orden en los tres.
    correcta (todas las preguntas se crearon con la correcta en `order_index = 0`).
 **Resultado esperado:** la opción correcta **no** aparece en primera posición
 para los tres estudiantes. Al menos uno la ve en otra posición.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** "git status" no quedó en primera posición para los tres — confirma que ya no se puede aprobar eligiendo siempre la primera opción.
 
 > Este es el caso que verifica el propósito de fondo del spec: que ya no se pueda
 > aprobar eligiendo siempre la primera opción.
@@ -77,8 +82,8 @@ haber enviado todavía.
 2. Tras cada recarga, comparar el orden con la secuencia anotada.
 **Resultado esperado:** el orden es **idéntico** las tres veces y coincide con lo
 anotado en `TC-034-001`. Las opciones no se reordenan al recargar.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** sin observaciones — orden idéntico en las 3 recargas.
 
 ---
 
@@ -92,8 +97,8 @@ anotado en `TC-034-001`. Las opciones no se reordenan al recargar.
 **Resultado esperado:** las opciones mantienen exactamente la misma posición al
 pasar al estado de feedback; ninguna salta de lugar. La opción correcta queda
 resaltada en la posición donde estaba.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** sin observaciones — el orden se mantuvo estable tras `router.refresh()`, sin saltos visibles.
 
 > Cubre el riesgo específico que motivó el barajado sembrado en vez de aleatorio:
 > `router.refresh()` tras enviar vuelve a ejecutar la consulta en el servidor.
@@ -109,8 +114,8 @@ para llegar al resumen de spec-033.
 2. Comparar el orden de las opciones con la secuencia anotada en `TC-034-001`.
 **Resultado esperado:** el formulario de reintento muestra las opciones en el
 mismo orden que vio siempre este estudiante.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** sin observaciones.
 
 ---
 
@@ -126,8 +131,8 @@ mismo orden que vio siempre este estudiante.
 **Resultado esperado:** la primera se marca "Correcto", la segunda "Incorrecto"
 con la correcta resaltada donde efectivamente está, y la tercera "Correcto". El
 conteo final refleja 2/3.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** calificación correcta pese al barajado — confirma que la corrección compara por ID de opción, no por posición.
 
 ---
 
@@ -142,11 +147,19 @@ conteo final refleja 2/3.
 **Resultado esperado:** el docente ve las opciones en orden canónico
 (`order_index`), con la correcta marcada. Su vista **no** está barajada — esto es
 intencional y supersede el criterio de correspondencia de orden de spec-031.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** las 3 preguntas mostraron la correcta en primera posición para el docente — confirma que el `.order()` agregado en `getAnswerKeyForLesson()` (corrección del hallazgo Mayor de `@reviewer`) funciona como se esperaba.
 
 ## Resumen de la ronda
 
-- Aprobados: {{n}} — Fallidos: {{n}} — Pendientes: 7
-- Hallazgos escalados a `docs/specs/backlog.md`: {{lista o "ninguno"}}
-- Limpieza de datos de prueba: ⬜ Pendiente
+- Aprobados: 7 — Fallidos: 0 — Pendientes: 0
+- Hallazgos escalados a `docs/specs/backlog.md`: ninguno.
+- Limpieza de datos de prueba: ✅ Completada — 3 estudiantes y 3 preguntas
+  eliminados vía MCP (matrículas en cascada, verificado sin huérfanos antes
+  del borrado del curso); curso académico eliminado con `DELETE` directo,
+  misma excepción que su creación. `list_academic_courses`, `list_students` y
+  `list_questions` (filtrado por tag `spec-034-qa`) confirmaron los tres en 0.
+  Se detectó una fila preexistente en `lesson_progress` para
+  `dev@nodo.local` / `github-flujo-de-trabajo-con-ramas` (probable vista de
+  TC-034-007, `completed_at` nulo): no se tocó por no ser dato creado para
+  esta ronda, pertenece a la cuenta persistente del docente de desarrollo.

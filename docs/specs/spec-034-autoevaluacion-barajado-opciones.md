@@ -1,4 +1,4 @@
-# spec-034 — [TESTING] Autoevaluación de cierre: barajar el orden de las opciones por estudiante
+# spec-034 — [DONE] Autoevaluación de cierre: barajar el orden de las opciones por estudiante
 
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.
@@ -129,7 +129,20 @@ lectura para un agente. `question-bank-mcp` sigue viendo y escribiendo
 ### Fase 4 — Verificación final
 - [x] `npm run lint` sin errores nuevos
 - [x] `npm run build` en verde
-- [ ] Ejecutar la ronda manual de `docs/testing/test-034-autoevaluacion-barajado-opciones.md`
+- [x] Ejecutar la ronda manual de `docs/testing/test-034-autoevaluacion-barajado-opciones.md`
+
+### Ronda de pruebas manuales (2026-07-31)
+
+7/7 casos aprobados, sin fallos: `TC-034-001` a `TC-034-007`. Tres estudiantes
+vieron los 3 valores de orden distintos entre sí para la misma pregunta
+(mejor que el mínimo exigido de "al menos dos"); la opción correcta no quedó
+primera para ninguno; el orden fue estable entre recargas, tras
+`router.refresh()` post-envío y tras "Reintentar"; la calificación fue
+correcta pese al barajado (verificado respondiendo por contenido, no por
+posición); y la clave del docente mostró orden canónico en las 3 preguntas,
+confirmando la corrección del hallazgo Mayor de `@reviewer`. Sin hallazgos
+nuevos para el backlog. Detalle completo en
+`docs/testing/test-034-autoevaluacion-barajado-opciones.md`.
 
 ### Revisión de `@reviewer` (2026-07-31)
 

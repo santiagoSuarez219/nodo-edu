@@ -250,14 +250,13 @@ este correo. Iniciá sesión en su lugar."
 
 ---
 
-## DEBT-029 — Preguntas de autoevaluación con la respuesta correcta siempre en la primera posición
+## DEBT-029 — Preguntas de autoevaluación con la respuesta correcta siempre en la primera posición — ✅ Frente 2 resuelto (spec-034, 2026-07-31)
 
 **Origen:** `TC-026-011` (spec-026, smoke test de producción, 2026-07-31),
 reportado por el usuario
-**Prioridad:** Media — no es un bug de la plataforma sino un patrón en el
-contenido/orden de captura de las preguntas, pero le resta valor pedagógico a
-la autoevaluación (un estudiante puede aprender a elegir siempre la primera
-opción sin leer)
+**Prioridad:** ~~Media~~ → **Baja** — reclasificado el 2026-07-31: el frente
+de plataforma (el que escalaba y no dependía de la memoria de cada autor) ya
+está resuelto. Lo que queda es solo contenido.
 
 Las 3 preguntas publicadas de `estructuras-de-datos/implementacion-de-pilas-en-java`
 tienen la opción correcta en `order_index = 0` (primera posición) en las
@@ -276,11 +275,22 @@ guardadas (a diferencia de `assignment_variant_groups`, que sí tiene un flag
    mostrar, sin alterar `order_index` en la base), para no depender de que
    cada autor de preguntas varíe el orden manualmente.
 
-**Spec asociado (frente 2):** `spec-034-autoevaluacion-barajado-opciones.md`
-— `[NOT STARTED]`. Baraja en el servidor de forma **determinista sembrada por
-`(user_id, question_id)`**: cada estudiante ve un orden distinto pero estable
-entre recargas, `router.refresh()` y reintentos (un `Math.random()` por request
-haría saltar las opciones mientras el estudiante lee su feedback).
+**Resolución (frente 2, 2026-07-31):** implementado y probado en
+`spec-034-autoevaluacion-barajado-opciones.md` — `[DONE]`. El servidor
+baraja las opciones con semilla **determinista `(user_id, question_id)`**:
+cada estudiante ve un orden distinto pero estable entre recargas,
+`router.refresh()` post-envío y "Reintentar" (un `Math.random()` por request
+habría hecho saltar las opciones mientras el estudiante lee su feedback). La
+clave de respuestas del docente (spec-031) sigue en orden canónico
+`order_index`, sin barajar. Ronda manual `test-034` (7 casos, 3 estudiantes)
+aprobada sin hallazgos nuevos; `@reviewer` verificó `seededShuffle`
+empíricamente con 5000 semillas (determinismo, pureza, distribución uniforme)
+antes de la ronda.
+
+El **frente 1** (revisar y variar la posición de la correcta en las preguntas
+ya publicadas) sigue abierto, pero dejó de ser crítico: tras el frente 2,
+ningún estudiante puede aprobar eligiendo siempre la primera opción,
+independientemente de cómo esté guardada la pregunta.
 
 > **Corrección menor de la premisa (2026-07-31).** Este ítem contrastaba la
 > autoevaluación con las evaluaciones formales A/B/C, *"que sí tiene un flag
