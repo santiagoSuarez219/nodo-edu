@@ -173,6 +173,14 @@ solo lectura y las escrituras van por `service_role` en
 (`drop policy`), aplicada tanto en dev como en producción. Verificar antes que
 ningún flujo de estudiante o docente dependa de ellas.
 
+---
+
+## DEBT-032 — Tokens crudos de Tailwind en los componentes nuevos del panel admin de curso
+
+> Título restaurado el 2026-08-01: esta entrada había perdido su encabezado y su
+> separador, quedando pegada al final de **[[DEBT-033]]** — era invisible al leer
+> el índice del backlog y su número no aparecía en la numeración.
+
 **Origen:** spec-032 (navegación admin de curso), hallazgo de `@reviewer`
 **Prioridad:** Baja — impacto visual/mantenibilidad, no funcional
 
