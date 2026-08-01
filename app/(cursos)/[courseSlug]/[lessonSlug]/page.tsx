@@ -18,7 +18,8 @@ import {
 } from "@/lib/self-assessment";
 import type { SelfAssessmentQuestion, AnswerKeyQuestion, SelfAssessmentStatus } from "@/lib/self-assessment/types";
 import { resolveAcademicCoursesBySlug } from "@/lib/academic-courses";
-import type { OpenSessionSummary } from "@/lib/attendance/types";
+import type { OpenSessionResult, StudentAttendanceState } from "@/lib/attendance/types";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { LessonArticle } from "@/components/courses/LessonArticle";
 import { LessonPagination } from "@/components/courses/LessonPagination";
 import { LessonClosureFlow } from "@/components/courses/LessonClosureFlow";
@@ -73,9 +74,10 @@ export default async function LessonPage({ params }: LessonPageProps) {
     ? await getLessonArticle(course.slug, lesson.articleSlug, lesson.kind)
     : null;
 
-  let attendanceState = null;
+  let attendanceState: StudentAttendanceState | null = null;
   let selfAssessment: SelfAssessmentQuestion[] = [];
   let selfAssessmentStatus: SelfAssessmentStatus = {
+    status: "ok",
     questionCount: 0,
     hasAttempt: false,
     requiresAttempt: false,
@@ -88,12 +90,27 @@ export default async function LessonPage({ params }: LessonPageProps) {
     selfAssessmentStatus = await getSelfAssessmentStatus(courseSlug, lessonSlug);
   }
 
+  // Fallar cerrado (D8 de spec-037): un fallo de infraestructura al verificar
+  // la autoevaluación NUNCA debe abrir el gate de "completar lección".
+  const selfAssessmentCanComplete =
+    selfAssessmentStatus.status === "ok"
+      ? !selfAssessmentStatus.requiresAttempt || selfAssessmentStatus.hasAttempt
+      : false;
+  const selfAssessmentBlockedReason =
+    selfAssessmentStatus.status === "unavailable"
+      ? "self_assessment_unavailable"
+      : selfAssessmentStatus.requiresAttempt && !selfAssessmentStatus.hasAttempt
+        ? "self_assessment_pending"
+        : undefined;
+  const selfAssessmentLastAttempt =
+    selfAssessmentStatus.status === "ok" ? selfAssessmentStatus.lastAttempt : null;
+
   // Vista docente (spec-031): rama independiente de la de "enrolled" — un
   // owner/admin nunca tiene reason "enrolled", así que ambos bloques son
   // mutuamente excluyentes por construcción.
   let teacherAnswerKey: AnswerKeyQuestion[] = [];
   let teacherCourses: AttendanceGroup[] = [];
-  let teacherSessionsByCourseId: Record<string, OpenSessionSummary | null> = {};
+  let teacherSessionsByCourseId: Record<string, OpenSessionResult> = {};
   let teacherAttendanceGroupId: string | null = null;
 
   if (access.ok && (access.reason === "owner" || access.reason === "admin")) {
@@ -153,20 +170,21 @@ export default async function LessonPage({ params }: LessonPageProps) {
           lessonSlug={lessonSlug}
           questions={selfAssessment}
           initialCompletedAt={progress?.completed_at ?? null}
-          canComplete={!selfAssessmentStatus.requiresAttempt || selfAssessmentStatus.hasAttempt}
-          blockedReason={
-            selfAssessmentStatus.requiresAttempt && !selfAssessmentStatus.hasAttempt
-              ? "self_assessment_pending"
-              : undefined
-          }
-          lastAttempt={selfAssessmentStatus.lastAttempt}
+          canComplete={selfAssessmentCanComplete}
+          blockedReason={selfAssessmentBlockedReason}
+          lastAttempt={selfAssessmentLastAttempt}
           attendance={
             attendanceState && (
-              <AttendanceSection
-                courseSlug={courseSlug}
-                lessonSlug={lessonSlug}
-                attendanceState={attendanceState}
-              />
+              <ErrorBoundary
+                title="La sección de asistencia no está disponible"
+                description="Ocurrió un error inesperado. Intenta de nuevo."
+              >
+                <AttendanceSection
+                  courseSlug={courseSlug}
+                  lessonSlug={lessonSlug}
+                  attendanceState={attendanceState}
+                />
+              </ErrorBoundary>
             )
           }
         />

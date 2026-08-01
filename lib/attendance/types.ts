@@ -21,12 +21,30 @@ export type OpenSessionSummary = {
   attendanceCount: number;
 };
 
-export type StudentAttendanceState = {
-  sessionOpen: boolean;
-  sessionId?: string;
-  alreadyMarked: boolean;
-  markedAt?: string;
-};
+// Resultado discriminado de getOpenSessionForCourse: `session: null` significa
+// "no hay sesión abierta" (negocio); `status: 'unavailable'` significa "no se
+// pudo consultar" (infraestructura) — antes ambos casos colapsaban en `null`.
+export type OpenSessionResult =
+  | { status: 'ok'; session: OpenSessionSummary | null }
+  | { status: 'unavailable' };
+
+// Resultado discriminado de getSessionAttendanceCount: antes un fallo de
+// consulta devolvía `0`, indistinguible de "nadie ha marcado".
+export type AttendanceCountResult =
+  | { status: 'ok'; count: number }
+  | { status: 'unavailable' };
+
+// Resultado discriminado de getStudentAttendanceForCourse: antes un fallo de
+// consulta devolvía el mismo shape que "sin sesión abierta".
+export type StudentAttendanceState =
+  | {
+      status: 'ok';
+      sessionOpen: boolean;
+      sessionId?: string;
+      alreadyMarked: boolean;
+      markedAt?: string;
+    }
+  | { status: 'unavailable' };
 
 export type MarkAttendanceResult =
   | 'marked'
@@ -34,4 +52,7 @@ export type MarkAttendanceResult =
   | 'not_found'
   | 'expired'
   | 'closed'
-  | 'not_enrolled';
+  | 'not_enrolled'
+  // Fallo de infraestructura (consulta caída, RPC inalcanzable) — antes se
+  // fundía en 'not_found', que el estudiante leía como "código incorrecto".
+  | 'unavailable';

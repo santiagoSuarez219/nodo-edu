@@ -5,40 +5,142 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
-## DEBT-039 — `<Script id="theme-init">` en el layout raíz genera un error de hidratación en consola
+## DEBT-042 — El middleware cierra la sesión de todos los usuarios ante cualquier caída de Supabase Auth
 
-**Origen:** Ronda manual de `test-036-admin-curso-slug-y-ciclo-de-vida.md`
-(TC-036-012, 2026-08-01), detectado incidentalmente — no tiene relación con
-`spec-036`
-**Prioridad:** Media — no rompe la funcionalidad observada, pero contamina la
-consola en cada carga y pudo causar el colgado transitorio reportado en
-TC-036-012 (indicador de dev de Next.js atascado)
+**Origen:** Detectado durante la ronda manual de `test-037-manejo-de-errores.md`
+(`TC-037-004`, 2026-08-01), al recargar la página con el túnel a `mirp-lab`
+cortado
+**Prioridad:** Alta — bloquea el sitio **completo** (no un dominio puntual) y,
+mientras dura el fallo, impide incluso volver a iniciar sesión
 
-`app/layout.tsx:48` monta `<Script id="theme-init" strategy="beforeInteractive"
-dangerouslySetInnerHTML={{ __html: themeInitScript }} />` dentro del `<body>`.
-En Next.js 16.2.4 / React 19 esto dispara el error de consola:
+`middleware.ts:18` hace `if (!isPublic && !user) redirect a /login` para
+prácticamente cualquier ruta del sitio (el `matcher` de `middleware.ts:52-54`
+cubre todo salvo estáticos). `user` viene de `updateSupabaseSession()`
+(`lib/auth/middleware.ts:28-30`), que llama `supabase.auth.getUser()` **sin
+ningún `try/catch`**. Cuando Supabase Auth es inalcanzable, esa llamada no
+lanza (el SDK la atrapa internamente) pero **resuelve `user: null`** —
+indistinguible de "no hay sesión". El middleware trata ambos casos igual:
+redirige a `/login`.
 
-```
-Console Error
-Encountered a script tag while rendering React component. Scripts inside
-React components are never executed when rendering on the client. Consider
-using template tag instead.
-    at script (<anonymous>:null:null)
-    at RootLayout (app/layout.tsx:48:9)
-```
+Consecuencia observada en vivo: con el túnel cortado, una simple recarga de
+página —de un estudiante, un docente, cualquier rol, en cualquier ruta—
+expulsa a la sesión activa a `/login`. Y como el propio login también
+necesita a Supabase Auth, **nadie puede volver a entrar hasta que el servicio
+se restaure**. Es el mismo antipatrón que motivó **[[DEBT-037]]**
+(infraestructura leída como caso de negocio) y que sistematiza
+**[[DEBT-040]]**/**[[DEBT-041]]**, pero con un radio de impacto mayor que
+cualquiera de esos dos: no es una función de un dominio (asistencia,
+autoevaluación), es el **gate de autenticación de toda la aplicación**.
 
-Se reprodujo primero indirectamente durante TC-036-012 (la pestaña de prueba
-quedó colgada en el indicador "Rendering..." de Next.js sin peticiones ni
-errores propios de la app en curso), y se confirmó luego navegando
-directamente: el error de hidratación aparece en cualquier página que use el
-layout raíz, no solo en el panel admin.
+**No se corrigió en spec-037**: `middleware.ts` y `lib/auth/middleware.ts` no
+estaban en su tabla de "Impacto en el sistema", y el hallazgo apareció
+después de la implementación, durante la ronda de pruebas. Además de
+distinguir "sin sesión" de "no se pudo verificar", el fix probablemente deba
+decidir **qué hacer** ante lo segundo — dejar pasar la request de todos
+modos (con el riesgo de que páginas protegidas rendericen sin verificación
+real) es una opción tan delicada como bloquear a todo el sitio; ver
+**Acción**.
 
-**Acción:** Revisar si `next/script` con `strategy="beforeInteractive"` sigue
-siendo la forma correcta de inyectar este script en Next 16 (parece requerir
-`<template>` o un mecanismo distinto para scripts inline tempranos, según el
-propio mensaje de error), o mover la lógica de tema inicial a un mecanismo que
-no dispare esta advertencia (por ejemplo, un atributo `data-*` leído por CSS,
-o `suppressHydrationWarning` combinado con otro patrón de inyección).
+**Acción:** Diseñar un spec dedicado (no una extensión de spec-037). Como
+mínimo: (1) envolver `supabase.auth.getUser()` en `updateSupabaseSession()`
+en un `try/catch` que distinga la excepción/fallo de red de "no hay sesión",
+y (2) decidir el comportamiento ante ese tercer caso — candidatos: dejar
+pasar la request con una advertencia degradada (arriesga exponer una ruta que
+debía estar protegida, si el fallo es transitorio y la sesión real no
+existe), mostrar una página de "servicio no disponible" en vez de redirigir a
+`/login` (evita el bucle de "no puedo entrar porque no puedo verificar, y no
+puedo verificar porque el servicio está caído"), o cachear brevemente el
+último `user` válido conocido para tolerar caídas cortas. Evaluar también si
+`/admin` (que además consulta `user_roles` sin manejo de error en
+`middleware.ts:35-39`) necesita su propio tratamiento.
+
+---
+
+## DEBT-041 — `createServerSupabaseClient()` fuera del `try` en módulos no cubiertos por spec-037
+
+**Origen:** Detectado al implementar **[[DEBT-037]]** (spec-037, 2026-08-01):
+el mismo patrón que se corrigió en `lib/attendance/` existe en otros módulos
+que spec-037 dejó fuera de alcance
+**Prioridad:** Baja — solo se manifiesta si el propio `.env`/cliente de
+Supabase falla al construirse, no ante un fallo de consulta normal
+
+`lib/auth/server.ts` usa non-null assertions (`!`) sobre
+`NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, así que
+`createServerSupabaseClient()` puede lanzar. Cuando esa llamada vive **antes**
+del `try` de la función que la usa, esa excepción se propaga cruda en vez de
+convertirse en un valor de retorno. Confirmado al menos en
+`lib/academic-courses/index.ts:206`.
+
+> **Nota (2026-08-01):** al implementar la Fase 7 de spec-037 se corrigió,
+> además de lo que su tabla de "Impacto en el sistema" listaba
+> (`getSelfAssessmentStatus`), el mismo patrón en las otras 4 funciones de
+> `lib/self-assessment/index.ts` (`getSelfAssessmentForLesson`,
+> `getAnswerKeyForLesson`, `checkSelfAssessmentAnswer`,
+> `submitSelfAssessment`) — el checklist de la Fase 7 las mencionaba
+> explícitamente y dejarlas fuera habría sido inconsistente con lo ya marcado
+> como hecho. `lib/self-assessment/` queda fuera del alcance de este ítem.
+
+**Acción:** Barrer el resto de `lib/` con
+`grep -rn "createServerSupabaseClient" --include=*.ts` y mover cada llamada
+dentro del `try` de su función, siguiendo el patrón ya aplicado en
+`lib/attendance/` y `lib/self-assessment/` (spec-037). No requiere cambios de
+tipos ni de contrato — es una guarda adicional, no una reclasificación de
+resultado.
+
+---
+
+## DEBT-040 — Error de Supabase descartado en la destructuración (~40 sitios)
+
+**Origen:** Barrido de `lib/` durante la implementación de **[[DEBT-037]]**
+(spec-037, 2026-08-01), al confirmar que el mismo antipatrón de
+`lib/attendance/index.ts` (fallos de infraestructura indistinguibles de casos
+de negocio) es sistémico
+**Prioridad:** Alta — al menos dos de los sitios encontrados relajan una
+regla de negocio en vez de solo confundir al usuario, el mismo tipo de riesgo
+que motivó tratar el gate de autoevaluación dentro de spec-037 en vez de
+aplazarlo
+
+Patrón recurrente: `const { data } = await supabase…`, que descarta `error` al
+destructurar, o un `catch` que degrada a un valor indistinguible del caso de
+negocio legítimo. Confirmado en ~40 sitios de `lib/`; los de mayor impacto:
+
+- **`lib/submissions/index.ts:77`** — un fallo al contar intentos previos se
+  lee como "primer intento" y **salta la validación de `max_attempts`** en una
+  evaluación calificable.
+- **`lib/submissions/index.ts:204-219`** — una respuesta vacía de Supabase
+  escribe `auto_score = 0` como si fuera una nota real.
+- **`lib/enrollments/access.ts:21,37`** (`hasCourseAccess`) — un fallo de
+  consulta devuelve `not-enrolled` y **expulsa a un docente u owner
+  legítimo** de su propio curso; no hay `try/catch` alrededor, así que un
+  fallo de red aquí también puede propagar una excepción cruda (relacionado
+  con el escenario de `TC-007` que originó **[[DEBT-037]]**, pero en un
+  archivo fuera de su alcance).
+- **`lib/grades/index.ts:64`** y **`lib/questions/index.ts:251`** — guardas de
+  borrado que, si no disparan por un error silencioso, permiten borrar con
+  dependencias y reportan éxito.
+
+**Acción:** Aplicar sistemáticamente el patrón que spec-037 estableció para
+`lib/attendance/`: tipos discriminados que separen negocio de infraestructura
+donde el llamador necesite distinguirlos, y capturar/verificar siempre
+`error` antes de confiar en `data`. Priorizar `lib/submissions/index.ts` (nota
+real de estudiante en juego) y `lib/enrollments/access.ts` (control de acceso)
+sobre el resto.
+
+---
+
+## DEBT-039 — 🔁 Duplicado de **[[DEBT-010]]** (fusionado el 2026-08-01)
+
+Este ítem se abrió el 2026-08-01 durante la ronda manual de `test-036`
+describiendo el error de consola de `<Script id="theme-init">` en
+`app/layout.tsx`. **Es exactamente el mismo problema que ya registraba
+[[DEBT-010]]** (2026-07-24): mismo archivo, mismo mensaje de error, misma
+acción propuesta. Solo cambiaba el número de línea citado (48 vs. 47), porque
+el layout se editó entremedio.
+
+La evidencia nueva que aportaba esta entrada —la reproducción durante
+TC-036-012 y la confirmación de que el error aparece en **cualquier** página
+del layout raíz, no solo en el panel admin— se incorporó a **[[DEBT-010]]**,
+que queda como el ítem canónico. No abrir trabajo contra este número.
 
 ---
 
@@ -81,36 +183,47 @@ diálogo y devolución del foco al elemento que lo abrió.
 
 ---
 
-## DEBT-037 — La app no tiene ningún error boundary: un server action que lanza deja al usuario sin mensaje útil
+## DEBT-037 — La app no tiene ningún error boundary: un server action que lanza deja al usuario sin mensaje útil — ✅ Resuelto (spec-037, 2026-08-01)
 
 **Origen:** `TC-007` de `docs/testing/test-fix-attendance-panel-flicker.md`
 (2026-08-01), al cortar deliberadamente la conexión con Supabase
-**Prioridad:** Media — no se manifiesta en operación normal, pero cuando se
-manifiesta es en el peor momento (docente en clase, sin base de datos)
+**Prioridad:** ~~Media~~ → **Resuelto**
 
-`find app -name "error.tsx" -o -name "global-error.tsx"` no devuelve **ningún
-archivo**: la app no define un solo error boundary de App Router. Cuando un
-server action lanza —por ejemplo `openSession`
-(`lib/attendance/index.ts:75`), que hace `throw error` ante cualquier fallo de
-Supabase que no sea una violación de unique constraint— la excepción no la
-recoge nadie.
+> **Corrección del diagnóstico (2026-08-01, al redactar spec-037).** Esta
+> entrada afirmaba que `openSession` "hace `throw error` ... la excepción no la
+> recoge nadie". **Es falso**: los 5 `throw` de `lib/attendance/index.ts`
+> estaban todos dentro de un `try/catch` de su propia función y se convertían
+> en un valor de retorno; ninguno se propagaba. El problema real era más sutil
+> y en parte peor: los `catch` degradaban fallos de infraestructura a valores
+> **indistinguibles de un caso legítimo de negocio** (`null` → "no hay sesión",
+> `0` → "nadie ha marcado", `'not_found'` → "código incorrecto"), y el caso
+> observado en `TC-007` era un fallo de **transporte del server action**
+> (respuesta RSC malformada), que ningún `try/catch` del servidor podía
+> atrapar — solo un `try/catch` en el propio Client Component o un error
+> boundary.
 
-Observado en desarrollo con el túnel SSH a `mirp-lab` caído: el overlay de
-Turbopack con *"An unexpected response was received from the server."*
-apuntando a `TeacherAttendanceControl.tsx:97`. En producción el usuario vería
-la pantalla de error genérica de Next.js, perdiendo el contexto de la página.
+`find app -name "error.tsx" -o -name "global-error.tsx"` no devolvía **ningún
+archivo**: la app no definía un solo error boundary de App Router. Observado en
+desarrollo con el túnel SSH a `mirp-lab` caído: el overlay de Turbopack con
+*"An unexpected response was received from the server."* apuntando a
+`TeacherAttendanceControl.tsx:97`.
 
-Los `try/catch` de los server actions distinguen bien los errores **de
-negocio** (devuelven `{ success: false, error }`, que la UI sí sabe mostrar),
-pero los de **infraestructura** se propagan crudos. El manejo de errores
-inline que agregó **[[DEBT-018]]** cubre solo la primera categoría, por diseño.
+**Resolución (2026-08-01):** implementado y probado en
+`docs/specs/spec-037-manejo-de-errores.md` — `[DONE]`, en cuatro frentes:
 
-**Acción:** Agregar al menos un `app/error.tsx` (y evaluar `global-error.tsx`)
-con un mensaje comprensible y un botón de reintento (`reset()`). Evaluar
-además si los server actions críticos —los del panel de asistencia, que se usa
-en vivo durante la clase— deberían capturar sus propias excepciones y
-devolverlas como `{ success: false, error }` en vez de lanzar, para que el
-docente vea el banner inline sin perder la página.
+1. **Boundaries de App Router:** `global-error.tsx` (obligatorio — un
+   `error.tsx` no captura errores del root layout, que es `async`),
+   `app/error.tsx`, `(admin)/error.tsx` y `[lessonSlug]/error.tsx`, más un
+   `ErrorBoundary` de componente para que un fallo del panel de asistencia
+   degrade solo su recuadro sin desmontar la lección proyectada en clase.
+2. **Señalización honesta** en las 6 funciones de `lib/attendance/index.ts`:
+   tipos discriminados (`{status: 'ok'|'unavailable'}`) que separan "no hay
+   sesión"/"código inválido" (negocio) de "no pude consultar" (infra).
+3. **`try/catch` cliente** sobre las 4 invocaciones de server action del
+   dominio de asistencia — el frente que de verdad cierra `TC-007`.
+4. **Gate de autoevaluación** (hallazgo nuevo durante el spec, ver
+   **[[DEBT-040]]**): `getSelfAssessmentStatus` fallaba abierto ante un fallo
+   de lectura; ahora falla cerrado.
 
 ---
 
@@ -858,7 +971,12 @@ nuevo para **reconstruir** el flujo de recuperación de contraseña desde cero
 
 ## DEBT-010 — Error de consola "script tag while rendering" en el init de tema (Next 16)
 
+> **Ítem canónico.** El 2026-08-01 se abrió **[[DEBT-039]]** describiendo este
+> mismo problema; se fusionó aquí y aquel número quedó como puntero. Toda la
+> evidencia acumulada vive en este ítem.
+
 **Origen:** Reportado por el usuario durante la ronda de pruebas de `test-020-assignment-review.md`, ajeno al scope de spec-020
+**Reconfirmado:** Ronda manual de `test-036` (TC-036-012, 2026-08-01)
 **Prioridad:** Media — error de consola en toda la app; relacionado con DEBT-008
 
 Next.js 16.2.4 (Turbopack) reporta en consola:
@@ -873,17 +991,28 @@ template tag instead.
 ```
 
 Apunta a `<Script id="theme-init" strategy="beforeInteractive" ...>` en
-`app/layout.tsx:47`, el mismo mecanismo de aplicación de tema documentado en
-**[[DEBT-008]]** (saltos perceptibles entre modo claro/oscuro). No se investigó
-la causa raíz todavía; podría deberse a un cambio de comportamiento de
-`next/script` con `strategy="beforeInteractive"` fuera de `<Head>` en Next 16,
-o a una interacción con Turbopack/Cache Components.
+`app/layout.tsx` (línea 47 al reportarse, 48 tras ediciones posteriores),
+montado **dentro del `<body>`** — el mismo mecanismo de aplicación de tema
+documentado en **[[DEBT-008]]** (saltos perceptibles entre modo claro/oscuro).
+No se investigó la causa raíz todavía; podría deberse a un cambio de
+comportamiento de `next/script` con `strategy="beforeInteractive"` fuera de
+`<Head>` en Next 16, o a una interacción con Turbopack/Cache Components.
+
+**Evidencia adicional (2026-08-01, ex-[[DEBT-039]]):** se reprodujo primero de
+forma indirecta durante `TC-036-012` —la pestaña de prueba quedó colgada en el
+indicador "Rendering..." de Next.js, sin peticiones ni errores propios de la
+app en curso— y se confirmó después navegando directamente: el error aparece
+en **cualquier** página que use el layout raíz, no solo en el panel admin. Es
+decir, contamina la consola en cada carga de la app y es sospechoso del
+colgado transitorio de aquel caso.
 
 **Acción:** Investigar en la misma iteración de temas/DESIGN.md prevista para
 DEBT-008 — revisar si `next/script` con `beforeInteractive` sigue siendo la
-API correcta en Next 16 para este caso, o si corresponde moverlo a
-`app/layout.tsx` `<head>` explícito o a un mecanismo distinto (ver skill
-`next-upgrade`).
+API correcta en Next 16 para este caso (el propio mensaje sugiere `<template>`
+para scripts inline tempranos), o si corresponde moverlo al `<head>` explícito
+de `app/layout.tsx`, o a un mecanismo que no dispare la advertencia — por
+ejemplo un atributo `data-*` leído por CSS, o `suppressHydrationWarning`
+combinado con otro patrón de inyección (ver skill `next-upgrade`).
 
 ---
 
@@ -1065,10 +1194,10 @@ lección nueva tiene su `.mdx` correspondiente.
 
 ---
 
-## DEBT-004 — Sin acción de eliminar/desactivar curso en el panel admin
+## DEBT-004 — Sin acción de eliminar/desactivar curso en el panel admin — ✅ Resuelto (spec-036, 2026-08-01)
 
 **Origen:** Consulta del usuario sobre cómo eliminar un curso (2026-07-16)
-**Prioridad:** Media — no bloquea producción, pero es una operación admin básica ausente
+**Prioridad:** ~~Media~~ → **Resuelto**
 
 `AcademicCourseList.tsx` y el detalle de curso (`app/(admin)/admin/courses/[academicCourseId]/`)
 no exponen ningún botón de eliminar ni desactivar. Ya existe
@@ -1081,12 +1210,30 @@ existe una acción de borrado definitivo (hard delete).
 2. Evaluar si además se requiere borrado definitivo, y si debe hacerse en
    cascada (asistencia, notas, matrículas asociadas).
 
+**Resolución (2026-08-01):** implementado y probado en
+`docs/specs/spec-036-admin-curso-slug-y-ciclo-de-vida.md` — `[DONE]`. El panel
+admin expone ahora el ciclo de vida completo del curso: **desactivar** (conecta
+`deactivateCourseAction`, que además dejó de tragar errores y ya verifica filas
+afectadas), **reactivar** —sin la cual la desactivación era un viaje de ida— y
+**borrado definitivo**, cada uno con su diálogo de confirmación.
+
+Sobre el punto 2, la decisión del usuario fue **no** hacer borrado en cascada:
+el borrado definitivo se limita a **cursos vacíos** (sin matrículas ni
+evaluaciones, verificado con `getCourseDependencyCounts`), con un diálogo más
+exigente que el de desactivar que advierte del arrastre de sesiones de
+asistencia e ítems de nota. Registrado como decisión D1 del spec.
+
+También quedó explícito que `is_active=false` significa *"cerré las
+inscripciones"*, no *"expulsé a mi curso"*: los estudiantes ya matriculados
+conservan acceso al contenido, porque `hasCourseAccess`
+(`lib/enrollments/access.ts`) mira `enrollments.status` y no `course.is_active`.
+
 ---
 
-## DEBT-003 — `course_slug` de `academic_courses` sin validación ni selector
+## DEBT-003 — `course_slug` de `academic_courses` sin validación ni selector — ✅ Resuelto (spec-036, 2026-08-01)
 
 **Origen:** Revisión manual durante spec-006 (lecciones privadas)
-**Prioridad:** Media — no bloquea producción, pero genera cursos "huérfanos"
+**Prioridad:** ~~Media~~ → **Resuelto**
 
 En `AcademicCourseForm` (`components/admin/AcademicCourseForm.tsx`), el campo
 `course_slug` es un input de texto libre: el docente debe escribir a mano el
@@ -1102,6 +1249,26 @@ de spec-006).
 reales de `lib/courses/index.ts` (o al menos validar contra esa lista en el
 server action antes de persistir), para evitar cursos académicos sin
 contenido asociado.
+
+**Resolución (2026-08-01):** implementado y probado en
+`docs/specs/spec-036-admin-curso-slug-y-ciclo-de-vida.md` — `[DONE]`. Se
+hicieron **las dos** cosas que la acción planteaba como alternativas: el input
+libre pasó a ser un **selector** poblado con los cursos reales del contenido
+(nombre + slug, con opción explícita "— Sin vincular —"), y además
+`createCourseAction`/`updateCourseAction` **validan el slug en el servidor**
+contra esa misma lista — la validación de cliente es comodidad, no barrera.
+
+Durante la redacción del spec apareció un bug adicional que este ítem no había
+detectado y que se corrigió en el mismo trabajo: **desvincular era imposible**.
+`updateCourseAction` hacía `course_slug: parsed.data.course_slug || undefined`,
+así que al vaciar el campo el cliente de Supabase omitía la columna del
+`UPDATE` y el slug anterior quedaba intacto, sin error. Sin ese arreglo la
+opción "— Sin vincular —" habría sido decorativa al editar.
+
+Los cursos ya creados con un typo **se señalizan como huérfanos** en el
+listado, para poder detectarlos y corregirlos; migrar los `course_slug` ya
+guardados en producción quedó explícitamente fuera de alcance (es trabajo de
+contenido).
 
 ---
 

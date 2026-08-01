@@ -206,6 +206,10 @@
 - Hallazgos escalados a `docs/specs/backlog.md`: **DEBT-039** — error de
   hidratación de `<Script id="theme-init">` en `app/layout.tsx:48` (ajeno a
   este spec, detectado incidentalmente en TC-036-012).
+  > Nota (2026-08-01, posterior al cierre de la ronda): al revisar el backlog
+  > se detectó que este hallazgo ya estaba registrado como **DEBT-010** desde
+  > la ronda de `test-020`. DEBT-039 se fusionó en DEBT-010, que queda como
+  > ítem canónico; la evidencia aportada por esta ronda se conservó allí.
 - Anomalía sin escalar (no reproducible con certeza): el primer "Curso F"
   creado para el reintento de TC-036-012 desapareció de la base entre su
   creación y su primer uso, sin que ninguna acción de la app lo tocara. Se

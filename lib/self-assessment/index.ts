@@ -39,9 +39,8 @@ export async function getSelfAssessmentForLesson(
   courseSlug: string,
   lessonSlug: string
 ): Promise<SelfAssessmentQuestion[]> {
-  const supabase = await createServerSupabaseClient();
-
   try {
+    const supabase = await createServerSupabaseClient();
     const user = await getCurrentUser();
 
     const { data, error } = await supabase
@@ -113,9 +112,8 @@ export async function getAnswerKeyForLesson(
     return [];
   }
 
-  const supabase = await createServerSupabaseClient();
-
   try {
+    const supabase = await createServerSupabaseClient();
     const { data, error } = await supabase
       .from('questions')
       .select(
@@ -198,9 +196,8 @@ export async function checkSelfAssessmentAnswer(
     return { ok: false, error: 'No autorizado' };
   }
 
-  const supabase = await createServerSupabaseClient();
-
   try {
+    const supabase = await createServerSupabaseClient();
     // Verificar que la pregunta es multiple_choice, publicada y pertenece a la lección
     const { data: question, error: questionError } = await supabase
       .from('questions')
@@ -257,7 +254,14 @@ export async function getSelfAssessmentStatus(
   lessonSlug: string
 ): Promise<SelfAssessmentStatus> {
   const user = await getCurrentUser();
-  const supabase = await createServerSupabaseClient();
+
+  let supabase;
+  try {
+    supabase = await createServerSupabaseClient();
+  } catch (error) {
+    console.error('Error getting self-assessment status:', error);
+    return { status: 'unavailable' };
+  }
 
   try {
     const { data: questions, error: qError } = await supabase
@@ -273,6 +277,7 @@ export async function getSelfAssessmentStatus(
 
     if (!user) {
       return {
+        status: 'ok',
         questionCount,
         hasAttempt: false,
         requiresAttempt: questionCount > 0,
@@ -303,14 +308,18 @@ export async function getSelfAssessmentStatus(
       : null;
 
     return {
+      status: 'ok',
       questionCount,
       hasAttempt,
       requiresAttempt: questionCount > 0,
       lastAttempt,
     };
   } catch (error) {
+    // Fallar cerrado (D8 de spec-037): antes esto devolvía
+    // `requiresAttempt: false`, que markLessonCompleted leía como "esta
+    // lección no tiene autoevaluación" y dejaba completar sin responder.
     console.error('Error getting self-assessment status:', error);
-    return { questionCount: 0, hasAttempt: false, requiresAttempt: false, lastAttempt: null };
+    return { status: 'unavailable' };
   }
 }
 
@@ -336,9 +345,8 @@ export async function submitSelfAssessment(
     return { ok: false, reason: 'not_enrolled' };
   }
 
-  const supabase = await createServerSupabaseClient();
-
   try {
+    const supabase = await createServerSupabaseClient();
     const { data: questions, error: qError } = await supabase
       .from('questions')
       .select('id, type, is_published')
