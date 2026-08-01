@@ -5,6 +5,66 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+## DEBT-037 — La app no tiene ningún error boundary: un server action que lanza deja al usuario sin mensaje útil
+
+**Origen:** `TC-007` de `docs/testing/test-fix-attendance-panel-flicker.md`
+(2026-08-01), al cortar deliberadamente la conexión con Supabase
+**Prioridad:** Media — no se manifiesta en operación normal, pero cuando se
+manifiesta es en el peor momento (docente en clase, sin base de datos)
+
+`find app -name "error.tsx" -o -name "global-error.tsx"` no devuelve **ningún
+archivo**: la app no define un solo error boundary de App Router. Cuando un
+server action lanza —por ejemplo `openSession`
+(`lib/attendance/index.ts:75`), que hace `throw error` ante cualquier fallo de
+Supabase que no sea una violación de unique constraint— la excepción no la
+recoge nadie.
+
+Observado en desarrollo con el túnel SSH a `mirp-lab` caído: el overlay de
+Turbopack con *"An unexpected response was received from the server."*
+apuntando a `TeacherAttendanceControl.tsx:97`. En producción el usuario vería
+la pantalla de error genérica de Next.js, perdiendo el contexto de la página.
+
+Los `try/catch` de los server actions distinguen bien los errores **de
+negocio** (devuelven `{ success: false, error }`, que la UI sí sabe mostrar),
+pero los de **infraestructura** se propagan crudos. El manejo de errores
+inline que agregó **[[DEBT-018]]** cubre solo la primera categoría, por diseño.
+
+**Acción:** Agregar al menos un `app/error.tsx` (y evaluar `global-error.tsx`)
+con un mensaje comprensible y un botón de reintento (`reset()`). Evaluar
+además si los server actions críticos —los del panel de asistencia, que se usa
+en vivo durante la clase— deberían capturar sus propias excepciones y
+devolverlas como `{ success: false, error }` en vez de lanzar, para que el
+docente vea el banner inline sin perder la página.
+
+---
+
+## DEBT-036 — CLAUDE.md declara Flowbite y shadcn/ui, pero ninguno está instalado
+
+**Origen:** Detectado al resolver **[[DEBT-018]]** (2026-08-01), al buscar un
+componente de modal/toast del sistema de diseño para reemplazar los
+`alert()`/`confirm()` nativos
+**Prioridad:** Baja — no rompe nada hoy, pero desvía cada decisión de UI
+
+CLAUDE.md → "Stack tecnológico" declara **Flowbite** ("componentes UI sobre
+Tailwind; usar primero") y **shadcn/ui** ("complementarios cuando Flowbite no
+cubra"), y "Convenciones de código" repite la regla ("Flowbite primero,
+shadcn/ui como complemento"). **Ninguno de los dos está en `package.json`**:
+las dependencias de UI son solo `tailwindcss`, `react-hook-form` y `zod`. No
+hay `components/ui/` ni `components.json`.
+
+En la práctica los componentes se escriben a mano con Tailwind, y los
+primitivos se van reinventando por archivo: el diálogo modal de
+`AssignmentPlayer` (spec-019) es el único patrón accesible existente, y
+DEBT-018 lo copió a `AdminAttendancePanel` en vez de importarlo.
+
+**Acción:** Decidir cuál de las dos realidades vale, y alinear la otra:
+(a) instalar Flowbite/shadcn/ui y adoptarlos donde ya hay primitivos a mano, o
+(b) corregir CLAUDE.md para reflejar que los componentes son propios, y extraer
+los primitivos repetidos (empezando por el diálogo de confirmación, hoy
+duplicado en dos archivos) a un `components/ui/` propio.
+
+---
+
 ## DEBT-035 — Barajado de evaluaciones A/B/C: orden estable entre intentos, no congelado en el `submission`
 
 **Origen:** Decisión D1 de spec-035 (2026-08-01), hallazgo de `@reviewer` al revisar el spec
@@ -425,14 +485,29 @@ correspondiente en `SignUpSchema`.
 
 ---
 
-## DEBT-023 — `TeacherAttendanceControl`: parpadeo del grupo/código equivocado antes de restaurar la selección guardada
+## DEBT-023 — `TeacherAttendanceControl`: parpadeo del grupo/código equivocado antes de restaurar la selección guardada — ✅ Resuelto (2026-08-01)
 
 **Origen:** `@reviewer` en la revisión de spec-031
-**Prioridad:** Media — puede inducir al docente a dictar en clase el código de un grupo equivocado
+**Prioridad:** ~~Media~~ → **Resuelto**
 
 Con más de un grupo y una elección guardada en `localStorage`, el primer pintado del cliente monta `AdminAttendancePanel` con `courses[0]` (y su sesión, si tiene una abierta); el `useEffect` post-montaje cambia después a la selección restaurada, remontando el panel (por el `key={selectedCourse.id}`). Si el grupo por defecto (`courses[0]`) tiene una sesión abierta, el docente ve un instante el código de **otro** grupo antes de que aparezca el correcto — riesgoso si la pantalla está proyectada en clase.
 
 **Acción:** Persistir la elección en una cookie legible desde el server component (para que el HTML inicial ya venga con el grupo correcto), o no renderizar `AdminAttendancePanel` hasta que la restauración desde `localStorage` haya corrido.
+
+**Resolución (2026-08-01, rama `fix/attendance-panel-flicker`):** se optó por la
+cookie. `lib/attendance/group-preference.ts` (nuevo) expone
+`attendanceGroupCookieName(courseSlug)` y `resolveStoredAttendanceGroup()`; la
+página de lección lee la cookie en el server y pasa `initialAttendanceGroupId`
+por `TeacherLessonPanel` → `TeacherAttendanceControl`, que ya no usa
+`localStorage` ni el `useEffect` de restauración (se fueron con él dos
+`eslint-disable`, incluido el de `set-state-in-effect`). El HTML inicial trae
+el grupo correcto, así que no hay remontaje ni parpadeo. La escritura sigue en
+el cliente vía `document.cookie` (`path=/`, `SameSite=Lax`, 1 año) por ser una
+preferencia de UI sin efecto en datos.
+
+**Nota de migración:** la preferencia anterior guardada en `localStorage` no se
+migra — cada docente con más de un grupo vuelve a elegirlo una vez y a partir
+de ahí queda persistido en la cookie.
 
 ---
 
@@ -471,21 +546,28 @@ Dos hallazgos menores en los componentes nuevos de spec-031:
 
 ---
 
-## DEBT-019 — `AdminAttendancePanel`: el botón "Cerrar sesión" parpadea a "Cerrando..." cada ~5s
+## DEBT-019 — `AdminAttendancePanel`: el botón "Cerrar sesión" parpadea a "Cerrando..." cada ~5s — ✅ Resuelto (2026-08-01)
 
 **Origen:** test-031 (TC-009), reportado por el usuario durante la ronda de pruebas manuales
-**Prioridad:** Media — molesto en uso real (el docente ve el botón "temblar" durante toda la clase), no bloquea funcionalidad
+**Prioridad:** ~~Media~~ → **Resuelto**
 
 `AdminAttendancePanel.tsx` usa un único `isPending` de `useTransition()` compartido entre tres operaciones: abrir sesión, cerrar sesión, y el polling del conteo de asistentes cada 5 segundos (`useEffect` con `setInterval` → `startTransition(async () => { getSessionAttendanceCount(...) })`). Como las tres comparten el mismo `isPending`, cada vez que el polling dispara su transición, el botón "Cerrar sesión" cambia brevemente a "Cerrando..." y se deshabilita, aunque nadie esté cerrando nada — un parpadeo cada ~5s mientras la sesión está abierta. Preexistente desde spec-010 (el componente original), pero mucho más visible ahora que spec-031 lo embebe en la vista de lección donde el docente lo tiene a la vista durante toda la clase.
 
 **Acción:** Usar un `useTransition()` (o simple `useState<boolean>`) independiente para el polling de conteo, separado del que gobierna los botones de abrir/cerrar sesión, para que el polling nunca afecte su estado visual.
 
+**Resolución (2026-08-01, rama `fix/attendance-panel-flicker`):** el polling salió
+por completo de `startTransition` — no necesitaba transición ninguna, solo un
+`setAttendanceCount` directo. `isPending` queda gobernando exclusivamente los
+botones de abrir/cerrar sesión. Se agregó un flag `cancelled` en el cleanup del
+efecto para que una respuesta en vuelo no reviva el conteo de una sesión ya
+cerrada.
+
 ---
 
-## DEBT-018 — `AdminAttendancePanel` usa `alert()`/`confirm()` nativos
+## DEBT-018 — `AdminAttendancePanel` usa `alert()`/`confirm()` nativos — ✅ Resuelto (2026-08-01)
 
 **Origen:** spec-031 (vista docente en la página de lección)
-**Prioridad:** Baja — cosmético, sin impacto funcional
+**Prioridad:** ~~Baja~~ → **Resuelto**
 
 `AdminAttendancePanel.tsx` (líneas 52 y 60-62) usa `alert()` para reportar
 errores y `confirm()` para confirmar el cierre de sesión. Es aceptable en el
@@ -499,6 +581,16 @@ admin ya `[DONE]`).
 **Acción:** En una iteración de UI, reemplazar `alert()`/`confirm()` por un
 toast/modal propio del sistema de diseño, y verificar ambos puntos de montaje
 (`/admin/courses/<id>/attendance` y la vista docente de lección).
+
+**Resolución (2026-08-01, rama `fix/attendance-panel-flicker`):** los `alert()`
+se reemplazaron por un banner inline con `role="alert"` y botón de descarte
+(estado `error` local), y el `confirm()` por un diálogo modal que reutiliza
+**verbatim el patrón ya existente** en `AssignmentPlayer` (spec-019):
+`role="dialog"` + `aria-modal` + `aria-labelledby`/`aria-describedby`, cierre
+con Escape, foco al botón de confirmar al abrir y `overflow: hidden` en el
+body. No se agregó ninguna dependencia — el proyecto no tiene Flowbite ni
+shadcn/ui instalados hoy, pese a lo que declara CLAUDE.md → "Stack tecnológico"
+(ver **[[DEBT-036]]**).
 
 ---
 
