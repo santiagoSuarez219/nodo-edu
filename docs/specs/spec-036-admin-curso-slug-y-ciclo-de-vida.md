@@ -1,4 +1,4 @@
-# spec-036 — [NOT STARTED] Panel admin de cursos: `course_slug` validado y ciclo de vida del curso
+# spec-036 — [DONE] Panel admin de cursos: `course_slug` validado y ciclo de vida del curso
 
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.
@@ -278,52 +278,73 @@ Confirmada por el usuario (2026-08-01).
 ## Fases de implementación
 
 ### Fase 1 — `course_slug` como selector validado
-- [ ] En `new/page.tsx` y `edit/page.tsx`, obtener los cursos de contenido con
+- [x] En `new/page.tsx` y `edit/page.tsx`, obtener los cursos de contenido con
       `getAllCourses()` y pasarlos al formulario como
-      `availableCourses: Array<{ slug: string; name: string }>` (D4)
-- [ ] Reemplazar el input de texto por un `<select>` con opción
+      `availableCourses: Array<{ slug: string; name: string }>` (D4).
+      Nota: `Course` expone el nombre legible como `title`, no `name` — el spec
+      original (D4) decía `name`; el mapeo `{ slug: c.slug, name: c.title }`
+      corrige esa inexactitud sin cambiar el contrato del prop.
+- [x] Reemplazar el input de texto por un `<select>` con opción
       "— Sin vincular —" (`value=""`) y una opción por curso, etiquetada
       `Nombre (slug)`
-- [ ] Si el curso editado tiene un slug que no está en la lista, añadirlo como
+- [x] Si el curso editado tiene un slug que no está en la lista, añadirlo como
       opción seleccionada y marcada como inválida (D2)
-- [ ] **Arreglar el desvinculado en edición:** en `updateCourseAction`, sustituir
+- [x] **Arreglar el desvinculado en edición:** en `updateCourseAction`, sustituir
       `course_slug: parsed.data.course_slug || undefined` por una traducción
       explícita `"" → null`, para que la columna sí se incluya en el `UPDATE`
       (hoy se omite y el slug viejo sobrevive sin error)
-- [ ] Validar el slug en `createCourseAction` y `updateCourseAction` contra la
+- [x] Validar el slug en `createCourseAction` y `updateCourseAction` contra la
       lista real, devolviendo `fieldErrors.course_slug` si no pertenece;
       en update, aceptar además el valor ya persistido para ese curso (D2/D3)
-- [ ] Señalizar en `AcademicCourseList` las filas cuyo `course_slug` no exista
+- [x] Señalizar en `AcademicCourseList` las filas cuyo `course_slug` no exista
       (pasando los slugs válidos desde `courses/page.tsx`); "sin vincular"
       (`null`) **no** se marca como huérfano
 
 ### Fase 2 — Ciclo de vida del curso
-- [ ] `getCourseDependencyCounts(courseId)` en `lib/academic-courses/index.ts` —
+- [x] `getCourseDependencyCounts(courseId)` en `lib/academic-courses/index.ts` —
       devuelve conteos de: matrículas, grupos de variantes + `assignments`
       legacy (bloquean el borrado), y sesiones de asistencia + ítems de nota
       (se arrastran en cascada, hay que advertirlos — D1)
-- [ ] Endurecer `deactivateAcademicCourse`: comprobar `error` y filas afectadas
+- [x] Endurecer `deactivateAcademicCourse`: comprobar `error` y filas afectadas
       vía `.select()`; devolver el resultado en vez de `void` (D5/D6)
-- [ ] `reactivateAcademicCourse` (`is_active: true`) con el mismo tratamiento
-- [ ] `deleteAcademicCourse`: `DELETE ... .select()`; traducir el error `23503`
+- [x] `reactivateAcademicCourse` (`is_active: true`) con el mismo tratamiento
+- [x] `deleteAcademicCourse`: `DELETE ... .select()`; traducir el error `23503`
       de Postgres a un mensaje comprensible y tratar "cero filas" como fallo
-- [ ] `deactivateCourseAction` pasa a `Promise<AuthResult>` y deja de llamar a
+- [x] `deactivateCourseAction` pasa a `Promise<AuthResult>` y deja de llamar a
       `redirect()`; nuevas `reactivateCourseAction` y `deleteCourseAction` con el
       mismo contrato (D5)
-- [ ] `CourseLifecycleActions.tsx` — client component con los diálogos de
+- [x] `CourseLifecycleActions.tsx` — client component con los diálogos de
       desactivar / reactivar / borrar; recibe `course` y los conteos de
       dependencias; deshabilita el borrado con explicación cuando hay
       dependencias bloqueantes, y advierte del arrastre en cascada cuando no
-- [ ] Montarlo al pie de `edit/page.tsx` como zona de peligro (D7), conectando
+- [x] Montarlo al pie de `edit/page.tsx` como zona de peligro (D7), conectando
       `deactivateCourseAction` (hoy código muerto)
-- [ ] Navegación post-acción según D8: permanecer en la página al
-      desactivar/reactivar; ir a `/admin/courses` tras un borrado exitoso
+- [x] Navegación post-acción según D8: permanecer en la página al
+      desactivar/reactivar (con `router.refresh()` para que `CourseHeader`
+      recoja el `is_active` nuevo); ir a `/admin/courses` tras un borrado
+      exitoso
 
 ### Fase 3 — Verificación
-- [ ] `npm run lint` sin errores nuevos
-- [ ] `npm run build` en verde
-- [ ] Invocar `@reviewer` antes de la ronda manual
-- [ ] Ejecutar la ronda manual de `docs/testing/test-036-admin-curso-slug-y-ciclo-de-vida.md`
+- [x] `npm run lint` sin errores nuevos (10 warnings preexistentes, ajenos a
+      este spec)
+- [x] `npm run build` en verde
+- [x] Invocar `@reviewer` antes de la ronda manual — **APROBADO** (2026-08-01),
+      con un hallazgo Mayor corregido antes de este commit:
+      `getCourseDependencyCounts` degradaba silenciosamente a "0 dependencias"
+      si la consulta a Postgres fallaba, lo que podía hacer que el diálogo de
+      borrado dijera "sin sesiones de asistencia ni ítems de nota" cuando en
+      realidad no se pudo verificar. Ahora devuelve
+      `{ ok: false }` explícito y el borrado se deshabilita si no se pudieron
+      calcular las dependencias. También se corrigieron dos hallazgos menores
+      (texto "0 matrícula(s)" cuando el bloqueo era solo por evaluaciones, y
+      `title` decorativo en un botón deshabilitado sin valor para lectores de
+      pantalla, reemplazado por `aria-describedby`).
+- [x] Ejecutar la ronda manual de `docs/testing/test-036-admin-curso-slug-y-ciclo-de-vida.md`
+      — **12/12 casos aprobados** (2026-08-01). Un hallazgo incidental y ajeno
+      al spec (error de hidratación de `<Script id="theme-init">` en
+      `app/layout.tsx:48`, causante probable de un colgado transitorio en el
+      primer intento de TC-036-012) se registró como **DEBT-039**, no se
+      corrigió en esta sesión. Datos de prueba limpiados por completo.
 
 > **Reutilización de patrones:** los diálogos de confirmación deben seguir el
 > mismo patrón accesible ya presente en `components/student/AssignmentPlayer.tsx`
@@ -390,5 +411,5 @@ Confirmada por el usuario (2026-08-01).
 
 ## Aprobación de implementación
 > Claude no escribe código de implementación hasta que esta sección esté marcada.
-- [ ] Paquete (spec + pruebas) aprobado por el usuario
-- **Fecha de aprobación:** {{pendiente}}
+- [x] Paquete (spec + pruebas) aprobado por el usuario
+- **Fecha de aprobación:** 2026-08-01 ("Implementa el spec")

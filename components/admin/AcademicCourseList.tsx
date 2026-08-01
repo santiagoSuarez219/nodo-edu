@@ -16,9 +16,11 @@ function formatTime(t: string) {
 
 interface Props {
   courses: AcademicCourse[];
+  validSlugs: string[];
 }
 
-export function AcademicCourseList({ courses }: Props) {
+export function AcademicCourseList({ courses, validSlugs }: Props) {
+  const validSlugSet = new Set(validSlugs);
   if (courses.length === 0) {
     return (
       <div className="rounded-[var(--radius-base)] border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-8 py-16 text-center">
@@ -55,46 +57,58 @@ export function AcademicCourseList({ courses }: Props) {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100 dark:divide-gray-700 bg-white dark:bg-gray-800">
-            {courses.map((course) => (
-              <tr
-                key={course.id}
-                className="relative hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer"
-              >
-                <td className="px-5 py-4 font-medium text-gray-900 dark:text-white">
-                  <Link
-                    href={`/admin/courses/${course.id}`}
-                    className="after:absolute after:inset-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-200 dark:focus-visible:ring-blue-700 hover:underline"
-                  >
-                    {course.name}
-                  </Link>
-                </td>
-                <td className="px-5 py-4 text-gray-600 dark:text-gray-300 font-mono text-xs">
-                  {course.code}
-                </td>
-                <td className="px-5 py-4 text-gray-600 dark:text-gray-300">
-                  <span className="block">
-                    {course.class_days.map((d) => DAY_LABELS[d] ?? d).join(", ")}
-                  </span>
-                  <span className="text-xs text-gray-400 dark:text-gray-500">
-                    {formatTime(course.class_time_start)} – {formatTime(course.class_time_end)}
-                  </span>
-                </td>
-                <td className="px-5 py-4 font-mono text-xs text-gray-600 dark:text-gray-300">
-                  {course.enrollment_code}
-                </td>
-                <td className="px-5 py-4">
-                  {course.is_active ? (
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
-                      Activo
+            {courses.map((course) => {
+              const isOrphan =
+                !!course.course_slug && !validSlugSet.has(course.course_slug);
+              return (
+                <tr
+                  key={course.id}
+                  className="relative hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                >
+                  <td className="px-5 py-4 font-medium text-gray-900 dark:text-white">
+                    <Link
+                      href={`/admin/courses/${course.id}`}
+                      className="after:absolute after:inset-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-200 dark:focus-visible:ring-blue-700 hover:underline"
+                    >
+                      {course.name}
+                    </Link>
+                    {isOrphan && (
+                      <span
+                        title={`El curso de contenido "${course.course_slug}" ya no existe`}
+                        className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300"
+                      >
+                        Slug huérfano
+                      </span>
+                    )}
+                  </td>
+                  <td className="px-5 py-4 text-gray-600 dark:text-gray-300 font-mono text-xs">
+                    {course.code}
+                  </td>
+                  <td className="px-5 py-4 text-gray-600 dark:text-gray-300">
+                    <span className="block">
+                      {course.class_days.map((d) => DAY_LABELS[d] ?? d).join(", ")}
                     </span>
-                  ) : (
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400">
-                      Inactivo
+                    <span className="text-xs text-gray-400 dark:text-gray-500">
+                      {formatTime(course.class_time_start)} – {formatTime(course.class_time_end)}
                     </span>
-                  )}
-                </td>
-              </tr>
-            ))}
+                  </td>
+                  <td className="px-5 py-4 font-mono text-xs text-gray-600 dark:text-gray-300">
+                    {course.enrollment_code}
+                  </td>
+                  <td className="px-5 py-4">
+                    {course.is_active ? (
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
+                        Activo
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400">
+                        Inactivo
+                      </span>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

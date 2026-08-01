@@ -5,6 +5,43 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+## DEBT-039 — `<Script id="theme-init">` en el layout raíz genera un error de hidratación en consola
+
+**Origen:** Ronda manual de `test-036-admin-curso-slug-y-ciclo-de-vida.md`
+(TC-036-012, 2026-08-01), detectado incidentalmente — no tiene relación con
+`spec-036`
+**Prioridad:** Media — no rompe la funcionalidad observada, pero contamina la
+consola en cada carga y pudo causar el colgado transitorio reportado en
+TC-036-012 (indicador de dev de Next.js atascado)
+
+`app/layout.tsx:48` monta `<Script id="theme-init" strategy="beforeInteractive"
+dangerouslySetInnerHTML={{ __html: themeInitScript }} />` dentro del `<body>`.
+En Next.js 16.2.4 / React 19 esto dispara el error de consola:
+
+```
+Console Error
+Encountered a script tag while rendering React component. Scripts inside
+React components are never executed when rendering on the client. Consider
+using template tag instead.
+    at script (<anonymous>:null:null)
+    at RootLayout (app/layout.tsx:48:9)
+```
+
+Se reprodujo primero indirectamente durante TC-036-012 (la pestaña de prueba
+quedó colgada en el indicador "Rendering..." de Next.js sin peticiones ni
+errores propios de la app en curso), y se confirmó luego navegando
+directamente: el error de hidratación aparece en cualquier página que use el
+layout raíz, no solo en el panel admin.
+
+**Acción:** Revisar si `next/script` con `strategy="beforeInteractive"` sigue
+siendo la forma correcta de inyectar este script en Next 16 (parece requerir
+`<template>` o un mecanismo distinto para scripts inline tempranos, según el
+propio mensaje de error), o mover la lógica de tema inicial a un mecanismo que
+no dispare esta advertencia (por ejemplo, un atributo `data-*` leído por CSS,
+o `suppressHydrationWarning` combinado con otro patrón de inyección).
+
+---
+
 ## DEBT-038 — El diálogo de confirmación accesible está copiado literalmente en cada componente que lo necesita
 
 **Origen:** Revisión de `spec-036` (2026-08-01), al detectar que su
