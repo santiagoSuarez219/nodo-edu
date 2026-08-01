@@ -316,21 +316,26 @@ lectura para un agente.
       `question_id`, no por índice
 
 ### Fase 5 — UI admin y documentación
-- [ ] Añadir en `components/admin/AssignmentGroupDetail.tsx`, junto al "Sí"/"No"
+- [x] Añadir en `components/admin/AssignmentGroupDetail.tsx`, junto al "Sí"/"No"
       de `shuffle_questions` y solo cuando el flag esté activo, una nota breve
       advirtiendo que cada estudiante ve las preguntas en un orden propio y que
       la numeración de esta ficha no coincide con la que ellos ven (D6).
-      Usar el patrón "Texto sutil" de `DESIGN.md`
+      Usa el patrón "Texto sutil" de `DESIGN.md`
       (`text-gray-500 dark:text-gray-400`), consistente con el componente
-- [ ] Marcar **[[DEBT-034]]** en `docs/specs/backlog.md` como resuelta por
+- [x] Marcar **[[DEBT-034]]** en `docs/specs/backlog.md` como resuelta por
       spec-035, dejando constancia de que el frente 2 (quitar los flags) queda
       descartado
-- [ ] Registrar en el backlog el ítem derivado de D1 (barajar por intento exige
-      antes unificar la resolución del intento vigente)
-- [ ] Anotar en `spec-034-autoevaluacion-barajado-opciones.md` que su exclusión
+- [x] Registrar en el backlog el ítem derivado de D1 (barajar por intento exige
+      antes unificar la resolución del intento vigente) — ver **[[DEBT-035]]**
+- [x] Anotar en `spec-034-autoevaluacion-barajado-opciones.md` que su exclusión
       de las evaluaciones A/B/C queda cubierta por spec-035
-- [ ] Decidir si se enriquece `docs/mcps/assignment-agent.system-prompt.md` con
-      orientación sobre cuándo activar cada flag (opcional, ver "Evaluación MCP")
+- [x] Decidir si se enriquece `docs/mcps/assignment-agent.system-prompt.md` con
+      orientación sobre cuándo activar cada flag — **decidido: no.** Es una
+      mejora opcional de calidad del prompt, no un requisito del spec (ver
+      "Evaluación MCP"); el spec no introduce ni cambia ninguna herramienta
+      del MCP, y el system prompt actual no menciona el barajado, por lo que no
+      contiene ninguna afirmación falsa que corregir con urgencia. Queda
+      disponible como mejora futura si se retoma `assignment-agent`
 
 ### Fase 6 — Verificación final
 - [ ] `npm run lint` sin errores nuevos

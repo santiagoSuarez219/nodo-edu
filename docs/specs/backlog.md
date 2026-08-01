@@ -5,6 +5,48 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+## DEBT-035 — Barajado de evaluaciones A/B/C: orden estable entre intentos, no congelado en el `submission`
+
+**Origen:** Decisión D1 de spec-035 (2026-08-01), hallazgo de `@reviewer` al revisar el spec
+**Prioridad:** Baja — el diseño actual está justificado y cubre el riesgo real
+(copieteo entre estudiantes contiguos); esto es refinamiento futuro, no un defecto
+
+spec-035 (`docs/specs/spec-035-evaluaciones-barajado.md`) implementó el
+barajado de `shuffle_questions`/`shuffle_choices` con una semilla que
+deliberadamente **no** incluye `attempt_number`: `assignment-questions:${enrollmentId}:${assignmentId}`
+y `assignment-choices:${enrollmentId}:${questionId}` (`lib/submissions/index.ts`,
+`getVariantQuestionDetails`). La decisión (D1 del spec) prioriza garantizar
+"por construcción" que el jugador y la página de resultados coincidan, en vez
+de depender de que ambas resuelvan igual cuál es el intento vigente —hoy lo
+hacen por caminos distintos (`createSubmission` recupera la fila
+creada/recuperada; `getSubmissionByStudent` toma el `attempt_number` más alto).
+
+**Consecuencia asumida:** con `max_attempts > 1` y `show_feedback_on: "submit"`,
+un estudiante que ya vio la retroalimentación de su primer intento puede
+memorizar la posición de la opción correcta y acertar el reintento sin releer
+el enunciado. La palanca correcta hoy contra esto es `show_feedback_on`
+(`"close"` o `"never"`), no el barajado.
+
+**Relacionado — flags no congelados en el intento:** los flags se leen en vivo
+del grupo en cada llamada a `getVariantQuestionDetails`, no se copian al
+`submission` al crearlo. Si el docente cambia `shuffle_questions`/
+`shuffle_choices` **a mitad de un intento en curso**, el orden se reordena en
+la siguiente recarga del estudiante y la página de resultados puede no
+coincidir con lo que vio durante la resolución — la misma incoherencia que D3
+de spec-035 buscaba evitar, mochila de que la configuración vive en el grupo y
+no en el intento.
+
+**Acción:** Si en la práctica se observa que estudiantes aprovechan la
+posición memorizada entre intentos, incorporar `attempt_number` (o
+`submission_id`) a la semilla — pero **antes** unificar cómo el jugador y la
+página de resultados resuelven cuál es el intento vigente para esa variante,
+o la coherencia jugador↔resultados que D3 garantiza hoy se rompe. Evaluar en
+el mismo trabajo si conviene copiar los flags al `submission` al crearlo (o a
+`assignment_variant_allocations`), para que un cambio de configuración del
+docente a mitad de examen no reordene un intento ya en curso.
+
+---
+
 ## DEBT-034 — `shuffle_choices` / `shuffle_questions` son flags decorativos: nada los implementa — ✅ Resuelto (spec-035, 2026-08-01)
 
 **Origen:** Detectado al investigar **[[DEBT-029]]** (2026-07-31)
