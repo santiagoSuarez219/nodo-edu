@@ -40,20 +40,18 @@ export function TeacherAnswerKey({ questions, initialExpanded }: TeacherAnswerKe
   };
 
   const toggleExpanded = () => {
-    setExpanded((prev) => {
-      const next = !prev;
-      if (next) {
-        document.cookie = `${ANSWER_KEY_COOKIE_NAME}=1; path=/; max-age=${ANSWER_KEY_COOKIE_MAX_AGE_SECONDS}; SameSite=Lax`;
-      } else {
-        // Plegar borra la cookie en vez de escribir "0": el estado por defecto
-        // y el estado plegado son el mismo estado (spec-038, D4).
-        document.cookie = `${ANSWER_KEY_COOKIE_NAME}=; path=/; max-age=0; SameSite=Lax`;
-        // Volver a desplegar nunca debe mostrar respuestas ya reveladas antes
-        // de plegar (spec-038, D8).
-        setRevealedIds(new Set());
-      }
-      return next;
-    });
+    const next = !expanded;
+    setExpanded(next);
+    if (next) {
+      document.cookie = `${ANSWER_KEY_COOKIE_NAME}=1; path=/; max-age=${ANSWER_KEY_COOKIE_MAX_AGE_SECONDS}; SameSite=Lax`;
+    } else {
+      // Plegar borra la cookie en vez de escribir "0": el estado por defecto
+      // y el estado plegado son el mismo estado (spec-038, D4).
+      document.cookie = `${ANSWER_KEY_COOKIE_NAME}=; path=/; max-age=0; SameSite=Lax`;
+      // Volver a desplegar nunca debe mostrar respuestas ya reveladas antes
+      // de plegar (spec-038, D8).
+      setRevealedIds(new Set());
+    }
   };
 
   if (questions.length === 0) return null;
@@ -77,6 +75,7 @@ export function TeacherAnswerKey({ questions, initialExpanded }: TeacherAnswerKe
           onClick={toggleExpanded}
           aria-expanded={expanded}
           aria-controls={bodyId}
+          aria-label={expanded ? 'Ocultar la clave de respuestas' : 'Mostrar la clave de respuestas'}
           className="shrink-0 px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"
         >
           {expanded ? 'Ocultar' : 'Mostrar'}
