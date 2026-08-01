@@ -1,4 +1,5 @@
 import { createServerSupabaseClient } from "@/lib/auth/server";
+import { seededShuffle } from "@/lib/shuffle";
 import { fetchStudentProfilesPublic } from "@/lib/enrollments";
 import type {
   Answer,
@@ -129,9 +130,17 @@ export async function saveAnswer(
 // resultados). `choices[].is_correct` viene ya gateado por show_feedback_on
 // desde la RPC (ver 20260724000002_variant_question_content_rpcs.sql) — nunca
 // se calcula aquí ni se le pasa un flag de "revelar" a la función.
+//
+// El barajado de preguntas y opciones respeta los flags shuffle_questions y
+// shuffle_choices del grupo (spec-035). La semilla es determinista por
+// (enrollmentId, assignmentId/questionId), estable entre recargas dentro del
+// mismo intento. NO es una garantía criptográfica: mitiga copieteo por vecindad
+// ("mira la pantalla de al lado"), no a un atacante con devtools que invoque
+// la RPC directa para obtener el orden canónico.
 export async function getVariantQuestionDetails(
   assignmentId: string,
-  enrollmentId: string
+  enrollmentId: string,
+  groupId: string
 ): Promise<QuestionDetail[]> {
   const supabase = await createServerSupabaseClient();
   const { data, error } = await supabase.rpc("get_variant_question_details", {
@@ -140,7 +149,41 @@ export async function getVariantQuestionDetails(
   });
 
   if (error) throw new Error(error.message);
-  return (data ?? []) as QuestionDetail[];
+  const questions = (data ?? []) as QuestionDetail[];
+
+  // Leer los flags de barajado del grupo
+  const { data: group, error: groupError } = await supabase
+    .from("assignment_variant_groups")
+    .select("shuffle_questions, shuffle_choices")
+    .eq("id", groupId)
+    .maybeSingle();
+
+  if (groupError) {
+    console.error("getVariantQuestionDetails: failed to read group flags:", groupError.message);
+    return questions;
+  }
+
+  if (!group) {
+    console.error("getVariantQuestionDetails: group not found:", groupId);
+    return questions;
+  }
+
+  let result = questions;
+
+  // Barajar opciones de cada pregunta si está habilitado
+  if (group.shuffle_choices) {
+    result = result.map((q) => ({
+      ...q,
+      choices: seededShuffle(q.choices ?? [], `assignment-choices:${enrollmentId}:${q.question_id}`),
+    }));
+  }
+
+  // Barajar preguntas si está habilitado
+  if (group.shuffle_questions) {
+    result = seededShuffle(result, `assignment-questions:${enrollmentId}:${assignmentId}`);
+  }
+
+  return result;
 }
 
 export async function submitSubmission(
