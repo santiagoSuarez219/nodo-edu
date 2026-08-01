@@ -10,18 +10,32 @@
 
 | Recurso | Endpoint / herramienta de creación | Identificador | Eliminado |
 |---|---|---|---|
-| Estudiante A | `students-mcp` → `create_student` | `{{id}}` | ⬜ |
-| Estudiante B | `students-mcp` → `create_student` | `{{id}}` | ⬜ |
-| Matrícula A | `students-mcp` → `enroll_student` | `{{enrollment_id}}` | ⬜ |
-| Matrícula B | `students-mcp` → `enroll_student` | `{{enrollment_id}}` | ⬜ |
-| Preguntas MC (≥4 opciones) | `question-bank-mcp` → `create_question` | `{{ids}}` | ⬜ |
-| Pregunta abierta (`open_text`) | `question-bank-mcp` → `create_question` | `{{id}}` | ⬜ |
-| Grupo G-BARAJA (`max_attempts: 2`) | `assignment-mcp` → `create_assignment_group` | `{{group_id}}` | ⬜ |
-| Variantes A/B/C de G-BARAJA | `assignment-mcp` → `replace_variant_questions` | `{{ids}}` | ⬜ |
-| Envíos generados en la ronda | (generados al resolver en la UI) | `{{ids}}` | ⬜ |
+| Curso académico de prueba | **SQL directo** (`POST /rest/v1/academic_courses`) — sin endpoint/MCP disponible, ver nota abajo | `4b6dd433-a41e-4d87-92f4-50da4dea5aa7` (código matrícula `TEST0035`) | ⬜ |
+| Estudiante A | `students-mcp` → `create_student` | `2caf011e-4d89-49bc-adf0-719e0b099677` (`spec035-a@nodo-test.local` / `Test035Pass!`) | ⬜ |
+| Estudiante B | `students-mcp` → `create_student` | `d1c0ecbe-16c1-41cd-9fd3-cf29551dd480` (`spec035-b@nodo-test.local` / `Test035Pass!`) | ⬜ |
+| Matrícula A | `students-mcp` → `create_student` (`enrollment_code`) | `445916da-af4b-4ab0-abcb-a029744be8e0` | ⬜ |
+| Matrícula B | `students-mcp` → `create_student` (`enrollment_code`) | `6f58584e-ffdb-4b5d-a0e3-facc0097d504` | ⬜ |
+| Pregunta MC — complejidad arreglo dinámico | `question-bank-mcp` → `create_question` | `54495bfa-d135-4562-a0be-428b8ab6667d` | ⬜ |
+| Pregunta MC — LIFO / Pila | `question-bank-mcp` → `create_question` | `fdad9014-74d6-4440-979a-86d4e0565c28` | ⬜ |
+| Pregunta MC — búsqueda en tabla hash | `question-bank-mcp` → `create_question` | `0fa8c72a-86b6-4104-b7a1-ae14c02fdb2f` | ⬜ |
+| Pregunta MC — recorrido preorden | `question-bank-mcp` → `create_question` | `c72ec245-e463-48c7-bb8b-484471713c5e` | ⬜ |
+| Pregunta abierta — listas enlazadas | `question-bank-mcp` → `create_question` | `21f7bbe9-84c9-4ea9-99ac-c677f8ef1e5f` | ⬜ |
+| Grupo G-BARAJA (`max_attempts: 2`, `show_feedback_on: submit`) | `assignment-mcp` → `create_assignment_group` | `d86ee011-8211-4c80-afda-09a46fa79519` | ⬜ |
+| Variante A (5 preguntas, 5 pts) | `assignment-mcp` → `create_assignment_group` | `a3f14d43-4dd1-4775-becd-df0b0eea353b` | ⬜ |
+| Variante B (5 preguntas, 5 pts) | `assignment-mcp` → `create_assignment_group` | `7e8573c4-a352-4a73-9831-c5c2a56bdb10` | ⬜ |
+| Variante C (5 preguntas, 5 pts) | `assignment-mcp` → `create_assignment_group` | `7ffcabcf-cf71-46ba-b3cc-ba31f7fa4b7c` | ⬜ |
+| Envíos generados en la ronda | (generados al resolver en la UI) | `{{a completar durante la ronda}}` | ⬜ |
 
 **Entorno de pruebas:** desarrollo (instancia local en `mirp-lab` vía túnel SSH — ver CLAUDE.md → "Base de datos"). **Nunca producción.**
-**Fecha de la ronda:** {{pendiente}}
+**Fecha de la ronda:** 2026-08-01
+
+> **Nota sobre el curso académico:** el entorno de desarrollo estaba recién
+> reseteado (sin ningún `academic_course`) y no existe endpoint ni herramienta
+> MCP para crear uno (`createCourseAction` es un Server Action del panel
+> admin, atado a sesión). Se insertó vía SQL directo contra la instancia local
+> de `mirp-lab`, con confirmación explícita del usuario — excepción puntual a
+> la regla de no manipular la base directamente. Se elimina de la misma forma
+> al cerrar la ronda.
 
 ### Preparación específica de esta ronda
 
@@ -40,6 +54,13 @@
 4. Anotar antes de empezar el **orden canónico** de cada variante
    (`assignment-mcp` → `get_assignment_group`, que numera por `order_index`):
    es la referencia contra la que se comparan todos los casos.
+
+   **Orden canónico real de esta ronda** (idéntico en las 3 variantes A/B/C):
+   1. ¿Cuál es la complejidad temporal de insertar... (MC, 4 opciones, correcta: "O(1) amortizado")
+   2. ¿Qué estructura de datos usa el principio LIFO...? (MC, 4 opciones, correcta: "Pila (Stack)")
+   3. ¿Cuál es la complejidad temporal promedio de buscar... tabla hash? (MC, 4 opciones, correcta: "O(1) promedio")
+   4. ¿Qué recorrido de un árbol binario visita primero la raíz...? (MC, 4 opciones, correcta: "Preorden")
+   5. Explica la diferencia entre lista enlazada simple y doblemente enlazada (open_text, sin opciones)
 
 ---
 
