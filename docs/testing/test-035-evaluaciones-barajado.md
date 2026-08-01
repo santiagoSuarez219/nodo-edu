@@ -10,23 +10,24 @@
 
 | Recurso | Endpoint / herramienta de creación | Identificador | Eliminado |
 |---|---|---|---|
-| Curso académico de prueba | **SQL directo** (`POST /rest/v1/academic_courses`) — sin endpoint/MCP disponible, ver nota abajo | `4b6dd433-a41e-4d87-92f4-50da4dea5aa7` (código matrícula `TEST0035`) | ⬜ |
-| Estudiante A | `students-mcp` → `create_student` | `2caf011e-4d89-49bc-adf0-719e0b099677` (`spec035-a@nodo-test.local` / `Test035Pass!`) | ⬜ |
-| Estudiante B | `students-mcp` → `create_student` | `d1c0ecbe-16c1-41cd-9fd3-cf29551dd480` (`spec035-b@nodo-test.local` / `Test035Pass!`) | ⬜ |
-| Matrícula A | `students-mcp` → `create_student` (`enrollment_code`) | `445916da-af4b-4ab0-abcb-a029744be8e0` | ⬜ |
-| Matrícula B | `students-mcp` → `create_student` (`enrollment_code`) | `6f58584e-ffdb-4b5d-a0e3-facc0097d504` | ⬜ |
-| Pregunta MC — complejidad arreglo dinámico | `question-bank-mcp` → `create_question` | `54495bfa-d135-4562-a0be-428b8ab6667d` | ⬜ |
-| Pregunta MC — LIFO / Pila | `question-bank-mcp` → `create_question` | `fdad9014-74d6-4440-979a-86d4e0565c28` | ⬜ |
-| Pregunta MC — búsqueda en tabla hash | `question-bank-mcp` → `create_question` | `0fa8c72a-86b6-4104-b7a1-ae14c02fdb2f` | ⬜ |
-| Pregunta MC — recorrido preorden | `question-bank-mcp` → `create_question` | `c72ec245-e463-48c7-bb8b-484471713c5e` | ⬜ |
-| Pregunta abierta — listas enlazadas | `question-bank-mcp` → `create_question` | `21f7bbe9-84c9-4ea9-99ac-c677f8ef1e5f` | ⬜ |
-| Grupo G-BARAJA (`max_attempts: 2`, `show_feedback_on: submit`) | `assignment-mcp` → `create_assignment_group` | `d86ee011-8211-4c80-afda-09a46fa79519` | ⬜ |
-| Variante A (5 preguntas, 5 pts) | `assignment-mcp` → `create_assignment_group` | `a3f14d43-4dd1-4775-becd-df0b0eea353b` | ⬜ |
-| Variante B (5 preguntas, 5 pts) | `assignment-mcp` → `create_assignment_group` | `7e8573c4-a352-4a73-9831-c5c2a56bdb10` | ⬜ |
-| Variante C (5 preguntas, 5 pts) | `assignment-mcp` → `create_assignment_group` | `7ffcabcf-cf71-46ba-b3cc-ba31f7fa4b7c` | ⬜ |
-| Estudiante C (par de comparación — variante A) | `students-mcp` → `create_student` | `24b99038-9cc6-4d0d-84a7-56cf1b10c02d` (`spec035-c@nodo-test.local` / `Test035Pass!`), matrícula `0ce3b4b0-a850-4a6b-9278-3e4670b37a03` | ⬜ |
-| Estudiante D (par de comparación — variante A) | `students-mcp` → `create_student` | `9f81dfa7-72aa-4635-b05b-3deca6ff34a2` (`spec035-d@nodo-test.local` / `Test035Pass!`), matrícula `a8c0e340-823c-43a0-bdb0-ce0c84b28321` | ⬜ |
-| Envíos generados en la ronda | (generados al resolver en la UI) | `{{a completar durante la ronda}}` | ⬜ |
+| Curso académico de prueba | **SQL directo** (`POST /rest/v1/academic_courses`) — sin endpoint/MCP disponible, ver nota abajo | `4b6dd433-a41e-4d87-92f4-50da4dea5aa7` (código matrícula `TEST0035`) | ⬜ **Conservado** — decisión del usuario, ver nota de cierre |
+| Estudiante A | `students-mcp` → `create_student` | `2caf011e-4d89-49bc-adf0-719e0b099677` (`spec035-a@nodo-test.local`) | ✅ |
+| Estudiante B | `students-mcp` → `create_student` | `d1c0ecbe-16c1-41cd-9fd3-cf29551dd480` (`spec035-b@nodo-test.local`) | ✅ |
+| Matrícula A | `students-mcp` → `create_student` (`enrollment_code`) | `445916da-af4b-4ab0-abcb-a029744be8e0` | ✅ (en cascada con Estudiante A) |
+| Matrícula B | `students-mcp` → `create_student` (`enrollment_code`) | `6f58584e-ffdb-4b5d-a0e3-facc0097d504` | ✅ (en cascada con Estudiante B) |
+| Pregunta MC — complejidad arreglo dinámico | `question-bank-mcp` → `create_question` | `54495bfa-d135-4562-a0be-428b8ab6667d` | ✅ |
+| Pregunta MC — LIFO / Pila | `question-bank-mcp` → `create_question` | `fdad9014-74d6-4440-979a-86d4e0565c28` | ✅ |
+| Pregunta MC — búsqueda en tabla hash | `question-bank-mcp` → `create_question` | `0fa8c72a-86b6-4104-b7a1-ae14c02fdb2f` | ✅ |
+| Pregunta MC — recorrido preorden | `question-bank-mcp` → `create_question` | `c72ec245-e463-48c7-bb8b-484471713c5e` | ✅ |
+| Pregunta abierta — listas enlazadas | `question-bank-mcp` → `create_question` | `21f7bbe9-84c9-4ea9-99ac-c677f8ef1e5f` | ✅ |
+| Pregunta MC — autoevaluación de prueba (TC-035-012) | `question-bank-mcp` → `create_question` | `b5868bd5-59a6-4192-a51f-7e82d96a1334` (lección `encapsulamiento`) | ✅ |
+| Grupo G-BARAJA (`max_attempts: 2`, `show_feedback_on: submit`) | `assignment-mcp` → `create_assignment_group` | `d86ee011-8211-4c80-afda-09a46fa79519` | ✅ |
+| Variante A (5 preguntas, 5 pts) | `assignment-mcp` → `create_assignment_group` | `a3f14d43-4dd1-4775-becd-df0b0eea353b` | ✅ (cascada al borrar el grupo) |
+| Variante B (5 preguntas, 5 pts) | `assignment-mcp` → `create_assignment_group` | `7e8573c4-a352-4a73-9831-c5c2a56bdb10` | ✅ (cascada al borrar el grupo) |
+| Variante C (5 preguntas, 5 pts) | `assignment-mcp` → `create_assignment_group` | `7ffcabcf-cf71-46ba-b3cc-ba31f7fa4b7c` | ✅ (cascada al borrar el grupo) |
+| Estudiante C (par de comparación — variante A) | `students-mcp` → `create_student` | `24b99038-9cc6-4d0d-84a7-56cf1b10c02d` (`spec035-c@nodo-test.local` / `Test035Pass!`), matrícula `0ce3b4b0-a850-4a6b-9278-3e4670b37a03` | ⬜ **Conservado** — decisión del usuario |
+| Estudiante D (par de comparación — variante A) | `students-mcp` → `create_student` | `9f81dfa7-72aa-4635-b05b-3deca6ff34a2` (`spec035-d@nodo-test.local` / `Test035Pass!`), matrícula `a8c0e340-823c-43a0-bdb0-ce0c84b28321` | ⬜ **Conservado** — decisión del usuario |
+| Envíos generados en la ronda (5 submissions, answers en cascada) | (generados al resolver en la UI) | `c3c276ae-…`, `420cfdcc-…`, `41fe8f98-…`, `4f5e3ac1-…`, `f0e05623-…` — eliminados vía SQL directo antes de poder borrar el grupo (`submissions.variant_group_id` es `on delete restrict`) | ✅ |
 
 > **Nota — descarte de A y B para el par de comparación:** Estudiante A cayó en
 > variante B y Estudiante B cayó en variante C (sorteo aleatorio de
@@ -223,17 +224,37 @@
 - Aprobados: 13 — Fallidos: 0 — Pendientes: 0
 - Hallazgos escalados a `docs/specs/backlog.md`: ninguno nuevo. **[[DEBT-035]]** ya se había registrado durante la implementación (no un hallazgo de esta ronda), y quedó confirmado en TC-035-006 (el reordenamiento al cambiar flags a mitad de ronda se comportó como se esperaba, sin sorpresas).
 - Nota de proceso: en TC-035-007 el usuario marcó 3 respuestas correctas en vez de las 2 planeadas al seguir la guía — no es un hallazgo del sistema, la calificación (`auto_score: 3.00`) fue matemáticamente consistente con lo realmente respondido, verificado por API.
-- Limpieza de datos de prueba: ⬜ Pendiente
+- Limpieza de datos de prueba: ✅ Completada (parcial, por decisión del usuario — ver nota)
 
-### Orden de limpieza (inverso a la creación)
+### Cierre real de la limpieza (2026-08-01)
 
-1. Envíos generados en la ronda (si no los borra en cascada el grupo).
-2. Grupo G-BARAJA (`assignment-mcp` → `delete_assignment_group`) — borra sus variantes.
-3. Preguntas creadas (`question-bank-mcp` → `delete_question`).
-4. Desmatricular A y B (`students-mcp` → `unenroll_student`).
-5. Eliminar estudiantes A, B y los descartados del paso 3 de la preparación
-   (`students-mcp` → `delete_student`). Devuelve `409` si hay entregas: en ese
-   caso eliminar primero los envíos y reintentar; si sigue fallando, reportar el
-   id exacto al usuario **sin borrar nada directamente en base de datos**.
-6. Verificar cada eliminación (consulta que devuelva `404` o lista vacía) y
-   marcar la columna "Eliminado" de la tabla de datos de prueba.
+El usuario pidió conservar **2 estudiantes y el docente de desarrollo** para
+rondas futuras, en vez de la limpieza total prevista originalmente. Se
+conservan:
+- **Estudiante C** (`24b99038-9cc6-4d0d-84a7-56cf1b10c02d`) y **Estudiante D**
+  (`9f81dfa7-72aa-4635-b05b-3deca6ff34a2`) — elegidos por ser el par ya
+  emparejado en la misma variante A, el resultado más costoso de reproducir
+  (requirió crear 2 estudiantes adicionales a los A/B originales).
+- El **curso académico de prueba** `[TEST-035] Estructuras de datos`
+  (`4b6dd433-a41e-4d87-92f4-50da4dea5aa7`), necesario para que la matrícula de
+  C y D siga siendo válida, y útil como base para una próxima ronda dado que no
+  hay endpoint/MCP para crearlo (ver nota más arriba).
+- El docente `dev@nodo.local` — cuenta sembrada del entorno, nunca se toca.
+
+Se ejecutó en este orden:
+1. **Envíos** (5 submissions + answers en cascada) eliminados vía SQL directo
+   — bloqueaban el borrado del grupo (`submissions.variant_group_id` es
+   `on delete restrict`).
+2. **Grupo G-BARAJA** eliminado vía `assignment-mcp` → `delete_assignment_group`
+   (cascada automática a las 3 variantes y sus `assignment_questions`).
+3. **6 preguntas** eliminadas vía `question-bank-mcp` → `delete_question`
+   (desbloqueadas tras el paso 2).
+4. **Estudiante A y B** eliminados vía `students-mcp` → `delete_student`
+   (sin `409`: sus envíos ya habían sido eliminados en el paso 1).
+5. Verificado el estado final: `list_students` del curso solo devuelve C y D;
+   `list_questions` del curso devuelve `total: 0`; `get_assignment_group` del
+   grupo eliminado devuelve "Grupo no encontrado" (esperado).
+
+**Pendiente para una futura limpieza total** (si se decide no reutilizar el
+entorno): eliminar C, D y el curso académico de prueba — el curso solo puede
+borrarse vía SQL directo, la misma excepción documentada al crearlo.

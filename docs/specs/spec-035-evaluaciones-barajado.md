@@ -1,4 +1,4 @@
-# spec-035 — [TESTING] Evaluaciones A/B/C: implementar `shuffle_questions` y `shuffle_choices`
+# spec-035 — [DONE] Evaluaciones A/B/C: implementar `shuffle_questions` y `shuffle_choices`
 
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.
@@ -338,10 +338,11 @@ lectura para un agente.
       disponible como mejora futura si se retoma `assignment-agent`
 
 ### Fase 6 — Verificación final
-- [ ] `npm run lint` sin errores nuevos
-- [ ] `npm run build` en verde
-- [ ] Invocar `@reviewer` antes de la ronda manual
-- [ ] Ejecutar la ronda manual de `docs/testing/test-035-evaluaciones-barajado.md`
+- [x] `npm run lint` sin errores nuevos
+- [x] `npm run build` en verde
+- [x] Invocar `@reviewer` antes de la ronda manual — APROBADO
+- [x] Ejecutar la ronda manual de `docs/testing/test-035-evaluaciones-barajado.md`
+      — 13/13 casos aprobados, sin hallazgos nuevos (2026-08-01)
 
 ## Criterios de aceptación
 
@@ -398,4 +399,4 @@ lectura para un agente.
 - [x] Fase 3 — Actualizar los consumidores
 - [x] Fase 4 — Tipos y verificación de no regresión
 - [x] Fase 5 — UI admin y documentación
-- [ ] Fase 6 — Ronda manual de pruebas (en curso)
+- [x] Fase 6 — Ronda manual de pruebas — 13/13 casos aprobados (2026-08-01)
