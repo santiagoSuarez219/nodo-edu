@@ -8,20 +8,17 @@ import { ErrorState } from "@/components/ErrorState";
 // es obligatorio, no opcional. Debe renderizar su propio <html>/<body> — no
 // hereda la fuente ni el resto del layout raíz.
 //
-// Decisión D2 del spec: se reinyecta solo el script de tema (evita un flash
-// blanco cegador en modo oscuro si la pantalla está proyectada), pero se
-// acepta la tipografía de sistema en vez de JetBrains Mono — cargar
+// Decisión D2 del spec: evitar un flash blanco cegador en modo oscuro si la
+// pantalla está proyectada. La primera versión reinyectaba el script de tema
+// del root layout (toggle de la clase `.dark` vía JS), pero un <script>
+// crudo dentro de JSX hace que React rehúse ejecutarlo en cliente y el
+// boundary de último recurso terminaba rompiéndose él mismo (hallazgo de
+// TC-037-006). En su lugar: un <style> con @media (prefers-color-scheme)
+// —seguro de renderizar, sin JS— que solo ajusta el fondo/color base de la
+// página; no intenta replicar la clase `.dark` completa del resto de la app.
+// Se acepta la tipografía de sistema en vez de JetBrains Mono — cargar
 // `next/font` aquí añadiría una vía de fallo dentro del propio manejador de
 // fallos, y este boundary solo se ve cuando el root layout ya falló.
-const themeInitScript = `
-(function () {
-  try {
-    var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    document.documentElement.classList.toggle('dark', prefersDark);
-  } catch (_) {}
-})();
-`;
-
 export default function GlobalError({
   reset,
 }: {
@@ -29,12 +26,14 @@ export default function GlobalError({
   reset: () => void;
 }) {
   return (
-    <html lang="es" suppressHydrationWarning>
-      <body
-        suppressHydrationWarning
-        className="min-h-screen flex items-center justify-center bg-white text-gray-900 dark:bg-gray-900 dark:text-white px-4"
-      >
-        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+    <html lang="es">
+      <body className="global-error-body min-h-screen flex items-center justify-center px-4">
+        <style>{`
+          .global-error-body { background: #ffffff; color: #111827; }
+          @media (prefers-color-scheme: dark) {
+            .global-error-body { background: #111827; color: #ffffff; }
+          }
+        `}</style>
         <div className="w-full max-w-sm">
           <ErrorState
             title="Algo salió mal"
