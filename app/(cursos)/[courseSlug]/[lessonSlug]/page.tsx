@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { getLessonBySlug, isGuide, buildCourseOutline } from "@/lib/courses";
 import { getLessonArticle } from "@/lib/courses/content";
@@ -6,6 +7,10 @@ import { requireCourseAccess } from "@/lib/enrollments";
 import { hasCourseAccess } from "@/lib/enrollments/access";
 import { markLessonViewed, getLessonProgress } from "@/lib/progress";
 import { getStudentAttendanceForCourse, getOpenSessionForCourse } from "@/lib/attendance";
+import {
+  attendanceGroupCookieName,
+  resolveStoredAttendanceGroup,
+} from "@/lib/attendance/group-preference";
 import {
   getSelfAssessmentForLesson,
   getSelfAssessmentStatus,
@@ -89,6 +94,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
   let teacherAnswerKey: AnswerKeyQuestion[] = [];
   let teacherCourses: AttendanceGroup[] = [];
   let teacherSessionsByCourseId: Record<string, OpenSessionSummary | null> = {};
+  let teacherAttendanceGroupId: string | null = null;
 
   if (access.ok && (access.reason === "owner" || access.reason === "admin")) {
     const [answerKey, academicCourses] = await Promise.all([
@@ -111,6 +117,14 @@ export default async function LessonPage({ params }: LessonPageProps) {
     );
     teacherSessionsByCourseId = Object.fromEntries(
       academicCourses.map((academicCourse, i) => [academicCourse.id, sessions[i]])
+    );
+
+    // Grupo elegido la última vez, leído en el server para que el HTML inicial
+    // ya traiga el código de asistencia correcto (DEBT-023).
+    const cookieStore = await cookies();
+    teacherAttendanceGroupId = resolveStoredAttendanceGroup(
+      cookieStore.get(attendanceGroupCookieName(courseSlug))?.value,
+      teacherCourses.map((group) => group.id)
     );
   }
 
@@ -164,6 +178,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
           answerKey={teacherAnswerKey}
           academicCourses={teacherCourses}
           initialSessionsByCourseId={teacherSessionsByCourseId}
+          initialAttendanceGroupId={teacherAttendanceGroupId}
         />
       )}
 

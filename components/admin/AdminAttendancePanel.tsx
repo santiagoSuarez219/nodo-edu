@@ -28,18 +28,25 @@ export function AdminAttendancePanel({
   );
   const [isPending, startTransition] = useTransition();
 
-  // Polling para conteo en vivo (cada ~5 segundos mientras haya sesión abierta)
+  // Polling para conteo en vivo (cada ~5 segundos mientras haya sesión abierta).
+  // Deliberadamente FUERA de `startTransition`: `isPending` gobierna los botones
+  // de abrir/cerrar sesión, y compartirlo con el polling hacía que "Cerrar
+  // sesión" parpadeara a "Cerrando..." cada 5s durante toda la clase (DEBT-019).
   useEffect(() => {
     if (!session) return;
 
-    const interval = setInterval(() => {
-      startTransition(async () => {
-        const count = await getSessionAttendanceCount(session.session.id);
-        setAttendanceCount(count);
-      });
+    let cancelled = false;
+    const interval = setInterval(async () => {
+      const count = await getSessionAttendanceCount(session.session.id);
+      // La sesión pudo cerrarse mientras la petición estaba en vuelo; sin este
+      // guard una respuesta tardía reviviría un conteo de una sesión ya cerrada.
+      if (!cancelled) setAttendanceCount(count);
     }, 5000);
 
-    return () => clearInterval(interval);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
   }, [session]);
 
   const handleOpenSession = useCallback(() => {

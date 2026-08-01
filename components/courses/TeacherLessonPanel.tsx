@@ -9,6 +9,7 @@ interface TeacherLessonPanelProps {
   answerKey: AnswerKeyQuestion[];
   academicCourses: AttendanceGroup[];
   initialSessionsByCourseId: Record<string, OpenSessionSummary | null>;
+  initialAttendanceGroupId: string | null;
 }
 
 export function TeacherLessonPanel({
@@ -16,6 +17,7 @@ export function TeacherLessonPanel({
   answerKey,
   academicCourses,
   initialSessionsByCourseId,
+  initialAttendanceGroupId,
 }: TeacherLessonPanelProps) {
   return (
     <section className="mt-12 pt-8">
@@ -42,6 +44,7 @@ export function TeacherLessonPanel({
               courseSlug={courseSlug}
               courses={academicCourses}
               initialSessionsByCourseId={initialSessionsByCourseId}
+              initialSelectedId={initialAttendanceGroupId}
             />
           </div>
         </div>

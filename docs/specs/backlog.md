@@ -425,14 +425,29 @@ correspondiente en `SignUpSchema`.
 
 ---
 
-## DEBT-023 — `TeacherAttendanceControl`: parpadeo del grupo/código equivocado antes de restaurar la selección guardada
+## DEBT-023 — `TeacherAttendanceControl`: parpadeo del grupo/código equivocado antes de restaurar la selección guardada — ✅ Resuelto (2026-08-01)
 
 **Origen:** `@reviewer` en la revisión de spec-031
-**Prioridad:** Media — puede inducir al docente a dictar en clase el código de un grupo equivocado
+**Prioridad:** ~~Media~~ → **Resuelto**
 
 Con más de un grupo y una elección guardada en `localStorage`, el primer pintado del cliente monta `AdminAttendancePanel` con `courses[0]` (y su sesión, si tiene una abierta); el `useEffect` post-montaje cambia después a la selección restaurada, remontando el panel (por el `key={selectedCourse.id}`). Si el grupo por defecto (`courses[0]`) tiene una sesión abierta, el docente ve un instante el código de **otro** grupo antes de que aparezca el correcto — riesgoso si la pantalla está proyectada en clase.
 
 **Acción:** Persistir la elección en una cookie legible desde el server component (para que el HTML inicial ya venga con el grupo correcto), o no renderizar `AdminAttendancePanel` hasta que la restauración desde `localStorage` haya corrido.
+
+**Resolución (2026-08-01, rama `fix/attendance-panel-flicker`):** se optó por la
+cookie. `lib/attendance/group-preference.ts` (nuevo) expone
+`attendanceGroupCookieName(courseSlug)` y `resolveStoredAttendanceGroup()`; la
+página de lección lee la cookie en el server y pasa `initialAttendanceGroupId`
+por `TeacherLessonPanel` → `TeacherAttendanceControl`, que ya no usa
+`localStorage` ni el `useEffect` de restauración (se fueron con él dos
+`eslint-disable`, incluido el de `set-state-in-effect`). El HTML inicial trae
+el grupo correcto, así que no hay remontaje ni parpadeo. La escritura sigue en
+el cliente vía `document.cookie` (`path=/`, `SameSite=Lax`, 1 año) por ser una
+preferencia de UI sin efecto en datos.
+
+**Nota de migración:** la preferencia anterior guardada en `localStorage` no se
+migra — cada docente con más de un grupo vuelve a elegirlo una vez y a partir
+de ahí queda persistido en la cookie.
 
 ---
 
@@ -471,14 +486,21 @@ Dos hallazgos menores en los componentes nuevos de spec-031:
 
 ---
 
-## DEBT-019 — `AdminAttendancePanel`: el botón "Cerrar sesión" parpadea a "Cerrando..." cada ~5s
+## DEBT-019 — `AdminAttendancePanel`: el botón "Cerrar sesión" parpadea a "Cerrando..." cada ~5s — ✅ Resuelto (2026-08-01)
 
 **Origen:** test-031 (TC-009), reportado por el usuario durante la ronda de pruebas manuales
-**Prioridad:** Media — molesto en uso real (el docente ve el botón "temblar" durante toda la clase), no bloquea funcionalidad
+**Prioridad:** ~~Media~~ → **Resuelto**
 
 `AdminAttendancePanel.tsx` usa un único `isPending` de `useTransition()` compartido entre tres operaciones: abrir sesión, cerrar sesión, y el polling del conteo de asistentes cada 5 segundos (`useEffect` con `setInterval` → `startTransition(async () => { getSessionAttendanceCount(...) })`). Como las tres comparten el mismo `isPending`, cada vez que el polling dispara su transición, el botón "Cerrar sesión" cambia brevemente a "Cerrando..." y se deshabilita, aunque nadie esté cerrando nada — un parpadeo cada ~5s mientras la sesión está abierta. Preexistente desde spec-010 (el componente original), pero mucho más visible ahora que spec-031 lo embebe en la vista de lección donde el docente lo tiene a la vista durante toda la clase.
 
 **Acción:** Usar un `useTransition()` (o simple `useState<boolean>`) independiente para el polling de conteo, separado del que gobierna los botones de abrir/cerrar sesión, para que el polling nunca afecte su estado visual.
+
+**Resolución (2026-08-01, rama `fix/attendance-panel-flicker`):** el polling salió
+por completo de `startTransition` — no necesitaba transición ninguna, solo un
+`setAttendanceCount` directo. `isPending` queda gobernando exclusivamente los
+botones de abrir/cerrar sesión. Se agregó un flag `cancelled` en el cleanup del
+efecto para que una respuesta en vuelo no reviva el conteo de una sesión ya
+cerrada.
 
 ---
 
