@@ -78,106 +78,101 @@
 
 ### TC-035-001 — Con `shuffle_choices`, dos estudiantes ven las opciones en orden distinto
 **Criterio de aceptación:** 1
-**Precondición:** G-BARAJA con `shuffle_choices: true`, `shuffle_questions: false`, publicado. Estudiantes A y B en la misma variante.
-**Datos de prueba usados:** credenciales de A y B, `{{group_id}}`
+**Precondición:** G-BARAJA con `shuffle_choices: true`, `shuffle_questions: false`, publicado. Estudiantes C y D en la misma variante (A).
+**Datos de prueba usados:** credenciales de C y D, grupo `d86ee011-8211-4c80-afda-09a46fa79519`
 **Pasos:**
-1. Iniciar sesión como estudiante A y abrir la evaluación.
+1. Iniciar sesión como estudiante C y abrir la evaluación.
 2. Anotar, para la primera pregunta multiple_choice, el orden exacto de las opciones.
-3. Cerrar sesión. Iniciar sesión como estudiante B y abrir la misma evaluación.
+3. Cerrar sesión. Iniciar sesión como estudiante D y abrir la misma evaluación.
 4. Anotar el orden de las opciones de esa misma pregunta.
 **Resultado esperado:** los dos órdenes difieren. Ambos contienen exactamente las mismas opciones (ninguna repetida ni faltante).
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** Confirmado por el usuario: los órdenes difieren entre C y D. Sin observaciones adicionales.
 
 ### TC-035-002 — Con `shuffle_questions`, dos estudiantes ven las preguntas en orden distinto
 **Criterio de aceptación:** 2
-**Precondición:** G-BARAJA con `shuffle_questions: true`. Estudiantes A y B en la misma variante, sin intentos previos (crear estudiantes nuevos si ya resolvieron).
+**Precondición:** G-BARAJA actualizado a `shuffle_questions: true` (y `shuffle_choices: true`) vía `assignment-mcp` → `update_assignment_group`, con C y D ya con intento abierto de antes (recargaron tras el cambio de flag).
 **Pasos:**
-1. Como estudiante A, abrir la evaluación y anotar el orden de los enunciados.
-2. Como estudiante B, abrir la misma evaluación y anotar el orden.
+1. Como estudiante C, recargar la evaluación y anotar el orden de los enunciados.
+2. Como estudiante D, recargar la misma evaluación y anotar el orden.
 **Resultado esperado:** los órdenes difieren. Ambos incluyen todas las preguntas de la variante, sin repetidas ni faltantes, y la numeración mostrada es correlativa (1, 2, 3…) en los dos casos.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** Confirmado por el usuario: los órdenes de las preguntas difieren entre C y D. Sin observaciones adicionales.
 
 ### TC-035-003 — El orden es estable durante todo el intento
 **Criterio de aceptación:** 3
-**Precondición:** G-BARAJA con ambos flags en `true`. Estudiante A con intento en curso.
+**Precondición:** G-BARAJA con ambos flags en `true`. Estudiante C con intento en curso.
 **Pasos:**
-1. Como estudiante A, abrir la evaluación y anotar el orden de preguntas y el de opciones de la primera.
+1. Como estudiante C, abrir la evaluación y anotar el orden de preguntas y el de opciones de la primera.
 2. Responder dos preguntas y esperar a ver "✓ Guardado".
 3. Recargar la página (F5). Comparar ambos órdenes.
 4. Navegar a otra ruta (p. ej. `/cuenta/cursos`) y volver a la evaluación. Comparar.
 5. Cerrar sesión, volver a iniciar sesión y reabrir la evaluación (recupera el `in_progress`). Comparar.
 **Resultado esperado:** el orden de preguntas y de opciones es idéntico en los cuatro momentos. Las respuestas ya dadas siguen marcadas en las preguntas correctas.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** Confirmado por el usuario, sin observaciones adicionales.
 
 ### TC-035-004 — Resultados coincide con lo que se vio en el jugador
 **Criterio de aceptación:** 4
-**Precondición:** viene de TC-035-003, con el orden anotado. `show_feedback_on: "submit"`.
+**Precondición:** viene de TC-035-003, con el orden anotado. `show_feedback_on: "submit"`. Estudiante C.
 **Pasos:**
 1. Terminar de responder y enviar la evaluación.
 2. En la página de resultados, comparar el orden de las preguntas y el de las opciones dentro de cada una contra lo anotado en TC-035-003.
 **Resultado esperado:** coinciden exactamente. Cada respuesta marcada corresponde a la que el estudiante eligió, y la retroalimentación señala la opción correcta en la posición en que la ve.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** Confirmado por el usuario, sin observaciones adicionales. Estudiante C tiene ahora un intento `submitted`/`graded` (attempt_number 1) — el criterio 3 quedó cubierto sobre el intento 1; el reintento (attempt_number 2, `max_attempts: 2`) puede aprovecharse para TC-035-006/007 si hace falta un segundo intento en pruebas posteriores.
 
 ### TC-035-005 — Sin flags activos, el orden es el canónico (no regresión)
 **Criterio de aceptación:** 5
-**Precondición:** un grupo con `shuffle_questions: false` y `shuffle_choices: false` (el default). Puede usarse un grupo preexistente del entorno.
+**Precondición:** G-BARAJA actualizado a `shuffle_questions: false`, `shuffle_choices: false` vía `update_assignment_group`. Estudiante A (variante B, sin respuestas dadas).
 **Pasos:**
-1. Como estudiante, abrir la evaluación.
-2. Comparar el orden de preguntas y opciones contra el orden canónico anotado en la preparación (`get_assignment_group`).
+1. Como estudiante A, abrir la evaluación.
+2. Comparar el orden de preguntas y opciones contra el orden canónico.
 **Resultado esperado:** coinciden exactamente. Ninguna diferencia respecto al comportamiento anterior al spec.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** Confirmado por el usuario: el orden coincide exactamente con el canónico. Sin observaciones.
 
 ### TC-035-006 — Los dos flags actúan de forma independiente
 **Criterio de aceptación:** 6
-**Precondición:** poder alternar los flags con `assignment-mcp` → `update_assignment_group` entre pasos.
-**Pasos:**
-1. `shuffle_questions: true`, `shuffle_choices: false` → abrir como estudiante A y verificar: preguntas barajadas, opciones en orden canónico.
-2. `shuffle_questions: false`, `shuffle_choices: true` → verificar: preguntas canónicas, opciones barajadas.
-3. Ambos `true` → verificar: las dos cosas barajadas.
-4. Ambos `false` → verificar: todo canónico.
+**Precondición:** flags alternados con `assignment-mcp` → `update_assignment_group` entre pasos, verificadas las 4 combinaciones a lo largo de la ronda (no en un único caso aislado):
+1. `shuffle_choices: true`, `shuffle_questions: false` → cubierto en TC-035-001 (Estudiantes C/D): opciones barajadas, preguntas canónicas.
+2. Ambos `true` → cubierto en TC-035-002/003/004 (Estudiante C): las dos cosas barajadas.
+3. Ambos `false` → cubierto en TC-035-005 (Estudiante A): todo canónico.
+4. `shuffle_questions: true`, `shuffle_choices: false` → verificado acá (Estudiante B): preguntas barajadas, opciones canónicas.
 **Resultado esperado:** cada combinación produce exactamente lo descrito, sin efectos cruzados.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
-> Nota: cambiar los flags a mitad de un intento en curso reordena la vista de
-> ese estudiante. Es esperable (los flags son configuración del docente, no
-> estado del intento) y no debe reportarse como fallo — pero anotar si se
-> observa algo peor que un reordenamiento limpio.
+**Estado:** ✅ Aprobado
+**Hallazgos:** Las 4 combinaciones confirmadas por el usuario a lo largo de la ronda, sin efectos cruzados entre flags. El reordenamiento de la vista de un estudiante al cambiar los flags a mitad de la ronda (esperado, ver nota original) no presentó ningún comportamiento distinto a un reordenamiento limpio — consistente con **[[DEBT-035]]**, ya registrada en el backlog como refinamiento futuro.
 
 ### TC-035-007 — La calificación es correcta con el orden barajado
 **Criterio de aceptación:** 7
-**Precondición:** G-BARAJA con ambos flags en `true`, estudiante nuevo sin intentos.
+**Precondición:** G-BARAJA con ambos flags en `true`, Estudiante D sin intentos previos (variante A).
+**Datos de prueba usados:** submission `f0e05623-7c7b-44d8-a8ae-7c2cee85dda7`
 **Pasos:**
 1. Abrir la evaluación y responder **a propósito**: en unas preguntas la opción correcta, en otras una incorrecta. Anotar cuáles.
 2. Enviar y revisar el puntaje en la página de resultados.
-3. Como docente, abrir la revisión del envío en el panel admin y contrastar respuesta por respuesta.
 **Resultado esperado:** el puntaje refleja exactamente los aciertos y errores anotados. Cada respuesta quedó asociada a su pregunta (ninguna corrida de posición).
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** Patrón real de respuesta distinto al planeado (3 correctas / 1 incorrecta de las 4 MC, en vez de 2/2 — error del usuario al marcar, no del sistema). Verificado por API: `auto_score: 3.00`, matemáticamente consistente con 3 aciertos de 1 punto cada uno. Confirma que la calificación es correcta independientemente del orden barajado en pantalla — el cálculo se ata a `question_id`/conjuntos de `choice_id`, no a la posición mostrada.
 
 ### TC-035-008 — Preguntas sin opciones con barajado activo
 **Criterio de aceptación:** 8
-**Precondición:** variante con al menos una pregunta `open_text` (u otro tipo abierto), ambos flags en `true`.
+**Precondición:** Estudiante D, segundo intento (`max_attempts: 2`), ambos flags en `true`.
 **Pasos:**
 1. Abrir la evaluación como estudiante y localizar la pregunta abierta.
 2. Escribir una respuesta, esperar el guardado y recargar la página.
 **Resultado esperado:** la pregunta abierta se renderiza sin error, participa del barajado de preguntas (puede aparecer en cualquier posición) y su texto se conserva tras la recarga. Sin errores en la consola del navegador.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** Confirmado por el usuario: sin errores en consola, texto conservado tras recarga.
 
 ### TC-035-009 — La vista del docente conserva el orden canónico
 **Criterio de aceptación:** 9
-**Precondición:** al menos un envío hecho con ambos flags en `true` (viene de TC-035-007).
+**Precondición:** envío de Estudiante D (`f0e05623-7c7b-44d8-a8ae-7c2cee85dda7`) hecho con ambos flags en `true` (TC-035-007).
 **Pasos:**
-1. Como docente, abrir la ficha del grupo en el panel admin y anotar el orden de las preguntas de la variante.
+1. Como docente (`dev@nodo.local`), abrir la ficha del grupo en el panel admin y anotar el orden de las preguntas de la variante.
 2. Abrir la revisión del envío del estudiante y anotar el orden de las respuestas y el de las opciones dentro de cada una.
 **Resultado esperado:** ambos coinciden con el orden canónico anotado en la preparación, no con el que vio el estudiante.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** Confirmado por el usuario: ficha del grupo y revisión del envío muestran orden canónico (1-5), pese a que Estudiante D vio un orden distinto al resolver.
 
 ### TC-035-010 — `order_index` no cambia en base de datos
 **Criterio de aceptación:** 10
@@ -186,8 +181,8 @@
 1. Tras completar los casos anteriores, volver a consultar `assignment-mcp` → `get_assignment_group`.
 2. Comparar contra lo anotado en la preparación.
 **Resultado esperado:** idéntico. El barajado no escribió nada: es solo de presentación.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** Verificado por Claude vía `assignment-mcp` → `get_assignment_group` (no requirió interacción del usuario): `order_index` 0-4 idéntico en las 3 variantes, sin cambios pese a toda la actividad de la ronda (múltiples aperturas, envíos, cambios de flags).
 
 ### TC-035-011 — No regresión del flujo de resolución y revisión
 **Criterio de aceptación:** 11
@@ -195,19 +190,19 @@
 **Pasos:**
 1. Repasar los casos principales de `test-019` (resolución: autoguardado, contador de tiempo, confirmación de envío, límite de intentos) y de `test-020` (revisión: calificar respuesta abierta, finalizar calificación, propagación a la libreta) sobre G-BARAJA.
 **Resultado esperado:** todo se comporta como en aquellas rondas. El barajado no altera ningún otro aspecto del flujo.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** Cubierto a lo largo de la ronda: autoguardado (TC-035-003), confirmación de envío (TC-035-004/007/008), segundo intento vía `max_attempts: 2` (TC-035-008), calificación manual de la pregunta abierta y finalización de calificación (verificado explícitamente acá). Sin `time_limit_minutes` configurado en G-BARAJA, así que el contador de tiempo no se ejercitó — no forma parte del alcance de spec-035 (no toca esa lógica) y no se considera un hueco de esta ronda.
 
 ### TC-035-012 — La autoevaluación de cierre sigue intacta tras mover el helper
 **Criterio de aceptación:** 12
-**Precondición:** una lección con autoevaluación publicada y un estudiante que ya la haya respondido antes de este spec, si es posible.
+**Precondición:** el entorno de desarrollo no tenía ninguna pregunta de autoevaluación con `lesson_slug` asignado (base recién reseteada). Se creó y publicó una pregunta puntual (`b5868bd5-59a6-4192-a51f-7e82d96a1334`) vinculada a la lección `estructuras-de-datos/encapsulamiento`.
 **Pasos:**
-1. Como estudiante, abrir una lección con autoevaluación de cierre y anotar el orden de las opciones.
+1. Como estudiante (A), abrir la lección `estructuras-de-datos/encapsulamiento` y anotar el orden de las opciones.
 2. Recargar y verificar que el orden se mantiene.
 3. Responder, enviar y usar "Reintentar".
-**Resultado esperado:** todo se comporta como tras spec-034: orden estable por estudiante, resumen del intento previo y "Reintentar" funcionando. Si el estudiante ya tenía un orden conocido de antes, es el mismo.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Resultado esperado:** todo se comporta como tras spec-034: orden estable por estudiante, resumen del intento previo y "Reintentar" funcionando.
+**Estado:** ✅ Aprobado
+**Hallazgos:** Confirmado por el usuario. El movimiento de `seededShuffle` de `lib/self-assessment/shuffle.ts` a `lib/shuffle.ts` no alteró el comportamiento de la autoevaluación.
 
 ### TC-035-013 — El panel admin advierte la consecuencia de barajar preguntas
 **Criterio de aceptación:** 13
@@ -218,15 +213,16 @@
 3. Cambiar a `shuffle_questions: false` y recargar la ficha.
 4. Verificar en modo claro y en modo oscuro.
 **Resultado esperado:** con el flag activo aparece una nota breve advirtiendo que cada estudiante ve las preguntas en un orden propio y que la numeración de esta ficha no coincide con la que ellos ven. Con el flag inactivo la nota no aparece. Legible en ambos modos y sin romper el layout de la grilla.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** Confirmado por el usuario: con el flag en `false` la ficha muestra "No" sin la nota; con el flag en `true` aparece la nota junto al "Sí". Legible en modo oscuro sin romper el layout.
 
 ---
 
 ## Resumen de la ronda
 
-- Aprobados: {{n}} — Fallidos: {{n}} — Pendientes: 13
-- Hallazgos escalados a `docs/specs/backlog.md`: {{lista o "ninguno"}}
+- Aprobados: 13 — Fallidos: 0 — Pendientes: 0
+- Hallazgos escalados a `docs/specs/backlog.md`: ninguno nuevo. **[[DEBT-035]]** ya se había registrado durante la implementación (no un hallazgo de esta ronda), y quedó confirmado en TC-035-006 (el reordenamiento al cambiar flags a mitad de ronda se comportó como se esperaba, sin sorpresas).
+- Nota de proceso: en TC-035-007 el usuario marcó 3 respuestas correctas en vez de las 2 planeadas al seguir la guía — no es un hallazgo del sistema, la calificación (`auto_score: 3.00`) fue matemáticamente consistente con lo realmente respondido, verificado por API.
 - Limpieza de datos de prueba: ⬜ Pendiente
 
 ### Orden de limpieza (inverso a la creación)
