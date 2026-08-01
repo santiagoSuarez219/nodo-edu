@@ -5,6 +5,39 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+## DEBT-037 — La app no tiene ningún error boundary: un server action que lanza deja al usuario sin mensaje útil
+
+**Origen:** `TC-007` de `docs/testing/test-fix-attendance-panel-flicker.md`
+(2026-08-01), al cortar deliberadamente la conexión con Supabase
+**Prioridad:** Media — no se manifiesta en operación normal, pero cuando se
+manifiesta es en el peor momento (docente en clase, sin base de datos)
+
+`find app -name "error.tsx" -o -name "global-error.tsx"` no devuelve **ningún
+archivo**: la app no define un solo error boundary de App Router. Cuando un
+server action lanza —por ejemplo `openSession`
+(`lib/attendance/index.ts:75`), que hace `throw error` ante cualquier fallo de
+Supabase que no sea una violación de unique constraint— la excepción no la
+recoge nadie.
+
+Observado en desarrollo con el túnel SSH a `mirp-lab` caído: el overlay de
+Turbopack con *"An unexpected response was received from the server."*
+apuntando a `TeacherAttendanceControl.tsx:97`. En producción el usuario vería
+la pantalla de error genérica de Next.js, perdiendo el contexto de la página.
+
+Los `try/catch` de los server actions distinguen bien los errores **de
+negocio** (devuelven `{ success: false, error }`, que la UI sí sabe mostrar),
+pero los de **infraestructura** se propagan crudos. El manejo de errores
+inline que agregó **[[DEBT-018]]** cubre solo la primera categoría, por diseño.
+
+**Acción:** Agregar al menos un `app/error.tsx` (y evaluar `global-error.tsx`)
+con un mensaje comprensible y un botón de reintento (`reset()`). Evaluar
+además si los server actions críticos —los del panel de asistencia, que se usa
+en vivo durante la clase— deberían capturar sus propias excepciones y
+devolverlas como `{ success: false, error }` en vez de lanzar, para que el
+docente vea el banner inline sin perder la página.
+
+---
+
 ## DEBT-036 — CLAUDE.md declara Flowbite y shadcn/ui, pero ninguno está instalado
 
 **Origen:** Detectado al resolver **[[DEBT-018]]** (2026-08-01), al buscar un
