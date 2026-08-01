@@ -49,12 +49,20 @@ export type SelfAssessmentAttemptSummary = {
   submittedAt: string;
 };
 
-export type SelfAssessmentStatus = {
-  questionCount: number;
-  hasAttempt: boolean;
-  requiresAttempt: boolean;
-  lastAttempt: SelfAssessmentAttemptSummary | null;
-};
+// Resultado discriminado de getSelfAssessmentStatus: antes un fallo de
+// consulta degradaba a `requiresAttempt: false`, lo que abría el gate de
+// "completar lección" de lib/progress/index.ts ante un fallo de
+// infraestructura (DEBT-037, Frente 4). `status: 'unavailable'` obliga al
+// llamador a fallar cerrado en vez de dejar pasar.
+export type SelfAssessmentStatus =
+  | {
+      status: "ok";
+      questionCount: number;
+      hasAttempt: boolean;
+      requiresAttempt: boolean;
+      lastAttempt: SelfAssessmentAttemptSummary | null;
+    }
+  | { status: "unavailable" };
 
 export type SubmitSelfAssessmentResult =
   | {

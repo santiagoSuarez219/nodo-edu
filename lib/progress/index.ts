@@ -77,12 +77,18 @@ export async function markLessonCompleted(
   }
 
   const status = await getSelfAssessmentStatus(courseSlug, lessonSlug);
+  // Fallar cerrado (D8 de spec-037): no se pudo verificar si esta lección
+  // requiere autoevaluación, así que se deniega en vez de asumir que no la
+  // requiere.
+  if (status.status === "unavailable") {
+    return { ok: false, reason: "self_assessment_unavailable" };
+  }
   if (status.requiresAttempt && !status.hasAttempt) {
     return { ok: false, reason: "self_assessment_pending" };
   }
 
   const supabase = await createServerSupabaseClient();
-  await supabase.from("lesson_progress").upsert(
+  const { error } = await supabase.from("lesson_progress").upsert(
     {
       user_id: user.id,
       course_slug: courseSlug,
@@ -91,6 +97,13 @@ export async function markLessonCompleted(
     },
     { onConflict: "user_id,course_slug,lesson_slug", ignoreDuplicates: false }
   );
+
+  // Antes este error se descartaba por completo y la función reportaba éxito
+  // aunque la escritura nunca ocurriera (DEBT-037, Frente 4).
+  if (error) {
+    console.error("Error marking lesson completed:", error);
+    return { ok: false, reason: "save_failed" };
+  }
 
   revalidatePath(`/${courseSlug}/${lessonSlug}`);
   revalidatePath("/cuenta/cursos");

@@ -116,7 +116,11 @@ resultado habría sido idéntico.
 
 El camino del banner se verifica en **TC-007b**, que provoca un error de negocio
 real. El fallo de infraestructura sin error boundary quedó escalado como
-**[[DEBT-037]]**.
+**[[DEBT-037]]**, resuelto el 2026-08-01 por
+`docs/specs/spec-037-manejo-de-errores.md` — `TC-037-001` de
+`docs/testing/test-037-manejo-de-errores.md` repite este mismo escenario
+(túnel SSH cortado, pulsar "Abrir sesión de asistencia") para verificar el
+arreglo.
 
 ### TC-007b — DEBT-018: el banner de error se muestra y se descarta (reemplaza a TC-007)
 > Provoca un error **de negocio** (`openSession` → "Ya hay una sesión abierta"),
@@ -161,6 +165,7 @@ tiempos de spec-031, anterior a spec-032.
 - Hallazgos escalados a `docs/specs/backlog.md`: **[[DEBT-037]]** (la app no
   define ningún error boundary; un server action que lanza deja al usuario sin
   mensaje útil). Preexistente, ajeno a esta rama — descubierto por TC-007.
+  **Resuelto el 2026-08-01** por `spec-037-manejo-de-errores.md`.
   **[[DEBT-036]]** ya se había registrado durante la implementación.
 - Limpieza de datos de prueba: ✅ Completada
 

@@ -8,23 +8,32 @@ import {
   openSession,
 } from '@/lib/attendance';
 import type {
+  OpenSessionResult,
   OpenSessionSummary,
 } from '@/lib/attendance/types';
 
 interface AdminAttendancePanelProps {
   academicCourseId: string;
-  initialSession: OpenSessionSummary | null;
+  initialSession: OpenSessionResult;
 }
 
 export function AdminAttendancePanel({
   academicCourseId,
   initialSession,
 }: AdminAttendancePanelProps) {
+  const initialResolvedSession =
+    initialSession.status === 'ok' ? initialSession.session : null;
   const [session, setSession] = useState<OpenSessionSummary | null>(
-    initialSession
+    initialResolvedSession
   );
   const [attendanceCount, setAttendanceCount] = useState(
-    initialSession?.attendanceCount ?? 0
+    initialResolvedSession?.attendanceCount ?? 0
+  );
+  // No sabemos con certeza si hay una sesión abierta: la carga inicial no
+  // pudo consultarlo (DEBT-037, Frente 2). El conteo, si lo hay, puede estar
+  // desactualizado.
+  const [countStale, setCountStale] = useState(
+    initialSession.status === 'unavailable'
   );
   const [isPending, startTransition] = useTransition();
   // `alert()`/`confirm()` nativos quedaron fuera (DEBT-018): este panel se
@@ -42,10 +51,26 @@ export function AdminAttendancePanel({
 
     let cancelled = false;
     const interval = setInterval(async () => {
-      const count = await getSessionAttendanceCount(session.session.id);
+      let result: Awaited<ReturnType<typeof getSessionAttendanceCount>>;
+      try {
+        result = await getSessionAttendanceCount(session.session.id);
+      } catch (err) {
+        // Fallo de transporte del server action (Frente 3): no generar un
+        // banner en cada tick, solo marcar el conteo como desactualizado.
+        console.error('Error polling attendance count:', err);
+        if (!cancelled) setCountStale(true);
+        return;
+      }
       // La sesión pudo cerrarse mientras la petición estaba en vuelo; sin este
       // guard una respuesta tardía reviviría un conteo de una sesión ya cerrada.
-      if (!cancelled) setAttendanceCount(count);
+      if (cancelled) return;
+      if (result.status === 'ok') {
+        setAttendanceCount(result.count);
+        setCountStale(false);
+      } else {
+        // No pintar 0: conservar el último conteo conocido (DEBT-037).
+        setCountStale(true);
+      }
     }, 5000);
 
     return () => {
@@ -57,12 +82,21 @@ export function AdminAttendancePanel({
   const handleOpenSession = useCallback(() => {
     setError(null);
     startTransition(async () => {
-      const result = await openSession(academicCourseId);
-      if (result.success && result.session) {
-        setSession(result.session);
-        setAttendanceCount(result.session.attendanceCount);
-      } else {
-        setError(result.error || 'No se pudo abrir la sesión.');
+      try {
+        const result = await openSession(academicCourseId);
+        if (result.success && result.session) {
+          setSession(result.session);
+          setAttendanceCount(result.session.attendanceCount);
+          setCountStale(false);
+        } else {
+          setError(result.error || 'No se pudo abrir la sesión.');
+        }
+      } catch (err) {
+        // Fallo de transporte del server action (Frente 3, cierra TC-007):
+        // sin este catch, la excepción escalaba al boundary y desmontaba
+        // toda la lección proyectada en clase.
+        console.error('Error opening session:', err);
+        setError('No se pudo conectar con el servidor. Intenta de nuevo.');
       }
     });
   }, [academicCourseId]);
@@ -73,12 +107,18 @@ export function AdminAttendancePanel({
     setError(null);
 
     startTransition(async () => {
-      const result = await closeSession(session.session.id);
-      if (result.success) {
-        setSession(null);
-        setAttendanceCount(0);
-      } else {
-        setError(result.error || 'No se pudo cerrar la sesión.');
+      try {
+        const result = await closeSession(session.session.id);
+        if (result.success) {
+          setSession(null);
+          setAttendanceCount(0);
+          setCountStale(false);
+        } else {
+          setError(result.error || 'No se pudo cerrar la sesión.');
+        }
+      } catch (err) {
+        console.error('Error closing session:', err);
+        setError('No se pudo conectar con el servidor. Intenta de nuevo.');
       }
     });
   }, [session]);
@@ -147,6 +187,17 @@ export function AdminAttendancePanel({
     return (
       <div className="flex flex-col gap-6">
         {errorBanner}
+        {countStale && (
+          <div
+            role="alert"
+            className="flex items-start gap-3 rounded-lg border border-danger/30 bg-danger/10 px-4 py-3"
+          >
+            <p className="text-sm text-danger dark:text-red-300">
+              No pudimos verificar si hay una sesión abierta. Si intentas abrir
+              una y ya existe, te lo indicaremos.
+            </p>
+          </div>
+        )}
         <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-[var(--radius-base)] px-6 py-8">
           <div className="flex flex-col gap-4">
             <p className="text-gray-600 dark:text-gray-400">
@@ -222,6 +273,14 @@ export function AdminAttendancePanel({
               <p className="text-3xl font-bold text-gray-900 dark:text-white">
                 {attendanceCount}
               </p>
+              {/* Ante un fallo de consulta se conserva el último valor
+                  conocido en vez de mostrar 0 — un docente proyectando esto
+                  en clase leería un 0 como "nadie ha marcado" (DEBT-037). */}
+              {countStale && (
+                <p className="text-xs text-danger dark:text-red-300 mt-1">
+                  Desactualizado — no pudimos consultar el conteo más reciente
+                </p>
+              )}
             </div>
           </div>
 

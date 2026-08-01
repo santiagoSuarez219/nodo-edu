@@ -5,6 +5,78 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+## DEBT-041 — `createServerSupabaseClient()` fuera del `try` en módulos no cubiertos por spec-037
+
+**Origen:** Detectado al implementar **[[DEBT-037]]** (spec-037, 2026-08-01):
+el mismo patrón que se corrigió en `lib/attendance/` existe en otros módulos
+que spec-037 dejó fuera de alcance
+**Prioridad:** Baja — solo se manifiesta si el propio `.env`/cliente de
+Supabase falla al construirse, no ante un fallo de consulta normal
+
+`lib/auth/server.ts` usa non-null assertions (`!`) sobre
+`NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, así que
+`createServerSupabaseClient()` puede lanzar. Cuando esa llamada vive **antes**
+del `try` de la función que la usa, esa excepción se propaga cruda en vez de
+convertirse en un valor de retorno. Confirmado al menos en
+`lib/academic-courses/index.ts:206`.
+
+> **Nota (2026-08-01):** al implementar la Fase 7 de spec-037 se corrigió,
+> además de lo que su tabla de "Impacto en el sistema" listaba
+> (`getSelfAssessmentStatus`), el mismo patrón en las otras 4 funciones de
+> `lib/self-assessment/index.ts` (`getSelfAssessmentForLesson`,
+> `getAnswerKeyForLesson`, `checkSelfAssessmentAnswer`,
+> `submitSelfAssessment`) — el checklist de la Fase 7 las mencionaba
+> explícitamente y dejarlas fuera habría sido inconsistente con lo ya marcado
+> como hecho. `lib/self-assessment/` queda fuera del alcance de este ítem.
+
+**Acción:** Barrer el resto de `lib/` con
+`grep -rn "createServerSupabaseClient" --include=*.ts` y mover cada llamada
+dentro del `try` de su función, siguiendo el patrón ya aplicado en
+`lib/attendance/` y `lib/self-assessment/` (spec-037). No requiere cambios de
+tipos ni de contrato — es una guarda adicional, no una reclasificación de
+resultado.
+
+---
+
+## DEBT-040 — Error de Supabase descartado en la destructuración (~40 sitios)
+
+**Origen:** Barrido de `lib/` durante la implementación de **[[DEBT-037]]**
+(spec-037, 2026-08-01), al confirmar que el mismo antipatrón de
+`lib/attendance/index.ts` (fallos de infraestructura indistinguibles de casos
+de negocio) es sistémico
+**Prioridad:** Alta — al menos dos de los sitios encontrados relajan una
+regla de negocio en vez de solo confundir al usuario, el mismo tipo de riesgo
+que motivó tratar el gate de autoevaluación dentro de spec-037 en vez de
+aplazarlo
+
+Patrón recurrente: `const { data } = await supabase…`, que descarta `error` al
+destructurar, o un `catch` que degrada a un valor indistinguible del caso de
+negocio legítimo. Confirmado en ~40 sitios de `lib/`; los de mayor impacto:
+
+- **`lib/submissions/index.ts:77`** — un fallo al contar intentos previos se
+  lee como "primer intento" y **salta la validación de `max_attempts`** en una
+  evaluación calificable.
+- **`lib/submissions/index.ts:204-219`** — una respuesta vacía de Supabase
+  escribe `auto_score = 0` como si fuera una nota real.
+- **`lib/enrollments/access.ts:21,37`** (`hasCourseAccess`) — un fallo de
+  consulta devuelve `not-enrolled` y **expulsa a un docente u owner
+  legítimo** de su propio curso; no hay `try/catch` alrededor, así que un
+  fallo de red aquí también puede propagar una excepción cruda (relacionado
+  con el escenario de `TC-007` que originó **[[DEBT-037]]**, pero en un
+  archivo fuera de su alcance).
+- **`lib/grades/index.ts:64`** y **`lib/questions/index.ts:251`** — guardas de
+  borrado que, si no disparan por un error silencioso, permiten borrar con
+  dependencias y reportan éxito.
+
+**Acción:** Aplicar sistemáticamente el patrón que spec-037 estableció para
+`lib/attendance/`: tipos discriminados que separen negocio de infraestructura
+donde el llamador necesite distinguirlos, y capturar/verificar siempre
+`error` antes de confiar en `data`. Priorizar `lib/submissions/index.ts` (nota
+real de estudiante en juego) y `lib/enrollments/access.ts` (control de acceso)
+sobre el resto.
+
+---
+
 ## DEBT-039 — 🔁 Duplicado de **[[DEBT-010]]** (fusionado el 2026-08-01)
 
 Este ítem se abrió el 2026-08-01 durante la ronda manual de `test-036`
@@ -60,36 +132,47 @@ diálogo y devolución del foco al elemento que lo abrió.
 
 ---
 
-## DEBT-037 — La app no tiene ningún error boundary: un server action que lanza deja al usuario sin mensaje útil
+## DEBT-037 — La app no tiene ningún error boundary: un server action que lanza deja al usuario sin mensaje útil — ✅ Resuelto (spec-037, 2026-08-01)
 
 **Origen:** `TC-007` de `docs/testing/test-fix-attendance-panel-flicker.md`
 (2026-08-01), al cortar deliberadamente la conexión con Supabase
-**Prioridad:** Media — no se manifiesta en operación normal, pero cuando se
-manifiesta es en el peor momento (docente en clase, sin base de datos)
+**Prioridad:** ~~Media~~ → **Resuelto**
 
-`find app -name "error.tsx" -o -name "global-error.tsx"` no devuelve **ningún
-archivo**: la app no define un solo error boundary de App Router. Cuando un
-server action lanza —por ejemplo `openSession`
-(`lib/attendance/index.ts:75`), que hace `throw error` ante cualquier fallo de
-Supabase que no sea una violación de unique constraint— la excepción no la
-recoge nadie.
+> **Corrección del diagnóstico (2026-08-01, al redactar spec-037).** Esta
+> entrada afirmaba que `openSession` "hace `throw error` ... la excepción no la
+> recoge nadie". **Es falso**: los 5 `throw` de `lib/attendance/index.ts`
+> estaban todos dentro de un `try/catch` de su propia función y se convertían
+> en un valor de retorno; ninguno se propagaba. El problema real era más sutil
+> y en parte peor: los `catch` degradaban fallos de infraestructura a valores
+> **indistinguibles de un caso legítimo de negocio** (`null` → "no hay sesión",
+> `0` → "nadie ha marcado", `'not_found'` → "código incorrecto"), y el caso
+> observado en `TC-007` era un fallo de **transporte del server action**
+> (respuesta RSC malformada), que ningún `try/catch` del servidor podía
+> atrapar — solo un `try/catch` en el propio Client Component o un error
+> boundary.
 
-Observado en desarrollo con el túnel SSH a `mirp-lab` caído: el overlay de
-Turbopack con *"An unexpected response was received from the server."*
-apuntando a `TeacherAttendanceControl.tsx:97`. En producción el usuario vería
-la pantalla de error genérica de Next.js, perdiendo el contexto de la página.
+`find app -name "error.tsx" -o -name "global-error.tsx"` no devolvía **ningún
+archivo**: la app no definía un solo error boundary de App Router. Observado en
+desarrollo con el túnel SSH a `mirp-lab` caído: el overlay de Turbopack con
+*"An unexpected response was received from the server."* apuntando a
+`TeacherAttendanceControl.tsx:97`.
 
-Los `try/catch` de los server actions distinguen bien los errores **de
-negocio** (devuelven `{ success: false, error }`, que la UI sí sabe mostrar),
-pero los de **infraestructura** se propagan crudos. El manejo de errores
-inline que agregó **[[DEBT-018]]** cubre solo la primera categoría, por diseño.
+**Resolución (2026-08-01):** implementado y probado en
+`docs/specs/spec-037-manejo-de-errores.md` — `[DONE]`, en cuatro frentes:
 
-**Acción:** Agregar al menos un `app/error.tsx` (y evaluar `global-error.tsx`)
-con un mensaje comprensible y un botón de reintento (`reset()`). Evaluar
-además si los server actions críticos —los del panel de asistencia, que se usa
-en vivo durante la clase— deberían capturar sus propias excepciones y
-devolverlas como `{ success: false, error }` en vez de lanzar, para que el
-docente vea el banner inline sin perder la página.
+1. **Boundaries de App Router:** `global-error.tsx` (obligatorio — un
+   `error.tsx` no captura errores del root layout, que es `async`),
+   `app/error.tsx`, `(admin)/error.tsx` y `[lessonSlug]/error.tsx`, más un
+   `ErrorBoundary` de componente para que un fallo del panel de asistencia
+   degrade solo su recuadro sin desmontar la lección proyectada en clase.
+2. **Señalización honesta** en las 6 funciones de `lib/attendance/index.ts`:
+   tipos discriminados (`{status: 'ok'|'unavailable'}`) que separan "no hay
+   sesión"/"código inválido" (negocio) de "no pude consultar" (infra).
+3. **`try/catch` cliente** sobre las 4 invocaciones de server action del
+   dominio de asistencia — el frente que de verdad cierra `TC-007`.
+4. **Gate de autoevaluación** (hallazgo nuevo durante el spec, ver
+   **[[DEBT-040]]**): `getSelfAssessmentStatus` fallaba abierto ante un fallo
+   de lectura; ahora falla cerrado.
 
 ---
 

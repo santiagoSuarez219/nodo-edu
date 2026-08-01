@@ -12,7 +12,7 @@ interface LessonClosureFlowProps {
   attendance: React.ReactNode;
   initialCompletedAt: string | null;
   canComplete: boolean;
-  blockedReason?: "self_assessment_pending";
+  blockedReason?: "self_assessment_pending" | "self_assessment_unavailable";
   lastAttempt: SelfAssessmentAttemptSummary | null;
 }
 

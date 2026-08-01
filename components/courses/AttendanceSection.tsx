@@ -57,6 +57,13 @@ const resultMessages: Record<MarkAttendanceResult, { title: string; message: str
     message: 'No tienes matrícula activa en este curso.',
     type: 'error',
   },
+  // Fallo de infraestructura al verificar el código — no culpa al estudiante
+  // (DEBT-037, Frente 2).
+  unavailable: {
+    title: 'No pudimos verificar tu código',
+    message: 'Ocurrió un error de conexión. Inténtalo de nuevo en un momento.',
+    type: 'error',
+  },
 };
 
 export function AttendanceSection({
@@ -81,15 +88,44 @@ export function AttendanceSection({
 
   const onSubmit = (data: CodeFormData) => {
     startTransition(async () => {
-      const result = await markAttendanceByCode(courseSlug, lessonSlug, data.code);
-      setLastResult(result);
-      reset();
-      if (result === 'marked' || result === 'already_marked') {
-        // Refrescar para mostrar estado actualizado
-        router.refresh();
+      try {
+        const result = await markAttendanceByCode(courseSlug, lessonSlug, data.code);
+        setLastResult(result);
+        reset();
+        if (result === 'marked' || result === 'already_marked') {
+          // Refrescar para mostrar estado actualizado
+          router.refresh();
+        }
+      } catch (err) {
+        // Fallo de transporte del server action (Frente 3, DEBT-037): un
+        // código correcto no debe leerse como "código no válido".
+        console.error('Error marking attendance:', err);
+        setLastResult('unavailable');
+        reset();
       }
     });
   };
+
+  // Caso 0: no se pudo consultar el estado (infraestructura) — distinto de
+  // "sin sesión abierta", que es un estado de negocio legítimo (DEBT-037).
+  if (attendanceState.status === 'unavailable') {
+    return (
+      <section className="mt-8 border-t border-gray-200 dark:border-gray-700 pt-8">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">
+          Asistencia
+        </h2>
+        <div
+          role="alert"
+          className="flex items-start gap-3 p-4 rounded-lg border border-danger/30 bg-danger/10"
+        >
+          <p className="text-sm text-danger dark:text-red-300">
+            No pudimos verificar el estado de la asistencia. Recarga la página
+            en un momento.
+          </p>
+        </div>
+      </section>
+    );
+  }
 
   // Caso 1: Sin sesión abierta
   if (!attendanceState.sessionOpen) {

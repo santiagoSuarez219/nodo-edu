@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { AdminAttendancePanel } from '@/components/admin/AdminAttendancePanel';
 import { attendanceGroupCookieName } from '@/lib/attendance/group-preference';
 import type { AcademicCourse } from '@/lib/academic-courses/types';
-import type { OpenSessionSummary } from '@/lib/attendance/types';
+import type { OpenSessionResult } from '@/lib/attendance/types';
 
 // Solo lo que la UI necesita — evita serializar enrollment_code (dato
 // sensible del docente) al cliente sin necesidad.
@@ -14,7 +14,7 @@ export type AttendanceGroup = Pick<AcademicCourse, 'id' | 'name' | 'code'>;
 interface TeacherAttendanceControlProps {
   courseSlug: string;
   courses: AttendanceGroup[];
-  initialSessionsByCourseId: Record<string, OpenSessionSummary | null>;
+  initialSessionsByCourseId: Record<string, OpenSessionResult>;
   /** Grupo restaurado desde la cookie por el server component; `null` si no hay. */
   initialSelectedId: string | null;
 }
@@ -97,7 +97,9 @@ export function TeacherAttendanceControl({
       <AdminAttendancePanel
         key={selectedCourse.id}
         academicCourseId={selectedCourse.id}
-        initialSession={initialSessionsByCourseId[selectedCourse.id] ?? null}
+        initialSession={
+          initialSessionsByCourseId[selectedCourse.id] ?? { status: 'unavailable' }
+        }
       />
     </div>
   );

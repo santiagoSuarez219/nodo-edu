@@ -1,4 +1,4 @@
-# spec-037 — [NOT STARTED] Manejo de errores: boundaries y señalización honesta de fallos de infraestructura
+# spec-037 — [TESTING] Manejo de errores: boundaries y señalización honesta de fallos de infraestructura
 
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.
@@ -186,109 +186,109 @@ spec; convertirlo en fase de MCP ampliaría el scope sin cerrar DEBT-037.
 ## Fases de implementación
 
 ### Fase 1 — Componente compartido de UI de error
-- [ ] Crear `components/ErrorState.tsx`: presentación pura, props `title`,
+- [x] Crear `components/ErrorState.tsx`: presentación pura, props `title`,
       `description`, `onRetry?`, `retryLabel?`, `digest?`.
-- [ ] Replicar el look del banner ya existente en
+- [x] Replicar el look del banner ya existente en
       `components/admin/AdminAttendancePanel.tsx:129-144`: `role="alert"`,
       `border-danger/30 bg-danger/10`, texto `text-danger dark:text-red-300`.
-- [ ] Copy en español, sin jerga técnica. Mostrar el `digest` solo como código de
+- [x] Copy en español, sin jerga técnica. Mostrar el `digest` solo como código de
       referencia discreto; **nunca** el `message` de la excepción.
-- [ ] Verificar contraste en claro y oscuro contra la tabla de `DESIGN.md`.
+- [x] Verificar contraste en claro y oscuro contra la tabla de `DESIGN.md`.
 
 ### Fase 2 — Boundaries de ruta (Frente 1)
-- [ ] `app/global-error.tsx` (`'use client'`). Debe renderizar su propio
+- [x] `app/global-error.tsx` (`'use client'`). Debe renderizar su propio
       `<html lang="es">`/`<body>`: no hereda fuente ni script de tema. Reinyectar
       el snippet de `prefers-color-scheme` (ver D2).
-- [ ] `app/error.tsx` (`'use client'`): red de seguridad global, botón
+- [x] `app/error.tsx` (`'use client'`): red de seguridad global, botón
       "Reintentar" → `reset()`.
-- [ ] `app/(admin)/error.tsx`: conserva el chrome admin al fallar.
-- [ ] `app/(cursos)/[courseSlug]/[lessonSlug]/error.tsx`: captura fallos de render
+- [x] `app/(admin)/error.tsx`: conserva el chrome admin al fallar.
+- [x] `app/(cursos)/[courseSlug]/[lessonSlug]/error.tsx`: captura fallos de render
       en servidor de la página de lección (las llamadas a datos de `page.tsx:86-128`),
       conservando el layout de lección.
-- [ ] **No** crear boundaries en `(auth)`, `cuenta` ni `(cursos)`: `app/error.tsx`
+- [x] **No** crear boundaries en `(auth)`, `cuenta` ni `(cursos)`: `app/error.tsx`
       ya los cubre (ver D1).
 
 ### Fase 3 — Boundary de componente para el panel proyectado en clase
-- [ ] Crear `components/ErrorBoundary.tsx`: boundary de clase
+- [x] Crear `components/ErrorBoundary.tsx`: boundary de clase
       (`getDerivedStateFromError` + `componentDidCatch`), con `fallback` y `onReset`.
-- [ ] Envolver `<TeacherAttendanceControl>` en `TeacherLessonPanel.tsx:43` — **no**
+- [x] Envolver `<TeacherAttendanceControl>` en `TeacherLessonPanel.tsx:43` — **no**
       `<AdminAttendancePanel>` desde dentro, para que el selector de grupo
       sobreviva al fallo.
-- [ ] Envolver `<AttendanceSection>` en la página de lección del estudiante.
-- [ ] Objetivo explícito: un fallo del panel degrada **solo su recuadro**; el
+- [x] Envolver `<AttendanceSection>` en la página de lección del estudiante.
+- [x] Objetivo explícito: un fallo del panel degrada **solo su recuadro**; el
       artículo y la navegación siguen en pantalla mientras se proyecta.
 
 ### Fase 4 — Señalización honesta en `lib/attendance/index.ts` (Frente 2)
-- [ ] Definir en `lib/attendance/types.ts` los resultados discriminados que
+- [x] Definir en `lib/attendance/types.ts` los resultados discriminados que
       separan negocio de infraestructura (forma en D3).
-- [ ] Mover `createServerSupabaseClient()` **dentro** del `try` en las 6 funciones
+- [x] Mover `createServerSupabaseClient()` **dentro** del `try` en las 6 funciones
       exportadas (líneas 40, 104, 126, 162, 183, 222).
-- [ ] `getOpenSessionForCourse`: separar "no hay sesión" (`PGRST116`, negocio) de
+- [x] `getOpenSessionForCourse`: separar "no hay sesión" (`PGRST116`, negocio) de
       fallo de consulta. Actualizar el llamador interno `openSession:93-96`, que
       hoy colapsa ambos en "Error al recuperar la sesión creada".
-- [ ] `getSessionAttendanceCount`: dejar de devolver `0` ante fallo (ver D4).
-- [ ] `markAttendanceByCode`: separar los tres casos hoy fundidos en `'not_found'`
+- [x] `getSessionAttendanceCount`: dejar de devolver `0` ante fallo (ver D4).
+- [x] `markAttendanceByCode`: separar los tres casos hoy fundidos en `'not_found'`
       — formato inválido (zod, `:189-193`), error del RPC (`:201-204`) y excepción
       (`:213-216`). Ampliar `MarkAttendanceResult`.
-- [ ] `getStudentAttendanceForCourse`: distinguir "sin sesión abierta" de "no pude
+- [x] `getStudentAttendanceForCourse`: distinguir "sin sesión abierta" de "no pude
       consultar". Ojo con `:230`, que hoy funde `error`, `!data` y `data.length === 0`
       en una sola rama.
-- [ ] `openSession` / `closeSession`: sin cambio de contrato; solo mover el cliente
+- [x] `openSession` / `closeSession`: sin cambio de contrato; solo mover el cliente
       dentro del `try`.
-- [ ] Mantener los `console.error`: son la única observabilidad hasta que exista Sentry.
+- [x] Mantener los `console.error`: son la única observabilidad hasta que exista Sentry.
 
 ### Fase 5 — Propagación a consumidores
-- [ ] `app/(cursos)/[courseSlug]/[lessonSlug]/page.tsx`: manejar la variante de
+- [x] `app/(cursos)/[courseSlug]/[lessonSlug]/page.tsx`: manejar la variante de
       infraestructura en `:86` y `:116`; ajustar el tipo de la prop serializada en cadena.
-- [ ] `components/courses/TeacherLessonPanel.tsx:11` y
+- [x] `components/courses/TeacherLessonPanel.tsx:11` y
       `TeacherAttendanceControl.tsx:17`: ajustar `initialSessionsByCourseId`.
-- [ ] `components/admin/AdminAttendancePanel.tsx`: aceptar el estado de infra en
+- [x] `components/admin/AdminAttendancePanel.tsx`: aceptar el estado de infra en
       `initialSession`; en el polling (`:44-49`) conservar el último conteo conocido
       y marcarlo como desactualizado en vez de pintar `0` (D4). **Mantener** el guard
       `cancelled` de **[[DEBT-019]]** y no volver a meter el polling en `startTransition`.
-- [ ] `components/courses/AttendanceSection.tsx`: añadir la entrada de infra a
+- [x] `components/courses/AttendanceSection.tsx`: añadir la entrada de infra a
       `resultMessages:29` con copy que **no culpe al estudiante** ("No pudimos
       verificar tu código, inténtalo de nuevo"); revisar que `:95` no muestre
       "Sin sesión activa" cuando en realidad la consulta falló.
 
 ### Fase 6 — `try/catch` cliente sobre server actions (Frente 3 — cierra `TC-007`)
-- [ ] Envolver las 4 invocaciones: `AdminAttendancePanel.tsx:60` (`openSession`),
+- [x] Envolver las 4 invocaciones: `AdminAttendancePanel.tsx:60` (`openSession`),
       `:76` (`closeSession`), `:45` (`getSessionAttendanceCount`) y
       `AttendanceSection.tsx:84` (`markAttendanceByCode`).
-- [ ] Ante excepción de transporte, alimentar el `setError`/banner existente en vez
+- [x] Ante excepción de transporte, alimentar el `setError`/banner existente en vez
       de dejar que escale al boundary. Esto evita el overlay de `TC-007` **sin**
       desmontar la lección.
-- [ ] El fallo del polling **no** debe generar banner en cada tick: degradar
+- [x] El fallo del polling **no** debe generar banner en cada tick: degradar
       silenciosamente a "conteo desactualizado".
 
 ### Fase 7 — Cerrar el gate de autoevaluación (Frente 4)
-- [ ] `lib/self-assessment/index.ts` → `getSelfAssessmentStatus`: dejar de degradar
+- [x] `lib/self-assessment/index.ts` → `getSelfAssessmentStatus`: dejar de degradar
       a `requiresAttempt: false` en el `catch`. Devolver un estado que el llamador
       pueda distinguir de "esta lección no tiene autoevaluación" (ver D8).
-- [ ] `lib/progress/index.ts` → `markLessonCompleted:79-82`: ante estado
+- [x] `lib/progress/index.ts` → `markLessonCompleted:79-82`: ante estado
       indeterminado, **denegar** el completado con un motivo propio, no permitirlo.
       Fallar cerrado, no abierto.
-- [ ] `lib/progress/index.ts:84`: capturar el `error` del `upsert` de
+- [x] `lib/progress/index.ts:84`: capturar el `error` del `upsert` de
       `lesson_progress` y dejar de reportar éxito ante un fallo de escritura.
-- [ ] Mover `createServerSupabaseClient()` dentro del `try` en las 5 funciones de
+- [x] Mover `createServerSupabaseClient()` dentro del `try` en las 5 funciones de
       `lib/self-assessment/index.ts` donde está fuera.
-- [ ] Verificar que el mensaje que ve el estudiante distingue "te falta la
+- [x] Verificar que el mensaje que ve el estudiante distingue "te falta la
       autoevaluación" de "no pudimos verificarlo ahora".
 
 ### Fase 8 — Documentación y deuda
-- [ ] Corregir la entrada **DEBT-037** de `docs/specs/backlog.md`: su diagnóstico
+- [x] Corregir la entrada **DEBT-037** de `docs/specs/backlog.md`: su diagnóstico
       (`openSession` "lanza y nadie recoge") es incorrecto. Dejar constancia del
       diagnóstico real (ver D7).
-- [ ] Registrar **DEBT-040** — error de Supabase descartado en la destructuración
+- [x] Registrar **DEBT-040** — error de Supabase descartado en la destructuración
       (~40 sitios). Los más costosos: `lib/submissions/index.ts:77` (un fallo al
       contar intentos se lee como "primer intento" y salta `max_attempts`),
       `:204-219` (respuestas vacías → `auto_score = 0` escrito como nota real),
       `lib/enrollments/access.ts:21,37` (un fallo devuelve `not-enrolled` y expulsa
       a un docente legítimo), `lib/grades/index.ts:64` y `lib/questions/index.ts:251`
       (guardas de borrado que no disparan → borran con dependencias y reportan éxito).
-- [ ] Registrar **DEBT-041** — `createServerSupabaseClient()` fuera del `try` en
+- [x] Registrar **DEBT-041** — `createServerSupabaseClient()` fuera del `try` en
       `lib/academic-courses/index.ts:206` y demás módulos no cubiertos por este spec.
-- [ ] Actualizar `docs/testing/test-fix-attendance-panel-flicker.md` enlazando
+- [x] Actualizar `docs/testing/test-fix-attendance-panel-flicker.md` enlazando
       `TC-007` a este spec.
 
 ## Criterios de aceptación
@@ -349,5 +349,5 @@ Verificables cortando el túnel SSH a `mirp-lab` (mismo método que originó `TC
 
 > Claude no escribe código de implementación hasta que esta sección esté marcada.
 
-- [ ] Paquete (spec + pruebas) aprobado por el usuario
-- **Fecha de aprobación:** {{pendiente}}
+- [x] Paquete (spec + pruebas) aprobado por el usuario
+- **Fecha de aprobación:** 2026-08-01

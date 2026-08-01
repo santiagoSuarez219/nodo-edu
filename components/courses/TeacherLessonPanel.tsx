@@ -1,14 +1,15 @@
 import { TeacherAnswerKey } from '@/components/courses/TeacherAnswerKey';
 import { TeacherAttendanceControl } from '@/components/courses/TeacherAttendanceControl';
 import type { AttendanceGroup } from '@/components/courses/TeacherAttendanceControl';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import type { AnswerKeyQuestion } from '@/lib/self-assessment/types';
-import type { OpenSessionSummary } from '@/lib/attendance/types';
+import type { OpenSessionResult } from '@/lib/attendance/types';
 
 interface TeacherLessonPanelProps {
   courseSlug: string;
   answerKey: AnswerKeyQuestion[];
   academicCourses: AttendanceGroup[];
-  initialSessionsByCourseId: Record<string, OpenSessionSummary | null>;
+  initialSessionsByCourseId: Record<string, OpenSessionResult>;
   initialAttendanceGroupId: string | null;
 }
 
@@ -40,12 +41,19 @@ export function TeacherLessonPanel({
             </h3>
           </div>
           <div className="px-6 py-6">
-            <TeacherAttendanceControl
-              courseSlug={courseSlug}
-              courses={academicCourses}
-              initialSessionsByCourseId={initialSessionsByCourseId}
-              initialSelectedId={initialAttendanceGroupId}
-            />
+            {/* Un fallo aquí no debe tumbar el resto de la lección proyectada
+                en clase (artículo, navegación, clave de respuestas). */}
+            <ErrorBoundary
+              title="El panel de asistencia no está disponible"
+              description="Ocurrió un error inesperado. Intenta de nuevo."
+            >
+              <TeacherAttendanceControl
+                courseSlug={courseSlug}
+                courses={academicCourses}
+                initialSessionsByCourseId={initialSessionsByCourseId}
+                initialSelectedId={initialAttendanceGroupId}
+              />
+            </ErrorBoundary>
           </div>
         </div>
       </div>
