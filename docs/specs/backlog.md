@@ -5,40 +5,19 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
-## DEBT-039 — `<Script id="theme-init">` en el layout raíz genera un error de hidratación en consola
+## DEBT-039 — 🔁 Duplicado de **[[DEBT-010]]** (fusionado el 2026-08-01)
 
-**Origen:** Ronda manual de `test-036-admin-curso-slug-y-ciclo-de-vida.md`
-(TC-036-012, 2026-08-01), detectado incidentalmente — no tiene relación con
-`spec-036`
-**Prioridad:** Media — no rompe la funcionalidad observada, pero contamina la
-consola en cada carga y pudo causar el colgado transitorio reportado en
-TC-036-012 (indicador de dev de Next.js atascado)
+Este ítem se abrió el 2026-08-01 durante la ronda manual de `test-036`
+describiendo el error de consola de `<Script id="theme-init">` en
+`app/layout.tsx`. **Es exactamente el mismo problema que ya registraba
+[[DEBT-010]]** (2026-07-24): mismo archivo, mismo mensaje de error, misma
+acción propuesta. Solo cambiaba el número de línea citado (48 vs. 47), porque
+el layout se editó entremedio.
 
-`app/layout.tsx:48` monta `<Script id="theme-init" strategy="beforeInteractive"
-dangerouslySetInnerHTML={{ __html: themeInitScript }} />` dentro del `<body>`.
-En Next.js 16.2.4 / React 19 esto dispara el error de consola:
-
-```
-Console Error
-Encountered a script tag while rendering React component. Scripts inside
-React components are never executed when rendering on the client. Consider
-using template tag instead.
-    at script (<anonymous>:null:null)
-    at RootLayout (app/layout.tsx:48:9)
-```
-
-Se reprodujo primero indirectamente durante TC-036-012 (la pestaña de prueba
-quedó colgada en el indicador "Rendering..." de Next.js sin peticiones ni
-errores propios de la app en curso), y se confirmó luego navegando
-directamente: el error de hidratación aparece en cualquier página que use el
-layout raíz, no solo en el panel admin.
-
-**Acción:** Revisar si `next/script` con `strategy="beforeInteractive"` sigue
-siendo la forma correcta de inyectar este script en Next 16 (parece requerir
-`<template>` o un mecanismo distinto para scripts inline tempranos, según el
-propio mensaje de error), o mover la lógica de tema inicial a un mecanismo que
-no dispare esta advertencia (por ejemplo, un atributo `data-*` leído por CSS,
-o `suppressHydrationWarning` combinado con otro patrón de inyección).
+La evidencia nueva que aportaba esta entrada —la reproducción durante
+TC-036-012 y la confirmación de que el error aparece en **cualquier** página
+del layout raíz, no solo en el panel admin— se incorporó a **[[DEBT-010]]**,
+que queda como el ítem canónico. No abrir trabajo contra este número.
 
 ---
 
@@ -858,7 +837,12 @@ nuevo para **reconstruir** el flujo de recuperación de contraseña desde cero
 
 ## DEBT-010 — Error de consola "script tag while rendering" en el init de tema (Next 16)
 
+> **Ítem canónico.** El 2026-08-01 se abrió **[[DEBT-039]]** describiendo este
+> mismo problema; se fusionó aquí y aquel número quedó como puntero. Toda la
+> evidencia acumulada vive en este ítem.
+
 **Origen:** Reportado por el usuario durante la ronda de pruebas de `test-020-assignment-review.md`, ajeno al scope de spec-020
+**Reconfirmado:** Ronda manual de `test-036` (TC-036-012, 2026-08-01)
 **Prioridad:** Media — error de consola en toda la app; relacionado con DEBT-008
 
 Next.js 16.2.4 (Turbopack) reporta en consola:
@@ -873,17 +857,28 @@ template tag instead.
 ```
 
 Apunta a `<Script id="theme-init" strategy="beforeInteractive" ...>` en
-`app/layout.tsx:47`, el mismo mecanismo de aplicación de tema documentado en
-**[[DEBT-008]]** (saltos perceptibles entre modo claro/oscuro). No se investigó
-la causa raíz todavía; podría deberse a un cambio de comportamiento de
-`next/script` con `strategy="beforeInteractive"` fuera de `<Head>` en Next 16,
-o a una interacción con Turbopack/Cache Components.
+`app/layout.tsx` (línea 47 al reportarse, 48 tras ediciones posteriores),
+montado **dentro del `<body>`** — el mismo mecanismo de aplicación de tema
+documentado en **[[DEBT-008]]** (saltos perceptibles entre modo claro/oscuro).
+No se investigó la causa raíz todavía; podría deberse a un cambio de
+comportamiento de `next/script` con `strategy="beforeInteractive"` fuera de
+`<Head>` en Next 16, o a una interacción con Turbopack/Cache Components.
+
+**Evidencia adicional (2026-08-01, ex-[[DEBT-039]]):** se reprodujo primero de
+forma indirecta durante `TC-036-012` —la pestaña de prueba quedó colgada en el
+indicador "Rendering..." de Next.js, sin peticiones ni errores propios de la
+app en curso— y se confirmó después navegando directamente: el error aparece
+en **cualquier** página que use el layout raíz, no solo en el panel admin. Es
+decir, contamina la consola en cada carga de la app y es sospechoso del
+colgado transitorio de aquel caso.
 
 **Acción:** Investigar en la misma iteración de temas/DESIGN.md prevista para
 DEBT-008 — revisar si `next/script` con `beforeInteractive` sigue siendo la
-API correcta en Next 16 para este caso, o si corresponde moverlo a
-`app/layout.tsx` `<head>` explícito o a un mecanismo distinto (ver skill
-`next-upgrade`).
+API correcta en Next 16 para este caso (el propio mensaje sugiere `<template>`
+para scripts inline tempranos), o si corresponde moverlo al `<head>` explícito
+de `app/layout.tsx`, o a un mecanismo que no dispare la advertencia — por
+ejemplo un atributo `data-*` leído por CSS, o `suppressHydrationWarning`
+combinado con otro patrón de inyección (ver skill `next-upgrade`).
 
 ---
 
@@ -1065,10 +1060,10 @@ lección nueva tiene su `.mdx` correspondiente.
 
 ---
 
-## DEBT-004 — Sin acción de eliminar/desactivar curso en el panel admin
+## DEBT-004 — Sin acción de eliminar/desactivar curso en el panel admin — ✅ Resuelto (spec-036, 2026-08-01)
 
 **Origen:** Consulta del usuario sobre cómo eliminar un curso (2026-07-16)
-**Prioridad:** Media — no bloquea producción, pero es una operación admin básica ausente
+**Prioridad:** ~~Media~~ → **Resuelto**
 
 `AcademicCourseList.tsx` y el detalle de curso (`app/(admin)/admin/courses/[academicCourseId]/`)
 no exponen ningún botón de eliminar ni desactivar. Ya existe
@@ -1081,12 +1076,30 @@ existe una acción de borrado definitivo (hard delete).
 2. Evaluar si además se requiere borrado definitivo, y si debe hacerse en
    cascada (asistencia, notas, matrículas asociadas).
 
+**Resolución (2026-08-01):** implementado y probado en
+`docs/specs/spec-036-admin-curso-slug-y-ciclo-de-vida.md` — `[DONE]`. El panel
+admin expone ahora el ciclo de vida completo del curso: **desactivar** (conecta
+`deactivateCourseAction`, que además dejó de tragar errores y ya verifica filas
+afectadas), **reactivar** —sin la cual la desactivación era un viaje de ida— y
+**borrado definitivo**, cada uno con su diálogo de confirmación.
+
+Sobre el punto 2, la decisión del usuario fue **no** hacer borrado en cascada:
+el borrado definitivo se limita a **cursos vacíos** (sin matrículas ni
+evaluaciones, verificado con `getCourseDependencyCounts`), con un diálogo más
+exigente que el de desactivar que advierte del arrastre de sesiones de
+asistencia e ítems de nota. Registrado como decisión D1 del spec.
+
+También quedó explícito que `is_active=false` significa *"cerré las
+inscripciones"*, no *"expulsé a mi curso"*: los estudiantes ya matriculados
+conservan acceso al contenido, porque `hasCourseAccess`
+(`lib/enrollments/access.ts`) mira `enrollments.status` y no `course.is_active`.
+
 ---
 
-## DEBT-003 — `course_slug` de `academic_courses` sin validación ni selector
+## DEBT-003 — `course_slug` de `academic_courses` sin validación ni selector — ✅ Resuelto (spec-036, 2026-08-01)
 
 **Origen:** Revisión manual durante spec-006 (lecciones privadas)
-**Prioridad:** Media — no bloquea producción, pero genera cursos "huérfanos"
+**Prioridad:** ~~Media~~ → **Resuelto**
 
 En `AcademicCourseForm` (`components/admin/AcademicCourseForm.tsx`), el campo
 `course_slug` es un input de texto libre: el docente debe escribir a mano el
@@ -1102,6 +1115,26 @@ de spec-006).
 reales de `lib/courses/index.ts` (o al menos validar contra esa lista en el
 server action antes de persistir), para evitar cursos académicos sin
 contenido asociado.
+
+**Resolución (2026-08-01):** implementado y probado en
+`docs/specs/spec-036-admin-curso-slug-y-ciclo-de-vida.md` — `[DONE]`. Se
+hicieron **las dos** cosas que la acción planteaba como alternativas: el input
+libre pasó a ser un **selector** poblado con los cursos reales del contenido
+(nombre + slug, con opción explícita "— Sin vincular —"), y además
+`createCourseAction`/`updateCourseAction` **validan el slug en el servidor**
+contra esa misma lista — la validación de cliente es comodidad, no barrera.
+
+Durante la redacción del spec apareció un bug adicional que este ítem no había
+detectado y que se corrigió en el mismo trabajo: **desvincular era imposible**.
+`updateCourseAction` hacía `course_slug: parsed.data.course_slug || undefined`,
+así que al vaciar el campo el cliente de Supabase omitía la columna del
+`UPDATE` y el slug anterior quedaba intacto, sin error. Sin ese arreglo la
+opción "— Sin vincular —" habría sido decorativa al editar.
+
+Los cursos ya creados con un typo **se señalizan como huérfanos** en el
+listado, para poder detectarlos y corregirlos; migrar los `course_slug` ya
+guardados en producción quedó explícitamente fuera de alcance (es trabajo de
+contenido).
 
 ---
 
