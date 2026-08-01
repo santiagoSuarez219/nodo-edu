@@ -1,4 +1,4 @@
-# spec-035 — [IN PROGRESS] Evaluaciones A/B/C: implementar `shuffle_questions` y `shuffle_choices`
+# spec-035 — [TESTING] Evaluaciones A/B/C: implementar `shuffle_questions` y `shuffle_choices`
 
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.
@@ -383,7 +383,14 @@ lectura para un agente.
 
 ## Aprobación de implementación
 
-> Claude no escribe código de implementación hasta que esta sección esté marcada.
+- [x] Paquete (spec + pruebas) aprobado por el usuario
+- **Fecha de aprobación:** 2026-08-01
 
-- [ ] Paquete (spec + pruebas) aprobado por el usuario
-- **Fecha de aprobación:** {{pendiente}}
+## Implementación completada
+
+- [x] Fase 1 — Compartir el helper de barajado
+- [x] Fase 2 — Barajado en `getVariantQuestionDetails`
+- [x] Fase 3 — Actualizar los consumidores
+- [x] Fase 4 — Tipos y verificación de no regresión
+- [x] Fase 5 — UI admin y documentación
+- [ ] Fase 6 — Ronda manual de pruebas (en curso)

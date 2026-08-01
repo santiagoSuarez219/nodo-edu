@@ -55,9 +55,9 @@ en base de datos.
 - **Barajar el orden de las *preguntas*** (solo las opciones de cada pregunta).
 - **Implementar `shuffle_choices` en las evaluaciones formales A/B/C** — ver
   **[[DEBT-034]]**: ese flag existe en el esquema y en la UI admin pero ningún
-  código lo lee. Es un problema real y adyacente, pero de otro flujo
-  (`get_variant_question_details`) y con su propia decisión de producto
-  (implementarlo vs. quitar el flag). Este spec deja el helper reutilizable.
+  código lo lee (en el momento de redactar este spec). Queda cubierto por
+  **spec-035** (2026-08-01), que implementa el barajado para evaluaciones
+  A/B/C reutilizando este helper. Este spec deja el helper reutilizable.
 - **Corregir las preguntas ya publicadas** con la correcta en primera posición
   (frente de contenido de DEBT-029). Tras este spec deja de importar para el
   estudiante, pero sigue siendo buena práctica de autoría.
@@ -206,8 +206,8 @@ por ID (independiente del orden), y que no hay migraciones ni cambios a
   contenido (variar posiciones al autorar) queda abierto pero deja de ser
   crítico.
 - **[[DEBT-034]]** — `shuffle_choices`/`shuffle_questions` decorativos en las
-  evaluaciones A/B/C. Fuera de alcance; este spec deja el helper listo para
-  reutilizar.
+  evaluaciones A/B/C. Resuelto por **spec-035** (2026-08-01), que reutiliza este
+  helper para implementar el barajado en el flujo de estudiante.
 - **[[DEBT-022]]** — `getAnswerKeyForLesson` duplica la consulta de
   `getSelfAssessmentForLesson`. Este spec **agranda la divergencia** (una baraja,
   la otra no), lo que refuerza el caso de extraer el helper común que ese ítem
