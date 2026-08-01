@@ -37,7 +37,7 @@
 **Pasos:**
 1. Ir a `/admin/courses/new`.
 2. Localizar el campo de curso de contenido.
-**Resultado esperado:** Es un desplegable con los cursos de contenido reales del proyecto (estructuras de datos, análisis de algoritmos, programación científica) más una opción "— Sin vincular —". No es posible escribir texto libre.
+**Resultado esperado:** Es un desplegable con los cursos de contenido reales del proyecto (estructuras de datos, análisis de algoritmos, programación científica) más una opción "— Sin vincular —". Cada opción muestra el **nombre legible** del curso además del slug (ej. `Estructuras de Datos (estructuras-de-datos)`), no el slug a secas. No es posible escribir texto libre.
 **Estado:** ⬜ Pendiente
 **Hallazgos:**
 
@@ -54,7 +54,9 @@
 **Hallazgos:**
 
 ### TC-036-003 — Crear un curso deliberadamente sin contenido vinculado
-> Criterio de aceptación 3
+> Criterio de aceptación 3 — **solo la creación**. Desvincular un curso que *ya*
+> estaba vinculado es el caso TC-036-011 (criterio 11), que ejercita una ruta de
+> código distinta (`updateCourseAction`).
 
 **Pasos:**
 1. Crear un curso eligiendo "— Sin vincular —".
@@ -92,38 +94,40 @@
 
 **Precondición:** Curso activo **con al menos un estudiante matriculado**.
 **Pasos:**
-1. Entrar al detalle del curso y pulsar "Desactivar".
-2. Verificar que aparece un diálogo de confirmación propio de la app (no `confirm()` nativo) y cancelarlo → el curso sigue activo.
+1. Ir a `/admin/courses/{id}/edit` y localizar la **zona de peligro** al pie del formulario (ver spec-036, D7).
+2. Pulsar "Desactivar": verificar que aparece un diálogo de confirmación propio de la app (no `confirm()` nativo) y cancelarlo → el curso sigue activo.
 3. Repetir y confirmar.
-4. Verificar en `/admin/courses` que figura como "Inactivo".
-5. Intentar matricularse con su `enrollment_code` desde `/cuenta/cursos` con otra cuenta → debe rechazarse.
-6. **Con la cuenta del estudiante ya matriculado**, entrar a una lección del curso.
-**Resultado esperado:** El curso queda inactivo y deja de aceptar matrículas nuevas (paso 5), pero el estudiante ya matriculado **conserva el acceso al contenido** (paso 6) — ver spec-036, "No incluye".
+4. **Sin navegar a ningún sitio**, observar la propia página.
+5. Verificar en `/admin/courses` que figura como "Inactivo".
+6. Intentar matricularse con su `enrollment_code` desde `/cuenta/cursos` con otra cuenta → debe rechazarse.
+7. **Con la cuenta del estudiante ya matriculado**, entrar a una lección del curso.
+**Resultado esperado:** En el paso 4 el docente **permanece en `/admin/courses/{id}/edit`** (no se le expulsa al listado): el badge del `CourseHeader` pasa a "Inactivo" y el botón de la zona de peligro muta a "Reactivar" (ver spec-036, D8). El curso deja de aceptar matrículas nuevas (paso 6), pero el estudiante ya matriculado **conserva el acceso al contenido** (paso 7) — ver spec-036, "No incluye".
 **Estado:** ⬜ Pendiente
 **Hallazgos:**
 
 ### TC-036-007 — Reactivar un curso desactivado
 > Criterio de aceptación 7
 
-**Precondición:** TC-036-006 ejecutado.
+**Precondición:** TC-036-006 ejecutado. El docente sigue en `/admin/courses/{id}/edit`, la misma página donde desactivó.
 **Pasos:**
-1. En el detalle del curso desactivado, pulsar "Reactivar" y confirmar.
-2. Verificar el estado en el listado.
-3. Intentar matricularse con su `enrollment_code` desde otra cuenta.
-**Resultado esperado:** El curso vuelve a "Activo" y admite matrículas de nuevo.
+1. Sin cambiar de página, pulsar "Reactivar" en la zona de peligro y confirmar.
+2. Observar la propia página.
+3. Verificar el estado en el listado.
+4. Intentar matricularse con su `enrollment_code` desde otra cuenta.
+**Resultado esperado:** El curso vuelve a "Activo" y admite matrículas de nuevo. Deshacer la desactivación cuesta **un solo clic desde donde quedó** el docente: badge de vuelta a "Activo" y botón de vuelta a "Desactivar", sin navegación.
 **Estado:** ⬜ Pendiente
 **Hallazgos:**
 
 ### TC-036-008 — Borrar definitivamente un curso vacío
 > Criterio de aceptación 8
 
-**Precondición:** Curso **sin** matrículas ni evaluaciones (el creado en TC-036-003 sirve).
+**Precondición:** Curso **sin** matrículas ni evaluaciones (el creado en TC-036-003 sirve), pero **con al menos una sesión de asistencia** creada — sin ella la advertencia de cascada no es observable. Anotar de antemano cuántas sesiones e ítems de nota tiene, para contrastarlos con el diálogo.
 **Pasos:**
-1. En su detalle, pulsar "Eliminar definitivamente".
-2. Observar el diálogo: debe ser más exigente que el de desactivar (advertencia de irreversibilidad).
-3. Cancelar → el curso sigue existiendo.
+1. Ir a `/admin/courses/{id}/edit` y pulsar "Eliminar definitivamente" en la zona de peligro.
+2. Observar el diálogo: debe ser más exigente que el de desactivar (advertencia de irreversibilidad) **y enumerar lo que se arrastra en cascada** con conteos reales (N sesiones de asistencia y sus registros, N ítems de nota).
+3. Cancelar → el curso sigue existiendo, y su sesión de asistencia también.
 4. Repetir y confirmar.
-**Resultado esperado:** El curso desaparece del listado. Verificable además por API: la fila ya no existe.
+**Resultado esperado:** En el paso 2 los conteos del diálogo coinciden con lo anotado en la precondición — "vacío" significa sin matrículas ni evaluaciones, **no** sin datos (ver spec-036, D1). Tras confirmar, el docente llega a `/admin/courses` y el curso ya no está en el listado. Verificable además por API: no existen ni la fila del curso ni sus `class_sessions`.
 **Estado:** ⬜ Pendiente
 **Hallazgos:**
 
@@ -132,8 +136,9 @@
 
 **Precondición:** Curso con al menos una matrícula.
 **Pasos:**
-1. Entrar a su detalle e intentar eliminarlo definitivamente.
-**Resultado esperado:** La UI lo impide y explica por qué (ej. "tiene N estudiantes matriculados"). **No** aparece un error crudo de Postgres (`23503`, "violates foreign key constraint") ni el overlay de error de Next.
+1. Ir a `/admin/courses/{id}/edit` y observar la zona de peligro.
+2. Intentar pulsar "Eliminar definitivamente".
+**Resultado esperado:** El botón aparece **deshabilitado**, acompañado de la explicación de por qué (ej. "tiene N estudiantes matriculados"). La UI lo impide **antes** de intentarlo, no al pulsarlo: no debe abrirse el diálogo, no debe llegarse a la action, y por tanto **no** aparece un error crudo de Postgres (`23503`, "violates foreign key constraint") ni el overlay de error de Next.
 **Estado:** ⬜ Pendiente
 **Hallazgos:**
 
@@ -152,7 +157,42 @@
 > prueba automática cuando exista framework (ver spec-036, "Pruebas asociadas"):
 > invocar la server action directamente con un slug inválido.
 
+### TC-036-011 — Desvincular un curso que ya estaba vinculado
+> Criterio de aceptación 11 — cubre el bug documentado en spec-036, "Contexto":
+> hoy `updateCourseAction` convierte el string vacío en `undefined`, Supabase lo
+> omite del `UPDATE` y **el slug anterior sobrevive sin error**. Este caso debe
+> fallar contra el código actual.
+
+**Precondición:** Curso con `course_slug = "estructuras-de-datos"` (el creado en TC-036-002 sirve).
+**Pasos:**
+1. Abrir `/admin/courses/{id}/edit`.
+2. Cambiar el desplegable de contenido a "— Sin vincular —".
+3. Guardar y observar si aparece algún error.
+4. Volver a abrir la edición del mismo curso.
+5. Verificar por API el valor de la columna: `GET /rest/v1/academic_courses?id=eq.{id}&select=course_slug`.
+**Resultado esperado:** Se guarda sin error (paso 3), el desplegable muestra "— Sin vincular —" al reabrir (paso 4) y la columna vale **`null`**, no el slug anterior (paso 5). El paso 5 es el que cuenta: sin él, un formulario que reabre con el valor cacheado podría aparentar éxito.
+**Estado:** ⬜ Pendiente
+**Hallazgos:**
+
+### TC-036-012 — Una acción de ciclo de vida que no afecta filas no reporta éxito
+> Criterio de aceptación 12 — modo de fallo de RLS (ver spec-036, D6): un
+> `UPDATE`/`DELETE` no autorizado o sobre una fila inexistente **no devuelve
+> error**, simplemente afecta cero filas.
+
+**Precondición:** Un curso vacío, borrable. Dos pestañas del navegador abiertas.
+**Pasos:**
+1. En la pestaña A, abrir `/admin/courses/{id}/edit` y dejarla quieta.
+2. En la pestaña B, borrar definitivamente ese mismo curso.
+3. Volver a la pestaña A (sin recargar) y pulsar "Desactivar", confirmando el diálogo.
+**Resultado esperado:** La pestaña A muestra un **mensaje de error** ("El curso ya no existe" o equivalente) y **no navega** ni finge éxito. No aparece el overlay de error de Next ni una pantalla en blanco.
+**Estado:** ⬜ Pendiente
+**Hallazgos:**
+
+> Caso incómodo de ejecutar a mano y fácil de dar por bueno por accidente: es el
+> **candidato preferente a prueba automática** cuando exista framework — invocar
+> la action con un `courseId` inexistente y afirmar `ok: false`.
+
 ## Resumen de la ronda
-- Aprobados: 0 — Fallidos: 0 — Pendientes: 10
+- Aprobados: 0 — Fallidos: 0 — Pendientes: 12
 - Hallazgos escalados a `docs/specs/backlog.md`: {{pendiente}}
 - Limpieza de datos de prueba: ⬜ Pendiente

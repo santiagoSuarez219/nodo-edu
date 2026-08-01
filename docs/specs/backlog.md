@@ -5,6 +5,45 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+## DEBT-038 — El diálogo de confirmación accesible está copiado literalmente en cada componente que lo necesita
+
+**Origen:** Revisión de `spec-036` (2026-08-01), al detectar que su
+`CourseLifecycleActions` sería la **tercera** copia del mismo diálogo
+**Prioridad:** Media — no hay bug hoy; el riesgo es que las copias diverjan
+
+`components/student/AssignmentPlayer.tsx:262` y
+`components/admin/AdminAttendancePanel.tsx:239` contienen el mismo diálogo de
+confirmación **carácter por carácter**: overlay `<button>` a pantalla completa
+con `aria-label`, contenedor con `role="dialog"` + `aria-modal="true"` +
+`aria-labelledby`/`aria-describedby`, tarjeta `max-w-sm`, y un `useEffect` que
+cierra con `Escape` y enfoca el botón de confirmar vía `confirmButtonRef`.
+Solo cambian los `id` y el texto.
+
+El patrón en sí es **correcto** —accesibilidad razonable, sin `confirm()`
+nativo, que es justo lo que arregló **[[DEBT-018]]** copiando el diálogo de
+`AssignmentPlayer` al panel de asistencia—; el problema es que vive duplicado. Cualquier mejora futura (trampa de foco real, que hoy no tiene
+ninguno de los dos; restaurar el foco al cerrar; `aria-live` para el error)
+hay que aplicarla N veces, y basta con que se olvide una para que un flujo
+quede menos accesible que los demás sin que nadie lo note.
+
+`components/courses/LessonSidebarMobile.tsx:72` también usa
+`role="dialog"`/`aria-modal`, pero es un **drawer** de navegación, no una
+confirmación: comparte las primitivas ARIA, no la forma. Si se extrae un
+componente, conviene que sea `<ConfirmDialog>` (título, descripción, acción
+destructiva o no, callbacks) y no un `<Modal>` genérico que intente cubrir
+también el drawer.
+
+**Acción:** Extraer un `components/ui/ConfirmDialog.tsx` y migrar los dos
+consumidores actuales (más el que agregue spec-036). Al hacerlo, aprovechar
+para añadir lo que hoy falta en las tres copias: trampa de foco dentro del
+diálogo y devolución del foco al elemento que lo abrió.
+
+> **spec-036 no resuelve esta deuda**: agregará una tercera copia siguiendo el
+> mismo patrón, deliberadamente, para no inventar un cuarto diálogo distinto y
+> dejar la extracción más difícil. Decisión registrada en el propio spec.
+
+---
+
 ## DEBT-037 — La app no tiene ningún error boundary: un server action que lanza deja al usuario sin mensaje útil
 
 **Origen:** `TC-007` de `docs/testing/test-fix-attendance-panel-flicker.md`
