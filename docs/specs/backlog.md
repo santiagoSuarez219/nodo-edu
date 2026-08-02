@@ -5,6 +5,39 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+## DEBT-043 — `self_assessment_breakdown` no filtra lecciones deshabilitadas (BLOQUE 039)
+
+**Origen:** spec-040, Fase 2, registrado explícitamente en la implementación
+(2026-08-01)
+**Prioridad:** Media — depende de que spec-039 se mergee a `development`
+
+El RPC `public.self_assessment_breakdown` (`20260802000004_self_assessment_grade_rpcs.sql`)
+calcula el denominador de la nota de autoevaluaciones sobre **todas** las
+lecciones de `lesson_progress`, sin excluir las que spec-039 marca como
+deshabilitadas (`public.disabled_lessons`, rama `feat/lecciones-habilitadas`,
+aún no mergeada a `development` cuando se implementó este spec).
+
+Consecuencia: si un docente deshabilita una lección después de que un
+estudiante la vio (pero antes de responderla), esa lección **sigue
+penalizando la nota** de autoevaluaciones como "vista y no respondida",
+contradiciendo la intención de spec-039 (D5: una lección deshabilitada sale
+de los conteos de progreso mientras dura el cierre).
+
+**No se corrigió en spec-040** porque referenciar en el RPC una tabla que no
+existe todavía rompería en tiempo de ejecución (no de creación) y tumbaría el
+envío de autoevaluaciones en producción antes de que spec-039 se despliegue.
+El bloque de filtro ya está escrito y comentado en la migración
+(`-- ▼▼▼ BLOQUE 039`), con el nombre de tabla como marcador a ajustar.
+
+**Fix cuando spec-039 esté mergeado:** `create or replace function
+public.self_assessment_breakdown(...)` descomentando el bloque y ajustando el
+nombre real de la tabla/columna de disponibilidad (`public.disabled_lessons`,
+confirmar contra la migración final de spec-039), más un recálculo masivo por
+curso (`recalculate_course_self_assessment_grades`, ya provisto por la
+Fase 5 de spec-040) para aplicar el filtro a las notas ya calculadas.
+
+---
+
 ## DEBT-042 — El middleware cierra la sesión de todos los usuarios ante cualquier caída de Supabase Auth
 
 **Origen:** Detectado durante la ronda manual de `test-037-manejo-de-errores.md`
