@@ -5,6 +5,7 @@ import { createServerSupabaseClient } from "@/lib/auth/server";
 import { getCurrentUser } from "@/lib/auth/session";
 import { hasCourseAccess } from "@/lib/enrollments/access";
 import { getSelfAssessmentStatus } from "@/lib/self-assessment";
+import { isLessonDisabled } from "@/lib/courses/availability";
 import type { LessonProgress, MarkLessonCompletedResult } from "./types";
 
 export async function getLessonProgress(
@@ -50,6 +51,12 @@ export async function markLessonViewed(
   const user = await getCurrentUser();
   if (!user) return;
 
+  // spec-039: no registrar visita a una lección deshabilitada, ni si su
+  // disponibilidad no se puede verificar — mismo criterio de "fallar
+  // cerrado" que el resto del gate (D6).
+  const availability = await isLessonDisabled(courseSlug, lessonSlug);
+  if (availability.status === "unavailable" || availability.disabled) return;
+
   const supabase = await createServerSupabaseClient();
   await supabase.from("lesson_progress").upsert(
     {
@@ -74,6 +81,17 @@ export async function markLessonCompleted(
   const access = await hasCourseAccess(courseSlug);
   if (!access.ok || access.reason !== "enrolled") {
     return { ok: false, reason: "not_enrolled" };
+  }
+
+  // spec-039: la disponibilidad se comprueba antes que la autoevaluación —
+  // es más barata y más determinante ("esta lección está cerrada" gana sobre
+  // "te falta la autoevaluación") — y falla cerrado (D6/D8).
+  const availability = await isLessonDisabled(courseSlug, lessonSlug);
+  if (availability.status === "unavailable") {
+    return { ok: false, reason: "availability_unavailable" };
+  }
+  if (availability.disabled) {
+    return { ok: false, reason: "lesson_disabled" };
   }
 
   const status = await getSelfAssessmentStatus(courseSlug, lessonSlug);
@@ -121,6 +139,11 @@ export async function markLessonUncompleted(
   const access = await hasCourseAccess(courseSlug);
   if (!access.ok || access.reason !== "enrolled") return;
 
+  // spec-039: deshacer nunca se bloquea, ni siquiera sobre una lección
+  // deshabilitada — es la contrapartida de que deshabilitar "descuenta" el
+  // progreso de los conteos sin borrarlo (D5); impedir desmarcar aquí no
+  // protegería nada y solo dejaría al estudiante sin forma de corregir su
+  // propio registro.
   const supabase = await createServerSupabaseClient();
   await supabase.from("lesson_progress").upsert(
     {

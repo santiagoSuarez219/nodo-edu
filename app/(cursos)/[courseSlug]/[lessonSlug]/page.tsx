@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { getLessonBySlug, isGuide, buildCourseOutline } from "@/lib/courses";
 import { getLessonArticle } from "@/lib/courses/content";
+import { isLessonDisabled } from "@/lib/courses/availability";
 import { requireCourseAccess } from "@/lib/enrollments";
 import { hasCourseAccess } from "@/lib/enrollments/access";
 import { markLessonViewed, getLessonProgress } from "@/lib/progress";
@@ -26,6 +27,7 @@ import { LessonClosureFlow } from "@/components/courses/LessonClosureFlow";
 import type { AttendanceGroup } from "@/components/courses/TeacherAttendanceControl";
 import { AttendanceSection } from "@/components/courses/AttendanceSection";
 import { TeacherLessonPanel } from "@/components/courses/TeacherLessonPanel";
+import { LessonUnavailable } from "@/components/courses/LessonUnavailable";
 import { MdxContent } from "@/components/mdx/MdxContent";
 import { TopicList } from "@/components/courses/TopicList";
 
@@ -63,16 +65,37 @@ export default async function LessonPage({ params }: LessonPageProps) {
   const nodeOutline = outline.find((n) => n.slug === lesson.slug);
   const classIndex = nodeOutline?.classIndex ?? null;
 
-  // Omitir tracking de progreso para guías
-  if (!isGuideNode) {
+  const access = await hasCourseAccess(courseSlug);
+
+  // spec-039: la disponibilidad se compone contra Supabase (D1) y se aplica
+  // solo al estudiante matriculado (D4) — owner y admin nunca son bloqueados.
+  // Cubre lecciones y guías por igual (el contexto del spec cita explícitamente
+  // el caso de una guía cuyo enunciado no debe verse antes de la sesión).
+  const availability = await isLessonDisabled(courseSlug, lessonSlug);
+  const isBlockedForStudent =
+    access.ok &&
+    access.reason === "enrolled" &&
+    (availability.status === "unavailable" || availability.disabled);
+  // D6: el owner/admin solo ve el aviso cuando el estado se pudo verificar
+  // y es efectivamente "deshabilitada" — nunca ante un fallo de verificación.
+  const showDisabledNoticeToTeacher =
+    access.ok &&
+    (access.reason === "owner" || access.reason === "admin") &&
+    availability.status === "ok" &&
+    availability.disabled;
+
+  // Omitir tracking de progreso para guías y para lecciones bloqueadas.
+  if (!isGuideNode && !isBlockedForStudent) {
     await markLessonViewed(courseSlug, lessonSlug);
   }
-  const access = await hasCourseAccess(courseSlug);
   const progress = !isGuideNode ? await getLessonProgress(courseSlug, lessonSlug) : null;
 
-  const article = lesson.articleSlug
-    ? await getLessonArticle(course.slug, lesson.articleSlug, lesson.kind)
-    : null;
+  // El artículo MDX no se carga cuando el gate bloquea (D3): el contenido
+  // nunca viaja al cliente, no es solo un ocultamiento visual.
+  const article =
+    !isBlockedForStudent && lesson.articleSlug
+      ? await getLessonArticle(course.slug, lesson.articleSlug, lesson.kind)
+      : null;
 
   let attendanceState: StudentAttendanceState | null = null;
   let selfAssessment: SelfAssessmentQuestion[] = [];
@@ -84,7 +107,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
     lastAttempt: null,
   };
 
-  if (access.ok && access.reason === "enrolled" && !isGuideNode) {
+  if (access.ok && access.reason === "enrolled" && !isGuideNode && !isBlockedForStudent) {
     attendanceState = await getStudentAttendanceForCourse(courseSlug);
     selfAssessment = await getSelfAssessmentForLesson(courseSlug, lessonSlug);
     selfAssessmentStatus = await getSelfAssessmentStatus(courseSlug, lessonSlug);
@@ -153,7 +176,13 @@ export default async function LessonPage({ params }: LessonPageProps) {
         classIndex={classIndex}
         updatedAt={article?.frontmatter.updatedAt}
       >
-        {article ? (
+        {isBlockedForStudent ? (
+          <LessonUnavailable
+            reason={availability.status === "unavailable" ? "unavailable" : "disabled"}
+            hasTopics={lesson.topics.length > 0}
+            topics={lesson.topics}
+          />
+        ) : article ? (
           <MdxContent source={article.rawSource} />
         ) : (
           <PreparationPlaceholder
@@ -164,7 +193,16 @@ export default async function LessonPage({ params }: LessonPageProps) {
         )}
       </LessonArticle>
 
-      {access.ok && access.reason === "enrolled" && !isGuideNode && (
+      {showDisabledNoticeToTeacher && (
+        <div
+          role="status"
+          className="mt-6 rounded-lg border border-yellow-300 dark:border-yellow-700 bg-yellow-50 dark:bg-yellow-900/20 px-4 py-3 text-sm text-yellow-800 dark:text-yellow-300"
+        >
+          Lección deshabilitada — los estudiantes no pueden abrirla.
+        </div>
+      )}
+
+      {access.ok && access.reason === "enrolled" && !isGuideNode && !isBlockedForStudent && (
         <LessonClosureFlow
           courseSlug={courseSlug}
           lessonSlug={lessonSlug}

@@ -9,7 +9,11 @@ interface LessonClosureProps {
   lessonSlug: string;
   initialCompletedAt: string | null;
   canComplete?: boolean;
-  blockedReason?: "self_assessment_pending" | "self_assessment_unavailable";
+  blockedReason?:
+    | "self_assessment_pending"
+    | "self_assessment_unavailable"
+    | "lesson_disabled"
+    | "availability_unavailable";
 }
 
 export function LessonClosure({
@@ -38,15 +42,26 @@ export function LessonClosure({
             router.refresh();
           } else if (
             result.reason === "save_failed" ||
-            result.reason === "self_assessment_unavailable"
+            result.reason === "self_assessment_unavailable" ||
+            result.reason === "lesson_disabled" ||
+            result.reason === "availability_unavailable"
           ) {
             // No reportar éxito silencioso ante un fallo de escritura o de
-            // verificación (DEBT-037, Frente 4).
-            setError(
-              result.reason === "save_failed"
-                ? "No se pudo guardar. Inténtalo de nuevo."
-                : "No pudimos verificar tu autoevaluación. Inténtalo de nuevo en un momento."
-            );
+            // verificación (DEBT-037, Frente 4). "lesson_disabled" y
+            // "availability_unavailable" (spec-039) solo llegan aquí por una
+            // condición de carrera: la lección se cerró (o dejó de poder
+            // verificarse) después de que la página cargó el estado con el
+            // que se calculó `canComplete`.
+            const messages: Record<string, string> = {
+              save_failed: "No se pudo guardar. Inténtalo de nuevo.",
+              self_assessment_unavailable:
+                "No pudimos verificar tu autoevaluación. Inténtalo de nuevo en un momento.",
+              lesson_disabled:
+                "Esta lección se deshabilitó. Actualiza la página para ver su estado actual.",
+              availability_unavailable:
+                "No pudimos verificar si esta lección está disponible. Inténtalo de nuevo en un momento.",
+            };
+            setError(messages[result.reason]);
           }
         }
       } catch (err) {
@@ -71,6 +86,9 @@ export function LessonClosure({
       "Completa la autoevaluación antes de marcar la lección como finalizada.",
     self_assessment_unavailable:
       "No pudimos verificar tu autoevaluación. Inténtalo de nuevo en un momento.",
+    lesson_disabled: "Esta lección está deshabilitada por tu docente.",
+    availability_unavailable:
+      "No pudimos verificar si esta lección está disponible. Inténtalo de nuevo en un momento.",
   };
 
   return (
