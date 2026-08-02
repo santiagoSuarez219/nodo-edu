@@ -32,7 +32,7 @@ importa ver más de una opción resaltada a la vez al revelar).
 **Entorno de pruebas:** desarrollo — instancia local de Supabase en `mirp-lab`
 vía túnel SSH (`.env.local`), con `npm run dev` corriendo. Ver CLAUDE.md →
 "Base de datos". No ejecutar esta ronda contra producción.
-**Fecha de la ronda:** {{pendiente}}
+**Fecha de la ronda:** 2026-08-02
 
 ## Casos de prueba
 
@@ -50,8 +50,8 @@ iniciada como docente dueño; Lección A tiene preguntas publicadas.
 preguntas (p. ej. "· 5 preguntas") y un control con etiqueta de texto visible
 ("Mostrar"). **Ningún** enunciado de pregunta ni opción es visible, y tampoco se
 ve el botón "Revelar todas".
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** sin observaciones
 
 ### TC-002 — Al desplegar, las preguntas aparecen con las respuestas ocultas
 **Precondición:** TC-001 recién ejecutado; bloque plegado en pantalla.
@@ -63,8 +63,8 @@ ve el botón "Revelar todas".
 todas las opciones; **ninguna** opción aparece resaltada como correcta (sin
 resaltado verde ni marca de "correcta"). Reaparece el botón "Revelar todas"
 dentro del bloque desplegado y la etiqueta del control pasa a "Ocultar".
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** sin observaciones
 
 ### TC-003 — Recarga con el bloque desplegado: llega desplegado desde el servidor
 **Precondición:** bloque desplegado (TC-002); cookie `nodo_teacher_answer_key=1`
@@ -82,8 +82,8 @@ presente.
 **Resultado esperado:** el bloque se ve desplegado desde el primer instante y no
 cambia de estado tras la hidratación. En el `Response` del documento, el
 contenedor del cuerpo **no** lleva el atributo `hidden`.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** sin observaciones
 
 ### TC-004 — Recarga con el bloque plegado: sin parpadeo del contenido
 **Precondición:** bloque plegado; cookie `nodo_teacher_answer_key` ausente.
@@ -101,8 +101,8 @@ contenedor del cuerpo **no** lleva el atributo `hidden`.
 **Resultado esperado:** en ningún fotograma de la carga (ni con JS deshabilitado)
 se ven enunciados u opciones. El bloque nunca aparece desplegado para luego
 plegarse.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** sin observaciones
 
 ### TC-005 — La preferencia se conserva al navegar a otra lección del mismo curso
 **Precondición:** sesión de docente dueño; bloque desplegado en la Lección A.
@@ -116,8 +116,8 @@ publicada)
 3. Volver a la Lección A por el mismo camino.
 **Resultado esperado:** el bloque llega **desplegado** en la segunda lección y
 sigue desplegado al volver. No hay que volver a pulsar el control.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** sin observaciones
 
 ### TC-006 — La preferencia se conserva al cambiar de curso (cookie global, D2)
 **Precondición:** sesión de docente dueño; Lección B pertenece a **otro curso**
@@ -132,8 +132,8 @@ del mismo docente y tiene preguntas publicadas.
 **Resultado esperado:** en el paso 2 el bloque está plegado; en el paso 4 está
 desplegado. El estado es el mismo en ambos cursos: no hay una preferencia por
 curso.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** sin observaciones
 
 ### TC-007 — Plegar y volver a desplegar oculta de nuevo las respuestas reveladas
 **Precondición:** Lección A, bloque desplegado.
@@ -146,8 +146,8 @@ curso.
 **Resultado esperado:** al desplegar, ninguna pregunta muestra su respuesta
 correcta resaltada; el estado de revelado quedó completamente limpio (el botón
 vuelve a decir "Revelar todas", no "Ocultar todas").
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** sin observaciones
 
 ### TC-008 — El control de asistencia funciona con el bloque plegado y desplegado
 **Precondición:** Lección A; docente dueño; el bloque de asistencia se renderiza
@@ -164,8 +164,8 @@ bajo la clave de respuestas.
 **Resultado esperado:** el control de asistencia es visible e interactivo en
 ambos estados; alternar el plegado de la clave no lo desmonta, no lo reinicia ni
 provoca errores en consola.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** sin observaciones
 
 ### TC-009 — El control de plegado es accesible por teclado y expone ARIA correcto
 **Precondición:** Lección A; docente dueño; bloque en cualquiera de los dos
@@ -187,8 +187,8 @@ estados.
 foco no se pierde al alternar; `aria-expanded` refleja el estado real;
 `aria-controls` resuelve siempre a un elemento existente; el buscador de la
 página no encuentra el enunciado mientras el bloque está plegado.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** sin observaciones
 
 ### TC-010 — Un admin no dueño obtiene el mismo comportamiento
 **Precondición:** usuario con rol `admin` que **no** es dueño del curso;
@@ -204,8 +204,8 @@ borrarla).
 **Resultado esperado:** el bloque llega plegado la primera vez; despliega,
 persiste tras recargar y vuelve a persistir plegado. Comportamiento idéntico al
 del docente dueño (TC-001 a TC-004).
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** sin observaciones
 
 ### TC-011 — Un estudiante matriculado no ve el panel docente (no regresión)
 **Precondición:** estudiante matriculado y activo en el curso de la Lección A;
@@ -224,8 +224,8 @@ sesión distinta de la del docente (ventana privada u otro navegador).
 ni cabecera "Clave de respuestas", ni control de plegado, ni control de
 asistencia. El HTML servido tampoco contiene los enunciados de la clave. La
 autoevaluación del estudiante se comporta como siempre.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** sin observaciones
 
 ### TC-012 — Lección sin preguntas publicadas: el bloque no se renderiza (no regresión)
 **Precondición:** docente dueño; Lección C sin preguntas `multiple_choice`
@@ -239,8 +239,8 @@ publicadas.
 **Resultado esperado:** en ambos casos **no** aparece el bloque "Clave de
 respuestas" ni su control de plegado — no una cabecera vacía, sino ausencia
 total. El bloque de control de asistencia sí se muestra.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** sin observaciones
 
 ### TC-013 — Guía de laboratorio: el bloque no se renderiza (no regresión)
 **Precondición:** docente dueño; nodo de tipo guía de laboratorio, sin
@@ -253,8 +253,8 @@ autoevaluación.
 **Resultado esperado:** no aparece el bloque "Clave de respuestas" ni su control
 de plegado. El resto de la vista docente de la guía se comporta como antes del
 spec.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** sin observaciones
 
 ### TC-014 — Conteo de preguntas en la cabecera plegada (singular/plural)
 **Precondición:** docente dueño; una lección con **varias** preguntas publicadas
@@ -270,8 +270,8 @@ sola pregunta
 **Resultado esperado:** el conteo coincide exactamente con las preguntas del
 bloque y la concordancia es correcta: "1 pregunta" en singular, "N preguntas" en
 plural.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** sin observaciones
 
 ### TC-015 — Caducidad de la preferencia desplegada (12 h, D5)
 **Precondición:** docente dueño; bloque desplegado.
@@ -284,10 +284,10 @@ plural.
 **Resultado esperado:** al desplegar, la cookie vale `1` y caduca ~12 horas
 después del momento actual (no un año, no "Session"). Al plegar, la cookie
 **desaparece** de la lista (no queda con valor `0`).
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** sin observaciones
 
 ## Resumen de la ronda
-- Aprobados: {{n}} — Fallidos: {{n}} — Pendientes: 15
-- Hallazgos escalados a `docs/specs/backlog.md`: {{lista o "ninguno"}}
-- Limpieza de datos de prueba: ⬜ Pendiente / ✅ Completada
+- Aprobados: 15 — Fallidos: 0 — Pendientes: 0
+- Hallazgos escalados a `docs/specs/backlog.md`: ninguno
+- Limpieza de datos de prueba: ⬜ Pendiente

@@ -1,4 +1,4 @@
-# spec-038 — [TESTING] Ocultar/mostrar la clave de respuestas en la vista docente
+# spec-038 — [DONE] Ocultar/mostrar la clave de respuestas en la vista docente
 
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.
