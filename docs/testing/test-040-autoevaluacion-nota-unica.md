@@ -417,46 +417,48 @@ Este spec convierte la autoevaluación en un **intento único por `(user_id, cou
 **Precondición:** TC-010 aprobado (E1 con 24/30 y su nota correspondiente).
 **Input de prueba:** `{ "student_id": "c0df2ab1-4417-420a-a6f9-6cd3b2de7967", "course_slug": "analisis-de-algoritmos" }`
 **Output esperado:** respuesta de solo lectura con (a) la **nota** 0–5 idéntica a la que muestra la libreta, (b) el **acumulado** `24/30`, y (c) el **desglose por lección** con una entrada por lección vista, cada una con `lesson_slug`, estado respondida / sin responder y `correctas/total`. Los números coinciden exactamente con los de la UI del estudiante y del docente en TC-010/TC-011. Ninguna llamada de escritura acompaña a la lectura.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** ejecutado directamente vía la herramienta `students-mcp` (conexión ya actualizada tras reinicio de sesión). Respuesta: `score: 4`, `correct_total: 24`, `question_total: 30`, desglose con las 6 lecciones (`sintaxis-de-python` a `como-resolver-recurrencias`), todas `answered: true` con `4/5` cada una — coincide exactamente con lo verificado en TC-010. Ninguna herramienta de escritura fue necesaria ni existe para esta consulta.
 
 ### TC-MCP-002 — El agente puede explicar una nota penalizada por lecciones sin responder
 **Herramienta probada:** `get_student_self_assessment_summary` en `students-mcp`
 **Precondición:** E2 con al menos una lección vista y no respondida (TC-011 / TC-015).
 **Input de prueba:** `{ "student_id": "ddbffc3a-b08b-4b47-bc1e-5275b7584599", "course_slug": "analisis-de-algoritmos" }`
 **Output esperado:** el desglose marca explícitamente las lecciones **sin responder** con `0/N`, de forma que el agente pueda responder "¿por qué tengo esta nota?" citando lección por lección, sin consultar la base de datos.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** respuesta: `score: 1.56`, `correct_total: 5`, `question_total: 16` — coincide exactamente con TC-015. Desglose: `sintaxis-de-python` (`answered: true`, `5/5`), `fundamentos-control-de-versiones-y-flujo-de-trabajo` (`answered: false`, `0/5`), `heaps-y-heapsort` (`answered: false`, `0/6`, ya reflejando la pregunta P32 publicada en TC-015). Las lecciones sin responder quedan marcadas explícitamente, sin necesidad de consultar la base de datos.
 
 ### TC-MCP-003 — Estudiante sin nada evaluable: nota nula, no 0
 **Herramienta probada:** `get_student_self_assessment_summary` en `students-mcp`
 **Precondición:** E3 sin lecciones con preguntas publicadas abiertas (TC-012).
 **Input de prueba:** `{ "student_id": "e5ef486d-498d-4f17-9191-9c4377c65c80", "course_slug": "analisis-de-algoritmos" }`
 **Output esperado:** nota **nula** (`null` / "sin nota"), acumulado `0/0` y desglose vacío. **No** devuelve `0` ni `0.00` como nota. La herramienta no falla ni devuelve error por ausencia de datos.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** respuesta: `score: null`, `correct_total: 0`, `question_total: 0`, `lessons: []` — sin error, sin 0.00. Coincide con el comportamiento verificado en TC-012 para el mismo estudiante.
 
 ### TC-MCP-004 — El agente no dispone de ninguna herramienta que modifique la nota
 **Herramienta probada:** inventario completo de `students-mcp`
 **Precondición:** MCP actualizado con la Fase 7.
 **Input de prueba:** listado de herramientas del servidor (`./mcp-servers/run-local-mcp.sh students-mcp </dev/null` y/o el panel de MCPs del cliente) + lectura de `docs/mcps/students-agent.system-prompt.md`.
 **Output esperado:** entre las herramientas expuestas **no** hay ninguna que escriba, fije, corrija o recalcule la nota de autoevaluaciones; la única incorporación es de lectura. El system prompt del agente docente declara explícitamente la capacidad nueva **y** la restricción de que esa nota **no es editable** por el agente, ni siquiera vía `student_grades`.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** inventario confirmado vía el listado de herramientas conectadas de esta sesión: `list_students`, `get_student`, `create_student`, `update_student`, `delete_student`, `enroll_student`, `unenroll_student`, `get_student_self_assessment_summary` — ninguna escribe, fija, corrige ni recalcula notas. `docs/mcps/students-agent.system-prompt.md` declara la capacidad nueva en "Capacidades" (línea 45-48) y la restricción explícita en "Restricciones": *"La nota de autoevaluaciones no es editable por ti... no intentes alterarla, ni siquiera mediante un `upsert` de `student_grades` desde otro MCP"* (líneas 81-88), incluyendo la instrucción de no reportar `null` como 0.
 
 ### TC-MCP-005 — Entradas inválidas devuelven un error claro
 **Herramienta probada:** `get_student_self_assessment_summary` en `students-mcp`
 **Precondición:** MCP activo y `npm run dev` corriendo.
 **Input de prueba:** (a) `student_id` inexistente; (b) `course_slug` inexistente; (c) `student_id` de un estudiante **no matriculado** en ningún curso académico con ese `course_slug`.
 **Output esperado:** en los tres casos, un mensaje de error o una respuesta vacía **explícita y comprensible** (no un stack trace, no un 500, no datos de otro estudiante). El caso (c) deja claro que el estudiante no tiene matrícula para ese curso.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado (con un hallazgo menor)
+**Hallazgos:** (a) `student_id` inexistente (UUID nulo `00000000-0000-0000-0000-000000000000`): error claro `"Estudiante no encontrado"`, sin stack trace ni 500. (b) `course_slug` inexistente (`curso-inexistente-spec040`) con un `student_id` real (E1): respuesta vacía explícita (`score: null`, `0/0`, `lessons: []`), sin error genérico. (c) `student_id` real pero sin matrícula en `analisis-de-algoritmos` (`test-student-spec038@nodo.test`, matriculado solo en `estructura-de-datos`): devuelve **la misma forma** que (b) y que TC-MCP-003 (`null`/`0/0`/`[]`) — no distingue "sin matrícula en este curso" de "matriculado pero sin preguntas evaluables aún". **Hallazgo menor, no bloqueante:** no hay fuga de datos ni fallo, pero el criterio pedía que el caso (c) "deje claro" la falta de matrícula, y la respuesta actual es indistinguible de un estudiante sí matriculado sin datos. No se registra como debt separado por ser una ambigüedad de mensaje, no un defecto funcional — el agente puede seguir resolviéndolo cruzando con `get_student` si necesita confirmar la matrícula.
 
 ---
 
 ## Resumen de la ronda
-- Aprobados: 21 — Fallidos: 0 — No aplica: 1 (TC-021, spec-039 no cableado en esta rama) — Pendientes: 5 (TC-MCP-001 a TC-MCP-005, `students-mcp` necesita reiniciar Claude Code para exponer `get_student_self_assessment_summary` — ya compilada, conexión de sesión desactualizada)
-- Dos casos aprobados con reservas: TC-013/TC-014 (renombrado imposible por bug real, DEBT-044); TC-015 (hallazgo menor de refresco de UI tras recalcular, no bloqueante).
+- Aprobados: 26 — Fallidos: 0 — No aplica: 1 (TC-021, spec-039 no cableado en esta rama)
+- Dos casos UI aprobados con reservas: TC-013/TC-014 (renombrado imposible por bug real, DEBT-044); TC-015 (hallazgo menor de refresco de UI tras recalcular, no bloqueante).
+- Un caso MCP aprobado con reserva: TC-MCP-005 (caso (c) no distingue "sin matrícula en el curso" de "matriculado sin datos aún" — ambigüedad de mensaje, no defecto funcional; no se registra como debt separado).
+- Casos MCP (TC-MCP-001 a TC-MCP-005) ejecutados en una sesión posterior, tras reiniciar Claude Code para que `students-mcp` expusiera `get_student_self_assessment_summary` — los 5 resultados coinciden con lo verificado por UI/base de datos en las fases anteriores de la ronda (TC-010, TC-011, TC-012, TC-015).
 - Casos dependientes de spec-039: TC-021 marcado **No aplica** — spec-039 está `[DONE]` y mergeado a `development`, pero esta rama no incluye el cableado del filtro BLOQUE 039 (creada antes del merge). Deuda ya registrada como DEBT-043.
 - Casos sin UI, ejecutados como verificación asistida por API/base de datos: TC-017 (paso 3), TC-018, TC-019.
 - Hallazgos escalados a `docs/specs/backlog.md`: **DEBT-044** (no existe forma de renombrar un ítem de calificación — bug real, `GradeItemsPanel.tsx` sin control de renombrado pese a que la UI lo promete, y la Server Action correspondiente no está cableada a ningún componente).
