@@ -19,7 +19,7 @@ los 5 MCPs tiene **dos variantes** registradas en `.mcp.json`:
 
 | Variante | Apunta a | Wrapper | Credenciales |
 |---|---|---|---|
-| `question-bank-mcp`, `assignment-mcp`, `attendance-mcp`, `students-mcp`, `courses-mcp` | `http://localhost:3002/api/*` (`npm run dev`) | `mcp-servers/run-local-mcp.sh` | `.env.local` |
+| `question-bank-mcp`, `assignment-mcp`, `attendance-mcp`, `students-mcp`, `courses-mcp` | `http://localhost:3000/api/*` (`npm run dev`) | `mcp-servers/run-local-mcp.sh` | `.env.local` |
 | `question-bank-mcp-prod`, `assignment-mcp-prod`, `attendance-mcp-prod`, `students-mcp-prod`, `courses-mcp-prod` | `https://www.nod0.dev/api/*` | `mcp-servers/run-prod-mcp.sh` | `.env.prod-mcp` (nunca commiteado) |
 
 Ambas variantes conviven — usar las `-prod` para operar sobre datos reales

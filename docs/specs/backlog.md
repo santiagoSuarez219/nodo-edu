@@ -5,6 +5,45 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+## DEBT-043 — Evaluaciones (`assignment`) accesibles aunque su lección esté deshabilitada
+
+**Origen:** spec-039 (R3), registrado explícitamente en la implementación
+(2026-08-01)
+**Prioridad:** Baja — requiere que un docente cierre una lección que además
+tenga una evaluación publicada apuntando a su `lesson_slug`; no bloquea el uso
+normal de spec-039
+
+spec-039 introduce un estado de habilitación por lección
+(`public.disabled_lessons`), pero **no toca el ciclo de vida de las
+evaluaciones** (`assignment_variant_groups`, spec-018). Un `assignment`
+publicado sigue siendo accesible por su propia ruta
+(`/cuenta/cursos/[enrollmentId]/evaluaciones/[groupId]`) sin importar si la
+lección a la que está asociada por `lesson_slug` está deshabilitada.
+
+Consecuencia: un estudiante puede llegar a resolver la evaluación de una
+lección que su docente cerró explícitamente para corregir un error o para no
+adelantar contenido — justo el escenario que spec-039 existe para evitar en
+el artículo y en el cierre pedagógico (autoevaluación, "marcar completada").
+
+**No se corrigió en spec-039** a propósito: el spec delimita su alcance a la
+lección y su cierre pedagógico (`docs/specs/spec-039-lecciones-habilitadas.md`
+→ "No incluye" → *"Deshabilitar cursos completos, o preguntas / evaluaciones
+asociadas a una lección deshabilitada. Un `assignment` sigue su propio ciclo
+de vida (spec-018); este spec no lo toca."*). Resolverlo implicaría decidir
+si el gate de `getDisabledLessonSlugs` debe extenderse a
+`lib/assignments`/`lib/submissions`, y si la relación `assignment ↔ lección`
+(hoy por `lesson_slug` de texto libre, sin FK) es lo bastante fiable para
+apoyar un bloqueo automático — merece su propio spec, no un parche aquí.
+
+**Fix sugerido (a validar por `@architect` cuando se aborde):** antes de
+permitir resolver o listar una evaluación, consultar
+`isLessonDisabled(courseSlug, lessonSlug)` (ya expuesta por spec-039,
+`lib/courses/availability.ts`) y bloquear con un mensaje honesto, mismo
+patrón D6 (fallar cerrado ante `unavailable`, mensaje distinto de
+"deshabilitada").
+
+---
+
 ## DEBT-042 — El middleware cierra la sesión de todos los usuarios ante cualquier caída de Supabase Auth
 
 **Origen:** Detectado durante la ronda manual de `test-037-manejo-de-errores.md`

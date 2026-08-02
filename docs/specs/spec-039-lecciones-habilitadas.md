@@ -134,6 +134,8 @@ ritmos distintos, será otro spec (ver "Decisiones de diseño → D2").
 | `components/courses/LessonSidebarItem.tsx` | Modificar — render "No disponible" (sin `Link`) |
 | `components/courses/LessonUnavailable.tsx` | **Crear** — bloque que sustituye al artículo para el estudiante |
 | `app/cuenta/cursos/[enrollmentId]/page.tsx` | Modificar — `totalCount` y `completedCount` sobre lecciones habilitadas |
+| `components/courses/LessonClosure.tsx` | Modificar — nuevos `blockedReason` (`lesson_disabled`, `availability_unavailable`) y sus mensajes (Fase 3) |
+| `components/courses/LessonClosureFlow.tsx` | Modificar — propagar el tipo ampliado de `blockedReason` (Fase 3) |
 
 ### API y MCP
 
@@ -1011,12 +1013,12 @@ Compromisos que spec-039 asume frente a spec-040:
 > Estos archivos se crean junto con el spec (ver `CLAUDE.md` → "Artefactos que
 > acompañan al spec").
 
-- **Manuales:** `docs/testing/test-039-lecciones-habilitadas.md` — casos `TC-039-*`
-  (flujos de UI: sidebar, gate de la página, progreso, vista docente) y
-  `TC-MCP-039-*` (las tres herramientas de `courses-mcp`).
-  **Pendiente de redacción** — no se escribió en esta pasada, en la que solo se
-  encargó el documento de spec. Debe existir antes de pedir la aprobación del
-  paquete.
+- **Manuales:** `docs/testing/test-039-lecciones-habilitadas.md` — 19 casos
+  `TC-001`–`TC-019` (flujos de UI: sidebar, gate de la página, progreso, vista
+  docente, seguridad/RLS, resiliencia) y 13 casos `TC-MCP-001`–`TC-MCP-013`
+  (las tres herramientas de `courses-mcp`, siguiendo la nomenclatura de
+  `CLAUDE.md` → "Pruebas manuales — estructura del archivo"). Escrito, con
+  todos los casos en ⬜ Pendiente de ejecución (Fase 6).
 - **Automáticas (e2e/unit):** `{{ubicación e2e por definir}}/e2e-039-lecciones-habilitadas.spec.ts`
   — un caso por criterio de aceptación, en rojo desde el inicio (cuando exista
   framework de testing). Candidatos naturales a prueba unitaria pura, sin

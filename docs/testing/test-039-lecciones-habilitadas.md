@@ -268,7 +268,7 @@ Nunca ejecutar ninguna de las tres contra producción.
 
 ### TC-018 — Un estudiante autenticado no puede escribir en `disabled_lessons` (RLS)
 **Rol que ejecuta:** estudiante **E1**
-**Criterio cubierto:** seguridad — criterio 16 del bloque "Seguridad"
+**Criterio cubierto:** seguridad — criterio 18 del bloque "Seguridad"
 **Precondición:** E1 autenticado en el navegador, con sesión activa en la app; lección A **habilitada** para poder detectar cualquier escritura indebida.
 **Datos de prueba usados:** `test-student-spec039@nodo.test`
 **Pasos:**
@@ -283,7 +283,7 @@ Nunca ejecutar ninguna de las tres contra producción.
 
 ### TC-019 — Un estudiante no lee las filas de un curso donde no está matriculado (RLS)
 **Rol que ejecuta:** estudiante **E3** (matriculado solo en `estructuras-de-datos`)
-**Criterio cubierto:** seguridad — criterio 17 del bloque "Seguridad"
+**Criterio cubierto:** seguridad — criterio 19 del bloque "Seguridad"
 **Precondición:** existe al menos una fila de `disabled_lessons` para `analisis-de-algoritmos` (dejar la lección A cerrada); E3 **no** está matriculado en ese curso.
 **Datos de prueba usados:** `test-student3-spec039@nodo.test` / `TestStudent039!`
 **Pasos:**
@@ -439,5 +439,3 @@ Nunca ejecutar ninguna de las tres contra producción.
   - [ ] Estudiantes E1, E2 y E3 eliminados con `students-mcp` → `delete_student` (matrículas en cascada) y verificado el `404` posterior.
   - [ ] Admin de prueba eliminado (Auth + `user_roles`).
   - [ ] Cursos académicos Grupo B y el de `estructuras-de-datos` eliminados; Grupo A conservado si es el curso real de desarrollo (anotarlo).
-</content>
-</invoke>
