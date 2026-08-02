@@ -1,4 +1,4 @@
-# spec-039 — [TESTING] Habilitar y deshabilitar lecciones vía MCP
+# spec-039 — [DONE] Habilitar y deshabilitar lecciones vía MCP
 
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.
