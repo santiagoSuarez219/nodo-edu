@@ -10,14 +10,22 @@ export function isNavigable(node: Lesson): boolean {
 
 export interface OutlineNode extends Lesson {
   classIndex: number | null;
+  isDisabled: boolean;
 }
 
-export function buildCourseOutline(course: Course): OutlineNode[] {
+export function buildCourseOutline(
+  course: Course,
+  disabledLessonSlugs?: ReadonlySet<string>
+): OutlineNode[] {
   const ordered = [...course.lessons].sort((a, b) => a.order - b.order);
   let classIndex = 0;
 
   return ordered.map((node) => {
-    const outline: OutlineNode = { ...node, classIndex: null };
+    const outline: OutlineNode = {
+      ...node,
+      classIndex: null,
+      isDisabled: disabledLessonSlugs?.has(node.slug) ?? false,
+    };
     if (!isGuide(node) && isNavigable(node)) {
       outline.classIndex = ++classIndex;
     }
@@ -25,6 +33,11 @@ export function buildCourseOutline(course: Course): OutlineNode[] {
   });
 }
 
-export function countProgressibleLessons(course: Course): Lesson[] {
-  return course.lessons.filter((l) => !isGuide(l) && isNavigable(l));
+export function countProgressibleLessons(
+  course: Course,
+  disabledLessonSlugs?: ReadonlySet<string>
+): Lesson[] {
+  return course.lessons.filter(
+    (l) => !isGuide(l) && isNavigable(l) && !disabledLessonSlugs?.has(l.slug)
+  );
 }

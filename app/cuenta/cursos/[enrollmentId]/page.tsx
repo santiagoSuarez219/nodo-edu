@@ -4,7 +4,8 @@ import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/auth/session";
 import { getEnrollmentById } from "@/lib/enrollments/index";
 import { getGradesByEnrollment } from "@/lib/grades/index";
-import { getCourseBySlug } from "@/lib/courses";
+import { getCourseBySlug, countProgressibleLessons } from "@/lib/courses";
+import { getDisabledLessonSlugs } from "@/lib/courses/availability";
 import { getCourseProgress } from "@/lib/progress";
 import { EnrollmentDetail } from "@/components/account/EnrollmentDetail";
 
@@ -29,12 +30,29 @@ export default async function EnrollmentDetailPage({ params }: Props) {
     ? await getCourseBySlug(enrollment.academic_course.course_slug)
     : null;
 
-  const progressData = course
-    ? await getCourseProgress(enrollment.academic_course.course_slug!)
+  const [progressData, disabledResult] = await Promise.all([
+    course ? getCourseProgress(enrollment.academic_course.course_slug!) : Promise.resolve([]),
+    course
+      ? getDisabledLessonSlugs(enrollment.academic_course.course_slug!)
+      : Promise.resolve({ status: "ok" as const, slugs: new Set<string>() }),
+  ]);
+  // spec-039 (D5, D6): excluir lecciones deshabilitadas de ambos lados del
+  // conteo; ante un fallo de infraestructura, degrada a "ninguna
+  // deshabilitada" (esta pantalla es de lectura, no el gate real).
+  const disabledLessonSlugs =
+    disabledResult.status === "ok" ? disabledResult.slugs : new Set<string>();
+  const progressibleLessons = course
+    ? countProgressibleLessons(course, disabledLessonSlugs)
     : [];
+  const progressibleSlugs = new Set(progressibleLessons.map((l) => l.slug));
 
-  const completedCount = progressData.filter((p) => p.completed_at !== null).length;
-  const totalCount = course?.lessons.length ?? 0;
+  // También corrige que `totalCount` usaba `course.lessons.length`, que
+  // incluía guías (sin autoevaluación ni progreso rastreado) en el
+  // denominador — entra en scope porque el conteo se toca de todos modos.
+  const completedCount = progressData.filter(
+    (p) => p.completed_at !== null && progressibleSlugs.has(p.lesson_slug)
+  ).length;
+  const totalCount = progressibleLessons.length;
 
   return (
     <main className="flex-1 pt-6 pb-14 flex flex-col gap-6">

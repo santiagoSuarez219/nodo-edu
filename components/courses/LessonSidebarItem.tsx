@@ -19,6 +19,7 @@ interface LessonSidebarItemProps {
   isActive: boolean;
   defaultExpanded?: boolean;
   isCompleted?: boolean;
+  isDisabled?: boolean;
 }
 
 export function LessonSidebarItem({
@@ -28,10 +29,14 @@ export function LessonSidebarItem({
   isActive,
   defaultExpanded = false,
   isCompleted = false,
+  isDisabled = false,
 }: LessonSidebarItemProps) {
   const [expanded, setExpanded] = useState(defaultExpanded);
   const panelId = `lesson-${courseSlug}-${lesson.slug}-topics`;
-  const isNav = isNavigable(lesson);
+  // spec-039: una lección deshabilitada nunca es navegable, sin importar si
+  // tiene artículo — es distinta de "sin artículo" (isNavigable=false), que
+  // se etiqueta "Próximamente" más abajo.
+  const isNav = isNavigable(lesson) && !isDisabled;
   const isGuideNode = isGuide(lesson);
   const orderLabel = classIndex ? classIndex.toString().padStart(2, "0") : null;
 
@@ -71,12 +76,21 @@ export function LessonSidebarItem({
               {lesson.title}
             </Link>
           ) : (
-            <span aria-disabled className={linkClass} title="Próximamente">
+            <span
+              aria-disabled
+              className={linkClass}
+              title={isDisabled ? "No disponible" : "Próximamente"}
+            >
               {lesson.title}
             </span>
           )}
           {isGuideNode && (
             <span className="text-xs text-gray-500 dark:text-gray-400">Guía</span>
+          )}
+          {isDisabled && (
+            <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+              No disponible
+            </span>
           )}
         </div>
         {isCompleted && (

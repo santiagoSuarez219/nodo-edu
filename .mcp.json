@@ -16,6 +16,10 @@
       "command": "./mcp-servers/run-local-mcp.sh",
       "args": ["students-mcp"]
     },
+    "courses-mcp": {
+      "command": "./mcp-servers/run-local-mcp.sh",
+      "args": ["courses-mcp"]
+    },
     "question-bank-mcp-prod": {
       "command": "./mcp-servers/run-prod-mcp.sh",
       "args": ["question-bank-mcp"]
@@ -31,6 +35,10 @@
     "students-mcp-prod": {
       "command": "./mcp-servers/run-prod-mcp.sh",
       "args": ["students-mcp"]
+    },
+    "courses-mcp-prod": {
+      "command": "./mcp-servers/run-prod-mcp.sh",
+      "args": ["courses-mcp"]
     }
   }
 }
