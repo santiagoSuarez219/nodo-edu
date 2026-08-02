@@ -6,13 +6,16 @@
 
 | Recurso        | Endpoint de creación | Identificador | Eliminado |
 |----------------|----------------------|---------------|-----------|
-| **Lección A** — lección existente del curso del docente dueño, con **al menos 3 preguntas `multiple_choice` publicadas** (una de ellas con varias opciones correctas, para observar bien el resaltado) | contenido existente; si la lección elegida no tiene preguntas suficientes, crearlas con `question-bank-mcp` → `create_question` + `publish_question` (borrado vía `DELETE /api/questions/:id`) | `{{courseSlug}}` / `{{lessonSlug}}` — ids de preguntas: `{{id-p1}}`, `{{id-p2}}`, `{{id-p3}}` | ⬜ |
-| **Lección B** — lección de **otro curso** del mismo docente dueño, también con preguntas publicadas (para TC-006, navegación entre cursos) | contenido existente; preguntas vía `question-bank-mcp` si hiciera falta | `{{courseSlugB}}` / `{{lessonSlugB}}` — ids: `{{id-pB1}}` | ⬜ |
-| **Lección C** — lección **sin ninguna pregunta `multiple_choice` publicada** (o con preguntas en borrador, no publicadas) | contenido existente; verificar con `question-bank-mcp` → `list_questions` que no hay publicadas | `{{courseSlug}}` / `{{lessonSlugSinPreguntas}}` | ⬜ |
-| **Guía de laboratorio** del mismo curso (nodo tipo guía, sin autoevaluación) | contenido existente, no se crea | `{{courseSlug}}` / `{{labSlug}}` | N/A |
+| Curso académico **Spec-038 QA — Estructuras A** (`course_slug=estructuras-de-datos`, docente dueño `dev@nodo.local`) | inserción directa vía `service_role` (no existe MCP/API para crear cursos académicos; autorizado explícitamente por el usuario, 2026-08-02) | `c2e3dd17-8128-464b-b22f-56df684597fe` (código `S038A000`) | ⬜ |
+| Curso académico **Spec-038 QA — Prog. Científica B** (`course_slug=programacion-cientifica`, docente dueño `dev@nodo.local`) — para TC-006 | inserción directa vía `service_role` (mismo motivo) | `bf31d772-fdca-40c2-9575-f1aa82834115` (código `S038B000`) | ⬜ |
+| **Lección A** — con **3 preguntas `multiple_choice` publicadas** (P3 con dos opciones correctas, B y C, para observar el resaltado múltiple) | `question-bank-mcp` → `create_question` + `publish_question` (borrado vía `delete_question`) | `estructuras-de-datos` / `encapsulamiento` — ids de preguntas: pendientes de registrar (ver nota de bloque MCP en curso) | ⬜ |
+| **Lección B** — otro curso del mismo docente, con 1 pregunta publicada (para TC-006, navegación entre cursos) | `question-bank-mcp` → `create_question` + `publish_question` | `programacion-cientifica` / `variables-tipos-de-datos-y-operadores` — id: pendiente de registrar | ⬜ |
+| **Lección C** — sin ninguna pregunta `multiple_choice` publicada (control negativo) | contenido existente; verificado con `question-bank-mcp` → `list_questions` que no hay publicadas | `estructuras-de-datos` / `metodos-avanzados-y-clases-de-utilidad` | N/A |
+| **Lección UML** — con **exactamente 1** pregunta publicada, para TC-014 (singular/plural) | `question-bank-mcp` → `create_question` + `publish_question` | `estructuras-de-datos` / `introduccion-al-uml` — id: pendiente de registrar | ⬜ |
+| **Guía de laboratorio** del mismo curso (nodo tipo guía, sin autoevaluación) | contenido existente, no se crea | `estructuras-de-datos` / `lab-00-git-fundamentos` | N/A |
 | **Docente dueño** del curso (`access.reason === "owner"`) | usuario sembrado del entorno de desarrollo (`npm run seed:teacher`) | `dev@nodo.local` / `DevLocal2026!` | N/A (no se elimina) |
-| **Usuario admin** no dueño del curso (`access.reason === "admin"`) | Supabase Auth `admin.createUser` + fila en `user_roles` (requiere autorización explícita del usuario, no hay endpoint) | `test-admin-spec038@nodo.test` / `TestAdmin038!` | ⬜ |
-| **Estudiante matriculado y activo** en el curso de la Lección A | `students-mcp` → `create_student` + `enroll_student` (borrado vía `DELETE /api/students/:id`) | `test-student-spec038@nodo.test` / `TestStudent038!` — id `{{id-estudiante}}` | ⬜ |
+| **Usuario admin** no dueño del curso (`access.reason === "admin"`) — **compartido con la ronda de spec-039** | Supabase Auth `admin.createUser` + fila en `user_roles` vía `service_role` (autorizado explícitamente, 2026-08-02) | `test-admin-shared@nodo.test` / `TestAdminShared038!` — id `b35310a3-03bd-4bfb-a8bb-fe8df9fb1253` | ⬜ |
+| **Estudiante matriculado y activo** en el curso de la Lección A | `students-mcp` → `create_student` + `enroll_student` | `test-student-spec038@nodo.test` / `TestStudent038!` — id `1781b4e0-f310-4d52-a7b4-fbea9b8827a4` | ⬜ |
 
 **Cookie involucrada:** `nodo_teacher_answer_key` (valor `"1"` = desplegado; ausente = plegado).
 Para dejar el estado "sin cookie previa" en cualquier momento: DevTools →
@@ -28,12 +31,12 @@ vía túnel SSH (`.env.local`), con `npm run dev` corriendo. Ver CLAUDE.md →
 ### TC-001 — Sin cookie previa, el bloque llega plegado
 **Precondición:** navegador sin la cookie `nodo_teacher_answer_key`; sesión
 iniciada como docente dueño; Lección A tiene preguntas publicadas.
-**Datos de prueba usados:** `dev@nodo.local` / `DevLocal2026!`; `{{courseSlug}}/{{lessonSlug}}`
+**Datos de prueba usados:** `dev@nodo.local` / `DevLocal2026!`; `estructuras-de-datos/encapsulamiento`
 **Pasos:**
 1. Iniciar sesión en `/ingresar` como `dev@nodo.local`.
 2. Abrir DevTools → `Application` → `Cookies` → borrar `nodo_teacher_answer_key`
    si existe.
-3. Navegar a `/{{courseSlug}}/{{lessonSlug}}`.
+3. Navegar a `/estructuras-de-datos/encapsulamiento`.
 4. Bajar hasta el final del artículo, donde vive el panel docente.
 **Resultado esperado:** se ve la cabecera "Clave de respuestas" con el conteo de
 preguntas (p. ej. "· 5 preguntas") y un control con etiqueta de texto visible
@@ -44,7 +47,7 @@ ve el botón "Revelar todas".
 
 ### TC-002 — Al desplegar, las preguntas aparecen con las respuestas ocultas
 **Precondición:** TC-001 recién ejecutado; bloque plegado en pantalla.
-**Datos de prueba usados:** `{{courseSlug}}/{{lessonSlug}}`
+**Datos de prueba usados:** `estructuras-de-datos/encapsulamiento`
 **Pasos:**
 1. Pulsar el control "Mostrar" de la cabecera de "Clave de respuestas".
 2. Revisar una a una las preguntas mostradas.
@@ -58,7 +61,7 @@ dentro del bloque desplegado y la etiqueta del control pasa a "Ocultar".
 ### TC-003 — Recarga con el bloque desplegado: llega desplegado desde el servidor
 **Precondición:** bloque desplegado (TC-002); cookie `nodo_teacher_answer_key=1`
 presente.
-**Datos de prueba usados:** `{{courseSlug}}/{{lessonSlug}}`
+**Datos de prueba usados:** `estructuras-de-datos/encapsulamiento`
 **Pasos:**
 1. Verificar en DevTools → `Application` → `Cookies` que existe
    `nodo_teacher_answer_key` con valor `1`.
@@ -76,7 +79,7 @@ contenedor del cuerpo **no** lleva el atributo `hidden`.
 
 ### TC-004 — Recarga con el bloque plegado: sin parpadeo del contenido
 **Precondición:** bloque plegado; cookie `nodo_teacher_answer_key` ausente.
-**Datos de prueba usados:** `{{courseSlug}}/{{lessonSlug}}`
+**Datos de prueba usados:** `estructuras-de-datos/encapsulamiento`
 **Pasos:**
 1. Plegar el bloque (o borrar la cookie) y confirmar que está plegado.
 2. En DevTools → `Network`, mantener throttling `Slow 3G`.
@@ -95,11 +98,12 @@ plegarse.
 
 ### TC-005 — La preferencia se conserva al navegar a otra lección del mismo curso
 **Precondición:** sesión de docente dueño; bloque desplegado en la Lección A.
-**Datos de prueba usados:** `{{courseSlug}}/{{lessonSlug}}` → otra lección con
-preguntas del mismo curso
+**Datos de prueba usados:** `estructuras-de-datos/encapsulamiento` →
+`estructuras-de-datos/introduccion-al-uml` (la lección "UML", con 1 pregunta
+publicada)
 **Pasos:**
 1. Con el bloque desplegado, usar la navegación lateral de lecciones para ir a
-   otra lección **del mismo curso** que tenga preguntas publicadas.
+   `estructuras-de-datos/introduccion-al-uml`.
 2. Bajar al panel docente.
 3. Volver a la Lección A por el mismo camino.
 **Resultado esperado:** el bloque llega **desplegado** en la segunda lección y
@@ -110,13 +114,13 @@ sigue desplegado al volver. No hay que volver a pulsar el control.
 ### TC-006 — La preferencia se conserva al cambiar de curso (cookie global, D2)
 **Precondición:** sesión de docente dueño; Lección B pertenece a **otro curso**
 del mismo docente y tiene preguntas publicadas.
-**Datos de prueba usados:** `{{courseSlug}}/{{lessonSlug}}` y `{{courseSlugB}}/{{lessonSlugB}}`
+**Datos de prueba usados:** `estructuras-de-datos/encapsulamiento` y `programacion-cientifica/variables-tipos-de-datos-y-operadores`
 **Pasos:**
 1. En la Lección A, dejar el bloque **plegado**.
-2. Navegar a `/{{courseSlugB}}/{{lessonSlugB}}` y bajar al panel docente:
+2. Navegar a `/programacion-cientifica/variables-tipos-de-datos-y-operadores` y bajar al panel docente:
    comprobar el estado.
 3. Desplegar el bloque en la Lección B.
-4. Volver a `/{{courseSlug}}/{{lessonSlug}}` y bajar al panel docente.
+4. Volver a `/estructuras-de-datos/encapsulamiento` y bajar al panel docente.
 **Resultado esperado:** en el paso 2 el bloque está plegado; en el paso 4 está
 desplegado. El estado es el mismo en ambos cursos: no hay una preferencia por
 curso.
@@ -125,7 +129,7 @@ curso.
 
 ### TC-007 — Plegar y volver a desplegar oculta de nuevo las respuestas reveladas
 **Precondición:** Lección A, bloque desplegado.
-**Datos de prueba usados:** `{{courseSlug}}/{{lessonSlug}}`
+**Datos de prueba usados:** `estructuras-de-datos/encapsulamiento`
 **Pasos:**
 1. Pulsar "Revelar todas" (o revelar al menos dos preguntas individualmente) y
    confirmar que las opciones correctas quedan resaltadas.
@@ -140,7 +144,7 @@ vuelve a decir "Revelar todas", no "Ocultar todas").
 ### TC-008 — El control de asistencia funciona con el bloque plegado y desplegado
 **Precondición:** Lección A; docente dueño; el bloque de asistencia se renderiza
 bajo la clave de respuestas.
-**Datos de prueba usados:** `{{courseSlug}}/{{lessonSlug}}`
+**Datos de prueba usados:** `estructuras-de-datos/encapsulamiento`
 **Pasos:**
 1. Con la clave de respuestas **plegada**, comprobar que el bloque de asistencia
    sigue visible debajo e interactuar con él (seleccionar el grupo académico,
@@ -158,7 +162,7 @@ provoca errores en consola.
 ### TC-009 — El control de plegado es accesible por teclado y expone ARIA correcto
 **Precondición:** Lección A; docente dueño; bloque en cualquiera de los dos
 estados.
-**Datos de prueba usados:** `{{courseSlug}}/{{lessonSlug}}`
+**Datos de prueba usados:** `estructuras-de-datos/encapsulamiento`
 **Pasos:**
 1. Sin usar el ratón, tabular (`Tab`) hasta llegar al control de plegado de
    "Clave de respuestas" y comprobar que tiene indicador de foco visible.
@@ -182,11 +186,11 @@ página no encuentra el enunciado mientras el bloque está plegado.
 **Precondición:** usuario con rol `admin` que **no** es dueño del curso;
 navegador sin la cookie `nodo_teacher_answer_key` (usar ventana privada o
 borrarla).
-**Datos de prueba usados:** `test-admin-spec038@nodo.test` / `TestAdmin038!`;
-`{{courseSlug}}/{{lessonSlug}}`
+**Datos de prueba usados:** `test-admin-shared@nodo.test` / `TestAdminShared038!`;
+`estructuras-de-datos/encapsulamiento`
 **Pasos:**
 1. Iniciar sesión como el admin de prueba en una ventana privada.
-2. Navegar a `/{{courseSlug}}/{{lessonSlug}}` y bajar al panel docente.
+2. Navegar a `/estructuras-de-datos/encapsulamiento` y bajar al panel docente.
 3. Desplegar el bloque, recargar la página y volver a bajar.
 4. Plegarlo y recargar de nuevo.
 **Resultado esperado:** el bloque llega plegado la primera vez; despliega,
@@ -199,10 +203,10 @@ del docente dueño (TC-001 a TC-004).
 **Precondición:** estudiante matriculado y activo en el curso de la Lección A;
 sesión distinta de la del docente (ventana privada u otro navegador).
 **Datos de prueba usados:** `test-student-spec038@nodo.test` / `TestStudent038!`;
-`{{courseSlug}}/{{lessonSlug}}`
+`estructuras-de-datos/encapsulamiento`
 **Pasos:**
 1. Iniciar sesión como el estudiante de prueba.
-2. Navegar a `/{{courseSlug}}/{{lessonSlug}}` y bajar hasta el final del
+2. Navegar a `/estructuras-de-datos/encapsulamiento` y bajar hasta el final del
    artículo.
 3. Forzar el otro estado: en DevTools → `Application` → `Cookies`, crear
    manualmente `nodo_teacher_answer_key=1` para este dominio y recargar.
@@ -218,10 +222,10 @@ autoevaluación del estudiante se comporta como siempre.
 ### TC-012 — Lección sin preguntas publicadas: el bloque no se renderiza (no regresión)
 **Precondición:** docente dueño; Lección C sin preguntas `multiple_choice`
 publicadas.
-**Datos de prueba usados:** `{{courseSlug}}/{{lessonSlugSinPreguntas}}`
+**Datos de prueba usados:** `estructuras-de-datos/metodos-avanzados-y-clases-de-utilidad`
 **Pasos:**
 1. Como docente dueño, con la cookie `nodo_teacher_answer_key=1` presente
-   (estado desplegado), navegar a `/{{courseSlug}}/{{lessonSlugSinPreguntas}}`.
+   (estado desplegado), navegar a `/estructuras-de-datos/metodos-avanzados-y-clases-de-utilidad`.
 2. Bajar al final del artículo.
 3. Borrar la cookie, recargar y volver a mirar.
 **Resultado esperado:** en ambos casos **no** aparece el bloque "Clave de
@@ -233,10 +237,10 @@ total. El bloque de control de asistencia sí se muestra.
 ### TC-013 — Guía de laboratorio: el bloque no se renderiza (no regresión)
 **Precondición:** docente dueño; nodo de tipo guía de laboratorio, sin
 autoevaluación.
-**Datos de prueba usados:** `{{courseSlug}}/{{labSlug}}`
+**Datos de prueba usados:** `estructuras-de-datos/lab-00-git-fundamentos`
 **Pasos:**
 1. Como docente dueño y con la cookie `nodo_teacher_answer_key=1` presente,
-   navegar a `/{{courseSlug}}/{{labSlug}}`.
+   navegar a `/estructuras-de-datos/lab-00-git-fundamentos`.
 2. Recorrer la página hasta el final.
 **Resultado esperado:** no aparece el bloque "Clave de respuestas" ni su control
 de plegado. El resto de la vista docente de la guía se comporta como antes del
@@ -249,7 +253,7 @@ spec.
 y, si es posible, otra con **exactamente una** (se puede lograr despublicando
 temporalmente con `question-bank-mcp` o creando una pregunta única en una
 lección sin preguntas).
-**Datos de prueba usados:** `{{courseSlug}}/{{lessonSlug}}` y la lección con una
+**Datos de prueba usados:** `estructuras-de-datos/encapsulamiento` y la lección con una
 sola pregunta
 **Pasos:**
 1. Con el bloque plegado en la lección con varias preguntas, leer el conteo de
@@ -263,7 +267,7 @@ plural.
 
 ### TC-015 — Caducidad de la preferencia desplegada (12 h, D5)
 **Precondición:** docente dueño; bloque desplegado.
-**Datos de prueba usados:** `{{courseSlug}}/{{lessonSlug}}`
+**Datos de prueba usados:** `estructuras-de-datos/encapsulamiento`
 **Pasos:**
 1. Con el bloque desplegado, abrir DevTools → `Application` → `Cookies` y
    localizar `nodo_teacher_answer_key`.
