@@ -62,7 +62,7 @@ export default async function EvaluacionPlayerPage({ params }: Props) {
   // carrera de lectura-tras-escritura.
   const submission = created.data;
   const answers = await getAnswersBySubmission(submission.id);
-  const questions = await getVariantQuestionDetails(allocation.variant.id, enrollmentId);
+  const questions = await getVariantQuestionDetails(allocation.variant.id, enrollmentId, groupId);
 
   return (
     <main className="flex-1 pt-6 pb-14 flex flex-col gap-6">

@@ -1,25 +1,43 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { getLessonBySlug, isGuide, buildCourseOutline } from "@/lib/courses";
 import { getLessonArticle } from "@/lib/courses/content";
+import { isLessonDisabled } from "@/lib/courses/availability";
 import { requireCourseAccess } from "@/lib/enrollments";
 import { hasCourseAccess } from "@/lib/enrollments/access";
 import { markLessonViewed, getLessonProgress } from "@/lib/progress";
 import { getStudentAttendanceForCourse, getOpenSessionForCourse } from "@/lib/attendance";
 import {
+  attendanceGroupCookieName,
+  resolveStoredAttendanceGroup,
+} from "@/lib/attendance/group-preference";
+import {
   getSelfAssessmentForLesson,
   getSelfAssessmentStatus,
   getAnswerKeyForLesson,
+  getAttemptReview,
 } from "@/lib/self-assessment";
-import type { SelfAssessmentQuestion, AnswerKeyQuestion } from "@/lib/self-assessment/types";
+import {
+  ANSWER_KEY_COOKIE_NAME,
+  resolveStoredAnswerKeyExpanded,
+} from "@/lib/self-assessment/answer-key-preference";
+import type {
+  SelfAssessmentQuestion,
+  AnswerKeyQuestion,
+  SelfAssessmentStatus,
+  AttemptReview,
+} from "@/lib/self-assessment/types";
 import { resolveAcademicCoursesBySlug } from "@/lib/academic-courses";
-import type { OpenSessionSummary } from "@/lib/attendance/types";
+import type { OpenSessionResult, StudentAttendanceState } from "@/lib/attendance/types";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { LessonArticle } from "@/components/courses/LessonArticle";
 import { LessonPagination } from "@/components/courses/LessonPagination";
 import { LessonClosureFlow } from "@/components/courses/LessonClosureFlow";
 import type { AttendanceGroup } from "@/components/courses/TeacherAttendanceControl";
 import { AttendanceSection } from "@/components/courses/AttendanceSection";
 import { TeacherLessonPanel } from "@/components/courses/TeacherLessonPanel";
+import { LessonUnavailable } from "@/components/courses/LessonUnavailable";
 import { MdxContent } from "@/components/mdx/MdxContent";
 import { TopicList } from "@/components/courses/TopicList";
 
@@ -57,37 +75,86 @@ export default async function LessonPage({ params }: LessonPageProps) {
   const nodeOutline = outline.find((n) => n.slug === lesson.slug);
   const classIndex = nodeOutline?.classIndex ?? null;
 
-  // Omitir tracking de progreso para guías
-  if (!isGuideNode) {
+  const access = await hasCourseAccess(courseSlug);
+
+  // spec-039: la disponibilidad se compone contra Supabase (D1) y se aplica
+  // solo al estudiante matriculado (D4) — owner y admin nunca son bloqueados.
+  // Cubre lecciones y guías por igual (el contexto del spec cita explícitamente
+  // el caso de una guía cuyo enunciado no debe verse antes de la sesión).
+  const availability = await isLessonDisabled(courseSlug, lessonSlug);
+  const isBlockedForStudent =
+    access.ok &&
+    access.reason === "enrolled" &&
+    (availability.status === "unavailable" || availability.disabled);
+  // D6: el owner/admin solo ve el aviso cuando el estado se pudo verificar
+  // y es efectivamente "deshabilitada" — nunca ante un fallo de verificación.
+  const showDisabledNoticeToTeacher =
+    access.ok &&
+    (access.reason === "owner" || access.reason === "admin") &&
+    availability.status === "ok" &&
+    availability.disabled;
+
+  // Omitir tracking de progreso para guías y para lecciones bloqueadas.
+  if (!isGuideNode && !isBlockedForStudent) {
     await markLessonViewed(courseSlug, lessonSlug);
   }
-  const access = await hasCourseAccess(courseSlug);
   const progress = !isGuideNode ? await getLessonProgress(courseSlug, lessonSlug) : null;
 
-  const article = lesson.articleSlug
-    ? await getLessonArticle(course.slug, lesson.articleSlug, lesson.kind)
-    : null;
+  // El artículo MDX no se carga cuando el gate bloquea (D3): el contenido
+  // nunca viaja al cliente, no es solo un ocultamiento visual.
+  const article =
+    !isBlockedForStudent && lesson.articleSlug
+      ? await getLessonArticle(course.slug, lesson.articleSlug, lesson.kind)
+      : null;
 
-  let attendanceState = null;
+  let attendanceState: StudentAttendanceState | null = null;
   let selfAssessment: SelfAssessmentQuestion[] = [];
-  let selfAssessmentStatus = {
+  let selfAssessmentStatus: SelfAssessmentStatus = {
+    status: "ok",
     questionCount: 0,
     hasAttempt: false,
     requiresAttempt: false,
+    lastAttempt: null,
   };
+  let attemptReview: AttemptReview | null = null;
 
-  if (access.ok && access.reason === "enrolled" && !isGuideNode) {
+  if (access.ok && access.reason === "enrolled" && !isGuideNode && !isBlockedForStudent) {
     attendanceState = await getStudentAttendanceForCourse(courseSlug);
     selfAssessment = await getSelfAssessmentForLesson(courseSlug, lessonSlug);
     selfAssessmentStatus = await getSelfAssessmentStatus(courseSlug, lessonSlug);
+    // spec-040: revisión persistente del intento único (reemplaza el
+    // resumen agregado de spec-033).
+    attemptReview = await getAttemptReview(courseSlug, lessonSlug);
   }
 
+  // Fallar cerrado (D8 de spec-037): un fallo de infraestructura al verificar
+  // la autoevaluación NUNCA debe abrir el gate de "completar lección".
+  const selfAssessmentCanComplete =
+    selfAssessmentStatus.status === "ok"
+      ? !selfAssessmentStatus.requiresAttempt || selfAssessmentStatus.hasAttempt
+      : false;
+  const selfAssessmentBlockedReason =
+    selfAssessmentStatus.status === "unavailable"
+      ? "self_assessment_unavailable"
+      : selfAssessmentStatus.requiresAttempt && !selfAssessmentStatus.hasAttempt
+        ? "self_assessment_pending"
+        : undefined;
+  // El estudiante ya envió su intento (según el gate, que sí falla cerrado),
+  // pero `getAttemptReview` no pudo reconstruir la revisión: no es lo mismo
+  // que "todavía no respondió", y mostrar el formulario en ese caso invitaría
+  // a un reenvío que la base rechazaría de todos modos, sin explicar por qué.
+  const selfAssessmentReviewUnavailable =
+    selfAssessmentStatus.status === "ok" &&
+    selfAssessmentStatus.hasAttempt &&
+    attemptReview === null;
   // Vista docente (spec-031): rama independiente de la de "enrolled" — un
   // owner/admin nunca tiene reason "enrolled", así que ambos bloques son
   // mutuamente excluyentes por construcción.
   let teacherAnswerKey: AnswerKeyQuestion[] = [];
   let teacherCourses: AttendanceGroup[] = [];
-  let teacherSessionsByCourseId: Record<string, OpenSessionSummary | null> = {};
+  let teacherSessionsByCourseId: Record<string, OpenSessionResult> = {};
+  let teacherAttendanceGroupId: string | null = null;
+  let teacherAnswerKeyExpanded = false;
 
   if (access.ok && (access.reason === "owner" || access.reason === "admin")) {
     const [answerKey, academicCourses] = await Promise.all([
@@ -111,6 +178,17 @@ export default async function LessonPage({ params }: LessonPageProps) {
     teacherSessionsByCourseId = Object.fromEntries(
       academicCourses.map((academicCourse, i) => [academicCourse.id, sessions[i]])
     );
+
+    // Grupo elegido la última vez, leído en el server para que el HTML inicial
+    // ya traiga el código de asistencia correcto (DEBT-023).
+    const cookieStore = await cookies();
+    teacherAttendanceGroupId = resolveStoredAttendanceGroup(
+      cookieStore.get(attendanceGroupCookieName(courseSlug))?.value,
+      teacherCourses.map((group) => group.id)
+    );
+    teacherAnswerKeyExpanded = resolveStoredAnswerKeyExpanded(
+      cookieStore.get(ANSWER_KEY_COOKIE_NAME)?.value
+    );
   }
 
   return (
@@ -121,7 +199,13 @@ export default async function LessonPage({ params }: LessonPageProps) {
         classIndex={classIndex}
         updatedAt={article?.frontmatter.updatedAt}
       >
-        {article ? (
+        {isBlockedForStudent ? (
+          <LessonUnavailable
+            reason={availability.status === "unavailable" ? "unavailable" : "disabled"}
+            hasTopics={lesson.topics.length > 0}
+            topics={lesson.topics}
+          />
+        ) : article ? (
           <MdxContent source={article.rawSource} />
         ) : (
           <PreparationPlaceholder
@@ -132,25 +216,37 @@ export default async function LessonPage({ params }: LessonPageProps) {
         )}
       </LessonArticle>
 
-      {access.ok && access.reason === "enrolled" && !isGuideNode && (
+      {showDisabledNoticeToTeacher && (
+        <div
+          role="status"
+          className="mt-6 rounded-lg border border-yellow-300 dark:border-yellow-700 bg-yellow-50 dark:bg-yellow-900/20 px-4 py-3 text-sm text-yellow-800 dark:text-yellow-300"
+        >
+          Lección deshabilitada — los estudiantes no pueden abrirla.
+        </div>
+      )}
+
+      {access.ok && access.reason === "enrolled" && !isGuideNode && !isBlockedForStudent && (
         <LessonClosureFlow
           courseSlug={courseSlug}
           lessonSlug={lessonSlug}
           questions={selfAssessment}
           initialCompletedAt={progress?.completed_at ?? null}
-          canComplete={!selfAssessmentStatus.requiresAttempt || selfAssessmentStatus.hasAttempt}
-          blockedReason={
-            selfAssessmentStatus.requiresAttempt && !selfAssessmentStatus.hasAttempt
-              ? "self_assessment_pending"
-              : undefined
-          }
+          canComplete={selfAssessmentCanComplete}
+          blockedReason={selfAssessmentBlockedReason}
+          attemptReview={attemptReview}
+          attemptReviewUnavailable={selfAssessmentReviewUnavailable}
           attendance={
             attendanceState && (
-              <AttendanceSection
-                courseSlug={courseSlug}
-                lessonSlug={lessonSlug}
-                attendanceState={attendanceState}
-              />
+              <ErrorBoundary
+                title="La sección de asistencia no está disponible"
+                description="Ocurrió un error inesperado. Intenta de nuevo."
+              >
+                <AttendanceSection
+                  courseSlug={courseSlug}
+                  lessonSlug={lessonSlug}
+                  attendanceState={attendanceState}
+                />
+              </ErrorBoundary>
             )
           }
         />
@@ -162,6 +258,8 @@ export default async function LessonPage({ params }: LessonPageProps) {
           answerKey={teacherAnswerKey}
           academicCourses={teacherCourses}
           initialSessionsByCourseId={teacherSessionsByCourseId}
+          initialAttendanceGroupId={teacherAttendanceGroupId}
+          initialAnswerKeyExpanded={teacherAnswerKeyExpanded}
         />
       )}
 

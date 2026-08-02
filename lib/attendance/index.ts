@@ -5,8 +5,10 @@ import { z } from 'zod';
 
 import { createServerSupabaseClient } from '@/lib/auth/server';
 import type {
+  AttendanceCountResult,
   ClassSession,
   MarkAttendanceResult,
+  OpenSessionResult,
   OpenSessionSummary,
   StudentAttendanceState,
 } from './types';
@@ -37,7 +39,13 @@ function getBogotaDateString(): string {
 export async function openSession(
   academicCourseId: string
 ): Promise<{ success: boolean; session?: OpenSessionSummary; error?: string }> {
-  const supabase = await createServerSupabaseClient();
+  let supabase;
+  try {
+    supabase = await createServerSupabaseClient();
+  } catch (err) {
+    console.error('Error opening session:', err);
+    return { success: false, error: 'Error al abrir la sesión' };
+  }
 
   // Intentar generar un código único (máximo 5 intentos)
   let code = generateAttendanceCode();
@@ -91,18 +99,23 @@ export async function openSession(
 
   // Obtener la sesión completa con conteo
   const summary = await getOpenSessionForCourse(academicCourseId);
-  if (!summary) {
+  if (summary.status === 'unavailable' || !summary.session) {
     return { success: false, error: 'Error al recuperar la sesión creada' };
   }
 
-  revalidatePath(`/admin/courses/${academicCourseId}/attendance`);
-  return { success: true, session: summary };
+  return { success: true, session: summary.session };
 }
 
 export async function closeSession(
   sessionId: string
 ): Promise<{ success: boolean; error?: string }> {
-  const supabase = await createServerSupabaseClient();
+  let supabase;
+  try {
+    supabase = await createServerSupabaseClient();
+  } catch (err) {
+    console.error('Error closing session:', err);
+    return { success: false, error: 'Error al cerrar la sesión' };
+  }
 
   try {
     const { error } = await supabase
@@ -123,8 +136,14 @@ export async function closeSession(
 
 export async function getOpenSessionForCourse(
   academicCourseId: string
-): Promise<OpenSessionSummary | null> {
-  const supabase = await createServerSupabaseClient();
+): Promise<OpenSessionResult> {
+  let supabase;
+  try {
+    supabase = await createServerSupabaseClient();
+  } catch (err) {
+    console.error('Error getting open session:', err);
+    return { status: 'unavailable' };
+  }
 
   try {
     const { data: session, error: sessionError } = await supabase
@@ -134,11 +153,13 @@ export async function getOpenSessionForCourse(
       .eq('is_open', true)
       .single();
 
+    // PGRST116 ("no rows") es el caso de negocio "sin sesión abierta"; otros
+    // errores son un fallo de consulta (infraestructura).
     if (sessionError && sessionError.code !== 'PGRST116') {
       throw sessionError;
     }
 
-    if (!session) return null;
+    if (!session) return { status: 'ok', session: null };
 
     const { count, error: countError } = await supabase
       .from('attendance_records')
@@ -148,19 +169,28 @@ export async function getOpenSessionForCourse(
     if (countError) throw countError;
 
     return {
-      session: session as ClassSession,
-      attendanceCount: count || 0,
+      status: 'ok',
+      session: {
+        session: session as ClassSession,
+        attendanceCount: count || 0,
+      },
     };
   } catch (err) {
     console.error('Error getting open session:', err);
-    return null;
+    return { status: 'unavailable' };
   }
 }
 
 export async function getSessionAttendanceCount(
   sessionId: string
-): Promise<number> {
-  const supabase = await createServerSupabaseClient();
+): Promise<AttendanceCountResult> {
+  let supabase;
+  try {
+    supabase = await createServerSupabaseClient();
+  } catch (err) {
+    console.error('Error getting attendance count:', err);
+    return { status: 'unavailable' };
+  }
 
   try {
     const { count, error } = await supabase
@@ -169,10 +199,10 @@ export async function getSessionAttendanceCount(
       .eq('session_id', sessionId);
 
     if (error) throw error;
-    return count || 0;
+    return { status: 'ok', count: count || 0 };
   } catch (err) {
     console.error('Error getting attendance count:', err);
-    return 0;
+    return { status: 'unavailable' };
   }
 }
 
@@ -181,9 +211,9 @@ export async function markAttendanceByCode(
   lessonSlug: string,
   code: string
 ): Promise<MarkAttendanceResult> {
-  const supabase = await createServerSupabaseClient();
-
-  // Validar formato del código: 4-6 dígitos
+  // Validar formato del código: 4-6 dígitos. Rechazo de negocio, no de
+  // infraestructura — un código con formato inválido nunca fue un código
+  // real, así que se queda en 'not_found'.
   const codeSchema = z
     .string()
     .regex(/^\d{4,6}$/, 'El código debe tener 4 a 6 dígitos');
@@ -193,6 +223,14 @@ export async function markAttendanceByCode(
     return 'not_found';
   }
 
+  let supabase;
+  try {
+    supabase = await createServerSupabaseClient();
+  } catch (err) {
+    console.error('Error marking attendance:', err);
+    return 'unavailable';
+  }
+
   try {
     const { data, error } = await supabase.rpc(
       'mark_attendance_by_code',
@@ -200,8 +238,10 @@ export async function markAttendanceByCode(
     );
 
     if (error) {
+      // Fallo del RPC (infraestructura): antes se leía como 'not_found', y el
+      // estudiante recibía la culpa de un fallo ajeno ("código incorrecto").
       console.error('RPC error:', error);
-      return 'not_found';
+      return 'unavailable';
     }
 
     if (!data || data.length === 0) {
@@ -213,14 +253,20 @@ export async function markAttendanceByCode(
     return (result.status as MarkAttendanceResult) || 'not_found';
   } catch (err) {
     console.error('Error marking attendance:', err);
-    return 'not_found';
+    return 'unavailable';
   }
 }
 
 export async function getStudentAttendanceForCourse(
   courseSlug: string
 ): Promise<StudentAttendanceState> {
-  const supabase = await createServerSupabaseClient();
+  let supabase;
+  try {
+    supabase = await createServerSupabaseClient();
+  } catch (err) {
+    console.error('Error getting student attendance status:', err);
+    return { status: 'unavailable' };
+  }
 
   try {
     const { data, error } = await supabase.rpc(
@@ -228,8 +274,16 @@ export async function getStudentAttendanceForCourse(
       { p_course_slug: courseSlug }
     );
 
-    if (error || !data || data.length === 0) {
-      return { sessionOpen: false, alreadyMarked: false };
+    if (error) {
+      // Fallo del RPC (infraestructura): antes se fundía con "sin sesión
+      // abierta", indistinguible del caso legítimo.
+      console.error('RPC error:', error);
+      return { status: 'unavailable' };
+    }
+
+    if (!data || data.length === 0) {
+      // Curso inexistente o sin matrícula activa — negocio (ver RPC), no infra.
+      return { status: 'ok', sessionOpen: false, alreadyMarked: false };
     }
 
     const result = data[0] as {
@@ -240,6 +294,7 @@ export async function getStudentAttendanceForCourse(
     };
 
     return {
+      status: 'ok',
       sessionOpen: result.session_open,
       sessionId: result.session_id,
       alreadyMarked: result.already_marked,
@@ -247,6 +302,6 @@ export async function getStudentAttendanceForCourse(
     };
   } catch (err) {
     console.error('Error getting student attendance status:', err);
-    return { sessionOpen: false, alreadyMarked: false };
+    return { status: 'unavailable' };
   }
 }

@@ -1,14 +1,17 @@
 import { TeacherAnswerKey } from '@/components/courses/TeacherAnswerKey';
 import { TeacherAttendanceControl } from '@/components/courses/TeacherAttendanceControl';
 import type { AttendanceGroup } from '@/components/courses/TeacherAttendanceControl';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import type { AnswerKeyQuestion } from '@/lib/self-assessment/types';
-import type { OpenSessionSummary } from '@/lib/attendance/types';
+import type { OpenSessionResult } from '@/lib/attendance/types';
 
 interface TeacherLessonPanelProps {
   courseSlug: string;
   answerKey: AnswerKeyQuestion[];
   academicCourses: AttendanceGroup[];
-  initialSessionsByCourseId: Record<string, OpenSessionSummary | null>;
+  initialSessionsByCourseId: Record<string, OpenSessionResult>;
+  initialAttendanceGroupId: string | null;
+  initialAnswerKeyExpanded: boolean;
 }
 
 export function TeacherLessonPanel({
@@ -16,6 +19,8 @@ export function TeacherLessonPanel({
   answerKey,
   academicCourses,
   initialSessionsByCourseId,
+  initialAttendanceGroupId,
+  initialAnswerKeyExpanded,
 }: TeacherLessonPanelProps) {
   return (
     <section className="mt-12 pt-8">
@@ -29,7 +34,12 @@ export function TeacherLessonPanel({
       </div>
 
       <div className="flex flex-col gap-6">
-        {answerKey.length > 0 && <TeacherAnswerKey questions={answerKey} />}
+        {answerKey.length > 0 && (
+          <TeacherAnswerKey
+            questions={answerKey}
+            initialExpanded={initialAnswerKeyExpanded}
+          />
+        )}
 
         <div className="border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 overflow-hidden">
           <div className="border-b border-gray-200 dark:border-gray-700 px-6 py-4">
@@ -38,11 +48,19 @@ export function TeacherLessonPanel({
             </h3>
           </div>
           <div className="px-6 py-6">
-            <TeacherAttendanceControl
-              courseSlug={courseSlug}
-              courses={academicCourses}
-              initialSessionsByCourseId={initialSessionsByCourseId}
-            />
+            {/* Un fallo aquí no debe tumbar el resto de la lección proyectada
+                en clase (artículo, navegación, clave de respuestas). */}
+            <ErrorBoundary
+              title="El panel de asistencia no está disponible"
+              description="Ocurrió un error inesperado. Intenta de nuevo."
+            >
+              <TeacherAttendanceControl
+                courseSlug={courseSlug}
+                courses={academicCourses}
+                initialSessionsByCourseId={initialSessionsByCourseId}
+                initialSelectedId={initialAttendanceGroupId}
+              />
+            </ErrorBoundary>
           </div>
         </div>
       </div>

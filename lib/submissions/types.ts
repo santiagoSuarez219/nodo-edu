@@ -37,6 +37,12 @@ export interface SubmissionWithAnswers extends Submission {
 // 20260724000002_variant_question_content_rpcs.sql). `is_correct` viene ya
 // gateado por show_feedback_on/closes_at/estado del intento: es `null`
 // mientras no corresponda revelarlo.
+//
+// IMPORTANTE (spec-035): `order_index` es la posición canónica de autoría en
+// la base de datos, NO la de renderizado. Si shuffle_choices está habilitado,
+// las opciones llegan barajadas y no coinciden con order_index. Nunca ordenar
+// por este campo en el cliente — renderizar en el orden que las opciones
+// llegan del servidor. Ver lib/submissions/index.ts getVariantQuestionDetails().
 export interface QuestionChoiceDetail {
   id: string;
   body: string;
@@ -44,6 +50,11 @@ export interface QuestionChoiceDetail {
   is_correct: boolean | null;
 }
 
+// IMPORTANTE (spec-035): `order_index` es la posición canónica de autoría en
+// la base de datos, NO la de renderizado. Si shuffle_questions está habilitado,
+// las preguntas llegan barajadas y no coinciden con order_index. Nunca ordenar
+// por este campo en el cliente — renderizar en el orden que las preguntas
+// llegan del servidor. Ver lib/submissions/index.ts getVariantQuestionDetails().
 export interface QuestionDetail {
   assignment_question_id: string;
   question_id: string;

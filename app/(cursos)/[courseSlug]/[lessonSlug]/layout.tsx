@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { getCourseBySlug } from "@/lib/courses";
+import { getDisabledLessonSlugs } from "@/lib/courses/availability";
 import { requireCourseAccess } from "@/lib/enrollments";
 import { getCourseProgress } from "@/lib/progress";
 import { LessonSidebar } from "@/components/courses/LessonSidebar";
@@ -27,6 +28,12 @@ export default async function LessonLayout({
       .map((p) => p.lesson_slug)
   );
 
+  // spec-039 (D6): ante un fallo de infraestructura el sidebar es navegación,
+  // no el gate real — degrada a "ninguna deshabilitada" en vez de bloquear.
+  const disabledResult = await getDisabledLessonSlugs(courseSlug);
+  const disabledLessonSlugs =
+    disabledResult.status === "ok" ? disabledResult.slugs : new Set<string>();
+
   return (
     <main
       className="flex-1 w-full px-4 md:px-6 lg:px-0 py-6 lg:py-10 lg:flex-none lg:h-[calc(100dvh_-_var(--header-height,6rem))] lg:min-h-0 lg:overflow-hidden"
@@ -37,6 +44,7 @@ export default async function LessonLayout({
             course={course}
             activeLessonSlug={lessonSlug}
             completedLessonSlugs={completedLessonSlugs}
+            disabledLessonSlugs={disabledLessonSlugs}
           />
         </aside>
 
@@ -47,6 +55,7 @@ export default async function LessonLayout({
                 course={course}
                 activeLessonSlug={lessonSlug}
                 completedLessonSlugs={completedLessonSlugs}
+                disabledLessonSlugs={disabledLessonSlugs}
               />
             </LessonSidebarMobile>
           </div>

@@ -2,13 +2,17 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { requireAnyRole } from "@/lib/auth/session";
 import { getCoursesByTeacher } from "@/lib/academic-courses/index";
+import { getCourseSlugs } from "@/lib/courses/index";
 import { AcademicCourseList } from "@/components/admin/AcademicCourseList";
 
 export const metadata: Metadata = { title: "Mis cursos — Panel docente" };
 
 export default async function AdminCoursesPage() {
   const user = await requireAnyRole(["teacher", "admin"]);
-  const courses = await getCoursesByTeacher(user.id);
+  const [courses, validSlugs] = await Promise.all([
+    getCoursesByTeacher(user.id),
+    getCourseSlugs(),
+  ]);
 
   return (
     <div className="flex flex-col gap-6 ">
@@ -32,7 +36,7 @@ export default async function AdminCoursesPage() {
         </Link>
       </div>
 
-      <AcademicCourseList courses={courses} />
+      <AcademicCourseList courses={courses} validSlugs={validSlugs} />
     </div>
   );
 }

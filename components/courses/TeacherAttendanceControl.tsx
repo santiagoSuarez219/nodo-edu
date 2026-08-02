@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { AdminAttendancePanel } from '@/components/admin/AdminAttendancePanel';
+import { attendanceGroupCookieName } from '@/lib/attendance/group-preference';
 import type { AcademicCourse } from '@/lib/academic-courses/types';
-import type { OpenSessionSummary } from '@/lib/attendance/types';
+import type { OpenSessionResult } from '@/lib/attendance/types';
 
 // Solo lo que la UI necesita — evita serializar enrollment_code (dato
 // sensible del docente) al cliente sin necesidad.
@@ -13,53 +14,33 @@ export type AttendanceGroup = Pick<AcademicCourse, 'id' | 'name' | 'code'>;
 interface TeacherAttendanceControlProps {
   courseSlug: string;
   courses: AttendanceGroup[];
-  initialSessionsByCourseId: Record<string, OpenSessionSummary | null>;
+  initialSessionsByCourseId: Record<string, OpenSessionResult>;
+  /** Grupo restaurado desde la cookie por el server component; `null` si no hay. */
+  initialSelectedId: string | null;
 }
 
-function storageKey(courseSlug: string) {
-  return `nodo:teacher-attendance-group:${courseSlug}`;
-}
+const COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 365;
 
 export function TeacherAttendanceControl({
   courseSlug,
   courses,
   initialSessionsByCourseId,
+  initialSelectedId,
 }: TeacherAttendanceControlProps) {
-  // Inicializar siempre con el mismo valor en servidor y cliente (courses[0]):
-  // localStorage no existe durante SSR, así que leerlo en el inicializador de
-  // useState produce un árbol distinto entre servidor y la primera hidratación
-  // (el server ve "sin sesión" y el cliente "con sesión" del grupo restaurado,
-  // o viceversa) — un mismatch de hidratación real, no solo un warning.
+  // La preferencia vive en una cookie, no en localStorage: el server component
+  // la lee y ya renderiza el grupo correcto en el HTML inicial. Con localStorage
+  // el primer pintado era siempre `courses[0]` y un efecto post-montaje corregía
+  // después, así que el docente veía un instante el código de asistencia de otro
+  // grupo — peligroso si la pantalla está proyectada en clase (DEBT-023).
   const [selectedId, setSelectedId] = useState<string | null>(
-    courses[0]?.id ?? null
+    initialSelectedId ?? courses[0]?.id ?? null
   );
-
-  // Restaurar la elección de grupo guardada DESPUÉS de montar (post-hidratación):
-  // en este punto un cambio de estado ya no compara contra el HTML del server,
-  // así que no hay riesgo de mismatch — solo un re-render normal del cliente.
-  useEffect(() => {
-    if (courses.length <= 1) return;
-    try {
-      const stored = window.localStorage.getItem(storageKey(courseSlug));
-      if (stored && stored !== courses[0]?.id && courses.some((c) => c.id === stored)) {
-        // eslint-disable-next-line react-hooks/set-state-in-effect -- sincroniza con localStorage, no disponible durante SSR; corre una sola vez al montar.
-        setSelectedId(stored);
-      }
-    } catch {
-      // localStorage bloqueado (Safari/modo privado, políticas corporativas):
-      // se queda con courses[0], ya elegido por el estado inicial.
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- solo se restaura una vez al montar; no reaccionar a cambios de `courses`.
-  }, [courseSlug]);
 
   const handleSelect = (id: string) => {
     setSelectedId(id);
-    try {
-      window.localStorage.setItem(storageKey(courseSlug), id);
-    } catch {
-      // localStorage bloqueado: la selección sigue funcionando en esta
-      // sesión, solo no persiste entre recargas.
-    }
+    // `document.cookie` en vez de una server action: es una preferencia de UI
+    // sin efecto en datos, y así no hay round-trip ni re-render del server.
+    document.cookie = `${attendanceGroupCookieName(courseSlug)}=${id}; path=/; max-age=${COOKIE_MAX_AGE_SECONDS}; SameSite=Lax`;
   };
 
   if (courses.length === 0) {
@@ -116,7 +97,9 @@ export function TeacherAttendanceControl({
       <AdminAttendancePanel
         key={selectedCourse.id}
         academicCourseId={selectedCourse.id}
-        initialSession={initialSessionsByCourseId[selectedCourse.id] ?? null}
+        initialSession={
+          initialSessionsByCourseId[selectedCourse.id] ?? { status: 'unavailable' }
+        }
       />
     </div>
   );

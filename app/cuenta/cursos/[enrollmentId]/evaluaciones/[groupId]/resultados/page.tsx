@@ -35,7 +35,7 @@ export default async function EvaluacionResultadosPage({ params }: Props) {
     redirect(`/cuenta/cursos/${enrollmentId}/evaluaciones/${groupId}`);
   }
 
-  const questions = await getVariantQuestionDetails(assignment.variant.id, enrollmentId);
+  const questions = await getVariantQuestionDetails(assignment.variant.id, enrollmentId, groupId);
   const canRetry = submission.attempt_number < assignment.group.max_attempts;
 
   return (

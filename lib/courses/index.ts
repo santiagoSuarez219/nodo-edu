@@ -151,11 +151,16 @@ export async function getCourseLessonSlugPairs(): Promise<
 export function resolveResumeLessonSlug(
   lessons: Lesson[],
   completedLessonSlugs: Set<string>,
+  disabledLessonSlugs?: ReadonlySet<string>,
 ): string | null {
   if (lessons.length === 0) return null;
 
-  // Filtrar solo lecciones (excluir guías)
-  const navigableLessons = lessons.filter((l) => !isGuide(l) && isNavigable(l));
+  // Filtrar solo lecciones navegables y habilitadas (excluir guías y
+  // deshabilitadas, spec-039 D7): sin este filtro el redirect de
+  // `/[courseSlug]` podría aterrizar siempre en una lección cerrada.
+  const navigableLessons = lessons.filter(
+    (l) => !isGuide(l) && isNavigable(l) && !disabledLessonSlugs?.has(l.slug)
+  );
   if (navigableLessons.length === 0) return null;
 
   const ordered = [...navigableLessons].sort((a, b) => a.order - b.order);
@@ -185,3 +190,5 @@ export {
   countProgressibleLessons,
 } from "./nodes";
 export type { OutlineNode } from "./nodes";
+export { getDisabledLessonSlugs, isLessonDisabled } from "./availability";
+export type { DisabledLessonsResult } from "./availability";

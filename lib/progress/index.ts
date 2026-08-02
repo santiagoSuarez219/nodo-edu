@@ -5,6 +5,7 @@ import { createServerSupabaseClient } from "@/lib/auth/server";
 import { getCurrentUser } from "@/lib/auth/session";
 import { hasCourseAccess } from "@/lib/enrollments/access";
 import { getSelfAssessmentStatus } from "@/lib/self-assessment";
+import { isLessonDisabled } from "@/lib/courses/availability";
 import type { LessonProgress, MarkLessonCompletedResult } from "./types";
 
 export async function getLessonProgress(
@@ -50,16 +51,43 @@ export async function markLessonViewed(
   const user = await getCurrentUser();
   if (!user) return;
 
+  // spec-039: no registrar visita a una lección deshabilitada, ni si su
+  // disponibilidad no se puede verificar — mismo criterio de "fallar
+  // cerrado" que el resto del gate (D6).
+  const availability = await isLessonDisabled(courseSlug, lessonSlug);
+  if (availability.status === "unavailable" || availability.disabled) return;
+
   const supabase = await createServerSupabaseClient();
-  await supabase.from("lesson_progress").upsert(
-    {
-      user_id: user.id,
-      course_slug: courseSlug,
-      lesson_slug: lessonSlug,
-      viewed_at: new Date().toISOString(),
-    },
-    { onConflict: "user_id,course_slug,lesson_slug", ignoreDuplicates: false }
-  );
+  // spec-040 D4: `ignoreDuplicates: true` distingue inserción de
+  // actualización en un solo round-trip — con `false` (comportamiento
+  // previo) cada carga de página pisaba `viewed_at` y, tras este spec,
+  // habría disparado un recálculo de nota en cada render. Con `true`, un
+  // conflicto no toca la fila y no devuelve datos; solo una fila **nueva**
+  // aparece en `data`.
+  const { data: inserted } = await supabase
+    .from("lesson_progress")
+    .upsert(
+      {
+        user_id: user.id,
+        course_slug: courseSlug,
+        lesson_slug: lessonSlug,
+        viewed_at: new Date().toISOString(),
+      },
+      { onConflict: "user_id,course_slug,lesson_slug", ignoreDuplicates: true }
+    )
+    .select("user_id");
+
+  if (inserted && inserted.length > 0) {
+    // Ver una lección nueva sube el denominador de la nota de
+    // autoevaluaciones aunque no se responda (D4) — recalcular solo aquí,
+    // no en cada render, es lo que evita escribir en la libreta a cada carga.
+    const { error } = await supabase.rpc("recalculate_self_assessment_grade", {
+      p_course_slug: courseSlug,
+    });
+    if (error) {
+      console.error("Error recalculating self-assessment grade on view:", error);
+    }
+  }
 }
 
 export async function markLessonCompleted(
@@ -76,13 +104,30 @@ export async function markLessonCompleted(
     return { ok: false, reason: "not_enrolled" };
   }
 
+  // spec-039: la disponibilidad se comprueba antes que la autoevaluación —
+  // es más barata y más determinante ("esta lección está cerrada" gana sobre
+  // "te falta la autoevaluación") — y falla cerrado (D6/D8).
+  const availability = await isLessonDisabled(courseSlug, lessonSlug);
+  if (availability.status === "unavailable") {
+    return { ok: false, reason: "availability_unavailable" };
+  }
+  if (availability.disabled) {
+    return { ok: false, reason: "lesson_disabled" };
+  }
+
   const status = await getSelfAssessmentStatus(courseSlug, lessonSlug);
+  // Fallar cerrado (D8 de spec-037): no se pudo verificar si esta lección
+  // requiere autoevaluación, así que se deniega en vez de asumir que no la
+  // requiere.
+  if (status.status === "unavailable") {
+    return { ok: false, reason: "self_assessment_unavailable" };
+  }
   if (status.requiresAttempt && !status.hasAttempt) {
     return { ok: false, reason: "self_assessment_pending" };
   }
 
   const supabase = await createServerSupabaseClient();
-  await supabase.from("lesson_progress").upsert(
+  const { error } = await supabase.from("lesson_progress").upsert(
     {
       user_id: user.id,
       course_slug: courseSlug,
@@ -91,6 +136,13 @@ export async function markLessonCompleted(
     },
     { onConflict: "user_id,course_slug,lesson_slug", ignoreDuplicates: false }
   );
+
+  // Antes este error se descartaba por completo y la función reportaba éxito
+  // aunque la escritura nunca ocurriera (DEBT-037, Frente 4).
+  if (error) {
+    console.error("Error marking lesson completed:", error);
+    return { ok: false, reason: "save_failed" };
+  }
 
   revalidatePath(`/${courseSlug}/${lessonSlug}`);
   revalidatePath("/cuenta/cursos");
@@ -108,6 +160,11 @@ export async function markLessonUncompleted(
   const access = await hasCourseAccess(courseSlug);
   if (!access.ok || access.reason !== "enrolled") return;
 
+  // spec-039: deshacer nunca se bloquea, ni siquiera sobre una lección
+  // deshabilitada — es la contrapartida de que deshabilitar "descuenta" el
+  // progreso de los conteos sin borrarlo (D5); impedir desmarcar aquí no
+  // protegería nada y solo dejaría al estudiante sin forma de corregir su
+  // propio registro.
   const supabase = await createServerSupabaseClient();
   await supabase.from("lesson_progress").upsert(
     {
