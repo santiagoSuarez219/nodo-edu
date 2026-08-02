@@ -5,6 +5,33 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+## DEBT-044 — No existe forma de renombrar un ítem de calificación (`GradeItemsPanel`)
+
+**Origen:** spec-040, ronda de pruebas manuales, TC-013/TC-014 (2026-08-02)
+**Prioridad:** Media — bloquea un flujo documentado en la propia UI
+
+`components/admin/GradeItemsPanel.tsx` solo implementa "Añadir ítem" y
+"Eliminar"; no existe ningún control (botón, ícono, edición inline) para
+renombrar un ítem de calificación ya creado. Esto afecta a **todos** los
+ítems, no solo a los de `kind='self_assessment'`.
+
+El problema es más profundo que un botón faltante: la Server Action
+`updateGradeItemAction` (`lib/grades/actions.ts:32`) existe, funciona sin
+bloqueo para ítems automáticos (`lib/grades/index.ts:67` lo confirma
+explícitamente en comentario: "Renombrarlo sigue permitido"), pero **no está
+importada ni invocada desde ningún componente del proyecto** — no hay ningún
+camino de invocación, ni siquiera indirecto.
+
+El ítem `kind='self_assessment'` (spec-040, D9/D10) muestra además el
+tooltip "Este ítem no se puede eliminar. Puedes renombrarlo." — una promesa
+de la UI que hoy es falsa: no se puede.
+
+**Fix:** cablear un control de renombrado (edición inline o modal) en
+`GradeItemsPanel.tsx` que invoque `updateGradeItemAction`, disponible para
+todo tipo de ítem.
+
+---
+
 ## DEBT-043 — `self_assessment_breakdown` no filtra lecciones deshabilitadas (BLOQUE 039)
 
 **Origen:** spec-040, Fase 2, registrado explícitamente en la implementación

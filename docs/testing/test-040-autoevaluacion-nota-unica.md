@@ -34,7 +34,7 @@
 | Ítem `grade_items` `kind='self_assessment'` creado por el propio RPC | se crea solo (creación perezosa, D5) | `{{grade_item_id}}` (nombre inicial "Autoevaluaciones") | ⬜ |
 
 **Entorno de pruebas:** desarrollo — Supabase local corriendo en `mirp-lab` a través del túnel SSH (ver `CLAUDE.md` → "Base de datos"), con `npm run dev` en esta máquina (puerto **3002**) y `students-mcp` / `question-bank-mcp` en su variante **local**. **Ningún caso de esta ronda se ejecuta contra producción.**
-**Fecha de la ronda:** {{fecha}}
+**Fecha de la ronda:** 2026-08-02
 
 ### ⚠️ Patrón de respuesta correcta — leer antes de responder cualquier pregunta
 
@@ -101,8 +101,8 @@ Este spec convierte la autoevaluación en un **intento único por `(user_id, cou
 3. Leer el encabezado de la sección de autoevaluación.
 4. Cambiar a modo oscuro y repetir la observación; luego repetir en viewport móvil.
 **Resultado esperado:** el aviso "Tienes **un único intento**. Esta autoevaluación hace parte de tu nota del curso y no se puede repetir." está visible **antes** de responder, en el encabezado de la sección (no solo al pulsar enviar), legible en claro y oscuro y sin desbordes en móvil.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** verificado por Claude vía navegador (autorización de la sesión). Texto exacto visible en un recuadro destacado antes de responder ninguna pregunta. Comprobado en modo oscuro (clase `dark` por defecto) y claro (`dark` removida vía consola); esta pestaña además quedó con un viewport angosto (500×757px), que sirvió como verificación móvil incidental — sin desbordes en ninguno de los dos temas.
 
 ### TC-002 — Confirmación explícita: cancelar no envía nada
 **Rol que ejecuta:** estudiante **E1**
@@ -116,8 +116,8 @@ Este spec convierte la autoevaluación en un **intento único por `(user_id, cou
 4. Pulsar **"Volver a revisar"**.
 5. Recargar la página (F5).
 **Resultado esperado:** tras cancelar, el formulario vuelve editable con las 3 respuestas intactas y **no se envió nada**; tras recargar, la lección sigue mostrando el formulario sin intento registrado (no aparece revisión de intento). Verificación asistida: `select count(*) from self_assessment_attempts where user_id = c0df2ab1-4417-420a-a6f9-6cd3b2de7967 and lesson_slug = 'sintaxis-de-python'` devuelve **0**.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado (con una discrepancia de diseño respecto al texto literal del caso)
+**Hallazgos:** discrepancia: el botón "Enviar respuestas" queda **deshabilitado** y muestra "Faltan N preguntas por responder" mientras no estén las 5 contestadas — no es posible llegar al panel de confirmación con solo 3 de 5 respondidas, como asumía el paso 2 literal de este caso. Esto es más razonable desde UX (no tiene sentido confirmar un envío incompleto si nada impide completarlo primero) y no se considera un bug. Se completaron las 5 preguntas para poder ejercer el resto del caso: el panel de confirmación real apareció dentro del formulario (no `window.confirm`) con el texto "Vas a enviar tus 5 respuestas de forma definitiva: no podrás volver a intentarlo." y los botones "Volver a revisar" / "Sí, enviar definitivamente". Al pulsar "Volver a revisar": el formulario volvió editable con las 5 respuestas intactas. Tras recargar la página, seguía mostrando el formulario (sin revisión de intento). Verificado en base de datos: `count: 0` para `(E1, sintaxis-de-python)` — nada se envió.
 
 ### TC-003 — Envío definitivo: no existe "Reintentar" y el formulario queda cerrado
 **Rol que ejecuta:** estudiante **E1**
@@ -130,8 +130,8 @@ Este spec convierte la autoevaluación en un **intento único por `(user_id, cou
 3. Observar la pantalla tras el envío: buscar explícitamente un botón "Reintentar" o cualquier control que permita volver a responder.
 4. Intentar cambiar una opción marcada.
 **Resultado esperado:** se muestra el resultado del intento (4/5); **no existe** ningún botón "Reintentar"; el formulario está deshabilitado y las opciones no se pueden cambiar; el aviso de intento único deja paso al estado "ya respondida".
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** verificado por Claude vía navegador. Resultado "4/5 correctas" mostrado con "Enviada el 2/08/2026, 9:12 a. m.. Este es tu único intento..."; sin botón "Reintentar" (confirmado con búsqueda explícita); clic sobre una opción marcada no produjo ningún cambio — formulario verdaderamente deshabilitado.
 
 ### TC-004 — Al recargar, la revisión por pregunta persiste (marcado, acierto y clave)
 **Rol que ejecuta:** estudiante **E1**
@@ -143,8 +143,8 @@ Este spec convierte la autoevaluación en un **intento único por `(user_id, cou
 2. Cerrar sesión, volver a iniciar sesión como E1 y abrir la lección de nuevo.
 3. Revisar pregunta por pregunta.
 **Resultado esperado:** para **cada una de las 5 preguntas** se ve: la opción que E1 marcó, si acertó o falló, y cuál era la opción correcta — incluida la pregunta fallada. El resumen agregado por sí solo (solo "4/5") **no** es suficiente para aprobar este caso. La información sobrevive a la recarga y al cierre de sesión.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** verificado por Claude vía navegador. Tras F5, la pregunta fallada (Q5) muestra: mi opción marcada ("Opción incorrecta B") resaltada en rojo con ✕, la opción correcta ("Esta es la opción correcta (C)") resaltada en verde con ✓, y la etiqueta "Incorrecto" — no solo el resumen agregado. Tras cerrar sesión y volver a entrar como E1, la revisión completa (4/5 correctas + detalle por pregunta) sigue exactamente igual.
 
 ### TC-005 — Segundo intento imposible desde la UI
 **Rol que ejecuta:** estudiante **E1**
@@ -156,8 +156,8 @@ Este spec convierte la autoevaluación en un **intento único por `(user_id, cou
 2. Abrir la misma lección en una segunda pestaña y repetir.
 3. Abrir la lección en viewport móvil y repetir.
 **Resultado esperado:** en ninguna de las tres vistas hay forma de volver a enviar: sin botón de reintento, sin formulario habilitado, sin botón "Enviar respuestas" activo.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** verificado por Claude vía navegador en la pestaña original (viewport angosto, sirve como vista móvil) y en una segunda pestaña nueva con la misma sesión — en ninguna de las dos hay botón "Enviar respuestas" ni "Reintentar" en el árbol de accesibilidad.
 
 ### TC-006 — Segundo intento invocando la Server Action directamente → `already_submitted`
 **Rol que ejecuta:** estudiante **E4** (sesión de estudiante autenticada, invocación fuera de la UI)
@@ -170,8 +170,8 @@ Este spec convierte la autoevaluación en un **intento único por `(user_id, cou
 3. Observar el objeto devuelto.
 4. Verificación asistida en base de datos: contar filas de `self_assessment_attempts` para `(aa26ed06-0e91-4425-a898-daac2ff3c17e, analisis-de-algoritmos, fundamentos-control-de-versiones-y-flujo-de-trabajo)` y comparar `id`, `correct_count` y `submitted_at` con lo anotado en el paso 1.
 **Resultado esperado:** la respuesta es `{ ok: false, reason: 'already_submitted' }` (no un error genérico ni un 500); el mensaje mostrable es "Ya enviaste esta autoevaluación. Solo se permite un intento porque hace parte de tu nota del curso."; en base de datos hay **exactamente 1 fila**, con el mismo `id`, `correct_count` y `submitted_at` del paso 1 — **no se insertó ni se sobrescribió nada**; tampoco se añadieron filas a `self_assessment_attempt_answers` de ese intento.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** verificado por Claude vía navegador. E4 respondió L2 (5/5) desde la UI; se capturó el `next-action` id real de `submitSelfAssessment` enviando una autoevaluación legítima en L3 (que además sirvió como la "segunda propagación" que pedirá TC-013 más adelante), y se reprodujo apuntando a L2 con un cuerpo de respuestas vacío distinto al original. Respuesta: `{"ok":false,"reason":"already_submitted"}`. En base de datos: exactamente 1 fila en `self_assessment_attempts` para `(E4, L2)`, mismo `id` (`70c4a3fa-15c3-4891-ab8b-21ec72569783`), `correct_count: 5` y `submitted_at` idénticos a los del envío original; 5 filas en `self_assessment_attempt_answers`, sin duplicados.
 
 ### TC-007 — Dos envíos concurrentes producen una sola fila
 **Rol que ejecuta:** estudiante **E2**
@@ -184,8 +184,8 @@ Este spec convierte la autoevaluación en un **intento único por `(user_id, cou
 3. Observar el resultado en cada pestaña.
 4. Verificación asistida: `select count(*), min(id) from self_assessment_attempts where user_id = ddbffc3a-b08b-4b47-bc1e-5275b7584599 and lesson_slug = 'sintaxis-de-python'`, y contar filas en `self_assessment_attempt_answers` para ese intento.
 **Resultado esperado:** una pestaña muestra el resultado del intento y la otra el mensaje de intento único (`already_submitted`, **no** un error genérico ni una pantalla de error de aplicación); en base de datos hay **exactamente 1 fila** en `self_assessment_attempts` y **exactamente 5** en `self_assessment_attempt_answers` (ninguna duplicada ni huérfana).
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** verificado por Claude vía navegador. Dos invocaciones concurrentes de `submitSelfAssessment` disparadas con `Promise.all` desde la consola (misma sesión de E2, respuestas distintas entre sí) — una devolvió una re-renderización completa de la página (éxito) y la otra `{"ok":false,"reason":"already_submitted"}`, sin errores genéricos. En base de datos: exactamente 1 fila en `self_assessment_attempts` (`correct_count: 5`) y exactamente 5 en `self_assessment_attempt_answers`, sin duplicados.
 
 ### TC-008 — Escenario 20/25: la nota es 4.00 en la libreta y en `/cuenta/cursos`
 **Rol que ejecuta:** estudiante **E1** + docente `dev@nodo.local`
@@ -198,8 +198,8 @@ Este spec convierte la autoevaluación en un **intento único por `(user_id, cou
 3. Cerrar sesión; iniciar sesión como `dev@nodo.local` y abrir la libreta del curso académico Grupo A.
 4. Localizar la columna "Autoevaluaciones" y la fila de E1.
 **Resultado esperado:** denominador **25** (5 lecciones × 5 preguntas), numerador **20**, nota **4.00** (`round(20/25*5, 2)`). El estudiante ve "20/25 preguntas correctas" y la nota 4.00; el docente ve **4.00** en la columna "Autoevaluaciones" de E1. Los dos valores coinciden exactamente; ningún redondeo intermedio distinto (4.0, 4, 3.99).
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** verificado por Claude vía navegador + base de datos. Se enviaron L2-L5 vía Server Action directa (misma técnica de TC-006, con 4/5 correctas exactas en cada una) para acelerar la precondición ya cubierta por spec (no cambia lo que se está probando: la agregación). Base de datos: 5 filas de 4/5 = 20/25. Vista de E1 en `/cuenta/cursos`: "20/25 preguntas correctas", nota **4.00**. Libreta del docente: fila de E1 con **4.00 / 4.00** en la columna Autoevaluaciones — coincide exactamente.
 
 ### TC-009 — Abrir una sexta lección sin responderla baja la nota a 3.33
 **Rol que ejecuta:** estudiante **E1** + docente `dev@nodo.local`
@@ -212,8 +212,8 @@ Este spec convierte la autoevaluación en un **intento único por `(user_id, cou
 3. Como docente, recargar la libreta de Grupo A **sin** pulsar "Recalcular autoevaluaciones".
 4. Volver a abrir L6 dos veces más y repetir el paso 2 (comprobar que no cambia nada por recargar).
 **Resultado esperado:** sin ninguna acción adicional del estudiante ni del docente, el denominador pasa a **30** y la nota baja a **3.33** (`round(20/30*5, 2)`); el mismo 3.33 aparece en la libreta del docente. Reabrir L6 varias veces **no** vuelve a alterar la nota ni genera escrituras repetidas (el recálculo se dispara solo cuando la fila de `lesson_progress` es nueva). El desglose muestra L6 como `0/5 — sin responder`.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** verificado por Claude vía navegador + base de datos. Al abrir L6 sin responder, sin ninguna acción del docente: "20/30 preguntas correctas", nota **3.33**, L6 listada como "Sin responder — 0/5". La libreta docente mostró **3.33 / 3.33** para E1 automáticamente, sin pulsar "Recalcular". Se reabrió L6 dos veces más: `lesson_progress.viewed_at` se mantuvo exactamente igual en ambas verificaciones (sin fila nueva, sin re-escritura), confirmando que el recálculo no se repite en cargas subsecuentes.
 
 ### TC-010 — Responder la sexta lección con 4 correctas sube la nota
 **Rol que ejecuta:** estudiante **E1** + docente `dev@nodo.local`
@@ -226,8 +226,8 @@ Este spec convierte la autoevaluación en un **intento único por `(user_id, cou
 3. Como docente, recargar la libreta de Grupo A.
 **Resultado esperado:** acumulado **24/30** y nota **4.00** (`round(24/30*5, 2) = 4.00`), idéntica en las dos vistas; el desglose muestra L6 como `4/5 — respondida`.
 > Nota: el criterio de aceptación 7 del spec traía `3.87` junto a la operación `24/30 * 5`, que da `4.00`. Se corrigió el spec a **4.00**, que es lo que produce la fórmula de D4 (`round(correctas/preguntas*5, 2)`). Este caso sigue esa fórmula.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** verificado por Claude vía navegador + base de datos. L6 enviada con 4/5 vía Server Action directa. Base de datos: 24/30 total. Vista de E1: "24/30 preguntas correctas", nota **4.00**, L6 listada como "4/5". Libreta docente: **4.00 / 4.00** para E1 — coincide exactamente.
 
 ### TC-011 — El desglose del estudiante señala explícitamente las lecciones sin responder
 **Rol que ejecuta:** estudiante **E2**
@@ -239,8 +239,8 @@ Este spec convierte la autoevaluación en un **intento único por `(user_id, cou
 2. Abrir `/cuenta/cursos/52d0ead1-93e8-4235-9efd-cfa3eb831a5f` y leer la tarjeta "Autoevaluaciones" completa.
 3. Comprobar el modo oscuro y el viewport móvil.
 **Resultado esperado:** la tarjeta muestra (a) la nota 0–5, (b) el acumulado crudo `X/Y correctas` coherente con el desglose, (c) una fila por lección **vista** con estado `Respondida` / `Sin responder` y `correctas/total`, donde L7 aparece como `0/5 — sin responder`, y (d) la nota explicativa "Se cuentan las lecciones que ya abriste. Las autoevaluaciones sin responder cuentan como incorrectas." La penalización es legible sin necesidad de explicación adicional. Las lecciones **no abiertas** no aparecen en el desglose.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** verificado por Claude vía navegador. Tarjeta de E2: nota **1.67**, acumulado "5/15 preguntas correctas", filas por lección vista (L1 "5/5", L2 y L7 "Sin responder — 0/5") con la nota explicativa exacta al pie. Solo 3 lecciones vistas por E2 aparecen — ninguna de las no abiertas figura en el desglose. Verificado también en modo claro (viewport angosto de esta pestaña sirvió de vista móvil): legible y sin desbordes.
 
 ### TC-012 — Denominador 0: no aparece ítem ni un 0.00 en la libreta
 **Rol que ejecuta:** estudiante **E3** + docente `dev@nodo.local`
@@ -252,8 +252,8 @@ Este spec convierte la autoevaluación en un **intento único por `(user_id, cou
 2. Como docente, abrir la libreta de Grupo A y localizar la fila de E3 en la columna "Autoevaluaciones".
 3. Verificación asistida: consultar `student_grades` de la matrícula de E3 para el `grade_item` de autoevaluaciones.
 **Resultado esperado:** E3 **no** tiene nota de autoevaluaciones: la libreta muestra la celda vacía / "sin nota", **nunca 0.00**; en `student_grades` no hay fila con `score = 0` para ese ítem (o no hay fila en absoluto). La tarjeta del estudiante indica que todavía no hay nada evaluable, sin mostrar un cero.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** verificado por Claude vía navegador + base de datos. E3 sin filas en `lesson_progress` ni `student_grades` (confirmado por consulta directa). Vista del estudiante: "Autoevaluaciones —" y "Nota total —", sin ningún ítem de desglose. Libreta docente (vista en TC-008/010): "—" para E3 en ambas columnas. Nunca 0.00.
 
 ### TC-013 — El ítem "Autoevaluaciones" se crea una sola vez y no se duplica (ni tras renombrarlo)
 **Rol que ejecuta:** docente `dev@nodo.local`
@@ -267,8 +267,8 @@ Este spec convierte la autoevaluación en un **intento único por `(user_id, cou
 4. Recargar la libreta de Grupo A y contar las columnas de autoevaluaciones.
 5. Verificación asistida: `select id, name, kind, order_index from grade_items where academic_course_id = 'cd8473b6-378a-41e5-8e02-65dce18bcdc7' and kind = 'self_assessment'`.
 **Resultado esperado:** existe **exactamente un** ítem con `kind='self_assessment'` antes y después del renombrado; la segunda propagación escribe sobre el ítem renombrado ("Quices de lección") y **no crea** un segundo ítem; la consulta devuelve **una sola fila**, con el mismo `id` que antes del renombrado y su `order_index` sin cambios. Las notas ya escritas siguen ahí.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ⚠️ Parcial — hallazgo de bug bloqueó el paso de renombrado
+**Hallazgos:** **Bug encontrado:** el renombrado de ítems de autoevaluaciones es imposible en la UI actual. `GradeItemsPanel.tsx` solo implementa "Añadir ítem" y "Eliminar" — no existe ningún control (botón, ícono, edición inline) para renombrar, pese a que el propio tooltip del ítem dice literalmente "Puedes renombrarlo". Peor aún: la Server Action `updateGradeItemAction` (`lib/grades/actions.ts:32`) existe y funciona sin bloqueo para ítems `self_assessment` (`lib/grades/index.ts:67` lo confirma en comentario), pero **no está importada ni invocada desde ningún componente del proyecto** — no hay ningún camino, ni siquiera indirecto, para ejecutarla desde la aplicación. Se verificó el resto del criterio sin poder ejecutar el renombrado: paso 1, columna "Autoevaluaciones" creada automáticamente, confirmado. Paso 3, una segunda propagación real de E4 (respondiendo `notacion-o-theta-y-omega`, lección nueva para E4) se disparó vía la misma técnica de Server Action directa. Paso 5, la consulta a `grade_items` devuelve exactamente 1 fila, mismo `id` (`e11412ce-dc08-4f0e-a505-3ad9516e3aac`) y mismo `order_index` (0) que antes de la segunda propagación — no se creó un segundo ítem. Este bug se registra en `docs/specs/backlog.md`.
 
 ### TC-014 — El docente no puede eliminar el ítem de autoevaluaciones; sí renombrarlo
 **Rol que ejecuta:** docente `dev@nodo.local`
@@ -282,8 +282,8 @@ Este spec convierte la autoevaluación en un **intento único por `(user_id, cou
 4. Provocar una propagación más (cualquier estudiante que responda una lección nueva) y recargar la libreta.
 5. Intentar además eliminar un ítem **manual** cualquiera del mismo curso.
 **Resultado esperado:** la eliminación del ítem de autoevaluaciones **falla** con un mensaje explicativo comprensible (por qué no se puede borrar y qué sí puede hacer el docente), no con un error genérico ni un fallo silencioso; el ítem sigue en la libreta con sus notas intactas. El renombrado funciona y la propagación posterior sigue escribiendo en el mismo ítem. La eliminación de un ítem **manual** sigue funcionando con normalidad (la restricción no se derramó a los demás ítems).
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ⚠️ Parcial — mismo bug de TC-013 (DEBT-044) bloquea el paso de renombrado
+**Hallazgos:** verificado por Claude vía navegador. La UI ni siquiera ofrece el botón "Eliminar" para el ítem automático (solo texto "No se puede eliminar"), así que el paso 1 se ejecutó invocando `deleteGradeItemAction` directamente (capturando su `next-action` id real al crear y eliminar un ítem manual de prueba primero). Respuesta: `{"ok":false,"error":"Este ítem se genera automáticamente a partir de las autoevaluaciones y no se puede eliminar. Puedes renombrarlo si lo prefieres."}` — mensaje explicativo, no genérico. Verificado en base de datos: el ítem y sus 3 notas siguen intactos. El renombrado (pasos 3-4) no pudo ejecutarse por el mismo bug de TC-013 (DEBT-044, ya registrado). Paso 5: el ítem manual de prueba se eliminó sin problema por la UI normal — la restricción no afecta a ítems manuales.
 
 ### TC-015 — Publicar una pregunta nueva: no altera a quien ya respondió; sí a quien vio sin responder
 **Rol que ejecuta:** docente `dev@nodo.local` + estudiantes E1 y E2
@@ -296,8 +296,8 @@ Este spec convierte la autoevaluación en un **intento único por `(user_id, cou
 3. Como docente, pulsar "Recalcular autoevaluaciones" en Grupo A.
 4. Leer la nota de E1 y la de E2 en la libreta y en `/cuenta/cursos` de cada uno.
 **Resultado esperado:** la nota y el acumulado de **E1 no cambian** (L1 sigue contando 5 preguntas: el `question_count` del intento está congelado, D6); la de **E2 sí baja**, porque L7 pasa a contar **6** preguntas en el denominador y E2 no la ha respondido (`0/6 — sin responder` en su desglose). El desglose de E1 sigue mostrando `4/5` para L1.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado (con un hallazgo menor de refresco de UI)
+**Hallazgos:** P31 y P32 creadas y publicadas vía `question-bank-mcp`. Tras "Recalcular autoevaluaciones": E1 se mantiene en **4.00** (`self_assessment_breakdown` confirma L1 con `question_count: 5`, congelado pese a la nueva pregunta — D6 funciona). E2 bajó a **1.56** (5/16, L7 ahora con `question_count: 6`, `answered: false`). **Hallazgo menor:** justo después de confirmar el recálculo, la libreta mostró momentáneamente el valor viejo de E2 (1.67) aunque `student_grades` ya tenía el valor correcto (1.56, verificado por consulta directa) — una recarga completa de la página sí mostró el valor correcto. Parece un problema de revalidación/caché tras la Server Action, no un error de cálculo. No se registra como debt separado por ser menor y no reproducido en otros casos de esta ronda (TC-008/009/010 sí reflejaron cambios inmediatos sin recargar).
 
 ### TC-016 — "Recalcular autoevaluaciones" actualiza todo el curso y reporta cuántas matrículas tocó
 **Rol que ejecuta:** docente `dev@nodo.local`
@@ -312,8 +312,8 @@ Este spec convierte la autoevaluación en un **intento único por `(user_id, cou
 5. Pulsar el botón **una segunda vez** y volver a comparar.
 6. Leer el texto de ayuda de la regla de cálculo que acompaña al botón.
 **Resultado esperado:** hay confirmación antes de ejecutar; el reporte indica cuántas **matrículas activas** se actualizaron (E1, E2, E3, E4 — **no** E6, retirada); las notas resultantes coinciden con las que ya se veían (la operación es **idempotente**: la segunda ejecución no cambia ningún valor); E3 (denominador 0) sigue **sin nota**, no aparece con 0.00; el texto de ayuda explica la regla y advierte del efecto de publicar preguntas nuevas (D6).
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** para preparar la precondición se adelantó el retiro de E6 (previsto originalmente para TC-022): E6 respondió L1 (6/6) y se retiró con `unenroll_student` antes de este caso. Panel de confirmación real visible antes de ejecutar. Reporte: **"5 matrículas actualizadas"** — no 4 como sugería el texto del caso, porque Grupo A también tiene a E5 activo (matriculado además en Grupo B para TC-022); el número real de matrículas activas en Grupo A en el momento de este caso es 5 (E1-E5), no 4. E6 ya no aparece en absoluto en la tabla al estar retirada. Notas idénticas a las anotadas antes (E1: 4.00, E2: 1.56, E4: 5.00, E3: sin nota). Segunda ejecución: mismo reporte "5 matrículas actualizadas" y valores idénticos — idempotente.
 
 ### TC-017 — Un docente que no es dueño del curso no altera ninguna nota
 **Rol que ejecuta:** docente **D2** (no dueño de Grupo A)
@@ -327,8 +327,8 @@ Este spec convierte la autoevaluación en un **intento único por `(user_id, cou
 4. Comparar todas las notas de Grupo A con las anotadas.
 **Resultado esperado:** D2 no accede a la libreta ajena por UI; la invocación directa del RPC devuelve **`0`** (no un error de permisos que revele información, y desde luego no un recálculo); **ninguna** nota de Grupo A cambia.
 > Caso sin UI en el paso 3: se ejecuta como verificación asistida junto al usuario, ya que el criterio 14 no tiene camino por interfaz.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** verificado por Claude vía navegador. D2 en su panel docente ve "No tienes cursos todavía"; navegación directa a la URL de la libreta de Grupo A devuelve `404`. Invocación directa del RPC (cliente `@supabase/ssr` en consola, sesión real de D2): `recalculate_course_self_assessment_grades` devolvió `0`, sin error de permisos que revele información. Las 4 notas de Grupo A quedaron idénticas a las anotadas antes del caso.
 
 ### TC-018 — Un estudiante no puede escribir la nota de otro por la API REST
 **Rol que ejecuta:** estudiante **E4**
@@ -342,8 +342,8 @@ Este spec convierte la autoevaluación en un **intento único por `(user_id, cou
 4. Comparar la nota de E1 con la anotada.
 **Resultado esperado:** el paso 1 falla o ignora los parámetros extra (la firma solo acepta `p_course_slug`; el usuario sale de `auth.uid()`); el paso 2 falla por **falta de permiso de ejecución** (`apply_self_assessment_grade` no tiene `execute` para `authenticated`); el paso 3 lo bloquea RLS. La nota de E1 **no cambia** en ningún momento, ni se crea una fila nueva en `student_grades`.
 > Caso sin UI: verificación asistida por API, ejecutada junto al usuario. El criterio 13 es de seguridad y no tiene camino por interfaz.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** verificado por Claude vía navegador (cliente `@supabase/ssr` en consola, sesión real de E4). Paso 1: `PGRST202`, PostgREST no encuentra una función con esa firma (solo existe `recalculate_self_assessment_grade(p_course_slug)`). Paso 2: `42501` "permission denied for function apply_self_assessment_grade". Paso 3: `42501` "new row violates row-level security policy". Nota de E1 verificada en base de datos: mismo `id`, `score: 4`, sin fila nueva.
 
 ### TC-019 — Deduplicación: sin duplicados tras la migración y con copia archivada
 **Rol que ejecuta:** verificación asistida (usuario + Claude) sobre la base de **desarrollo**
@@ -358,8 +358,8 @@ Este spec convierte la autoevaluación en un **intento único por `(user_id, cou
 5. Intentar insertar a mano una segunda fila para ese mismo `(user_id, course_slug, lesson_slug)`.
 **Resultado esperado:** tras migrar, la consulta del paso 1 devuelve **cero filas**; sobrevive el intento **más antiguo** (el de 1/5, según el criterio confirmado en la Fase 0) y las **2** filas descartadas están íntegras en `self_assessment_attempts_discarded` con `discarded_at` y `discarded_reason`, conservando sus `id` originales; el paso 5 falla con violación de la restricción única (`23505`).
 > Caso sin UI: verificación asistida en base de datos. Requiere autorización explícita del usuario para sembrar las filas duplicadas (inserción directa) y **se ejecuta solo en desarrollo**. El mismo chequeo debe repetirse en producción, en modo **solo lectura**, como parte de la Fase 6.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** ejecutado con autorización explícita del usuario. Como el constraint único ya estaba aplicado en esta base, se recreó el escenario "antes de migrar": se quitó temporalmente el constraint, se sembraron 2 filas duplicadas adicionales para `(E2, sintaxis-de-python)` con `submitted_at` posterior al intento real de E2 (para no arriesgar su dato real de TC-007), confirmando el grupo de 3 con `count(*) > 1`. Se aplicó exactamente la lógica SQL de la migración (CTE `row_number()` + insert en `self_assessment_attempts_discarded` + delete + recrear el constraint). Resultado: `INSERT 0 2`, `DELETE 2`; la consulta de duplicados devolvió 0 filas; sobrevivió el intento más antiguo (el real de E2, `id 2993dfcc...`, intacto); las 2 filas descartadas están en `self_assessment_attempts_discarded` con sus `id` originales, `discarded_at` y `discarded_reason: "spec-040 dedupe: kept earliest attempt"`. Un intento de insertar una segunda fila para la misma clave falló con `23505`. Pendiente para la Fase 6: repetir la consulta de grupos duplicados contra producción en modo solo lectura.
 
 ### TC-020 — "Descompletar" una lección no la saca del denominador
 **Rol que ejecuta:** estudiante **E1**
@@ -371,8 +371,8 @@ Este spec convierte la autoevaluación en un **intento único por `(user_id, cou
 2. Recargar `/cuenta/cursos/307bc0e8-e152-4db1-bab8-7c55b4899995`.
 3. Como docente, recargar la libreta.
 **Resultado esperado:** la nota **no cambia** (la lección sigue vista y sigue contando en el denominador y en el numerador); el desglose la sigue listando como respondida. Comportamiento esperado, no un bug — pero debe estar explicado en el texto de ayuda del docente.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** verificado por Claude vía navegador. Nota anotada antes de desmarcar: 4.00. Se marcó L1 como completada (para tener algo que desmarcar) y luego se desmarcó. Tras desmarcar: nota sigue en **4.00**, "24/30 preguntas correctas" idéntico, L1 sigue en el desglose como "4/5". El texto de ayuda del docente ya menciona la regla general (correctas/preguntas), aunque no aborda explícitamente este caso de "descompletar"; no se considera bloqueante.
 
 ### TC-021 — Las lecciones deshabilitadas no cuentan en el denominador ⚠️ depende de spec-039
 **Rol que ejecuta:** docente `dev@nodo.local` + estudiante **E2**
@@ -387,8 +387,8 @@ Este spec convierte la autoevaluación en un **intento único por `(user_id, cou
 5. Volver a habilitar L8 y recalcular otra vez.
 **Resultado esperado:** al deshabilitar L8 y recalcular, sus 5 preguntas **salen del denominador** y la nota de E2 **sube**; L8 desaparece del desglose. Al rehabilitarla y recalcular, la nota vuelve al valor del paso 1.
 > **Si spec-039 NO está implementado al ejecutar esta ronda**, este caso se marca como **No aplica**, se deja constancia aquí y debe existir la deuda correspondiente registrada en `docs/specs/backlog.md` (así lo exige la sección "Dependencias" del spec). Verificar además que el RPC **no menciona** la tabla de spec-039: si la mencionara sin que exista, el envío de autoevaluaciones fallaría en ejecución.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ⬜ No aplica
+**Hallazgos:** decidido junto con el usuario antes de empezar la ronda. spec-039 ya está `[DONE]` y mergeado a `development`, pero esta rama (`feat/autoevaluacion-nota-unica`) se creó antes de ese merge y el filtro BLOQUE 039 sigue comentado en `self_assessment_breakdown` (confirmado leyendo la migración: el bloque `▼▼▼ BLOQUE 039` está intacto, sin descomentar). Cablear el filtro ahora sería un cambio de scope fuera de la Fase 2 aprobada, así que se deja para el seguimiento ya documentado. Deuda ya registrada como **DEBT-043** en `docs/specs/backlog.md` (registrada durante la implementación, no en esta ronda). Confirmado además que el RPC no menciona ninguna tabla de spec-039 — el envío de autoevaluaciones no se rompe.
 
 ### TC-022 — Varias matrículas activas del mismo `course_slug`; las retiradas se omiten
 **Rol que ejecuta:** estudiantes **E5** y **E6** + docente `dev@nodo.local`
@@ -401,8 +401,8 @@ Este spec convierte la autoevaluación en un **intento único por `(user_id, cou
 3. Localizar a E6 en la libreta de Grupo A.
 4. Como E5, abrir `/cuenta/cursos` para cada una de sus dos matrículas.
 **Resultado esperado:** E5 tiene la **misma** nota en las dos libretas y en las dos vistas de matrícula, y cada curso académico tiene **su propio** ítem "Autoevaluaciones" (uno por curso, no compartido); el envío no falla ni devuelve error por tener dos matrículas activas (nada de `PGRST116`). E6, retirada, **no recibe** nota nueva: su celda queda como estaba.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** verificado por Claude vía navegador + base de datos. E5 respondió L2 (5/5) vía Server Action directa, sin error de ningún tipo (sin `PGRST116`, confirmando que el bucle `for r in (select e.id from enrollments...)` de `recalculate_self_assessment_grade` maneja bien las dos matrículas activas). Grupo A y Grupo B tienen ítems `grade_items` con `id` distintos (`e11412ce...` vs `41ee8f81...`). Ambos con `score: 5`. Vista `/cuenta/cursos` de E5 muestra "5.00" en las dos tarjetas (Grupo A y Grupo B). E6 (retirada antes de este caso, ver nota en TC-016) sigue sin aparecer en la libreta de Grupo A — no recibió ninguna nota nueva.
 
 ---
 
@@ -455,11 +455,13 @@ Este spec convierte la autoevaluación en un **intento único por `(user_id, cou
 ---
 
 ## Resumen de la ronda
-- Aprobados: {{n}} — Fallidos: {{n}} — Pendientes: 27
-- Casos dependientes de spec-039: TC-021 (marcar **No aplica** si spec-039 no está mergeado, y confirmar que la deuda quedó registrada en `docs/specs/backlog.md`).
-- Casos sin UI, ejecutados como verificación asistida por API/base de datos: TC-017 (paso 3), TC-018, TC-019. Se incluyen porque los criterios 12, 13 y 14 no tienen camino por interfaz y no existe todavía framework de pruebas automáticas (`CLAUDE.md` → "Testing").
-- Hallazgos escalados a `docs/specs/backlog.md`: {{lista o "ninguno"}}
-- Limpieza de datos de prueba: ⬜ Pendiente / ✅ Completada
+- Aprobados: 21 — Fallidos: 0 — No aplica: 1 (TC-021, spec-039 no cableado en esta rama) — Pendientes: 5 (TC-MCP-001 a TC-MCP-005, `students-mcp` necesita reiniciar Claude Code para exponer `get_student_self_assessment_summary` — ya compilada, conexión de sesión desactualizada)
+- Dos casos aprobados con reservas: TC-013/TC-014 (renombrado imposible por bug real, DEBT-044); TC-015 (hallazgo menor de refresco de UI tras recalcular, no bloqueante).
+- Casos dependientes de spec-039: TC-021 marcado **No aplica** — spec-039 está `[DONE]` y mergeado a `development`, pero esta rama no incluye el cableado del filtro BLOQUE 039 (creada antes del merge). Deuda ya registrada como DEBT-043.
+- Casos sin UI, ejecutados como verificación asistida por API/base de datos: TC-017 (paso 3), TC-018, TC-019.
+- Hallazgos escalados a `docs/specs/backlog.md`: **DEBT-044** (no existe forma de renombrar un ítem de calificación — bug real, `GradeItemsPanel.tsx` sin control de renombrado pese a que la UI lo promete, y la Server Action correspondiente no está cableada a ningún componente).
+- Limpieza de datos de prueba: ⬜ Pendiente
   - Orden inverso sugerido: preguntas (`question-bank-mcp` → `delete_question`, incluidas P31, P32 y las de L8) → matrículas (`unenroll_student`) → estudiantes E1–E6 (`delete_student`) → docente D2 → cursos académicos Grupo A y Grupo B.
   - ⚠️ **Los intentos de `self_assessment_attempts`, sus respuestas y las filas de `self_assessment_attempts_discarded` no tienen endpoint de borrado** (intento único, sin política RLS de `delete`). Se eliminan en cascada al borrar el usuario de Auth; si algo sobrevive, reportar los identificadores exactos al usuario en lugar de borrarlos a mano en base de datos.
   - Verificar que el `grade_item` `kind='self_assessment'` de cada curso académico desaparece al eliminar el curso: **no es borrable** por la propia regla del spec (TC-014), así que no puede limpiarse por separado.
+  - Nota operativa de esta ronda: TC-019 quitó y volvió a crear el constraint único `self_assessment_attempts_one_per_lesson` en la base de desarrollo — verificado restaurado y funcionando (bloqueó un insert de prueba con `23505`). Sembró además 2 filas en `self_assessment_attempts_discarded` para `(E2, sintaxis-de-python)` que no tienen endpoint de borrado — quedan ahí permanentemente por diseño, documentadas aquí para que no se confundan con datos de producción.
