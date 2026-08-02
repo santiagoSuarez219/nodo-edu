@@ -524,6 +524,13 @@ export async function getAttemptReview(
     if (attemptError) throw attemptError;
     if (!attempt) return null;
 
+    // `.order('created_at', { foreignTable: 'questions' })` NO ordena aquí:
+    // ese parámetro solo reordena filas embebidas de una relación *to-many*.
+    // `questions` es to-one (cada respuesta referencia una sola pregunta), así
+    // que PostgREST lo ignora — el orden de las filas de la consulta principal
+    // sigue siendo indefinido (en la práctica, por la PK compuesta). Traemos
+    // `created_at` y ordenamos en TypeScript, igual que ya se hace con
+    // `choices` más abajo.
     const { data: answerRows, error: answersError } = await supabase
       .from('self_assessment_attempt_answers')
       .select(
@@ -536,12 +543,12 @@ export async function getAttemptReview(
           code_snippet,
           code_language,
           topic_title,
+          created_at,
           choices:question_choices(id, body, order_index, is_correct)
         )
       `
       )
-      .eq('attempt_id', attempt.id)
-      .order('created_at', { foreignTable: 'questions', ascending: true });
+      .eq('attempt_id', attempt.id);
 
     if (answersError) throw answersError;
 
@@ -554,6 +561,7 @@ export async function getAttemptReview(
         code_snippet: string | null;
         code_language: string | null;
         topic_title: string | null;
+        created_at: string;
         choices: Array<{
           id: string;
           body: string;
@@ -566,6 +574,11 @@ export async function getAttemptReview(
     const answers: AttemptReviewQuestion[] = ((answerRows as unknown as AnswerRow[] | null) ?? [])
       .filter((row): row is AnswerRow & { questions: NonNullable<AnswerRow['questions']> } =>
         row.questions !== null
+      )
+      .sort(
+        (a, b) =>
+          new Date(a.questions.created_at).getTime() -
+          new Date(b.questions.created_at).getTime()
       )
       .map((row) => {
         const choices = [...row.questions.choices].sort(

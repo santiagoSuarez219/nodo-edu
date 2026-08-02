@@ -838,20 +838,20 @@ grant execute on function public.recalculate_course_self_assessment_grades(uuid)
       proyecto**: cualquier `GRANT ALL ON ALL FUNCTIONS` posterior a una
       migración con un `revoke` explícito debe re-verificar ese `revoke`.
 
-### Fase 3 — Backend: bloqueo de reintentos y disparadores
-- [ ] `SubmitSelfAssessmentResult`: nuevo `reason: 'already_submitted'`
-- [ ] `submitSelfAssessment`: comprobar intento previo antes de calificar;
+### Fase 3 — Backend: bloqueo de reintentos y disparadores — ✅ Completada (2026-08-02)
+- [x] `SubmitSelfAssessmentResult`: nuevo `reason: 'already_submitted'`
+- [x] `submitSelfAssessment`: comprobar intento previo antes de calificar;
       persistir `self_assessment_attempt_answers` con el `id` del intento
       (`.insert(...).select('id').single()`); mapear el error `23505` a
       `already_submitted`; invocar `recalculate_self_assessment_grade`;
       `revalidatePath('/cuenta/cursos')`
-- [ ] `markLessonViewed`: distinguir inserción de actualización y recalcular
+- [x] `markLessonViewed`: distinguir inserción de actualización y recalcular
       **solo** cuando la fila de `lesson_progress` sea nueva
-- [ ] `getAttemptReview(courseSlug, lessonSlug)`: intento + respuestas por
+- [x] `getAttemptReview(courseSlug, lessonSlug)`: intento + respuestas por
       pregunta + opciones correctas
-- [ ] `getSelfAssessmentCourseSummary(courseSlug)`: nota, acumulado y desglose
+- [x] `getSelfAssessmentCourseSummary(courseSlug)`: nota, acumulado y desglose
       por lección (lee `self_assessment_breakdown`)
-- [ ] `deleteGradeItem`: rechazar `kind = 'self_assessment'` con mensaje claro
+- [x] `deleteGradeItem`: rechazar `kind = 'self_assessment'` con mensaje claro
 
 ### Fase 4 — UI del estudiante — ✅ Completada (2026-08-02)
 - [x] `SelfAssessmentSection`: aviso de intento único visible desde la carga

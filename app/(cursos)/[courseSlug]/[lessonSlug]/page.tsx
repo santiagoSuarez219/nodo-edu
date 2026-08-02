@@ -112,6 +112,14 @@ export default async function LessonPage({ params }: LessonPageProps) {
       : selfAssessmentStatus.requiresAttempt && !selfAssessmentStatus.hasAttempt
         ? "self_assessment_pending"
         : undefined;
+  // El estudiante ya envió su intento (según el gate, que sí falla cerrado),
+  // pero `getAttemptReview` no pudo reconstruir la revisión: no es lo mismo
+  // que "todavía no respondió", y mostrar el formulario en ese caso invitaría
+  // a un reenvío que la base rechazaría de todos modos, sin explicar por qué.
+  const selfAssessmentReviewUnavailable =
+    selfAssessmentStatus.status === "ok" &&
+    selfAssessmentStatus.hasAttempt &&
+    attemptReview === null;
   // Vista docente (spec-031): rama independiente de la de "enrolled" — un
   // owner/admin nunca tiene reason "enrolled", así que ambos bloques son
   // mutuamente excluyentes por construcción.
@@ -180,6 +188,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
           canComplete={selfAssessmentCanComplete}
           blockedReason={selfAssessmentBlockedReason}
           attemptReview={attemptReview}
+          attemptReviewUnavailable={selfAssessmentReviewUnavailable}
           attendance={
             attendanceState && (
               <ErrorBoundary

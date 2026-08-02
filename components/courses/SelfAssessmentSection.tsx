@@ -17,6 +17,9 @@ interface SelfAssessmentSectionProps {
   // spec-040: `null` mientras no hay intento; una vez enviado, la revisión
   // persistente reemplaza por completo el formulario — no hay reintentos.
   attemptReview: AttemptReview | null;
+  // Ya existe un intento pero no se pudo reconstruir la revisión (fallo
+  // transitorio de lectura) — nunca mostrar el formulario en este caso.
+  attemptReviewUnavailable: boolean;
 }
 
 export function SelfAssessmentSection({
@@ -24,11 +27,11 @@ export function SelfAssessmentSection({
   lessonSlug,
   questions,
   attemptReview,
+  attemptReviewUnavailable,
 }: SelfAssessmentSectionProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const [alreadySubmitted, setAlreadySubmitted] = useState(false);
   const [awaitingConfirmation, setAwaitingConfirmation] = useState(false);
 
   const schemaObject: Record<string, z.ZodTypeAny> = {};
@@ -67,21 +70,25 @@ export function SelfAssessmentSection({
         // El servidor ya tiene el intento persistido; refrescar trae
         // `attemptReview` con la revisión completa y oculta el formulario.
         router.refresh();
-      } else if (result.reason === 'already_submitted') {
+        return;
+      }
+
+      const errorMessages: Record<string, string> = {
+        not_enrolled: 'No estás matriculado en este curso',
+        incomplete: 'Debes responder todas las preguntas',
+        no_questions: 'No hay preguntas disponibles',
+        already_submitted:
+          'Ya enviaste esta autoevaluación. Solo se permite un intento porque hace parte de tu nota del curso.',
+        error: 'Ocurrió un error al enviar. Intenta de nuevo.',
+      };
+      setAwaitingConfirmation(false);
+      setSubmitError(errorMessages[result.reason] || 'Error desconocido');
+
+      if (result.reason === 'already_submitted') {
         // Condición de carrera (doble clic, dos pestañas): el servidor ya
         // tiene un intento aunque esta pestaña no lo supiera. Refrescar trae
         // la revisión real en vez de dejar el formulario reenviable.
-        setAlreadySubmitted(true);
         router.refresh();
-      } else {
-        const errorMessages: Record<string, string> = {
-          not_enrolled: 'No estás matriculado en este curso',
-          incomplete: 'Debes responder todas las preguntas',
-          no_questions: 'No hay preguntas disponibles',
-          error: 'Ocurrió un error al enviar. Intenta de nuevo.',
-        };
-        setAwaitingConfirmation(false);
-        setSubmitError(errorMessages[result.reason] || 'Error desconocido');
       }
     });
   };
@@ -198,6 +205,39 @@ export function SelfAssessmentSection({
     );
   }
 
+  // --- Ya hay un intento, pero no se pudo reconstruir la revisión ---
+  if (attemptReviewUnavailable) {
+    return (
+      <section className="mt-8 border-t border-gray-200 dark:border-gray-700 pt-8">
+        <div className="border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 overflow-hidden">
+          <div className="border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+              Autoevaluación
+            </h2>
+          </div>
+          <div className="px-6 py-6 flex items-start gap-3 text-sm text-gray-600 dark:text-gray-400">
+            <svg
+              className="w-4 h-4 shrink-0 mt-0.5 text-gray-400 dark:text-gray-500"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+              aria-hidden="true"
+            >
+              <path
+                fillRule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                clipRule="evenodd"
+              />
+            </svg>
+            <p>
+              Ya enviaste esta autoevaluación, pero no pudimos cargar tu revisión en este
+              momento. Intenta de nuevo en unos minutos.
+            </p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   // --- Sin intento todavía: formulario con aviso de intento único ---
   return (
     <section className="mt-8 border-t border-gray-200 dark:border-gray-700 pt-8">
@@ -277,12 +317,6 @@ export function SelfAssessmentSection({
                 </svg>
                 <p>{submitError}</p>
               </div>
-            )}
-
-            {alreadySubmitted && (
-              <p className="mb-4 text-sm text-gray-600 dark:text-gray-400">
-                Ya enviaste esta autoevaluación. Actualizando tu revisión…
-              </p>
             )}
 
             {!awaitingConfirmation ? (

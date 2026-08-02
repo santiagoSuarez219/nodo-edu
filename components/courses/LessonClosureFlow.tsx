@@ -14,6 +14,10 @@ interface LessonClosureFlowProps {
   // estudiante todavía no respondió. Reemplaza el resumen agregado de
   // spec-033 — ya no hace falta el estado "isRetrying" (no hay reintentos).
   attemptReview: AttemptReview | null;
+  // `true` cuando el estudiante ya tiene un intento registrado (el gate ya
+  // lo confirmó) pero `getAttemptReview` no pudo reconstruirlo — distinto de
+  // "todavía no respondió", para no ofrecer un formulario reenviable.
+  attemptReviewUnavailable: boolean;
 }
 
 export function LessonClosureFlow({
@@ -25,6 +29,7 @@ export function LessonClosureFlow({
   canComplete,
   blockedReason,
   attemptReview,
+  attemptReviewUnavailable,
 }: LessonClosureFlowProps) {
   return (
     <>
@@ -34,6 +39,7 @@ export function LessonClosureFlow({
           lessonSlug={lessonSlug}
           questions={questions}
           attemptReview={attemptReview}
+          attemptReviewUnavailable={attemptReviewUnavailable}
         />
       )}
 
