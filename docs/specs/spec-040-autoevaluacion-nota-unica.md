@@ -1,4 +1,4 @@
-# spec-040 — [TESTING] Autoevaluación de intento único y nota acumulada del curso
+# spec-040 — [DONE] Autoevaluación de intento único y nota acumulada del curso
 
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.
@@ -818,7 +818,7 @@ grant execute on function public.recalculate_course_self_assessment_grades(uuid)
 - [x] Decidir e implementar el BLOQUE 039 según el estado de spec-039: **se
       omite** (spec-039 vive en `feat/lecciones-habilitadas`, no mergeada a
       `development` al implementar este spec) — deuda registrada como
-      **DEBT-043** en `docs/specs/backlog.md`
+      **DEBT-045** en `docs/specs/backlog.md`
 - [x] Verificar en `mirp-lab`: casos denominador 0, lección vista sin
       responder, dos matrículas activas del mismo `course_slug`, ítem
       inexistente — los 4 casos verificados con datos desechables vía

@@ -4,7 +4,7 @@
 --
 -- BLOQUE 039 (spec-039, estado habilitado/deshabilitado de lecciones) no
 -- está mergeado a development todavía cuando se implementa esta migración
--- (ver DEBT-043 en docs/specs/backlog.md): el filtro queda comentado a
+-- (ver DEBT-045 en docs/specs/backlog.md): el filtro queda comentado a
 -- propósito. Referenciar aquí una tabla que no existe rompería en tiempo de
 -- ejecución (no de creación) y tumbaría el envío de autoevaluaciones en
 -- producción. Cuando spec-039 esté mergeado, se agrega el filtro con un

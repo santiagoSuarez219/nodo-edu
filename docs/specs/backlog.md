@@ -5,7 +5,7 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
-## DEBT-044 — No existe forma de renombrar un ítem de calificación (`GradeItemsPanel`)
+## DEBT-046 — No existe forma de renombrar un ítem de calificación (`GradeItemsPanel`)
 
 **Origen:** spec-040, ronda de pruebas manuales, TC-013/TC-014 (2026-08-02)
 **Prioridad:** Media — bloquea un flujo documentado en la propia UI
@@ -32,7 +32,7 @@ todo tipo de ítem.
 
 ---
 
-## DEBT-043 — `self_assessment_breakdown` no filtra lecciones deshabilitadas (BLOQUE 039)
+## DEBT-045 — `self_assessment_breakdown` no filtra lecciones deshabilitadas (BLOQUE 039)
 
 **Origen:** spec-040, Fase 2, registrado explícitamente en la implementación
 (2026-08-01)
