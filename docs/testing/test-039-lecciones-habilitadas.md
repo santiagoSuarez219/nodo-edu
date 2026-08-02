@@ -11,25 +11,25 @@
 | Lección **A** (se deshabilitará y reabrirá) | contenido existente | `analisis-de-algoritmos` / `sintaxis-de-python` | N/A |
 | Lección **B** (se completará antes de cerrarla, para TC-011) | contenido existente | `analisis-de-algoritmos` / `fundamentos-control-de-versiones-y-flujo-de-trabajo` | N/A |
 | Lección **C** (primera sin completar, para el redirect de TC-009) | contenido existente | `analisis-de-algoritmos` / `algoritmos-como-tecnologia` | N/A |
-| Curso académico **Grupo A** (`course_slug=analisis-de-algoritmos`, docente dueño `dev@nodo.local`) | UI de admin `/admin/courses` (spec-036) o el que ya exista en la base local | `{{academic_course_id_A}}` (código `{{code}}`, enrollment_code `{{code}}`) | ⬜ |
-| Curso académico **Grupo B** (mismo `course_slug`, mismo docente dueño) — para TC-016 | UI de admin `/admin/courses` | `{{academic_course_id_B}}` | ⬜ |
-| Curso académico de **otro `course_slug`** (`estructuras-de-datos`) — para TC-019 | UI de admin `/admin/courses` | `{{academic_course_id_X}}` | ⬜ |
-| Estudiante **E1**, matriculado activo en Grupo A | `students-mcp` → `create_student` y luego `enroll_student` (o `create_student` con el `academic_course_id` de Grupo A) | `{{student_id_E1}}` — `test-student-spec039@nodo.test` / `TestStudent039!` | ⬜ |
-| Estudiante **E2**, matriculado activo en Grupo B (mismo `course_slug`) — para TC-016 | `students-mcp` → `create_student` + `enroll_student` | `{{student_id_E2}}` — `test-student2-spec039@nodo.test` / `TestStudent039!` | ⬜ |
-| Estudiante **E3**, matriculado **solo** en `estructuras-de-datos` — para TC-019 | `students-mcp` → `create_student` + `enroll_student` | `{{student_id_E3}}` — `test-student3-spec039@nodo.test` / `TestStudent039!` | ⬜ |
-| Usuario **admin** no dueño del curso — para TC-013 | Supabase Auth `admin.createUser` + fila en `user_roles` (inserción directa, requiere autorización explícita del usuario) | `{{admin_id}}` — `test-admin-spec039@nodo.test` / `TestAdmin039!` | ⬜ |
+| Curso académico **Grupo A** (`course_slug=analisis-de-algoritmos`, docente dueño `dev@nodo.local`) | inserción directa vía `service_role` (no existe MCP/API para crear cursos académicos; autorizado explícitamente por el usuario, 2026-08-02) | `00d0f44d-5459-45bc-826d-988428ea3d69` (código `S039A000`) | ⬜ |
+| Curso académico **Grupo B** (mismo `course_slug`, mismo docente dueño) — para TC-016 | inserción directa vía `service_role` (mismo motivo) | `9479dc67-6493-46b2-b612-a889d2879bfe` (código `S039B000`) | ⬜ |
+| Curso académico de **otro `course_slug`** (`estructuras-de-datos`) — para TC-019. **Compartido con la ronda de spec-038** (su "Grupo A — Estructuras") | inserción directa vía `service_role` | `c2e3dd17-8128-464b-b22f-56df684597fe` (código `S038A000`) | ⬜ |
+| Estudiante **E1**, matriculado activo en Grupo A | `students-mcp` → `create_student` + `enroll_student` | `064e4a19-eef6-4005-9415-4abded1dab5c` — `test-student-spec039@nodo.test` / `TestStudent039!`, enrollment `fd66546e-bc34-4506-a925-5af5d24d6e39` | ⬜ |
+| Estudiante **E2**, matriculado activo en Grupo B (mismo `course_slug`) — para TC-016 | `students-mcp` → `create_student` + `enroll_student` | `0dc129f9-4ea2-475a-87de-a6eb8ea9b2d3` — `test-student2-spec039@nodo.test` / `TestStudent039!` | ⬜ |
+| Estudiante **E3**, matriculado **solo** en `estructuras-de-datos` — para TC-019 | `students-mcp` → `create_student` + `enroll_student` | `85800ee2-ca21-48f5-aa96-f27b789ea552` — `test-student3-spec039@nodo.test` / `TestStudent039!` | ⬜ |
+| Usuario **admin** no dueño del curso — para TC-013. **Compartido con la ronda de spec-038** | Supabase Auth `admin.createUser` + fila en `user_roles` vía `service_role` (autorizado explícitamente, 2026-08-02) | `b35310a3-03bd-4bfb-a8bb-fe8df9fb1253` — `test-admin-shared@nodo.test` / `TestAdminShared038!` | ⬜ |
 | Filas de `disabled_lessons` creadas durante la ronda (TC-003 en adelante y todos los `TC-MCP-*`) | `courses-mcp` → `set_lesson_availability { enabled: false }` | `(analisis-de-algoritmos, sintaxis-de-python)`, `(analisis-de-algoritmos, fundamentos-control-de-versiones-y-flujo-de-trabajo)`, y las que se generen en los casos MCP | ⬜ |
-| Fila **huérfana** simulada en `disabled_lessons` — para TC-MCP-012 | inserción directa en la base **de desarrollo** (`lesson_slug` inexistente en el catálogo; no hay endpoint que la produzca, por diseño) | `(analisis-de-algoritmos, leccion-que-no-existe-spec039)` | ⬜ |
+| Fila **huérfana** simulada en `disabled_lessons` — para TC-MCP-012 | inserción directa en la base **de desarrollo** (`lesson_slug` inexistente en el catálogo; no hay endpoint que la produzca, por diseño) — **requiere tu autorización explícita en el momento de ejecutar ese caso**, no se creó en esta pasada | `(analisis-de-algoritmos, leccion-que-no-existe-spec039)` | ⬜ |
 
-**Entorno de pruebas:** desarrollo — Supabase local corriendo en `mirp-lab` a través del túnel SSH (ver `CLAUDE.md` → "Base de datos"), con `npm run dev` levantado en esta máquina y `courses-mcp` (variante **local**, nunca `courses-mcp-prod`) apuntando a `http://localhost:3000/api/courses` con `COURSES_ADMIN_API_KEY` de desarrollo.
+**Entorno de pruebas:** desarrollo — Supabase local corriendo en `mirp-lab` a través del túnel SSH (ver `CLAUDE.md` → "Base de datos"), con `npm run dev` levantado en esta máquina (puerto **3002**, ver `package.json`) y `courses-mcp` (variante **local**, nunca `courses-mcp-prod`) apuntando a `http://localhost:3002/api/courses` con `COURSES_ADMIN_API_KEY` de desarrollo. **Nota:** `courses-mcp` no está registrado en la sesión actual de Claude Code (se añadió a `.mcp.json` después de que la sesión arrancara) — reiniciar Claude Code antes de ejecutar los casos `TC-MCP-*` o cualquier caso que dependa de deshabilitar/habilitar lecciones.
 **Fecha de la ronda:** {{fecha}}
 
 **Preparación previa (antes del primer caso):**
 
 1. Confirmar el túnel SSH y que el stack de Supabase está arriba en `mirp-lab`.
-2. Confirmar que las migraciones de la Fase 1 están aplicadas en la base local (`disabled_lessons` existe con RLS habilitado).
-3. Crear los tres estudiantes con `students-mcp` (`create_student` + `enroll_student`) y anotar sus IDs en la tabla de arriba.
-4. Verificar con `courses-mcp` → `list_course_lessons { course_slug: "analisis-de-algoritmos" }` que **ninguna** lección está deshabilitada al arrancar (`meta.disabled_count === 0`). Si alguna lo está, reabrirla antes de empezar.
+2. Confirmar que las migraciones de la Fase 1 están aplicadas en la base local (`disabled_lessons` existe con RLS habilitado) — verificado en la Fase 1 de implementación.
+3. ✅ Los tres estudiantes ya están creados y matriculados (ver tabla de arriba).
+4. Verificar con `courses-mcp` → `list_course_lessons { course_slug: "analisis-de-algoritmos" }` que **ninguna** lección está deshabilitada al arrancar (`meta.disabled_count === 0`). Si alguna lo está, reabrirla antes de empezar. **Pendiente de ejecutar** (requiere `courses-mcp` cargado en la sesión, ver nota de arriba).
 
 ---
 
@@ -132,7 +132,7 @@
 **Precondición:** E1 tiene completada la lección **B**; la lección B está habilitada al empezar.
 **Datos de prueba usados:** `test-student-spec039@nodo.test`, enrollment de E1 en Grupo A
 **Pasos:**
-1. Como E1, entrar a `/cuenta/cursos/{{enrollmentId}}` y anotar "N de M lecciones completadas".
+1. Como E1, entrar a `/cuenta/cursos/fd66546e-bc34-4506-a925-5af5d24d6e39` y anotar "N de M lecciones completadas".
 2. Con `courses-mcp`, deshabilitar la lección **B** (ya completada por E1).
 3. Recargar la página y anotar el nuevo valor.
 **Resultado esperado:** bajan **numerador y denominador** (p. ej. de 5 de 10 a 4 de 9), nunca solo uno; `N ≤ M` siempre; no aparece un conteo del tipo "8 de 7". El total tampoco incluye las guías de laboratorio (corrección de scope de la Fase 4).
