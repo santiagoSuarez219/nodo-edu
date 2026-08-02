@@ -221,6 +221,7 @@ npm run lint
 | `SUPABASE_SERVICE_ROLE_KEY` | Clave de servicio (solo server-side, nunca en cliente) |
 | `NEXT_PUBLIC_SITE_URL` | URL base del sitio. Reservada: sin uso actual en el código (no hay OAuth ni recuperación de contraseña implementados); se carga por si un flujo futuro la requiere (ver DEBT-014 en `docs/specs/backlog.md`) |
 | `STUDENTS_ADMIN_API_KEY` | Clave de servicio del dominio de estudiantes (`/api/students/*`, `students-mcp`) — permisos de admin, distinta de `QUESTION_BANK_API_KEY` |
+| `COURSES_ADMIN_API_KEY` | Clave de servicio del dominio de cursos (`/api/courses/*`, `courses-mcp`) — abre y cierra lecciones a los estudiantes. Propia y distinta de `QUESTION_BANK_API_KEY` y `STUDENTS_ADMIN_API_KEY`: debe poder revocarse sin apagar el banco de preguntas (spec-039 M2). Si falta, la ruta responde `500 configuration_error`, nunca `401` |
 
 > ⚠️ Nunca escribas valores reales de variables de entorno en este archivo
 > ni en ningún archivo rastreado por git.
@@ -373,6 +374,7 @@ docs/
 | `assignment-mcp` | Cliente de la API `/api/assignments/*` para que un agente docente diseñe evaluaciones formadas por 3 variantes (A/B/C) de preguntas distintas, publique con validación de invariantes, y monitoree el reparto aleatorio a estudiantes. | Activo | `docs/mcps/assignment-agent.system-prompt.md` |
 | `attendance-mcp` | Cliente de solo lectura de la API `/api/attendance/*` para que un agente docente liste sesiones de asistencia, consulte roster y resúmenes de asistencia por estudiante. | Activo | `docs/mcps/attendance-agent.system-prompt.md` |
 | `students-mcp` | Cliente de la API `/api/students/*` (permisos de admin, `service_role`) para que un agente docente liste, cree, corrija, elimine y (des)matricule estudiantes manualmente. Autenticado con `STUDENTS_ADMIN_API_KEY`, distinta de `QUESTION_BANK_API_KEY`. | Activo | `docs/mcps/students-agent.system-prompt.md` |
+| `courses-mcp` | Cliente de la API `/api/courses/*` para que un agente docente consulte el catálogo de lecciones de un curso y abra o cierre lecciones a los estudiantes sin desplegar (spec-039). El estado es global por `course_slug`: afecta a todos los grupos. Autenticado con `COURSES_ADMIN_API_KEY`, propia de este dominio. | Activo | `docs/mcps/courses-agent.system-prompt.md` |
 
 ### Reglas de gestión de MCPs
 
@@ -437,7 +439,9 @@ resuelve eso:
 - Mapea los nombres de variable que espera cada servidor:
   `ASSIGNMENT_API_KEY` reutiliza `QUESTION_BANK_API_KEY` (las rutas de
   `/api/assignments` autentican con esa clave por defecto), y `attendance-mcp` /
-  `students-mcp` reciben los genéricos `API_BASE_URL` / `API_KEY`.
+  `students-mcp` / `courses-mcp` reciben los genéricos `API_BASE_URL` /
+  `API_KEY` (mapeados desde `QUESTION_BANK_API_KEY`, `STUDENTS_ADMIN_API_KEY` y
+  `COURSES_ADMIN_API_KEY` respectivamente).
 
 > ⚠️ Los MCPs son clientes HTTP: **requieren `npm run dev` corriendo** y fallan
 > con "API no disponible" sin reintentar. Comprobar un servidor de forma aislada:
@@ -481,6 +485,7 @@ Para ejecutar agentes con MCPs locales en Claude Desktop:
 | `assignment-mcp` | `node /path/to/mcp-servers/assignment-mcp/dist/index.js` | `ASSIGNMENT_API_BASE_URL=http://localhost:3000/api/assignments`, `ASSIGNMENT_API_KEY={{key}}` |
 | `attendance-mcp` | `node /path/to/mcp-servers/attendance-mcp/dist/index.js` | `API_BASE_URL=http://localhost:3000/api`, `API_KEY={{key}}` |
 | `students-mcp` | `node /path/to/mcp-servers/students-mcp/dist/index.js` | `API_BASE_URL=http://localhost:3000/api/students`, `API_KEY={{STUDENTS_ADMIN_API_KEY}}` |
+| `courses-mcp` | `node /path/to/mcp-servers/courses-mcp/dist/index.js` | `API_BASE_URL=http://localhost:3000/api/courses`, `API_KEY={{COURSES_ADMIN_API_KEY}}` |
 
 #### Pasos para agregar un MCP a Claude Desktop
 

@@ -48,7 +48,8 @@ ASSIGNMENT_API_BASE_URL="${ASSIGNMENT_API_BASE_URL:-$API_ORIGIN/api/assignments}
 ASSIGNMENT_API_KEY="${ASSIGNMENT_API_KEY:-$QUESTION_BANK_API_KEY}"
 export ASSIGNMENT_API_BASE_URL ASSIGNMENT_API_KEY
 
-# attendance-mcp y students-mcp usan nombres genericos API_BASE_URL / API_KEY.
+# attendance-mcp, students-mcp y courses-mcp usan los nombres genericos
+# API_BASE_URL / API_KEY (spec-039 M2).
 case "$SERVER_NAME" in
   attendance-mcp)
     API_BASE_URL="${API_BASE_URL:-$API_ORIGIN/api}"
@@ -58,6 +59,11 @@ case "$SERVER_NAME" in
   students-mcp)
     API_BASE_URL="${API_BASE_URL:-$STUDENTS_ADMIN_API_BASE_URL}"
     API_KEY="${API_KEY:-$STUDENTS_ADMIN_API_KEY}"
+    export API_BASE_URL API_KEY
+    ;;
+  courses-mcp)
+    API_BASE_URL="${API_BASE_URL:-${COURSES_API_BASE_URL:-$API_ORIGIN/api/courses}}"
+    API_KEY="${API_KEY:-$COURSES_ADMIN_API_KEY}"
     export API_BASE_URL API_KEY
     ;;
 esac

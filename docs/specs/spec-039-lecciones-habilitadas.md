@@ -1,4 +1,4 @@
-# spec-039 — [IN PROGRESS] Habilitar y deshabilitar lecciones vía MCP
+# spec-039 — [TESTING] Habilitar y deshabilitar lecciones vía MCP
 
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.
@@ -800,16 +800,16 @@ Compromisos que spec-039 asume frente a spec-040:
 
 ### Fase 2 — Capa de lectura y composición con el catálogo
 
-- [ ] Crear `lib/courses/availability.ts` con `DisabledLessonsResult`,
+- [x] Crear `lib/courses/availability.ts` con `DisabledLessonsResult`,
       `getDisabledLessonSlugs` (envuelta en `cache()`) e `isLessonDisabled`.
-- [ ] Extender `OutlineNode` con `isDisabled: boolean` y hacer que
+- [x] Extender `OutlineNode` con `isDisabled: boolean` y hacer que
       `buildCourseOutline(course, disabledLessonSlugs?)` lo calcule.
-- [ ] Extender `countProgressibleLessons(course, disabledLessonSlugs?)` para
+- [x] Extender `countProgressibleLessons(course, disabledLessonSlugs?)` para
       excluir las deshabilitadas.
-- [ ] Extender `resolveResumeLessonSlug` con el tercer parámetro
+- [x] Extender `resolveResumeLessonSlug` con el tercer parámetro
       `disabledLessonSlugs` según D7.
-- [ ] Re-exportar lo nuevo desde `lib/courses/index.ts`.
-- [ ] Confirmar que los tres consumidores actuales de `buildCourseOutline` y
+- [x] Re-exportar lo nuevo desde `lib/courses/index.ts`.
+- [x] Confirmar que los tres consumidores actuales de `buildCourseOutline` y
       `countProgressibleLessons` siguen compilando (parámetro opcional).
 
 ### Fase 3 — Bloqueo en servidor (server actions)
@@ -857,73 +857,73 @@ Compromisos que spec-039 asume frente a spec-040:
 
 **5.1 — Credencial y configuración de entorno (M2)**
 
-- [ ] Añadir `COURSES_ADMIN_API_KEY=` a `.env.example` (bloque de variables de
+- [x] Añadir `COURSES_ADMIN_API_KEY=` a `.env.example` (bloque de variables de
       la APP) con el comentario de por qué es una clave propia, y
       `COURSES_API_BASE_URL=http://localhost:3000/api/courses` en el bloque de
       clientes MCP.
-- [ ] Generar el valor de desarrollo en `.env.local` (no versionado).
-- [ ] Generar el valor de producción, **distinto**, en `.env.prod-mcp`
+- [x] Generar el valor de desarrollo en `.env.local` (no versionado).
+- [x] Generar el valor de producción, **distinto**, en `.env.prod-mcp`
       (no versionado); dejar anotado que debe cargarse en Vercel → Production
       antes de desplegar el spec.
-- [ ] Añadir la rama `courses-mcp)` al `case` de `mcp-servers/run-local-mcp.sh`
+- [x] Añadir la rama `courses-mcp)` al `case` de `mcp-servers/run-local-mcp.sh`
       (`API_BASE_URL` derivada de `$API_ORIGIN/api/courses`, `API_KEY` desde
       `COURSES_ADMIN_API_KEY`) y la equivalente en `run-prod-mcp.sh`.
 
 **5.2 — Capa de servicio y API (M3)**
 
-- [ ] Crear `lib/courses/service.ts` (`service_role`, espejo de
+- [x] Crear `lib/courses/service.ts` (`service_role`, espejo de
       `lib/attendance/service.ts`) con: composición catálogo × `disabled_lessons`
       para un curso, lectura de una lección y escritura idempotente según la
       tabla de M4; y la detección de `orphan_disabled_slugs`.
-- [ ] Crear `app/api/courses/[courseSlug]/lessons/route.ts` (`GET`).
-- [ ] Crear `app/api/courses/[courseSlug]/lessons/[lessonSlug]/route.ts`
+- [x] Crear `app/api/courses/[courseSlug]/lessons/route.ts` (`GET`).
+- [x] Crear `app/api/courses/[courseSlug]/lessons/[lessonSlug]/route.ts`
       (`GET` + `PATCH`), con `authenticateServiceRequest(req,
       "COURSES_ADMIN_API_KEY")`, esquema Zod del cuerpo del `PATCH` y los
       helpers de `lib/api/errors.ts`; `runtime = "nodejs"` y
       `dynamic = "force-dynamic"` como el resto de rutas de servicio.
-- [ ] Verificar que la validación contra el catálogo estático ocurre **antes**
+- [x] Verificar que la validación contra el catálogo estático ocurre **antes**
       de cualquier consulta a Supabase.
 
 **5.3 — Servidor MCP**
 
-- [ ] Crear `mcp-servers/courses-mcp/` (`src/index.ts`, `src/tools.ts`,
+- [x] Crear `mcp-servers/courses-mcp/` (`src/index.ts`, `src/tools.ts`,
       `src/api.ts`, `package.json`, `tsconfig.json`, `.env.example`) copiando la
       estructura de `students-mcp`; el servidor lee los genéricos
       `API_BASE_URL` / `API_KEY` y hace `exit(1)` si faltan.
-- [ ] Implementar las tres herramientas con los `inputSchema` literales de M4.
-- [ ] `npm install && npm run build` dentro del servidor.
-- [ ] Registrar `courses-mcp` y `courses-mcp-prod` en `.mcp.json`.
+- [x] Implementar las tres herramientas con los `inputSchema` literales de M4.
+- [x] `npm install && npm run build` dentro del servidor.
+- [x] Registrar `courses-mcp` y `courses-mcp-prod` en `.mcp.json`.
 
 **5.4 — Documentación (M5)**
 
-- [ ] Añadir la fila de `courses-mcp` al inventario de `docs/mcps/README.md` y
+- [x] Añadir la fila de `courses-mcp` al inventario de `docs/mcps/README.md` y
       actualizar allí la tabla "local vs. producción".
-- [ ] Crear `docs/mcps/courses-agent.system-prompt.md` con las secciones
+- [x] Crear `docs/mcps/courses-agent.system-prompt.md` con las secciones
       esbozadas en M5, incluyendo las seis restricciones tal como están
       enumeradas.
-- [ ] Actualizar `CLAUDE.md`: inventario de MCPs, tabla de variables de entorno
+- [x] Actualizar `CLAUDE.md`: inventario de MCPs, tabla de variables de entorno
       (`COURSES_ADMIN_API_KEY`) y tabla de MCPs locales de Claude Desktop.
 
 **5.5 — Verificación (todos los checks deben pasar antes de cerrar la fase)**
 
-- [ ] `./mcp-servers/run-local-mcp.sh courses-mcp </dev/null` arranca e imprime
+- [x] `./mcp-servers/run-local-mcp.sh courses-mcp </dev/null` arranca e imprime
       la línea de inicio sin errores de variables faltantes.
-- [ ] Con `npm run dev` corriendo, `list_course_lessons` sobre un curso real
+- [x] Con `npm run dev` corriendo, `list_course_lessons` sobre un curso real
       devuelve todas sus lecciones en orden, con `is_disabled: false`.
-- [ ] `set_lesson_availability { enabled: false, reason: "..." }` responde
+- [x] `set_lesson_availability { enabled: false, reason: "..." }` responde
       `changed: true`, y `get_lesson_availability` confirma `is_disabled: true`
       con ese `disabled_reason`.
-- [ ] Repetir la misma llamada sin `reason` → `200` con `changed: false`
+- [x] Repetir la misma llamada sin `reason` → `200` con `changed: false`
       (idempotencia), y `disabled_at` sin cambios.
-- [ ] `set_lesson_availability { enabled: true }` reabre y `changed: true`;
+- [x] `set_lesson_availability { enabled: true }` reabre y `changed: true`;
       repetirlo → `changed: false`.
-- [ ] `lesson_slug` inexistente → error `404` y **cero** filas nuevas en
+- [x] `lesson_slug` inexistente → error `404` y **cero** filas nuevas en
       `disabled_lessons` (verificar en la base de desarrollo).
-- [ ] `course_slug` inexistente → error `404`.
-- [ ] `reason` junto a `enabled: true` → `422`.
-- [ ] Petición sin `x-api-key`, o con `QUESTION_BANK_API_KEY` en su lugar →
+- [x] `course_slug` inexistente → error `404`.
+- [x] `reason` junto a `enabled: true` → `422`.
+- [x] Petición sin `x-api-key`, o con `QUESTION_BANK_API_KEY` en su lugar →
       `401` (confirma que la separación de claves de M2 es efectiva).
-- [ ] Fila huérfana simulada (insertar un `lesson_slug` que no está en el
+- [x] Fila huérfana simulada (insertar un `lesson_slug` que no está en el
       catálogo) → aparece en `meta.orphan_disabled_slugs` y **no** rompe
       `list_course_lessons`; borrarla al terminar.
 
