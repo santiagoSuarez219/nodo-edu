@@ -133,6 +133,22 @@ export const tools: Tool[] = [
       required: ["id", "academic_course_id"],
     },
   },
+  {
+    name: "get_student_self_assessment_summary",
+    description:
+      "Consulta la nota de autoevaluaciones de un estudiante en un curso: nota 0-5 (null si aún no hay preguntas evaluables, nunca 0.00), acumulado de preguntas correctas sobre el total y desglose por lección (respondida o no, correctas/total). Sirve para explicar de dónde sale la nota. Es una herramienta de SOLO LECTURA: la nota se calcula automáticamente a partir de las lecciones vistas y respondidas, y no se puede modificar desde aquí.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        student_id: { type: "string", description: "UUID del estudiante" },
+        course_slug: {
+          type: "string",
+          description: "Slug del curso publicado (ej. 'estructura-de-datos')",
+        },
+      },
+      required: ["student_id", "course_slug"],
+    },
+  },
 ];
 
 export async function processToolCall(
@@ -176,6 +192,16 @@ export async function processToolCall(
       return await callStudentsApi(
         "DELETE",
         `/${toolInput.id}/enrollments?${params}`
+      );
+    }
+
+    case "get_student_self_assessment_summary": {
+      const params = new URLSearchParams({
+        course_slug: String(toolInput.course_slug),
+      });
+      return await callStudentsApi(
+        "GET",
+        `/${toolInput.student_id}/self-assessment?${params}`
       );
     }
 

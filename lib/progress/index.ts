@@ -51,15 +51,36 @@ export async function markLessonViewed(
   if (!user) return;
 
   const supabase = await createServerSupabaseClient();
-  await supabase.from("lesson_progress").upsert(
-    {
-      user_id: user.id,
-      course_slug: courseSlug,
-      lesson_slug: lessonSlug,
-      viewed_at: new Date().toISOString(),
-    },
-    { onConflict: "user_id,course_slug,lesson_slug", ignoreDuplicates: false }
-  );
+  // spec-040 D4: `ignoreDuplicates: true` distingue inserción de
+  // actualización en un solo round-trip — con `false` (comportamiento
+  // previo) cada carga de página pisaba `viewed_at` y, tras este spec,
+  // habría disparado un recálculo de nota en cada render. Con `true`, un
+  // conflicto no toca la fila y no devuelve datos; solo una fila **nueva**
+  // aparece en `data`.
+  const { data: inserted } = await supabase
+    .from("lesson_progress")
+    .upsert(
+      {
+        user_id: user.id,
+        course_slug: courseSlug,
+        lesson_slug: lessonSlug,
+        viewed_at: new Date().toISOString(),
+      },
+      { onConflict: "user_id,course_slug,lesson_slug", ignoreDuplicates: true }
+    )
+    .select("user_id");
+
+  if (inserted && inserted.length > 0) {
+    // Ver una lección nueva sube el denominador de la nota de
+    // autoevaluaciones aunque no se responda (D4) — recalcular solo aquí,
+    // no en cada render, es lo que evita escribir en la libreta a cada carga.
+    const { error } = await supabase.rpc("recalculate_self_assessment_grade", {
+      p_course_slug: courseSlug,
+    });
+    if (error) {
+      console.error("Error recalculating self-assessment grade on view:", error);
+    }
+  }
 }
 
 export async function markLessonCompleted(

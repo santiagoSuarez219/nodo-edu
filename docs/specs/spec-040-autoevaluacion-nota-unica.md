@@ -853,26 +853,51 @@ grant execute on function public.recalculate_course_self_assessment_grades(uuid)
       por lección (lee `self_assessment_breakdown`)
 - [ ] `deleteGradeItem`: rechazar `kind = 'self_assessment'` con mensaje claro
 
-### Fase 4 — UI del estudiante
-- [ ] `SelfAssessmentSection`: aviso de intento único visible desde la carga
-- [ ] `SelfAssessmentSection`: paso de confirmación explícita antes del envío
-- [ ] `SelfAssessmentSection`: **eliminar** el botón "Reintentar" y `handleRetry`
-- [ ] `SelfAssessmentSection`: revisión permanente del intento por pregunta
+### Fase 4 — UI del estudiante — ✅ Completada (2026-08-02)
+- [x] `SelfAssessmentSection`: aviso de intento único visible desde la carga
+- [x] `SelfAssessmentSection`: paso de confirmación explícita antes del envío
+- [x] `SelfAssessmentSection`: **eliminar** el botón "Reintentar" y `handleRetry`
+- [x] `SelfAssessmentSection`: revisión permanente del intento por pregunta
       (respuesta marcada, acierto/fallo, opciones correctas), sustituyendo el
-      resumen agregado de spec-033
-- [ ] `LessonClosureFlow`: eliminar `isRetrying` / `onRetryingChange`
-- [ ] `page.tsx` de la lección: cargar y pasar `getAttemptReview`
-- [ ] `EnrollmentDetail`: tarjeta "Autoevaluaciones" (nota, acumulado, desglose
-      por lección con las no respondidas explícitas)
-- [ ] Tokens semánticos y modo claro/oscuro según `DESIGN.md`
+      resumen agregado de spec-033 — controlada por la prop `attemptReview`
+      (`null` = formulario; con datos = revisión, sin formulario posible)
+- [x] `LessonClosureFlow`: eliminar `isRetrying` / `onRetryingChange` — el
+      componente dejó de necesitar estado de cliente y pasó a ser un server
+      component
+- [x] `page.tsx` de la lección: cargar y pasar `getAttemptReview`
+- [x] Tarjeta "Autoevaluaciones" (nota, acumulado, desglose por lección con las
+      no respondidas explícitas) — implementada como componente propio
+      (`SelfAssessmentSummaryCard`) renderizado junto a `EnrollmentDetail` en
+      `app/cuenta/cursos/[enrollmentId]/page.tsx`, en vez de modificar la
+      interfaz de `EnrollmentDetail` (que no tenía un punto de extensión para
+      secciones adicionales)
+- [x] Tokens semánticos y modo claro/oscuro según `DESIGN.md` — mismos
+      patrones de color que `LessonClosure`/`SelfAssessmentSection` ya usaban
+      (`text-danger`, `bg-yellow-50 dark:bg-yellow-900/20`, etc.)
 
-### Fase 5 — UI y acción del docente
-- [ ] Server Action `recalculateCourseSelfAssessmentGrades(academicCourseId)`
-- [ ] Botón "Recalcular autoevaluaciones" en la libreta del curso, con
-      confirmación y reporte de cuántas matrículas se actualizaron
-- [ ] Desglose por estudiante accesible desde la libreta
-- [ ] Texto de ayuda con la regla de cálculo y el efecto de publicar preguntas
-      nuevas (D6)
+### Fase 5 — UI y acción del docente — ✅ Completada (2026-08-02)
+- [x] Server Action `recalculateCourseSelfAssessmentGrades(academicCourseId)`
+      en `lib/grades/actions.ts` — la autorización real vive en el RPC
+      (devuelve `0` sin tocar nada si el llamador no es el docente dueño ni
+      admin); `requireUser()` solo descarta visitantes anónimos
+- [x] Botón "Recalcular autoevaluaciones" en la libreta del curso
+      (`RecalculateSelfAssessmentButton`), con confirmación y reporte de
+      cuántas matrículas se actualizaron
+- [x] Desglose por estudiante accesible desde la libreta
+      (`SelfAssessmentGradeCell`, expandible bajo demanda) — usa una función
+      nueva, `getSelfAssessmentBreakdownForEnrollment`, que verifica en la
+      sesión del docente que es dueño del curso académico (o admin) y luego
+      lee con `service_role`, porque `self_assessment_breakdown` no es
+      `security definer` y la RLS de `lesson_progress`/
+      `self_assessment_attempts` no concede lectura a un docente no-admin
+- [x] Texto de ayuda con la regla de cálculo y el efecto de publicar preguntas
+      nuevas (D6), en el propio botón de recálculo
+- [x] Además: celda de solo lectura para el ítem `kind = 'self_assessment'`
+      en `GradesTable` (editarla a mano quedaría pisada por el siguiente
+      recálculo) y bloqueo del botón "Eliminar" en `GradeItemsPanel` para ese
+      mismo ítem, con la etiqueta "Automático" — no estaba en el checklist
+      literal pero es consecuencia directa de D5 ("la nota es derivada") y del
+      rechazo ya implementado en `deleteGradeItem` (Fase 3)
 
 ### Fase 6 — Aplicación retroactiva controlada
 - [ ] Verificar en `mirp-lab` con datos representativos
@@ -882,14 +907,23 @@ grant execute on function public.recalculate_course_self_assessment_grades(uuid)
       recálculo curso por curso desde la UI, para elegir cuándo aparece la nota
 - [ ] Revisar las notas resultantes de un curso antes de recalcular el resto
 
-### Fase 7 — MCP: actualizar `students-mcp`
-- [ ] Endpoint de lectura `GET /api/students/:id/self-assessment?course_slug=`
-      (autenticado con `STUDENTS_ADMIN_API_KEY`)
-- [ ] Herramienta `get_student_self_assessment_summary` en `students-mcp`
-- [ ] Actualizar la entrada de `students-mcp` en `docs/mcps/README.md`
-- [ ] Actualizar `docs/mcps/students-agent.system-prompt.md`: nueva capacidad +
+### Fase 7 — MCP: actualizar `students-mcp` — ✅ Completada (2026-08-02)
+- [x] Endpoint de lectura `GET /api/students/:id/self-assessment?course_slug=`
+      (autenticado con `STUDENTS_ADMIN_API_KEY`) — el `npm run dev` de la
+      sesión anterior había quedado colgado (proceso vivo, 0% CPU, sin
+      responder ninguna ruta, ni siquiera `/login`); se reinició y se
+      verificaron por HTTP los cuatro casos de error (`401` sin `x-api-key`,
+      `404` con UUID inválido, `422` sin `course_slug`, `404` con estudiante
+      inexistente) y el caso `200` con un estudiante real desechable
+      (creado y borrado vía `students-mcp`/API en la misma pasada, sin
+      intentos de autoevaluación): `{ score: null, correct_total: 0,
+      question_total: 0, lessons: [] }` — confirma D4 (nunca `0.00` con
+      denominador 0).
+- [x] Herramienta `get_student_self_assessment_summary` en `students-mcp`
+- [x] Actualizar la entrada de `students-mcp` en `docs/mcps/README.md`
+- [x] Actualizar `docs/mcps/students-agent.system-prompt.md`: nueva capacidad +
       restricción explícita de que la nota de autoevaluaciones **no es editable**
-- [ ] Verificar el servidor de forma aislada
+- [x] Verificar el servidor de forma aislada
       (`./mcp-servers/run-local-mcp.sh students-mcp </dev/null`)
 
 ### Fase 8 — Pruebas

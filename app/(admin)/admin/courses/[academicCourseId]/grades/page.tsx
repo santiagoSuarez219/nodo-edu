@@ -3,6 +3,7 @@ import { requireAnyRole } from "@/lib/auth/session";
 import { getGradeItemsByCourse, getGradesByCourse } from "@/lib/grades/index";
 import { GradeItemsPanel } from "@/components/admin/GradeItemsPanel";
 import { GradesTable } from "@/components/admin/GradesTable";
+import { RecalculateSelfAssessmentButton } from "@/components/admin/RecalculateSelfAssessmentButton";
 
 export const metadata: Metadata = { title: "Calificaciones — Panel docente" };
 
@@ -27,6 +28,8 @@ export default async function GradesPage({ params }: Props) {
         academicCourseId={academicCourseId}
         initialItems={gradeItems}
       />
+
+      <RecalculateSelfAssessmentButton academicCourseId={academicCourseId} />
 
       <GradesTable
         academicCourseId={academicCourseId}

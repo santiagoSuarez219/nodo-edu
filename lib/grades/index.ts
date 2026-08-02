@@ -61,6 +61,24 @@ export async function deleteGradeItem(
 ): Promise<{ ok: true } | { ok: false; error: string }> {
   const supabase = await createServerSupabaseClient();
 
+  // spec-040 D5: el ítem de autoevaluaciones lo crea y mantiene el RPC de
+  // propagación. Si el docente lo borrara, el siguiente envío lo recrearía
+  // en silencio con el order_index movido — un comportamiento incomprensible
+  // desde la UI. Renombrarlo sigue permitido (updateGradeItem no lo bloquea).
+  const { data: item } = await supabase
+    .from("grade_items")
+    .select("kind")
+    .eq("id", gradeItemId)
+    .single();
+
+  if (item?.kind === "self_assessment") {
+    return {
+      ok: false,
+      error:
+        "Este ítem se genera automáticamente a partir de las autoevaluaciones y no se puede eliminar. Puedes renombrarlo si lo prefieres.",
+    };
+  }
+
   const { count } = await supabase
     .from("student_grades")
     .select("id", { count: "exact", head: true })
