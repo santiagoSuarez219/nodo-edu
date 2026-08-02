@@ -8,10 +8,10 @@
 |----------------|----------------------|---------------|-----------|
 | Curso académico **Spec-038 QA — Estructuras A** (`course_slug=estructuras-de-datos`, docente dueño `dev@nodo.local`) | inserción directa vía `service_role` (no existe MCP/API para crear cursos académicos; autorizado explícitamente por el usuario, 2026-08-02) | `c2e3dd17-8128-464b-b22f-56df684597fe` (código `S038A000`) | ⬜ |
 | Curso académico **Spec-038 QA — Prog. Científica B** (`course_slug=programacion-cientifica`, docente dueño `dev@nodo.local`) — para TC-006 | inserción directa vía `service_role` (mismo motivo) | `bf31d772-fdca-40c2-9575-f1aa82834115` (código `S038B000`) | ⬜ |
-| **Lección A** — con **3 preguntas `multiple_choice` publicadas** (P3 con dos opciones correctas, B y C, para observar el resaltado múltiple) | `question-bank-mcp` → `create_question` + `publish_question` (borrado vía `delete_question`) | `estructuras-de-datos` / `encapsulamiento` — ids de preguntas: pendientes de registrar (ver nota de bloque MCP en curso) | ⬜ |
-| **Lección B** — otro curso del mismo docente, con 1 pregunta publicada (para TC-006, navegación entre cursos) | `question-bank-mcp` → `create_question` + `publish_question` | `programacion-cientifica` / `variables-tipos-de-datos-y-operadores` — id: pendiente de registrar | ⬜ |
+| **Lección A** — con **3 preguntas `multiple_choice` publicadas** (P3 con dos opciones correctas, B y C, para observar el resaltado múltiple) | `question-bank-mcp` → `create_question` + `publish_question` (borrado vía `delete_question`) | `estructuras-de-datos` / `encapsulamiento` — P1 `a5d0ffc5-42e3-4268-a30b-5a5198f48fa2`, P2 `a8144276-5bf3-48c5-9d08-2345eda9ace1`, P3 (doble correcta) `61262e42-bfa9-4e5f-b4af-6fc2802e19bd` | ✅ |
+| **Lección B** — otro curso del mismo docente, con 1 pregunta publicada (para TC-006, navegación entre cursos) | `question-bank-mcp` → `create_question` + `publish_question` | `programacion-cientifica` / `variables-tipos-de-datos-y-operadores` — id `06de5e7a-cfcd-4637-b26e-cbf80a296ea5` | ✅ |
 | **Lección C** — sin ninguna pregunta `multiple_choice` publicada (control negativo) | contenido existente; verificado con `question-bank-mcp` → `list_questions` que no hay publicadas | `estructuras-de-datos` / `metodos-avanzados-y-clases-de-utilidad` | N/A |
-| **Lección UML** — con **exactamente 1** pregunta publicada, para TC-014 (singular/plural) | `question-bank-mcp` → `create_question` + `publish_question` | `estructuras-de-datos` / `introduccion-al-uml` — id: pendiente de registrar | ⬜ |
+| **Lección UML** — con **exactamente 1** pregunta publicada, para TC-014 (singular/plural) | `question-bank-mcp` → `create_question` + `publish_question` | `estructuras-de-datos` / `introduccion-al-uml` — id `7539b77b-c64b-4e29-8ce5-aed96780be16` | ✅ |
 | **Guía de laboratorio** del mismo curso (nodo tipo guía, sin autoevaluación) | contenido existente, no se crea | `estructuras-de-datos` / `lab-00-git-fundamentos` | N/A |
 | **Docente dueño** del curso (`access.reason === "owner"`) | usuario sembrado del entorno de desarrollo (`npm run seed:teacher`) | `dev@nodo.local` / `DevLocal2026!` | N/A (no se elimina) |
 | **Usuario admin** no dueño del curso (`access.reason === "admin"`) — **compartido con la ronda de spec-039** | Supabase Auth `admin.createUser` + fila en `user_roles` vía `service_role` (autorizado explícitamente, 2026-08-02) | `test-admin-shared@nodo.test` / `TestAdminShared038!` — id `b35310a3-03bd-4bfb-a8bb-fe8df9fb1253` | ⬜ |
@@ -20,6 +20,14 @@
 **Cookie involucrada:** `nodo_teacher_answer_key` (valor `"1"` = desplegado; ausente = plegado).
 Para dejar el estado "sin cookie previa" en cualquier momento: DevTools →
 `Application` → `Cookies` → seleccionar `nodo_teacher_answer_key` → `Delete`.
+
+**Patrón de respuestas correctas:** todas las preguntas de Lección A/B/UML
+tienen 4 opciones con el texto literal `"Opción incorrecta A"`, `"Opción
+incorrecta B"`, `"Esta es la opción correcta (C)"`, `"Opción incorrecta D"` —
+la correcta es siempre la tercera opción ("C"), salvo **P3 de Lección A**
+(`estructuras-de-datos`/`encapsulamiento`), que tiene **dos** correctas:
+`"Opción correcta B"` y `"Opción correcta C"` (para TC-002/TC-007, donde
+importa ver más de una opción resaltada a la vez al revelar).
 
 **Entorno de pruebas:** desarrollo — instancia local de Supabase en `mirp-lab`
 vía túnel SSH (`.env.local`), con `npm run dev` corriendo. Ver CLAUDE.md →
