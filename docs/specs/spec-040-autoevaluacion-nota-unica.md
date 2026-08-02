@@ -1,4 +1,4 @@
-# spec-040 — [IN PROGRESS] Autoevaluación de intento único y nota acumulada del curso
+# spec-040 — [TESTING] Autoevaluación de intento único y nota acumulada del curso
 
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.
