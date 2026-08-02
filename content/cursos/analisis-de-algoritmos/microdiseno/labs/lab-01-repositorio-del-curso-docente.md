@@ -6,7 +6,7 @@
 - **Semana / sesión:** Semana 1 (3–9 de agosto de 2026), Sesión 2 (P) — laboratorio práctico
 - **Duración:** 2 horas
 - **Momento evaluativo:** Ninguno. No hay ★ esta semana; el primer laboratorio evaluativo (★ Laboratorio 1) es en la Semana 6. Esta sesión alimenta únicamente la nota de **Seguimiento** (consistencia de commits desde el día 1).
-- **Lección teórica de la que depende:** "Fundamentos de control de versiones y flujo de trabajo" (Sesión 1 T, misma semana) — terminal y línea de comandos, repositorio, `.gitignore`, `README.md`, staging area, commit (y buenas prácticas de mensaje), HEAD, `git diff`, remotos (`push`/`pull`/`fetch`/`clone`), ramas (`branch`/`checkout`/`merge`, convención `main`/`development`/`feature`/`bug`/`hotfix`) y conflicto de fusión.
+- **Lección teórica de la que depende:** "Fundamentos de control de versiones y flujo de trabajo" (Sesión 1 T, misma semana) — terminal y línea de comandos, repositorio, `.gitignore`, `README.md`, staging area, commit (y buenas prácticas de mensaje), HEAD, `git diff`, remotos (`push`/`pull`/`fetch`/`clone`), colaboradores en GitHub, ramas (`branch`/`checkout`/`merge`, convención `main`/`development`/`feature`/`bug`/`hotfix`) y conflicto de fusión.
 - **Sprint del proyecto:** No aplica — este curso no tiene proyecto de aula. En su lugar, esta sesión funda el **único repositorio** que el estudiante usará todo el semestre para sus 5 informes de laboratorio evaluativos (Semanas 6, 8, 11, 13, 16).
 
 ## Objetivo de la sesión
@@ -15,6 +15,7 @@ Al salir del aula, el estudiante debe poder:
 
 - Crear un repositorio Git local con la estructura de carpetas exacta que usará durante los 17 semanas del curso (`laboratorios/`, `ejercicios-clase/`, `benchmarks/`, `README.md`, `.gitignore`).
 - Vincular ese repositorio a GitHub y sincronizarlo con `push`.
+- Agregar al docente (`santiagoSuarez219`) como colaborador de su repositorio, para que pueda hacer `push` y `pull` sobre él durante el semestre.
 - Redactar un `README.md` correcto en Markdown, con la misma sintaxis que usará en cada informe de laboratorio.
 - Crear una rama con el prefijo `feature/` (siguiendo la convención de ramas vista en teoría), provocar un conflicto de fusión a propósito, leer el mensaje de Git y resolverlo manualmente sin pánico.
 
@@ -30,7 +31,7 @@ Pregunta de apertura para el grupo: *"Si perdieran ahora mismo la carpeta de est
 |---|---|---|---|
 | 0:00 – 0:05 | Apertura | Plantea la pregunta de conexión con la teoría. Anuncia que el repositorio de hoy es el que usarán los 17 semanas del curso — no es un ejercicio de una sola sesión. | Responde la pregunta de apertura. Abre terminal y editor. |
 | 0:05 – 0:30 | Bloque 1 — `init` + estructura + `.gitignore` + primer commit | Proyecta la estructura de carpetas exacta del `info.md`. Guía la creación paso a paso, incluyendo el `.gitignore`. Circula verificando `git status` de cada estudiante antes de dejarlos avanzar al primer `commit`. | Ejecuta `git init`, crea las carpetas/archivos y el `.gitignore`, hace `add` + primer `commit`. |
-| 0:30 – 1:00 | Bloque 2 — Vincular a GitHub + push | Demuestra en su propia pantalla: crear repo vacío en GitHub, `git remote add origin`, primer `push`. Resuelve en vivo el problema de autenticación (token, no contraseña). | Crea su cuenta/repo en GitHub (si no lo tenía), vincula, hace `push`. Verifica en el navegador que el código apareció. |
+| 0:30 – 1:00 | Bloque 2 — Vincular a GitHub + push + colaborador | Demuestra en su propia pantalla: crear repo vacío en GitHub, `git remote add origin`, primer `push`. Resuelve en vivo el problema de autenticación (token, no contraseña). Guía cómo agregar un colaborador desde `Settings → Collaborators and teams`. | Crea su cuenta/repo en GitHub (si no lo tenía), vincula, hace `push`. Verifica en el navegador que el código apareció. Agrega a `santiagoSuarez219` como colaborador de su repositorio. |
 | 1:00 – 1:30 | Bloque 3 — README + rama + commits en paralelo | Explica el propósito del `README.md` como plantilla de los futuros informes. Introduce `git branch` / `git checkout -b`. Pide un cambio en la MISMA línea en `main` y en la rama. | Redacta el `README.md` con la sintaxis pedida. Crea la rama, hace commits en ambas líneas de trabajo sobre la misma línea del archivo. |
 | 1:30 – 1:50 | Bloque 4 — Conflicto simulado + resolución | Guía el intento de `merge`, la lectura del mensaje de conflicto y la edición manual de los marcadores `<<<<<<<` / `=======` / `>>>>>>>`. Verifica que cada estudiante complete el `commit` de cierre del merge. | Ejecuta el `merge`, lee el conflicto, lo resuelve a mano, hace `git add` + `commit`. |
 | 1:50 – 2:00 | Cierre | Resume el flujo completo en el tablero (diagrama de ramas). Anuncia la Semana 2 (Python) y recuerda que el repositorio de hoy sigue vivo hasta la Semana 16. | Hace el `push` final con el merge resuelto. Verifica en GitHub que el historial refleja los commits, la rama y el merge. |
@@ -94,6 +95,14 @@ git push -u origin main
 Si Git pide usuario y contraseña: la contraseña de la cuenta **ya no funciona** para `push` desde 2022. El estudiante debe generar un token de acceso personal en GitHub (Settings → Developer settings → Personal access tokens) y pegarlo donde se pide la contraseña. Documentarlo en el tablero antes de que aparezca el error, para no perder tiempo de sesión.
 
 Punto de control (minuto ~55): cada estudiante debe poder mostrar en el navegador su repositorio en GitHub con la estructura de carpetas y el primer commit visibles.
+
+Inmediatamente después, agregar al docente como colaborador — este es el mecanismo que le dará acceso de `push`/`pull` a cada repositorio durante el resto del semestre:
+
+1. En la página del repositorio en GitHub, entrar a `Settings → Collaborators and teams`.
+2. `Add people` → buscar la cuenta `santiagoSuarez219` → enviar invitación.
+3. Confirmar que la invitación queda listada (estado `Pending` hasta que el docente la acepte desde su propia cuenta).
+
+Punto de control (minuto ~58): cada estudiante debe mostrar en pantalla la invitación a `santiagoSuarez219` ya enviada en `Settings → Collaborators and teams`. El docente acepta las invitaciones recibidas antes de cerrar la sesión o en un momento posterior de la semana.
 
 ### Paso 3 — README.md, rama y commits en paralelo (1:00–1:30)
 
@@ -218,6 +227,7 @@ Punto de control final: `git log --oneline --graph --all` debe mostrar el commit
 |---|---|---|
 | ~0:25 | `git status` tras crear carpetas y `git log --oneline` | Working tree limpio, exactamente 1 commit |
 | ~0:55 | Repositorio abierto en el navegador (GitHub) | Estructura de carpetas y primer commit visibles en remoto |
+| ~0:58 | `Settings → Collaborators and teams` del repositorio | `santiagoSuarez219` aparece invitado (`Pending`) o ya aceptado |
 | ~1:25 | `git log --oneline --all --graph` | Dos ramas visibles, cada una con un commit propio sobre la misma línea del README |
 | ~1:48 | `git log --oneline --graph --all` tras el merge, y GitHub actualizado | Commit de merge presente; sin marcadores `<<<<<<<` residuales en el archivo |
 
@@ -231,6 +241,7 @@ Punto de control final: `git log --oneline --graph --all` debe mostrar el commit
 | Al hacer `git checkout main` (o `git checkout -b`), el estudiante reporta que su cambio en la rama "desapareció" | Cambió de rama con cambios sin confirmar (sin `commit`) | Insistir en la regla del minuto 1:20: "siempre `commit` antes de cambiar de rama". Si el cambio se perdió, no hay forma de recuperarlo automáticamente — que lo vuelva a escribir y confirme el hábito para el resto del semestre |
 | `git push` falla con un error de autenticación (403, o pide contraseña y la rechaza) | Intentó usar la contraseña de su cuenta de GitHub en vez de un token de acceso personal | Guiarlo a Settings → Developer settings → Personal access tokens en GitHub, generar un token, y usarlo como contraseña cuando el sistema operativo lo solicite |
 | `git push` rechazado con mensaje sobre que el remoto tiene commits que el local no tiene | El repositorio remoto no se creó vacío (tenía README o licencia inicial de GitHub) | Verificar en el Paso 2 que el repo se creó sin ningún archivo inicial; si ya ocurrió, resolver con `git pull origin main --allow-unrelated-histories` y explicar brevemente qué hizo ese comando |
+| El estudiante no encuentra `Collaborators and teams` en `Settings`, o busca `santiagoSuarez219` y no aparece resultado | Está en el repositorio equivocado, o escribió mal el nombre de usuario | Confirmar que está parado en el repositorio que acaba de crear (no uno de práctica anterior) y que el nombre de usuario está escrito exactamente `santiagoSuarez219` |
 
 ## Preguntas socráticas
 
@@ -254,4 +265,5 @@ Se conecta directamente con la Semana 2 (Python): el mismo repositorio recibirá
 - Tener preparado, en la propia máquina del docente, un repositorio de demostración ya vinculado a GitHub para proyectar el flujo completo antes de que el grupo lo replique.
 - Confirmar que todos los estudiantes ya tienen cuenta de GitHub creada — si el curso lo permite, pedirlo como tarea antes de esta sesión para no perder tiempo de clase en el registro.
 - Tener a la mano la ruta exacta en GitHub para generar un token de acceso personal (Settings → Developer settings → Personal access tokens), para resolver rápido el bloqueo de autenticación del Paso 2.
+- Tener a mano (o revisar durante/después de la sesión) la cuenta `santiagoSuarez219` para aceptar las invitaciones de colaborador que envíe cada estudiante en el Paso 2.
 - Revisar que la lección teórica de la Sesión 1 (T) ya cubrió remotos y ramas antes de esta sesión práctica; si por algún motivo esa sesión quedó incompleta, reforzar brevemente esos conceptos al inicio del Bloque 2 y del Bloque 3.

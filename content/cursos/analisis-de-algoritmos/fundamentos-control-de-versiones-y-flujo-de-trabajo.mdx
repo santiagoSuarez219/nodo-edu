@@ -12,7 +12,7 @@ slides_hint: "Cada sección ## es una diapositiva. Presentación sincrona."
 date: "2026-07-21"
 author: "Asistente de Docencia"
 summary: ""
-updatedAt: "2026-07-30"
+updatedAt: "2026-08-02"
 ---
 
 ## El problema: proyectos sin memoria
@@ -74,15 +74,15 @@ Antes de crear tu primer repositorio necesitas tener Git instalado en tu máquin
 
 **En la práctica**, la **terminal** (o línea de comandos) es una ventana de texto donde escribes instrucciones y el sistema operativo las ejecuta directamente, sin pasar por menús gráficos. Antes de usar Git necesitas moverte por carpetas y archivos desde ahí:
 
-| Comando | ¿Qué hace? |
-| --- | --- |
-| `pwd` | Muestra la carpeta en la que estás parado ahora mismo |
-| `ls` (`dir` en Windows) | Lista los archivos y carpetas del directorio actual |
-| `cd <carpeta>` | Entra a esa carpeta |
-| `cd ..` | Sube un nivel, a la carpeta contenedora |
-| `mkdir <nombre>` | Crea una carpeta nueva |
-| `touch <archivo>` (o `type nul > archivo` en Windows) | Crea un archivo vacío |
-| `clear` (`cls` en Windows) | Limpia el texto acumulado en la pantalla |
+| Comando                                               | ¿Qué hace?                                            |
+| ----------------------------------------------------- | ----------------------------------------------------- |
+| `pwd`                                                 | Muestra la carpeta en la que estás parado ahora mismo |
+| `ls` (`dir` en Windows)                               | Lista los archivos y carpetas del directorio actual   |
+| `cd <carpeta>`                                        | Entra a esa carpeta                                   |
+| `cd ..`                                               | Sube un nivel, a la carpeta contenedora               |
+| `mkdir <nombre>`                                      | Crea una carpeta nueva                                |
+| `touch <archivo>` (o `type nul > archivo` en Windows) | Crea un archivo vacío                                 |
+| `clear` (`cls` en Windows)                            | Limpia el texto acumulado en la pantalla              |
 
 > **Terminal:** interfaz de texto para dar instrucciones al sistema operativo mediante comandos, en vez de clics. Es el lugar donde ejecutarás **todos** los comandos de Git de esta lección.
 
@@ -109,8 +109,6 @@ flowchart TB
     readme["README.md"]
   end
 ```
-
-Este es el repositorio que vas a crear en el laboratorio de hoy: **uno solo para todo el curso**, con esas mismas carpetas.
 
 > **Repositorio (repo):** carpeta cuyo contenido es rastreado por Git. Contiene el proyecto actual **y** toda su historia de cambios.
 > ⚠️ Si borras la carpeta `.git/`, pierdes todo el historial — el código actual queda, pero la memoria del proyecto desaparece.
@@ -147,17 +145,19 @@ Cada línea es un patrón: una carpeta, una extensión (`*.pyc`) o un nombre exa
 Repositorio con laboratorios, ejercicios de clase y benchmarks del curso.
 
 ## Estructura
+
 - `laboratorios/` — los 5 informes evaluativos
 - `ejercicios-clase/` — código de las sesiones prácticas
 - `benchmarks/` — scripts de medición de tiempos
 
 ## Cómo ejecutar
+
 ```bash
 python benchmarks/comparar_ordenamientos.py
 ```
 ````
 
-Está escrito en **Markdown** (de ahí la extensión `.md`), el mismo lenguaje de formato liviano que usas para tus informes de laboratorio.
+Está escrito en **Markdown** (de ahí la extensión `.md`), el mismo lenguaje de formato liviano que usaras para tus informes de laboratorio.
 
 > **`README.md`:** archivo en Markdown, ubicado en la raíz del repositorio, que documenta de qué trata el proyecto, cómo está organizado y cómo usarlo. Es lo primero que ve cualquiera que llega al repositorio.
 
@@ -288,7 +288,24 @@ Este es exactamente el mecanismo detrás de la entrega de cada uno de tus cinco 
 
 Para autenticarte contra GitHub sin escribir usuario y contraseña en cada `push` o `pull`, se configura una **clave SSH** asociada a tu cuenta. El siguiente video muestra el proceso completo de generación y configuración:
 
-<YouTubeEmbed id="akuG7eRtaXc" title="Cómo configurar claves SSH para Git y GitHub" />
+<YouTubeEmbed
+  id="akuG7eRtaXc"
+  title="Cómo configurar claves SSH para Git y GitHub"
+/>
+
+## Dar acceso a otros: colaboradores en GitHub
+
+**Situación:** ya tienes tu repositorio en GitHub, con `push` y `pull` funcionando desde tu propia cuenta. Pero el docente necesita revisar tu código directamente desde su computador — o, en un equipo real, un compañero necesita subir cambios al mismo repositorio remoto que tú creaste. Por defecto, solo **tu** cuenta tiene permiso de escritura sobre ese repositorio: cualquier otra persona que intente `git push` recibirá un error de permisos, aunque el repositorio sea público.
+
+**En la práctica**, GitHub permite agregar **colaboradores**: otras cuentas a las que les das permiso explícito de `push` y `pull` sobre tu repositorio, sin que dejen de ser tu copia y tu historial.
+
+1. En la página del repositorio en GitHub, entra a `Settings → Collaborators and teams`.
+2. Haz clic en `Add people` y busca la cuenta por su nombre de usuario.
+3. GitHub le envía una invitación a esa cuenta; el acceso queda activo solo **después** de que la acepte — hasta entonces aparece como `Pending`.
+4. Una vez aceptada, esa cuenta puede hacer `git clone`, `git pull` y `git push` sobre tu repositorio exactamente igual que tú.
+
+> **Colaborador:** cuenta de GitHub distinta al dueño del repositorio a la que se le concede permiso explícito de lectura y escritura (`push`/`pull`), sin transferir la propiedad del repositorio.
+> ⚠️ Agregar un colaborador no es lo mismo que hacer público el repositorio: en uno privado, solo el dueño y sus colaboradores pueden siquiera verlo.
 
 ## Experimentar sin romper lo que funciona: ramas
 
@@ -325,13 +342,13 @@ Este patrón — crear una rama para cada cambio que quieres probar, y fusionarl
 
 **En la práctica**, un esquema muy usado en la industria separa dos grupos: ramas **permanentes** (viven todo el proyecto) y ramas **temporales** (se crean para un cambio puntual y se eliminan al fusionarse):
 
-| Rama | Tipo | ¿De dónde parte? | ¿Hacia dónde se fusiona? | ¿Cuándo se usa? |
-| --- | --- | --- | --- | --- |
-| `main` | Permanente | — | — | Código estable, listo para entregar o desplegar |
-| `development` | Permanente | `main` | — | Integración: donde se juntan los cambios ya terminados |
-| `feature/<nombre>` | Temporal | `development` | `development` | Una funcionalidad nueva, ej. `feature/ordenamiento-por-mezcla` |
-| `bug/<nombre>` | Temporal | `development` | `development` | Corregir un error detectado, ej. `bug/desborde-en-pila` |
-| `hotfix/<nombre>` | Temporal | `main` | `main` **y** `development` | Un error crítico en producción que no puede esperar al ciclo normal |
+| Rama               | Tipo       | ¿De dónde parte? | ¿Hacia dónde se fusiona?   | ¿Cuándo se usa?                                                     |
+| ------------------ | ---------- | ---------------- | -------------------------- | ------------------------------------------------------------------- |
+| `main`             | Permanente | —                | —                          | Código estable, listo para entregar o desplegar                     |
+| `development`      | Permanente | `main`           | —                          | Integración: donde se juntan los cambios ya terminados              |
+| `feature/<nombre>` | Temporal   | `development`    | `development`              | Una funcionalidad nueva, ej. `feature/ordenamiento-por-mezcla`      |
+| `bug/<nombre>`     | Temporal   | `development`    | `development`              | Corregir un error detectado, ej. `bug/desborde-en-pila`             |
+| `hotfix/<nombre>`  | Temporal   | `main`           | `main` **y** `development` | Un error crítico en producción que no puede esperar al ciclo normal |
 
 ```mermaid
 gitGraph
@@ -404,6 +421,7 @@ git commit -m "Resuelve conflicto en seccion de resultados"
 - `git diff` te deja ver exactamente qué cambió, línea por línea, antes de comprometerte con el cambio.
 - Un buen **mensaje de commit** explica el _por qué_ de un cambio, no el _qué_ — imperativo, presente, corto y con contenido real; es lo que hace útil el historial meses después.
 - Los **repositorios remotos** (`push`, `pull`, `fetch`, `clone`) sincronizan tu historial local con una copia en GitHub — el mecanismo detrás de la entrega de cada informe de laboratorio.
+- Los **colaboradores** en GitHub son cuentas a las que das permiso explícito de `push` y `pull` sobre tu repositorio, sin transferir su propiedad — así el docente puede acceder directamente a tu copia.
 - Las **ramas** (`branch`, `checkout`, `merge`) te permiten probar cambios en paralelo sin arriesgar lo que ya funciona en `main`; el flujo tipo feature branch es la forma estándar de organizar ese trabajo.
 - Una **convención de ramas** (`main`, `development`, `feature/`, `bug/`, `hotfix/`) define de dónde parte cada rama y hacia dónde se fusiona, para que un equipo completo trabaje sin pisarse.
 - Un **conflicto de fusión** aparece cuando dos cambios tocan la misma línea del mismo archivo — no es un error, es parte normal del trabajo colaborativo, y se resuelve editando el archivo a mano.
