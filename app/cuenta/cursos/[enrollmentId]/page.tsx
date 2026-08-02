@@ -7,7 +7,9 @@ import { getGradesByEnrollment } from "@/lib/grades/index";
 import { getCourseBySlug, countProgressibleLessons } from "@/lib/courses";
 import { getDisabledLessonSlugs } from "@/lib/courses/availability";
 import { getCourseProgress } from "@/lib/progress";
+import { getSelfAssessmentCourseSummary } from "@/lib/self-assessment";
 import { EnrollmentDetail } from "@/components/account/EnrollmentDetail";
+import { SelfAssessmentSummaryCard } from "@/components/account/SelfAssessmentSummaryCard";
 
 export const metadata: Metadata = { title: "Detalle de matrícula — Mis cursos" };
 
@@ -54,6 +56,10 @@ export default async function EnrollmentDetailPage({ params }: Props) {
   ).length;
   const totalCount = progressibleLessons.length;
 
+  const selfAssessmentSummary = course
+    ? await getSelfAssessmentCourseSummary(enrollment.academic_course.course_slug!)
+    : null;
+
   return (
     <main className="flex-1 pt-6 pb-14 flex flex-col gap-6">
       <div>
@@ -77,6 +83,10 @@ export default async function EnrollmentDetailPage({ params }: Props) {
       </div>
 
       <EnrollmentDetail enrollment={enrollment} gradesData={gradesData} />
+
+      {selfAssessmentSummary && (
+        <SelfAssessmentSummaryCard summary={selfAssessmentSummary} />
+      )}
     </main>
   );
 }

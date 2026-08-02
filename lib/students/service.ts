@@ -461,3 +461,79 @@ export async function unenrollServiceStudent(
   if (!data) return { ok: false, error: "Matrícula no encontrada." };
   return { ok: true, enrollment: data };
 }
+
+// spec-040 Fase 7: lectura de la nota de autoevaluaciones de un estudiante
+// para el agente docente (students-mcp). Solo lectura: la nota es derivada y
+// se recalcula sola, así que no existe contraparte de escritura.
+//
+// `self_assessment_breakdown` no es security definer (hereda RLS del rol que
+// la invoca) y este camino ya está detrás de STUDENTS_ADMIN_API_KEY, así que
+// se invoca con el cliente de servicio, igual que el resto de este módulo.
+//
+// A diferencia del camino de UI (lib/self-assessment), aquí no se resuelven
+// títulos de lección desde el catálogo MDX: el agente solo necesita el slug.
+type ServiceSelfAssessmentBreakdownRow = {
+  lesson_slug: string;
+  question_count: number;
+  correct_count: number;
+  answered: boolean;
+};
+
+export interface ServiceSelfAssessmentSummary {
+  course_slug: string;
+  score: number | null;
+  correct_total: number;
+  question_total: number;
+  lessons: Array<{
+    lesson_slug: string;
+    answered: boolean;
+    correct_count: number;
+    question_count: number;
+  }>;
+}
+
+export async function getServiceStudentSelfAssessmentSummary(
+  studentId: string,
+  courseSlug: string
+): Promise<
+  { ok: true; summary: ServiceSelfAssessmentSummary } | { ok: false; error: string }
+> {
+  const supabase = createServiceSupabaseClient();
+
+  const { data, error } = await supabase.rpc("self_assessment_breakdown", {
+    p_user_id: studentId,
+    p_course_slug: courseSlug,
+  });
+
+  if (error) {
+    console.error("self_assessment_breakdown error:", error);
+    return { ok: false, error: "No se pudo calcular la nota de autoevaluaciones." };
+  }
+
+  const rows = (data ?? []) as ServiceSelfAssessmentBreakdownRow[];
+  const questionTotal = rows.reduce((sum, r) => sum + r.question_count, 0);
+  const correctTotal = rows.reduce((sum, r) => sum + r.correct_count, 0);
+  // D4: sin nada evaluable la nota es null, nunca 0.00 (un 0 se lee como reprobado).
+  const score =
+    questionTotal > 0
+      ? Math.round((correctTotal / questionTotal) * 5 * 100) / 100
+      : null;
+
+  return {
+    ok: true,
+    summary: {
+      course_slug: courseSlug,
+      score,
+      correct_total: correctTotal,
+      question_total: questionTotal,
+      lessons: rows
+        .filter((r) => r.question_count > 0)
+        .map((r) => ({
+          lesson_slug: r.lesson_slug,
+          answered: r.answered,
+          correct_count: r.correct_count,
+          question_count: r.question_count,
+        })),
+    },
+  };
+}

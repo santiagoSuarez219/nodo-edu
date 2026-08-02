@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { GradeInputCell } from "./GradeInputCell";
+import { SelfAssessmentGradeCell } from "./SelfAssessmentGradeCell";
 import type { GradeItem, CourseGradesRow } from "@/lib/grades/types";
 
 interface Props {
@@ -86,17 +87,30 @@ export function GradesTable({ academicCourseId, gradeItems, rows }: Props) {
                   </td>
                   {gradeItems.map((item) => (
                     <td key={item.id} className="px-4 py-2">
-                      <GradeInputCell
-                        enrollmentId={row.enrollment_id}
-                        gradeItemId={item.id}
-                        academicCourseId={academicCourseId}
-                        initialScore={grades[item.id] ?? null}
-                        studentName={row.student_name}
-                        itemName={item.name}
-                        onSave={(gradeItemId, score) =>
-                          handleCellSave(row.enrollment_id, gradeItemId, score)
-                        }
-                      />
+                      {item.kind === "self_assessment" ? (
+                        // spec-040 D5: la nota es derivada — editarla a mano
+                        // quedaría pisada por el siguiente recálculo, así que
+                        // la celda es de solo lectura (se actualiza con el
+                        // botón "Recalcular autoevaluaciones") con desglose
+                        // por lección bajo demanda (D7).
+                        <SelfAssessmentGradeCell
+                          enrollmentId={row.enrollment_id}
+                          academicCourseId={academicCourseId}
+                          score={grades[item.id] ?? null}
+                        />
+                      ) : (
+                        <GradeInputCell
+                          enrollmentId={row.enrollment_id}
+                          gradeItemId={item.id}
+                          academicCourseId={academicCourseId}
+                          initialScore={grades[item.id] ?? null}
+                          studentName={row.student_name}
+                          itemName={item.name}
+                          onSave={(gradeItemId, score) =>
+                            handleCellSave(row.enrollment_id, gradeItemId, score)
+                          }
+                        />
+                      )}
                     </td>
                   ))}
                   <td className="px-5 py-3 text-right font-mono font-semibold text-gray-700 dark:text-gray-300">

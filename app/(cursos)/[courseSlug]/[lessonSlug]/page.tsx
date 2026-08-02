@@ -16,12 +16,18 @@ import {
   getSelfAssessmentForLesson,
   getSelfAssessmentStatus,
   getAnswerKeyForLesson,
+  getAttemptReview,
 } from "@/lib/self-assessment";
 import {
   ANSWER_KEY_COOKIE_NAME,
   resolveStoredAnswerKeyExpanded,
 } from "@/lib/self-assessment/answer-key-preference";
-import type { SelfAssessmentQuestion, AnswerKeyQuestion, SelfAssessmentStatus } from "@/lib/self-assessment/types";
+import type {
+  SelfAssessmentQuestion,
+  AnswerKeyQuestion,
+  SelfAssessmentStatus,
+  AttemptReview,
+} from "@/lib/self-assessment/types";
 import { resolveAcademicCoursesBySlug } from "@/lib/academic-courses";
 import type { OpenSessionResult, StudentAttendanceState } from "@/lib/attendance/types";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
@@ -110,11 +116,15 @@ export default async function LessonPage({ params }: LessonPageProps) {
     requiresAttempt: false,
     lastAttempt: null,
   };
+  let attemptReview: AttemptReview | null = null;
 
   if (access.ok && access.reason === "enrolled" && !isGuideNode && !isBlockedForStudent) {
     attendanceState = await getStudentAttendanceForCourse(courseSlug);
     selfAssessment = await getSelfAssessmentForLesson(courseSlug, lessonSlug);
     selfAssessmentStatus = await getSelfAssessmentStatus(courseSlug, lessonSlug);
+    // spec-040: revisión persistente del intento único (reemplaza el
+    // resumen agregado de spec-033).
+    attemptReview = await getAttemptReview(courseSlug, lessonSlug);
   }
 
   // Fallar cerrado (D8 de spec-037): un fallo de infraestructura al verificar
@@ -129,9 +139,14 @@ export default async function LessonPage({ params }: LessonPageProps) {
       : selfAssessmentStatus.requiresAttempt && !selfAssessmentStatus.hasAttempt
         ? "self_assessment_pending"
         : undefined;
-  const selfAssessmentLastAttempt =
-    selfAssessmentStatus.status === "ok" ? selfAssessmentStatus.lastAttempt : null;
-
+  // El estudiante ya envió su intento (según el gate, que sí falla cerrado),
+  // pero `getAttemptReview` no pudo reconstruir la revisión: no es lo mismo
+  // que "todavía no respondió", y mostrar el formulario en ese caso invitaría
+  // a un reenvío que la base rechazaría de todos modos, sin explicar por qué.
+  const selfAssessmentReviewUnavailable =
+    selfAssessmentStatus.status === "ok" &&
+    selfAssessmentStatus.hasAttempt &&
+    attemptReview === null;
   // Vista docente (spec-031): rama independiente de la de "enrolled" — un
   // owner/admin nunca tiene reason "enrolled", así que ambos bloques son
   // mutuamente excluyentes por construcción.
@@ -218,7 +233,8 @@ export default async function LessonPage({ params }: LessonPageProps) {
           initialCompletedAt={progress?.completed_at ?? null}
           canComplete={selfAssessmentCanComplete}
           blockedReason={selfAssessmentBlockedReason}
-          lastAttempt={selfAssessmentLastAttempt}
+          attemptReview={attemptReview}
+          attemptReviewUnavailable={selfAssessmentReviewUnavailable}
           attendance={
             attendanceState && (
               <ErrorBoundary

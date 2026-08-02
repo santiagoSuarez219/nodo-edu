@@ -5,6 +5,66 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+## DEBT-045 — `self_assessment_breakdown` no filtra lecciones deshabilitadas (BLOQUE 039)
+
+**Origen:** spec-040, Fase 2, registrado explícitamente en la implementación
+(2026-08-01)
+**Prioridad:** Media — depende de que spec-039 se mergee a `development`
+
+El RPC `public.self_assessment_breakdown` (`20260802000004_self_assessment_grade_rpcs.sql`)
+calcula el denominador de la nota de autoevaluaciones sobre **todas** las
+lecciones de `lesson_progress`, sin excluir las que spec-039 marca como
+deshabilitadas (`public.disabled_lessons`, rama `feat/lecciones-habilitadas`,
+aún no mergeada a `development` cuando se implementó este spec).
+
+Consecuencia: si un docente deshabilita una lección después de que un
+estudiante la vio (pero antes de responderla), esa lección **sigue
+penalizando la nota** de autoevaluaciones como "vista y no respondida",
+contradiciendo la intención de spec-039 (D5: una lección deshabilitada sale
+de los conteos de progreso mientras dura el cierre).
+
+**No se corrigió en spec-040** porque referenciar en el RPC una tabla que no
+existe todavía rompería en tiempo de ejecución (no de creación) y tumbaría el
+envío de autoevaluaciones en producción antes de que spec-039 se despliegue.
+El bloque de filtro ya está escrito y comentado en la migración
+(`-- ▼▼▼ BLOQUE 039`), con el nombre de tabla como marcador a ajustar.
+
+**Fix cuando spec-039 esté mergeado:** `create or replace function
+public.self_assessment_breakdown(...)` descomentando el bloque y ajustando el
+nombre real de la tabla/columna de disponibilidad (`public.disabled_lessons`,
+confirmar contra la migración final de spec-039), más un recálculo masivo por
+curso (`recalculate_course_self_assessment_grades`, ya provisto por la
+Fase 5 de spec-040) para aplicar el filtro a las notas ya calculadas.
+
+---
+
+## DEBT-044 — No existe forma de renombrar un ítem de calificación (`GradeItemsPanel`)
+
+**Origen:** spec-040, ronda de pruebas manuales, TC-013/TC-014 (2026-08-02)
+**Prioridad:** Media — bloquea un flujo documentado en la propia UI
+
+`components/admin/GradeItemsPanel.tsx` solo implementa "Añadir ítem" y
+"Eliminar"; no existe ningún control (botón, ícono, edición inline) para
+renombrar un ítem de calificación ya creado. Esto afecta a **todos** los
+ítems, no solo a los de `kind='self_assessment'`.
+
+El problema es más profundo que un botón faltante: la Server Action
+`updateGradeItemAction` (`lib/grades/actions.ts:32`) existe, funciona sin
+bloqueo para ítems automáticos (`lib/grades/index.ts:67` lo confirma
+explícitamente en comentario: "Renombrarlo sigue permitido"), pero **no está
+importada ni invocada desde ningún componente del proyecto** — no hay ningún
+camino de invocación, ni siquiera indirecto.
+
+El ítem `kind='self_assessment'` (spec-040, D9/D10) muestra además el
+tooltip "Este ítem no se puede eliminar. Puedes renombrarlo." — una promesa
+de la UI que hoy es falsa: no se puede.
+
+**Fix:** cablear un control de renombrado (edición inline o modal) en
+`GradeItemsPanel.tsx` que invoque `updateGradeItemAction`, disponible para
+todo tipo de ítem.
+
+---
+
 ## DEBT-043 — Evaluaciones (`assignment`) accesibles aunque su lección esté deshabilitada
 
 **Origen:** spec-039 (R3), registrado explícitamente en la implementación

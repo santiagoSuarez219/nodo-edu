@@ -93,15 +93,32 @@ export function GradeItemsPanel({ academicCourseId, initialItems }: Props) {
                 <span className="text-sm text-gray-900 dark:text-white font-medium">
                   {item.name}
                 </span>
+                {item.kind === "self_assessment" && (
+                  <span
+                    className="text-xs px-1.5 py-0.5 rounded bg-brand-softer dark:bg-blue-900/20 text-brand dark:text-blue-300"
+                    title="Se genera y actualiza automáticamente a partir de las autoevaluaciones"
+                  >
+                    Automático
+                  </span>
+                )}
               </div>
-              <button
-                onClick={() => handleDelete(item.id, item.name)}
-                disabled={deletingId === item.id || isPending}
-                className="text-xs text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 disabled:opacity-40 transition-colors"
-                aria-label={`Eliminar ítem ${item.name}`}
-              >
-                {deletingId === item.id ? "Eliminando…" : "Eliminar"}
-              </button>
+              {item.kind === "self_assessment" ? (
+                <span
+                  className="text-xs text-gray-400 dark:text-gray-500"
+                  title="Este ítem no se puede eliminar. Puedes renombrarlo."
+                >
+                  No se puede eliminar
+                </span>
+              ) : (
+                <button
+                  onClick={() => handleDelete(item.id, item.name)}
+                  disabled={deletingId === item.id || isPending}
+                  className="text-xs text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 disabled:opacity-40 transition-colors"
+                  aria-label={`Eliminar ítem ${item.name}`}
+                >
+                  {deletingId === item.id ? "Eliminando…" : "Eliminar"}
+                </button>
+              )}
             </li>
           ))}
         </ul>
