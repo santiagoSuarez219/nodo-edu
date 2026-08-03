@@ -85,12 +85,12 @@ Este patrón — crear una rama para cada cambio que quieres probar, y fusionarl
 
 **En la práctica**, vas a usar el mismo esquema que se usa en la industria: ramas **permanentes** (viven todo el proyecto) y ramas **temporales** (se crean para un cambio puntual y se eliminan al fusionarse):
 
-| Rama | Tipo | ¿De dónde parte? | ¿Hacia dónde se fusiona? | ¿Cuándo se usa? |
-| --- | --- | --- | --- | --- |
-| `main` | Permanente | — | — | Código estable, el que se entrega en cada sprint |
-| `development` | Permanente | `main` | — | Integración: donde se juntan los cambios ya terminados |
-| `feature/<nombre>` | Temporal | `development` | `development` | Una clase o funcionalidad nueva, ej. `feature/cliente-domain` |
-| `bug/<nombre>` | Temporal | `development` | `development` | Corregir un error detectado, ej. `bug/npe-en-menu` |
+| Rama               | Tipo       | ¿De dónde parte? | ¿Hacia dónde se fusiona? | ¿Cuándo se usa?                                               |
+| ------------------ | ---------- | ---------------- | ------------------------ | ------------------------------------------------------------- |
+| `main`             | Permanente | —                | —                        | Código estable, el que se entrega en cada sprint              |
+| `development`      | Permanente | `main`           | —                        | Integración: donde se juntan los cambios ya terminados        |
+| `feature/<nombre>` | Temporal   | `development`    | `development`            | Una clase o funcionalidad nueva, ej. `feature/cliente-domain` |
+| `bug/<nombre>`     | Temporal   | `development`    | `development`            | Corregir un error detectado, ej. `bug/npe-en-menu`            |
 
 ```mermaid
 gitGraph
@@ -117,25 +117,6 @@ gitGraph
 Cada rama temporal se elimina inmediatamente después de fusionarse: dejarla viva no aporta nada y ensucia el repositorio.
 
 > **Convención de ramas:** acuerdo de equipo sobre cómo nombrar cada rama según su propósito (`feature/`, `bug/`) y con qué rama permanente debe fusionarse. No es una regla de Git — es una disciplina que el equipo decide y respeta.
-
-## La estructura que vas a versionar: el proyecto en capas
-
-Todo lo anterior no es teoría suelta: es exactamente lo que vas a montar el viernes. El repositorio único del equipo va a contener la estructura de paquetes del proyecto del curso, organizada en cuatro capas:
-
-```mermaid
-flowchart TB
-  subgraph src/main/java/proyecto/
-    direction TB
-    domain["model/domain/\nClases del negocio: Cliente, Cuenta..."]
-    structures["model/structures/\nEstructuras de datos propias"]
-    service["service/\nLogica de negocio"]
-    controller["controller/\nCoordina vista y servicio"]
-    view["view/\nMenus e interaccion con el usuario"]
-    main["Main.java\nPunto de entrada, mensaje de bienvenida"]
-  end
-```
-
-Cada capa la vas a construir en ramas `feature/` distintas a lo largo del semestre, y las vas a integrar en `development` con `git merge`. El laboratorio del viernes crea el esqueleto completo — las cinco carpetas y un `Main.java` de bienvenida — sobre el repositorio que inicias hoy.
 
 ## Cuando dos cambios chocan: el conflicto de fusión
 
@@ -174,35 +155,22 @@ sequenceDiagram
 > **Conflicto de fusión:** situación en la que Git no puede combinar automáticamente dos cambios porque afectan la misma parte de un archivo; requiere intervención manual antes de completar el `merge`.
 > ⚠️ Un conflicto no es un error — es una señal normal de que dos personas tocaron lo mismo. El viernes vas a provocar uno a propósito y resolverlo, para que la primera vez que aparezca de verdad en tu proyecto ya sepas exactamente qué hacer.
 
-## Lo que te espera el viernes
-
-La sesión de hoy es la preparación teórica directa del laboratorio de este viernes (festivo, trabajo independiente guiado). Ahí vas a, en orden:
-
-1. Crear el repositorio único del proyecto con `git init` y una secuencia de commits.
-2. Crear al menos una rama, hacer commits en ella y fusionarla a `main` con `git merge`.
-3. Provocar un conflicto de fusión a propósito y resolverlo siguiendo el procedimiento de esta lección.
-4. Montar la estructura de paquetes completa (`model/domain`, `model/structures`, `service`, `controller`, `view`) con un `Main.java` que imprima un mensaje de bienvenida.
-
-Todo lo que necesitas para ese laboratorio ya lo viste entre la sesión del martes y esta: `init`/`add`/`commit` para el historial local, y `branch`/`checkout`/`merge` más `push`/`pull` para el trabajo remoto y en equipo.
-
 ## Comandos de esta sesión — resumen
 
-| Comando | ¿Qué hace? | ¿Cuándo se usa? |
-| --- | --- | --- |
-| `git clone <url>` | Descarga un repositorio remoto completo | Al empezar a trabajar sobre un repo ya existente en GitHub |
-| `git push origin main` | Sube tus commits locales al remoto | Después de commitear, para compartir tu avance |
-| `git fetch origin` | Trae los commits nuevos del remoto sin aplicarlos | Para revisar qué cambió antes de mezclarlo |
-| `git pull origin main` | Trae y aplica los commits nuevos del remoto | Para actualizar tu copia local con el trabajo del equipo |
-| `git branch <nombre>` | Crea una rama nueva | Antes de empezar una funcionalidad o corrección |
-| `git checkout <rama>` | Cambia a otra rama | Para moverte entre líneas de trabajo |
-| `git checkout -b <rama>` | Crea y cambia a la rama en un solo paso | Atajo del uso más común |
-| `git merge <rama>` | Fusiona los commits de una rama en la actual | Cuando el trabajo de la rama ya está listo |
+| Comando                  | ¿Qué hace?                                        | ¿Cuándo se usa?                                            |
+| ------------------------ | ------------------------------------------------- | ---------------------------------------------------------- |
+| `git clone <url>`        | Descarga un repositorio remoto completo           | Al empezar a trabajar sobre un repo ya existente en GitHub |
+| `git push origin main`   | Sube tus commits locales al remoto                | Después de commitear, para compartir tu avance             |
+| `git fetch origin`       | Trae los commits nuevos del remoto sin aplicarlos | Para revisar qué cambió antes de mezclarlo                 |
+| `git pull origin main`   | Trae y aplica los commits nuevos del remoto       | Para actualizar tu copia local con el trabajo del equipo   |
+| `git branch <nombre>`    | Crea una rama nueva                               | Antes de empezar una funcionalidad o corrección            |
+| `git checkout <rama>`    | Cambia a otra rama                                | Para moverte entre líneas de trabajo                       |
+| `git checkout -b <rama>` | Crea y cambia a la rama en un solo paso           | Atajo del uso más común                                    |
+| `git merge <rama>`       | Fusiona los commits de una rama en la actual      | Cuando el trabajo de la rama ya está listo                 |
 
 ## Síntesis
 
 - Los **repositorios remotos** (`push`, `pull`, `fetch`, `clone`) sincronizan tu historial local con una copia en GitHub — así no dependes de un solo computador y el profesor revisa directamente sobre el repositorio.
 - Las **ramas** (`branch`, `checkout`, `merge`) te permiten a ti y a tu compañero trabajar en paralelo sin arriesgar el código que ya funciona en `main`; el flujo tipo feature branch es la forma estándar de organizar ese trabajo en equipo.
 - Una **convención de ramas** (`main`, `development`, `feature/`, `bug/`) define de dónde parte cada rama y hacia dónde se fusiona, para que el equipo completo trabaje sin pisarse.
-- El repositorio único del proyecto va a alojar la estructura en capas (`model/domain`, `model/structures`, `service`, `controller`, `view`) que construirás rama por rama durante el semestre.
 - Un **conflicto de fusión** aparece cuando dos cambios tocan la misma línea del mismo archivo — no es un error, es parte normal del trabajo colaborativo, y se resuelve editando el archivo a mano, con `git add` y un commit final.
-- El laboratorio del viernes pone en práctica exactamente estos cinco comandos nuevos: crear el repo, ramificar, fusionar, provocar y resolver un conflicto, y montar el esqueleto de paquetes con `Main.java`.

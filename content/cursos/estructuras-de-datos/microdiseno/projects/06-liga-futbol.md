@@ -40,7 +40,7 @@ Es el proyecto con mayor potencial de motivación para los estudiantes. El domin
 
 ## Sprints acumulativos
 
-### Sprint 1 — POO y arquitectura base *(Semanas 1–5)*
+### Sprint 1 — POO y arquitectura base *(Semanas 1–4)*
 
 **Entregable:** modelo de equipos y jugadores con menú funcional.
 
@@ -53,19 +53,18 @@ Es el proyecto con mayor potencial de motivación para los estudiantes. El domin
 
 ---
 
-### Sprint 2 — Listas y persistencia *(Semanas 6–11)*
+### Sprint 2 — Listas *(Semanas 5–7)*
 
-**Entregable:** fixture completo con partidos registrados, tabla de posiciones básica y persistencia.
+**Entregable:** fixture completo con partidos registrados, tabla de posiciones básica.
 
 - Plantilla de cada equipo como `ListaSimple<Jugador>`
 - Fixture de la temporada como `ListaSimple<Partido>`
 - Goles de cada partido como `ListaSimple<Gol>`
 - Ordenar la tabla de posiciones por puntos (y por diferencia de goles como criterio de desempate) usando `InsertionSort` en el `Service`
-- Persistir resultados en `data/partidos.txt` y estadísticas en `data/estadisticas.txt`
 
 ---
 
-### Sprint 3 — Pilas y Colas *(Semanas 12–13)*
+### Sprint 3 — Pilas y Colas *(Semanas 8–9)*
 
 **Entregable:** registro de goles con opción de anular y gestión del calendario de jornada.
 
@@ -75,16 +74,17 @@ Es el proyecto con mayor potencial de motivación para los estudiantes. El domin
 
 ---
 
-### Sprint 4 — Recursividad *(Semana 14)*
+### Sprint 4 — Persistencia y recursividad *(Semanas 10–13)*
 
-**Entregable:** estadísticas calculadas recursivamente.
+**Entregable:** persistencia del sistema en archivos y estadísticas calculadas recursivamente.
 
+- Persistir resultados en `data/partidos.txt` y estadísticas en `data/estadisticas.txt`
 - Calcular recursivamente los puntos acumulados de un equipo recorriendo su lista de partidos jugados
 - Encontrar recursivamente al máximo goleador de un equipo recorriendo su plantilla
 
 ---
 
-### Sprint 5 — Árboles e integración final *(Semanas 15–17)*
+### Sprint 5 — Árboles e integración final *(Semanas 14–16)*
 
 **Entregable:** tabla de posiciones eficiente con BST y proyecto completo integrado.
 

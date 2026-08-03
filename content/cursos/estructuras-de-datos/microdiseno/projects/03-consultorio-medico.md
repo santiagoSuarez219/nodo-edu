@@ -37,7 +37,7 @@ El dominio médico ofrece casos de uso muy naturales para las estructuras del cu
 
 ## Sprints acumulativos
 
-### Sprint 1 — POO y arquitectura base *(Semanas 1–5)*
+### Sprint 1 — POO y arquitectura base *(Semanas 1–4)*
 
 **Entregable:** modelo de dominio con jerarquía de personas y menú funcional.
 
@@ -50,19 +50,18 @@ El dominio médico ofrece casos de uso muy naturales para las estructuras del cu
 
 ---
 
-### Sprint 2 — Listas y persistencia *(Semanas 6–11)*
+### Sprint 2 — Listas *(Semanas 5–7)*
 
-**Entregable:** agenda de citas dinámica con historial de consultas y persistencia.
+**Entregable:** agenda de citas dinámica con historial de consultas.
 
 - Gestionar pacientes y médicos con `ListaSimple<T>` en el `Service`
 - Historial de consultas de cada paciente como `ListaSimple<Consulta>`
 - Listar citas del día ordenadas por hora (`InsertionSort` en el `Service`)
-- Persistir pacientes en `data/pacientes.txt` y consultas en `data/consultas.txt`
 - Reconstruir las listas al iniciar la aplicación
 
 ---
 
-### Sprint 3 — Pilas y Colas *(Semanas 12–13)*
+### Sprint 3 — Pilas y Colas *(Semanas 8–9)*
 
 **Entregable:** sala de espera funcional y acceso rápido al historial reciente.
 
@@ -72,16 +71,17 @@ El dominio médico ofrece casos de uso muy naturales para las estructuras del cu
 
 ---
 
-### Sprint 4 — Recursividad *(Semana 14)*
+### Sprint 4 — Persistencia y recursividad *(Semanas 10–13)*
 
-**Entregable:** búsqueda recursiva en el historial clínico.
+**Entregable:** persistencia del sistema en archivos y búsqueda recursiva en el historial clínico.
 
+- Persistir pacientes en `data/pacientes.txt` y consultas en `data/consultas.txt`
 - Buscar recursivamente en el historial de un paciente la primera consulta que contenga un diagnóstico específico
 - Contar recursivamente el número de consultas de un paciente en un rango de fechas
 
 ---
 
-### Sprint 5 — Árboles e integración final *(Semanas 15–17)*
+### Sprint 5 — Árboles e integración final *(Semanas 14–16)*
 
 **Entregable:** búsqueda eficiente de pacientes y proyecto completo integrado.
 

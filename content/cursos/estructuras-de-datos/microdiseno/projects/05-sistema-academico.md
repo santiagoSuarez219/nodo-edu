@@ -38,7 +38,7 @@ Es el proyecto con mayor riqueza de relaciones entre entidades (`Estudiante ↔ 
 
 ## Sprints acumulativos
 
-### Sprint 1 — POO y arquitectura base *(Semanas 1–5)*
+### Sprint 1 — POO y arquitectura base *(Semanas 1–4)*
 
 **Entregable:** modelo de dominio con jerarquía de personas, materias y menú funcional.
 
@@ -51,19 +51,18 @@ Es el proyecto con mayor riqueza de relaciones entre entidades (`Estudiante ↔ 
 
 ---
 
-### Sprint 2 — Listas y persistencia *(Semanas 6–11)*
+### Sprint 2 — Listas *(Semanas 5–7)*
 
-**Entregable:** matrículas dinámicas con notas registradas, ordenamiento y persistencia.
+**Entregable:** matrículas dinámicas con notas registradas, ordenamiento.
 
 - Gestionar estudiantes y materias con `ListaSimple<T>` en el `Service`
 - Cada matrícula contiene `ListaSimple<Calificacion>`
 - Listar estudiantes ordenados por promedio (`SelectionSort` en el `Service`)
-- Persistir estudiantes en `data/estudiantes.txt` y calificaciones en `data/calificaciones.txt`
 - Reconstruir las listas al iniciar la aplicación
 
 ---
 
-### Sprint 3 — Pilas y Colas *(Semanas 12–13)*
+### Sprint 3 — Pilas y Colas *(Semanas 8–9)*
 
 **Entregable:** corrección de notas con trazabilidad y gestión de solicitudes de matrícula.
 
@@ -73,16 +72,17 @@ Es el proyecto con mayor riqueza de relaciones entre entidades (`Estudiante ↔ 
 
 ---
 
-### Sprint 4 — Recursividad *(Semana 14)*
+### Sprint 4 — Persistencia y recursividad *(Semanas 10–13)*
 
-**Entregable:** cálculo recursivo del promedio y búsqueda en historial.
+**Entregable:** persistencia del sistema en archivos y cálculo recursivo del promedio y búsqueda en historial.
 
+- Persistir estudiantes en `data/estudiantes.txt` y calificaciones en `data/calificaciones.txt`
 - Calcular recursivamente el promedio ponderado acumulado de un estudiante (recorriendo su lista de calificaciones)
 - Buscar recursivamente si un estudiante ha cursado una materia específica en su historial
 
 ---
 
-### Sprint 5 — Árboles e integración final *(Semanas 15–17)*
+### Sprint 5 — Árboles e integración final *(Semanas 14–16)*
 
 **Entregable:** ranking de estudiantes y proyecto completo integrado.
 

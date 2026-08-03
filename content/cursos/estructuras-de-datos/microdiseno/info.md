@@ -11,15 +11,17 @@
 
 | Actividad                                                                 | Porcentaje | Momento                          |
 | ------------------------------------------------------------------------- | ---------- | -------------------------------- |
-| **Momento evaluativo 1:** Programación orientada a objetos (encapsulamiento, herencia, polimorfismo y UML) | 15%        | Semana 5 (XX de XX)              |
-| **Momento evaluativo 2:** Listas — listas enlazadas y ordenamiento        | 15%        | Semana 10 (XX de XX)            |
-| **Momento evaluativo 3:** Manejo de archivos                              | 10%        | Semana 11 (XX de XX)            |
-| **Momento evaluativo 4:** Pilas y colas                                   | 15%        | Semana 13 (XX de XX)            |
-| **Momento evaluativo 5:** Proyecto final — árboles e integración          | 25%        | Semana 16 (XX de XX)            |
+| **Momento evaluativo 1:** Programación orientada a objetos (encapsulamiento, herencia, polimorfismo y UML) | 15%        | Semana 4 (28 de agosto)          |
+| **Momento evaluativo 2:** Listas — listas enlazadas y ordenamiento        | 15%        | Semana 7 (18 de septiembre)      |
+| **Momento evaluativo 3:** Pilas y colas — **examen institucional**         | 20%        | Semana 9 (2 de octubre)          |
+| **Momento evaluativo 4:** Manejo de archivos                              | 10%        | Semana 11 (16 de octubre)        |
+| **Momento evaluativo 5:** Proyecto final — árboles e integración          | 20%        | Semana de exámenes (24–27 nov)   |
 | **Seguimiento** (incluye recursividad y actividades continuas)           | 20%        | Durante todo el semestre          |
 | **Total**                                                                 | **100%**   |                                  |
 
-> Cada momento evaluativo se cierra **después** de que su contenido se ha enseñado por completo, y su componente práctico es el laboratorio evaluativo (★) del tema correspondiente. No existe un sistema de evaluación paralelo: el laboratorio ★ *es* la parte práctica del momento. La recursividad (Semana 14) ya no es un momento evaluativo independiente: su laboratorio se evalúa como parte del Seguimiento continuo.
+> Cada momento evaluativo se cierra **después** de que su contenido se ha enseñado por completo, y su componente práctico es el laboratorio evaluativo (★) del tema correspondiente. No existe un sistema de evaluación paralelo: el laboratorio ★ *es* la parte práctica del momento. La recursividad (Semanas 12–13) no es un momento evaluativo independiente: su laboratorio se evalúa como parte del Seguimiento continuo.
+
+> **Momento 3 — excepción.** Pilas y colas se evalúa mediante un **examen institucional del 20 %**, cuyo formato y aplicación define la institución. El laboratorio del viernes 2 de octubre se mantiene, pero **no** constituye el momento evaluativo: se califica dentro del Seguimiento continuo y funciona como preparación para el examen. Es el único momento del curso cuyo componente práctico no es su laboratorio ★.
 
 ### Estructura semanal
 
@@ -33,7 +35,7 @@
 
 ---
 
-## Prererequisitos técnicos
+## Prerrequisitos técnicos
 - **Java JDK 21 LTS**: instalación y configuración en el entorno de desarrollo.
 - **Visual Studio Code**: instalación y configuración de extensiones para Java.
 - **Git y GitHub**: instalación, configuración y uso básico de control de versiones.
@@ -45,21 +47,29 @@
 | Sem | Módulo | Foco de la semana | Evaluación |
 |-----|--------|-------------------|------------|
 | 1  | Git y GitHub | Control de versiones, ramas, estructura del proyecto | |
-| 2  | POO (parte 1) | Clases, objetos, encapsulamiento | |
-| 3  | POO (parte 1) | Métodos avanzados, `static`, UML básico | |
-| 4  | POO (parte 2) | Herencia y polimorfismo | |
-| 5  | POO (parte 2) | Composición/agregación, UML avanzado, diseño con TAD | ★ M1 |
-| 6  | Introducción a las estructuras | TAD y criterios de selección | |
-| 7  | Eficiencia algorítmica | Notación Big O y comparación de estructuras | |
-| 8  | Listas | Lista simple enlazada | |
-| 9  | Listas | Lista doble y circular | |
-| 10 | Listas | Ordenamiento sobre listas enlazadas | ★ M2 |
-| 11 | Manejo de archivos | Persistencia en archivos de texto | ★ M3 |
-| 12 | Pilas y colas | Pilas (LIFO) | |
-| 13 | Pilas y colas | Colas (FIFO) | ★ M4 |
-| 14 | Recursividad | Algoritmos recursivos (evaluado como Seguimiento) | |
-| 15 | Árboles | Árbol binario y recorridos | |
-| 16 | Árboles | BST + integración y sustentación del proyecto final | ★ M5 |
+| 2  | POO | Clases, objetos y encapsulamiento | |
+| 3  | POO | Herencia y polimorfismo | |
+| 4  | POO | Relaciones entre clases, UML y diagramas de paquetes | ★ M1 |
+| 5  | Listas | Big O (sesión única) y lista simple enlazada | |
+| 6  | Listas | Operaciones, lista doble y circular | |
+| 7  | Listas | Ordenamiento sobre listas enlazadas | ★ M2 |
+| 8  | Pilas y colas | Pilas (LIFO) | |
+| 9  | Pilas y colas | Colas (FIFO) | ★ M3 |
+| 10 | Manejo de archivos | Persistencia en archivos de texto | |
+| 11 | Manejo de archivos | Archivos binarios y modificación de registros | ★ M4 |
+| 12 | Recursividad | Fundamentos y algoritmos recursivos clásicos | |
+| 13 | Recursividad | Recursión sobre estructuras y backtracking | |
+| 14 | Árboles | Árbol binario y recorridos | |
+| 15 | Árboles | Árbol binario de búsqueda (BST) | |
+| 16 | Árboles | Integración final y preparación de la sustentación | |
+| Exám. | — | Sustentación del proyecto de aula | ★ M5 |
+
+### Criterios transversales
+
+Dos temas no tienen semana propia y se trabajan distribuidos:
+
+- **Criterios de selección de estructuras (RADE1-1):** cada estructura se presenta respondiendo "¿para qué problema sirve esta?". Semanas 5, 6, 7, 8, 9 y 14.
+- **Tipos abstractos de datos (TAD):** cada estructura se introduce primero como contrato (`interface` en Java) y después como implementación — TAD Pila (sem. 8), TAD Cola (sem. 9), TAD Árbol binario (sem. 14). El diseño con TAD y su representación en UML se evalúa en el Momento 1 (sem. 4).
 
 ---
 
@@ -87,7 +97,7 @@ proyecto-aula/
 │   ├── controller/        # recibe el input del usuario y coordina con el service
 │   ├── view/              # menús y presentación en consola
 │   └── Main.java
-├── data/                  # archivos de texto para persistencia
+├── data/                  # archivos de texto y binarios para persistencia
 └── README.md
 ```
 
@@ -119,11 +129,11 @@ Cada archivo de proyecto detalla la evaluación de viabilidad, las entidades del
 
 | Sprint | Foco | Semanas |
 |--------|------|---------|
-| Sprint 1 | POO y arquitectura base | 1–5 |
-| Sprint 2 | Listas y persistencia | 6–11 |
-| Sprint 3 | Pilas y colas | 12–13 |
-| Sprint 4 | Recursividad | 14 |
-| Sprint 5 | Árboles e integración final | 15–16 |
+| Sprint 1 | POO y arquitectura base | 1–4 |
+| Sprint 2 | Listas | 5–7 |
+| Sprint 3 | Pilas y colas | 8–9 |
+| Sprint 4 | Persistencia y recursividad | 10–13 |
+| Sprint 5 | Árboles e integración final | 14–16 |
 
 ---
 
@@ -141,7 +151,7 @@ Cada archivo de proyecto detalla la evaluación de viabilidad, las entidades del
 - Ramas: `branch`, `checkout`, `merge`
 - Flujo de trabajo básico: feature branch, resolución de conflictos
 
-**P — Laboratorio: Repositorio, ramas y conflictos**
+**P — Laboratorio: Repositorio, ramas y conflictos** *(trabajo independiente guiado — el viernes 7 de agosto es festivo)*
 - Crear un repositorio local y vincularlo a GitHub
 - Realizar una secuencia de commits con mensajes descriptivos
 - Crear y fusionar ramas; identificar y resolver un conflicto de merge
@@ -149,7 +159,7 @@ Cada archivo de proyecto detalla la evaluación de viabilidad, las entidades del
 
 ---
 
-## Módulo 2 — Programación orientada a objetos (parte 1)
+## Módulo 2 — Programación orientada a objetos
 
 ### Semana 2 — Clases, objetos y encapsulamiento
 
@@ -162,6 +172,7 @@ Cada archivo de proyecto detalla la evaluación de viabilidad, las entidades del
 - Modificadores de acceso: `private`, `public`, `protected`, default
 - Getters y setters: convenciones y casos de uso
 - Buenas prácticas de encapsulamiento; validación dentro de setters
+- Constructores sobrecargados
 
 **P — Laboratorio: Clase de dominio encapsulada**
 - Modelar una clase con atributos privados y constructores sobrecargados
@@ -169,28 +180,9 @@ Cada archivo de proyecto detalla la evaluación de viabilidad, las entidades del
 - Verificar el comportamiento con casos de prueba
 - *Capas involucradas:* la clase modelada va en `model/domain/`; el menú de consola va en `view/`; se crea un stub vacío en `service/` y en `controller/`
 
-### Semana 3 — Modelado y UML básico
+> **Trabajo independiente guiado:** métodos y atributos estáticos (`static`), sobrecarga de métodos, clase `String` y wrapper classes (`Integer`, `Double`). Se revisan en asesoría y se dan por vistos en el laboratorio de la semana 3.
 
-**T1 — Métodos avanzados y clases de utilidad**
-- Sobrecarga de métodos (method overloading)
-- Métodos y atributos estáticos (`static`)
-- Clase `String` y Wrapper classes (`Integer`, `Double`, etc.)
-
-**T2 — Introducción al UML**
-- ¿Para qué sirve el UML en el desarrollo de software?
-- Diagrama de clases: clase, atributos, métodos, visibilidad
-- Lectura e interpretación de un diagrama de clases
-
-**P — Laboratorio: Del diagrama al código**
-- Leer un diagrama de clases e implementarlo en Java
-- Diseñar el diagrama de la arquitectura del proyecto de aula mostrando las cuatro capas y sus relaciones; luego implementarlo
-- Revisión entre pares: ¿el código respeta el diagrama?
-
----
-
-## Módulo 3 — Programación orientada a objetos (parte 2)
-
-### Semana 4 — Herencia y polimorfismo
+### Semana 3 — Herencia y polimorfismo
 
 **T1 — Herencia**
 - Superclase y subclase: keyword `extends`
@@ -206,17 +198,18 @@ Cada archivo de proyecto detalla la evaluación de viabilidad, las entidades del
 - Diseñar una jerarquía de al menos tres niveles para un contexto dado
 - Implementar polimorfismo a través de una interfaz o clase abstracta común
 - Probar el comportamiento polimórfico mediante arreglos de referencias
+- Primera lectura e interpretación de un diagrama de clases
 - *Capas involucradas:* la jerarquía va en `model/domain/`; las interfaces compartidas pueden definirse en `model/` directamente
 
-### Semana 5 — Relaciones entre clases y UML avanzado
+### Semana 4 — Relaciones entre clases, UML y diseño con TAD
 
-**T1 — Composición, agregación y diagramas de paquetes**
+**T1 — Composición, agregación y UML**
 - Asociación, agregación y composición: diferencias conceptuales
-- Representación en UML: multiplicidades, roles, flechas de navegación
-- Diagramas de paquetes: organización de clases en Java
+- Diagrama de clases: atributos, métodos, visibilidad
+- Representación de relaciones en UML: multiplicidades, roles, flechas de navegación
 
-**T2 — Diseño con TAD y orientación a objetos**
-- Diagrama de clases con relaciones: cómo leerlo e implementarlo en Java
+**T2 — Diagramas de paquetes y diseño con TAD**
+- Diagramas de paquetes: organización de clases en Java
 - Modelar el TAD de una estructura de datos con clases e interfaces
 - Puente entre el diseño OO y la implementación de estructuras de datos
 
@@ -228,80 +221,43 @@ Cada archivo de proyecto detalla la evaluación de viabilidad, las entidades del
 
 ---
 
-## Módulo 4 — Introducción a las estructuras de datos
+## Módulo 3 — Listas
 
-*Incluye fundamentos de eficiencia algorítmica como criterio central para la selección de estructuras.*
+*Incluye la sesión única de eficiencia algorítmica, que se dicta antes de la primera estructura y queda como criterio de decisión para todo el semestre.*
 
-### Semana 6 — Panorama general y tipos abstractos de datos
+### Semana 5 — Eficiencia algorítmica y lista simple enlazada
 
-**T1 — Tipos abstractos de datos (TAD)**
-- ¿Qué es un tipo abstracto de datos?
-- Separación entre interfaz y representación interna (conexión directa con las interfaces y clases abstractas vistas en el Módulo 3)
-- Panorama general de estructuras: arreglos, listas, pilas, colas, árboles, grafos, tablas hash
-
-**T2 — Criterios de selección de estructuras**
-- Ventajas y desventajas de cada estructura de datos
-- Preguntas clave para elegir una estructura: ¿cómo se accede?, ¿con qué frecuencia se inserta o elimina?, ¿importa el orden?
-- Relación entre el tipo de problema, los datos y la estructura adecuada
-
-**P — Laboratorio: Selección argumentada de estructuras**
-- Dado un conjunto de enunciados de problemas, identificar la estructura más adecuada para cada uno
-- Justificar la selección con criterios explícitos
-- Discusión grupal de las decisiones tomadas y revisión de alternativas
-- *Capas involucradas:* se consolida el entendimiento de que todas las estructuras del semestre vivirán en `model/structures/`
-
-### Semana 7 — Eficiencia algorítmica aplicada a estructuras
-
-**T1 — Notación Big O y análisis de complejidad**
+**T1 — Notación Big O (sesión única)**
 - Complejidad temporal y espacial
-- Notación Big O: definición e interpretación
-- Casos mejor, promedio y peor
+- Notación Big O: definición e interpretación; casos mejor, promedio y peor
 - Reglas básicas: constantes, término dominante, composición de operaciones
-
-**T2 — Comparación de estructuras por eficiencia**
 - Tabla comparativa de operaciones clave (acceso, búsqueda, inserción, eliminación) por estructura: O(1), O(log n), O(n), O(n²)
-- ¿Cuándo determina la eficiencia la elección de una estructura?
-- Conexión entre Big O y las decisiones de diseño que se tomarán en el curso
+- El análisis de complejidad se retoma dentro de cada estructura del curso
 
-**P — Laboratorio: Análisis de complejidad en Java**
-- Medir tiempos de ejecución con `System.nanoTime()`
-- Comparar operaciones de acceso y búsqueda en arreglo, lista enlazada y mapa
-- Tabular los resultados y contrastarlos con la teoría Big O
-- *Capas involucradas:* el código de medición va en el `Service`; la presentación de resultados va en la `View`
-
----
-
-## Módulo 5 — Listas
-
-### Semana 8 — Lista simple enlazada
-
-**T1 — Nodos y memoria dinámica en Java**
+**T2 — Nodos y memoria dinámica en Java**
 - Gestión de memoria dinámica y referencias en Java
 - Estructura de un nodo: atributo dato y referencia al siguiente nodo
 - Estructura de la lista: referencia `head` y tamaño; lista vacía
 
-**T2 — Operaciones sobre la lista simple**
-- Inserción al inicio, al final y en posición arbitraria
-- Búsqueda por valor y por índice
-- Análisis de complejidad de cada operación
-
 **P — Laboratorio: Lista simple enlazada en Java**
 - Implementar la clase `Nodo<T>` y la clase `ListaSimple<T>` genérica
-- Implementar inserción, búsqueda y recorrido completo
+- Implementar inserción y recorrido completo
 - Validar con casos de prueba que cubran listas vacías, de un elemento y con varios elementos
 - *Capas involucradas:* `Nodo<T>` y `ListaSimple<T>` van en `model/structures/`; el `Service` las usa para gestionar entidades del dominio; `Controller` y `View` no referencian las estructuras directamente
 
-### Semana 9 — Lista doble y lista circular
+### Semana 6 — Operaciones, lista doble y circular
 
-**T1 — Eliminación en lista simple y comparación con arreglos**
-- Eliminación al inicio, al final y por valor en lista simple
+**T1 — Operaciones sobre la lista simple y comparación con arreglos**
+- Inserción, búsqueda y eliminación al inicio, al final y en posición arbitraria
+- Análisis de complejidad de cada operación
 - Ventajas y desventajas frente a arreglos: acceso, inserción, uso de memoria
-- ¿Cuándo elegir una lista enlazada sobre un arreglo?
+- **¿Cuándo elegir una lista enlazada sobre un arreglo?**
 
 **T2 — Lista doblemente enlazada y lista circular**
-- Nodo doble: referencia `prev` y `next`; operaciones de inserción y eliminación
+- Nodo doble: referencias `prev` y `next`; operaciones de inserción y eliminación
 - Recorrido inverso como ventaja de la lista doble
 - Lista circular simple y doble: estructura y casos de uso típicos
+- **¿Cuándo simple, cuándo doble, cuándo circular?**
 
 **P — Laboratorio: Lista doble y circular**
 - Implementar `ListaDoble<T>` con inserción y eliminación en ambos extremos
@@ -309,7 +265,7 @@ Cada archivo de proyecto detalla la evaluación de viabilidad, las entidades del
 - Comparar el código de la lista simple y la doble: ¿qué cambió estructuralmente?
 - *Capas involucradas:* `ListaDoble<T>` y `ListaCircular<T>` van en `model/structures/`; el `Service` decide cuál usar según el caso de estudio
 
-### Semana 10 — Ordenamiento ★
+### Semana 7 — Ordenamiento ★
 
 **T1 — Estrategias de ordenamiento sobre listas enlazadas**
 - Insertion sort adaptado a lista enlazada: lógica y complejidad
@@ -319,7 +275,7 @@ Cada archivo de proyecto detalla la evaluación de viabilidad, las entidades del
 **T2 — Síntesis del módulo de listas**
 - Comparación entre lista simple, doble y circular
 - Tabla de decisión: cuándo usar cada tipo de lista
-- Integración con el modelo TAD y los diagramas UML del módulo anterior
+- Integración con los diagramas UML del módulo anterior
 
 **P ★ — Laboratorio evaluativo (Momento 2): Caso de estudio con listas**
 - Implementar una solución completa para un caso de estudio dado
@@ -329,37 +285,15 @@ Cada archivo de proyecto detalla la evaluación de viabilidad, las entidades del
 
 ---
 
-## Módulo 6 — Manejo de archivos
+## Módulo 4 — Pilas y Colas
 
-### Semana 11 — Archivos de texto en Java ★
-
-**T1 — Fundamentos de archivos**
-- Archivos de texto vs. archivos binarios: diferencias y casos de uso
-- Modelo de flujos (streams) en Java
-- Clases `File`, `FileReader`, `FileWriter`
-
-**T2 — Lectura, escritura y modificación**
-- `BufferedReader` y `BufferedWriter`: lectura y escritura eficiente línea a línea
-- Manejo de excepciones: `IOException`, bloque `try-with-resources`
-- Lectura y escritura de datos estructurados (formato CSV-like)
-
-**P ★ — Laboratorio evaluativo (Momento 3): Persistencia de una lista enlazada**
-- Guardar el contenido de una lista enlazada en un archivo de texto
-- Leer el archivo y reconstruir la lista en memoria
-- Manejar correctamente errores de lectura, escritura y archivo inexistente
-- *Capas involucradas:* los métodos `guardar()` y `cargar()` van en el `Service`; los archivos `.txt` se almacenan en `data/`; ninguna otra capa accede directamente al sistema de archivos
-- Cierre del **Momento evaluativo 3 — Manejo de archivos**, con rúbrica socializada previamente
-
----
-
-## Módulo 7 — Pilas y Colas
-
-### Semana 12 — Pilas
+### Semana 8 — Pilas
 
 **T1 — TAD Pila**
 - Concepto LIFO (Last In, First Out)
 - Operaciones: `push`, `pop`, `peek`, `isEmpty`, `size`
 - Aplicaciones reales: historial de navegación, pila de llamadas, deshacer/rehacer
+- **¿Qué problemas piden una pila?**
 
 **T2 — Implementación de pilas en Java**
 - Implementación propia con lista enlazada simple
@@ -372,29 +306,75 @@ Cada archivo de proyecto detalla la evaluación de viabilidad, las entidades del
 - Evaluar una expresión en notación postfija usando una pila
 - *Capas involucradas:* `Pila<T>` va en `model/structures/`; los algoritmos de verificación y conversión van en el `Service`
 
-### Semana 13 — Colas ★
+### Semana 9 — Colas ★
 
 **T1 — TAD Cola**
 - Concepto FIFO (First In, First Out)
 - Operaciones: `enqueue`, `dequeue`, `front`, `isEmpty`, `size`
 - Aplicaciones reales: gestión de turnos, impresión, scheduling de procesos
+- **¿Qué problemas piden una cola y no una pila?**
 
 **T2 — Implementación de colas en Java**
 - Implementación propia con lista enlazada simple
 - Interface `Queue<E>` y clase `LinkedList<E>` del API de Java
 - Introducción a la cola de prioridad (`PriorityQueue<E>`)
 
-**P ★ — Laboratorio evaluativo (Momento 4): Caso de estudio con pilas y colas**
+**P — Laboratorio: Caso de estudio con pilas y colas**
 - Implementar una solución que combine pila y cola para un caso de estudio dado
 - Incluir diseño UML y código en Java
 - *Capas involucradas:* `Cola<T>` va en `model/structures/`; la solución debe mostrar `Pila<T>` y `Cola<T>` integradas a través del `Service`; `Controller` y `View` no conocen las estructuras directamente
-- Evaluación con rúbrica socializada previamente con el grupo (cierre del **Momento evaluativo 4 — Pilas y colas**)
+- Se califica dentro del **Seguimiento continuo** y sirve de preparación para el examen institucional
+
+**★ Momento evaluativo 3 — Examen institucional de pilas y colas (20 %)**
+- Formato y aplicación definidos por la institución
+- Cubre TAD Pila y TAD Cola, sus operaciones, implementación y criterios de uso (semanas 8–9)
 
 ---
 
-## Módulo 8 — Recursividad
+## Módulo 5 — Manejo de archivos
 
-### Semana 14 — Algoritmos recursivos
+### Semana 10 — Archivos de texto
+
+**T1 — Fundamentos de archivos**
+- Archivos de texto vs. archivos binarios: diferencias, ventajas y desventajas según el contexto de uso
+- Modelo de flujos (streams) en Java
+- Clases `File`, `FileReader`, `FileWriter`
+
+**T2 — Lectura y escritura**
+- `BufferedReader` y `BufferedWriter`: lectura y escritura eficiente línea a línea
+- Manejo de excepciones: `IOException`, bloque `try-with-resources`
+- Lectura y escritura de datos estructurados (formato CSV-like)
+
+**P — Laboratorio: Persistencia de una lista enlazada**
+- Guardar el contenido de una lista enlazada en un archivo de texto
+- Leer el archivo y reconstruir la lista en memoria
+- Manejar correctamente errores de lectura, escritura y archivo inexistente
+- *Capas involucradas:* los métodos `guardar()` y `cargar()` van en el `Service`; los archivos `.txt` se almacenan en `data/`; ninguna otra capa accede directamente al sistema de archivos
+
+### Semana 11 — Archivos binarios y modificación ★
+
+**T1 — Archivos binarios**
+- `DataOutputStream` y `DataInputStream`: escritura y lectura de tipos primitivos
+- Serialización de objetos: `ObjectOutputStream`, `ObjectInputStream`, interface `Serializable`
+- Comparación con archivos de texto: tamaño, velocidad y legibilidad
+
+**T2 — Modificación de registros**
+- Actualizar y eliminar registros sin reescribir el archivo completo
+- Estrategia de archivo temporal y reemplazo atómico
+- Integridad de los datos ante errores a mitad de escritura
+
+**P ★ — Laboratorio evaluativo (Momento 4): Persistencia completa del proyecto**
+- Guardar y cargar el estado del caso de estudio en formato de texto y en binario
+- Implementar actualización y eliminación de registros
+- Manejar correctamente los errores de lectura, escritura y archivo inexistente
+- *Capas involucradas:* toda la persistencia vive en el `Service`; los archivos se almacenan en `data/`
+- Cierre del **Momento evaluativo 4 — Manejo de archivos**, con rúbrica socializada previamente
+
+---
+
+## Módulo 6 — Recursividad
+
+### Semana 12 — Fundamentos y algoritmos clásicos
 
 **T1 — Fundamentos de recursividad**
 - Concepto de recursividad: caso base y caso recursivo
@@ -406,23 +386,39 @@ Cada archivo de proyecto detalla la evaluación de viabilidad, las entidades del
 - Torres de Hanói: planteamiento, solución recursiva y complejidad
 - ¿Cuándo preferir recursión sobre iteración? Ventajas y riesgos
 
+**P — Laboratorio: Algoritmos recursivos clásicos**
+- Diseñar, documentar e implementar dos algoritmos recursivos
+- Incluir prueba de escritorio para al menos dos casos de cada uno
+- Validar la implementación con casos de prueba
+
+### Semana 13 — Recursión sobre estructuras
+
+**T1 — Recursión aplicada a estructuras de datos**
+- Recorrido, búsqueda y conteo recursivos sobre una lista enlazada
+- Versión recursiva vs. iterativa del mismo recorrido: legibilidad y costo
+
+**T2 — Riesgos, límites y backtracking**
+- `StackOverflowError`, recursión sin caso base, costo exponencial del Fibonacci ingenuo
+- Introducción al backtracking
+- Puente hacia los recorridos recursivos de árboles del módulo siguiente
+
 **P — Laboratorio: Caso de estudio recursivo**
-- Diseñar y documentar un algoritmo recursivo para un problema dado
-- Incluir prueba de escritorio para al menos dos casos
+- Diseñar y documentar un algoritmo recursivo para el proyecto de aula
 - Implementar la solución en Java y validarla con casos de prueba
 - *Capas involucradas:* los métodos recursivos van en el `Service` si son lógica de negocio, o dentro de la propia estructura en `model/structures/` si son operaciones de recorrido
-- Evaluación con rúbrica socializada previamente con el grupo, computada como parte del **Seguimiento continuo** (ya no es un momento evaluativo independiente)
+- Evaluación con rúbrica socializada previamente con el grupo, computada como parte del **Seguimiento continuo** (no es un momento evaluativo independiente)
 
 ---
 
-## Módulo 9 — Árboles ★
+## Módulo 7 — Árboles e integración final ★
 
-### Semana 15 — Árbol binario
+### Semana 14 — Árbol binario
 
 **T1 — Conceptos y TAD árbol binario**
 - Estructura de árbol: raíz, nodo, hoja, subárbol, nivel, altura
 - Árbol binario: definición y propiedades
 - TAD Árbol binario: representación con nodos enlazados en Java
+- **¿Qué problemas piden una estructura jerárquica?**
 
 **T2 — Inserción y recorridos**
 - Inserción de nodos en un árbol binario
@@ -435,23 +431,42 @@ Cada archivo de proyecto detalla la evaluación de viabilidad, las entidades del
 - Visualizar por consola el resultado de cada recorrido sobre un árbol de prueba
 - *Capas involucradas:* `NodoArbol<T>` y `ArbolBinario<T>` van en `model/structures/`; los recorridos se exponen a través del `Service`; la `View` solo imprime los resultados
 
-### Semana 16 — Árbol binario de búsqueda (BST) e integración final ★
+### Semana 15 — Árbol binario de búsqueda (BST)
 
 **T1 — BST: búsqueda e inserción**
 - Propiedad de ordenamiento del BST
 - Operación `buscar`: implementación recursiva y análisis de complejidad
 - Operación `insertar`: mantenimiento de la propiedad BST tras cada inserción
+- Efecto de un árbol degenerado sobre la complejidad
 
-**T2 — Eliminación en BST y síntesis del curso**
+**T2 — Eliminación en BST**
 - Casos de eliminación: nodo hoja, nodo con un hijo, nodo con dos hijos (sucesor in-order)
+- Verificación de que la propiedad BST se mantiene tras cada eliminación
+
+**P — Laboratorio: BST completo**
+- Implementar un `BST<T>` con inserción, búsqueda, eliminación y recorridos
+- Validar con casos de prueba que cubran los tres casos de eliminación
+- *Capas involucradas:* `BST<T>` va en `model/structures/`; el `Service` expone búsqueda, inserción y eliminación
+
+### Semana 16 — Integración final y preparación de la sustentación
+
+**T1 — Aplicaciones de BST y síntesis del curso**
 - Aplicaciones de los BST: diccionarios, índices, autocompletado
 - Síntesis del curso: hilo conductor entre todos los módulos
 
-**P ★ — Laboratorio evaluativo (Momento 5): Proyecto final con árboles**
-- Implementar un BST completo con inserción, búsqueda, eliminación y recorridos
-- Aplicarlo a un caso de estudio que integre al menos dos estructuras vistas en el curso
-- *Capas involucradas:* `BST<T>` va en `model/structures/`; el `Service` expone búsqueda, inserción y eliminación; la solución final debe demostrar que las cuatro capas están correctamente separadas
-- Sustentación del proyecto de aula completo y evaluación con rúbrica socializada previamente (cierre del **Momento evaluativo 5 — Proyecto final**)
+**T2 — Integración y criterios de sustentación**
+- Revisión de la separación de las cuatro capas en el proyecto de aula
+- Criterios y rúbrica de la sustentación, socializados con el grupo
+
+**P — Laboratorio: Integración final**
+- El proyecto debe articular al menos tres estructuras vistas en el curso sobre el caso de estudio elegido
+- Verificar que las cuatro capas están correctamente separadas
+- Ensayo de sustentación y retroalimentación entre pares
+
+### Semana de exámenes ★ — Sustentación del proyecto final
+
+- Sustentación del proyecto de aula completo ante el grupo
+- Evaluación con rúbrica socializada previamente (cierre del **Momento evaluativo 5 — Proyecto final**)
 
 ---
 

@@ -39,7 +39,7 @@ El dominio veterinario añade un nivel de modelado interesante respecto al consu
 
 ## Sprints acumulativos
 
-### Sprint 1 — POO y arquitectura base *(Semanas 1–5)*
+### Sprint 1 — POO y arquitectura base *(Semanas 1–4)*
 
 **Entregable:** fichas de mascotas con jerarquía de animales y relación con dueños.
 
@@ -52,19 +52,18 @@ El dominio veterinario añade un nivel de modelado interesante respecto al consu
 
 ---
 
-### Sprint 2 — Listas y persistencia *(Semanas 6–11)*
+### Sprint 2 — Listas *(Semanas 5–7)*
 
-**Entregable:** gestión dinámica de mascotas por dueño, historial de consultas y persistencia.
+**Entregable:** gestión dinámica de mascotas por dueño, historial de consultas.
 
 - Cada `Dueño` gestiona sus mascotas con `ListaSimple<Animal>`
 - Cartilla de vacunas de cada mascota como `ListaSimple<Vacuna>`
 - Listar consultas ordenadas por fecha
-- Persistir fichas en `data/mascotas.txt` y consultas en `data/consultas.txt`
 - Reconstruir las listas al iniciar la aplicación
 
 ---
 
-### Sprint 3 — Pilas y Colas *(Semanas 12–13)*
+### Sprint 3 — Pilas y Colas *(Semanas 8–9)*
 
 **Entregable:** sala de espera funcional y acceso rápido al historial reciente de una mascota.
 
@@ -74,16 +73,17 @@ El dominio veterinario añade un nivel de modelado interesante respecto al consu
 
 ---
 
-### Sprint 4 — Recursividad *(Semana 14)*
+### Sprint 4 — Persistencia y recursividad *(Semanas 10–13)*
 
-**Entregable:** lógica recursiva sobre la cartilla de vacunación.
+**Entregable:** persistencia del sistema en archivos y lógica recursiva sobre la cartilla de vacunación.
 
+- Persistir fichas en `data/mascotas.txt` y consultas en `data/consultas.txt`
 - Buscar recursivamente en la cartilla si una vacuna específica está pendiente (próxima fecha < hoy)
 - Contar recursivamente las consultas de una mascota en un rango de fechas
 
 ---
 
-### Sprint 5 — Árboles e integración final *(Semanas 15–17)*
+### Sprint 5 — Árboles e integración final *(Semanas 14–16)*
 
 **Entregable:** búsqueda eficiente por número de ficha y proyecto completo integrado.
 

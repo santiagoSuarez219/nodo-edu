@@ -11,8 +11,8 @@ presentation: true
 slides_hint: "Cada sección ## es una diapositiva. Presentación sincrona."
 date: "2026-07-21"
 author: "Asistente de Docencia"
-summary: ""
-updatedAt: "2026-07-21"
+summary: "Repositorio, staging area, commit, HEAD e historial con Git, más buenas prácticas de mensajes de commit y el uso básico de la terminal."
+updatedAt: "2026-08-03"
 ---
 
 # Fundamentos de Control de Versiones
@@ -34,23 +34,6 @@ proyectoAula_v2_final_YA_arreglado.java
 - Si borraste sin querer una función que sí funcionaba ayer, ¿cómo la recuperas?
 - Ahora súmale un compañero de equipo que trabaja **al mismo tiempo** que tú sobre el mismo archivo, enviándolo por correo o USB o por WhastApp.
 
-Esto no es un problema de programación: es un problema de **gestión de cambios en el tiempo**. Y es exactamente el problema que resuelve el control de versiones.
-
-## Más problemas que resuelve el control de versiones
-
-El ejemplo de las copias manuales es solo uno de varios escenarios donde la falta de control de versiones se convierte en un dolor de cabeza:
-
-**1. Un cambio nuevo rompe lo que ya funcionaba**
-Estás construyendo un proyecto con 5 funcionalidades. Terminaste las primeras tres, y funcionan bien. Al implementar la cuarta, algo sale mal: el código se daña y, sin darte cuenta, ese error también rompe las funcionalidades 1, 2 y 3. Sin un historial de cambios, no tienes forma de volver al punto exacto donde todo funcionaba — tocaría reescribir desde cero o depurar a ciegas.
-
-**2. Juntar el trabajo de dos personas**
-Tú y un compañero trabajan sobre el mismo proyecto al mismo tiempo. Cada uno edita partes distintas (o a veces las mismas) del código. Al final del día, ¿cómo combinan ambos trabajos sin que uno sobrescriba al otro? Copiar y pegar archivos a mano es lento y propenso a errores — casi siempre alguien termina perdiendo parte de su trabajo.
-
-**3. El cliente cambia de opinión**
-El profesor (o el cliente, en un proyecto real) te pide una función nueva. La construyes, la pruebas, todo bien. Una semana después te dice: "en realidad estaba mejor como estaba antes, revierte ese cambio". Sin un registro de versiones, "como estaba antes" es solo un recuerdo impreciso — no un estado real y recuperable del proyecto.
-
-Los tres problemas comparten algo: todos requieren poder **volver atrás** o **combinar cambios** de forma confiable, en vez de depender de la memoria o de archivos duplicados. Git resuelve el primero y el tercero con el historial de commits que vemos hoy (`git log`, y comandos como `checkout`/`revert` que se profundizan en el laboratorio); el segundo requiere además trabajar con **ramas** (`branch`, `merge`), tema de la sesión T2.
-
 ## La solución: un sistema que recuerda por ti
 
 En vez de copias manuales, un **sistema de control de versiones** guarda automáticamente cada cambio significativo del proyecto, con quién lo hizo, cuándo y por qué — sin duplicar archivos.
@@ -63,6 +46,30 @@ flowchart LR
 **Git** es el sistema de control de versiones más usado en la industria. Es **distribuido**: cada persona tiene una copia completa del historial del proyecto en su propia máquina, no depende de un único servidor central.
 
 > Definición formal: el **control de versiones** es la práctica de registrar los cambios realizados sobre uno o varios archivos a lo largo del tiempo, de modo que se pueda recuperar cualquier versión anterior cuando se necesite.
+
+## Material adicional: descarga e instalación de Git
+
+Antes de crear tu primer repositorio necesitas tener Git instalado en tu máquina. El siguiente video cubre la descarga e instalación paso a paso en los distintos sistemas operativos:
+
+<YouTubeEmbed id="jdXKwLNUfmg" title="Descarga e instalación de Git" />
+
+## La terminal: donde vas a escribir todo esto
+
+**Situación:** cada comando de Git que verás de aquí en adelante (`git init`, `git add`, `git commit`...) no se hace haciendo clic en botones — se escribe. Necesitas saber dónde escribirlo.
+
+**En la práctica**, la **terminal** (o línea de comandos) es una ventana de texto donde escribes instrucciones y el sistema operativo las ejecuta directamente, sin pasar por menús gráficos. Antes de usar Git necesitas moverte por carpetas y archivos desde ahí:
+
+| Comando                                               | ¿Qué hace?                                            |
+| ----------------------------------------------------- | ----------------------------------------------------- |
+| `pwd`                                                 | Muestra la carpeta en la que estás parado ahora mismo |
+| `ls` (`dir` en Windows)                               | Lista los archivos y carpetas del directorio actual   |
+| `cd <carpeta>`                                        | Entra a esa carpeta                                   |
+| `cd ..`                                               | Sube un nivel, a la carpeta contenedora               |
+| `mkdir <nombre>`                                      | Crea una carpeta nueva                                |
+| `touch <archivo>` (o `type nul > archivo` en Windows) | Crea un archivo vacío                                 |
+| `clear` (`cls` en Windows)                            | Limpia el texto acumulado en la pantalla              |
+
+> **Terminal:** interfaz de texto para dar instrucciones al sistema operativo mediante comandos, en vez de clics. Es el lugar donde ejecutarás **todos** los comandos de Git de esta lección.
 
 ## El repositorio: la memoria del proyecto
 
@@ -131,25 +138,26 @@ flowchart LR
 > **HEAD:** puntero que indica el commit en el que te encuentras actualmente. En el uso normal del día a día, HEAD apunta al último commit de tu rama de trabajo.
 > **Historial:** la secuencia completa y ordenada de commits del proyecto, consultable en cualquier momento con `git log`.
 
-## Ver el cambio exacto: git diff
+## Buenas prácticas al escribir un mensaje de commit
 
-**Situación:** antes de hacer `commit`, quieres confirmar _línea por línea_ qué modificaste, no solo recordar "creo que cambié algo en el constructor".
+**Situación:** revisas el `git log --oneline` de un compañero y encuentras mensajes como `cambios`, `arreglo`, `asdf`. Seis meses después, nadie — ni siquiera quien los escribió — recuerda qué significaban. El historial existe, pero no sirve como memoria del proyecto.
 
-**En la práctica:**
+**En la práctica**, un buen mensaje de commit sigue unas pocas reglas simples:
 
-```bash
-git diff
-```
+- **Un commit, un cambio lógico.** Si el mensaje necesita un "y" para describirlo ("arregla el bug y refactoriza Cliente"), probablemente son dos commits.
+- **Modo imperativo, presente:** "Agrega validación de edad", no "Agregado" ni "Agregando".
+- **Máximo ~50 caracteres en la primera línea.** Si hace falta más detalle, una línea en blanco y luego el cuerpo explicando el _por qué_, no el _qué_ — el `git diff` ya muestra el qué.
+- **Sin mensajes vacíos de contenido:** `wip`, `cambios`, `fix` no dicen nada sobre el proyecto.
 
 ```text
-- public Cliente(String nombre) {
-+ public Cliente(String nombre, int edad) {
-+     if (edad < 0) throw new IllegalArgumentException("Edad invalida");
+✅ "Agrega validacion de edad del cliente"
+❌ "cambios"
+
+✅ "Corrige NullPointerException en Cuenta.retirar"
+❌ "fix"
 ```
 
-Las líneas con `-` son lo que había antes; las líneas con `+` son lo nuevo.
-
-> `git diff` compara el directorio de trabajo contra la staging area. `git diff --staged` compara la staging area contra el último commit.
+> **Mensaje de commit:** la explicación de _por qué_ existe un cambio, dirigida a tu yo del futuro o a un compañero que nunca vio el código. Un buen mensaje ahorra minutos de arqueología cada vez que alguien revisa `git log`.
 
 ## Comandos esenciales — resumen
 
@@ -160,7 +168,6 @@ Las líneas con `-` son lo que había antes; las líneas con `+` son lo nuevo.
 | `git add <archivo>`       | Mueve cambios al staging area                       | Antes de cada commit                               |
 | `git commit -m "mensaje"` | Guarda el staging area como un punto en la historia | Cada vez que completas una unidad lógica de cambio |
 | `git log`                 | Muestra el historial de commits                     | Para revisar qué se ha hecho                       |
-| `git diff`                | Muestra los cambios línea por línea                 | Antes de un `add` o `commit`, para revisar         |
 
 ## Síntesis
 
@@ -168,4 +175,4 @@ Las líneas con `-` son lo que había antes; las líneas con `+` son lo nuevo.
 - El **repositorio** (`.git/`) guarda todo el historial del proyecto.
 - Los cambios pasan por dos etapas antes de quedar permanentes: **directorio de trabajo → staging area (`git add`) → historial (`git commit`)**.
 - **HEAD** indica dónde estás parado en la historia; `git log` te muestra toda la historia.
-- `git diff` te deja ver exactamente qué cambió, línea por línea, antes de comprometerte con el cambio.
+- Un buen **mensaje de commit** explica el _por qué_ de un cambio, no el _qué_ — imperativo, presente, corto y con contenido real; es lo que hace útil el historial meses después.

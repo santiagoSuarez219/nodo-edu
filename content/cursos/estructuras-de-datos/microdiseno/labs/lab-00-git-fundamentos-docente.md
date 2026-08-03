@@ -10,7 +10,7 @@
 | Duración equivalente | 2 h de trabajo autónomo (igual a la sesión P regular) |
 | Momento evaluativo | Seguimiento continuo (no es un momento evaluativo ★) |
 | Lección teórica de la que depende | T1 — *Fundamentos de Control de Versiones* (martes 4 ago) y T2 — *GitHub y flujo de trabajo con ramas* (jueves 6 ago) |
-| Sprint del proyecto | Sprint 1 — POO y arquitectura base (semanas 1–5). Este laboratorio crea el repositorio único del equipo y el esqueleto de paquetes sobre el que se construye todo el sprint. |
+| Sprint del proyecto | Sprint 1 — POO y arquitectura base (semanas 1–4). Este laboratorio crea el repositorio único del equipo y el esqueleto de paquetes sobre el que se construye todo el sprint. |
 | Revisión en clase | Martes 11 de agosto (T1 de la Semana 2, *Diagnóstico y revisión de clases*) — apertura de 10-15 min para resolver dudas y verificar avance antes de continuar con el contenido nuevo. |
 
 Este laboratorio **no lo dirige el docente en vivo**. La guía del estudiante
