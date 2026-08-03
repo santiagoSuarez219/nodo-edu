@@ -40,7 +40,7 @@ El dominio es cotidiano y fácil de entender. El riesgo es que el caso de uso pu
 
 ## Sprints acumulativos
 
-### Sprint 1 — POO y arquitectura base *(Semanas 1–5)*
+### Sprint 1 — POO y arquitectura base *(Semanas 1–4)*
 
 **Entregable:** catálogo de productos modelado con herencia y menú de consola operativo.
 
@@ -53,19 +53,18 @@ El dominio es cotidiano y fácil de entender. El riesgo es que el caso de uso pu
 
 ---
 
-### Sprint 2 — Listas y persistencia *(Semanas 6–11)*
+### Sprint 2 — Listas *(Semanas 5–7)*
 
-**Entregable:** inventario dinámico con ventas registradas, ordenamiento y persistencia.
+**Entregable:** inventario dinámico con ventas registradas, ordenamiento.
 
 - Gestionar el inventario con `ListaSimple<Producto>` en el `Service`
 - Registrar ventas como `ListaSimple<Venta>`; cada venta contiene su propia `ListaSimple<ItemVenta>`
 - Actualizar el stock automáticamente al registrar una venta
 - Ordenar el inventario por precio o por nombre
-- Persistir inventario en `data/inventario.txt` y ventas en `data/ventas.txt`
 
 ---
 
-### Sprint 3 — Pilas y Colas *(Semanas 12–13)*
+### Sprint 3 — Pilas y Colas *(Semanas 8–9)*
 
 **Entregable:** deshacer ventas y gestión de pedidos a proveedor.
 
@@ -75,16 +74,17 @@ El dominio es cotidiano y fácil de entender. El riesgo es que el caso de uso pu
 
 ---
 
-### Sprint 4 — Recursividad *(Semana 14)*
+### Sprint 4 — Persistencia y recursividad *(Semanas 10–13)*
 
-**Entregable:** al menos dos algoritmos recursivos integrados.
+**Entregable:** persistencia del sistema en archivos y al menos dos algoritmos recursivos integrados.
 
+- Persistir inventario en `data/inventario.txt` y ventas en `data/ventas.txt`
 - Calcular recursivamente el valor total del inventario (suma de precio × stock de cada producto)
 - Buscar recursivamente un producto por código dentro de una categoría
 
 ---
 
-### Sprint 5 — Árboles e integración final *(Semanas 15–17)*
+### Sprint 5 — Árboles e integración final *(Semanas 14–16)*
 
 **Entregable:** búsqueda eficiente por código y proyecto completo integrado.
 

@@ -37,7 +37,7 @@ El dominio bancario es familiar para los estudiantes y ofrece casos de uso natur
 
 ## Sprints acumulativos
 
-### Sprint 1 — POO y arquitectura base *(Semanas 1–5)*
+### Sprint 1 — POO y arquitectura base *(Semanas 1–4)*
 
 **Entregable:** esqueleto del sistema con las capas definidas y las entidades del dominio modeladas.
 
@@ -50,19 +50,18 @@ El dominio bancario es familiar para los estudiantes y ofrece casos de uso natur
 
 ---
 
-### Sprint 2 — Listas y persistencia *(Semanas 6–11)*
+### Sprint 2 — Listas *(Semanas 5–7)*
 
-**Entregable:** gestión de múltiples clientes y cuentas con historial de transacciones y persistencia en archivos.
+**Entregable:** gestión de múltiples clientes y cuentas con historial de transacciones.
 
 - Reemplazar los arreglos temporales por `ListaSimple<T>` para gestionar clientes y cuentas
 - Implementar historial de transacciones con `ListaSimple<Transaccion>` por cuenta
 - Agregar operaciones de depósito, retiro y transferencia desde el `Service`
 - Ordenar el historial de transacciones por monto o por fecha (`InsertionSort` / `SelectionSort` en el `Service`)
-- Persistir clientes y cuentas en `data/clientes.txt` y `data/cuentas.txt`; reconstruir la lista al iniciar
 
 ---
 
-### Sprint 3 — Pilas y Colas *(Semanas 12–13)*
+### Sprint 3 — Pilas y Colas *(Semanas 8–9)*
 
 **Entregable:** operaciones de deshacer y simulación de cola de atención en ventanilla.
 
@@ -72,16 +71,17 @@ El dominio bancario es familiar para los estudiantes y ofrece casos de uso natur
 
 ---
 
-### Sprint 4 — Recursividad *(Semana 14)*
+### Sprint 4 — Persistencia y recursividad *(Semanas 10–13)*
 
-**Entregable:** al menos dos algoritmos recursivos integrados al sistema.
+**Entregable:** persistencia del sistema en archivos y al menos dos algoritmos recursivos integrados al sistema.
 
+- Persistir clientes y cuentas en `data/clientes.txt` y `data/cuentas.txt`; reconstruir la lista al iniciar
 - Búsqueda recursiva de una transacción por monto en el historial de una cuenta
 - Cálculo recursivo del saldo total de todos las cuentas de un cliente
 
 ---
 
-### Sprint 5 — Árboles e integración final *(Semanas 15–17)*
+### Sprint 5 — Árboles e integración final *(Semanas 14–16)*
 
 **Entregable:** proyecto completo con búsqueda eficiente por BST y demostración de las cuatro capas correctamente separadas.
 

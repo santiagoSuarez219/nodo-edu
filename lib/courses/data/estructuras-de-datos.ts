@@ -14,6 +14,8 @@ export const estructurasDeDatos: Course = {
       articleSlug: "fundamentos-control-de-versiones",
       order: 1,
       title: "Fundamentos de control de versiones",
+      summary:
+        "Repositorio, staging area, commit, HEAD e historial con Git, más buenas prácticas de mensajes de commit y el uso básico de la terminal.",
       topics: [
         { title: "Repositorio, commit, staging area, HEAD, historial" },
         { title: "Comandos esenciales: init, add, commit, status, log, diff" },
@@ -32,15 +34,6 @@ export const estructurasDeDatos: Course = {
         { title: "Ramas: branch, checkout, merge" },
         { title: "Flujo de trabajo con feature branch y resolución de conflictos" },
       ],
-    },
-    {
-      id: "lab-00-git-fundamentos",
-      slug: "lab-00-git-fundamentos",
-      articleSlug: "lab-00-git-fundamentos",
-      kind: "guide",
-      order: 3,
-      title: "Laboratorio 00 — Git: repositorio y flujo de trabajo",
-      topics: [],
     },
     {
       id: "diagnostico-y-revision-de-clases",

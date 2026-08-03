@@ -7,13 +7,9 @@ updatedAt: "2026-07-30"
 
 ## Objetivo
 
-El viernes 7 de agosto es festivo (Batalla de Boyacá) y **no hay sesión
-presencial**. Este laboratorio se realiza como **trabajo independiente
+Este laboratorio se realiza como **trabajo independiente
 guiado**: usted lo trabaja por su cuenta, con esta guía como única referencia,
-en un bloque de aproximadamente 2 horas.
-
-Va a construir, con sus propias manos, el repositorio de Git que va a alojar
-el proyecto de aula durante todo el semestre: un historial de commits real,
+en un bloque de aproximadamente 2 horas. Va a construir, con sus propias manos, el repositorio de Git que va a alojar el proyecto de aula durante todo el semestre: un historial de commits real,
 al menos una rama fusionada, un conflicto de fusión resuelto correctamente, y
 el esqueleto de paquetes de las cuatro capas sobre el que se construirá cada
 laboratorio de las próximas 16 semanas.
@@ -33,7 +29,7 @@ misma semana:
 
 - **Fundamentos de Control de Versiones** (Clase T1, martes): repositorio,
   staging area, commit, HEAD, historial; comandos `init`, `add`, `commit`,
-  `status`, `log`, `diff`.
+  `status`, `log`.
 - **GitHub y flujo de trabajo con ramas** (Clase T2, jueves): repositorios
   remotos (`push`, `pull`, `fetch`, `clone`); ramas (`branch`, `checkout`,
   `merge`); convención de ramas del curso; conflictos de fusión.
