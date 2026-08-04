@@ -147,23 +147,7 @@ export const programacionCientifica: CoursePresentation = {
     },
     { date: "26 nov", label: "Exámenes finales" },
   ],
-  bibliography: [
-    {
-      title: "Python for Data Analysis",
-      author: "Wes McKinney",
-      edition: "3rd Edition",
-    },
-    {
-      title: "Computational Physics with Python",
-      author: "Paul Gessler, Jeffrey Karp",
-    },
-  ],
-  documents: [
-    {
-      title: "Guía para el informe de laboratorio",
-      url: "/documentos/programacion-cientifica/guia-informe-laboratorio.pdf",
-      description: "Estructura y formato esperado de los informes de laboratorio.",
-    },
-  ],
+  bibliography: [],
+  documents: [],
   conditions: TRANSVERSAL_CONDITIONS,
 };

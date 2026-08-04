@@ -19,13 +19,13 @@ export const programacionCientifica: Course = {
       order: 1,
       title: "Fundamentos de control de versiones (Colab) y diagnóstico",
       summary:
-        "Por qué un análisis de datos necesita historial: repositorio, commit y el Flujo A de GitHub desde Colab, con diagnóstico inicial de nivel.",
+        "Presentación de Google Colab y GitHub: celdas de código y texto, y cómo subir y traer tu trabajo desde la interfaz de Colab (Flujo A), con diagnóstico inicial de nivel.",
       topics: [
         { title: "Diagnóstico inicial: cuestionario de autoevaluación y reto breve de lógica" },
-        { title: "Qué es el control de versiones y por qué importa en proyectos de datos" },
-        { title: "Conceptos clave: repositorio, commit, historial" },
-        { title: "Comandos esenciales desde la interfaz de Colab: add, commit, status, log, push, pull" },
+        { title: "Google Colab: celdas de código (Python) y celdas de texto (Markdown)" },
+        { title: "Por qué guardar solo en Colab no basta: GitHub como historial compartido" },
         { title: "Autenticación con GitHub: Personal Access Token (PAT) y Colab Secret" },
+        { title: "Subir y traer tu trabajo desde Colab: Flujo A (push y pull sin comandos)" },
       ],
     },
     {
@@ -35,7 +35,7 @@ export const programacionCientifica: Course = {
       order: 2,
       title: "Variables, tipos de datos y operadores",
       topics: [
-        { title: "Entornos de desarrollo en la nube: Google Colab; celdas de código y markdown" },
+        { title: "Repaso rápido de Google Colab (visto en la Semana 1) y alternativa local con Jupyter" },
         { title: "Variables y tipado dinámico en Python" },
         { title: "Tipos de datos básicos: int, float, str, bool" },
         { title: "Operadores aritméticos, de comparación y lógicos" },
