@@ -107,22 +107,22 @@ Para bajar la carga de decisión, especialmente a estudiantes de primer semestre
 
 ### Semana 1
 
-**Sesión — Fundamentos de control de versiones (100% en Colab) y diagnóstico**
+**Sesión — Presentación de Google Colab, GitHub y diagnóstico**
 - Diagnóstico inicial: cuestionario de autoevaluación + reto breve de lógica (sin código) para identificar el nivel de cada estudiante
-- ¿Qué es el control de versiones y por qué importa en proyectos de análisis de datos?
-- Conceptos clave: repositorio, commit, historial
-- Comandos esenciales (se explican pero se usan sobre todo a través de la interfaz de Colab): `add`, `commit`, `status`, `log`, `push`, `pull`
-- *No se cubren ramas (`branch`, `checkout`, `merge`) — no se usan en el resto del curso y agregan carga innecesaria a un estudiante sin experiencia previa.*
+- Google Colab: qué es, celdas de código (Python, `Shift + Enter`) y celdas de texto (Markdown) para documentar el razonamiento
+- Por qué guardar solo en Colab no basta: GitHub como lugar compartido que conserva versiones anteriores del trabajo
+- *Se evita todo vocabulario formal de Git (repositorio/commit/historial como términos, comandos `add`/`commit`/`status`/`log`, ramas) — se explica solo en términos de "subir" y "traer" desde la interfaz de Colab. No se usa en el resto del curso y agrega carga innecesaria a un estudiante sin experiencia previa.*
 - Autenticación con GitHub: qué es un Personal Access Token (PAT) y por qué ya no se usa usuario/contraseña
 - Cómo guardar el PAT como *Colab Secret* para no exponerlo nunca en el notebook
 
 **Práctica**
-- Crear el repositorio del curso en GitHub
+- Crear el proyecto del curso en GitHub
 - Generar el PAT y guardarlo como Colab Secret (`GITHUB_TOKEN`)
 - Crear la carpeta `ejercicios/` con un `README.md` inicial
-- Practicar el **Flujo A**: escribir un ejercicio corto en un notebook de Colab y subirlo con `Archivo → Guardar una copia en GitHub`
+- Escribir un notebook corto con una celda de código y una de texto
+- Practicar el **Flujo A**: subir el notebook con `Archivo → Guardar una copia en GitHub` y volver a abrirlo con `Archivo → Abrir notebook → GitHub` para confirmar el cambio
 
-**◇ Seguimiento:** resultado del diagnóstico + evidencia del primer commit subido con Flujo A
+**◇ Seguimiento:** resultado del diagnóstico + evidencia del primer notebook subido con Flujo A
 
 ---
 
@@ -133,7 +133,7 @@ Para bajar la carga de decisión, especialmente a estudiantes de primer semestre
 ### Semana 2 — Variables, tipos de datos y operadores
 
 **Sesión**
-- Entornos de desarrollo en la nube: Google Colab (y alternativa local con Jupyter); celdas de código y markdown
+- Repaso rápido de Google Colab (celdas de código y de texto, vistas en la Semana 1) y mención de la alternativa local con Jupyter
 - Variables y tipado dinámico en Python
 - Tipos de datos básicos: `int`, `float`, `str`, `bool`
 - Operadores aritméticos, de comparación y lógicos
