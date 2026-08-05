@@ -5,6 +5,55 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+## DEBT-046 — La policy de `update` de `class_sessions` no tiene `with check`: un `update` puede reasignar la sesión a otro curso
+
+**Origen:** Análisis de impacto de `spec-041` (refrescar el código de asistencia),
+2026-08-05 — detectado al confirmar que refrescar el código no necesitaba policy
+nueva
+**Prioridad:** Media — no hay explotación conocida hoy; requiere migración y su
+propia ronda de pruebas
+
+`class_sessions_mutate_owner_or_admin`
+(`supabase/migrations/20260716000001_rls_attendance.sql:22`) define la policy
+`for update` con `using (...)` pero **sin `with check (...)`**:
+
+```sql
+create policy "class_sessions_mutate_owner_or_admin" on public.class_sessions
+  for update
+  using ( ...docente dueño o admin... );
+  -- falta: with check ( ...mismo predicado sobre la fila resultante... )
+```
+
+En Postgres, una policy `for update` sin `with check` valida **solo la fila
+original** contra `using`; la fila **resultante** no se valida contra nada. Es
+decir: un docente dueño del curso X puede ejecutar un `update` que cambie
+`academic_course_id` al curso Y de **otro docente**, y la policy lo permite —
+la fila que sale ya no le pertenece, pero nadie lo comprueba. Se llevaría con
+ella todas sus `attendance_records` (cuelgan de `session_id`, no del curso),
+contaminando el roster y el `attendance_pct` del curso ajeno.
+
+Contrasta con `class_sessions_insert_owner_or_admin`, definida justo debajo,
+que **sí** usa `with check` con el mismo predicado: la asimetría parece un
+descuido de spec-010, no una decisión.
+
+**No es explotable desde la aplicación hoy:** ninguna Server Action de
+`lib/attendance/index.ts` escribe `academic_course_id` (`openSession` lo fija en
+el `insert`, `closeSession` solo toca `is_open`, y las dos acciones nuevas de
+spec-041 solo tocan `attendance_code` / `code_expires_at`). La vía sería un
+cliente hablando directo con PostgREST con el JWT de un docente.
+
+**No se corrigió en spec-041** a propósito: es un hallazgo preexistente ajeno a
+refrescar un código, y tocar una policy exige migración —que spec-041 declara
+explícitamente fuera de alcance (D3)— más verificación en `mirp-lab` y despliegue
+a producción.
+
+**Fix:** migración nueva que haga `alter policy class_sessions_mutate_owner_or_admin
+... with check (<mismo predicado que using>)`. Al hacerlo, **auditar el resto de
+policies `for update` del proyecto** con el mismo criterio: si esta se escribió
+así, es probable que no sea la única.
+
+---
+
 ## DEBT-045 — `self_assessment_breakdown` no filtra lecciones deshabilitadas (BLOQUE 039)
 
 **Origen:** spec-040, Fase 2, registrado explícitamente en la implementación
