@@ -608,29 +608,47 @@ de `.claude/skills/lesson-authoring/SKILL.md` (~520), que hoy dice
       preexistentes no relacionados). Confirmado además que no queda ningún
       `.from('questions')` con filtro `.eq('course_slug', ...)` en el archivo.
 
-### Fase 6 — MCP: actualizar `question-bank-mcp`
-- [ ] Añadir a `mcp-servers/question-bank-mcp/src/tools.ts`: `list_keywords`,
+### Fase 6 — MCP: actualizar `question-bank-mcp` ✅ Completada 2026-08-06
+- [x] Añadir a `mcp-servers/question-bank-mcp/src/tools.ts`: `list_keywords`,
       `create_keyword`, `mount_question_in_lesson`, `unmount_question_from_lesson`,
-      `list_lesson_questions`, `reorder_lesson_questions`.
-- [ ] Modificar `create_question` / `update_question` (quitar `course_slug`,
+      `list_lesson_questions`, `reorder_lesson_questions`. Se refactorizó
+      `src/api.ts` para derivar el origen de la app desde
+      `QUESTION_BANK_API_BASE_URL` (sin renombrar la variable, para no romper
+      el wrapper local ni la config de Claude Desktop) y exponer un cliente
+      genérico compartido por `/api/questions`, `/api/keywords` y `/api/lessons`.
+- [x] Modificar `create_question` / `update_question` (quitar `course_slug`,
       `lesson_slug`, `tags`; añadir `keywords`) y `list_questions`
-      (`tag` → `keyword`).
-- [ ] Verificar que el error `422` de keyword inexistente se relaya al agente **con
+      (`tag` → `keyword`, `course_slug`/`lesson_slug` conservan el nombre).
+- [x] Verificar que el error `422` de keyword inexistente se relaya al agente **con
       el mensaje original de la API**, sin reformular (regla de spec-005).
-- [ ] `npm run build` en `mcp-servers/question-bank-mcp/`.
-- [ ] Reescribir `docs/mcps/question-bank-agent.system-prompt.md`: flujo obligatorio
-      de tres pasos, prohibición de inventar keywords, `list_keywords` antes de
-      asignar, `create_keyword` se propone al usuario antes de invocarse,
-      `update_question` ya no mueve preguntas de lección, y la advertencia de que
-      una pregunta publicada sin montar es invisible.
-- [ ] Actualizar `docs/mcps/README.md` y la tabla "Inventario de MCPs" de
+      **Hallazgo y corrección:** el mensaje de nivel superior de un
+      `validation_error` es genérico ("El cuerpo no cumple el esquema
+      esperado."); el detalle accionable (qué keyword falta y por qué) vive en
+      `details.fieldErrors`, que `api.ts` no relayaba. Se corrigió para anexar
+      las líneas de `fieldErrors` al mensaje — verificado end-to-end vía MCP
+      real (stdio): las **dos** keywords faltantes de una prueba con dos slugs
+      inexistentes llegaron íntegras.
+- [x] `npm run build` en `mcp-servers/question-bank-mcp/`: sin errores.
+- [x] Reescribir `docs/mcps/question-bank-agent.system-prompt.md`: flujo
+      obligatorio de tres pasos (crear → publicar → montar), prohibición de
+      inventar keywords, `list_keywords` antes de asignar, `create_keyword` se
+      propone al usuario antes de invocarse, `update_question` ya no mueve
+      preguntas de lección (reemplaza `keywords` por completo, no hace merge),
+      y la advertencia de que una pregunta publicada sin montar es invisible.
+- [x] Actualizar `docs/mcps/README.md` y la tabla "Inventario de MCPs" de
       `CLAUDE.md`.
-- [ ] Actualizar `.claude/skills/lesson-authoring/SKILL.md` (~447-456: el bloque de
-      restricciones de `course_slug`/`lesson_slug`/`tags`; ~520: el checklist de
-      cierre) con el flujo nuevo.
-- [ ] Verificar el servidor de forma aislada:
-      `./mcp-servers/run-local-mcp.sh question-bank-mcp </dev/null` con
-      `npm run dev` corriendo.
+- [x] Actualizar `.claude/skills/lesson-authoring/SKILL.md` (sección 5, el
+      cuestionario de cierre, y el checklist de la sección 8) con el flujo de
+      tres pasos y el vocabulario controlado; confirmado sin referencias
+      residuales a `tags` ni al contrato viejo tras el cambio.
+- [x] Verificado el servidor de forma aislada por JSON-RPC sobre stdio (con
+      `npm run dev` corriendo en `localhost:3002`): `tools/list` devuelve las
+      12 herramientas; `tools/call` probado extremo a extremo para
+      `list_keywords`, `create_question` (con keyword inválida → error
+      detallado; con keywords válidas → 201), `publish_question`,
+      `mount_question_in_lesson` (idempotente), `list_lesson_questions`
+      (orden correcto) y `unmount_question_from_lesson`. Datos de prueba
+      eliminados al terminar.
 
 ### Fase 7 — Pruebas
 - [ ] Ejecutar los casos manuales de
