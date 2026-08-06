@@ -323,15 +323,15 @@ cada una empieza con su etiqueta: `[042 PA1] …`, `[042 PA2] …`, etc.
 **Rol que ejecuta:** estudiante **E4** + docente
 **Criterio cubierto:** políticas RLS de D7 (`lesson_questions` legible por el estudiante solo si la pregunta está publicada o es suya).
 **Precondición:** una pregunta nueva **en borrador** (creada sin `publish_question`) y **montada** en LA.
-**Datos de prueba usados:** `{{pz_borrador}}`
+**Datos de prueba usados:** `99d007b1-62f5-46ed-95cc-5f740676da80` (PZ)
 **Pasos:**
 1. Con `question-bank-mcp`, crear una pregunta **sin publicar** y montarla en LA.
 2. Como E4, abrir LA y contar las preguntas del formulario.
 3. Como docente, abrir la clave de respuestas de LA y contar.
 4. Publicar la pregunta y repetir el paso 2.
 **Resultado esperado:** en el paso 2 la pregunta en borrador **no aparece** ni suma al denominador; en el paso 4, una vez publicada, sí aparece. El estudiante nunca ve el montaje de una pregunta no publicada.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{observaciones}}
+**Estado:** ✅ Aprobado
+**Hallazgos:** Verificado con navegador real. Paso 2: como E4, el formulario de LA mostró exactamente 4 preguntas (PA2, PA1, PA4, PX) — "Faltan 4 preguntas por responder", sin `[042 PZ]`. Paso 3: el panel "Clave de respuestas" del docente mostró "4 preguntas" (`getAnswerKeyForLesson` filtra `is_published=true` igual que la vista del estudiante — el borrador tampoco aparece ahí). Paso 4: tras `publish_question`, el mismo panel pasó a "5 preguntas" de inmediato.
 
 ### TC-042-013 — Una pregunta publicada pero NO montada no aparece en ninguna autoevaluación
 **Rol que ejecuta:** estudiante **E4** + docente vía MCP
@@ -345,7 +345,8 @@ cada una empieza con su etiqueta: `[042 PA1] …`, `[042 PA2] …`, etc.
 4. Con `list_questions`, comprobar que PY **sí** existe en el banco y está publicada.
 5. Montar PY en LA con `mount_question_in_lesson` y recargar LA como E4.
 **Resultado esperado:** una pregunta publicada sin montar es invisible para el estudiante en todas las lecciones y **no** afecta a ningún denominador, pero es visible y localizable desde el banco: `list_lesson_questions` da la lista real y permite detectar el olvido (a diferencia del slug mal escrito del modelo anterior, que era indetectable). Al montarla, aparece de inmediato tras recargar.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
+**Hallazgos:** Confirmado por API antes de tocar el navegador: PY ausente en `list_lesson_questions` de LA (5), LB (1) y LE (2); `get_question` la muestra `is_published: true` con `lessons: []`. Confirmado con navegador real (panel del docente): tras `mount_question_in_lesson` sobre LA, "Clave de respuestas" pasó de 5 a **6 preguntas** de inmediato al recargar (F5), sin redeploy ni cambios de contenido MDX.
 **Hallazgos:** {{observaciones}}
 
 ---
