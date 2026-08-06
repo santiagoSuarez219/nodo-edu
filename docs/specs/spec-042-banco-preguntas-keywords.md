@@ -1,4 +1,4 @@
-# spec-042 — [NOT STARTED] Banco de preguntas: desacople pregunta↔lección y catálogo de keywords
+# spec-042 — [IN PROGRESS] Banco de preguntas: desacople pregunta↔lección y catálogo de keywords
 
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.
@@ -646,5 +646,5 @@ de `.claude/skills/lesson-authoring/SKILL.md` (~520), que hoy dice
 ## Aprobación de implementación
 
 > Claude no escribe código de implementación hasta que esta sección esté marcada.
-- [ ] Paquete (spec + pruebas) aprobado por el usuario
-- **Fecha de aprobación:** {{fecha}}
+- [x] Paquete (spec + pruebas) aprobado por el usuario
+- **Fecha de aprobación:** 2026-08-06
