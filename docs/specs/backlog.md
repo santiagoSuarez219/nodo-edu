@@ -26,6 +26,74 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+## DEBT-055 — `list_questions`/`GET /api/questions` ignora en silencio el filtro `tag` retirado
+
+**Origen:** Ronda manual `test-042-banco-preguntas-keywords.md`, TC-MCP-042-013,
+2026-08-06.
+**Prioridad:** Baja — no hay pérdida de datos ni contrato roto; es una
+superficie de confusión para el agente.
+
+spec-042 sustituyó el filtro `tag` de `GET /api/questions` (y de la
+herramienta MCP `list_questions`) por `keyword`. `tag` ya no existe en
+`ListQuestionsFiltersSchema` (`lib/questions/schemas.ts`), así que un agente
+que siga enviándolo por costumbre no recibe ningún error: Zod descarta la
+propiedad desconocida en silencio y la ruta responde con el listado
+**sin filtrar** (todas las preguntas), no con las preguntas de esa etiqueta.
+Un agente puede leer eso como "cero resultados para ese tag" o, peor, confiar
+en que sí filtró.
+
+Esto no incumple ningún criterio de aceptación escrito de spec-042: D2 solo
+exige rechazo explícito en el **cuerpo** de `POST`/`PATCH /api/questions`
+(`course_slug`/`lesson_slug`/`tags`), nunca se comprometió con los query
+params de lectura. Es una mejora de robustez, no una corrección de contrato.
+
+**Acción sugerida:** validar `ListQuestionsFiltersSchema` con `.strict()` (o
+un chequeo explícito equivalente al de `findLegacyQuestionFields` para el
+cuerpo) para que `GET /api/questions?tag=...` devuelva `422` en vez de
+ignorar el parámetro. Aplicar el mismo criterio a `list_lesson_questions` si
+en algún momento acepta filtros adicionales.
+
+---
+
+## DEBT-054 — Lecturas transitoriamente inconsistentes bajo llamadas MCP concurrentes por el mismo pipe stdio
+
+**Origen:** Ronda manual `test-042-banco-preguntas-keywords.md`,
+TC-MCP-042-004 y TC-MCP-042-008, 2026-08-06.
+**Prioridad:** Baja — no reprodujo en llamadas aisladas; posible artefacto de
+infraestructura de la ronda, no defecto de código confirmado.
+
+Durante la ejecución de varias llamadas a `question-bank-mcp` disparadas de
+forma concurrente por el mismo pipe stdio (patrón usado solo para acelerar
+esta ronda de pruebas, no el uso real de un cliente MCP, que invoca
+herramientas una a la vez), se observaron dos lecturas anómalas:
+
+1. `create_keyword` para un slug nuevo (`spec042-kind-null`) devolvió un
+   `409` ("ya existe") pese a que la fila se creó correctamente — confirmado
+   consultando la keyword directamente después.
+2. Inmediatamente después de un `update_question` que reemplazaba
+   `keywords: ["python"]`, un `get_question` de la misma pregunta mostró
+   `keywords: []` por un instante; una relectura momentos después mostró el
+   valor correcto y estable.
+
+Ninguno de los dos se reprodujo en una llamada aislada (sin concurrencia).
+Coincide en el tiempo con dos caídas del túnel SSH hacia `mirp-lab` durante
+la misma sesión de implementación (ver Fase 0/Fase 5 de
+`docs/specs/spec-042-banco-preguntas-keywords.md`), así que el diagnóstico más
+probable es inestabilidad de la conexión Postgres tunelizada, no una
+condición de carrera real en `_createKeywordForActor`/`_updateQuestionForActor`
+(que sí documentan explícitamente la carrera esperada entre dos clientes
+reales creando el mismo slug — ver D3 del spec — pero ese no es el escenario
+que se reprodujo aquí, no había dos clientes apuntando al mismo slug).
+
+**Acción sugerida:** si vuelve a observarse contra producción (conexión
+directa, sin túnel SSH) o bajo carga concurrente real de un agente, investigar
+si `createServiceSupabaseClient()` (`lib/auth/service.ts`, cliente singleton
+por proceso) tiene algún problema de aislamiento entre invocaciones
+concurrentes de la misma ruta API. Mientras tanto, no bloquea el cierre de
+spec-042: el estado final de los datos siempre fue el correcto.
+
+---
+
 ## DEBT-053 — Error de hidratación recuperable en el contador "Expira en: mm:ss" de `AdminAttendancePanel` al abrir una segunda pestaña
 
 **Origen:** Ronda manual `test-041-refrescar-codigo-asistencia.md`, TC-008,

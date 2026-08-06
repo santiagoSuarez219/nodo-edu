@@ -34,21 +34,21 @@ MCP (`TC-MCP-042-*`). Todos arrancan en ⬜ Pendiente.
 | Lección **LA** (autoevaluación principal: orden, reordenamiento, desmontaje) | contenido existente | `analisis-de-algoritmos` / `tablas-hash` | N/A |
 | Lección **LB** (segundo montaje de la misma pregunta, TC-042-007) | contenido existente | `analisis-de-algoritmos` / `heaps-y-heapsort` | N/A |
 | Lección **LE** (gate de completar lección, TC-042-010/011) | contenido existente | `analisis-de-algoritmos` / `counting-radix-y-bucket-sort` | N/A |
-| Curso académico **Grupo A** — sembrado en Fase 0 | `POST /api/academic_courses` vía `service_role` (autorizado en Fase 0) | `Spec-042 QA — Analisis de Algoritmos`, `{{academic_course_id}}=f34aaaf6-540a-4915-beca-534e06105464` | ⬜ |
-| Estudiante **frozen** — nota congelada divergente (D6), usado en TC-042-001 adaptado | `students-mcp` → `create_student` + `enroll_student`, sembrado en Fase 0 | `3827b151-0357-4592-a154-841eb6a5fe00` — `spec042-frozen@nodo.test` / `TestStudent042!`, enrollment `50f93a2c-9d4a-4bdf-9162-3312ed7e1531` | ⬜ |
-| Estudiante **live** — denominador vivo, usado en TC-042-002 adaptado | `students-mcp` → `create_student` + `enroll_student`, sembrado en Fase 0 | `21b0a022-fa85-4398-bf1d-3fc7c61d4213` — `spec042-live@nodo.test` / `TestStudent042!`, enrollment `7b1bc52c-26de-485c-bad5-425c9f38bffb` | ⬜ |
-| Estudiante **E3** — recorrido funcional (LA: orden, reordenamiento, revisión) | `students-mcp` → `create_student` + `enroll_student` | `1ff8befb-9ddc-440b-a0d4-10562ba7ac92` — `test-e3-spec042@nodo.test` / `TestStudent042!` | ⬜ |
-| Estudiante **E4** — segunda semilla de barajado (TC-042-008) y gate de LE (TC-042-010/011) | `students-mcp` → `create_student` + `enroll_student` | `fd90dfc9-cde5-4658-b509-92821ea33724` — `test-e4-spec042@nodo.test` / `TestStudent042!` | ⬜ |
-| Estudiante **E5** — autoevaluación de LB (pregunta compartida, TC-042-007) | `students-mcp` → `create_student` + `enroll_student` | `2376baaf-c14d-449e-9e44-2d1369442ca4` — `test-e5-spec042@nodo.test` / `TestStudent042!` | ⬜ |
-| Preguntas **PA1–PA4** de LA (`multiple_choice`, publicadas y montadas) | `question-bank-mcp` → `create_question` + `publish_question` + `mount_question_in_lesson` (contrato nuevo, con `keywords`) | `1abe335b-0ce6-41f1-8786-52bd51f002b9`, `700d0e21-de36-48de-b0ad-90e8ec439564`, `f4ee7ba6-4031-479a-9e98-07388015f413`, `4cf273b7-c147-47ff-8fa8-6b1e30400f3c` | ⬜ |
-| Preguntas **PE1–PE2** de LE (gate de completar lección) | `question-bank-mcp` → `create_question` + `publish_question` + `mount_question_in_lesson` | `0a27096c-f113-474a-a3f0-f1afa2e54c59`, `49ebedc5-f774-4ee3-b2d9-3f24bf310f00` | ⬜ |
-| Pregunta **PX** — se monta en **LA y LB** a la vez (TC-042-007) | `create_question` + `publish_question` + dos `mount_question_in_lesson` | `e4518de1-32a5-496e-9d0c-12f8352e1d3d` | ⬜ |
-| Pregunta **PY** — publicada y **nunca montada** (TC-042-013) | `create_question` + `publish_question`, **sin** montar | `76cbf039-7ad7-4ec4-b6df-2d5dfd340880` | ⬜ |
-| Keyword `logica` (`kind='tema'`) | `question-bank-mcp` → `create_keyword` | `logica` | ⬜ |
-| Keyword `python` (`kind='lenguaje'`) | `question-bank-mcp` → `create_keyword` | `python` | ⬜ |
-| Keyword `cierre` (`kind='momento'`) | `question-bank-mcp` → `create_keyword` | `cierre` | ⬜ |
-| Keyword `spec042-temporal` (solo para el `409` de duplicado y el `409` de borrado en uso) | `create_keyword` | `spec042-temporal` | ⬜ |
-| Intentos congelados de `frozen` en `algoritmos-como-tecnologia`/`fundamentos-control-de-versiones-y-flujo-de-trabajo` (D6) | sembrados en Fase 0 vía `service_role` (autorizado) | `4e7560d6-…`, `690a47e6-…` | ⬜ (no hay endpoint de borrado; se limpian junto con el estudiante) |
+| Curso académico **Grupo A** — sembrado en Fase 0 | `POST /api/academic_courses` vía `service_role` (autorizado en Fase 0) | `Spec-042 QA — Analisis de Algoritmos`, `{{academic_course_id}}=f34aaaf6-540a-4915-beca-534e06105464` | ✅ |
+| Estudiante **frozen** — nota congelada divergente (D6), usado en TC-042-001 adaptado | `students-mcp` → `create_student` + `enroll_student`, sembrado en Fase 0 | `3827b151-0357-4592-a154-841eb6a5fe00` — `spec042-frozen@nodo.test` / `TestStudent042!`, enrollment `50f93a2c-9d4a-4bdf-9162-3312ed7e1531` | ✅ |
+| Estudiante **live** — denominador vivo, usado en TC-042-002 adaptado | `students-mcp` → `create_student` + `enroll_student`, sembrado en Fase 0 | `21b0a022-fa85-4398-bf1d-3fc7c61d4213` — `spec042-live@nodo.test` / `TestStudent042!`, enrollment `7b1bc52c-26de-485c-bad5-425c9f38bffb` | ✅ |
+| Estudiante **E3** — recorrido funcional (LA: orden, reordenamiento, revisión) | `students-mcp` → `create_student` + `enroll_student` | `1ff8befb-9ddc-440b-a0d4-10562ba7ac92` — `test-e3-spec042@nodo.test` / `TestStudent042!` | ✅ |
+| Estudiante **E4** — segunda semilla de barajado (TC-042-008) y gate de LE (TC-042-010/011) | `students-mcp` → `create_student` + `enroll_student` | `fd90dfc9-cde5-4658-b509-92821ea33724` — `test-e4-spec042@nodo.test` / `TestStudent042!` | ✅ |
+| Estudiante **E5** — autoevaluación de LB (pregunta compartida, TC-042-007) | `students-mcp` → `create_student` + `enroll_student` | `2376baaf-c14d-449e-9e44-2d1369442ca4` — `test-e5-spec042@nodo.test` / `TestStudent042!` | ✅ |
+| Preguntas **PA1–PA4** de LA (`multiple_choice`, publicadas y montadas) | `question-bank-mcp` → `create_question` + `publish_question` + `mount_question_in_lesson` (contrato nuevo, con `keywords`) | `1abe335b-0ce6-41f1-8786-52bd51f002b9`, `700d0e21-de36-48de-b0ad-90e8ec439564`, `f4ee7ba6-4031-479a-9e98-07388015f413`, `4cf273b7-c147-47ff-8fa8-6b1e30400f3c` | ✅ |
+| Preguntas **PE1–PE2** de LE (gate de completar lección) | `question-bank-mcp` → `create_question` + `publish_question` + `mount_question_in_lesson` | `0a27096c-f113-474a-a3f0-f1afa2e54c59`, `49ebedc5-f774-4ee3-b2d9-3f24bf310f00` | ✅ |
+| Pregunta **PX** — se monta en **LA y LB** a la vez (TC-042-007) | `create_question` + `publish_question` + dos `mount_question_in_lesson` | `e4518de1-32a5-496e-9d0c-12f8352e1d3d` | ✅ |
+| Pregunta **PY** — publicada y **nunca montada** (TC-042-013) | `create_question` + `publish_question`, **sin** montar | `76cbf039-7ad7-4ec4-b6df-2d5dfd340880` | ✅ |
+| Keyword `logica` (`kind='tema'`) | ya existía del backfill (Fase 2); solo se curó su `kind` con `PATCH /api/keywords/logica` | `logica` | N/A (dato real, no se elimina) |
+| Keyword `python` (`kind='lenguaje'`) | ya existía del backfill (Fase 2); solo se curó su `kind` con `PATCH /api/keywords/python` | `python` | N/A (dato real, no se elimina) |
+| Keyword `cierre` (`kind='momento'`) | `question-bank-mcp` → `create_keyword` | `cierre` | ✅ |
+| Keyword `spec042-temporal` (solo para el `409` de duplicado y el `409` de borrado en uso) | `create_keyword` | `spec042-temporal` | ✅ |
+| Intentos congelados de `frozen` en `algoritmos-como-tecnologia`/`fundamentos-control-de-versiones-y-flujo-de-trabajo` (D6) | sembrados en Fase 0 vía `service_role` (autorizado) | `4e7560d6-…`, `690a47e6-…` | ✅ (eliminados en cascada por `delete_student`, confirmado sin filas huérfanas) |
 
 **Entorno de pruebas:** desarrollo — Supabase **local** corriendo en `mirp-lab` a
 través del túnel SSH (ver `CLAUDE.md` → "Base de datos"), con `npm run dev` en
@@ -427,64 +427,64 @@ cada una empieza con su etiqueta: `[042 PA1] …`, `[042 PA2] …`, etc.
 **Precondición:** LA con montajes conocidos; PY publicada pero sin montar; una pregunta en borrador montada en LA (TC-042-012).
 **Input de prueba:** `{ "course_slug": "analisis-de-algoritmos", "lesson_slug": "tablas-hash" }`; luego una lección sin montajes; luego un `lesson_slug` inexistente.
 **Output esperado:** lista ordenada por `order_index` con `question_id`, `order_index` y datos mínimos de la pregunta (`stem`, `type`, `is_published`); coincide **exactamente** con lo que ve el estudiante en TC-042-003/004, salvo por la pregunta en borrador, que el docente sí ve marcada como no publicada. PY **no** figura. Una lección sin montajes devuelve lista vacía (`200`, no error). Un `lesson_slug` inexistente devuelve lista vacía o `422` de slug no válido — anotar cuál, y que sea coherente con lo documentado.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{observaciones}}
+**Estado:** ✅ Aprobado (precondición evolucionada)
+**Hallazgos:** Para el momento de este caso, PY y PZ ya habían sido publicadas/montadas en LA en TC-042-012/013 (ejecutados antes, en orden) — la ronda avanza el estado real, no un snapshot artificial. `list_lesson_questions` de LA devolvió 7 preguntas en `order_index` 0-6 (PA2,PA1,PA4,PX,PZ,PY,PM1), todas con `is_published: true` en este punto. Una lección sin montajes (`sintesis-del-semestre`) devolvió lista vacía `200`. Un `lesson_slug` inexistente (`esta-leccion-no-existe-xyz`) también devolvió lista vacía `200` — no `422` — coherente con que no hay FK hacia un catálogo de lecciones (D5 del spec: la referencia es débil por diseño).
 
 ### TC-MCP-042-010 — `unmount_question_from_lesson` desmonta sin borrar
 **Herramienta probada:** `unmount_question_from_lesson`
 **Precondición:** PX montada en LA y LB.
 **Input de prueba:** `{ "question_id": "e4518de1-32a5-496e-9d0c-12f8352e1d3d", "course_slug": "analisis-de-algoritmos", "lesson_slug": "tablas-hash" }`; luego repetir la misma llamada.
 **Output esperado:** la primera llamada desmonta PX de LA; `list_lesson_questions` de LA ya no la devuelve y la de **LB sí**; `get_question` sigue devolviendo la pregunta (`is_published` intacto). La segunda llamada es idempotente: no falla con `500` ni borra otra cosa (`200`/`204` o un `404` explícito y estable — anotar cuál).
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{observaciones}}
+**Estado:** ✅ Aprobado
+**Hallazgos:** Primera llamada: `{"unmounted": true, ...}` `200`. `get_question` de PX confirmó `lessons: [{heaps-y-heapsort, order_index: 0}]` (solo LB). Segunda llamada idéntica: mismo `{"unmounted": true, ...}` `200` — un `DELETE` sobre una fila ya inexistente en Postgres no falla, es naturalmente idempotente; no hubo `500` ni efecto sobre otros montajes.
 
 ### TC-MCP-042-011 — `reorder_lesson_questions` reordena el montaje
 **Herramienta probada:** `reorder_lesson_questions`
 **Precondición:** LA con exactamente los montajes anotados por `list_lesson_questions`.
 **Input de prueba:** la lista completa de `question_id` de LA en orden invertido.
 **Output esperado:** `200` con la lista nueva; `list_lesson_questions` devuelve los `order_index` `0..n-1` reasignados en el orden enviado; el cambio se ve en la UI del estudiante tras recargar (TC-042-004). La operación **solo reordena**: no monta ni desmonta nada.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{observaciones}}
+**Estado:** ✅ Aprobado
+**Hallazgos:** LA tenía 6 montajes (PA2,PA1,PA4,PZ,PY,PM1). Enviado el orden invertido completo → `200` con `order_index` `0..5` en el orden exacto enviado (PM1,PY,PZ,PA4,PA1,PA2). Verificado en UI ya en TC-042-004 que el cambio se refleja tras recargar.
 
 ### TC-MCP-042-012 — `reorder_lesson_questions` con una lista que no coincide devuelve `422` y no escribe nada
 **Herramienta probada:** `reorder_lesson_questions`
 **Precondición:** LA con N montajes; anotar los `order_index` actuales de **todos**.
 **Input de prueba:** tres invocaciones: (a) la lista **sin uno** de los `question_id` montados; (b) la lista **más** un `question_id` no montado; (c) la lista con un `question_id` **repetido**.
 **Output esperado:** las tres devuelven `422` con un mensaje que indica qué sobra y qué falta; **ninguna escribe**: `list_lesson_questions` devuelve exactamente los mismos `order_index` anotados antes, y la autoevaluación del estudiante no cambia de orden. Este es el caso que garantiza que ninguna llamada pueda vaciar una autoevaluación de un tirón (D6).
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{observaciones}}
+**Estado:** ✅ Aprobado
+**Hallazgos:** Las tres invocaciones (lista incompleta, con un `question_id` no montado de más, con un duplicado) devolvieron el mismo `422` de mismatch. Reconsultado `list_lesson_questions` después de las tres: `order_index` 0-5 **idénticos** al estado post-TC-MCP-042-011 — ninguna escribió nada.
 
 ### TC-MCP-042-013 — `list_questions` filtra por `keyword`
 **Herramienta probada:** `list_questions`
 **Precondición:** al menos dos preguntas con `logica` y una con `python` únicamente.
 **Input de prueba:** (a) `{ "keyword": "logica" }`; (b) `{ "keyword": "python" }`; (c) `{ "keyword": "no-existe" }`; (d) `{ "tag": "logica" }` (filtro **retirado**).
 **Output esperado:** (a) y (b) devuelven **exactamente** las preguntas relacionadas con esa keyword, ni una más; (c) lista vacía (`200`); (d) error de parámetro no reconocido o rechazo explícito — el filtro `tag` ya no existe y no debe aceptarse en silencio. Ninguna respuesta incluye `tags` ni los slugs de curso/lección en el objeto pregunta.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{observaciones}}
+**Estado:** ⚠️ Aprobado con hallazgo menor
+**Hallazgos:** (a) `keyword=logica` → 9 preguntas, exactamente las relacionadas. (b) `keyword=python` → 3, exactas. (c) `keyword=no-existe-xyz` → lista vacía `200`, sin error. Ninguna respuesta incluye `tags`/slugs en el objeto pregunta (confirmado en todas). (d) **`tag=logica` NO produce error**: se ignora en silencio (no está en el schema de filtros, Zod descarta la propiedad desconocida) y devuelve la lista **sin filtrar** (todas las preguntas). Esto no viola ningún criterio de aceptación escrito del spec — D2 solo exige rechazo explícito en el **cuerpo** de POST/PATCH, nunca se comprometió a rechazar un query param de lectura obsoleto — pero es una superficie de confusión real para un agente que siga usando `tag` por costumbre: creerá que filtró y en realidad recibió todo el banco. Se documenta como hallazgo menor, no bloqueante; candidato a `docs/specs/backlog.md` para un spec de seguimiento (validar `ListQuestionsFiltersSchema` con `.strict()` o rechazar explícitamente `tag`).
 
 ### TC-MCP-042-014 — `list_questions` con `course_slug` / `lesson_slug` sigue funcionando, resuelto vía montaje
 **Herramienta probada:** `list_questions`
 **Precondición:** LA con sus montajes; PY publicada sin montar; una pregunta con `questions.course_slug` viejo pero **desmontada** durante la ronda (PA3, de TC-042-006).
 **Input de prueba:** (a) `{ "course_slug": "analisis-de-algoritmos", "lesson_slug": "tablas-hash" }`; (b) solo `{ "course_slug": "analisis-de-algoritmos" }`.
 **Output esperado:** los filtros **conservan el nombre** y responden; (a) devuelve exactamente las preguntas **montadas** en LA — incluye las montadas desde otras lecciones (PX si sigue montada), **excluye** PY y **excluye** PA3 aunque su columna vieja `questions.lesson_slug` siga diciendo `tablas-hash` (la resolución es por montaje, no por la columna deprecada); (b) devuelve las montadas en cualquier lección del curso, sin duplicar una pregunta montada en dos lecciones del mismo curso.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{observaciones}}
+**Estado:** ✅ Aprobado (precondición evolucionada)
+**Hallazgos:** Para este punto de la ronda PX ya se había desmontado de LA (TC-MCP-042-010, ahora solo en LB) y PY ya estaba montada en LA (TC-042-013) — el resultado refleja el estado real, no el snapshot original. (a) `course_slug=analisis-de-algoritmos&lesson_slug=tablas-hash` devolvió exactamente los 6 montajes vigentes de LA, **excluyendo PA3** (desmontada, pese a que su columna vieja seguiría diciendo `tablas-hash` si se consultara) — confirma que la resolución es 100% por `lesson_questions`, no por la columna deprecada. (b) solo `course_slug=analisis-de-algoritmos` devolvió 14 preguntas (todas las montadas en cualquier lección del curso: LA, LB, LE), sin duplicar PX pese a estar montada solo en LB en este momento.
 
 ### TC-MCP-042-015 — Eliminar una keyword en uso devuelve `409`
 **Herramienta probada:** `DELETE /api/keywords/{slug}` — verificación asistida por API (no hay herramienta MCP de borrado; es la única forma de observar este criterio)
 **Precondición:** `spec042-temporal` relacionada con al menos una pregunta vía `question_keywords`; y `spec042-kind-null` (creada en TC-MCP-042-004) **sin** ninguna relación.
 **Input de prueba:** (a) `DELETE /api/keywords/spec042-temporal`; (b) tras desasociarla de la pregunta con `update_question`, repetir (a); (c) `DELETE /api/keywords/spec042-kind-null`.
 **Output esperado:** (a) `409` con mensaje que explica que está en uso (idealmente con el número de preguntas relacionadas); la keyword **sigue en el catálogo** y las preguntas relacionadas no se tocan. (b) y (c) eliminan correctamente. En ningún caso se borran preguntas en cascada: la FK hacia `keywords` es `on delete restrict`.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{observaciones}}
+**Estado:** ✅ Aprobado
+**Hallazgos:** (a) `409` — "La keyword 'spec042-temporal' está en uso por 1 pregunta(s) y no se puede eliminar." (mensaje incluye el conteo, como se esperaba). (b) tras desasociarla de PZ vía `update_question`/PATCH, el `DELETE` devolvió `200 {"deleted":true}`. (c) `spec042-kind-null`, nunca usada, se eliminó igual `200`.
 
 ### TC-MCP-042-016 — El system prompt y `SKILL.md` describen el flujo nuevo
 **Herramienta probada:** documentación de `question-bank-mcp` (revisión asistida, sin invocación)
 **Precondición:** Fase 6 completada.
 **Input de prueba:** lectura de `docs/mcps/question-bank-agent.system-prompt.md`, `docs/mcps/README.md`, la tabla "Inventario de MCPs" de `CLAUDE.md` y `.claude/skills/lesson-authoring/SKILL.md`.
 **Output esperado:** los cuatro documentos (a) describen el flujo obligatorio de **tres pasos** (crear → publicar → montar), (b) prohíben inventar keywords y exigen `list_keywords` antes de asignar, (c) indican que `create_keyword` se **propone al usuario** antes de invocarse, (d) advierten que `update_question` ya no mueve preguntas de lección y que una pregunta publicada sin montar es invisible, y (e) **no mencionan** `tags` ni `course_slug`/`lesson_slug` como campos de la pregunta. Una búsqueda de `tags` y `lesson_slug` en esos archivos no arroja instrucciones vigentes.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{observaciones}}
+**Estado:** ✅ Aprobado
+**Hallazgos:** Confirmado por `grep` sobre los cuatro documentos: flujo de tres pasos descrito, prohibición de inventar keywords + `list_keywords` presentes, `create_keyword` documentada como propuesta al usuario, advertencia sobre `update_question`/montaje presente. Las únicas menciones de `tags`/`lesson_slug` restantes son contrastivas ("ya no hay tags libres", "se reemplazaron por..."), ninguna como instrucción vigente de uso.
 
 ---
 
@@ -774,13 +774,13 @@ order by slug;
 ---
 
 ## Resumen de la ronda
-- Aprobados: {{n}} — Fallidos: {{n}} — Pendientes: **29** (13 `TC-042-*` + 16 `TC-MCP-042-*`)
-- Verificación 1 (montajes faltantes): ⬜ Pendiente — resultado: {{filas}}
-- Verificación 2 (keywords faltantes): ⬜ Pendiente — resultado: {{filas}}
-- Verificación 3 (paridad de `question_count`): ⬜ Pendiente — resultado: {{filas}} (**esperado: 0**)
-- Verificación 3 reejecutada tras el `create or replace` del RPC: ⬜ Pendiente
-- Colisiones de slugificación reportadas al usuario: {{lista o "ninguna"}}
-- Hallazgos escalados a `docs/specs/backlog.md`: {{lista o "ninguno"}}
-- Limpieza de datos de prueba: ⬜ Pendiente / ✅ Completada
-  - Orden inverso de creación: desmontar preguntas (`unmount_question_from_lesson`) → eliminar preguntas (`delete_question`) → eliminar keywords de prueba (`DELETE /api/keywords/{slug}`, ya sin uso) → `unenroll_student` + `delete_student` de E1–E5.
-  - Los intentos de `self_assessment_attempts` y las filas de `student_grades` de los estudiantes de prueba se eliminan en cascada al borrar las matrículas; verificarlo y, si algo queda huérfano, **reportarlo con el identificador exacto en lugar de borrarlo en base**.
+- Aprobados: **29** (13 `TC-042-*` + 16 `TC-MCP-042-*`, dos con hallazgos menores no bloqueantes: TC-MCP-042-004 y TC-MCP-042-013) — Fallidos: **0** — Pendientes: **0**
+- Verificación 1 (montajes faltantes): ✅ Aprobado — resultado: **0 filas**, reejecutada al cierre de la ronda tras toda la actividad de prueba
+- Verificación 2 (keywords faltantes): ✅ Aprobado — resultado: **0 filas**, reejecutada al cierre
+- Verificación 3 (paridad de `question_count`): ✅ Aprobado — resultado: **0 filas**, reejecutada al cierre (**esperado: 0** — cumplido)
+- Verificación 3 reejecutada tras el `create or replace` del RPC (Fase 5): ✅ Completada — idéntica al snapshot "antes" de la Fase 0, byte a byte
+- Colisiones de slugificación reportadas al usuario: **una** — `recursion`/`recursión` → `recursion` (sembrada deliberadamente en la Fase 0 para ejercitar la detección; resuelta por diseño con `min(label)`, no requirió intervención)
+- Hallazgos escalados a `docs/specs/backlog.md`: **DEBT-055** (`tag` retirado se ignora en silencio en `list_questions`/`GET /api/questions`, TC-MCP-042-013) y **DEBT-054** (lecturas transitoriamente inconsistentes bajo llamadas MCP concurrentes vía stdio crudo, TC-MCP-042-004/008 — no reprodujeron aisladas, probable inestabilidad del túnel SSH)
+- Limpieza de datos de prueba: ✅ **Completada**
+  - Orden real ejecutado: eliminar las 15 preguntas de prueba (`delete_question`, cascada automática sobre `lesson_questions`/`question_keywords`) → eliminar keywords de prueba (`cierre`, `recursion-multiple`, `spec042-race-test`, `spec042-kind-null`; `logica`/`python` se conservan por ser datos reales del backfill) → eliminar los 5 estudiantes de prueba (`delete_student`, cascada sobre matrículas) → eliminar el curso académico de prueba (`academic_courses`, vía `service_role`, mismo camino usado para crearlo en la Fase 0).
+  - Verificado sin huérfanos: `lesson_progress` y `self_assessment_attempts` de los 5 estudiantes de prueba, vacíos tras el borrado; catálogo de `keywords` final son exactamente las 7 originales del backfill (`big-o`, `control-de-versiones`, `git`, `ramas`, `recursion`, `logica`, `python`); banco de `questions` en 0 filas de prueba.
