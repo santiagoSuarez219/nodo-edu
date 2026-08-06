@@ -394,25 +394,37 @@ de `.claude/skills/lesson-authoring/SKILL.md` (~520), que hoy dice
       D6 a propósito.
 - [x] Registrar los conteos en `docs/testing/test-042-banco-preguntas-keywords.md`.
 
-### Fase 1 — Migraciones de esquema y RLS
-- [ ] `supabase/migrations/20260806000000_init_keywords.sql`: tablas `keywords`
+### Fase 1 — Migraciones de esquema y RLS ✅ Completada 2026-08-06
+- [x] `supabase/migrations/20260806000000_init_keywords.sql`: tablas `keywords`
       (con el `check` de facetas de D3) y `question_keywords`, con PKs, FKs
       (`restrict` hacia `keywords`, `cascade` hacia `questions`) e índices de D8.
-- [ ] `supabase/migrations/20260806000001_init_lesson_questions.sql`: tabla
+- [x] `supabase/migrations/20260806000001_init_lesson_questions.sql`: tabla
       `lesson_questions` con PK compuesta, `order_index`, FK a `questions`
       (`cascade`), índice inverso por `question_id`, y `comment on table`
       explicando el rol.
-- [ ] `supabase/migrations/20260806000002_rls_keywords_and_lesson_questions.sql`:
+- [x] `supabase/migrations/20260806000002_rls_keywords_and_lesson_questions.sql`:
       `enable row level security` en las tres tablas y las políticas de D7,
       calcadas en estilo de `20260715000001_rls_questions.sql`.
-- [ ] `supabase/migrations/20260806000003_deprecate_question_slug_columns.sql`:
+- [x] `supabase/migrations/20260806000003_deprecate_question_slug_columns.sql`:
       `comment on column` para `questions.course_slug`, `lesson_slug` y `tags`
       marcándolas como deprecadas por spec-042. Sin DDL destructivo (D1).
-- [ ] `rsync` de las migraciones a `mirp-lab` y `supabase db reset` allá; verificar
+- [x] `rsync` de las migraciones a `mirp-lab` y `supabase db reset` allá; verificar
       que reconstruye sin conflictos y que las tres tablas tienen RLS habilitado.
-- [ ] Verificar las políticas por rol a mano: un estudiante matriculado **ve** filas
+      El reset limpió los datos sembrados en la Fase 0 (esperado — se
+      resembrarán con el contrato viejo al inicio de la Fase 2); se reaplicaron
+      a mano los `GRANT`s estándar sobre `public` (quirk documentado de
+      `CLAUDE.md` para esta instancia local, CLI `2.111.0`) y se recreó el
+      docente de desarrollo con `npm run seed:teacher` (nuevo UUID
+      `7207c852-dd6c-4df4-ac33-99985c36e26c`, actualizado en
+      `QUESTION_BANK_AGENT_TEACHER_ID` de `.env.local`). Confirmado con SQL
+      directo: `relrowsecurity = true` en las tres tablas nuevas.
+- [x] Verificar las políticas por rol a mano: un estudiante matriculado **ve** filas
       de `lesson_questions` de preguntas publicadas; **no ve** montajes de
-      preguntas en borrador.
+      preguntas en borrador. Verificado con `set local role authenticated` +
+      `request.jwt.claims` simulando un usuario no-dueño/no-admin: montó una
+      pregunta borrador y una publicada en la misma lección de prueba, la
+      consulta solo devolvió la fila de la publicada. Datos de verificación
+      eliminados al terminar.
 
 ### Fase 2 — Backfill idempotente y paridad de datos
 - [ ] `supabase/migrations/20260806000004_backfill_lesson_questions.sql`:
