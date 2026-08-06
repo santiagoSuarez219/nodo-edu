@@ -6,8 +6,19 @@ import {
   _updateQuestionForActor,
   _publishQuestionForActor,
   _deleteQuestionForActor,
+  _mountQuestionInLesson,
+  _unmountQuestionFromLesson,
+  _getQuestionLessonsForActor,
+  _getLessonQuestionsForActor,
+  _reorderLessonQuestions,
 } from "./index";
-import type { Question, QuestionWithDetails, QuestionInput, QuestionContext } from "./types";
+import type {
+  QuestionWithDetails,
+  QuestionInput,
+  QuestionContext,
+  QuestionWriteResult,
+  LessonQuestionEntry,
+} from "./types";
 
 export function getServiceQuestionsContext(): QuestionContext {
   const supabase = createServiceSupabaseClient();
@@ -25,7 +36,7 @@ export async function getServiceQuestions(filters?: {
   lessonSlug?: string;
   type?: string;
   difficulty?: number;
-  tag?: string;
+  keyword?: string;
   isPublished?: boolean;
   q?: string;
   limit?: number;
@@ -44,7 +55,7 @@ export async function getServiceQuestionById(
 
 export async function createServiceQuestion(
   input: QuestionInput
-): Promise<Question> {
+): Promise<QuestionWriteResult> {
   const context = getServiceQuestionsContext();
   return _createQuestionForActor(context, input);
 }
@@ -52,7 +63,7 @@ export async function createServiceQuestion(
 export async function updateServiceQuestion(
   questionId: string,
   input: QuestionInput
-): Promise<Question | null> {
+): Promise<QuestionWriteResult> {
   const context = getServiceQuestionsContext();
   return _updateQuestionForActor(context, questionId, input);
 }
@@ -69,4 +80,44 @@ export async function deleteServiceQuestion(
 ): Promise<{ ok: true } | { ok: false; error: string }> {
   const context = getServiceQuestionsContext();
   return _deleteQuestionForActor(context, questionId);
+}
+
+export async function mountServiceQuestionInLesson(
+  questionId: string,
+  courseSlug: string,
+  lessonSlug: string
+) {
+  const context = getServiceQuestionsContext();
+  return _mountQuestionInLesson(context, questionId, courseSlug, lessonSlug);
+}
+
+export async function unmountServiceQuestionFromLesson(
+  questionId: string,
+  courseSlug: string,
+  lessonSlug: string
+) {
+  const context = getServiceQuestionsContext();
+  return _unmountQuestionFromLesson(context, questionId, courseSlug, lessonSlug);
+}
+
+export async function getServiceQuestionLessons(questionId: string) {
+  const context = getServiceQuestionsContext();
+  return _getQuestionLessonsForActor(context, questionId);
+}
+
+export async function getServiceLessonQuestions(
+  courseSlug: string,
+  lessonSlug: string
+): Promise<LessonQuestionEntry[]> {
+  const context = getServiceQuestionsContext();
+  return _getLessonQuestionsForActor(context, courseSlug, lessonSlug);
+}
+
+export async function reorderServiceLessonQuestions(
+  courseSlug: string,
+  lessonSlug: string,
+  questionIds: string[]
+) {
+  const context = getServiceQuestionsContext();
+  return _reorderLessonQuestions(context, courseSlug, lessonSlug, questionIds);
 }

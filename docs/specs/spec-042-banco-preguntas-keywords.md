@@ -470,36 +470,54 @@ de `.claude/skills/lesson-authoring/SKILL.md` (~520), que hoy dice
       estaban en `test-042-banco-preguntas-keywords.md` (redactado junto con el
       spec) y su forma se confirmó ejecutable tal cual contra desarrollo.
 
-### Fase 3 — Dominio TypeScript
-- [ ] Crear `lib/keywords/types.ts` y `lib/keywords/schemas.ts` (Zod: `slug`
+### Fase 3 — Dominio TypeScript ✅ Completada 2026-08-06
+- [x] Crear `lib/keywords/types.ts` y `lib/keywords/schemas.ts` (Zod: `slug`
       normalizado, `label` requerido, `kind` opcional restringido al enum de D3;
       schema de filtros de listado).
-- [ ] Crear `lib/keywords/index.ts` con contexto `{ supabase, actorId }` y
+- [x] Crear `lib/keywords/index.ts` con contexto `{ supabase, actorId }` y
       `lib/keywords/service.ts` con `getServiceKeywordsContext()`, replicando el
-      patrón de `lib/questions/service.ts:12-21`.
-- [ ] Implementar `assertKeywordsExist(context, slugs)`: devuelve **todas** las
+      patrón de `lib/questions/service.ts:12-21`. `slugifyKeyword()` usa
+      normalización Unicode NFD (no la tabla manual de traducción del backfill
+      SQL — no rige datos ya migrados, solo keywords nuevas desde ahora).
+- [x] Implementar `assertKeywordsExist(context, slugs)`: devuelve **todas** las
       faltantes (D3), no la primera.
-- [ ] Editar `lib/questions/types.ts`: quitar `course_slug`/`lesson_slug`/`tags` de
+- [x] Editar `lib/questions/types.ts`: quitar `course_slug`/`lesson_slug`/`tags` de
       `Question` y `QuestionInput`; añadir `keywords: string[]` y
       `lessons: LessonMount[]` a `QuestionWithDetails`; tipo
-      `LessonMount { course_slug, lesson_slug, order_index }`.
-- [ ] Editar `lib/questions/schemas.ts:3-15` y `:110-120` (`tag` → `keyword`).
-- [ ] Editar `lib/questions/index.ts:12-72` (`_getQuestionsByActor`): filtros
+      `LessonMount { course_slug, lesson_slug, order_index }`. Se agregó además
+      `QuestionWriteResult`/`MountResult`/`UnmountResult`/`ReorderResult`
+      (discriminados) para poder comunicar `invalid_keywords` con la lista de
+      faltantes y `mismatch` en el reordenamiento (D6), algo que el `Question |
+      null` original no podía expresar.
+- [x] Editar `lib/questions/schemas.ts:3-15` y `:110-120` (`tag` → `keyword`).
+      Se agregó `findLegacyQuestionFields()` para el rechazo `422` de D2 (Fase 4)
+      y los schemas de montaje (`MountQuestionSchema`,
+      `ReorderLessonQuestionsSchema`).
+- [x] Editar `lib/questions/index.ts:12-72` (`_getQuestionsByActor`): filtros
       `course_slug`/`lesson_slug` vía `lesson_questions`, filtro `keyword` vía
       `question_keywords`; embeber `keywords` y `lessons` en el `select`.
-- [ ] Editar `:98-135` y `:137-195` (create/update): validar keywords contra el
+      Implementado como dos consultas previas (ids por montaje, ids por
+      keyword) en vez de un embed filtrado con `!inner`, para que el campo
+      `lessons` de la respuesta muestre siempre el montaje completo de cada
+      pregunta, no solo la fila que hizo match con el filtro.
+- [x] Editar `:98-135` y `:137-195` (create/update): validar keywords contra el
       catálogo **antes** de escribir; escribir `question_keywords`; reemplazo total
       del set de keywords en update; **no tocar `lesson_questions`** (D6).
-- [ ] Editar `mapQuestionRow` (`:349-376`): exponer `keywords` y `lessons`, dejar
+- [x] Editar `mapQuestionRow` (`:349-376`): exponer `keywords` y `lessons`, dejar
       de exponer los slugs y `tags`.
-- [ ] Añadir funciones de montaje en `lib/questions/index.ts`:
+- [x] Añadir funciones de montaje en `lib/questions/index.ts`:
       `_mountQuestionInLesson`, `_unmountQuestionFromLesson`,
       `_getLessonQuestionsForActor`, `_reorderLessonQuestions` — todas con la
       comprobación de propiedad (`created_by = actorId` ⇒ si no, tratar como no
-      encontrada).
-- [ ] Añadir sus wrappers en `lib/questions/service.ts`.
-- [ ] `npx tsc --noEmit`: los errores que aparezcan en `lib/self-assessment/*` son
-      **esperados** y los resuelve la Fase 5.
+      encontrada). Se agregó también `_getQuestionLessonsForActor` (el reverso:
+      lecciones de una pregunta, para `GET /api/questions/{id}/lessons`).
+- [x] Añadir sus wrappers en `lib/questions/service.ts`.
+- [x] `npx tsc --noEmit`: **un solo error** (`app/api/questions/route.ts:83`, el
+      filtro `tag` que ahora es `keyword` — se resuelve al editar la ruta en la
+      Fase 4). La reescritura de `lib/self-assessment/*` no genera errores de
+      tipos porque esas consultas usan el cliente Supabase sin tipado
+      generado — su ruptura es funcional, no de compilación; queda intacta
+      hasta la Fase 5.
 
 ### Fase 4 — API REST
 - [ ] Crear `app/api/keywords/route.ts` (`GET` con filtros + paginación, `POST` con
