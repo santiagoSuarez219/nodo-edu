@@ -37,13 +37,13 @@ MCP (`TC-MCP-042-*`). Todos arrancan en ⬜ Pendiente.
 | Curso académico **Grupo A** — sembrado en Fase 0 | `POST /api/academic_courses` vía `service_role` (autorizado en Fase 0) | `Spec-042 QA — Analisis de Algoritmos`, `{{academic_course_id}}=f34aaaf6-540a-4915-beca-534e06105464` | ⬜ |
 | Estudiante **frozen** — nota congelada divergente (D6), usado en TC-042-001 adaptado | `students-mcp` → `create_student` + `enroll_student`, sembrado en Fase 0 | `3827b151-0357-4592-a154-841eb6a5fe00` — `spec042-frozen@nodo.test` / `TestStudent042!`, enrollment `50f93a2c-9d4a-4bdf-9162-3312ed7e1531` | ⬜ |
 | Estudiante **live** — denominador vivo, usado en TC-042-002 adaptado | `students-mcp` → `create_student` + `enroll_student`, sembrado en Fase 0 | `21b0a022-fa85-4398-bf1d-3fc7c61d4213` — `spec042-live@nodo.test` / `TestStudent042!`, enrollment `7b1bc52c-26de-485c-bad5-425c9f38bffb` | ⬜ |
-| Estudiante **E3** — recorrido funcional (LA: orden, reordenamiento, revisión) | `students-mcp` → `create_student` + `enroll_student` | `{{e3_id}}` — `test-e3-spec042@nodo.test` / `TestStudent042!` | ⬜ |
-| Estudiante **E4** — segunda semilla de barajado (TC-042-008) y gate de LE (TC-042-010/011) | `students-mcp` → `create_student` + `enroll_student` | `{{e4_id}}` — `test-e4-spec042@nodo.test` / `TestStudent042!` | ⬜ |
-| Estudiante **E5** — autoevaluación de LB (pregunta compartida, TC-042-007) | `students-mcp` → `create_student` + `enroll_student` | `{{e5_id}}` — `test-e5-spec042@nodo.test` / `TestStudent042!` | ⬜ |
-| Preguntas **PA1–PA4** de LA (`multiple_choice`, publicadas y montadas) | `question-bank-mcp` → `create_question` + `publish_question` + `mount_question_in_lesson` (contrato nuevo, con `keywords`) | `{{pa1}}`, `{{pa2}}`, `{{pa3}}`, `{{pa4}}` | ⬜ |
-| Preguntas **PE1–PE2** de LE (gate de completar lección) | `question-bank-mcp` → `create_question` + `publish_question` + `mount_question_in_lesson` | `{{pe1}}`, `{{pe2}}` | ⬜ |
-| Pregunta **PX** — se monta en **LA y LB** a la vez (TC-042-007) | `create_question` + `publish_question` + dos `mount_question_in_lesson` | `{{px}}` | ⬜ |
-| Pregunta **PY** — publicada y **nunca montada** (TC-042-013) | `create_question` + `publish_question`, **sin** montar | `{{py}}` | ⬜ |
+| Estudiante **E3** — recorrido funcional (LA: orden, reordenamiento, revisión) | `students-mcp` → `create_student` + `enroll_student` | `1ff8befb-9ddc-440b-a0d4-10562ba7ac92` — `test-e3-spec042@nodo.test` / `TestStudent042!` | ⬜ |
+| Estudiante **E4** — segunda semilla de barajado (TC-042-008) y gate de LE (TC-042-010/011) | `students-mcp` → `create_student` + `enroll_student` | `fd90dfc9-cde5-4658-b509-92821ea33724` — `test-e4-spec042@nodo.test` / `TestStudent042!` | ⬜ |
+| Estudiante **E5** — autoevaluación de LB (pregunta compartida, TC-042-007) | `students-mcp` → `create_student` + `enroll_student` | `2376baaf-c14d-449e-9e44-2d1369442ca4` — `test-e5-spec042@nodo.test` / `TestStudent042!` | ⬜ |
+| Preguntas **PA1–PA4** de LA (`multiple_choice`, publicadas y montadas) | `question-bank-mcp` → `create_question` + `publish_question` + `mount_question_in_lesson` (contrato nuevo, con `keywords`) | `1abe335b-0ce6-41f1-8786-52bd51f002b9`, `700d0e21-de36-48de-b0ad-90e8ec439564`, `f4ee7ba6-4031-479a-9e98-07388015f413`, `4cf273b7-c147-47ff-8fa8-6b1e30400f3c` | ⬜ |
+| Preguntas **PE1–PE2** de LE (gate de completar lección) | `question-bank-mcp` → `create_question` + `publish_question` + `mount_question_in_lesson` | `0a27096c-f113-474a-a3f0-f1afa2e54c59`, `49ebedc5-f774-4ee3-b2d9-3f24bf310f00` | ⬜ |
+| Pregunta **PX** — se monta en **LA y LB** a la vez (TC-042-007) | `create_question` + `publish_question` + dos `mount_question_in_lesson` | `e4518de1-32a5-496e-9d0c-12f8352e1d3d` | ⬜ |
+| Pregunta **PY** — publicada y **nunca montada** (TC-042-013) | `create_question` + `publish_question`, **sin** montar | `76cbf039-7ad7-4ec4-b6df-2d5dfd340880` | ⬜ |
 | Keyword `logica` (`kind='tema'`) | `question-bank-mcp` → `create_keyword` | `logica` | ⬜ |
 | Keyword `python` (`kind='lenguaje'`) | `question-bank-mcp` → `create_keyword` | `python` | ⬜ |
 | Keyword `cierre` (`kind='momento'`) | `question-bank-mcp` → `create_keyword` | `cierre` | ⬜ |
@@ -57,7 +57,7 @@ variante **local** (`./mcp-servers/run-local-mcp.sh`).
 **Ningún caso de esta ronda se ejecuta contra producción.** Las consultas de la
 sección final sí se reejecutarán contra producción el día del despliegue, pero
 como **lectura**, y con confirmación explícita del usuario en ese momento.
-**Fecha de la ronda:** {{fecha}}
+**Fecha de la ronda:** 2026-08-06
 
 ### ⚠️ Patrón de respuesta correcta
 
@@ -189,7 +189,7 @@ cada una empieza con su etiqueta: `[042 PA1] …`, `[042 PA2] …`, etc.
 **Rol que ejecuta:** estudiante **E3**
 **Criterio cubierto:** puntos 1 y 6 de la reescritura (mismo conjunto y mismo orden en formulario y envío).
 **Precondición:** migraciones aplicadas. PA1–PA4 publicadas y montadas en LA con `order_index` 0,1,2,3 (verificado con `list_lesson_questions`). E3 sin intento en LA.
-**Datos de prueba usados:** `test-e3-spec042@nodo.test`; `{{pa1}}`–`{{pa4}}`
+**Datos de prueba usados:** `test-e3-spec042@nodo.test`; `1abe335b-0ce6-41f1-8786-52bd51f002b9`–`4cf273b7-c147-47ff-8fa8-6b1e30400f3c`
 **Pasos:**
 1. Como E3, abrir `/analisis-de-algoritmos/tablas-hash` y bajar a la autoevaluación de cierre **sin responder**.
 2. Anotar el orden de las etiquetas visibles.
@@ -203,7 +203,7 @@ cada una empieza con su etiqueta: `[042 PA1] …`, `[042 PA2] …`, etc.
 **Rol que ejecuta:** docente vía MCP + estudiante **E3**
 **Criterio cubierto:** "Reordenar el montaje cambia el orden en que el estudiante ve las preguntas".
 **Precondición:** TC-042-003 ejecutado; E3 **sigue sin enviar** su intento en LA.
-**Datos de prueba usados:** `{{pa1}}`–`{{pa4}}`
+**Datos de prueba usados:** `1abe335b-0ce6-41f1-8786-52bd51f002b9`–`4cf273b7-c147-47ff-8fa8-6b1e30400f3c`
 **Pasos:**
 1. Con `question-bank-mcp` → `reorder_lesson_questions` sobre `analisis-de-algoritmos` / `tablas-hash`, enviar el orden invertido: `[PA4, PA3, PA2, PA1]`.
 2. Como E3, recargar la lección (F5).
@@ -232,12 +232,12 @@ cada una empieza con su etiqueta: `[042 PA1] …`, `[042 PA2] …`, etc.
 **Rol que ejecuta:** docente vía MCP + estudiantes **E4** (LA) y **E3** (revisión previa)
 **Criterio cubierto:** "Desmontar una pregunta de una lección la retira de esa autoevaluación sin eliminarla del banco ni afectar sus otros montajes"; punto 7 (fallback a `created_at` para preguntas desmontadas).
 **Precondición:** TC-042-005 aprobado (E3 **ya** tiene intento en LA con las 4 preguntas). E4 matriculado, **sin** intento en LA.
-**Datos de prueba usados:** `{{pa3}}`; `{{px}}` (montada en LA y LB)
+**Datos de prueba usados:** `f4ee7ba6-4031-479a-9e98-07388015f413`; `e4518de1-32a5-496e-9d0c-12f8352e1d3d` (montada en LA y LB)
 **Pasos:**
 1. Con `unmount_question_from_lesson`, desmontar **PA3** de `analisis-de-algoritmos` / `tablas-hash`.
 2. Como E4, abrir LA y contar las preguntas del formulario.
 3. Como E3 (que ya respondió con 4), recargar LA y revisar su intento.
-4. Con `get_question` sobre `{{pa3}}`, comprobar que la pregunta sigue existiendo y publicada.
+4. Con `get_question` sobre `f4ee7ba6-4031-479a-9e98-07388015f413`, comprobar que la pregunta sigue existiendo y publicada.
 5. Con `list_questions` sin filtros (o filtrando por `keyword`), comprobar que PA3 sigue apareciendo en el banco.
 6. Comprobar que **PX**, montada también en LB, sigue apareciendo en la autoevaluación de LB (paso rápido: abrir LB como E5).
 **Resultado esperado:** E4 ve **3** preguntas (sin `[042 PA3]`) y su denominador es 3. E3 sigue viendo su revisión **completa de 4 preguntas**, incluida PA3 ya desmontada (fallback a `created_at`), con resultado "3/4" intacto y su nota sin cambios. PA3 sigue existiendo en el banco (`get_question` responde `200`, `is_published: true`) y sus otros montajes, si los tiene, siguen vivos. PX sigue en LB.
@@ -248,12 +248,12 @@ cada una empieza con su etiqueta: `[042 PA1] …`, `[042 PA2] …`, etc.
 **Rol que ejecuta:** estudiantes **E4** (LA) y **E5** (LB)
 **Criterio cubierto:** "Una misma pregunta puede montarse en 2+ lecciones y aparece en la autoevaluación de todas ellas".
 **Precondición:** PX publicada y montada en LA **y** en LB con `mount_question_in_lesson` (dos llamadas). E4 sin intento en LA; E5 sin intento en LB.
-**Datos de prueba usados:** `{{px}}`
+**Datos de prueba usados:** `e4518de1-32a5-496e-9d0c-12f8352e1d3d`
 **Pasos:**
 1. Como E4, abrir LA y localizar `[042 PX]` en el formulario.
 2. Como E5, abrir LB y localizar `[042 PX]` en el formulario.
 3. Comparar el enunciado y las opciones (contenido, no orden) en ambas vistas.
-4. Verificación asistida: `list_questions` sobre `{{px}}` muestra **un solo** `id`, con dos montajes.
+4. Verificación asistida: `list_questions` sobre `e4518de1-32a5-496e-9d0c-12f8352e1d3d` muestra **un solo** `id`, con dos montajes.
 **Resultado esperado:** la misma pregunta (mismo `id`, mismo enunciado) aparece en las dos autoevaluaciones, sin duplicarla en el banco. Cada lección la cuenta en su propio denominador. El orden de sus opciones puede diferir entre E4 y E5 (barajado de spec-034), pero el conjunto de opciones es el mismo.
 **Estado:** ⬜ Pendiente
 **Hallazgos:** {{observaciones}}
@@ -290,7 +290,7 @@ cada una empieza con su etiqueta: `[042 PA1] …`, `[042 PA2] …`, etc.
 **Rol que ejecuta:** estudiante **E4**
 **Criterio cubierto:** "Completar una lección sigue exigiendo haber respondido la autoevaluación (spec-033 / spec-037 D8)" — punto 5 de la reescritura, el que alimenta el gate.
 **Precondición:** LE con PE1–PE2 publicadas y **montadas**; E4 sin intento en LE.
-**Datos de prueba usados:** `test-e4-spec042@nodo.test`; `{{pe1}}`, `{{pe2}}`
+**Datos de prueba usados:** `test-e4-spec042@nodo.test`; `0a27096c-f113-474a-a3f0-f1afa2e54c59`, `49ebedc5-f774-4ee3-b2d9-3f24bf310f00`
 **Pasos:**
 1. Como E4, abrir `/analisis-de-algoritmos/counting-radix-y-bucket-sort` sin responder la autoevaluación.
 2. Intentar marcar la lección como completada.
@@ -335,7 +335,7 @@ cada una empieza con su etiqueta: `[042 PA1] …`, `[042 PA2] …`, etc.
 **Rol que ejecuta:** estudiante **E4** + docente vía MCP
 **Criterio cubierto:** el modo de fallo nuevo del flujo de tres pasos (crear → publicar → **montar**), que el spec exige que sea **detectable**.
 **Precondición:** PY creada y publicada, **sin** ningún montaje.
-**Datos de prueba usados:** `{{py}}`
+**Datos de prueba usados:** `76cbf039-7ad7-4ec4-b6df-2d5dfd340880`
 **Pasos:**
 1. Como E4, abrir LA y comprobar que `[042 PY]` **no** está.
 2. Recorrer LB y LE y comprobar lo mismo.
@@ -430,7 +430,7 @@ cada una empieza con su etiqueta: `[042 PA1] …`, `[042 PA2] …`, etc.
 ### TC-MCP-042-010 — `unmount_question_from_lesson` desmonta sin borrar
 **Herramienta probada:** `unmount_question_from_lesson`
 **Precondición:** PX montada en LA y LB.
-**Input de prueba:** `{ "question_id": "{{px}}", "course_slug": "analisis-de-algoritmos", "lesson_slug": "tablas-hash" }`; luego repetir la misma llamada.
+**Input de prueba:** `{ "question_id": "e4518de1-32a5-496e-9d0c-12f8352e1d3d", "course_slug": "analisis-de-algoritmos", "lesson_slug": "tablas-hash" }`; luego repetir la misma llamada.
 **Output esperado:** la primera llamada desmonta PX de LA; `list_lesson_questions` de LA ya no la devuelve y la de **LB sí**; `get_question` sigue devolviendo la pregunta (`is_published` intacto). La segunda llamada es idempotente: no falla con `500` ni borra otra cosa (`200`/`204` o un `404` explícito y estable — anotar cuál).
 **Estado:** ⬜ Pendiente
 **Hallazgos:** {{observaciones}}
