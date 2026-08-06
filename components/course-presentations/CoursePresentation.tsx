@@ -179,52 +179,40 @@ export function CoursePresentation({ presentation, cta }: Props) {
           </section>
         </div>
 
-        {/* Conditions */}
-        <section className="flex flex-col gap-4 pb-8 lg:pb-12 ">
-          <h2 className="text-xl lg:text-2xl font-bold">
-            Condiciones del curso
-          </h2>
-          <ul className="space-y-2 text-sm text-gray-700 dark:text-gray-300 text-justify">
-            {presentation.conditions.map((condition) => (
-              <li key={condition} className="ml-6 list-disc leading-relaxed">
-                {condition}
-              </li>
-            ))}
-          </ul>
-        </section>
-
         {/* Bibliography */}
-        <section className="flex flex-col gap-4 pb-8 lg:pb-12">
-          <h2 className="text-xl lg:text-2xl font-bold">Bibliografía</h2>
-          <div className="space-y-3">
-            {presentation.bibliography.map((book, idx) => (
-              <div
-                key={idx}
-                className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4"
-              >
-                <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-                  {book.title}
-                </p>
-                <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                  {book.author}
-                </p>
-                {book.edition && (
-                  <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-                    {book.edition}
+        {presentation.bibliography.length > 0 && (
+          <section className="flex flex-col gap-4 pb-8 lg:pb-12">
+            <h2 className="text-xl lg:text-2xl font-bold">Bibliografía</h2>
+            <div className="space-y-3">
+              {presentation.bibliography.map((book, idx) => (
+                <div
+                  key={idx}
+                  className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4"
+                >
+                  <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                    {book.title}
                   </p>
-                )}
-              </div>
-            ))}
-          </div>
-          <a
-            href="https://www.itm.edu.co/biblioteca/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm font-semibold text-blue-700 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors inline-block mt-2"
-          >
-            Visita la biblioteca del ITM →
-          </a>
-        </section>
+                  <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                    {book.author}
+                  </p>
+                  {book.edition && (
+                    <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                      {book.edition}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+            <a
+              href="https://www.itm.edu.co/biblioteca/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm font-semibold text-blue-700 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors inline-block mt-2"
+            >
+              Visita la biblioteca del ITM →
+            </a>
+          </section>
+        )}
 
         {/* Documents */}
         {presentation.documents.length > 0 && (

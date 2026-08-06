@@ -5,6 +5,290 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+> **Bloque A11Y-SORDOS (DEBT-047 … DEBT-051)** — hallazgos de la revisión de
+> accesibilidad del 2026-08-05, motivada por la matrícula de estudiantes
+> sordos en `programacion-cientifica` (curso presencial, Nodo como apoyo).
+> Criterio común a los cinco: **el rol de Nodo es convertir lo efímero-hablado
+> del salón en persistente-textual/visual**. No son ítems de WCAG genérico
+> (contraste, teclado, screen reader) — esa auditoría es un trabajo distinto y
+> de menor impacto para este perfil. Priorizados de mayor a menor impacto:
+> DEBT-047 > DEBT-048 > DEBT-049 > DEBT-050 > DEBT-051.
+>
+> Cuatro acciones adicionales de esta misma revisión **no generaron ítem de
+> backlog** porque no requieren código y se resuelven con operación del curso:
+> publicar la lección *antes* de la clase (`courses-mcp`,
+> `set_lesson_availability`); auditar las guías de laboratorio de
+> `programacion-cientifica` para eliminar dependencias de la explicación oral
+> ("como expliqué en clase"); dar acceso anticipado al intérprete
+> (matricularlo vía `students-mcp` y abrirle las lecciones); y proyectar
+> siempre el código de asistencia en pantalla en vez de dictarlo — relevante
+> tras spec-041, que permite refrescarlo en mitad de la sesión.
+
+---
+
+## DEBT-053 — Error de hidratación recuperable en el contador "Expira en: mm:ss" de `AdminAttendancePanel` al abrir una segunda pestaña
+
+**Origen:** Ronda manual `test-041-refrescar-codigo-asistencia.md`, TC-008,
+2026-08-06 — hallazgo colateral, no bloqueante.
+**Prioridad:** Baja — Next.js regenera el árbol en cliente automáticamente
+("Recoverable Error"); no se observó pérdida de funcionalidad.
+
+Al abrir una segunda pestaña con la vista docente de la lección (necesario
+para TC-008, que simula el docente con el panel abierto en dos lugares a la
+vez), React reportó un hydration mismatch en el `<span>` del contador "Expira
+en: mm:ss" de `AdminAttendancePanel.tsx:391`:
+
+```
++  12:53   (server)
+-  12:54   (client)
+```
+
+**Causa probable:** el valor se computa a partir de `code_expires_at` y
+`Date.now()` en el render, y el segundo puede diferir entre el render de
+servidor (SSR de la segunda pestaña) y la primera pintada en cliente —
+exactamente el patrón que React documenta como causa típica de este error
+("Variable input such as `Date.now()` ... which changes each time it's
+called"). No se investigó más a fondo: es preexistente (el cálculo del
+countdown no lo tocó spec-041) y no bloqueó ninguna prueba.
+
+**Fix sugerido:** no renderizar `timeRemaining` en el primer render de
+servidor (devolver `null`/placeholder hasta que el `useEffect` lo calcule en
+cliente), o envolver el valor inicial en `suppressHydrationWarning` si el
+parpadeo de 1s es aceptable. Requiere decidir cuál, y verificar que no
+reintroduce el problema que motivó calcular `timeRemaining` de forma
+inmediata tras un refresco (spec-041, Decisión 8, punto 1).
+
+---
+
+## DEBT-052 — `openSession`/`closeSession` revalidan `/admin/courses` (ruta muerta): el panel muestra estado obsoleto al remontar tras cambiar de grupo — ✅ Resuelto (spec-041, 2026-08-06)
+
+**Origen:** Ronda manual `test-041-refrescar-codigo-asistencia.md`, TC-011,
+2026-08-06 — falló al confirmar que rotar el código de un grupo no afecta al
+otro.
+**Prioridad:** Media — reproducible en el flujo normal de un docente con
+varios grupos; no hay pérdida de datos, pero el panel proyectado en clase
+puede mostrar "sin sesión de asistencia abierta" para una sesión que sí está
+abierta.
+
+**Resuelto (2026-08-06):** al reproducir el mismo síntoma con `openSession`
+durante el re-test de TC-011 (abrir sesión en ambos grupos y cambiar entre
+ellos mostraba "sin sesión abierta" sin haber tocado extender/rotar), se
+amplió el alcance de spec-041 para corregir también `openSession` y
+`closeSession` con el mismo patrón que ya se había aplicado a
+`extendSessionCode`/`rotateSessionCode`. Las cuatro acciones de
+`lib/attendance/index.ts` reciben ahora `courseSlug`/`lessonSlug` y revalidan
+`/${courseSlug}/${lessonSlug}` en vez de `/admin/courses`. Ver spec-041,
+Decisión 11.
+
+**Causa raíz (confirmada durante la investigación de TC-011):**
+`AdminAttendancePanel` recibe su estado inicial como prop (`initialSession`)
+desde `page.tsx` (`app/(cursos)/[courseSlug]/[lessonSlug]/page.tsx:176`, vía
+`getOpenSessionForCourse` por curso académico) — un snapshot tomado una sola
+vez en el render del servidor. `TeacherAttendanceControl` monta el panel con
+`key={selectedCourse.id}` (`components/courses/TeacherAttendanceControl.tsx`):
+cambiar de grupo **desmonta** el panel del grupo anterior y **remonta** uno
+nuevo, releyendo ese mismo snapshot congelado — porque cambiar de grupo es
+puramente cliente (cookie + `useState`), sin navegación, así que el snapshot
+del servidor nunca se refresca.
+
+`openSession` no llama `revalidatePath` en absoluto; `closeSession` llama
+`revalidatePath('/admin/courses', 'layout')` — la subruta que creó spec-010 y
+que **ya no existe** desde que spec-031 movió el panel a la vista de lección
+(`/${courseSlug}/${lessonSlug}`). Revalidar esa ruta muerta no tiene ningún
+efecto sobre la página real donde vive el panel hoy.
+
+**Resultado:** si el docente abre o cierra una sesión en un grupo y luego
+cambia a otro grupo y vuelve, el panel remontado puede mostrar un estado que
+no coincide con la base de datos (ej. "sin sesión abierta" para una sesión
+que sí está abierta).
+
+**No corregido aquí:** `spec-041` (2026-08-06) encontró y corrigió el mismo
+defecto en `extendSessionCode`/`rotateSessionCode` — las dos acciones que ese
+spec introdujo — pasándoles `courseSlug`/`lessonSlug` y apuntando
+`revalidatePath` a la ruta real (ver `lib/attendance/index.ts`). Se decidió
+explícitamente **no** extender el fix a `openSession`/`closeSession` en esa
+misma sesión para no ampliar el alcance del spec más allá de lo que su propia
+ronda de pruebas (`test-041`) cubre; queda registrado aquí para una
+corrección posterior con el mismo patrón.
+
+**Fix:** aplicar el mismo cambio que ya recibieron `extendSessionCode` /
+`rotateSessionCode`: agregar `courseSlug`/`lessonSlug` a las firmas de
+`openSession` y `closeSession`, enhebrarlos desde `AdminAttendancePanel`
+(que ya los recibe como prop tras el fix de spec-041) hasta las llamadas, y
+usar `revalidatePath(\`/${courseSlug}/${lessonSlug}\`)` en vez de
+`/admin/courses`.
+
+---
+
+## DEBT-051 — Los diagramas Mermaid no tienen descripción textual
+
+**Origen:** Revisión de accesibilidad para estudiantes sordos, 2026-08-05
+(bloque A11Y-SORDOS)
+**Prioridad:** Baja — mejora transversal, sin bloqueo funcional
+
+`components/mdx/MermaidDiagram.tsx` renderiza el diagrama sin `aria-label`,
+sin `title` ni ningún equivalente textual: no hay una sola ocurrencia de
+`aria-`, `alt` o `caption` en el componente. Un diagrama que solo existe como
+grafo no se puede repasar en prosa, no es buscable y depende de que alguien lo
+explique — normalmente de viva voz en clase.
+
+**Acción:** Prop opcional `description` (o slot MDX) que renderice un párrafo
+explicando el diagrama, más un `aria-label` derivado. Convención en la skill
+`lesson-authoring` para que las lecciones nuevas lo incluyan por defecto.
+
+---
+
+## DEBT-050 — El límite de tiempo de una evaluación es global por grupo: no admite tiempo extendido por estudiante
+
+**Origen:** Revisión de accesibilidad para estudiantes sordos, 2026-08-05
+(bloque A11Y-SORDOS)
+**Prioridad:** Media — se vuelve Alta si se aplica una evaluación calificable
+con temporizador a un estudiante sordo
+
+`time_limit_minutes` vive en el grupo de evaluación (`lib/assignments/types.ts:16`,
+`lib/assignments/service.ts:45`) y llega al reproductor como un único valor
+(`AssignmentPlayer.tsx:15`, countdown en `AssignmentPlayer.tsx:35-65`). No hay
+forma de conceder tiempo adicional a un estudiante concreto sin alargar la
+evaluación para todo el grupo.
+
+Para un usuario nativo de lengua de señas, **el español escrito es segunda
+lengua**: leer el enunciado cuesta más tiempo, no menos comprensión. El tiempo
+extendido es un ajuste razonable reconocido, no una ventaja.
+
+**Acción:** Factor de tiempo extendido por matrícula (ej. `extra_time_factor`
+en `enrollments`, por defecto `1.0`), aplicado al calcular el `deadline` en
+`useCountdown`. Requiere migración, exposición en el panel admin y,
+probablemente, en `students-mcp`. Verificar además que **ningún aviso de tiempo
+dependa de audio**: hoy el único indicador es visual (`countdownUrgent`,
+`AssignmentPlayer.tsx:150`) — mantenerlo así.
+
+---
+
+## DEBT-049 — No hay canal de avisos en texto durante la clase
+
+**Origen:** Revisión de accesibilidad para estudiantes sordos, 2026-08-05
+(bloque A11Y-SORDOS)
+**Prioridad:** Media
+
+Las instrucciones que el docente da a mitad de sesión ("pasen al ejercicio 3",
+"el laboratorio se entrega el viernes") solo existen habladas. El estudiante
+sordo depende de que alguien se las repita, con retraso y pérdida.
+
+Ya existe la infraestructura donde encajaría: `TeacherLessonPanel`
+(`components/courses/TeacherLessonPanel.tsx`) es el panel del docente sobre la
+lección, y `AttendanceSection` ya demuestra el patrón de estado de sesión en
+vivo del lado del estudiante.
+
+**Acción:** Mensaje en vivo que el docente publica desde el panel de la lección
+y los estudiantes ven en la página de la lección. Decidir el mecanismo de
+propagación (Supabase Realtime vs. polling) al redactar el spec.
+
+---
+
+## DEBT-048 — No existe glosario técnico por curso
+
+**Origen:** Revisión de accesibilidad para estudiantes sordos, 2026-08-05
+(bloque A11Y-SORDOS)
+**Prioridad:** Media-Alta — el hallazgo menos obvio y de mayor impacto
+pedagógico
+
+En LSC no hay señas estandarizadas para prácticamente ningún término del curso
+(*broadcasting*, vectorización, `DataFrame`, complejidad amortizada). Sin
+vocabulario acordado, cada intérprete improvisa y el término cambia de seña
+entre sesiones. Hoy los términos solo viven dispersos en el cuerpo de los
+`.mdx`.
+
+**Acción:** Glosario por curso —`término → definición corta → seña acordada
+(imagen o video corto) → lecciones donde aparece`— mantenido junto con el
+intérprete. Beneficia a todo el grupo (repaso, búsqueda); para estos
+estudiantes es habilitante. Evaluar si el contenido vive en
+`content/cursos/<curso>/glosario/` (versionado, coherente con el modelo MDX
+actual) o en base de datos.
+
+---
+
+## DEBT-047 — `YouTubeEmbed` no activa subtítulos ni admite transcripción
+
+**Origen:** Revisión de accesibilidad para estudiantes sordos, 2026-08-05
+(bloque A11Y-SORDOS)
+**Prioridad:** Alta — es el hueco más directo: un video sin subtítulos es
+contenido del curso que un estudiante sordo simplemente no recibe
+
+`components/mdx/YouTubeEmbed.tsx:43` construye la URL del embed con
+`autoplay=1` como único parámetro:
+
+```ts
+const embedSrc = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1${...}`;
+```
+
+No hay `cc_load_policy`, ni `cc_lang_pref`, ni `hl`, ni ninguna vía para
+adjuntar una transcripción. El componente tampoco expone si el video tiene
+subtítulos, así que el estudiante lo descubre después de abrirlo.
+
+**Acción (tres partes):**
+1. Añadir `cc_load_policy=1&cc_lang_pref=es&hl=es` a `embedSrc` para que los
+   subtítulos arranquen activos.
+2. Prop `transcript` (o slot MDX) que renderice la transcripción en texto bajo
+   el video, colapsable. **Es la parte que más importa**: los subtítulos
+   automáticos de YouTube en español destrozan el vocabulario técnico; el valor
+   real está en una transcripción revisada.
+3. Indicador visible "Con subtítulos revisados / Sin subtítulos" para que el
+   estudiante lo sepa antes de invertir el tiempo.
+
+Candidato natural a ser el primer spec del bloque: alcance acotado, un solo
+componente, sin migración.
+
+---
+
+## DEBT-046 — La policy de `update` de `class_sessions` no tiene `with check`: un `update` puede reasignar la sesión a otro curso
+
+**Origen:** Análisis de impacto de `spec-041` (refrescar el código de asistencia),
+2026-08-05 — detectado al confirmar que refrescar el código no necesitaba policy
+nueva
+**Prioridad:** Media — no hay explotación conocida hoy; requiere migración y su
+propia ronda de pruebas
+
+`class_sessions_mutate_owner_or_admin`
+(`supabase/migrations/20260716000001_rls_attendance.sql:22`) define la policy
+`for update` con `using (...)` pero **sin `with check (...)`**:
+
+```sql
+create policy "class_sessions_mutate_owner_or_admin" on public.class_sessions
+  for update
+  using ( ...docente dueño o admin... );
+  -- falta: with check ( ...mismo predicado sobre la fila resultante... )
+```
+
+En Postgres, una policy `for update` sin `with check` valida **solo la fila
+original** contra `using`; la fila **resultante** no se valida contra nada. Es
+decir: un docente dueño del curso X puede ejecutar un `update` que cambie
+`academic_course_id` al curso Y de **otro docente**, y la policy lo permite —
+la fila que sale ya no le pertenece, pero nadie lo comprueba. Se llevaría con
+ella todas sus `attendance_records` (cuelgan de `session_id`, no del curso),
+contaminando el roster y el `attendance_pct` del curso ajeno.
+
+Contrasta con `class_sessions_insert_owner_or_admin`, definida justo debajo,
+que **sí** usa `with check` con el mismo predicado: la asimetría parece un
+descuido de spec-010, no una decisión.
+
+**No es explotable desde la aplicación hoy:** ninguna Server Action de
+`lib/attendance/index.ts` escribe `academic_course_id` (`openSession` lo fija en
+el `insert`, `closeSession` solo toca `is_open`, y las dos acciones nuevas de
+spec-041 solo tocan `attendance_code` / `code_expires_at`). La vía sería un
+cliente hablando directo con PostgREST con el JWT de un docente.
+
+**No se corrigió en spec-041** a propósito: es un hallazgo preexistente ajeno a
+refrescar un código, y tocar una policy exige migración —que spec-041 declara
+explícitamente fuera de alcance (D3)— más verificación en `mirp-lab` y despliegue
+a producción.
+
+**Fix:** migración nueva que haga `alter policy class_sessions_mutate_owner_or_admin
+... with check (<mismo predicado que using>)`. Al hacerlo, **auditar el resto de
+policies `for update` del proyecto** con el mismo criterio: si esta se escribió
+así, es probable que no sea la única.
+
+---
+
 ## DEBT-045 — `self_assessment_breakdown` no filtra lecciones deshabilitadas (BLOQUE 039)
 
 **Origen:** spec-040, Fase 2, registrado explícitamente en la implementación

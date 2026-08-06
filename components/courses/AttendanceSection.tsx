@@ -37,9 +37,14 @@ const resultMessages: Record<MarkAttendanceResult, { title: string; message: str
     message: 'Tu asistencia ya estaba registrada en esta sesión.',
     type: 'success',
   },
+  // spec-041 D8: tras una rotación de código, un estudiante con la página
+  // abierta que teclea el código viejo cae aquí — el mismo resultado que un
+  // código simplemente mal escrito. No podemos afirmar que hubo rotación
+  // (por eso el título no cambia), pero sí ofrecer la hipótesis correcta.
   not_found: {
     title: 'Código no válido',
-    message: 'El código que ingresaste no corresponde a ninguna sesión abierta.',
+    message:
+      'El código que ingresaste no corresponde a ninguna sesión abierta. Si el docente generó uno nuevo, recarga la página y usa el que esté proyectado.',
     type: 'error',
   },
   expired: {

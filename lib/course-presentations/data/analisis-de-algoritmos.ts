@@ -1,9 +1,8 @@
 import type { CoursePresentation } from "../types";
-import { TRANSVERSAL_CONDITIONS } from "./transversal";
 
 export const analisisDeAlgoritmos: CoursePresentation = {
-  name: "Introducción al Análisis de Algoritmos",
-  desc: "Estudio de la complejidad computacional y las técnicas fundamentales de diseño de algoritmos: recurrencias, divide y vencer, ordenamiento, estructuras de datos, programación dinámica y algoritmos voraces.",
+  name: "Análisis de Algoritmos",
+  desc: "Estudio de la complejidad computacional y las técnicas fundamentales de diseño de algoritmos: recurrencias, dividir y vencer, ordenamiento, estructuras de datos, programación dinámica y algoritmos voraces.",
   program: "Ingeniería de Sistemas",
   level: "Intermedio - Avanzado",
   credits: 3,
@@ -12,7 +11,7 @@ export const analisisDeAlgoritmos: CoursePresentation = {
   independentHours: "5 h/semana independientes",
   spots: 10,
   prereqs: [],
-  tools: ["Python 3.x", "Visual Studio Code", "Git y GitHub", "Markdown"],
+  tools: ["Python 3.13", "Visual Studio Code", "Git y GitHub", "Markdown"],
   syllabus: [
     {
       n: 1,
@@ -27,18 +26,19 @@ export const analisisDeAlgoritmos: CoursePresentation = {
     },
     {
       n: 2,
-      week: "Semana 2",
+      week: "Semana 2-3",
       title: "Introducción a Python",
       topics: [
         "Sintaxis: tipos de datos, control de flujo, funciones",
         "Estructuras nativas: listas, tuplas, diccionarios, conjuntos",
+        "POO: clases, objetos, atributos y métodos",
         "Entornos virtuales y gestión de dependencias (venv, requirements.txt)",
         "Buenas prácticas de código: PEP 8, docstrings, type hints",
       ],
     },
     {
       n: 3,
-      week: "Semanas 3-4",
+      week: "Semanas 4",
       title: "Fundamentos del análisis de algoritmos",
       topics: [
         "Algoritmos como tecnología: por qué importa la eficiencia",
@@ -154,6 +154,11 @@ export const analisisDeAlgoritmos: CoursePresentation = {
       url: "/documentos/analisis-de-algoritmos/compromiso.pdf",
       description: "Documento con las políticas y normas académicas del curso.",
     },
+    {
+      title: "02-Microdiseño curricular",
+      url: "/documentos/analisis-de-algoritmos/micro.pdf",
+      description:
+        "Microdiseño oficial de la asignatura: competencias, contenidos y evaluación.",
+    },
   ],
-  conditions: TRANSVERSAL_CONDITIONS,
 };

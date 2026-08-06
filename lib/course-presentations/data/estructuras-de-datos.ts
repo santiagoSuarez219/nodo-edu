@@ -1,5 +1,4 @@
 import type { CoursePresentation } from "../types";
-import { TRANSVERSAL_CONDITIONS } from "./transversal";
 
 export const estructurasDatos: CoursePresentation = {
   name: "Estructuras de Datos",
@@ -84,9 +83,6 @@ export const estructurasDatos: CoursePresentation = {
         "Concepto de recursividad: caso base y recursivo",
         "Pila de llamadas (call stack) y prueba de escritorio",
         "Recursivos clásicos: factorial, Fibonacci, Torres de Hanói",
-        "Recorrido y búsqueda recursiva sobre listas enlazadas",
-        "Riesgos y límites: StackOverflowError, costo exponencial",
-        "Introducción al backtracking",
       ],
     },
     {
@@ -99,8 +95,6 @@ export const estructurasDatos: CoursePresentation = {
         "Recorridos recursivos: in-order, pre-order, post-order",
         "Árbol binario de búsqueda (BST): búsqueda e inserción",
         "Eliminación en BST y análisis de complejidad",
-        "Aplicaciones: diccionarios, índices, autocompletado",
-        "Integración final del proyecto de aula y sustentación",
       ],
     },
   ],
@@ -131,7 +125,7 @@ export const estructurasDatos: CoursePresentation = {
       week: "Semana de exámenes",
     },
     {
-      name: "Seguimiento continuo (incluye recursividad y laboratorios)",
+      name: "Seguimiento continuo",
       pct: 20,
       week: "A lo largo del curso",
     },
@@ -166,11 +160,15 @@ export const estructurasDatos: CoursePresentation = {
   ],
   documents: [
     {
-      title: "Guía para el informe de laboratorio",
-      url: "/documentos/estructuras-de-datos/guia-informe-laboratorio.pdf",
+      title: "01-Compromiso academico",
+      url: "/documentos/estructuras-de-datos/compromiso.pdf",
+      description: "Documento con las políticas y normas académicas del curso.",
+    },
+    {
+      title: "02-Microdiseño curricular",
+      url: "/documentos/estructuras-de-datos/micro.pdf",
       description:
-        "Estructura y formato esperado de los informes de laboratorio.",
+        "Microdiseño oficial de la asignatura: competencias, contenidos y evaluación.",
     },
   ],
-  conditions: TRANSVERSAL_CONDITIONS,
 };

@@ -10,6 +10,7 @@ import type {
   MarkAttendanceResult,
   OpenSessionResult,
   OpenSessionSummary,
+  RefreshCodeResult,
   StudentAttendanceState,
 } from './types';
 
@@ -36,8 +37,63 @@ function getBogotaDateString(): string {
   );
 }
 
+interface CodeAttemptError {
+  code?: string;
+  message?: string;
+}
+
+type UniqueCodeOutcome<T> =
+  | { outcome: 'success'; data: T }
+  // Colisión en un índice ajeno al código (ej. el curso ya tiene una sesión
+  // abierta) — no tiene sentido reintentar con un código nuevo.
+  | { outcome: 'own_conflict' }
+  // Se agotaron los intentos sin lograr un código único.
+  | { outcome: 'code_exhausted' }
+  // Cualquier otro error (ni colisión de código ni del índice propio).
+  | { outcome: 'error'; error: CodeAttemptError };
+
+// Decisión 5 (spec-041): el índice `unique (attendance_code) where is_open`
+// aplica igual a INSERT (openSession) que a UPDATE (rotateSessionCode) — ambos
+// reintentan con un código nuevo ante una colisión, sin duplicar el bucle.
+// `ownConflictIndexName` es el índice, si lo hay, que la operación del llamador
+// puede violar y que NO debe reintentarse con un código distinto (solo lo usa
+// openSession, vía `class_sessions_academic_course_id_idx`).
+async function attemptWithUniqueCode<T>(
+  attemptFn: (
+    code: string
+  ) => Promise<{ data: T | null; error: CodeAttemptError | null }>,
+  ownConflictIndexName?: string
+): Promise<UniqueCodeOutcome<T>> {
+  let code = generateAttendanceCode();
+  let attempts = 0;
+
+  while (attempts < 5) {
+    const { data, error } = await attemptFn(code);
+
+    if (!error) {
+      return { outcome: 'success', data: data as T };
+    }
+
+    if (error.code === '23505') {
+      if (ownConflictIndexName && error.message?.includes(ownConflictIndexName)) {
+        return { outcome: 'own_conflict' };
+      }
+      // Colisión de código entre sesiones abiertas: reintentar con uno nuevo.
+      code = generateAttendanceCode();
+      attempts++;
+      continue;
+    }
+
+    return { outcome: 'error', error };
+  }
+
+  return { outcome: 'code_exhausted' };
+}
+
 export async function openSession(
-  academicCourseId: string
+  academicCourseId: string,
+  courseSlug: string,
+  lessonSlug: string
 ): Promise<{ success: boolean; session?: OpenSessionSummary; error?: string }> {
   let supabase;
   try {
@@ -47,54 +103,45 @@ export async function openSession(
     return { success: false, error: 'Error al abrir la sesión' };
   }
 
-  // Intentar generar un código único (máximo 5 intentos)
-  let code = generateAttendanceCode();
-  let attempts = 0;
-  let success = false;
-
-  while (attempts < 5 && !success) {
-    try {
-      const { error } = await supabase
-        .from('class_sessions')
-        .insert({
-          academic_course_id: academicCourseId,
-          session_date: getBogotaDateString(),
-          attendance_code: code,
-          code_expires_at: getCodeExpiresAt().toISOString(),
-          is_open: true,
-        })
-        .select()
-        .single();
-
-      if (error) {
-        if (error.code === '23505') {
-          // Violación de unique constraint: distinguir por el índice afectado
-          if (error.message?.includes('class_sessions_academic_course_id_idx')) {
-            return {
-              success: false,
-              error: 'Ya hay una sesión de asistencia abierta en este curso',
-            };
-          }
-          // Colisión de código entre sesiones abiertas (class_sessions_attendance_code_idx): reintentar
-          code = generateAttendanceCode();
-          attempts++;
-          continue;
-        }
-        throw error;
-      }
-
-      success = true;
-    } catch (err) {
-      console.error('Error opening session:', err);
-      return { success: false, error: 'Error al abrir la sesión' };
-    }
+  let outcome: UniqueCodeOutcome<unknown>;
+  try {
+    outcome = await attemptWithUniqueCode(
+      async (code) =>
+        await supabase
+          .from('class_sessions')
+          .insert({
+            academic_course_id: academicCourseId,
+            session_date: getBogotaDateString(),
+            attendance_code: code,
+            code_expires_at: getCodeExpiresAt().toISOString(),
+            is_open: true,
+          })
+          .select()
+          .single(),
+      'class_sessions_academic_course_id_idx'
+    );
+  } catch (err) {
+    console.error('Error opening session:', err);
+    return { success: false, error: 'Error al abrir la sesión' };
   }
 
-  if (!success) {
+  if (outcome.outcome === 'own_conflict') {
+    return {
+      success: false,
+      error: 'Ya hay una sesión de asistencia abierta en este curso',
+    };
+  }
+
+  if (outcome.outcome === 'code_exhausted') {
     return {
       success: false,
       error: 'No se pudo generar un código único después de varios intentos',
     };
+  }
+
+  if (outcome.outcome === 'error') {
+    console.error('Error opening session:', outcome.error);
+    return { success: false, error: 'Error al abrir la sesión' };
   }
 
   // Obtener la sesión completa con conteo
@@ -103,11 +150,129 @@ export async function openSession(
     return { success: false, error: 'Error al recuperar la sesión creada' };
   }
 
+  // DEBT-052 (resuelto aquí): sin esto, el snapshot que arma `page.tsx` para
+  // `initialSessionsByCourseId` queda desactualizado, y `AdminAttendancePanel`
+  // (que remonta con `key={selectedCourse.id}` al cambiar de grupo) puede
+  // mostrar "sin sesión abierta" para una sesión recién abierta. Mismo
+  // hallazgo que TC-011 destapó en `extendSessionCode`/`rotateSessionCode`.
+  revalidatePath(`/${courseSlug}/${lessonSlug}`);
   return { success: true, session: summary.session };
 }
 
+export async function extendSessionCode(
+  sessionId: string,
+  courseSlug: string,
+  lessonSlug: string
+): Promise<RefreshCodeResult> {
+  let supabase;
+  try {
+    supabase = await createServerSupabaseClient();
+  } catch (err) {
+    console.error('Error extending session code:', err);
+    return { status: 'unavailable' };
+  }
+
+  try {
+    // Decisión 6 (spec-041): `is_open = true` en el WHERE evita revivir el
+    // código de una sesión cerrada desde otra pestaña. Sin fila afectada,
+    // Supabase responde PGRST116 ("no rows"), el mismo criterio de negocio
+    // que ya usa getOpenSessionForCourse.
+    const { data, error } = await supabase
+      .from('class_sessions')
+      .update({ code_expires_at: getCodeExpiresAt().toISOString() })
+      .eq('id', sessionId)
+      .eq('is_open', true)
+      .select()
+      .single();
+
+    if (error) {
+      if (error.code === 'PGRST116') {
+        return { status: 'not_open' };
+      }
+      throw error;
+    }
+
+    // Hallazgo TC-011 (spec-041): revalidar `/admin/courses` no tiene efecto
+    // sobre este panel — vive en la vista de lección desde spec-031, y esa
+    // subruta ya no existe. Sin la ruta correcta, el snapshot que lee
+    // `page.tsx` para armar `initialSessionsByCourseId` queda desactualizado,
+    // y al cambiar de grupo (que remonta `AdminAttendancePanel` con
+    // `key={selectedCourse.id}`) el panel remontado muestra ese snapshot
+    // viejo en vez del estado real. `openSession`/`closeSession` compartían el
+    // mismo defecto — ver DEBT-052 (resuelto) en backlog.md.
+    revalidatePath(`/${courseSlug}/${lessonSlug}`);
+    return { status: 'ok', session: data as ClassSession };
+  } catch (err) {
+    console.error('Error extending session code:', err);
+    return { status: 'unavailable' };
+  }
+}
+
+export async function rotateSessionCode(
+  sessionId: string,
+  courseSlug: string,
+  lessonSlug: string
+): Promise<RefreshCodeResult> {
+  let supabase;
+  try {
+    supabase = await createServerSupabaseClient();
+  } catch (err) {
+    console.error('Error rotating session code:', err);
+    return { status: 'unavailable' };
+  }
+
+  let outcome: UniqueCodeOutcome<ClassSession>;
+  try {
+    // Sin `ownConflictIndexName`: un UPDATE de attendance_code nunca toca
+    // academic_course_id ni is_open, así que el único índice que puede violar
+    // es el de código único entre sesiones abiertas (D5) — siempre reintenta.
+    outcome = await attemptWithUniqueCode<ClassSession>(
+      async (code) =>
+        await supabase
+          .from('class_sessions')
+          .update({
+            attendance_code: code,
+            code_expires_at: getCodeExpiresAt().toISOString(),
+          })
+          .eq('id', sessionId)
+          .eq('is_open', true)
+          .select()
+          .single()
+    );
+  } catch (err) {
+    console.error('Error rotating session code:', err);
+    return { status: 'unavailable' };
+  }
+
+  if (outcome.outcome === 'code_exhausted') {
+    return { status: 'code_collision' };
+  }
+
+  if (outcome.outcome === 'error') {
+    if (outcome.error.code === 'PGRST116') {
+      return { status: 'not_open' };
+    }
+    console.error('Error rotating session code:', outcome.error);
+    return { status: 'unavailable' };
+  }
+
+  // `own_conflict` nunca ocurre aquí: rotateSessionCode no pasa
+  // `ownConflictIndexName`, así que attemptWithUniqueCode no lo produce. Se
+  // trata como fallo de infraestructura por si el contrato cambiara.
+  if (outcome.outcome === 'own_conflict') {
+    console.error('Unexpected own_conflict outcome rotating session code');
+    return { status: 'unavailable' };
+  }
+
+  // Ver comentario equivalente en `extendSessionCode` (hallazgo TC-011).
+  revalidatePath(`/${courseSlug}/${lessonSlug}`);
+  return { status: 'ok', session: outcome.data };
+}
+
 export async function closeSession(
-  sessionId: string
+  sessionId: string,
+  courseSlug: string,
+  lessonSlug: string
 ): Promise<{ success: boolean; error?: string }> {
   let supabase;
   try {
@@ -125,8 +290,10 @@ export async function closeSession(
 
     if (error) throw error;
 
-    // Revalidate para que se reflejen los cambios
-    revalidatePath(`/admin/courses`, 'layout');
+    // DEBT-052 (resuelto aquí): `/admin/courses` es una ruta muerta desde
+    // spec-031 — el panel vive en `/${courseSlug}/${lessonSlug}`. Ver
+    // comentario equivalente en `openSession`.
+    revalidatePath(`/${courseSlug}/${lessonSlug}`);
     return { success: true };
   } catch (err) {
     console.error('Error closing session:', err);
