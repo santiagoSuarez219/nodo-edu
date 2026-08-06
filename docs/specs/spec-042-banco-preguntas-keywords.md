@@ -426,31 +426,49 @@ de `.claude/skills/lesson-authoring/SKILL.md` (~520), que hoy dice
       consulta solo devolvió la fila de la publicada. Datos de verificación
       eliminados al terminar.
 
-### Fase 2 — Backfill idempotente y paridad de datos
-- [ ] `supabase/migrations/20260806000004_backfill_lesson_questions.sql`:
+### Fase 2 — Backfill idempotente y paridad de datos ✅ Completada 2026-08-06
+- [x] `supabase/migrations/20260806000004_backfill_lesson_questions.sql`:
       `insert into lesson_questions (...) select q.course_slug, q.lesson_slug,
       q.id, row_number() over (partition by q.course_slug, q.lesson_slug order by
       q.created_at, q.id) - 1 from questions q where q.course_slug is not null and
       q.lesson_slug is not null ... on conflict do nothing`. Reejecutable sin
       efecto (D4/D5).
-- [ ] `supabase/migrations/20260806000005_seed_keywords_from_tags.sql`: sembrar
+- [x] `supabase/migrations/20260806000005_seed_keywords_from_tags.sql`: sembrar
       `keywords` con los `tags` distintos existentes (slug normalizado, `label` =
       texto original, `kind = null` → sin clasificar, D3) y poblar
       `question_keywords` desde `unnest(tags)`. Ambos `on conflict do nothing`.
-- [ ] **Detectar colisiones de slugificación** (dos tags distintos que producen el
+      Sin extensión `unaccent` disponible en el proyecto: normalización manual
+      con `translate()` para las vocales acentuadas y la ñ, idéntica a la de
+      las consultas de verificación de `test-042` (deben coincidir literalmente
+      o la Verificación 2 da falsos positivos).
+- [x] **Detectar colisiones de slugificación** (dos tags distintos que producen el
       mismo slug, p. ej. `recursión` y `recursion`): consulta que las liste.
       `on conflict do nothing` conserva el primer `label`; si hay colisiones,
-      **reportarlas al usuario** antes de continuar.
-- [ ] Verificación 1: cero preguntas con `course_slug`/`lesson_slug` no nulos sin
-      fila en `lesson_questions`.
-- [ ] Verificación 2: cero preguntas con `tags` no vacío sin filas en
-      `question_keywords` (descontadas las colisiones ya reportadas).
-- [ ] **Verificación 3 (la que importa, D5):** consulta que compara, por
+      **reportarlas al usuario** antes de continuar. **Reportado:** la colisión
+      deliberada sembrada en la Fase 0 (`recursion`/`recursión` →
+      `recursion`) fue detectada correctamente por la consulta; es la única
+      colisión en desarrollo. `min(label)` la resolvió determinísticamente a
+      `recursion` (sin tilde, por orden de bytes UTF-8).
+- [x] Verificación 1: cero preguntas con `course_slug`/`lesson_slug` no nulos sin
+      fila en `lesson_questions`. **0 filas** — confirmado en desarrollo.
+- [x] Verificación 2: cero preguntas con `tags` no vacío sin filas en
+      `question_keywords` (descontadas las colisiones ya reportadas). **0 filas**
+      en ambas variantes (por tag y agregada) — confirmado en desarrollo.
+- [x] **Verificación 3 (la que importa, D5):** consulta que compara, por
       `(user_id, course_slug, lesson_slug)`, el `question_count` de la fórmula
-      vieja contra la nueva. **Resultado esperado: cero filas.** Si no lo es,
-      detenerse y reportar antes de la Fase 5.
-- [ ] Dejar las tres consultas de verificación registradas en el archivo de test
-      para poder reejecutarlas contra producción el día del despliegue.
+      vieja contra la nueva. **Resultado esperado: cero filas.** **0 filas** —
+      confirmado en desarrollo con el escenario sembrado en la Fase 0 (una
+      estudiante con nota congelada — cuyo conteo congelado de 1 diverge a
+      propósito del recuento en vivo actual de 2 preguntas publicadas para esa
+      lección, y se preserva igual en ambas fórmulas por D6 — y una estudiante
+      con denominador vivo).
+- [x] Idempotencia verificada además reejecutando ambos `insert` a mano contra la
+      base ya poblada: `INSERT 0 0` en los tres, conteos y `order_index`
+      idénticos antes y después.
+- [x] Dejar las tres consultas de verificación registradas en el archivo de test
+      para poder reejecutarlas contra producción el día del despliegue. Ya
+      estaban en `test-042-banco-preguntas-keywords.md` (redactado junto con el
+      spec) y su forma se confirmó ejecutable tal cual contra desarrollo.
 
 ### Fase 3 — Dominio TypeScript
 - [ ] Crear `lib/keywords/types.ts` y `lib/keywords/schemas.ts` (Zod: `slug`
