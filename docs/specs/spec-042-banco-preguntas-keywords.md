@@ -368,21 +368,31 @@ de `.claude/skills/lesson-authoring/SKILL.md` (~520), que hoy dice
 
 ## Fases de implementación
 
-### Fase 0 — Snapshot y verificación previa (antes de tocar nada)
-- [ ] Confirmar entorno de trabajo: desarrollo (instancia local en `mirp-lab`, ver
+### Fase 0 — Snapshot y verificación previa (antes de tocar nada) ✅ Completada 2026-08-06
+- [x] Confirmar entorno de trabajo: desarrollo (instancia local en `mirp-lab`, ver
       "Base de datos" de `CLAUDE.md`). Reconectar túnel SSH y `supabase status`.
-- [ ] Contar en **producción** (solo lectura, sin escribir): total de `questions`;
+- [x] Contar en **producción** (solo lectura, sin escribir): total de `questions`;
       cuántas con `course_slug`/`lesson_slug` no nulos; cuántas con `tags` no
       vacío; cuántas `multiple_choice` publicadas por `(course_slug, lesson_slug)`.
-- [ ] Exportar el **breakdown de referencia**: por cada `(user_id, course_slug)`
+      121 filas totales, 117 con ambos slugs, 118 con `tags` no vacío, 7
+      lecciones distintas con `multiple_choice` publicadas.
+- [x] Exportar el **breakdown de referencia**: por cada `(user_id, course_slug)`
       con filas en `self_assessment_attempts`, el resultado actual de
       `self_assessment_breakdown` y la nota vigente en `student_grades` del
-      `grade_item` con `kind='self_assessment'`. Guardar en el scratchpad de la
-      sesión, **fuera del repo**.
-- [ ] Traer una copia de esos datos a la base de desarrollo (o sembrar un escenario
+      `grade_item` con `kind='self_assessment'`. Guardado en el scratchpad de la
+      sesión (`spec042_pairs.json`, `spec042_breakdown_reference.json`,
+      `spec042_grades_reference.json`), **fuera del repo**: 78 pares
+      `(user_id, course_slug)`, 113 filas de breakdown, 117 filas de nota.
+- [x] Traer una copia de esos datos a la base de desarrollo (o sembrar un escenario
       equivalente) para que el backfill se pruebe contra datos con la misma forma
-      que producción.
-- [ ] Registrar los conteos en `docs/testing/test-042-banco-preguntas-keywords.md`.
+      que producción. Se sembraron 5 preguntas reales vía `create_question` +
+      `publish_question` (contrato anterior) en `analisis-de-algoritmos`: dos
+      lecciones con 2 preguntas (reuso/orden) y una colisión de slug deliberada
+      (`recursion`/`recursión`) para la Fase 2. Se conservan intactos 3
+      `self_assessment_attempts` huérfanos de una ronda QA previa, cuyo conteo
+      congelado (5) diverge del recuento en vivo actual — reproduce el escenario
+      D6 a propósito.
+- [x] Registrar los conteos en `docs/testing/test-042-banco-preguntas-keywords.md`.
 
 ### Fase 1 — Migraciones de esquema y RLS
 - [ ] `supabase/migrations/20260806000000_init_keywords.sql`: tablas `keywords`

@@ -94,16 +94,56 @@ cada una empieza con su etiqueta: `[042 PA1] …`, `[042 PA2] …`, etc.
    `(course_slug, lesson_slug)`) en la tabla de abajo, y exportar el breakdown de
    referencia al scratchpad de la sesión (**fuera del repo**).
 
-#### Conteos de la Fase 0 (rellenar antes de migrar)
+#### Conteos de la Fase 0 (registrados 2026-08-06, antes de migrar)
 
 | Métrica | Desarrollo | Producción (solo lectura) |
 |---|---|---|
-| Total de filas en `questions` | {{n}} | {{n}} |
-| Con `course_slug` y `lesson_slug` no nulos | {{n}} | {{n}} |
-| Con `cardinality(tags) > 0` | {{n}} | {{n}} |
-| `multiple_choice` publicadas, agrupadas por `(course_slug, lesson_slug)` | {{adjuntar}} | {{adjuntar}} |
-| Filas en `self_assessment_attempts` | {{n}} | {{n}} |
-| Filas en `student_grades` del `grade_item` con `kind='self_assessment'` | {{n}} | {{n}} |
+| Total de filas en `questions` | 10 | 121 |
+| Con `course_slug` y `lesson_slug` no nulos | 10 | 117 |
+| Con `cardinality(tags) > 0` | 10 | 118 |
+| `multiple_choice` publicadas, agrupadas por `(course_slug, lesson_slug)` | 6 lecciones — ver detalle abajo | 7 lecciones — ver detalle abajo |
+| Filas en `self_assessment_attempts` | 3 | 78 |
+| Filas en `student_grades` del `grade_item` con `kind='self_assessment'` | 0 | 117 |
+
+**Detalle `multiple_choice` publicadas por `(course_slug, lesson_slug)` — desarrollo:**
+
+| `course_slug` | `lesson_slug` | # preguntas |
+|---|---|---|
+| `analisis-de-algoritmos` | `algoritmos-como-tecnologia` | 2 |
+| `analisis-de-algoritmos` | `fundamentos-control-de-versiones-y-flujo-de-trabajo` | 2 |
+| `analisis-de-algoritmos` | `sintaxis-de-python` | 1 |
+| `estructuras-de-datos` | `encapsulamiento` | 3 |
+| `estructuras-de-datos` | `introduccion-al-uml` | 1 |
+| `programacion-cientifica` | `variables-tipos-de-datos-y-operadores` | 1 |
+
+> Las 5 preguntas de `analisis-de-algoritmos` fueron sembradas en la Fase 0 vía
+> `question-bank-mcp`/API real (`create_question` + `publish_question`, contrato
+> **anterior** al spec) para validar el backfill contra datos con forma real:
+> dos lecciones con 2 preguntas cada una (repaso de reuso/orden) y una colisión de
+> slug deliberada en los tags `recursion` / `recursión` de
+> `algoritmos-como-tecnologia` (para ejercitar la detección de colisiones de la
+> Fase 2). Las 5 preguntas restantes (`estructuras-de-datos` /
+> `programacion-cientifica`) son datos huérfanos de rondas QA anteriores
+> (spec-038/039), ya publicados; se dejan tal cual porque no interfieren y
+> sirven como ruido realista adicional para el backfill.
+>
+> Los 3 `self_assessment_attempts` existentes en desarrollo (usuario
+> `064e4a19-…`, lecciones `algoritmos-como-tecnologia`,
+> `fundamentos-control-de-versiones-y-flujo-de-trabajo`, `sintaxis-de-python`,
+> `question_count=5` cada uno) son intentos **huérfanos** de una ronda QA previa:
+> el conteo congelado (5) ya no coincide con las preguntas publicadas hoy en esas
+> lecciones. Esto reproduce exactamente el escenario D6 ("congelado si ya
+> respondió") con una divergencia real entre lo congelado y lo vivo — útil para
+> confirmar en la Fase 2 que el backfill y la verificación de paridad usan
+> **siempre** el conteo congelado del intento, nunca el recuento en vivo, para
+> estos tres casos. No se tocan ni se limpian antes del backfill: forman parte
+> deliberada del escenario de prueba.
+>
+> **Detalle producción** (7 lecciones, 121 preguntas totales — no se listan aquí
+> por extenso; ver `spec042_breakdown_reference.json` y `spec042_pairs.json` en
+> el scratchpad de la sesión, fuera del repo, para la lista completa por curso y
+> las 78 combinaciones `(user_id, course_slug)` con intentos exportadas como
+> referencia para la Verificación 3).
 
 ---
 
