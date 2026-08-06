@@ -1,4 +1,4 @@
-# spec-041 — [TESTING] Refrescar el código de una sesión de asistencia abierta
+# spec-041 — [DONE] Refrescar el código de una sesión de asistencia abierta
 
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.
@@ -136,15 +136,28 @@ Dos Server Actions nuevas (`extendSessionCode`, `rotateSessionCode`) y la
 extracción del bucle de reintento de código a un helper interno reutilizable por
 `openSession` y `rotateSessionCode` (D5).
 
+> **Ampliación de alcance (2026-08-06, hallazgo de TC-011):** las **cuatro**
+> Server Actions del módulo (`openSession`, `closeSession` incluidas) reciben
+> ahora `courseSlug`/`lessonSlug` y revalidan `/${courseSlug}/${lessonSlug}`
+> en vez de `/admin/courses` (ruta muerta desde spec-031). Ver "Decisión 11".
+
 ### `components/admin/AdminAttendancePanel.tsx`
 
 El archivo con más trabajo: dos botones, dos diálogos de confirmación, estado
 pendiente por acción, reinicio del countdown y preservación del conteo. Detalle
-en D6/D7.
+en D6/D7. Tras el hallazgo de TC-011, recibe también `courseSlug`/`lessonSlug`
+como props nuevas (Decisión 11) para pasarlas a `extendSessionCode`/
+`rotateSessionCode`.
 
 ### `components/courses/AttendanceSection.tsx`
 
 Solo copia (D8). Sin cambios de lógica, contratos ni props.
+
+### `components/courses/TeacherAttendanceControl.tsx`, `components/courses/TeacherLessonPanel.tsx`, `app/(cursos)/[courseSlug]/[lessonSlug]/page.tsx`
+
+**No estaban en el alcance original.** Ampliación de alcance (2026-08-06,
+Decisión 11): enhebran la prop `lessonSlug` (ya existía `courseSlug`) desde
+`page.tsx` hasta `AdminAttendancePanel`, sin más cambios de lógica.
 
 ### Sin impacto
 
@@ -412,6 +425,46 @@ Este spec **no repara retroactivamente** los días ya duplicados en producción
 sin forma fiable de saber cuál duplicado era "el bueno"). Si el usuario lo
 requiere, es un trabajo aparte y se abrirá su propia entrada de backlog.
 
+### Decisión 11 — Ampliación de alcance: `revalidatePath` apuntaba a una ruta muerta (hallazgo de TC-011, 2026-08-06)
+
+La ronda manual (`test-041`) encontró que rotar el código de un grupo y volver a
+él tras pasar por otro grupo mostraba **"sin sesión de asistencia abierta"**
+pese a que la sesión seguía abierta y vigente en base de datos (verificado por
+`attendance-mcp`).
+
+**Causa raíz:** `AdminAttendancePanel` recibe su estado inicial
+(`initialSession`) como snapshot server-side, tomado una sola vez por
+`page.tsx` (`getOpenSessionForCourse` por curso). `TeacherAttendanceControl` lo
+monta con `key={selectedCourse.id}`: cambiar de grupo es puramente cliente
+(cookie + `useState`, sin navegación) y **desmonta y remonta** el panel,
+releyendo ese mismo snapshot congelado. `extendSessionCode`/`rotateSessionCode`
+(D4) revalidaban `/admin/courses` — la subruta que creó spec-010 y que **ya no
+existe** desde que spec-031 movió el panel a la vista de lección — siguiendo
+fielmente el mismo patrón que ya tenía `closeSession`. Revalidar una ruta
+inexistente no refresca nada, así que el remount siempre parte del snapshot
+original de la carga de página, sin las mutaciones posteriores.
+
+**Fix aplicado** (dentro del alcance de este spec, ver "Impacto en el
+sistema"): `extendSessionCode`/`rotateSessionCode` reciben `courseSlug` y
+`lessonSlug`, y llaman `revalidatePath(\`/${courseSlug}/${lessonSlug}\`)` — la
+ruta real del panel. Esos parámetros se enhebran desde `page.tsx` →
+`TeacherLessonPanel` → `TeacherAttendanceControl` → `AdminAttendancePanel`.
+
+**Alcance ampliado en la misma sesión:** `openSession` y `closeSession`
+comparten exactamente la misma causa raíz (la segunda con el mismo
+`revalidatePath('/admin/courses', ...)` roto; la primera sin `revalidatePath`
+en absoluto). Inicialmente se decidió **no** corregirlas aquí y registrar
+**[[DEBT-052]]**, para no ampliar el spec más allá de lo que TC-011 prueba
+directamente (`rotateSessionCode`). Esa decisión se revirtió minutos después,
+durante el re-test de TC-011: al recrear la precondición con **"Abrir sesión
+de asistencia"** en ambos grupos tras reconectar el entorno, el mismo síntoma
+apareció con `openSession` — cambiar de grupo mostraba "sin sesión abierta"
+sin haber tocado extender ni rotar. Con el bug reproducido en vivo por el
+propio flujo de prueba (no solo en el análisis de código), se decidió corregir
+las cuatro acciones en la misma pasada. `openSession` y `closeSession` reciben
+ahora `courseSlug`/`lessonSlug` con el mismo patrón, y **[[DEBT-052]]** quedó
+marcado como resuelto en el backlog en vez de pendiente.
+
 ---
 
 ## Fases de implementación
@@ -426,12 +479,24 @@ requiere, es un trabajo aparte y se abrirá su propia entrada de backlog.
       `is_open = true` en el `WHERE`, `PGRST116` → `not_open`, `revalidatePath`.
 - [x] Implementar `rotateSessionCode(sessionId)` — ídem + `attendance_code` nuevo,
       con reintentos `23505` y `code_collision` al agotarlos.
-- [ ] Verificar contra `mirp-lab` (entorno de desarrollo) que ambas acciones
-      afectan la fila esperada, que `updated_at` avanza por el trigger, que las
-      `attendance_records` previas siguen ahí y que sobre una sesión cerrada
-      devuelven `not_open` **sin** modificar nada. *(pendiente: se ejecuta junto
-      con la ronda manual de la Fase 4, contra los datos que se preparen para
-      `test-041`.)*
+- [x] **(Ampliación 2026-08-06, Decisión 11)** Corregir `revalidatePath` de
+      las **cuatro** Server Actions (`openSession`, `closeSession`,
+      `extendSessionCode`, `rotateSessionCode`) para apuntar a
+      `/${courseSlug}/${lessonSlug}` en vez de la ruta muerta
+      `/admin/courses`; enhebrar `courseSlug`/`lessonSlug` desde `page.tsx`
+      hasta `AdminAttendancePanel`. El fix nació acotado a
+      extend/rotate (**DEBT-052** pendiente para open/close) y se amplió a
+      las cuatro al reproducirse el mismo síntoma con `openSession` durante
+      el re-test de TC-011 — DEBT-052 quedó marcado **resuelto**.
+- [x] Verificar contra `mirp-lab` (entorno de desarrollo) que ambas acciones
+      afectan la fila esperada, que las `attendance_records` previas siguen
+      ahí y que sobre una sesión cerrada devuelven `not_open` **sin**
+      modificar nada. Verificado vía `attendance-mcp` durante la ronda manual
+      (TC-006, TC-008): una sola fila por día, `is_open`/`code_expires_at`
+      intactos tras `not_open`. `updated_at` no se verificó puntualmente (el
+      MCP de solo lectura no lo expone), pero el trigger
+      `set_class_sessions_updated_at` no se tocó y ya estaba probado en
+      spec-010.
 
 **Verificación:** el `select` de la fila tras cada acción muestra el
 `code_expires_at` empujado, el `attendance_code` conservado (extender) o distinto
@@ -461,10 +526,9 @@ requiere, es un trabajo aparte y se abrirá su propia entrada de backlog.
       informativo en un banner `warning` nuevo, distinto del banner rojo de
       error), `code_collision` y `unavailable` a mensajes distintos, y
       `try/catch` de transporte como el resto de handlers.
-- [ ] Revisar que el panel siga correcto en modo claro y oscuro y con el grupo
-      conmutado en `TeacherAttendanceControl`. *(pendiente: requiere navegador,
-      ver "Pruebas visuales y uso del navegador" en CLAUDE.md — se verifica en
-      la ronda manual de Fase 4.)*
+- [x] Revisar que el panel siga correcto en modo claro y oscuro y con el grupo
+      conmutado en `TeacherAttendanceControl`. Verificado por el usuario
+      durante la ronda manual, sin observaciones.
 
 **Verificación:** con una sesión abierta, extender conserva el código y reinicia
 la cuenta atrás; rotar muestra un código distinto; el conteo de asistentes no se
@@ -473,17 +537,26 @@ mueve; ningún botón ajeno cambia de etiqueta durante la acción.
 ### Fase 3 — Copia del estudiante (`AttendanceSection.tsx`) ✅
 - [x] Ajustar el mensaje de `not_found` para contemplar la rotación e invitar a
       recargar (D8), sin cambiar el título ni la lógica.
-- [ ] Confirmar la redacción final con el usuario antes de cerrar la fase.
+- [x] Confirmar la redacción final con el usuario antes de cerrar la fase.
+      Confirmado tras TC-004: la redacción implementada queda aprobada tal
+      cual.
 
 **Verificación:** con un código rotado, el estudiante que teclea el viejo recibe
 un mensaje que le dice qué hacer.
 
-### Fase 4 — Verificación final (parcial)
+### Fase 4 — Verificación final ✅
 - [x] `npm run lint` y `npm run build` sin errores. *(0 errores; los 8 warnings
-      restantes son preexistentes y ajenos a este spec.)*
-- [ ] Ejecutar la ronda manual `docs/testing/test-041-refrescar-codigo-asistencia.md`
+      restantes son preexistentes y ajenos a este spec — reverificado tras la
+      ampliación de alcance de Decisión 11.)*
+- [x] Ejecutar la ronda manual `docs/testing/test-041-refrescar-codigo-asistencia.md`
       (el usuario opera la UI; Claude prepara datos y registra hallazgos).
+      **11/11 casos aprobados.** TC-011 encontró y motivó la corrección de
+      Decisión 11 (ver arriba); registrado también un hallazgo colateral no
+      bloqueante en TC-008 (hidratación de React), pendiente de decidir si se
+      escala al backlog.
 - [x] Registrar **DEBT-046** en `docs/specs/backlog.md` (D9) — verificado presente.
+- [x] Registrar y resolver **DEBT-052** en `docs/specs/backlog.md` (Decisión 11,
+      hallazgo de TC-011).
 - [ ] Pruebas automáticas: **N/A** mientras no exista framework (ver "Pruebas
       asociadas").
 
