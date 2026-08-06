@@ -7,6 +7,7 @@ import type { OpenSessionResult } from '@/lib/attendance/types';
 
 interface TeacherLessonPanelProps {
   courseSlug: string;
+  lessonSlug: string;
   answerKey: AnswerKeyQuestion[];
   academicCourses: AttendanceGroup[];
   initialSessionsByCourseId: Record<string, OpenSessionResult>;
@@ -16,6 +17,7 @@ interface TeacherLessonPanelProps {
 
 export function TeacherLessonPanel({
   courseSlug,
+  lessonSlug,
   answerKey,
   academicCourses,
   initialSessionsByCourseId,
@@ -56,6 +58,7 @@ export function TeacherLessonPanel({
             >
               <TeacherAttendanceControl
                 courseSlug={courseSlug}
+                lessonSlug={lessonSlug}
                 courses={academicCourses}
                 initialSessionsByCourseId={initialSessionsByCourseId}
                 initialSelectedId={initialAttendanceGroupId}

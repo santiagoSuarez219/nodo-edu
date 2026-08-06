@@ -91,7 +91,9 @@ async function attemptWithUniqueCode<T>(
 }
 
 export async function openSession(
-  academicCourseId: string
+  academicCourseId: string,
+  courseSlug: string,
+  lessonSlug: string
 ): Promise<{ success: boolean; session?: OpenSessionSummary; error?: string }> {
   let supabase;
   try {
@@ -148,11 +150,19 @@ export async function openSession(
     return { success: false, error: 'Error al recuperar la sesión creada' };
   }
 
+  // DEBT-052 (resuelto aquí): sin esto, el snapshot que arma `page.tsx` para
+  // `initialSessionsByCourseId` queda desactualizado, y `AdminAttendancePanel`
+  // (que remonta con `key={selectedCourse.id}` al cambiar de grupo) puede
+  // mostrar "sin sesión abierta" para una sesión recién abierta. Mismo
+  // hallazgo que TC-011 destapó en `extendSessionCode`/`rotateSessionCode`.
+  revalidatePath(`/${courseSlug}/${lessonSlug}`);
   return { success: true, session: summary.session };
 }
 
 export async function extendSessionCode(
-  sessionId: string
+  sessionId: string,
+  courseSlug: string,
+  lessonSlug: string
 ): Promise<RefreshCodeResult> {
   let supabase;
   try {
@@ -182,7 +192,15 @@ export async function extendSessionCode(
       throw error;
     }
 
-    revalidatePath(`/admin/courses`, 'layout');
+    // Hallazgo TC-011 (spec-041): revalidar `/admin/courses` no tiene efecto
+    // sobre este panel — vive en la vista de lección desde spec-031, y esa
+    // subruta ya no existe. Sin la ruta correcta, el snapshot que lee
+    // `page.tsx` para armar `initialSessionsByCourseId` queda desactualizado,
+    // y al cambiar de grupo (que remonta `AdminAttendancePanel` con
+    // `key={selectedCourse.id}`) el panel remontado muestra ese snapshot
+    // viejo en vez del estado real. `openSession`/`closeSession` compartían el
+    // mismo defecto — ver DEBT-052 (resuelto) en backlog.md.
+    revalidatePath(`/${courseSlug}/${lessonSlug}`);
     return { status: 'ok', session: data as ClassSession };
   } catch (err) {
     console.error('Error extending session code:', err);
@@ -191,7 +209,9 @@ export async function extendSessionCode(
 }
 
 export async function rotateSessionCode(
-  sessionId: string
+  sessionId: string,
+  courseSlug: string,
+  lessonSlug: string
 ): Promise<RefreshCodeResult> {
   let supabase;
   try {
@@ -244,12 +264,15 @@ export async function rotateSessionCode(
     return { status: 'unavailable' };
   }
 
-  revalidatePath(`/admin/courses`, 'layout');
+  // Ver comentario equivalente en `extendSessionCode` (hallazgo TC-011).
+  revalidatePath(`/${courseSlug}/${lessonSlug}`);
   return { status: 'ok', session: outcome.data };
 }
 
 export async function closeSession(
-  sessionId: string
+  sessionId: string,
+  courseSlug: string,
+  lessonSlug: string
 ): Promise<{ success: boolean; error?: string }> {
   let supabase;
   try {
@@ -267,8 +290,10 @@ export async function closeSession(
 
     if (error) throw error;
 
-    // Revalidate para que se reflejen los cambios
-    revalidatePath(`/admin/courses`, 'layout');
+    // DEBT-052 (resuelto aquí): `/admin/courses` es una ruta muerta desde
+    // spec-031 — el panel vive en `/${courseSlug}/${lessonSlug}`. Ver
+    // comentario equivalente en `openSession`.
+    revalidatePath(`/${courseSlug}/${lessonSlug}`);
     return { success: true };
   } catch (err) {
     console.error('Error closing session:', err);

@@ -13,6 +13,7 @@ export type AttendanceGroup = Pick<AcademicCourse, 'id' | 'name' | 'code'>;
 
 interface TeacherAttendanceControlProps {
   courseSlug: string;
+  lessonSlug: string;
   courses: AttendanceGroup[];
   initialSessionsByCourseId: Record<string, OpenSessionResult>;
   /** Grupo restaurado desde la cookie por el server component; `null` si no hay. */
@@ -23,6 +24,7 @@ const COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 365;
 
 export function TeacherAttendanceControl({
   courseSlug,
+  lessonSlug,
   courses,
   initialSessionsByCourseId,
   initialSelectedId,
@@ -97,6 +99,8 @@ export function TeacherAttendanceControl({
       <AdminAttendancePanel
         key={selectedCourse.id}
         academicCourseId={selectedCourse.id}
+        courseSlug={courseSlug}
+        lessonSlug={lessonSlug}
         initialSession={
           initialSessionsByCourseId[selectedCourse.id] ?? { status: 'unavailable' }
         }

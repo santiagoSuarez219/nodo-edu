@@ -17,6 +17,11 @@ import type {
 
 interface AdminAttendancePanelProps {
   academicCourseId: string;
+  // Hallazgo TC-011 (spec-041): necesarios para que `extendSessionCode` /
+  // `rotateSessionCode` revaliden la ruta real del panel (ver comentario en
+  // `lib/attendance/index.ts`), no la subruta muerta `/admin/courses`.
+  courseSlug: string;
+  lessonSlug: string;
   initialSession: OpenSessionResult;
 }
 
@@ -41,6 +46,8 @@ function computeTimeRemaining(codeExpiresAt: string): string {
 
 export function AdminAttendancePanel({
   academicCourseId,
+  courseSlug,
+  lessonSlug,
   initialSession,
 }: AdminAttendancePanelProps) {
   const initialResolvedSession =
@@ -111,7 +118,7 @@ export function AdminAttendancePanel({
     setNotice(null);
     setPendingAction('open');
     try {
-      const result = await openSession(academicCourseId);
+      const result = await openSession(academicCourseId, courseSlug, lessonSlug);
       if (result.success && result.session) {
         setSession(result.session);
         setAttendanceCount(result.session.attendanceCount);
@@ -128,7 +135,7 @@ export function AdminAttendancePanel({
     } finally {
       setPendingAction(null);
     }
-  }, [academicCourseId]);
+  }, [academicCourseId, courseSlug, lessonSlug]);
 
   // Calcular tiempo restante de expiración
   const getTimeRemaining = useCallback(() => {
@@ -206,7 +213,7 @@ export function AdminAttendancePanel({
 
     try {
       if (action === 'close') {
-        const result = await closeSession(session.session.id);
+        const result = await closeSession(session.session.id, courseSlug, lessonSlug);
         if (result.success) {
           setSession(null);
           setAttendanceCount(0);
@@ -219,8 +226,8 @@ export function AdminAttendancePanel({
 
       const refresh =
         action === 'extend'
-          ? await extendSessionCode(session.session.id)
-          : await rotateSessionCode(session.session.id);
+          ? await extendSessionCode(session.session.id, courseSlug, lessonSlug)
+          : await rotateSessionCode(session.session.id, courseSlug, lessonSlug);
       applyRefreshResult(refresh, action);
     } catch (err) {
       console.error(`Error en la acción "${action}" de la sesión:`, err);
@@ -228,7 +235,7 @@ export function AdminAttendancePanel({
     } finally {
       setPendingAction(null);
     }
-  }, [confirmAction, session, applyRefreshResult]);
+  }, [confirmAction, session, applyRefreshResult, courseSlug, lessonSlug]);
 
   // Cierre del diálogo con Escape + foco en el botón de confirmar al abrirlo,
   // mismo comportamiento que el diálogo de envío de `AssignmentPlayer`.

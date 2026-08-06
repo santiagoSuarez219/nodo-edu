@@ -255,6 +255,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
       {access.ok && (access.reason === "owner" || access.reason === "admin") && (
         <TeacherLessonPanel
           courseSlug={courseSlug}
+          lessonSlug={lessonSlug}
           answerKey={teacherAnswerKey}
           academicCourses={teacherCourses}
           initialSessionsByCourseId={teacherSessionsByCourseId}
