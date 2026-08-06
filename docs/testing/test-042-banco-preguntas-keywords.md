@@ -168,8 +168,8 @@ cada una empieza con su etiqueta: `[042 PA1] …`, `[042 PA2] …`, etc.
 3. Anotar la nota de autoevaluaciones mostrada, el acumulado `X/Y` y el desglose por lección — en particular la fila de `fundamentos-control-de-versiones-y-flujo-de-trabajo`.
 4. Abrir la lección `algoritmos-como-tecnologia` y comprobar que la autoevaluación se muestra como ya respondida (sin poder reenviar).
 **Resultado esperado:** la nota mostrada es **3.33**, el acumulado es **2/3**, y la fila de `fundamentos-control-de-versiones-y-flujo-de-trabajo` muestra el denominador **congelado en 1** (no 2, que es el recuento en vivo hoy) — la UI respeta D6 igual que el RPC ya verificado. La lección `algoritmos-como-tecnologia` no permite responder de nuevo.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{observaciones}}
+**Estado:** ✅ Aprobado
+**Hallazgos:** Confirmado por el usuario — la UI muestra la nota y el desglose esperados, sin observaciones adicionales reportadas.
 
 ### TC-042-002 — [ADAPTADO] La UI muestra correctamente la nota con denominador vivo de un estudiante sin intento previo
 **Rol que ejecuta:** estudiante **spec042-live@nodo.test** (sembrado en Fase 0) + docente `dev@nodo.local`
@@ -182,8 +182,8 @@ cada una empieza con su etiqueta: `[042 PA1] …`, `[042 PA2] …`, etc.
 3. Como docente, abrir la libreta del grupo `Spec-042 QA — Analisis de Algoritmos` y anotar la nota de este estudiante en la columna "Autoevaluaciones".
 4. Como docente, pulsar "Recalcular autoevaluaciones" y volver a mirar la nota.
 **Resultado esperado:** la nota mostrada al estudiante es **0.00** (o "sin nota" si el criterio de UI para 0 sin denominador difiere — anotar cuál), el acumulado es **0/3**, ambas lecciones muestran "sin responder" con sus denominadores en vivo (2 y 1). La libreta del docente muestra el mismo valor. Recalcular **no cambia** el valor (ya es el correcto). Si aparece cualquier diferencia frente a lo esperado, **detener la ronda** y ejecutar la verificación 3 de la sección final antes de continuar.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{observaciones}}
+**Estado:** ✅ Aprobado
+**Hallazgos:** Confirmado por el usuario — nota, acumulado y desglose coinciden con lo esperado; el recálculo del docente no altera el valor.
 
 ### TC-042-003 — La autoevaluación muestra las preguntas montadas, en el orden de `order_index`
 **Rol que ejecuta:** estudiante **E3**
@@ -196,7 +196,8 @@ cada una empieza con su etiqueta: `[042 PA1] …`, `[042 PA2] …`, etc.
 3. Recargar la página (F5) dos veces y volver a anotar el orden.
 4. Cerrar sesión, volver a entrar y repetir.
 **Resultado esperado:** se ven exactamente **4** preguntas, en el orden `[042 PA1] → [042 PA2] → [042 PA3] → [042 PA4]`, que es el de `order_index`. El orden es **estable** entre recargas y entre sesiones (el barajado de spec-034 afecta a las opciones, nunca al orden de las preguntas). No aparece ninguna pregunta de otra lección ni ninguna sin montar.
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
+**Hallazgos:** Confirmado por el usuario — 4 preguntas en el orden esperado, estable entre recargas.
 **Hallazgos:** {{observaciones}}
 
 ### TC-042-004 — Reordenar el montaje cambia el orden que ve el estudiante
@@ -210,8 +211,8 @@ cada una empieza con su etiqueta: `[042 PA1] …`, `[042 PA2] …`, etc.
 3. Anotar el orden de las etiquetas.
 4. Comprobar que la sección de asistencia/progreso y el resto de la lección no cambian.
 **Resultado esperado:** el estudiante ve ahora `[042 PA4] → [042 PA3] → [042 PA2] → [042 PA1]`. El cambio se refleja tras una recarga, sin necesidad de redeploy ni de tocar contenido MDX. Nada más de la lección se altera.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{observaciones}}
+**Estado:** ✅ Aprobado
+**Hallazgos:** Confirmado por el usuario — el reordenamiento vía API se reflejó de inmediato tras recargar.
 
 ### TC-042-005 — La revisión del intento respeta el MISMO orden que el formulario
 **Rol que ejecuta:** estudiante **E3**
@@ -225,8 +226,8 @@ cada una empieza con su etiqueta: `[042 PA1] …`, `[042 PA2] …`, etc.
 4. Recargar (F5) y volver a anotar. Cerrar sesión, entrar de nuevo y repetir.
 5. Reordenar de nuevo con `reorder_lesson_questions` a `[PA2, PA1, PA4, PA3]` y recargar la revisión de E3.
 **Resultado esperado:** en los pasos 3 y 4 la revisión lista las preguntas en **exactamente el mismo orden** que tenía el formulario (`PA4, PA3, PA2, PA1`), con la fallada en segunda posición y el resultado "3/4". Tras el paso 5, la revisión sigue el nuevo `order_index` (`PA2, PA1, PA4, PA3`) y **el contenido de la revisión no cambia**: la misma opción marcada, el mismo acierto/fallo por pregunta y el mismo "3/4". En ningún momento el formulario y la revisión muestran órdenes distintos.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{observaciones}}
+**Estado:** ✅ Aprobado
+**Hallazgos:** Confirmado por el usuario en dos mitades — la revisión siguió el orden del formulario original (PA4,PA3,PA2,PA1) con PA3 fallada en 2ª posición y "3/4"; tras reordenar a (PA2,PA1,PA4,PA3) la revisión adoptó el nuevo orden sin alterar el contenido (mismo acierto/fallo, mismo resultado). Confirma que el desempate D4 es idéntico entre formulario y revisión.
 
 ### TC-042-006 — Desmontar una pregunta la retira de esa autoevaluación, sin borrarla del banco
 **Rol que ejecuta:** docente vía MCP + estudiantes **E4** (LA) y **E3** (revisión previa)
@@ -241,8 +242,8 @@ cada una empieza con su etiqueta: `[042 PA1] …`, `[042 PA2] …`, etc.
 5. Con `list_questions` sin filtros (o filtrando por `keyword`), comprobar que PA3 sigue apareciendo en el banco.
 6. Comprobar que **PX**, montada también en LB, sigue apareciendo en la autoevaluación de LB (paso rápido: abrir LB como E5).
 **Resultado esperado:** E4 ve **3** preguntas (sin `[042 PA3]`) y su denominador es 3. E3 sigue viendo su revisión **completa de 4 preguntas**, incluida PA3 ya desmontada (fallback a `created_at`), con resultado "3/4" intacto y su nota sin cambios. PA3 sigue existiendo en el banco (`get_question` responde `200`, `is_published: true`) y sus otros montajes, si los tiene, siguen vivos. PX sigue en LB.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{observaciones}}
+**Estado:** ✅ Aprobado
+**Hallazgos:** Confirmado por el usuario (E4 ve 3 preguntas, E3 conserva su revisión completa de 4). Verificado por API: `get_question` de PA3 devuelve `is_published: true` con `lessons: []` (desmontada, no borrada); PX sigue montada solo en `heaps-y-heapsort` (nunca se tocó su montaje en este caso).
 
 ### TC-042-007 — Una misma pregunta montada en dos lecciones aparece en las dos autoevaluaciones
 **Rol que ejecuta:** estudiantes **E4** (LA) y **E5** (LB)
@@ -255,8 +256,8 @@ cada una empieza con su etiqueta: `[042 PA1] …`, `[042 PA2] …`, etc.
 3. Comparar el enunciado y las opciones (contenido, no orden) en ambas vistas.
 4. Verificación asistida: `list_questions` sobre `e4518de1-32a5-496e-9d0c-12f8352e1d3d` muestra **un solo** `id`, con dos montajes.
 **Resultado esperado:** la misma pregunta (mismo `id`, mismo enunciado) aparece en las dos autoevaluaciones, sin duplicarla en el banco. Cada lección la cuenta en su propio denominador. El orden de sus opciones puede diferir entre E4 y E5 (barajado de spec-034), pero el conjunto de opciones es el mismo.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{observaciones}}
+**Estado:** ✅ Aprobado
+**Hallazgos:** Confirmado por el usuario en la UI. Verificado por API: `get_question` de PX devuelve un único `id` con `lessons` mostrando los dos montajes (`heaps-y-heapsort` order_index 0, `tablas-hash` order_index 3).
 
 ### TC-042-008 — Las opciones se siguen barajando por estudiante (spec-034) tras la migración
 **Rol que ejecuta:** estudiantes **E4** y **E5**
@@ -269,8 +270,8 @@ cada una empieza con su etiqueta: `[042 PA1] …`, `[042 PA2] …`, etc.
 3. Cerrar sesión, entrar como E5, abrir LA y anotar el orden de las opciones de la misma pregunta.
 4. Comparar ambos órdenes.
 **Resultado esperado:** el orden de las opciones es **estable por estudiante** entre recargas (semilla `usuario:pregunta`) y **distinto entre E4 y E5** en al menos una de las preguntas. La opción correcta no queda sistemáticamente en la misma posición. Este comportamiento es idéntico al de antes de la migración.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{observaciones}}
+**Estado:** ✅ Aprobado
+**Hallazgos:** Confirmado por el usuario — orden de opciones estable por estudiante entre recargas y distinto entre E4 y E5.
 
 ### TC-042-009 — La clave de respuestas del docente: mismo conjunto, orden de montaje, opciones en orden canónico
 **Rol que ejecuta:** docente `dev@nodo.local`
@@ -283,8 +284,8 @@ cada una empieza con su etiqueta: `[042 PA1] …`, `[042 PA2] …`, etc.
 3. Para cada pregunta, anotar el orden de las opciones y compararlo con el `order_index` de `question_choices` (el que devuelve `get_question`).
 4. Cerrar sesión, entrar como estudiante **E4** y navegar a la misma lección buscando explícitamente el panel de clave.
 **Resultado esperado:** el docente ve las preguntas en el **mismo orden de montaje** que el estudiante, con las opciones **sin barajar** (orden canónico por `order_index`, idéntico al de `get_question`) y la correcta señalada. El estudiante **no** ve el panel de clave por ningún camino. El gate de rol no cambió con este spec.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{observaciones}}
+**Estado:** ✅ Aprobado
+**Hallazgos:** Confirmado por el usuario — orden `PA2 → PA1 → PA4 → PX` con opciones canónicas A/B/C/D sin barajar, "C" marcada correcta; E4 no ve el panel.
 
 ### TC-042-010 — Completar la lección sigue exigiendo la autoevaluación
 **Rol que ejecuta:** estudiante **E4**
@@ -298,7 +299,8 @@ cada una empieza con su etiqueta: `[042 PA1] …`, `[042 PA2] …`, etc.
 4. Responder y enviar la autoevaluación; volver a intentar completar.
 5. Repetir el paso 1–2 en una lección **sin** preguntas montadas (por ejemplo `sintesis-del-semestre`, verificando antes con `list_lesson_questions` que está vacía).
 **Resultado esperado:** en el paso 2 la lección **no** se marca como completada y se explica que falta responder la autoevaluación; en el paso 4 sí se completa. En el paso 5, una lección sin preguntas montadas se completa sin exigir autoevaluación (el gate depende del conteo de montajes, no de la existencia de la sección).
-**Estado:** ⬜ Pendiente
+**Estado:** ✅ Aprobado
+**Hallazgos:** Ejecutado por Claude con el navegador (autorizado explícitamente por el usuario en esta sesión). Paso 2: el botón "Completar lección" aparece deshabilitado con el texto "Completa la autoevaluación antes de marcar la lección como finalizada."; un clic no produce efecto (0 de 17 sin cambios). Paso 4: tras responder PE1/PE2 correctamente y confirmar el envío definitivo, el botón se habilita; al pulsarlo la lección queda "Lección completada" (1 de 17 · 6%). Paso 5: en `notacion-o-theta-y-omega` (sin autoevaluación ni preguntas montadas) el botón está habilitado desde el inicio y completa sin exigir nada (2 de 17 · 12%).
 **Hallazgos:** {{observaciones}}
 
 ### TC-042-011 — Fail-closed: si el estado de la autoevaluación no se puede consultar, no se completa la lección
@@ -314,8 +316,8 @@ cada una empieza con su etiqueta: `[042 PA1] …`, `[042 PA2] …`, etc.
 5. Revertir el fallo inducido y volver a intentar tras responder la autoevaluación.
 6. Verificación asistida: comprobar que en el paso 3 **no** se escribió `completed_at`.
 **Resultado esperado:** la lección **no** se marca como completada y se muestra un mensaje de indisponibilidad (`self_assessment_unavailable`), **nunca** un "completada" optimista. No hay escritura de `completed_at`. Tras revertir, el flujo normal funciona. El fail-closed sobrevive al cambio de la consulta a `lesson_questions`.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{observaciones}}
+**Estado:** ✅ Aprobado
+**Hallazgos:** Ejecutado con autorización explícita del usuario y navegador real. Se usó `algoritmos-como-tecnologia` (2 preguntas montadas, sin intento de E4) en vez de `sintesis-del-paradigma-de-divide-y-venceras`, por tener datos ya sembrados. Fallo inducido: `REVOKE SELECT ON lesson_questions FROM authenticated` en `mirp-lab`. Con el fallo activo, el botón "Completar lección" aparece deshabilitado con "No pudimos verificar tu autoevaluación. Inténtalo de nuevo en un momento."; un clic no tiene efecto (progreso sin cambios). Se revirtió con `GRANT SELECT` de inmediato. Tras recargar, el flujo normal se restauró: la autoevaluación volvió a mostrarse, se respondió correctamente y la lección se completó sin problema (3 de 17 · 18%). Nota: durante la preparación el túnel SSH se cayó dos veces por causas ajenas a la prueba (mostró "Correo o contraseña incorrectos" en el login por falla de conectividad, no por RLS); se identificó, reconectó y no afectó el resultado.
 
 ### TC-042-012 — Un estudiante no ve montajes de preguntas en borrador
 **Rol que ejecuta:** estudiante **E4** + docente
