@@ -519,26 +519,39 @@ de `.claude/skills/lesson-authoring/SKILL.md` (~520), que hoy dice
       generado — su ruptura es funcional, no de compilación; queda intacta
       hasta la Fase 5.
 
-### Fase 4 — API REST
-- [ ] Crear `app/api/keywords/route.ts` (`GET` con filtros + paginación, `POST` con
+### Fase 4 — API REST ✅ Completada 2026-08-06
+- [x] Crear `app/api/keywords/route.ts` (`GET` con filtros + paginación, `POST` con
       `409` en slug duplicado).
-- [ ] Crear `app/api/keywords/[slug]/route.ts` (`GET`, `PATCH`, `DELETE` con `409`
+- [x] Crear `app/api/keywords/[slug]/route.ts` (`GET`, `PATCH`, `DELETE` con `409`
       si hay filas en `question_keywords`).
-- [ ] Crear `app/api/questions/[questionId]/lessons/route.ts` (`GET`, `POST`
+- [x] Crear `app/api/questions/[questionId]/lessons/route.ts` (`GET`, `POST`
       idempotente, `DELETE` por query params; `404` si la pregunta no es del actor;
       `422` si falta un slug).
-- [ ] Crear `app/api/lessons/[courseSlug]/[lessonSlug]/questions/route.ts` (`GET`
+- [x] Crear `app/api/lessons/[courseSlug]/[lessonSlug]/questions/route.ts` (`GET`
       en orden, `PUT` que **solo reordena** y devuelve `422` si la lista no coincide
       exactamente con lo montado — D6).
-- [ ] Editar `app/api/questions/route.ts`: `POST` rechaza
+- [x] Editar `app/api/questions/route.ts`: `POST` rechaza
       `course_slug`/`lesson_slug`/`tags` con `422` y mensaje que apunta a los
       endpoints nuevos (D2); `GET` (`:32-48`) sustituye `tag` por `keyword`.
-- [ ] Editar `app/api/questions/[questionId]/route.ts`: `PATCH` con el mismo rechazo
+- [x] Editar `app/api/questions/[questionId]/route.ts`: `PATCH` con el mismo rechazo
       `422`; confirmar que no toca montajes.
-- [ ] Cada ruta nueva: `runtime`/`dynamic`, `authenticateServiceRequest` primero,
+- [x] Cada ruta nueva: `runtime`/`dynamic`, `authenticateServiceRequest` primero,
       errores con `lib/api/errors.ts`.
-- [ ] Verificar que ninguna ruta nueva importa `SUPABASE_SERVICE_ROLE_KEY` fuera de
-      `lib/auth/service.ts`.
+- [x] Verificar que ninguna ruta nueva importa `SUPABASE_SERVICE_ROLE_KEY` fuera de
+      `lib/auth/service.ts` (`grep` limpio).
+- [x] `npx tsc --noEmit` y `npm run lint`: sin errores (0 errores, 8 warnings
+      preexistentes no relacionados con el spec).
+- [x] Smoke test funcional contra `localhost:3002` con datos reales (limpiados al
+      terminar): `POST /api/keywords` (201, 409 duplicado, 422 `kind` inválido),
+      `POST /api/questions` con `course_slug`/`tags` legado (422, mensaje con
+      endpoint correcto), con keywords inexistentes (422, **las dos** faltantes
+      listadas), con keywords válidas (201); montaje idempotente (mismo
+      `order_index` en dos `POST` seguidos); `GET /api/lessons/.../questions` en
+      orden con `keywords`/`lessons` embebidos; `PUT` reordena correctamente y
+      rechaza con `422` una lista que no coincide exactamente con lo montado
+      **sin escribir nada** (D6, verificado releyendo el orden después); `DELETE`
+      desmonta sin borrar la pregunta del banco ni sus otros montajes; `DELETE
+      /api/keywords/{slug}` en uso devuelve `409`.
 
 ### Fase 5 — Reescritura de la autoevaluación (la fase de riesgo)
 - [ ] Punto 1 — `lib/self-assessment/index.ts:52-69`: query desde
