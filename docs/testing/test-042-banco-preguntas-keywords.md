@@ -7,9 +7,21 @@ MCP (`TC-MCP-042-*`). Todos arrancan en ⬜ Pendiente.
 > denominador de la nota de autoevaluación sale de contar preguntas por
 > `(course_slug, lesson_slug)`; este spec cambia de dónde sale ese conteo. Un
 > montaje faltante no rompe nada visible: **infla la nota en silencio** del
-> estudiante que no respondió. Por eso los dos primeros casos de la ronda son de
-> paridad de nota y se ejecutan **antes y después** de las migraciones, y por eso
-> existe la sección "Consultas de verificación de la migración" al final.
+> estudiante que no respondió. Por eso existe la sección "Consultas de
+> verificación de la migración" al final, y por eso los dos primeros casos de
+> la ronda son de paridad de nota.
+>
+> ⚠️ **Adaptación acordada con el usuario (2026-08-06):** el diseño original de
+> TC-042-001/002 pedía correrlos **antes y después** de aplicar las
+> migraciones. Eso ya no es posible en esta ronda: la base de desarrollo quedó
+> migrada durante la implementación (Fases 1, 2 y 5 tuvieron que aplicarse y
+> probarse ahí). La paridad **backend** ya quedó demostrada byte a byte en la
+> Fase 5 con datos reales — incluido un escenario de nota congelada que
+> diverge deliberadamente del recuento en vivo (ver spec-042 D6) — comparando
+> el resultado del RPC antes y después del `create or replace`, sin pasar por
+> la UI. TC-042-001/002 se adaptan aquí a verificar que la UI **muestra
+> correctamente** ese mismo resultado ya probado (verificación "después"), en
+> vez de repetir la comparación antes/después a través de la pantalla.
 
 ## Datos de prueba
 > Recursos creados vía API para poder ejecutar estos casos.
@@ -17,30 +29,26 @@ MCP (`TC-MCP-042-*`). Todos arrancan en ⬜ Pendiente.
 
 | Recurso | Endpoint de creación | Identificador | Eliminado |
 |---------|----------------------|---------------|-----------|
-| Docente de desarrollo (dueño del curso académico de pruebas) | ya existe — `npm run seed:teacher` | `dev@nodo.local` / `DevLocal2026!` | N/A (cuenta base de desarrollo) |
+| Docente de desarrollo (dueño del curso académico de pruebas) | ya existe — `npm run seed:teacher` | `dev@nodo.local` / `DevLocal2026!` (recreado en Fase 1, id `7207c852-dd6c-4df4-ac33-99985c36e26c`) | N/A (cuenta base de desarrollo) |
 | Curso del catálogo usado en la ronda | contenido versionado en git, no se crea | `analisis-de-algoritmos` | N/A |
 | Lección **LA** (autoevaluación principal: orden, reordenamiento, desmontaje) | contenido existente | `analisis-de-algoritmos` / `tablas-hash` | N/A |
 | Lección **LB** (segundo montaje de la misma pregunta, TC-042-007) | contenido existente | `analisis-de-algoritmos` / `heaps-y-heapsort` | N/A |
-| Lección **LC** (paridad: estudiante con intento previo) | contenido existente | `analisis-de-algoritmos` / `quicksort-determinista-y-aleatorizado` | N/A |
-| Lección **LD** (paridad: estudiante sin intento previo, denominador vivo) | contenido existente | `analisis-de-algoritmos` / `estrategia-voraz` | N/A |
 | Lección **LE** (gate de completar lección, TC-042-010/011) | contenido existente | `analisis-de-algoritmos` / `counting-radix-y-bucket-sort` | N/A |
-| Curso académico **Grupo A** (`course_slug=analisis-de-algoritmos`, dueño `dev@nodo.local`) | reutilizar el grupo existente en desarrollo o crearlo vía `service_role` (**requiere autorización explícita**, no existe API de cursos académicos) | `{{academic_course_id}}` | ⬜ |
-| Estudiante **E1** — **responde LC ANTES de migrar** (nota congelada, spec-040/D6) | `students-mcp` → `create_student` + `enroll_student` | `{{e1_id}}` — `test-e1-spec042@nodo.test` / `TestStudent042!`, enrollment `{{e1_enrollment}}` | ⬜ |
-| Estudiante **E2** — **abre LD sin responder ANTES de migrar** (denominador vivo) | `students-mcp` → `create_student` + `enroll_student` | `{{e2_id}}` — `test-e2-spec042@nodo.test` / `TestStudent042!`, enrollment `{{e2_enrollment}}` | ⬜ |
-| Estudiante **E3** — recorrido funcional post-migración (LA: orden, reordenamiento, revisión) | `students-mcp` → `create_student` + `enroll_student` | `{{e3_id}}` — `test-e3-spec042@nodo.test` / `TestStudent042!` | ⬜ |
+| Curso académico **Grupo A** — sembrado en Fase 0 | `POST /api/academic_courses` vía `service_role` (autorizado en Fase 0) | `Spec-042 QA — Analisis de Algoritmos`, `{{academic_course_id}}=f34aaaf6-540a-4915-beca-534e06105464` | ⬜ |
+| Estudiante **frozen** — nota congelada divergente (D6), usado en TC-042-001 adaptado | `students-mcp` → `create_student` + `enroll_student`, sembrado en Fase 0 | `3827b151-0357-4592-a154-841eb6a5fe00` — `spec042-frozen@nodo.test` / `TestStudent042!`, enrollment `50f93a2c-9d4a-4bdf-9162-3312ed7e1531` | ⬜ |
+| Estudiante **live** — denominador vivo, usado en TC-042-002 adaptado | `students-mcp` → `create_student` + `enroll_student`, sembrado en Fase 0 | `21b0a022-fa85-4398-bf1d-3fc7c61d4213` — `spec042-live@nodo.test` / `TestStudent042!`, enrollment `7b1bc52c-26de-485c-bad5-425c9f38bffb` | ⬜ |
+| Estudiante **E3** — recorrido funcional (LA: orden, reordenamiento, revisión) | `students-mcp` → `create_student` + `enroll_student` | `{{e3_id}}` — `test-e3-spec042@nodo.test` / `TestStudent042!` | ⬜ |
 | Estudiante **E4** — segunda semilla de barajado (TC-042-008) y gate de LE (TC-042-010/011) | `students-mcp` → `create_student` + `enroll_student` | `{{e4_id}}` — `test-e4-spec042@nodo.test` / `TestStudent042!` | ⬜ |
 | Estudiante **E5** — autoevaluación de LB (pregunta compartida, TC-042-007) | `students-mcp` → `create_student` + `enroll_student` | `{{e5_id}}` — `test-e5-spec042@nodo.test` / `TestStudent042!` | ⬜ |
-| Preguntas **PA1–PA4** de LA (`multiple_choice`, publicadas) | `question-bank-mcp` → `create_question` + `publish_question` (+ `mount_question_in_lesson` tras la migración) | `{{pa1}}`, `{{pa2}}`, `{{pa3}}`, `{{pa4}}` | ⬜ |
-| Preguntas **PC1–PC3** de LC (creadas y respondidas por E1 **antes** de migrar, con `course_slug`/`lesson_slug` del contrato viejo) | `question-bank-mcp` → `create_question` + `publish_question` (contrato **anterior** al spec) | `{{pc1}}`, `{{pc2}}`, `{{pc3}}` | ⬜ |
-| Preguntas **PD1–PD3** de LD (publicadas antes de migrar; E2 nunca las responde) | `question-bank-mcp` → `create_question` + `publish_question` (contrato **anterior**) | `{{pd1}}`, `{{pd2}}`, `{{pd3}}` | ⬜ |
-| Preguntas **PE1–PE2** de LE (gate de completar lección) | `question-bank-mcp` → `create_question` + `publish_question` | `{{pe1}}`, `{{pe2}}` | ⬜ |
+| Preguntas **PA1–PA4** de LA (`multiple_choice`, publicadas y montadas) | `question-bank-mcp` → `create_question` + `publish_question` + `mount_question_in_lesson` (contrato nuevo, con `keywords`) | `{{pa1}}`, `{{pa2}}`, `{{pa3}}`, `{{pa4}}` | ⬜ |
+| Preguntas **PE1–PE2** de LE (gate de completar lección) | `question-bank-mcp` → `create_question` + `publish_question` + `mount_question_in_lesson` | `{{pe1}}`, `{{pe2}}` | ⬜ |
 | Pregunta **PX** — se monta en **LA y LB** a la vez (TC-042-007) | `create_question` + `publish_question` + dos `mount_question_in_lesson` | `{{px}}` | ⬜ |
 | Pregunta **PY** — publicada y **nunca montada** (TC-042-013) | `create_question` + `publish_question`, **sin** montar | `{{py}}` | ⬜ |
 | Keyword `logica` (`kind='tema'`) | `question-bank-mcp` → `create_keyword` | `logica` | ⬜ |
 | Keyword `python` (`kind='lenguaje'`) | `question-bank-mcp` → `create_keyword` | `python` | ⬜ |
 | Keyword `cierre` (`kind='momento'`) | `question-bank-mcp` → `create_keyword` | `cierre` | ⬜ |
 | Keyword `spec042-temporal` (solo para el `409` de duplicado y el `409` de borrado en uso) | `create_keyword` | `spec042-temporal` | ⬜ |
-| Intento de autoevaluación de E1 en LC (fila congelada, spec-040/D6) | se crea al enviar desde la UI en TC-042-001 | `{{attempt_e1_lc}}` | ⬜ (no hay endpoint de borrado; requiere autorización explícita para limpiarlo en base) |
+| Intentos congelados de `frozen` en `algoritmos-como-tecnologia`/`fundamentos-control-de-versiones-y-flujo-de-trabajo` (D6) | sembrados en Fase 0 vía `service_role` (autorizado) | `4e7560d6-…`, `690a47e6-…` | ⬜ (no hay endpoint de borrado; se limpian junto con el estudiante) |
 
 **Entorno de pruebas:** desarrollo — Supabase **local** corriendo en `mirp-lab` a
 través del túnel SSH (ver `CLAUDE.md` → "Base de datos"), con `npm run dev` en
@@ -68,13 +76,11 @@ cada una empieza con su etiqueta: `[042 PA1] …`, `[042 PA2] …`, etc.
   `(user_id, course_slug, lesson_slug)`, sin acción de anulación). Cada caso que
   implique un envío quema ese par estudiante-lección. Si un caso falla a mitad,
   **crear otro estudiante** con `students-mcp`, no borrar el intento en base.
-- **TC-042-001 y TC-042-002 se ejecutan en dos mitades**: los pasos 1–3 **antes**
-  de aplicar las migraciones de las Fases 1/2 y el código de la Fase 5; los pasos
-  4–6 **después**. Si se aplican las migraciones antes de tomar la foto inicial,
-  ambos casos quedan inválidos para esta ronda y hay que rehacerlos con
-  estudiantes nuevos sobre una base reseteada.
-- Orden obligatorio: **preparación → TC-042-001/002 (mitad "antes") → migrar →
-  TC-042-001/002 (mitad "después") → resto de `TC-042-*` → `TC-MCP-042-*`**.
+- Las migraciones (Fases 1, 2, 5 del spec) **ya están aplicadas** en desarrollo
+  desde la implementación — no forman parte de esta ronda. TC-042-001/002 se
+  ejecutan en su forma **[ADAPTADO]** (ver la nota al inicio del documento).
+- Orden: **preparación → TC-042-001/002 (adaptados) → resto de `TC-042-*` →
+  `TC-MCP-042-*`**.
 - Los `TC-MCP-042-*` de contrato (`422`/`409`) se ejecutan **después** de los
   casos de UI: algunos crean y borran keywords compartidas.
 
@@ -82,17 +88,19 @@ cada una empieza con su etiqueta: `[042 PA1] …`, `[042 PA2] …`, etc.
 
 1. Túnel SSH activo y stack de Supabase arriba en `mirp-lab`; `npm run dev`
    corriendo en `localhost:3002`.
-2. **Base en el estado ANTERIOR al spec**: sin las migraciones
-   `20260806000000`–`20260806000006` aplicadas.
-3. Crear los cinco estudiantes y sus matrículas con `students-mcp`; anotar IDs.
-4. Crear y publicar con el **contrato viejo** (`course_slug`/`lesson_slug` en el
-   payload de `create_question`): PC1–PC3 en LC, PD1–PD3 en LD, PE1–PE2 en LE.
-   Verificar con `list_questions` que **no hay preguntas publicadas de más** en
-   esas lecciones: los números de los casos dependen de que sean exactamente esas.
-5. Registrar los conteos de la **Fase 0** del spec (total de `questions`; con
-   slugs no nulos; con `tags` no vacío; `multiple_choice` publicadas por
-   `(course_slug, lesson_slug)`) en la tabla de abajo, y exportar el breakdown de
-   referencia al scratchpad de la sesión (**fuera del repo**).
+2. Los estudiantes `frozen`/`live` y el curso académico de la Fase 0 ya existen
+   (ver tabla de arriba) — no se recrean.
+3. Crear los estudiantes E3–E5 y sus matrículas con `students-mcp`; anotar IDs.
+4. Crear el catálogo de keywords de la ronda (`logica`, `python`, `cierre`,
+   `spec042-temporal`) con `create_keyword`.
+5. Crear, publicar y montar con el **contrato nuevo** (`keywords` en el payload,
+   `mount_question_in_lesson` explícito): PA1–PA4 en LA, PE1–PE2 en LE, PX en LA
+   y LB, PY publicada sin montar. Verificar con `list_lesson_questions` que cada
+   lección tiene exactamente las preguntas esperadas.
+6. Los conteos de la **Fase 0** del spec (total de `questions`; con slugs no
+   nulos; con `tags` no vacío; `multiple_choice` publicadas por
+   `(course_slug, lesson_slug)`) ya están registrados abajo, con el breakdown de
+   referencia exportado al scratchpad de la sesión (**fuera del repo**).
 
 #### Conteos de la Fase 0 (registrados 2026-08-06, antes de migrar)
 
@@ -149,35 +157,31 @@ cada una empieza con su etiqueta: `[042 PA1] …`, `[042 PA2] …`, etc.
 
 ## Casos de prueba — UI
 
-### TC-042-001 — Paridad: el estudiante con intento previo ve la MISMA nota y la MISMA revisión tras la migración
-**Rol que ejecuta:** estudiante **E1**
-**Criterio cubierto:** "Un estudiante con intento previo ve la misma nota y la misma revisión que antes"; "ninguna fila de `student_grades` cambia como efecto de la migración".
-**Precondición:** base **sin** las migraciones del spec. LC con PC1–PC3 publicadas por el contrato viejo. E1 matriculado activo en Grupo A y sin intentos.
-**Datos de prueba usados:** `test-e1-spec042@nodo.test` / `TestStudent042!`; `{{e1_enrollment}}`
+### TC-042-001 — [ADAPTADO] La UI muestra correctamente la nota congelada de un estudiante con intento previo a la migración
+**Rol que ejecuta:** estudiante **spec042-frozen@nodo.test** (sembrado en Fase 0, ver spec-042)
+**Criterio cubierto:** "Un estudiante con intento previo ve la misma nota... que antes"; "ninguna fila de `student_grades` cambia como efecto de la migración" — verificado aquí como "la UI concuerda con el resultado ya probado byte a byte en la Fase 5", no como comparación antes/después en pantalla (ver nota de adaptación arriba).
+**Precondición:** estudiante `spec042-frozen@nodo.test` (id `3827b151-0357-4592-a154-841eb6a5fe00`) con un intento congelado en `analisis-de-algoritmos/algoritmos-como-tecnologia` (`question_count=2, correct_count=1`) y otro en `fundamentos-control-de-versiones-y-flujo-de-trabajo` (`question_count=1` — **deliberadamente divergente** de las 2 preguntas publicadas hoy en esa lección, D6). Nota ya verificada por RPC: **3.33**. Matriculado en el curso académico `Spec-042 QA — Analisis de Algoritmos` (`f34aaaf6-540a-4915-beca-534e06105464`).
+**Datos de prueba usados:** `spec042-frozen@nodo.test` / `TestStudent042!`
 **Pasos:**
-1. Como E1, abrir `/analisis-de-algoritmos/quicksort-determinista-y-aleatorizado`, responder la autoevaluación acertando exactamente **2 de 3** y confirmar el envío definitivo.
-2. Anotar **captura o transcripción literal** de: el resultado mostrado ("2/3"), el **orden** en que aparecen las tres preguntas por su etiqueta (`[042 PC1]`, `[042 PC2]`, `[042 PC3]`), y para cada una la opción marcada, si acertó y cuál era la correcta.
-3. Abrir `/cuenta/cursos/{{e1_enrollment}}` y anotar la nota exacta, el acumulado `X/Y` y el desglose por lección.
-4. **Aplicar las migraciones de las Fases 1 y 2** y ejecutar el código de la Fase 5 (con el punto 8, el `create or replace` de `self_assessment_breakdown`).
-5. Como E1, recargar (F5) la lección LC y comparar la revisión del intento con lo anotado en el paso 2.
-6. Recargar `/cuenta/cursos/{{e1_enrollment}}` y comparar con lo anotado en el paso 3.
-**Resultado esperado:** la nota, el acumulado `X/Y`, el desglose por lección, el resultado "2/3", **el orden de las tres preguntas en la revisión** y el detalle por pregunta (marcada / acierto / correcta) son **idénticos byte a byte** antes y después. El `question_count` del intento sigue congelado en 3 (D6 de spec-040) y nada en pantalla cambia por efecto de la migración.
+1. Iniciar sesión como `spec042-frozen@nodo.test`.
+2. Abrir `/cuenta/cursos` (o la ruta de la libreta del estudiante) y localizar el curso `analisis-de-algoritmos`.
+3. Anotar la nota de autoevaluaciones mostrada, el acumulado `X/Y` y el desglose por lección — en particular la fila de `fundamentos-control-de-versiones-y-flujo-de-trabajo`.
+4. Abrir la lección `algoritmos-como-tecnologia` y comprobar que la autoevaluación se muestra como ya respondida (sin poder reenviar).
+**Resultado esperado:** la nota mostrada es **3.33**, el acumulado es **2/3**, y la fila de `fundamentos-control-de-versiones-y-flujo-de-trabajo` muestra el denominador **congelado en 1** (no 2, que es el recuento en vivo hoy) — la UI respeta D6 igual que el RPC ya verificado. La lección `algoritmos-como-tecnologia` no permite responder de nuevo.
 **Estado:** ⬜ Pendiente
 **Hallazgos:** {{observaciones}}
 
-### TC-042-002 — Paridad: el estudiante SIN intento previo (denominador vivo) tampoco cambia de nota
-**Rol que ejecuta:** estudiante **E2** + docente `dev@nodo.local`
-**Criterio cubierto:** "el `question_count` de `self_assessment_breakdown` es idéntico antes y después"; es el caso que detecta un backfill incompleto (denominador que se encoge ⇒ nota inflada).
-**Precondición:** base **sin** las migraciones. LD con PD1–PD3 publicadas. E2 matriculado activo, sin intentos, y con al menos otra lección ya respondida para que tenga nota distinta de cero (responder LC completa **no**: LC es de E1; usar LE o cualquier lección con preguntas propias).
-**Datos de prueba usados:** `test-e2-spec042@nodo.test`; `{{e2_enrollment}}`; `{{academic_course_id}}`
+### TC-042-002 — [ADAPTADO] La UI muestra correctamente la nota con denominador vivo de un estudiante sin intento previo
+**Rol que ejecuta:** estudiante **spec042-live@nodo.test** (sembrado en Fase 0) + docente `dev@nodo.local`
+**Criterio cubierto:** "el `question_count` de `self_assessment_breakdown` es idéntico antes y después" — verificado aquí como "la UI concuerda con el recuento en vivo ya probado", el caso que detectaría un backfill incompleto (denominador que se encoge ⇒ nota inflada).
+**Precondición:** estudiante `spec042-live@nodo.test` (id `21b0a022-fa85-4398-bf1d-3fc7c61d4213`) con `lesson_progress` en `algoritmos-como-tecnologia` y `sintaxis-de-python`, **sin** ningún intento. Nota ya verificada por RPC: **0.00** (denominador vivo 2+1=3, sin respuestas). Matriculado en el mismo curso académico.
+**Datos de prueba usados:** `spec042-live@nodo.test` / `TestStudent042!`
 **Pasos:**
-1. Como E2, **abrir LD sin responder nada** (`/analisis-de-algoritmos/estrategia-voraz`) para que quede registrada en `lesson_progress`.
-2. Abrir `/cuenta/cursos/{{e2_enrollment}}` y anotar: nota, acumulado `X/Y` y la fila de LD del desglose (debe decir `0/3 — sin responder`).
-3. Como docente, abrir la libreta de Grupo A y anotar la nota de E2 en la columna "Autoevaluaciones".
-4. **Aplicar las migraciones y el código** (igual que el paso 4 de TC-042-001).
-5. Como E2, recargar `/cuenta/cursos/{{e2_enrollment}}`.
-6. Como docente, recargar la libreta **sin** pulsar "Recalcular autoevaluaciones", y después **con** el recálculo.
-**Resultado esperado:** la nota de E2, el acumulado y la fila `0/3 — sin responder` de LD son **idénticos** antes y después; el denominador **no baja** (una bajada significaría montajes faltantes ⇒ nota inflada). Pulsar "Recalcular autoevaluaciones" tampoco altera el valor. Si aparece cualquier diferencia, **detener la ronda** y ejecutar la verificación 3 de la sección final antes de continuar.
+1. Iniciar sesión como `spec042-live@nodo.test`.
+2. Abrir `/cuenta/cursos` y anotar la nota de autoevaluaciones, el acumulado `X/Y` y las filas de `algoritmos-como-tecnologia` y `sintaxis-de-python`.
+3. Como docente, abrir la libreta del grupo `Spec-042 QA — Analisis de Algoritmos` y anotar la nota de este estudiante en la columna "Autoevaluaciones".
+4. Como docente, pulsar "Recalcular autoevaluaciones" y volver a mirar la nota.
+**Resultado esperado:** la nota mostrada al estudiante es **0.00** (o "sin nota" si el criterio de UI para 0 sin denominador difiere — anotar cuál), el acumulado es **0/3**, ambas lecciones muestran "sin responder" con sus denominadores en vivo (2 y 1). La libreta del docente muestra el mismo valor. Recalcular **no cambia** el valor (ya es el correcto). Si aparece cualquier diferencia frente a lo esperado, **detener la ronda** y ejecutar la verificación 3 de la sección final antes de continuar.
 **Estado:** ⬜ Pendiente
 **Hallazgos:** {{observaciones}}
 
