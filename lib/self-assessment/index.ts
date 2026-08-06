@@ -21,18 +21,28 @@ import type {
   SelfAssessmentLessonRow,
 } from './types';
 
-type QuestionRow = {
+type ChoiceRow = {
   id: string;
-  stem: string;
-  code_snippet: string | null;
-  code_language: string | null;
-  topic_title: string | null;
-  choices: Array<{
+  body: string;
+  order_index: number;
+  is_correct: boolean;
+};
+
+// spec-042: la pregunta ya no vive en questions.course_slug/lesson_slug —
+// se lee desde el montaje (lesson_questions), embebiendo la pregunta con
+// questions!inner para que el filtro de type/is_published excluya montajes
+// que ya no califican (borrador, o un tipo distinto a multiple_choice).
+type LessonQuestionRow = {
+  order_index: number;
+  question: {
     id: string;
-    body: string;
-    order_index: number;
-    is_correct: boolean;
-  }>;
+    stem: string;
+    code_snippet: string | null;
+    code_language: string | null;
+    topic_title: string | null;
+    created_at: string;
+    choices: ChoiceRow[];
+  };
 };
 
 type AttemptRow = {
@@ -40,6 +50,34 @@ type AttemptRow = {
   correct_count: number;
   submitted_at: string;
 };
+
+// D4: mismo desempate en los 4 puntos de lectura que dependen del orden de
+// las preguntas (este, getAnswerKeyForLesson, submitSelfAssessment,
+// getAttemptReview) — order_index del montaje, luego questions.created_at,
+// luego questions.id. Si diverge entre puntos, el estudiante ve un orden y
+// la revisión otro.
+function sortByMountOrder(rows: LessonQuestionRow[]): LessonQuestionRow[] {
+  return [...rows].sort((a, b) => {
+    if (a.order_index !== b.order_index) return a.order_index - b.order_index;
+    const createdDiff =
+      new Date(a.question.created_at).getTime() - new Date(b.question.created_at).getTime();
+    if (createdDiff !== 0) return createdDiff;
+    return a.question.id.localeCompare(b.question.id);
+  });
+}
+
+const LESSON_QUESTIONS_SELECT = `
+  order_index,
+  question:questions!inner(
+    id,
+    stem,
+    code_snippet,
+    code_language,
+    topic_title,
+    created_at,
+    choices:question_choices(id, body, order_index, is_correct)
+  )
+`;
 
 export async function getSelfAssessmentForLesson(
   courseSlug: string,
@@ -49,53 +87,50 @@ export async function getSelfAssessmentForLesson(
     const supabase = await createServerSupabaseClient();
     const user = await getCurrentUser();
 
+    // Punto 1 (spec-042): las preguntas de la lección salen del montaje, no
+    // de columnas directas de questions.
     const { data, error } = await supabase
-      .from('questions')
-      .select(
-        `
-        id,
-        stem,
-        code_snippet,
-        code_language,
-        topic_title,
-        choices:question_choices(id, body, order_index, is_correct)
-      `
-      )
+      .from('lesson_questions')
+      .select(LESSON_QUESTIONS_SELECT)
       .eq('course_slug', courseSlug)
       .eq('lesson_slug', lessonSlug)
-      .eq('type', 'multiple_choice')
-      .eq('is_published', true)
-      .order('order_index', { referencedTable: 'question_choices', ascending: true })
-      .order('created_at', { ascending: true });
+      .eq('question.type', 'multiple_choice')
+      .eq('question.is_published', true);
 
     if (error) throw error;
 
-    const questions: SelfAssessmentQuestion[] = (data as QuestionRow[] | null || []).map(
-      (row: QuestionRow) => {
-        const correctCount = (row.choices || []).filter(
-          (c) => c.is_correct
-        ).length;
+    const rows = sortByMountOrder((data as unknown as LessonQuestionRow[] | null) ?? []);
 
-        // Sembrado por (usuario, pregunta): estable para ese estudiante en esa
-        // pregunta entre recargas y router.refresh(); distinto entre estudiantes.
-        const seed = user ? `${user.id}:${row.id}` : row.id;
-        const shuffledChoices = seededShuffle(row.choices || [], seed);
+    // Punto 2 (spec-042): se conserva intacto el barajado por estudiante
+    // (spec-034) — solo cambia de dónde sale la fila. Las opciones se
+    // ordenan por order_index en TS (en vez de vía embed de PostgREST, que
+    // no soporta ordenar de forma fiable un embed anidado a dos niveles) para
+    // fijar la ENTRADA canónica del barajado; sin esto, seededShuffle
+    // produciría un resultado distinto al histórico.
+    const questions: SelfAssessmentQuestion[] = rows.map((row) => {
+      const q = row.question;
+      const orderedChoices = [...q.choices].sort((a, b) => a.order_index - b.order_index);
+      const correctCount = orderedChoices.filter((c) => c.is_correct).length;
 
-        return {
-          id: row.id,
-          stem: row.stem,
-          code_snippet: row.code_snippet,
-          code_language: row.code_language,
-          topic_title: row.topic_title,
-          allowMultiple: correctCount > 1,
-          choices: shuffledChoices.map((c) => ({
-            id: c.id,
-            body: c.body,
-            order_index: c.order_index,
-          })),
-        };
-      }
-    );
+      // Sembrado por (usuario, pregunta): estable para ese estudiante en esa
+      // pregunta entre recargas y router.refresh(); distinto entre estudiantes.
+      const seed = user ? `${user.id}:${q.id}` : q.id;
+      const shuffledChoices = seededShuffle(orderedChoices, seed);
+
+      return {
+        id: q.id,
+        stem: q.stem,
+        code_snippet: q.code_snippet,
+        code_language: q.code_language,
+        topic_title: q.topic_title,
+        allowMultiple: correctCount > 1,
+        choices: shuffledChoices.map((c) => ({
+          id: c.id,
+          body: c.body,
+          order_index: c.order_index,
+        })),
+      };
+    });
 
     return questions;
   } catch (error) {
@@ -105,7 +140,8 @@ export async function getSelfAssessmentForLesson(
 }
 
 // Vista docente (spec-031): misma consulta y mismo orden que
-// getSelfAssessmentForLesson, pero propaga is_correct en vez de descartarlo.
+// getSelfAssessmentForLesson, pero propaga is_correct en vez de descartarlo
+// y NO baraja (spec-034 Fase 1: la clave del docente va en orden canónico).
 // Solo el docente dueño o un admin pueden obtener esta clave de respuestas;
 // el gate vive aquí (no solo en la página) porque es una Server Action
 // invocable directamente.
@@ -120,49 +156,40 @@ export async function getAnswerKeyForLesson(
 
   try {
     const supabase = await createServerSupabaseClient();
+
+    // Punto 3 (spec-042): mismo cambio de origen que Punto 1.
     const { data, error } = await supabase
-      .from('questions')
-      .select(
-        `
-        id,
-        stem,
-        code_snippet,
-        code_language,
-        topic_title,
-        choices:question_choices(id, body, order_index, is_correct)
-      `
-      )
+      .from('lesson_questions')
+      .select(LESSON_QUESTIONS_SELECT)
       .eq('course_slug', courseSlug)
       .eq('lesson_slug', lessonSlug)
-      .eq('type', 'multiple_choice')
-      .eq('is_published', true)
-      .order('order_index', { referencedTable: 'question_choices', ascending: true })
-      .order('created_at', { ascending: true });
+      .eq('question.type', 'multiple_choice')
+      .eq('question.is_published', true);
 
     if (error) throw error;
 
-    const questions: AnswerKeyQuestion[] = (data as QuestionRow[] | null || []).map(
-      (row: QuestionRow) => {
-        const correctCount = (row.choices || []).filter(
-          (c) => c.is_correct
-        ).length;
+    const rows = sortByMountOrder((data as unknown as LessonQuestionRow[] | null) ?? []);
 
-        return {
-          id: row.id,
-          stem: row.stem,
-          code_snippet: row.code_snippet,
-          code_language: row.code_language,
-          topic_title: row.topic_title,
-          allowMultiple: correctCount > 1,
-          choices: (row.choices || []).map((c) => ({
-            id: c.id,
-            body: c.body,
-            order_index: c.order_index,
-            is_correct: c.is_correct,
-          })),
-        };
-      }
-    );
+    const questions: AnswerKeyQuestion[] = rows.map((row) => {
+      const q = row.question;
+      const orderedChoices = [...q.choices].sort((a, b) => a.order_index - b.order_index);
+      const correctCount = orderedChoices.filter((c) => c.is_correct).length;
+
+      return {
+        id: q.id,
+        stem: q.stem,
+        code_snippet: q.code_snippet,
+        code_language: q.code_language,
+        topic_title: q.topic_title,
+        allowMultiple: correctCount > 1,
+        choices: orderedChoices.map((c) => ({
+          id: c.id,
+          body: c.body,
+          order_index: c.order_index,
+          is_correct: c.is_correct,
+        })),
+      };
+    });
 
     return questions;
   } catch (error) {
@@ -204,18 +231,21 @@ export async function checkSelfAssessmentAnswer(
 
   try {
     const supabase = await createServerSupabaseClient();
-    // Verificar que la pregunta es multiple_choice, publicada y pertenece a la lección
-    const { data: question, error: questionError } = await supabase
-      .from('questions')
-      .select('id, type, is_published')
-      .eq('id', questionId)
+
+    // Punto 4 (spec-042): "la pregunta pertenece a esta lección" pasa de dos
+    // .eq() sobre questions a comprobar que existe el montaje, con la
+    // pregunta embebida vía !inner filtrando type/is_published.
+    const { data: mount, error: mountError } = await supabase
+      .from('lesson_questions')
+      .select('question:questions!inner(id)')
       .eq('course_slug', courseSlug)
       .eq('lesson_slug', lessonSlug)
-      .eq('type', 'multiple_choice')
-      .eq('is_published', true)
-      .single();
+      .eq('question_id', questionId)
+      .eq('question.type', 'multiple_choice')
+      .eq('question.is_published', true)
+      .maybeSingle();
 
-    if (questionError || !question) {
+    if (mountError || !mount) {
       return { ok: false, error: 'Pregunta no encontrada' };
     }
 
@@ -270,16 +300,20 @@ export async function getSelfAssessmentStatus(
   }
 
   try {
-    const { data: questions, error: qError } = await supabase
-      .from('questions')
-      .select('id')
+    // Punto 5 (spec-042): el conteo pasa de una columna directa a contar
+    // montajes con la pregunta embebida vía !inner. Fail-closed sin cambios
+    // (D8 de spec-037, ver catch): si esta consulta falla, 'unavailable',
+    // nunca requiresAttempt: false.
+    const { data: mounts, error: qError } = await supabase
+      .from('lesson_questions')
+      .select('question:questions!inner(id)')
       .eq('course_slug', courseSlug)
       .eq('lesson_slug', lessonSlug)
-      .eq('type', 'multiple_choice')
-      .eq('is_published', true);
+      .eq('question.type', 'multiple_choice')
+      .eq('question.is_published', true);
 
     if (qError) throw qError;
-    const questionCount = (questions || []).length;
+    const questionCount = (mounts || []).length;
 
     if (!user) {
       return {
@@ -373,18 +407,38 @@ export async function submitSelfAssessment(
       return { ok: false, reason: 'already_submitted' };
     }
 
-    const { data: questions, error: qError } = await supabase
-      .from('questions')
-      .select('id, type, is_published')
+    // Punto 6 (spec-042): el conjunto de preguntas a calificar sale del
+    // mismo origen y el mismo desempate que Punto 1 (D4) — debe ser
+    // EXACTAMENTE el conjunto que el estudiante vio, o
+    // Object.keys(answers).length !== questionCount (abajo) rechaza el envío
+    // como incompleto. Sin `choices` acá: se piden por pregunta más abajo.
+    type MountedQuestionRow = {
+      order_index: number;
+      question: { id: string; created_at: string };
+    };
+
+    const { data: mountRows, error: qError } = await supabase
+      .from('lesson_questions')
+      .select('order_index, question:questions!inner(id, created_at)')
       .eq('course_slug', courseSlug)
       .eq('lesson_slug', lessonSlug)
-      .eq('type', 'multiple_choice')
-      .eq('is_published', true)
-      .order('created_at', { ascending: true });
+      .eq('question.type', 'multiple_choice')
+      .eq('question.is_published', true);
 
-    if (qError || !questions) {
+    if (qError || !mountRows) {
       return { ok: false, reason: 'error' };
     }
+
+    const questions = ((mountRows as unknown as MountedQuestionRow[]) ?? [])
+      .slice()
+      .sort((a, b) => {
+        if (a.order_index !== b.order_index) return a.order_index - b.order_index;
+        const createdDiff =
+          new Date(a.question.created_at).getTime() - new Date(b.question.created_at).getTime();
+        if (createdDiff !== 0) return createdDiff;
+        return a.question.id.localeCompare(b.question.id);
+      })
+      .map((row) => ({ id: row.question.id }));
 
     const questionCount = questions.length;
     if (questionCount === 0) {
@@ -524,13 +578,23 @@ export async function getAttemptReview(
     if (attemptError) throw attemptError;
     if (!attempt) return null;
 
-    // `.order('created_at', { foreignTable: 'questions' })` NO ordena aquí:
-    // ese parámetro solo reordena filas embebidas de una relación *to-many*.
-    // `questions` es to-one (cada respuesta referencia una sola pregunta), así
-    // que PostgREST lo ignora — el orden de las filas de la consulta principal
-    // sigue siendo indefinido (en la práctica, por la PK compuesta). Traemos
-    // `created_at` y ordenamos en TypeScript, igual que ya se hace con
-    // `choices` más abajo.
+    // Punto 7 (spec-042): mapa question_id → order_index del montaje VIGENTE
+    // de esta lección. Puede faltar alguna pregunta que el estudiante
+    // respondió y que luego se desmontó de esta lección — para esas, el
+    // desempate cae a created_at/id (mismo criterio de D4), en vez de perder
+    // la fila de la revisión.
+    const { data: mountRows, error: mountsError } = await supabase
+      .from('lesson_questions')
+      .select('question_id, order_index')
+      .eq('course_slug', courseSlug)
+      .eq('lesson_slug', lessonSlug);
+
+    if (mountsError) throw mountsError;
+
+    const orderIndexByQuestionId = new Map<string, number>(
+      (mountRows ?? []).map((m) => [m.question_id as string, m.order_index as number])
+    );
+
     const { data: answerRows, error: answersError } = await supabase
       .from('self_assessment_attempt_answers')
       .select(
@@ -562,12 +626,7 @@ export async function getAttemptReview(
         code_language: string | null;
         topic_title: string | null;
         created_at: string;
-        choices: Array<{
-          id: string;
-          body: string;
-          order_index: number;
-          is_correct: boolean;
-        }>;
+        choices: ChoiceRow[];
       } | null;
     };
 
@@ -575,11 +634,24 @@ export async function getAttemptReview(
       .filter((row): row is AnswerRow & { questions: NonNullable<AnswerRow['questions']> } =>
         row.questions !== null
       )
-      .sort(
-        (a, b) =>
-          new Date(a.questions.created_at).getTime() -
-          new Date(b.questions.created_at).getTime()
-      )
+      .sort((a, b) => {
+        const orderA = orderIndexByQuestionId.get(a.question_id);
+        const orderB = orderIndexByQuestionId.get(b.question_id);
+
+        if (orderA !== undefined && orderB !== undefined && orderA !== orderB) {
+          return orderA - orderB;
+        }
+        // Montada (con order_index vigente) siempre antes que desmontada.
+        if (orderA !== undefined && orderB === undefined) return -1;
+        if (orderA === undefined && orderB !== undefined) return 1;
+
+        // Empate de order_index, o ambas desmontadas de esta lección desde
+        // que se respondió: mismo desempate que el resto (D4).
+        const createdDiff =
+          new Date(a.questions.created_at).getTime() - new Date(b.questions.created_at).getTime();
+        if (createdDiff !== 0) return createdDiff;
+        return a.question_id.localeCompare(b.question_id);
+      })
       .map((row) => {
         const choices = [...row.questions.choices].sort(
           (a, b) => a.order_index - b.order_index
@@ -665,6 +737,9 @@ async function buildCourseSummaryFromBreakdown(
 // spec-040 D4/D7: nota acumulada del curso, leída del RPC canónico
 // `self_assessment_breakdown` (mismo cálculo que usa la propagación a la
 // libreta, para que estudiante y docente nunca vean números distintos).
+// Punto 8 (spec-042): el RPC en sí resuelve ahora vía lesson_questions — ver
+// supabase/migrations/20260806000006_self_assessment_breakdown_via_lesson_questions.sql.
+// Esta función y la de abajo no cambian: consumen el RPC por firma.
 export async function getSelfAssessmentCourseSummary(
   courseSlug: string
 ): Promise<SelfAssessmentCourseSummary | null> {

@@ -553,35 +553,60 @@ de `.claude/skills/lesson-authoring/SKILL.md` (~520), que hoy dice
       desmonta sin borrar la pregunta del banco ni sus otros montajes; `DELETE
       /api/keywords/{slug}` en uso devuelve `409`.
 
-### Fase 5 — Reescritura de la autoevaluación (la fase de riesgo)
-- [ ] Punto 1 — `lib/self-assessment/index.ts:52-69`: query desde
-      `lesson_questions` con `questions!inner`, `.order('order_index')` +
-      desempate en TS por `created_at`, `id`.
-- [ ] Punto 2 — `:73-98`: adaptar el mapeo a la fila anidada. **Conservar
-      `seededShuffle` y el `.order` sobre `question_choices`** (spec-034).
-- [ ] Punto 3 — `:123-140` y `:144-165` (`getAnswerKeyForLesson`): mismo cambio,
-      sin barajar; gate de rol intacto.
-- [ ] Punto 4 — `:208-216` (`checkSelfAssessmentAnswer`): pertenencia vía
-      `lesson_questions`.
-- [ ] Punto 5 — `:273-281` (`getSelfAssessmentStatus`): conteo vía montaje,
-      **manteniendo el fail-closed de spec-037/D8** (`:323-329`).
-- [ ] Punto 6 — `:376-391` (`submitSelfAssessment`): mismo conjunto y mismo orden
-      que el punto 1; sin cambios en el insert de `:445-456`.
-- [ ] Punto 7 — `:534-551` y `:574-582` (`getAttemptReview`): ordenar por
-      `order_index` del montaje con fallback a `created_at` para preguntas
-      desmontadas.
-- [ ] Punto 8 —
+### Fase 5 — Reescritura de la autoevaluación (la fase de riesgo) ✅ Completada 2026-08-06
+- [x] Punto 1 — `lib/self-assessment/index.ts` `getSelfAssessmentForLesson`: query
+      desde `lesson_questions` con `questions!inner`, filtrando
+      `question.type`/`question.is_published`. El `.order('order_index')` del
+      montaje se complementa con un desempate explícito en TS
+      (`sortByMountOrder`, por `created_at` luego `id`) en vez de encadenar
+      `.order()` sobre columnas de un embed anidado a dos niveles — validado
+      contra la API REST que el patrón `!inner` + filtro por alias funciona
+      como se espera antes de escribirlo en TS.
+- [x] Punto 2 — mapeo adaptado a la fila anidada. **`seededShuffle` intacto**
+      (spec-034): las opciones se ordenan por `order_index` en TS antes de
+      barajar (fija la misma entrada canónica que antes daba el `.order()` de
+      PostgREST sobre `question_choices`), así que el barajado por
+      `(user_id, question_id)` reproduce exactamente el mismo resultado que
+      antes de la migración.
+- [x] Punto 3 — `getAnswerKeyForLesson`: mismo cambio de origen y mismo
+      `sortByMountOrder`, sin barajar (spec-034 Fase 1); gate de rol
+      (`hasCourseAccess` owner/admin) intacto.
+- [x] Punto 4 — `checkSelfAssessmentAnswer`: la pertenencia pasa de dos `.eq()`
+      sobre `questions` a comprobar el montaje vía `lesson_questions` con
+      `questions!inner` filtrado. Verificado por REST: una pregunta montada en
+      otra lección no matchea (`[]`).
+- [x] Punto 5 — `getSelfAssessmentStatus`: conteo vía montaje con el mismo patrón
+      `!inner`. **Fail-closed de spec-037/D8 intacto** — el `catch` sigue
+      devolviendo `{status:'unavailable'}`, nunca `requiresAttempt:false`.
+- [x] Punto 6 — `submitSelfAssessment`: mismo conjunto y mismo desempate que el
+      Punto 1, con una consulta más liviana (sin `choices`, que se piden por
+      pregunta más abajo, como ya hacía el código original). Sin cambios en el
+      insert de `self_assessment_attempts`/`self_assessment_attempt_answers`.
+- [x] Punto 7 — `getAttemptReview`: nueva consulta a `lesson_questions` que arma
+      un mapa `question_id → order_index` del montaje vigente; el `.sort()` de
+      las respuestas usa ese mapa y cae a `created_at`/`id` (D4) cuando una
+      pregunta respondida ya no está montada en esa lección.
+- [x] Punto 8 —
       `supabase/migrations/20260806000006_self_assessment_breakdown_via_lesson_questions.sql`:
-      `create or replace function public.self_assessment_breakdown(...)` con firma
-      **idéntica**, cambiando solo la subconsulta de conteo. Preservar literalmente
-      el `BLOQUE 039` comentado. No tocar `apply_self_assessment_grade` ni las dos
-      RPC de recálculo.
-- [ ] Reejecutar la **verificación 3 de la Fase 2** contra la función ya
-      reemplazada: cero diferencias.
-- [ ] Escenario de regresión completo en desarrollo: estudiante con intento previo
-      (nota congelada, spec-040/D6) y estudiante sin intento (denominador vivo) →
-      ninguna de las dos notas cambia tras la migración.
-- [ ] `npm run lint` y `npx tsc --noEmit` sin errores.
+      `create or replace function` con firma **idéntica**; solo cambió la
+      subconsulta de conteo (`lesson_questions join questions` en vez de
+      `questions.course_slug/lesson_slug`). `BLOQUE 039` preservado
+      literalmente. `apply_self_assessment_grade` y las dos RPC de recálculo
+      no se tocaron (consumen por firma).
+- [x] Reejecutada la **verificación 3 de la Fase 2** contra la función ya
+      reemplazada: **resultado idéntico, byte a byte**, al snapshot "antes" de
+      la Fase 0 — mismo `question_count`/`correct_count`/`answered` para la
+      estudiante con nota congelada (incluida la lección con divergencia
+      deliberada entre congelado y vivo, D6) y para la estudiante con
+      denominador vivo.
+- [x] Escenario de regresión en desarrollo: `student_grades` de ambas
+      estudiantes (3.33 congelada, 0.00 viva) **sin cambios** tras aplicar la
+      migración — no se disparó ningún recálculo, exactamente el
+      comportamiento esperado (la migración solo reemplaza la función; nadie
+      volvió a invocar `apply_self_assessment_grade`).
+- [x] `npm run lint` y `npx tsc --noEmit`: sin errores (0 errores, 8 warnings
+      preexistentes no relacionados). Confirmado además que no queda ningún
+      `.from('questions')` con filtro `.eq('course_slug', ...)` en el archivo.
 
 ### Fase 6 — MCP: actualizar `question-bank-mcp`
 - [ ] Añadir a `mcp-servers/question-bank-mcp/src/tools.ts`: `list_keywords`,
