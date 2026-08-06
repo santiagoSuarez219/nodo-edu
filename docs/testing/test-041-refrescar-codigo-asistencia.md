@@ -289,11 +289,11 @@ mostró el código rotado correctamente al volver a él.
 - Hallazgo colateral en TC-008 (no bloqueante, sin corregir): error de
   hidratación recuperable en el contador "Expira en: mm:ss" al abrir una
   segunda pestaña. Registrado como **DEBT-053** en `docs/specs/backlog.md`.
-- Limpieza de datos de prueba: 🟡 Parcial — E1/E2/E3 desmatriculados y
+- Limpieza de datos de prueba: ✅ Completada — E1/E2/E3 desmatriculados y
   eliminados vía `students-mcp` (verificado: ya no aparecen en el roster de
-  Grupo A). **Pendiente:** cerrar las sesiones de asistencia abiertas en
-  Grupo A y Grupo B desde la UI — `attendance-mcp` es de solo lectura, no hay
-  endpoint de API para `closeSession`.
+  Grupo A). Sesiones de asistencia de Grupo A y Grupo B cerradas por el
+  usuario desde la UI (verificado: `attendance-mcp` → `list_sessions` con
+  `is_open=true` devuelve 0 resultados en ambos grupos).
   - Cerrar todas las sesiones de asistencia abiertas durante la ronda.
   - Desmatricular y eliminar E1, E2 y E3 vía `students-mcp`
     (`unenroll_student` → `delete_student`), en orden inverso a su creación.
