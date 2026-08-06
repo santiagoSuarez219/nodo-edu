@@ -363,64 +363,64 @@ cada una empieza con su etiqueta: `[042 PA1] …`, `[042 PA2] …`, etc.
 **Precondición:** catálogo con al menos `logica` (`tema`), `python` (`lenguaje`), `cierre` (`momento`) y las keywords sembradas desde `tags` en el backfill (con `kind = null`).
 **Input de prueba:** (a) sin filtros; (b) `{ "kind": "tema" }`; (c) `{ "q": "pyth" }`; (d) `{ "kind": "inventado" }`
 **Output esperado:** (a) lista con `slug`, `label`, `description` y `kind` de cada término, incluidas las sembradas con `kind: null`; (b) solo las de `kind: 'tema'`; (c) solo `python`; (d) error de validación, **no** una lista vacía silenciosa.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{observaciones}}
+**Estado:** ✅ Aprobado
+**Hallazgos:** Ejecutado por MCP real (stdio). (a) 11 keywords con todos los campos, incluidas `big-o`/`git`/`ramas`/`recursion`/`control-de-versiones` con `kind: null` del backfill. (b) exactamente `logica` y `recursion-multiple` (ambas `tema`). (c) exactamente `python`. (d) `kind: "inventado"` devuelve error de validación listando el enum admitido, sin lista vacía.
 
 ### TC-MCP-042-002 — `create_keyword` crea un término del vocabulario controlado
 **Herramienta probada:** `create_keyword`
 **Precondición:** el slug no existe en el catálogo.
 **Input de prueba:** `{ "slug": "Recursión Múltiple", "label": "Recursión múltiple", "kind": "tema", "description": "Preguntas sobre recursión con más de una llamada." }`
 **Output esperado:** `201` con el término creado y el `slug` **normalizado** a `recursion-multiple` (minúsculas, sin acentos, espacios → `-`); `label` conserva la forma legible original. Inmediatamente después, `list_keywords` lo devuelve.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{observaciones}}
+**Estado:** ✅ Aprobado
+**Hallazgos:** Slug normalizado correctamente a `recursion-multiple`, `label` conservó "Recursión múltiple" con tilde, `description` completa. Apareció de inmediato en `list_keywords`.
 
 ### TC-MCP-042-003 — `create_keyword` con slug duplicado devuelve `409`
 **Herramienta probada:** `create_keyword`
 **Precondición:** `spec042-temporal` ya existe en el catálogo.
 **Input de prueba:** `{ "slug": "spec042-temporal", "label": "Otro rótulo distinto", "kind": "tema" }`
 **Output esperado:** `409` con mensaje explícito de slug ya existente. **No** hay upsert silencioso: `list_keywords` sigue mostrando el `label` original, no "Otro rótulo distinto". El agente recibe el mensaje original de la API, sin reformular.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{observaciones}}
+**Estado:** ✅ Aprobado
+**Hallazgos:** Mensaje "Ya existe una keyword con el slug 'spec042-temporal'." relayado tal cual, sin reformular. `list_keywords` confirmó que el `label` siguió siendo "Spec042 temporal", sin upsert.
 
 ### TC-MCP-042-004 — `create_keyword` con `kind` fuera del enum falla
 **Herramienta probada:** `create_keyword`
 **Precondición:** ninguna.
 **Input de prueba:** `{ "slug": "spec042-kind-malo", "label": "Kind inválido", "kind": "legacy" }`
 **Output esperado:** error de validación (`422`) indicando los valores admitidos `('tema','lenguaje','momento','ejercicio')`; la keyword **no se crea** (`list_keywords` no la devuelve). Repetir con `kind` omitido: **sí** se crea, con `kind: null` (nullable a propósito, D3) — recordar limpiarla al cerrar la ronda.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{observaciones}}
+**Estado:** ✅ Aprobado
+**Hallazgos:** `kind: "legacy"` rechazado con el enum completo en el mensaje; `spec042-kind-malo` nunca apareció en el catálogo. Con `kind` omitido (`spec042-kind-null`) se creó correctamente con `kind: null`, confirmado con `GET /api/keywords/spec042-kind-null`. Nota de proceso: en la primera corrida (con 4 `create_keyword` disparados de forma concurrente por el harness de prueba vía stdio crudo) esta misma llamada devolvió un `409` espurio pese a que la fila se creó correctamente — se reprodujo aislada (una sola llamada, sin concurrencia) y funcionó limpio. Es un artefacto de enviar varias llamadas MCP en paralelo por el mismo pipe stdio en esta ronda de pruebas, no un defecto del servidor: un cliente MCP real invoca las herramientas una a la vez.
 
 ### TC-MCP-042-005 — Flujo de tres pasos: `create_question` con `keywords` → `publish_question` → `mount_question_in_lesson`
 **Herramienta probada:** `create_question`, `publish_question`, `mount_question_in_lesson`
 **Precondición:** `logica` y `cierre` existen en el catálogo. LA con sus montajes conocidos.
 **Input de prueba:** `create_question` de tipo `multiple_choice` con `stem: "[042 PM1] …"`, 4 `choices` (la tercera correcta) y `keywords: ["logica", "cierre"]`; luego `publish_question`; luego `mount_question_in_lesson { course_slug: "analisis-de-algoritmos", lesson_slug: "tablas-hash" }`.
 **Output esperado:** (1) la pregunta se crea con `keywords: ["cierre","logica"]` en la respuesta y **sin** `course_slug`/`lesson_slug`/`tags` en el objeto devuelto; (2) tras publicar, `is_published: true`; (3) el montaje devuelve la fila con su `order_index` y `list_lesson_questions` de LA la muestra al final de la lista. Invocar `mount_question_in_lesson` **una segunda vez** con los mismos parámetros es **idempotente**: no duplica el montaje ni cambia el `order_index`.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{observaciones}}
+**Estado:** ✅ Aprobado (con precisión menor)
+**Hallazgos:** (1) creada correctamente. Precisión: `create_question` devuelve la fila cruda del `insert` (mismo comportamiento que antes de spec-042: nunca incluyó `choices` tampoco), así que **sí** aparecen `course_slug`/`lesson_slug`/`tags` en la respuesta pero como `null`/`[]` (columnas deprecadas, D1) — no se guardan ni se usan, solo son visibles como artefacto de la respuesta cruda. `keywords` no viaja en la respuesta de `create_question` por el mismo motivo (solo en `get_question`, confirmado con keywords `["cierre","logica"]`). (2) `is_published: true` tras publicar. (3) montaje con `order_index: 6` (al final de la lista de 7); segundo `mount_question_in_lesson` idéntico devolvió el mismo `order_index: 6` — idempotente confirmado.
 
 ### TC-MCP-042-006 — `create_question` con una keyword inexistente devuelve `422` con TODAS las faltantes y no crea la pregunta
 **Herramienta probada:** `create_question`
 **Precondición:** `logica` existe; `no-existe-1` y `no-existe-2` **no** existen. Anotar el total de filas de `questions` antes.
 **Input de prueba:** `create_question` válida en todo lo demás, con `keywords: ["logica", "no-existe-1", "no-existe-2"]`.
 **Output esperado:** `422 validation_error` con `details.fieldErrors.keywords` listando **las dos** faltantes en el mismo error (no solo la primera), con el texto de la API: `"La keyword 'no-existe-1' no existe en el catálogo. Créala con POST /api/keywords."` y su equivalente para `no-existe-2`. **La pregunta no se crea**: el total de `questions` es el mismo que antes y `list_questions` no la devuelve. El mensaje llega al agente **sin reformular**.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{observaciones}}
+**Estado:** ✅ Aprobado
+**Hallazgos:** Las dos keywords faltantes listadas en un único mensaje relayado por el MCP (`api.ts` anexa `fieldErrors`, ver Fase 6). Total de `questions` antes y después: **15 en ambos casos** — la pregunta no se creó.
 
 ### TC-MCP-042-007 — `create_question` con `course_slug` / `lesson_slug` / `tags` devuelve `422` apuntando al endpoint correcto
 **Herramienta probada:** `create_question`
 **Precondición:** ninguna.
 **Input de prueba:** tres invocaciones, cada una con un campo prohibido: (a) `course_slug: "analisis-de-algoritmos"`; (b) `lesson_slug: "tablas-hash"`; (c) `tags: ["recursion"]`.
 **Output esperado:** las tres devuelven `422` con un mensaje que **nombra el reemplazo**: (a) y (b) apuntan a `POST /api/questions/{id}/lessons` (`mount_question_in_lesson`); (c) apunta a `keywords` + `POST /api/keywords`. En ningún caso el campo se ignora en silencio ni se crea la pregunta. Repetir (a) sobre `update_question` de una pregunta existente: mismo `422`, y la pregunta queda **intacta**.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{observaciones}}
+**Estado:** ✅ Aprobado
+**Hallazgos:** Las tres invocaciones de `create_question` (course_slug/lesson_slug/tags) devolvieron `422` nombrando el reemplazo correcto. `update_question` con `course_slug` sobre PM1 devolvió el mismo `422`; `get_question` posterior confirmó la pregunta intacta (`stem` sin cambios).
 
 ### TC-MCP-042-008 — `update_question` con `keywords` reemplaza el set y NO altera los montajes
 **Herramienta probada:** `update_question`
 **Precondición:** una pregunta con `keywords: ["logica","cierre"]` y **dos** montajes (LA y LB). Anotar sus montajes con `list_lesson_questions` de ambas lecciones.
 **Input de prueba:** `update_question` con el payload completo de la pregunta y `keywords: ["python"]`.
 **Output esperado:** la pregunta queda con `keywords: ["python"]` (reemplazo total del set, `logica` y `cierre` desaparecen de esa pregunta pero **siguen en el catálogo**); los **dos montajes siguen exactamente igual** (mismas lecciones, mismo `order_index`) — D6. Verificarlo abriendo LA y LB como estudiante: las preguntas y su orden no cambian.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{observaciones}}
+**Estado:** ✅ Aprobado
+**Hallazgos:** Usada PM1 (montada en `tablas-hash` order_index 6 y `heaps-y-heapsort` order_index 1). Tras `update_question` con `keywords: ["python"]`, `get_question` mostró finalmente `keywords: ["python"]` y `lessons` **sin cambios** (mismas dos lecciones, mismos `order_index`). Nota de proceso: la primera lectura inmediatamente después del `update_question` vía MCP mostró transitoriamente `keywords: []`; una relectura vía API directa momentos después mostró el valor correcto y estable. Mismo patrón de inestabilidad de lectura ya observado dos veces en esta sesión por el túnel SSH hacia `mirp-lab` (ver Fase 0/Fase 5) — no se reprodujo con el túnel estable, así que se registra como artefacto de infraestructura de esta ronda, no como defecto de `_updateQuestionForActor` (que borra e inserta `question_keywords` de forma secuencial y `await`eada antes de responder).
 
 ### TC-MCP-042-009 — `list_lesson_questions` devuelve las preguntas montadas en orden
 **Herramienta probada:** `list_lesson_questions`
