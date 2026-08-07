@@ -35,13 +35,26 @@ export const analisisDeAlgoritmos: Course = {
       slug: "sintaxis-de-python",
       articleSlug: "sintaxis-de-python",
       order: 2,
-      title: "Sintaxis de Python",
+      title: "Introducción a Python",
+      summary:
+        "La sintaxis mínima de Python para escribir y medir algoritmos: tipos, control de flujo, funciones, estructuras nativas, comprensión de listas y manejo básico de errores.",
       topics: [
         { title: "Tipos de datos básicos: int, float, str, bool, None" },
         { title: "Estructuras de control: if/elif/else, for, while" },
         { title: "Funciones: definición, parámetros, valores de retorno, docstrings" },
         { title: "Estructuras de datos nativas: listas, tuplas, diccionarios, conjuntos" },
+        { title: "Comprensión de listas (*list comprehensions*)" },
+        { title: "Manejo básico de excepciones (`try`/`except`) e importación de módulos" },
       ],
+    },
+    {
+      id: "lab-02-configuracion-del-entorno",
+      slug: "lab-02-configuracion-del-entorno",
+      articleSlug: "lab-02-configuracion-del-entorno",
+      kind: "guide",
+      order: 2.5,
+      title: "Laboratorio 02 — Configuración del entorno de trabajo",
+      topics: [],
     },
     {
       id: "algoritmos-como-tecnologia",
