@@ -198,7 +198,6 @@ cada una empieza con su etiqueta: `[042 PA1] …`, `[042 PA2] …`, etc.
 **Resultado esperado:** se ven exactamente **4** preguntas, en el orden `[042 PA1] → [042 PA2] → [042 PA3] → [042 PA4]`, que es el de `order_index`. El orden es **estable** entre recargas y entre sesiones (el barajado de spec-034 afecta a las opciones, nunca al orden de las preguntas). No aparece ninguna pregunta de otra lección ni ninguna sin montar.
 **Estado:** ✅ Aprobado
 **Hallazgos:** Confirmado por el usuario — 4 preguntas en el orden esperado, estable entre recargas.
-**Hallazgos:** {{observaciones}}
 
 ### TC-042-004 — Reordenar el montaje cambia el orden que ve el estudiante
 **Rol que ejecuta:** docente vía MCP + estudiante **E3**
@@ -301,7 +300,6 @@ cada una empieza con su etiqueta: `[042 PA1] …`, `[042 PA2] …`, etc.
 **Resultado esperado:** en el paso 2 la lección **no** se marca como completada y se explica que falta responder la autoevaluación; en el paso 4 sí se completa. En el paso 5, una lección sin preguntas montadas se completa sin exigir autoevaluación (el gate depende del conteo de montajes, no de la existencia de la sección).
 **Estado:** ✅ Aprobado
 **Hallazgos:** Ejecutado por Claude con el navegador (autorizado explícitamente por el usuario en esta sesión). Paso 2: el botón "Completar lección" aparece deshabilitado con el texto "Completa la autoevaluación antes de marcar la lección como finalizada."; un clic no produce efecto (0 de 17 sin cambios). Paso 4: tras responder PE1/PE2 correctamente y confirmar el envío definitivo, el botón se habilita; al pulsarlo la lección queda "Lección completada" (1 de 17 · 6%). Paso 5: en `notacion-o-theta-y-omega` (sin autoevaluación ni preguntas montadas) el botón está habilitado desde el inicio y completa sin exigir nada (2 de 17 · 12%).
-**Hallazgos:** {{observaciones}}
 
 ### TC-042-011 — Fail-closed: si el estado de la autoevaluación no se puede consultar, no se completa la lección
 **Rol que ejecuta:** estudiante **E4**, con inducción de fallo asistida
@@ -347,7 +345,6 @@ cada una empieza con su etiqueta: `[042 PA1] …`, `[042 PA2] …`, etc.
 **Resultado esperado:** una pregunta publicada sin montar es invisible para el estudiante en todas las lecciones y **no** afecta a ningún denominador, pero es visible y localizable desde el banco: `list_lesson_questions` da la lista real y permite detectar el olvido (a diferencia del slug mal escrito del modelo anterior, que era indetectable). Al montarla, aparece de inmediato tras recargar.
 **Estado:** ✅ Aprobado
 **Hallazgos:** Confirmado por API antes de tocar el navegador: PY ausente en `list_lesson_questions` de LA (5), LB (1) y LE (2); `get_question` la muestra `is_published: true` con `lessons: []`. Confirmado con navegador real (panel del docente): tras `mount_question_in_lesson` sobre LA, "Clave de respuestas" pasó de 5 a **6 preguntas** de inmediato al recargar (F5), sin redeploy ni cambios de contenido MDX.
-**Hallazgos:** {{observaciones}}
 
 ---
 
@@ -769,7 +766,7 @@ order by slug;
 
 | Slug resultante | Tags originales fusionados | Reportado al usuario | Decisión |
 |---|---|---|---|
-| {{slug}} | {{tag-a}}, {{tag-b}} | ⬜ | {{conservar / crear término aparte}} |
+| `recursion` | `recursion`, `recursión` | ✅ (Fase 2) | Conservar fusionado — la colisión fue sembrada deliberadamente en la Fase 0 para ejercitar esta detección; `min(label)` la resolvió a `recursion` (sin tilde) de forma determinista. No se creó término aparte. |
 
 ---
 

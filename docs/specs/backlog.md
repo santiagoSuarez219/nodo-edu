@@ -26,6 +26,34 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+## DEBT-056 — `DROP` de `questions.course_slug`/`lesson_slug`/`tags`, deprecadas por spec-042
+
+**Origen:** spec-042 (D1), 2026-08-06.
+**Prioridad:** Media — sin impacto funcional mientras existan (nadie las lee
+ni las escribe desde la Fase 3 de spec-042), pero es esquema muerto que
+confunde a quien lo lea sin este contexto.
+
+D1 de spec-042 decidió deliberadamente **no** eliminar estas tres columnas en
+el mismo spec: el backfill de `lesson_questions`/`keywords` alimenta el
+denominador de la nota de autoevaluación (spec-040), y mientras las columnas
+sigan ahí la consulta de paridad de la Fase 2 se puede volver a correr contra
+producción si algo no cuadra tras el despliegue. Quedaron marcadas con
+`comment on column ... is 'DEPRECADO spec-042: ...'`
+(`supabase/migrations/20260806000003_deprecate_question_slug_columns.sql`).
+
+**Acción:** tras un ciclo completo en producción sin necesidad de reejecutar
+la verificación de paridad, abrir un spec de seguimiento que:
+- Reejecute las tres consultas de verificación de
+  `docs/testing/test-042-banco-preguntas-keywords.md` contra producción una
+  última vez.
+- `DROP COLUMN` de `course_slug`, `lesson_slug` y `tags` en `questions`.
+- Elimine el índice `(course_slug, lesson_slug)` de
+  `20260715000000_init_questions.sql` si sigue existiendo sin uso.
+- Confirme que ningún código (incluido `question-bank-mcp`) sigue
+  referenciando estas columnas antes del `DROP`.
+
+---
+
 ## DEBT-055 — `list_questions`/`GET /api/questions` ignora en silencio el filtro `tag` retirado
 
 **Origen:** Ronda manual `test-042-banco-preguntas-keywords.md`, TC-MCP-042-013,

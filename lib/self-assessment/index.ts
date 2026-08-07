@@ -56,7 +56,13 @@ type AttemptRow = {
 // getAttemptReview) — order_index del montaje, luego questions.created_at,
 // luego questions.id. Si diverge entre puntos, el estudiante ve un orden y
 // la revisión otro.
-function sortByMountOrder(rows: LessonQuestionRow[]): LessonQuestionRow[] {
+// Genérica sobre la forma mínima que necesita (order_index + id/created_at de
+// la pregunta) para que la reutilicen tanto las consultas completas (con
+// choices) como las livianas (submitSelfAssessment, que no necesita choices
+// en este punto) — un solo lugar define el desempate, no una copia por sitio.
+function sortByMountOrder<T extends { order_index: number; question: { id: string; created_at: string } }>(
+  rows: T[]
+): T[] {
   return [...rows].sort((a, b) => {
     if (a.order_index !== b.order_index) return a.order_index - b.order_index;
     const createdDiff =
@@ -408,8 +414,8 @@ export async function submitSelfAssessment(
     }
 
     // Punto 6 (spec-042): el conjunto de preguntas a calificar sale del
-    // mismo origen y el mismo desempate que Punto 1 (D4) — debe ser
-    // EXACTAMENTE el conjunto que el estudiante vio, o
+    // mismo origen y el mismo desempate que Punto 1 (D4, sortByMountOrder) —
+    // debe ser EXACTAMENTE el conjunto que el estudiante vio, o
     // Object.keys(answers).length !== questionCount (abajo) rechaza el envío
     // como incompleto. Sin `choices` acá: se piden por pregunta más abajo.
     type MountedQuestionRow = {
@@ -429,16 +435,9 @@ export async function submitSelfAssessment(
       return { ok: false, reason: 'error' };
     }
 
-    const questions = ((mountRows as unknown as MountedQuestionRow[]) ?? [])
-      .slice()
-      .sort((a, b) => {
-        if (a.order_index !== b.order_index) return a.order_index - b.order_index;
-        const createdDiff =
-          new Date(a.question.created_at).getTime() - new Date(b.question.created_at).getTime();
-        if (createdDiff !== 0) return createdDiff;
-        return a.question.id.localeCompare(b.question.id);
-      })
-      .map((row) => ({ id: row.question.id }));
+    const questions = sortByMountOrder((mountRows as unknown as MountedQuestionRow[]) ?? []).map(
+      (row) => ({ id: row.question.id })
+    );
 
     const questionCount = questions.length;
     if (questionCount === 0) {

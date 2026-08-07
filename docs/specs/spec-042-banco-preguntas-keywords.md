@@ -650,17 +650,34 @@ de `.claude/skills/lesson-authoring/SKILL.md` (~520), que hoy dice
       (orden correcto) y `unmount_question_from_lesson`. Datos de prueba
       eliminados al terminar.
 
-### Fase 7 — Pruebas
-- [ ] Ejecutar los casos manuales de
+### Fase 7 — Pruebas ✅ Completada 2026-08-07
+- [x] Ejecutar los casos manuales de
       `docs/testing/test-042-banco-preguntas-keywords.md` con el usuario (protocolo
       de "Pruebas manuales asistidas por Claude"): preparación de datos vía API, un
-      caso a la vez, registro de hallazgos caso por caso.
-- [ ] Ejecutar los `TC-MCP-042-*` contra la API local.
-- [ ] Eliminar vía API todos los datos de prueba, en orden inverso, y marcar la
-      limpieza en el archivo de test.
-- [ ] Invocar `@tester` para las pruebas automáticas (cuando exista framework; hoy
-      "por definir" en `CLAUDE.md` — su ausencia no bloquea el `[DONE]`).
-- [ ] Invocar `@reviewer` antes de marcar `[DONE]`.
+      caso a la vez, registro de hallazgos caso por caso. 13/13 `TC-042-*`
+      aprobados (incluidos TC-042-001/002 adaptados a verificación "después" por
+      acuerdo explícito del usuario, y TC-042-011 con fallo real inducido —
+      `REVOKE`/`GRANT` en `mirp-lab` — autorizado en el momento y revertido de
+      inmediato).
+- [x] Ejecutar los `TC-MCP-042-*` contra la API local. 16/16 aprobados; dos con
+      hallazgos menores no bloqueantes escalados a `docs/specs/backlog.md`
+      (DEBT-054, DEBT-055).
+- [x] Eliminar vía API todos los datos de prueba, en orden inverso, y marcar la
+      limpieza en el archivo de test. Verificado sin filas huérfanas en
+      `lesson_progress`/`self_assessment_attempts`; catálogo de `keywords` de
+      vuelta a las 7 originales del backfill.
+- [x] Invocar `@tester` para las pruebas automáticas — no aplica: el framework de
+      testing automatizado sigue "por definir" en `CLAUDE.md`; su ausencia no
+      bloquea el `[DONE]` (regla explícita del proyecto).
+- [x] Invocar `@reviewer` antes de marcar `[DONE]`: **APROBADO** (con hallazgos no
+      bloqueantes). Verificaciones automáticas limpias (typecheck, lint, build,
+      build del MCP). Los dos hallazgos 🟠 (deuda del `DROP` sin registrar,
+      errores de `question_keywords` descartados en create/update) se
+      corrigieron tras la revisión: ver DEBT-056 y el manejo de errores en
+      `_createQuestionForActor`/`_updateQuestionForActor`
+      (`lib/questions/index.ts`). El 🟡 sobre el desempate duplicado en
+      `submitSelfAssessment` también se corrigió, reutilizando
+      `sortByMountOrder` (genérica ahora) en vez de una copia inline.
 
 > **Orden de despliegue a producción** (no forma parte de este spec; requiere
 > confirmación explícita en su momento): migraciones de las Fases 1 y 2

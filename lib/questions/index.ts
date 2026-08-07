@@ -146,30 +146,43 @@ async function _createQuestionForActor(
 
   if (error) return { ok: false, reason: "error", error: error.message };
 
-  await Promise.all([
+  const detailResults = await Promise.all([
     choices?.length
       ? supabase
           .from("question_choices")
           .insert(choices.map((c) => ({ ...c, question_id: question.id })))
-      : Promise.resolve(),
+      : Promise.resolve({ error: null }),
     rubric
       ? supabase
           .from("question_rubrics")
           .insert({ ...rubric, question_id: question.id })
-      : Promise.resolve(),
+      : Promise.resolve({ error: null }),
     challenge_tests?.length
       ? supabase
           .from("coding_challenge_tests")
           .insert(
             challenge_tests.map((t) => ({ ...t, question_id: question.id }))
           )
-      : Promise.resolve(),
+      : Promise.resolve({ error: null }),
     keywords?.length
       ? supabase
           .from("question_keywords")
           .insert(keywords.map((slug) => ({ question_id: question.id, keyword_slug: slug })))
-      : Promise.resolve(),
+      : Promise.resolve({ error: null }),
   ]);
+
+  // No se descartan los errores de estos inserts (DEBT-040): si alguno falla
+  // (p. ej. una keyword borrada entre la validación de D3 y este insert), la
+  // pregunta ya existe con datos parciales — se reporta en vez de devolver
+  // `ok: true` con un estado incompleto y sin señal para el agente.
+  const detailError = detailResults.find((r) => r.error)?.error;
+  if (detailError) {
+    return {
+      ok: false,
+      reason: "error",
+      error: `La pregunta se creó (id ${question.id}) pero falló al guardar sus detalles: ${detailError.message}`,
+    };
+  }
 
   return { ok: true, question: question as Question };
 }
@@ -219,30 +232,43 @@ async function _updateQuestionForActor(
     supabase.from("question_keywords").delete().eq("question_id", questionId),
   ]);
 
-  await Promise.all([
+  const detailResults = await Promise.all([
     choices?.length
       ? supabase
           .from("question_choices")
           .insert(choices.map((c) => ({ ...c, question_id: questionId })))
-      : Promise.resolve(),
+      : Promise.resolve({ error: null }),
     rubric
       ? supabase
           .from("question_rubrics")
           .insert({ ...rubric, question_id: questionId })
-      : Promise.resolve(),
+      : Promise.resolve({ error: null }),
     challenge_tests?.length
       ? supabase
           .from("coding_challenge_tests")
           .insert(
             challenge_tests.map((t) => ({ ...t, question_id: questionId }))
           )
-      : Promise.resolve(),
+      : Promise.resolve({ error: null }),
     keywords?.length
       ? supabase
           .from("question_keywords")
           .insert(keywords.map((slug) => ({ question_id: questionId, keyword_slug: slug })))
-      : Promise.resolve(),
+      : Promise.resolve({ error: null }),
   ]);
+
+  // No se descartan los errores (DEBT-040): el borrado previo (:215-220) ya
+  // se ejecutó, así que un fallo aquí deja la pregunta con detalles
+  // incompletos (posiblemente sin keywords) — se reporta en vez de un
+  // `ok: true` que oculta la pérdida.
+  const detailError = detailResults.find((r) => r.error)?.error;
+  if (detailError) {
+    return {
+      ok: false,
+      reason: "error",
+      error: `La pregunta se actualizó (id ${questionId}) pero falló al reescribir sus detalles: ${detailError.message}`,
+    };
+  }
 
   return { ok: true, question: question as Question };
 }
