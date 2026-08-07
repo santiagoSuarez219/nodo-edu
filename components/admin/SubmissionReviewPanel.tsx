@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { finalizeGradingAction, gradeAnswerAction } from "@/lib/submissions/actions";
 import type { AnswerForReview, SubmissionForReview } from "@/lib/submissions/types";
+import { QuestionText } from "@/components/questions/QuestionText";
 
 interface SubmissionReviewPanelProps {
   submission: SubmissionForReview;
@@ -87,7 +88,7 @@ function AnswerCard({
             {TYPE_LABELS[answer.question_type] ?? answer.question_type}
           </p>
           <p className="text-sm font-medium text-gray-800 dark:text-gray-200">
-            {answer.question_stem}
+            <QuestionText text={answer.question_stem} />
           </p>
         </div>
         <div className="shrink-0 text-right">
@@ -99,13 +100,13 @@ function AnswerCard({
       </div>
 
       {answer.question_code_snippet && (
-        <div className="rounded-lg bg-gray-900 dark:bg-gray-950 border border-gray-700 px-4 py-3 overflow-x-auto">
+        <div className="rounded-lg bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-4 py-3 overflow-x-auto">
           {answer.question_code_language && (
-            <p className="text-xs text-gray-500 mb-1.5 uppercase tracking-wider">
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-wider">
               {answer.question_code_language}
             </p>
           )}
-          <pre className="text-sm text-green-300 font-mono whitespace-pre">
+          <pre className="text-sm text-gray-800 dark:text-gray-200 font-mono whitespace-pre">
             {answer.question_code_snippet}
           </pre>
         </div>
@@ -130,7 +131,7 @@ function AnswerCard({
                 <span className="w-4 h-4 shrink-0 rounded-full border border-gray-400 dark:border-gray-500 flex items-center justify-center">
                   {checked && <span className="w-2 h-2 rounded-full bg-current" />}
                 </span>
-                {choice.body}
+                <QuestionText text={choice.body} className="flex-1" />
                 {choice.is_correct && (
                   <span className="ml-auto text-xs text-green-600 dark:text-green-400 shrink-0">
                     correcta

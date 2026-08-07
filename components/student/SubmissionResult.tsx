@@ -1,5 +1,6 @@
 import { QuestionRenderer } from "./QuestionRenderer";
 import type { QuestionDetail, SubmissionWithAnswers } from "@/lib/submissions/types";
+import { QuestionText } from "@/components/questions/QuestionText";
 
 interface Props {
   submission: SubmissionWithAnswers;
@@ -65,7 +66,9 @@ export function SubmissionResult({ submission, questions, totalPoints }: Props) 
                     <p className="text-xs text-gray-400 dark:text-gray-500">
                       #{idx + 1} · {TYPE_LABELS[q.type] ?? q.type}
                     </p>
-                    <p className="text-sm font-medium text-gray-800 dark:text-gray-200">{q.stem}</p>
+                    <p className="text-sm font-medium text-gray-800 dark:text-gray-200">
+                      <QuestionText text={q.stem} />
+                    </p>
                   </div>
                   <div className="shrink-0 text-right">
                     <p className="text-sm font-mono font-semibold text-gray-900 dark:text-white">

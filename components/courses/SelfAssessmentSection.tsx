@@ -9,6 +9,7 @@ import { z } from 'zod';
 import { submitSelfAssessment } from '@/lib/self-assessment';
 import type { SelfAssessmentQuestion, AttemptReview } from '@/lib/self-assessment/types';
 import { QuestionStem } from '@/components/courses/QuestionStem';
+import { QuestionText } from '@/components/questions/QuestionText';
 
 interface SelfAssessmentSectionProps {
   courseSlug: string;
@@ -152,9 +153,10 @@ export function SelfAssessmentSection({
 
                     return (
                       <div key={choice.id} className={choiceClassName}>
-                        <span className="text-sm text-gray-800 dark:text-gray-200">
-                          {choice.body}
-                        </span>
+                        <QuestionText
+                          text={choice.body}
+                          className="text-sm text-gray-800 dark:text-gray-200"
+                        />
                         {choice.is_correct && (
                           <svg
                             className="ml-auto w-5 h-5 text-green-600 dark:text-green-400 shrink-0"
@@ -289,9 +291,10 @@ export function SelfAssessmentSection({
                           disabled={awaitingConfirmation}
                           className="mt-1 shrink-0 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
                         />
-                        <span className="text-sm text-gray-800 dark:text-gray-200">
-                          {choice.body}
-                        </span>
+                        <QuestionText
+                          text={choice.body}
+                          className="text-sm text-gray-800 dark:text-gray-200"
+                        />
                       </label>
                     );
                   })}

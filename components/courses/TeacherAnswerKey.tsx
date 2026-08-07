@@ -2,6 +2,7 @@
 
 import { useId, useMemo, useState } from 'react';
 import { QuestionStem } from '@/components/courses/QuestionStem';
+import { QuestionText } from '@/components/questions/QuestionText';
 import {
   ANSWER_KEY_COOKIE_NAME,
   ANSWER_KEY_COOKIE_MAX_AGE_SECONDS,
@@ -134,9 +135,10 @@ export function TeacherAnswerKey({ questions, initialExpanded }: TeacherAnswerKe
                             : 'border-gray-200 dark:border-gray-600'
                         }`}
                       >
-                        <span className="text-sm text-gray-800 dark:text-gray-200">
-                          {choice.body}
-                        </span>
+                        <QuestionText
+                          text={choice.body}
+                          className="text-sm text-gray-800 dark:text-gray-200"
+                        />
                         {highlight && (
                           <svg
                             className="ml-auto w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0"
