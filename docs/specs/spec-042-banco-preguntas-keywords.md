@@ -1,4 +1,4 @@
-# spec-042 — [TESTING] Banco de preguntas: desacople pregunta↔lección y catálogo de keywords
+# spec-042 — [DONE] Banco de preguntas: desacople pregunta↔lección y catálogo de keywords
 
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.
