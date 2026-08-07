@@ -13,7 +13,7 @@ import {
   updateServiceQuestion,
   deleteServiceQuestion,
 } from "@/lib/questions/service";
-import { QuestionSchema } from "@/lib/questions/schemas";
+import { QuestionSchema, findLegacyQuestionFields } from "@/lib/questions/schemas";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -54,6 +54,9 @@ export async function GET(
   }
 }
 
+// D6: reemplaza el recurso pregunta completo (choices/rubric/challenge_tests
+// y ahora también keywords), pero NUNCA toca los montajes en lecciones — eso
+// vive en /api/questions/{id}/lessons y /api/lessons/{c}/{l}/questions.
 export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ questionId: string }> }
@@ -83,6 +86,21 @@ export async function PATCH(
       return NextResponse.json(response, { status: 400 });
     }
 
+    // spec-042 D2: mismo rechazo explícito que POST /api/questions.
+    const legacyFields = findLegacyQuestionFields(body);
+    if (legacyFields.length > 0) {
+      const response = apiError(
+        "validation_error",
+        `El campo${legacyFields.length > 1 ? "s" : ""} ${legacyFields.map((f) => `'${f}'`).join(", ")} ya no ${
+          legacyFields.length > 1 ? "se aceptan" : "se acepta"
+        } en /api/questions. course_slug/lesson_slug se reemplazaron por el montaje ` +
+          "en POST /api/questions/{questionId}/lessons; tags se reemplazó por " +
+          "keywords (POST /api/keywords para crear el catálogo, GET /api/keywords para listarlo).",
+        { fields: legacyFields }
+      );
+      return NextResponse.json(response, { status: 422 });
+    }
+
     const parsed = QuestionSchema.safeParse(body);
     if (!parsed.success) {
       const fieldErrors = parsed.error.flatten().fieldErrors as Record<
@@ -94,16 +112,26 @@ export async function PATCH(
     }
 
     const input = parsed.data;
-    const question = await updateServiceQuestion(questionId, input);
+    const result = await updateServiceQuestion(questionId, input);
 
-    if (!question) {
-      const response = notFoundError(
-        "Pregunta no encontrada o no autorizado"
-      );
-      return NextResponse.json(response, { status: 404 });
+    if (!result.ok) {
+      if (result.reason === "invalid_keywords") {
+        const response = validationError({
+          keywords: result.missing.map(
+            (slug) => `La keyword '${slug}' no existe en el catálogo. Créala con POST /api/keywords.`
+          ),
+        });
+        return NextResponse.json(response, { status: 422 });
+      }
+      if (result.reason === "not_found") {
+        const response = notFoundError("Pregunta no encontrada o no autorizado");
+        return NextResponse.json(response, { status: 404 });
+      }
+      const response = internalError(result.error);
+      return NextResponse.json(response, { status: 500 });
     }
 
-    return NextResponse.json({ data: question }, { status: 200 });
+    return NextResponse.json({ data: result.question }, { status: 200 });
   } catch (err) {
     console.error("PATCH /api/questions/[questionId] error:", err);
     const response = internalError();
