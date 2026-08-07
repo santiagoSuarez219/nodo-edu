@@ -37,11 +37,13 @@ export const analisisDeAlgoritmos: Course = {
       order: 2,
       title: "Introducción a Python",
       summary:
-        "La sintaxis mínima de Python para escribir y medir algoritmos: tipos, control de flujo, funciones, estructuras nativas, comprensión de listas y manejo básico de errores.",
+        "La sintaxis mínima de Python para escribir y medir algoritmos: entornos virtuales, tipos, control de flujo, funciones, buenas prácticas de estilo (PEP 8, docstrings, type hints), estructuras nativas, comprensión de listas y manejo básico de errores.",
       topics: [
+        { title: "Entornos virtuales y gestión de dependencias (venv, pip, requirements.txt)" },
         { title: "Tipos de datos básicos: int, float, str, bool, None" },
         { title: "Estructuras de control: if/elif/else, for, while" },
         { title: "Funciones: definición, parámetros, valores de retorno, docstrings" },
+        { title: "Buenas prácticas de código: PEP 8, docstrings y type hints" },
         { title: "Estructuras de datos nativas: listas, tuplas, diccionarios, conjuntos" },
         { title: "Comprensión de listas (*list comprehensions*)" },
         { title: "Manejo básico de excepciones (`try`/`except`) e importación de módulos" },
