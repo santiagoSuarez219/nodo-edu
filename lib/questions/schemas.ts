@@ -1,8 +1,9 @@
 import { z } from "zod";
 
+// spec-042 D2: sustituyeron a course_slug/lesson_slug/tags en el contrato de
+// creación/edición. Si el cliente los envía igual, la API responde 422 (ver
+// LEGACY_QUESTION_FIELDS más abajo) — no se ignoran en silencio.
 const QuestionBaseSchema = z.object({
-  course_slug: z.string().optional(),
-  lesson_slug: z.string().optional(),
   topic_title: z.string().optional(),
   stem: z.string().min(1, "El enunciado de la pregunta es requerido"),
   difficulty: z.coerce
@@ -11,7 +12,7 @@ const QuestionBaseSchema = z.object({
     .min(1, "Dificultad mínima: 1")
     .max(5, "Dificultad máxima: 5")
     .default(1),
-  tags: z.array(z.string()).default([]),
+  keywords: z.array(z.string()).default([]),
 });
 
 const ChoiceSchema = z.object({
@@ -107,12 +108,27 @@ export const QuestionSchema = z.discriminatedUnion("type", [
 
 export type QuestionFormInput = z.infer<typeof QuestionSchema>;
 
+// spec-042 D2: campos del contrato anterior. Si el body de
+// POST/PATCH /api/questions incluye alguno, la ruta responde 422 con un
+// mensaje que apunta al endpoint correcto, en vez de ignorarlos en silencio.
+export const LEGACY_QUESTION_FIELDS = ["course_slug", "lesson_slug", "tags"] as const;
+
+export function findLegacyQuestionFields(body: unknown): string[] {
+  if (typeof body !== "object" || body === null) return [];
+  return LEGACY_QUESTION_FIELDS.filter((field) =>
+    Object.prototype.hasOwnProperty.call(body, field)
+  );
+}
+
 export const ListQuestionsFiltersSchema = z.object({
+  // Se mantienen con el mismo nombre (D6): antes filtraban directamente sobre
+  // questions.course_slug/lesson_slug, ahora resuelven vía lesson_questions.
   course_slug: z.string().optional(),
   lesson_slug: z.string().optional(),
   type: z.enum(["multiple_choice", "open_text", "code_snippet", "code_write", "coding_challenge"]).optional(),
   difficulty: z.coerce.number().int().min(1).max(5).optional(),
-  tag: z.string().optional(),
+  // spec-042: sustituye a `tag` (vocabulario controlado).
+  keyword: z.string().optional(),
   is_published: z.enum(["true", "false"]).transform(v => v === "true").optional(),
   q: z.string().optional(),
   limit: z.coerce.number().int().min(1).max(100).default(50),
@@ -120,3 +136,22 @@ export const ListQuestionsFiltersSchema = z.object({
 });
 
 export type ListQuestionsFilters = z.infer<typeof ListQuestionsFiltersSchema>;
+
+// ─── Montaje de preguntas en lecciones (spec-042) ─────────────────────────
+
+export const MountQuestionSchema = z.object({
+  course_slug: z.string().min(1, "course_slug es requerido"),
+  lesson_slug: z.string().min(1, "lesson_slug es requerido"),
+});
+
+export type MountQuestionInput = z.infer<typeof MountQuestionSchema>;
+
+// D6: PUT /api/lessons/{curso}/{leccion}/questions SOLO reordena — la lista
+// debe coincidir exactamente con lo montado, o 422 sin escribir nada.
+export const ReorderLessonQuestionsSchema = z.object({
+  question_ids: z
+    .array(z.string().uuid("Cada elemento debe ser un UUID válido"))
+    .min(1, "Se requiere al menos una pregunta"),
+});
+
+export type ReorderLessonQuestionsInput = z.infer<typeof ReorderLessonQuestionsSchema>;

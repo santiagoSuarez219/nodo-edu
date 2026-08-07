@@ -54,5 +54,4 @@ export interface CoursePresentation {
   dates: ImportantDate[];
   bibliography: BibliographyItem[];
   documents: CourseDocument[];
-  conditions: string[];
 }

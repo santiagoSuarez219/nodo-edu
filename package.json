@@ -11,7 +11,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "seed:teacher": "node --env-file-if-exists=.env.local scripts/seed-teacher.mjs"
+    "seed:teacher": "node --env-file-if-exists=.env.local scripts/seed-teacher.mjs",
+    "reset:password:prod": "node --env-file-if-exists=.env.prod scripts/reset-account-password.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",

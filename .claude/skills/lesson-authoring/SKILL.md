@@ -428,33 +428,45 @@ documentación y organización del informe): **respetarla**, no inventar otra.
 ## 5. Cuestionario de cierre de lección (formativo, sin nota)
 
 Es la sección de autoevaluación al final de la lección (spec-011). **No se
-"crea" ningún objeto**: aparece sola cuando existen preguntas publicadas cuyo
-`course_slug` y `lesson_slug` coinciden con la lección.
+"crea" ningún objeto**: aparece sola cuando existen preguntas publicadas
+**montadas** en la lección (spec-042 — el montaje sustituyó a
+`course_slug`/`lesson_slug` como campos de la pregunta).
 
-Procedimiento con `question-bank-mcp`:
+Procedimiento con `question-bank-mcp` — **tres pasos, en orden**:
 
-1. `create_question` por cada pregunta.
-2. Revisar el contenido con el usuario.
-3. `publish_question` en cada una. **No existe `unpublish_question`** — publicar
-   es prácticamente irreversible desde el MCP.
+1. `create_question` por cada pregunta, con `keywords: string[]` (deben existir
+   en el catálogo — confirmar con `list_keywords` antes; nunca inventar un
+   slug de keyword, y si falta una proponerle al usuario crearla con
+   `create_keyword` antes de seguir).
+2. Revisar el contenido con el usuario, luego `publish_question` en cada una.
+   **No existe `unpublish_question`** — publicar es prácticamente irreversible
+   desde el MCP.
+3. `mount_question_in_lesson` por cada una, con el `course_slug`/`lesson_slug`
+   exactos de la lección. **Publicar NO monta**: una pregunta publicada y
+   nunca montada es invisible en cualquier autoevaluación, sin ningún error.
+   Verificar con `list_lesson_questions` que las preguntas quedaron
+   realmente visibles y en el orden esperado.
 
 Restricciones que determinan el diseño:
 
-- **Solo `multiple_choice` se muestra.** Los otros cuatro tipos con el mismo
-  `lesson_slug` se **ignoran en silencio** — no los crees para el cierre.
+- **Solo `multiple_choice` se muestra.** Los otros cuatro tipos montados en la
+  misma lección se **ignoran en silencio** — no los crees para el cierre.
 - `choices` necesita **mínimo 2** opciones y **al menos una** `is_correct: true`.
   Varias correctas ⇒ la UI pasa de radios a checkboxes automáticamente.
-- `course_slug`/`lesson_slug` son **texto libre sin foreign key**. Un slug mal
+- `course_slug`/`lesson_slug` del montaje son **texto libre sin foreign key**
+  hacia el catálogo de lecciones (vive en git, no en Postgres). Un slug mal
   escrito **no falla**: deja la pregunta huérfana e invisible para siempre.
   **Nunca inventar slugs** — copiarlos del nombre del archivo `.mdx`.
-- `difficulty` es 1–5. `tags` es un array de strings.
+- `difficulty` es 1–5. `keywords` es un array de slugs del catálogo
+  controlado (ya no hay `tags` libres).
 - Es formativo y **no persiste nada**: sin nota, sin intentos, feedback efímero.
 - Solo lo ven estudiantes matriculados.
 
 Diseño recomendado: **4–6 preguntas** por lección, una por sección `##` de peso,
 escalonadas en dificultad, con distractores que correspondan a errores
-conceptuales reales (no opciones absurdas de relleno). `tags` con el módulo y
-el concepto.
+conceptuales reales (no opciones absurdas de relleno). `keywords` con el
+módulo y el concepto (ej. `recursion`, `python`) — confirmadas en el catálogo,
+nunca inventadas al vuelo.
 
 ---
 
@@ -517,5 +529,5 @@ y que `mcp-servers/<nombre>/dist/` está compilado.
 - [ ] Entrada en `lib/courses/data/<curso>.ts` con `articleSlug`, `order` único y `summary` escrito.
 - [ ] Guía del estudiante con `kind: "guide"`; guía del docente en `microdiseno/labs/` y **sin** entrada TS.
 - [ ] Rúbrica suma 100 y cada criterio es verificable.
-- [ ] Preguntas de cierre: solo `multiple_choice`, `course_slug`/`lesson_slug` copiados literalmente, publicadas.
+- [ ] Preguntas de cierre: solo `multiple_choice`, publicadas y **montadas** en la lección (`mount_question_in_lesson`), verificado con `list_lesson_questions`.
 - [ ] `npm run build` pasa (el validador de cursos corre ahí).

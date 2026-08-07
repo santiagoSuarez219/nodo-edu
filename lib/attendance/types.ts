@@ -46,6 +46,15 @@ export type StudentAttendanceState =
     }
   | { status: 'unavailable' };
 
+// Resultado discriminado de extendSessionCode / rotateSessionCode. Sigue el
+// criterio de spec-037: los estados de negocio son valores distintos y
+// nombrados; 'unavailable' está reservado a fallos de infraestructura.
+export type RefreshCodeResult =
+  | { status: 'ok'; session: ClassSession }
+  | { status: 'not_open' } // negocio: ya no hay sesión abierta con ese id
+  | { status: 'code_collision' } // negocio: no se logró un código único (solo rotate)
+  | { status: 'unavailable' }; // infraestructura
+
 export type MarkAttendanceResult =
   | 'marked'
   | 'already_marked'
