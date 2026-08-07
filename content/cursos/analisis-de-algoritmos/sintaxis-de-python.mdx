@@ -1,12 +1,12 @@
 ---
-title: "Introducción a Python"
+title: "Sintaxis básica de Python"
 course: "Análisis de Algoritmos"
 course_code: "AA"
 level: "Ultimos semestres"
 type: "Apuntes teóricos"
 language: "Python 3"
 difficulty: "Básico"
-estimated_time: "50 minutos de clase (sesión T1, Semana 2)"
+estimated_time: "25 minutos de clase (sesión T, Semana 2 — primera mitad)"
 presentation: true
 slides_hint: "Cada sección ## es una diapositiva. Presentación sincrona."
 date: "2026-08-07"
@@ -14,27 +14,6 @@ author: "Asistente de Docencia"
 summary: ""
 updatedAt: "2026-08-07"
 ---
-
-## Antes de escribir código: entornos virtuales y dependencias
-
-**Situación:** en el laboratorio de esta semana vas a instalar `matplotlib` para graficar tiempos de ejecución. Más adelante, otro proyecto en tu computador podría necesitar una versión distinta de esa misma librería. Si instalas todo "a nivel del sistema" con un solo `pip`, ambos proyectos comparten las mismas versiones — y actualizar una para el proyecto nuevo puede romper silenciosamente el proyecto viejo.
-
-**En la práctica**, Python resuelve esto con **entornos virtuales**: una carpeta que contiene una copia aislada del intérprete y sus paquetes, exclusiva de un proyecto. `venv` (incluido en la instalación estándar) crea uno; lo activas para que `pip install` instale ahí y no en el sistema; y `pip freeze` vuelca la lista exacta de lo instalado a un archivo `requirements.txt`, que cualquier otra persona — o tú mismo en otra máquina — puede usar para reconstruir el mismo entorno con `pip install -r requirements.txt`.
-
-```mermaid
-flowchart TB
-  subgraph "Proyecto A"
-    A1["venv propio"] --> A2["matplotlib 3.5"]
-  end
-  subgraph "Proyecto B"
-    B1["venv propio"] --> B2["matplotlib 3.9"]
-  end
-  A1 -.->|"sin conflicto entre si"| B1
-```
-
-> **Entorno virtual:** copia aislada del intérprete de Python y sus paquetes instalados, propia de un proyecto. Evita que las dependencias de un proyecto interfieran con las de otro. `requirements.txt` es el registro reproducible de esas dependencias — cualquiera puede recrear el entorno exacto con `pip install -r requirements.txt`.
-
-El **Laboratorio 02** de esta semana practica el flujo completo paso a paso: creación, activación, instalación y verificación de reproducibilidad. Aquí solo necesitas entender **por qué** existe, antes de llegar a esa sesión.
 
 ## Tipos de datos básicos
 
@@ -100,55 +79,6 @@ Los valores entre paréntesis al definirla (`lista`) son **parámetros**; los va
 
 > **Función:** bloque de código con nombre propio, que recibe parámetros, ejecuta una tarea y opcionalmente devuelve un resultado con `return`. Se define una vez y se invoca cuantas veces haga falta.
 
-## Buenas prácticas: PEP 8, docstrings y type hints
-
-**Situación:** en este curso vas a entregar cinco informes de laboratorio que tu profesor va a leer y evaluar como código, no solo ejecutarlo. Además, desde la Semana 1 tu código vive en un repositorio Git que puede compartirse con otros. Un script que funciona pero es ilegible cuesta tiempo a quien lo lee — incluido tu propio yo, dos semanas después.
-
-**En la práctica**, la comunidad de Python estandarizó estas convenciones en la **PEP 8**, la guía de estilo oficial del lenguaje:
-
-- Nombres de variables y funciones en `snake_case` (`contar_comparaciones`, no `contarComparaciones` ni `ContarComparaciones`).
-- Nombres de clases en `PascalCase` (`ListaEnlazada`).
-- Máximo 79-99 caracteres por línea.
-- Un espacio alrededor de operadores y después de cada coma (`s = s + x`, no `s=s+x`).
-- 4 espacios de indentación, nunca tabulaciones — ya lo viste en "Estructuras de control", donde la indentación no es solo estilo: es sintaxis.
-
-```python
-# Estilo a evitar
-def EsPrimo(N):
-    if N<2:
-        return False
-    for i in range(2,N):
-        if N%i==0:
-            return False
-    return True
-
-# PEP 8, type hints y docstring
-def es_primo(numero: int) -> bool:
-    """Determina si un numero es primo.
-
-    Args:
-        numero: entero a evaluar.
-
-    Returns:
-        True si numero es primo, False en caso contrario.
-    """
-    if numero < 2:
-        return False
-    for i in range(2, numero):
-        if numero % i == 0:
-            return False
-    return True
-```
-
-Dos anotaciones más documentan la intención del código sin obligar a leer su cuerpo completo:
-
-- **Type hints** (`numero: int`, `-> bool`): anotan el tipo esperado de cada parámetro y del valor de retorno, igual que `lista: list` y `-> int` en `contar_comparaciones`. Python no los obliga en tiempo de ejecución — pasar un `str` donde se espera un `list` no lanza error solo por eso —, pero documentan la intención y permiten que el editor detecte inconsistencias antes de ejecutar el programa.
-- **Docstrings** en formato Google-style (`Args:`, `Returns:`): documentan qué hace la función, qué recibe y qué devuelve. En un informe de laboratorio, un docstring bien escrito suele ser la diferencia entre un lector que entiende tu código en diez segundos y uno que tiene que rastrear cada línea.
-
-> **PEP 8:** guía de estilo oficial de Python. No es un capricho estético: código que la sigue es más fácil de leer, revisar y mantener — especialmente en un repositorio compartido, como el que ya usas desde la Semana 1.
-
-El **Laboratorio 02** de esta semana te pide refactorizar un script que viola estas convenciones, aplicando PEP 8 y type hints de punta a punta. Cada uno de tus cinco informes se evalúa, en parte, con este mismo criterio.
-
 ## Estructuras de datos nativas
 
 **En la práctica**, Python trae cuatro estructuras nativas, cada una con un comportamiento distinto:
@@ -165,11 +95,11 @@ Usa **lista** cuando el orden importa y vas a modificar el contenido (los númer
 > **Mutabilidad:** una estructura es mutable si su contenido puede modificarse después de creada (`lista.append(6)`), e inmutable si no (una tupla no admite `punto[0] = 5`; hay que crear una tupla nueva).
 
 | Estructura  | Mutable | Ordenada             | Duplicados            | Sintaxis    |
-| ----------- | ------- | -------------------- | --------------------- | ----------- |
-| Lista       | Sí      | Sí                   | Sí                    | `[1, 2, 3]` |
-| Tupla       | No      | Sí                   | Sí                    | `(1, 2, 3)` |
-| Diccionario | Sí      | Por inserción (3.7+) | Claves no, valores sí | `{"a": 1}`  |
-| Conjunto    | Sí      | No                   | No                    | `{1, 2, 3}` |
+| ----------- | ------- | --------------------- | --------------------- | ----------- |
+| Lista       | Sí      | Sí                    | Sí                    | `[1, 2, 3]` |
+| Tupla       | No      | Sí                    | Sí                    | `(1, 2, 3)` |
+| Diccionario | Sí      | Por inserción (3.7+)  | Claves no, valores sí | `{"a": 1}`  |
+| Conjunto    | Sí      | No                     | No                    | `{1, 2, 3}` |
 
 ## De un `for` a una línea: comprensión de listas
 

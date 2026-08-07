@@ -6,7 +6,7 @@
 - **Semana / sesión:** Semana 2 (10–16 de agosto de 2026), Sesión 2 (P) — laboratorio práctico
 - **Duración:** 2 horas
 - **Momento evaluativo:** Ninguno. No hay ★ esta semana; el primer laboratorio evaluativo (★ Laboratorio 1) es en la Semana 6. Esta sesión alimenta únicamente la nota de **Seguimiento** (ejercicios de clase, consistencia de commits).
-- **Lección teórica de la que depende:** "Introducción a Python" (Sesión 1 T, misma semana) — tipos de datos básicos, estructuras de control (`if`/`elif`/`else`, `for`, `while`), funciones (definición, parámetros, retorno, *docstrings*), estructuras nativas (listas, tuplas, diccionarios, conjuntos), comprensión de listas y manejo básico de excepciones (`try`/`except`) e `import`.
+- **Lección teórica de la que depende:** "Sintaxis básica de Python" (Sesión 1 T, misma semana) — tipos de datos básicos, estructuras de control (`if`/`elif`/`else`, `for`, `while`), funciones (definición, parámetros, retorno, *docstrings*), estructuras nativas (listas, tuplas, diccionarios, conjuntos), comprensión de listas y manejo básico de excepciones (`try`/`except`) e `import`. También depende de "Buenas prácticas y entornos de trabajo en Python" (misma sesión T, segunda mitad) — PEP 8, `pip`, entornos virtuales y `requirements.txt`, que es lo que esta sesión práctica ejecuta directamente.
 - **Sprint del proyecto:** No aplica — este curso no tiene proyecto de aula (ver `info.md`). Esta sesión monta el **entorno técnico** (`venv`, `requirements.txt`, convenciones PEP 8) que el estudiante reutilizará sin volver a crearlo en cada una de las 14 sesiones prácticas restantes, incluidos los 5 informes evaluativos.
 
 ## Objetivo de la sesión
@@ -292,4 +292,4 @@ Se conecta directamente con la Semana 3 (insertion sort): el mismo `venv` y el m
 - Verificar que el repositorio de cada estudiante (Laboratorio 01, Semana 1) sigue accesible y que la carpeta `ejercicios-clase/` existe.
 - Tener listo el script mal escrito del Paso 3 (PEP 8) para proyectarlo tal cual, sin refactorizar de antemano frente al grupo.
 - Tener a la mano el enunciado exacto del ejercicio integrador (Paso 4) para proyectarlo o compartirlo por escrito.
-- Confirmar que la sesión T de la misma semana ("Introducción a Python") ya cubrió control de flujo, funciones, estructuras nativas, comprensión de listas y excepciones/`import` antes de esta sesión práctica; si quedó incompleta, reforzar brevemente esos conceptos al inicio del Bloque 4 o el Bloque 5.
+- Confirmar que la sesión T de la misma semana ("Sintaxis básica de Python" y "Buenas prácticas y entornos de trabajo en Python") ya cubrió control de flujo, funciones, estructuras nativas, comprensión de listas, excepciones/`import`, PEP 8 y entornos virtuales antes de esta sesión práctica; si quedó incompleta, reforzar brevemente esos conceptos al inicio del Bloque 4 o el Bloque 5.

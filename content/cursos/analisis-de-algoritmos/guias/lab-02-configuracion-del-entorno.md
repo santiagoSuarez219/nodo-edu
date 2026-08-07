@@ -17,13 +17,9 @@ Competencias esperadas:
 
 ## Requisitos Previos
 
-Antes de comenzar, debe dominar los conceptos de la lección "Introducción a Python" (Sesión 1, Semana 2):
-- Tipos de datos básicos: `int`, `float`, `str`, `bool`, `None`.
-- Estructuras de control: `if` / `elif` / `else`, `for`, `while`.
-- Funciones: definición, parámetros, valores de retorno, *docstrings*.
-- Estructuras de datos nativas: listas, tuplas, diccionarios, conjuntos.
-- Comprensión de listas.
-- Manejo básico de excepciones (`try` / `except`) y de módulos (`import`).
+Antes de comenzar, debe dominar los conceptos de las dos lecciones teóricas de esta semana:
+- De "Sintaxis básica de Python": tipos de datos básicos (`int`, `float`, `str`, `bool`, `None`), estructuras de control (`if` / `elif` / `else`, `for`, `while`), funciones (definición, parámetros, valores de retorno, *docstrings*), estructuras de datos nativas (listas, tuplas, diccionarios, conjuntos), comprensión de listas, y manejo básico de excepciones (`try` / `except`) y de módulos (`import`).
+- De "Buenas prácticas y entornos de trabajo en Python": convenciones PEP 8, `pip`, entornos virtuales y `requirements.txt` — es la lección que esta sesión práctica pone en marcha directamente.
 
 También necesita, de la lección "Fundamentos de control de versiones y flujo de trabajo" (Semana 1) y del "Laboratorio 01 — Repositorio del curso":
 - Su repositorio del curso ya creado, vinculado a GitHub, con la carpeta `ejercicios-clase/` en su raíz.
@@ -227,7 +223,7 @@ Esta sesión **no es evaluativa** (no corresponde a ninguno de los cinco laborat
 
 ## Recursos
 
-- **Apuntes del curso:** lección "Introducción a Python" (Semana 2, Sesión 1).
+- **Apuntes del curso:** lecciones "Sintaxis básica de Python" y "Buenas prácticas y entornos de trabajo en Python" (Semana 2, Sesión 1).
 - **Guía de estilo oficial:** PEP 8 — Style Guide for Python Code (`https://peps.python.org/pep-0008/`).
 - **Documentación oficial:** módulo `venv` de la biblioteca estándar de Python.
 - **Editor de código recomendado:** Visual Studio Code, con la extensión oficial de Python.
