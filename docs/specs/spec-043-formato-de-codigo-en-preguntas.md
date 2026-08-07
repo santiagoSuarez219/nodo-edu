@@ -1,4 +1,4 @@
-# spec-043 — [TESTING] Formato de código en enunciados y opciones de preguntas
+# spec-043 — [DONE] Formato de código en enunciados y opciones de preguntas
 
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.
@@ -209,12 +209,21 @@ su descripción menciona el formato del enunciado.
       (el texto debe guardarse y devolverse **sin alterar**) — se ejecuta como
       parte de la ronda manual (`TC-MCP-043-001`), Fase 5.
 
-### Fase 5 — Pruebas
+### Fase 5 — Pruebas ✅
 
-- [ ] Ejecutar la ronda manual de `docs/testing/test-043-formato-de-codigo-en-preguntas.md`.
-- [ ] Ejecutar las pruebas automáticas (cuando exista framework, ver "Testing"
-      en `CLAUDE.md`).
-- [ ] Limpiar los datos de prueba creados vía MCP.
+- [x] Ejecutar la ronda manual de `docs/testing/test-043-formato-de-codigo-en-preguntas.md`
+      — 13/13 casos aprobados (`TC-043-001`…`011`, `TC-MCP-043-001`/`002`).
+- [ ] Ejecutar las pruebas automáticas — no aplica: framework "por definir"
+      según "Testing" en `CLAUDE.md`.
+- [x] Limpiar los datos de prueba: curso académico, estudiante, 7 preguntas,
+      grupo de evaluación y envío, verificados vacíos tras la limpieza. El
+      curso académico y algunos recursos con envío real requirieron SQL
+      directo autorizado explícitamente por el usuario (bloqueados por 409 en
+      la API — comportamiento correcto, no un bug); el resto se limpió vía
+      MCP normal.
+- Hallazgo fuera de alcance registrado como **DEBT-057** en
+  `docs/specs/backlog.md`: `code_snippet`/`code_language` no se persisten
+  para `code_write`/`coding_challenge`.
 
 ## Criterios de aceptación
 
