@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { saveAnswerAction } from "@/lib/submissions/actions";
 import { QuestionRenderer, type QuestionAnswer } from "./QuestionRenderer";
 import type { QuestionDetail, Answer, Submission } from "@/lib/submissions/types";
+import { QuestionText } from "@/components/questions/QuestionText";
 
 interface Props {
   questions: QuestionDetail[];
@@ -233,7 +234,7 @@ export function AssignmentPlayer({
                   Pregunta {idx + 1} · {q.points.toFixed(2)} pts
                 </p>
                 <p className="text-base font-medium text-gray-900 dark:text-white leading-relaxed">
-                  {q.stem}
+                  <QuestionText text={q.stem} />
                 </p>
               </div>
 

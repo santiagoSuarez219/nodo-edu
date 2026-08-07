@@ -35,13 +35,40 @@ export const analisisDeAlgoritmos: Course = {
       slug: "sintaxis-de-python",
       articleSlug: "sintaxis-de-python",
       order: 2,
-      title: "Sintaxis de Python",
+      title: "Sintaxis básica de Python",
+      summary:
+        "La sintaxis mínima de Python para escribir y medir algoritmos: tipos, control de flujo, funciones, estructuras nativas, comprensión de listas y manejo básico de errores.",
       topics: [
         { title: "Tipos de datos básicos: int, float, str, bool, None" },
         { title: "Estructuras de control: if/elif/else, for, while" },
         { title: "Funciones: definición, parámetros, valores de retorno, docstrings" },
         { title: "Estructuras de datos nativas: listas, tuplas, diccionarios, conjuntos" },
+        { title: "Comprensión de listas (*list comprehensions*)" },
+        { title: "Manejo básico de excepciones (`try`/`except`) e importación de módulos" },
       ],
+    },
+    {
+      id: "buenas-practicas-y-entornos-python",
+      slug: "buenas-practicas-y-entornos-python",
+      articleSlug: "buenas-practicas-y-entornos-python",
+      order: 2.5,
+      title: "Buenas prácticas y entornos de trabajo en Python",
+      summary:
+        "Cómo escribir Python legible (PEP 8, docstrings, type hints) y cómo empaquetar las dependencias de un proyecto con pip, entornos virtuales y requirements.txt.",
+      topics: [
+        { title: "Buenas prácticas de código: PEP 8, docstrings y type hints" },
+        { title: "PIP: instalación de paquetes desde PyPI" },
+        { title: "Entornos virtuales y gestión de dependencias (venv, requirements.txt)" },
+      ],
+    },
+    {
+      id: "lab-02-configuracion-del-entorno",
+      slug: "lab-02-configuracion-del-entorno",
+      articleSlug: "lab-02-configuracion-del-entorno",
+      kind: "guide",
+      order: 2.75,
+      title: "Laboratorio 02 — Configuración del entorno de trabajo",
+      topics: [],
     },
     {
       id: "algoritmos-como-tecnologia",
