@@ -5,6 +5,36 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+## DEBT-057 — `code_snippet`/`code_language` no se persisten para `code_write`/`coding_challenge`
+
+**Origen:** ronda manual de test-043 (preparación de datos para TC-043-007),
+al crear la pregunta Q6 (`code_write`) vía `question-bank-mcp`
+**Prioridad:** Media — el campo dedicado de código queda inutilizable para
+estos dos tipos, aunque el resto de la pregunta funciona
+
+`create_question` y `update_question` aceptan `code_snippet`/`code_language`
+en el payload (el MCP los envía y la respuesta HTTP no reporta error), pero al
+releer la pregunta —tanto por `get_question` como por consulta directa a la
+tabla `questions`— `code_snippet` queda `null`. `code_language` sí se
+persiste. Reproducido dos veces: una en `create_question`, otra en
+`update_question` sobre la misma pregunta, ambas sin efecto.
+
+No se investigó la causa raíz (probablemente en `/api/questions` — validación
+Zod que descarta el campo, o mapeo incompleto en el insert/update del
+servicio). Queda fuera del alcance de spec-043, que no toca ese endpoint.
+
+**Impacto:** cualquier pregunta `code_snippet`, `code_write` o
+`coding_challenge` que dependa del bloque de código dedicado (no del `stem`)
+no lo muestra en ninguna superficie, porque el dato nunca llegó a la base.
+
+**Acción:** revisar `app/api/questions/route.ts` (POST) y
+`app/api/questions/[questionId]/route.ts` (PATCH) — o el servicio que
+componen — para confirmar por qué `code_snippet` se descarta mientras
+`code_language` sí pasa. Añadir un caso de prueba automática que cubra
+explícitamente la persistencia de `code_snippet` en creación y actualización.
+
+---
+
 > **Bloque A11Y-SORDOS (DEBT-047 … DEBT-051)** — hallazgos de la revisión de
 > accesibilidad del 2026-08-05, motivada por la matrícula de estudiantes
 > sordos en `programacion-cientifica` (curso presencial, Nodo como apoyo).

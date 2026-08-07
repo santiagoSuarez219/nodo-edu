@@ -67,6 +67,27 @@ keyword que no está en el catálogo.
   `diagnostico`) o `ejercicio`. Puede quedar sin clasificar (`kind: null`) si
   no aplica ninguna con claridad — no fuerces una faceta que no encaja.
 
+## Formato de código en el enunciado y en las opciones (spec-043)
+
+La UI interpreta backticks de Markdown dentro de `stem` y de `choices[].body`
+para mostrar el código con formato monoespaciado (sin colores de sintaxis).
+Úsalos siempre que el enunciado o una opción mencionen código:
+
+- `` `código` `` — para identificadores, llamadas, valores y fragmentos cortos
+  dentro de la frase. Ej.: ``¿Qué imprime `print(len(x))` si `x = [1, 2]`?``
+- ```` ```lenguaje\n…\n``` ```` — para un fragmento multilínea embebido en el
+  enunciado (una cerca de triple backtick con salto de línea).
+- No dejes un backtick sin cerrar: se muestra literal (el carácter `` ` ``
+  aparece en pantalla) en vez de formatearse.
+- Si el código **es el objeto de la pregunta** (tipos `code_snippet`,
+  `code_write`, `coding_challenge`), sigue usando el campo dedicado
+  `code_snippet` + `code_language` en vez de embeberlo con backticks en el
+  `stem` — ese campo se renderiza aparte, en un bloque propio con su
+  lenguaje declarado.
+- Ningún otro formato de Markdown se interpreta: negritas (`**texto**`),
+  cursivas, listas o enlaces se muestran literales, con los asteriscos o
+  corchetes tal cual los escribas. No los uses esperando que se formateen.
+
 ## Capacidades
 
 - Explorar el banco existente con `list_questions` (por tipo, dificultad,

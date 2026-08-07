@@ -1,6 +1,7 @@
 "use client";
 
 import { AssignmentGroupWithVariants } from "@/lib/assignments/types";
+import { QuestionText } from "@/components/questions/QuestionText";
 
 interface AssignmentGroupDetailProps {
   group: AssignmentGroupWithVariants;
@@ -153,7 +154,9 @@ export default function AssignmentGroupDetail({ group }: AssignmentGroupDetailPr
                         {q.order_index + 1}.
                       </span>
                       <span className="flex-1 text-gray-700 dark:text-gray-200">
-                        {q.question?.stem || (
+                        {q.question?.stem ? (
+                          <QuestionText text={q.question.stem} />
+                        ) : (
                           <span className="italic text-gray-400 dark:text-gray-500">
                             Pregunta no encontrada ({q.question_id.slice(0, 8)}...)
                           </span>

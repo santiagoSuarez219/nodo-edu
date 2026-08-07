@@ -1,5 +1,153 @@
 ---
-title: "Sintaxis de Python"
+title: "Sintaxis básica de Python"
+course: "Análisis de Algoritmos"
+course_code: "AA"
+level: "Ultimos semestres"
+type: "Apuntes teóricos"
+language: "Python 3"
+difficulty: "Básico"
+estimated_time: "25 minutos de clase (sesión T, Semana 2 — primera mitad)"
+presentation: true
+slides_hint: "Cada sección ## es una diapositiva. Presentación sincrona."
+date: "2026-08-07"
+author: "Asistente de Docencia"
 summary: ""
-updatedAt: 2026-07-18
+updatedAt: "2026-08-07"
 ---
+
+## Tipos de datos básicos
+
+```python
+n = 10000                       # int: numero entero
+tiempo = 0.0034                 # float: numero con decimales
+algoritmo = "insertion_sort"    # str: texto
+ordenado = True                 # bool: verdadero o falso
+resultado = None                # None: "todavia no hay valor"
+```
+
+> **Tipado dinámico:** el tipo de una variable no se declara explícitamente; se determina en tiempo de ejecución según el valor que contiene, y puede cambiar si la variable se reasigna. La funcion `type()` devuelve el tipo de un valor o variable.
+
+## Estructuras de control
+
+```python
+tiempo = 0.0034
+
+if tiempo < 0.001:
+    categoria = "rapido"
+elif tiempo < 0.01:
+    categoria = "moderado"
+else:
+    categoria = "lento"
+
+for tamano in [100, 1000, 10000]:
+    print(f"Probando con n = {tamano}")
+
+intentos = 0
+while intentos < 3:
+    intentos = intentos + 1
+```
+
+> **Bloque indentado:** en Python, el conjunto de instrucciones que pertenecen a un `if`, `for`, `while` o función se delimita por indentación (4 espacios, por convención de PEP 8), no por llaves `{}`.
+
+## Funciones
+
+Una **función** empaqueta código, tiene un nombre, parámetros y valores de retorno. La puedes reutilizar las veces que sean necesarias pasandole diferentes argumentos.
+
+```python
+def contar_comparaciones(lista: list) -> int:
+    """Cuenta cuantas comparaciones hace insertion sort sobre 'lista'.
+
+    Args:
+        lista: lista de numeros a ordenar.
+
+    Returns:
+        El numero total de comparaciones realizadas.
+    """
+    comparaciones = 0
+    for i in range(1, len(lista)):
+        j = i
+        while j > 0 and lista[j - 1] > lista[j]:
+            comparaciones = comparaciones + 1
+            lista[j - 1], lista[j] = lista[j], lista[j - 1]
+            j = j - 1
+    return comparaciones
+
+total = contar_comparaciones([5, 2, 9, 1])
+```
+
+Los valores entre paréntesis al definirla (`lista`) son **parámetros**; los valores que le pasas al llamarla (`[5, 2, 9, 1]`) son **argumentos**. `return` entrega el resultado a quien llamó la función; una función sin `return` explícito entrega `None`. El texto entre `"""..."""` justo después de `def` es el **docstring**: documenta qué hace la función, sin necesidad de leer su cuerpo.
+
+> **Función:** bloque de código con nombre propio, que recibe parámetros, ejecuta una tarea y opcionalmente devuelve un resultado con `return`. Se define una vez y se invoca cuantas veces haga falta.
+
+## Estructuras de datos nativas
+
+**En la práctica**, Python trae cuatro estructuras nativas, cada una con un comportamiento distinto:
+
+```python
+numeros = [5, 2, 9, 1]                      # lista: mutable, ordenada, admite duplicados
+punto = (10000, 0.0034)                     # tupla: inmutable, ordenada, admite duplicados
+tiempos = {10000: 0.0034, 1000: 0.0002}     # diccionario: clave -> valor
+tamanos_probados = {100, 1000, 10000}       # conjunto: sin orden, sin duplicados
+```
+
+Usa **lista** cuando el orden importa y vas a modificar el contenido (los números que vas a ordenar). Usa **tupla** cuando el dato es fijo y no debería cambiarse por accidente (un par `(tamaño, tiempo)` ya medido). Usa **diccionario** cuando necesitas buscar un valor por una clave (el tiempo medido para cada tamaño de entrada). Usa **conjunto** cuando solo te importa "¿esto ya está?", sin importar el orden ni repetir.
+
+> **Mutabilidad:** una estructura es mutable si su contenido puede modificarse después de creada (`lista.append(6)`), e inmutable si no (una tupla no admite `punto[0] = 5`; hay que crear una tupla nueva).
+
+| Estructura  | Mutable | Ordenada             | Duplicados            | Sintaxis    |
+| ----------- | ------- | --------------------- | --------------------- | ----------- |
+| Lista       | Sí      | Sí                    | Sí                    | `[1, 2, 3]` |
+| Tupla       | No      | Sí                    | Sí                    | `(1, 2, 3)` |
+| Diccionario | Sí      | Por inserción (3.7+)  | Claves no, valores sí | `{"a": 1}`  |
+| Conjunto    | Sí      | No                     | No                    | `{1, 2, 3}` |
+
+## De un `for` a una línea: comprensión de listas
+
+**Situación:** quieres construir la lista de los cuadrados de los tamaños de entrada que vas a probar: `[100, 1000, 10000]` → `[10000, 1000000, 100000000]`. La forma más directa que ya conoces es un `for` que va llenando una lista vacía:
+
+```python
+tamanos = [100, 1000, 10000]
+cuadrados = []
+for t in tamanos:
+    cuadrados.append(t ** 2)
+```
+
+Funciona, pero son cuatro líneas para una idea simple: "el cuadrado de cada elemento". Python permite expresar exactamente esa idea en una sola línea, con **comprensión de listas**:
+
+```python
+cuadrados = [t ** 2 for t in tamanos]
+
+# con filtro: solo los tamanos mayores a 500
+grandes = [t for t in tamanos if t > 500]
+```
+
+Ambas versiones producen el mismo resultado. La segunda es más corta, pero no siempre más clara — si la expresión dentro de `[...]` empieza a ser difícil de leer, el `for` explícito de varias líneas sigue siendo la opción correcta. Es idiomática en Python y la vas a ver constantemente en el código de otros, así que necesitas poder leerla aunque no la uses siempre.
+
+## Cuando algo falla en tiempo de ejecución: excepciones e `import`
+
+**Situación:** una función de ordenamiento recibe una lista vacía, o alguien intenta dividir el tiempo total entre cero repeticiones. El programa no debería simplemente detenerse con un mensaje críptico — necesitas anticipar ese fallo y decidir qué hacer.
+
+**En la práctica**, Python permite envolver el código riesgoso en un bloque `try`, y capturar el error en `except` sin que el programa se caiga:
+
+```python
+try:
+    promedio = tiempo_total / repeticiones
+except ZeroDivisionError:
+    print("No se registraron repeticiones; no se puede promediar.")
+    promedio = None
+```
+
+> **Excepción:** error que ocurre durante la ejecución del programa (no al escribirlo). Un bloque `try`/`except` permite anticiparlo y responder sin que el programa se detenga abruptamente.
+
+El otro mecanismo que vas a usar desde el primer laboratorio es traer código que no escribiste tú: la librería `time` para medir tiempos, o `matplotlib` para graficar. Eso se hace con `import`:
+
+```python
+import time
+from matplotlib import pyplot as plt
+
+inicio = time.time()
+# ... código a medir ...
+duracion = time.time() - inicio
+```
+
+> **`import`:** trae al script el código de un módulo o librería externa, para usar sus funciones sin reescribirlas.

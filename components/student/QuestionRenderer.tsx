@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { runCodeAction } from "@/lib/submissions/actions";
 import type { QuestionDetail } from "@/lib/submissions/types";
+import { QuestionText } from "@/components/questions/QuestionText";
 
 export interface QuestionAnswer {
   selected_choice_ids: string[];
@@ -68,7 +69,7 @@ export function QuestionRenderer({ question, answer, onChange, disabled = false 
                 onChange={(e) => toggleChoice(c.id, e.target.checked)}
                 className="mt-0.5 w-4 h-4 shrink-0 accent-blue-600"
               />
-              <span className="text-sm text-gray-800 dark:text-gray-200">{c.body}</span>
+              <QuestionText text={c.body} className="text-sm text-gray-800 dark:text-gray-200" />
               {revealed && !checked && c.is_correct && (
                 <span className="ml-auto text-xs text-green-600 dark:text-green-400 shrink-0">
                   correcta
@@ -87,11 +88,15 @@ export function QuestionRenderer({ question, answer, onChange, disabled = false 
   }
 
   const codeBlock = code_snippet && (
-    <div className="rounded-lg bg-gray-900 dark:bg-gray-950 border border-gray-700 px-4 py-3 overflow-x-auto">
+    <div className="rounded-lg bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-4 py-3 overflow-x-auto">
       {code_language && (
-        <p className="text-xs text-gray-500 mb-1.5 uppercase tracking-wider">{code_language}</p>
+        <p className="text-xs text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-wider">
+          {code_language}
+        </p>
       )}
-      <pre className="text-sm text-green-300 font-mono whitespace-pre">{code_snippet}</pre>
+      <pre className="text-sm text-gray-800 dark:text-gray-200 font-mono whitespace-pre">
+        {code_snippet}
+      </pre>
     </div>
   );
 
