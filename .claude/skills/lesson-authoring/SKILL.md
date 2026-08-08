@@ -14,7 +14,7 @@ gana el código y hay que actualizar este archivo.
 
 ---
 
-## 1. Los cinco artefactos de una lección
+## 1. Los seis artefactos de una lección
 
 | # | Artefacto | Ubicación | ¿Se publica? |
 |---|-----------|-----------|--------------|
@@ -22,6 +22,7 @@ gana el código y hay que actualizar este archivo.
 | 1b | Registro de la lección | `lib/courses/data/<curso>.ts` | Requisito para publicar |
 | 2 | Cuestionario de cierre | Banco de preguntas (Supabase, vía `question-bank-mcp`) | Sí, al publicar cada pregunta |
 | 3 | Guía de laboratorio — docente | `content/cursos/<curso>/microdiseno/labs/<slug>-docente.md` | **No** |
+| 3b | Apuntes de clase — docente (spec-044) | `content/cursos/<curso>/apuntes/<articleSlug>.md` | Sí, pero **solo visible a owner/admin** (nunca a estudiantes) |
 | 4 | Guía de laboratorio — estudiante | `content/cursos/<curso>/guias/<slug>.md` | Sí (`kind: "guide"`) |
 | 5 | Quiz calificable A/B/C | Assignments (Supabase, vía `assignment-mcp`) | Solo a demanda |
 
@@ -341,6 +342,52 @@ Es el **guion de la sesión**, no una copia de la guía del estudiante. Seccione
 ## Materiales y preparación previa
   Qué debe tener listo el docente antes de entrar (datasets, repos, ramas).
 ```
+
+---
+
+## 3b. Apuntes de clase — docente (spec-044)
+
+`content/cursos/<curso>/apuntes/<articleSlug>.md`. Opcional: no todas las
+secciones lo tienen, y su ausencia no es un error (el bloque simplemente no
+aparece). Se resuelve por convención de nombre sobre el `articleSlug` de la
+lección o guía — no lleva frontmatter obligatorio ni entrada en TS.
+
+**No es lo mismo que el artefacto #3** (guía de laboratorio del docente en
+`microdiseno/labs/`). Son documentos con propósito distinto y nunca se migra
+contenido de uno a otro sin recortarlo:
+
+| | Guía docente (`microdiseno/labs/`) | Apunte de clase (`apuntes/`) |
+|---|---|---|
+| Contenido | Ficha de sesión, objetivos, **minutado**, desarrollo paso a paso, puntos de control, diferenciación, cierre | **Solo** el desarrollo de ejercicios y código — nada más |
+| Se publica en la app | No, nunca (`CLAUDE.md`: `microdiseno/` no se publica) | Sí, pero solo a owner/admin (renderizado dentro de "Vista docente") |
+| Para qué se usa | Planificar la sesión antes de dictarla | Consultarlo **durante** la clase, proyectado, como referencia rápida |
+
+Formato — solo el guion de ejercicios, sin ficha de sesión ni minutado:
+
+```
+> (Opcional) una nota de contexto breve para el docente, en blockquote.
+
+## Paso N — <nombre del ejercicio o parte>
+
+Enunciado breve + código de partida y/o solución de referencia en bloque de
+código con lenguaje explícito (` ```java `, ` ```python `, etc.).
+
+Punto a resaltar: qué observar o señalar en pantalla mientras se demuestra.
+
+## Errores frecuentes y cómo intervenir   (opcional)
+  | Síntoma observable | Causa probable | Intervención sugerida |
+```
+
+**Prohibido en este artefacto:** ficha de sesión, objetivos de sesión,
+minutado, puntos de control por minuto, diferenciación pedagógica, cierre de
+sesión. Todo eso sigue viviendo exclusivamente en la guía docente de
+`microdiseno/labs/` (artefacto #3), que no se toca ni se recorta al escribir
+un apunte de clase.
+
+⚠️ El pipeline compila `.md` como MDX (igual que las guías de laboratorio,
+ver §4): todo placeholder o genérico (`<tu-usuario>`, `List<Nodo>`) fuera de
+backticks rompe la compilación en vez de degradar. Va siempre entre
+backticks o dentro de un bloque de código.
 
 ---
 

@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { getLessonBySlug, isGuide, buildCourseOutline } from "@/lib/courses";
 import { getLessonArticle } from "@/lib/courses/content";
+import { getTeacherLessonNotes } from "@/lib/courses/teacher-notes";
 import { isLessonDisabled } from "@/lib/courses/availability";
 import { requireCourseAccess } from "@/lib/enrollments";
 import { hasCourseAccess } from "@/lib/enrollments/access";
@@ -155,15 +156,21 @@ export default async function LessonPage({ params }: LessonPageProps) {
   let teacherSessionsByCourseId: Record<string, OpenSessionResult> = {};
   let teacherAttendanceGroupId: string | null = null;
   let teacherAnswerKeyExpanded = false;
+  let teacherNotes: string | null = null;
 
   if (access.ok && (access.reason === "owner" || access.reason === "admin")) {
-    const [answerKey, academicCourses] = await Promise.all([
+    const [answerKey, academicCourses, notes] = await Promise.all([
       isGuideNode
         ? Promise.resolve([] as AnswerKeyQuestion[])
         : getAnswerKeyForLesson(courseSlug, lessonSlug),
       resolveAcademicCoursesBySlug(courseSlug, access),
+      // spec-044: apuntes docente — aplica a lecciones y guías por igual.
+      lesson.articleSlug
+        ? getTeacherLessonNotes(courseSlug, lesson.articleSlug)
+        : Promise.resolve(null as string | null),
     ]);
     teacherAnswerKey = answerKey;
+    teacherNotes = notes;
     // Solo id/name/code viajan al cliente — evita serializar enrollment_code
     // (dato sensible del docente) en el payload RSC sin necesidad.
     teacherCourses = academicCourses.map((academicCourse) => ({
@@ -256,6 +263,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
         <TeacherLessonPanel
           courseSlug={courseSlug}
           lessonSlug={lessonSlug}
+          teacherNotes={teacherNotes}
           answerKey={teacherAnswerKey}
           academicCourses={teacherCourses}
           initialSessionsByCourseId={teacherSessionsByCourseId}

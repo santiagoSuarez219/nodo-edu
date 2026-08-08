@@ -1,4 +1,4 @@
-# spec-044 — [NOT STARTED] Apuntes docente en la vista de lección/guía
+# spec-044 — [TESTING] Apuntes docente en la vista de lección/guía
 
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.
@@ -106,93 +106,102 @@ system prompt.
 ## Fases de implementación
 
 ### Fase 1 — Frontera de resolución de apuntes
-- [ ] Crear `lib/courses/teacher-notes.ts` con `CONTENT_ROOT` propio,
+- [x] Crear `lib/courses/teacher-notes.ts` con `CONTENT_ROOT` propio,
       consistente con el de `lib/courses/content.ts`.
-- [ ] Implementar `resolveTeacherNotesPath(courseSlug, articleSlug)` →
+- [x] Implementar `resolveTeacherNotesPath(courseSlug, articleSlug)` →
       `content/cursos/<courseSlug>/apuntes/<articleSlug>.md`. Sin
       discriminar por `kind`: lecciones y guías comparten carpeta (su
       `articleSlug` ya es único dentro del curso).
-- [ ] Validar `articleSlug` contra path traversal (rechazar `/`, `..`) antes
+- [x] Validar `articleSlug` contra path traversal (rechazar `/`, `..`) antes
       de componer la ruta.
-- [ ] Implementar `getTeacherLessonNotes(courseSlug, articleSlug): Promise<string | null>`:
-  - [ ] Gate interno: `hasCourseAccess(courseSlug)`; si `!ok` o `reason` no es
+- [x] Implementar `getTeacherLessonNotes(courseSlug, articleSlug): Promise<string | null>`:
+  - [x] Gate interno: `hasCourseAccess(courseSlug)`; si `!ok` o `reason` no es
         `"owner"` ni `"admin"` → `return null` **antes** de tocar el
         filesystem (mismo patrón que `getAnswerKeyForLesson`, spec-031).
-  - [ ] Leer con `fs.readFile` + `gray-matter`; devolver solo `content` (el
+  - [x] Leer con `fs.readFile` + `gray-matter`; devolver solo `content` (el
         frontmatter, si lo hubiera, se descarta).
-  - [ ] `ENOENT` → `null` (no hay apunte para esa sección, no es un error).
-  - [ ] Cualquier otro error de lectura/parseo → `console.error` + `null`
+  - [x] `ENOENT` → `null` (no hay apunte para esa sección, no es un error).
+  - [x] Cualquier otro error de lectura/parseo → `console.error` + `null`
         (fallar cerrado, nunca propagar ni tumbar la página).
 
 ### Fase 2 — Componente de presentación
-- [ ] Leer `DESIGN.md` completo y las skills `frontend-design` y
+- [x] Leer `DESIGN.md` completo y las skills `frontend-design` y
       `tailwind-css-patterns` antes de escribir markup de esta fase.
-- [ ] Crear `components/courses/TeacherClassNotes.tsx` (server component):
+- [x] Crear `components/courses/TeacherClassNotes.tsx` (server component):
       recibe `source: string`, renderiza `<MdxContent source={source} />`
       dentro de un contenedor con la misma estructura visual que el bloque
       "Asistencia" de `TeacherLessonPanel` (borde, cabecera con título
       "Apuntes de clase", cuerpo).
-- [ ] Colapsable con `<details>`/`<summary>` nativo, **abierto por defecto**.
+- [x] Colapsable con `<details>`/`<summary>` nativo, **abierto por defecto**.
       Sin persistencia de estado en este spec (ver "No incluye").
-- [ ] Usar exclusivamente tokens semánticos de `DESIGN.md`
+- [x] Usar exclusivamente tokens semánticos de `DESIGN.md`
       (`bg-brand-softer`, `text-brand`, escala `gray-*` con `dark:`), sin
       valores crudos de paleta ni toggle de tema manual.
 
 ### Fase 3 — Integración en la vista docente
-- [ ] En `app/(cursos)/[courseSlug]/[lessonSlug]/page.tsx`, declarar
+- [x] En `app/(cursos)/[courseSlug]/[lessonSlug]/page.tsx`, declarar
       `let teacherNotes: string | null = null` junto a las demás variables
       de la vista docente.
-- [ ] Dentro del bloque `access.ok && (access.reason === "owner" || access.reason === "admin")`,
+- [x] Dentro del bloque `access.ok && (access.reason === "owner" || access.reason === "admin")`,
       sumar la resolución al `Promise.all` existente: solo si
       `lesson.articleSlug` está definido; si no, `null`.
-- [ ] Pasar `teacherNotes={teacherNotes}` a `<TeacherLessonPanel />`.
-- [ ] En `TeacherLessonPanel.tsx`, añadir `teacherNotes: string | null` a
+- [x] Pasar `teacherNotes={teacherNotes}` a `<TeacherLessonPanel />`.
+- [x] En `TeacherLessonPanel.tsx`, añadir `teacherNotes: string | null` a
       `TeacherLessonPanelProps` y renderizar `<TeacherClassNotes />` como
       **primer** bloque del contenedor (antes de la clave de respuestas y de
       asistencia — es lo primero que el docente consulta al iniciar la
       clase), condicionado a `teacherNotes !== null`.
-- [ ] Envolver ese bloque en `<ErrorBoundary title="Los apuntes de clase no están disponibles" description="Ocurrió un error inesperado. Intenta de nuevo." />`,
+- [x] Envolver ese bloque en `<ErrorBoundary title="Los apuntes de clase no están disponibles" description="Ocurrió un error inesperado. Intenta de nuevo." />`,
       con el mismo criterio que ya usa `TeacherAttendanceControl`: un fallo
       de compilación MDX del apunte no debe tumbar el resto de la vista
       docente proyectada en clase.
-- [ ] Verificar que la rama `enrolled` y `LessonClosureFlow` no se alteran:
+- [x] Verificar que la rama `enrolled` y `LessonClosureFlow` no se alteran:
       ambas ramas siguen siendo mutuamente excluyentes por construcción.
 
 ### Fase 4 — Reservas y validación del catálogo
-- [ ] Añadir `"apuntes"` a `RESERVED_LESSON_SLUGS` en `lib/courses/index.ts`.
-- [ ] Confirmar por inspección que ningún nodo actual usa `slug: "apuntes"`,
+- [x] Añadir `"apuntes"` a `RESERVED_LESSON_SLUGS` en `lib/courses/index.ts`.
+- [x] Confirmar por inspección que ningún nodo actual usa `slug: "apuntes"`,
       para que el validador de arranque (IIFE al importar el módulo) no
       lance al aplicar este spec.
-- [ ] No extender la validación `existsSync` de artículos a los apuntes: son
+- [x] No extender la validación `existsSync` de artículos a los apuntes: son
       opcionales por diseño y validarlos rompería el build de los nodos que
       no tienen apunte.
 
 ### Fase 5 — Contenido semilla y documentación de formato
-- [ ] Crear `content/cursos/programacion-cientifica/apuntes/` con al menos un
+- [x] Crear `content/cursos/programacion-cientifica/apuntes/` con al menos un
       apunte real derivado del bloque "Desarrollo paso a paso" del
       `*-docente.md` correspondiente en `microdiseno/labs/`, sin minutado,
       objetivos ni diferenciación pedagógica.
-- [ ] Crear un segundo apunte para un nodo `kind: "guide"`, para ejercitar
+- [x] Crear un segundo apunte para un nodo `kind: "guide"`, para ejercitar
       ambos tipos de sección.
-- [ ] Dejar intactos los archivos de `microdiseno/labs/`: no se migran ni se
+- [x] Dejar intactos los archivos de `microdiseno/labs/`: no se migran ni se
       recortan en este spec.
-- [ ] Documentar en `.claude/skills/lesson-authoring/SKILL.md` el formato del
+- [x] Documentar en `.claude/skills/lesson-authoring/SKILL.md` el formato del
       apunte: encabezados de paso, bloques de código con lenguaje explícito,
       prohibición explícita de minutado/objetivos/ficha de sesión, y la
       advertencia de que el pipeline compila `.md` como MDX (escapar `<` y
       `{` fuera de fences de código, mismo riesgo documentado en spec-021).
-- [ ] Actualizar el árbol de `content/cursos/<curso>/` en `CLAUDE.md` con la
+- [x] Actualizar el árbol de `content/cursos/<curso>/` en `CLAUDE.md` con la
       carpeta `apuntes/` y la nota de que es material servido solo a
       owner/admin, distinto de `microdiseno/` (no publicado en ningún caso).
 
 ### Fase 6 — Verificación de despliegue
-- [ ] `npx tsc --noEmit`, `npm run lint` y `npm run build` en verde.
-- [ ] Verificar que los `.md` de `apuntes/` quedan incluidos en el file
+- [x] `npx tsc --noEmit`, `npm run lint` y `npm run build` en verde.
+- [x] Verificar que los `.md` de `apuntes/` quedan incluidos en el file
       tracing de Vercel (misma raíz `content/cursos/` que ya funciona en
       producción para artículos y guías); si no aparecieran, añadir
       `outputFileTracingIncludes` en `next.config` y documentarlo aquí.
-- [ ] Confirmar que ninguna ruta estática expone `content/` ni `apuntes/`
+- [x] Confirmar que ninguna ruta estática expone `content/` ni `apuntes/`
       directamente.
+
+**Nota de implementación:** no se agregó `outputFileTracingIncludes` a
+`next.config.ts`. `getTeacherLessonNotes` resuelve la ruta con el mismo
+patrón (`CONTENT_ROOT` fijo + segmento dinámico) que `getLessonArticle` usa
+para `guias/`, que ya funciona en producción (spec-021, `[DONE]`) sin esa
+configuración — se asume el mismo comportamiento de tracing por analogía
+estructural; **queda pendiente confirmarlo en un despliegue real** antes del
+primer uso en producción de este spec (ver checklist pre-despliegue de
+`CLAUDE.md`).
 
 ### Fase 7 — Pruebas
 - [ ] Ejecutar los casos manuales de
@@ -250,5 +259,5 @@ system prompt.
 
 ## Aprobación de implementación
 > Claude no escribe código de implementación hasta que esta sección esté marcada.
-- [ ] Paquete (spec + pruebas) aprobado por el usuario
-- **Fecha de aprobación:** {{fecha}}
+- [x] Paquete (spec + pruebas) aprobado por el usuario
+- **Fecha de aprobación:** 2026-08-08

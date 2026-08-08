@@ -1,6 +1,7 @@
 import { TeacherAnswerKey } from '@/components/courses/TeacherAnswerKey';
 import { TeacherAttendanceControl } from '@/components/courses/TeacherAttendanceControl';
 import type { AttendanceGroup } from '@/components/courses/TeacherAttendanceControl';
+import { TeacherClassNotes } from '@/components/courses/TeacherClassNotes';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import type { AnswerKeyQuestion } from '@/lib/self-assessment/types';
 import type { OpenSessionResult } from '@/lib/attendance/types';
@@ -8,6 +9,7 @@ import type { OpenSessionResult } from '@/lib/attendance/types';
 interface TeacherLessonPanelProps {
   courseSlug: string;
   lessonSlug: string;
+  teacherNotes: string | null;
   answerKey: AnswerKeyQuestion[];
   academicCourses: AttendanceGroup[];
   initialSessionsByCourseId: Record<string, OpenSessionResult>;
@@ -18,6 +20,7 @@ interface TeacherLessonPanelProps {
 export function TeacherLessonPanel({
   courseSlug,
   lessonSlug,
+  teacherNotes,
   answerKey,
   academicCourses,
   initialSessionsByCourseId,
@@ -36,6 +39,18 @@ export function TeacherLessonPanel({
       </div>
 
       <div className="flex flex-col gap-6">
+        {teacherNotes !== null && (
+          // Un fallo al compilar el Markdown del apunte (MDX interpreta
+          // `<...>` como JSX, ver spec-021 D5) no debe tumbar el resto de la
+          // lección proyectada en clase.
+          <ErrorBoundary
+            title="Los apuntes de clase no están disponibles"
+            description="Ocurrió un error inesperado. Intenta de nuevo."
+          >
+            <TeacherClassNotes source={teacherNotes} />
+          </ErrorBoundary>
+        )}
+
         {answerKey.length > 0 && (
           <TeacherAnswerKey
             questions={answerKey}
