@@ -1,4 +1,4 @@
-# spec-045 — [TESTING] Redirigir `/login` a `/` cuando ya hay sesión iniciada
+# spec-045 — [DONE] Redirigir `/login` a `/` cuando ya hay sesión iniciada
 
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.
@@ -69,11 +69,14 @@ agente, y ningún MCP existente cubre navegación de UI.
       `npm run build` verificados sin errores.
 
 ### Fase 2 — Pruebas
-- [ ] Ejecutar los casos manuales de
+- [x] Ejecutar los casos manuales de
       `docs/testing/test-045-redirect-login-autenticado.md`.
-- [ ] Invocar `@reviewer` antes de marcar el spec como `[DONE]` (cambio
-      pequeño; confirmar con el usuario si amerita revisión formal o basta
-      con `npx tsc --noEmit` + `npm run lint` + `npm run build`).
+      **Resultado: 4/4 aprobados** (ronda del 2026-08-08, entorno de
+      desarrollo, `http://localhost:3002`). Sin datos de prueba que limpiar
+      (solo se usó la cuenta de desarrollo ya sembrada `dev@nodo.local`).
+- [x] `@reviewer` — el usuario decidió explícitamente cerrar sin invocarlo,
+      dado el tamaño del cambio (guard de 2 líneas en un único archivo) y
+      que `tsc`/`lint`/`build` y las 4 pruebas manuales ya estaban en verde.
 
 ## Criterios de aceptación
 
