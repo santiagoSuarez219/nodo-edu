@@ -58,3 +58,31 @@ export async function getTeacherLessonNotes(
     return null;
   }
 }
+
+/**
+ * Comprobación liviana de existencia, para decidir si mostrar el botón
+ * "Apuntes de clase" en el header de la lección sin leer ni parsear el
+ * Markdown completo (eso lo hace la ruta dedicada `/apuntes` bajo demanda).
+ * Mismo gate y mismo tratamiento de errores que `getTeacherLessonNotes`.
+ */
+export async function hasTeacherLessonNotes(
+  courseSlug: string,
+  articleSlug: string
+): Promise<boolean> {
+  const access = await hasCourseAccess(courseSlug);
+  if (!access.ok || (access.reason !== "owner" && access.reason !== "admin")) {
+    return false;
+  }
+
+  if (!isSafeArticleSlug(articleSlug)) return false;
+
+  const filePath = resolveTeacherNotesPath(courseSlug, articleSlug);
+  try {
+    await fs.access(filePath);
+    return true;
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code === "ENOENT") return false;
+    console.error("[hasTeacherLessonNotes] fallo al comprobar apuntes docente:", err);
+    return false;
+  }
+}

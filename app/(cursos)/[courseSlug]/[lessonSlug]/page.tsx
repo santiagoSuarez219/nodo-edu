@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { getLessonBySlug, isGuide, buildCourseOutline } from "@/lib/courses";
 import { getLessonArticle } from "@/lib/courses/content";
-import { getTeacherLessonNotes } from "@/lib/courses/teacher-notes";
+import { hasTeacherLessonNotes } from "@/lib/courses/teacher-notes";
 import { isLessonDisabled } from "@/lib/courses/availability";
 import { requireCourseAccess } from "@/lib/enrollments";
 import { hasCourseAccess } from "@/lib/enrollments/access";
@@ -156,21 +156,24 @@ export default async function LessonPage({ params }: LessonPageProps) {
   let teacherSessionsByCourseId: Record<string, OpenSessionResult> = {};
   let teacherAttendanceGroupId: string | null = null;
   let teacherAnswerKeyExpanded = false;
-  let teacherNotes: string | null = null;
+  let teacherNotesHref: string | null = null;
 
   if (access.ok && (access.reason === "owner" || access.reason === "admin")) {
-    const [answerKey, academicCourses, notes] = await Promise.all([
+    const [answerKey, academicCourses, hasNotes] = await Promise.all([
       isGuideNode
         ? Promise.resolve([] as AnswerKeyQuestion[])
         : getAnswerKeyForLesson(courseSlug, lessonSlug),
       resolveAcademicCoursesBySlug(courseSlug, access),
       // spec-044: apuntes docente — aplica a lecciones y guías por igual.
+      // Solo comprueba existencia (sin leer el Markdown): el contenido se
+      // resuelve bajo demanda en la ruta dedicada `/apuntes`, para no
+      // engordar el payload de cada lección con texto que no se muestra ahí.
       lesson.articleSlug
-        ? getTeacherLessonNotes(courseSlug, lesson.articleSlug)
-        : Promise.resolve(null as string | null),
+        ? hasTeacherLessonNotes(courseSlug, lesson.articleSlug)
+        : Promise.resolve(false),
     ]);
     teacherAnswerKey = answerKey;
-    teacherNotes = notes;
+    teacherNotesHref = hasNotes ? `/${courseSlug}/${lessonSlug}/apuntes` : null;
     // Solo id/name/code viajan al cliente — evita serializar enrollment_code
     // (dato sensible del docente) en el payload RSC sin necesidad.
     teacherCourses = academicCourses.map((academicCourse) => ({
@@ -205,6 +208,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
         lesson={lesson}
         classIndex={classIndex}
         updatedAt={article?.frontmatter.updatedAt}
+        teacherNotesHref={teacherNotesHref}
       >
         {isBlockedForStudent ? (
           <LessonUnavailable
@@ -263,7 +267,6 @@ export default async function LessonPage({ params }: LessonPageProps) {
         <TeacherLessonPanel
           courseSlug={courseSlug}
           lessonSlug={lessonSlug}
-          teacherNotes={teacherNotes}
           answerKey={teacherAnswerKey}
           academicCourses={teacherCourses}
           initialSessionsByCourseId={teacherSessionsByCourseId}

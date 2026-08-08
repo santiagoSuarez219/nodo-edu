@@ -22,10 +22,18 @@ lo documenta explícitamente, y hoy ningún módulo de `app/` ni `lib/` lee de
 
 Este spec introduce un artefacto **distinto y más acotado**: un apunte corto,
 por sección, con únicamente el desarrollo de ejercicios y código —sin
-minutado ni objetivos de sesión—, renderizado dentro de la propia página de
-lección/guía, visible **solo** para el docente dueño del curso o un admin.
-Reutiliza el gate de acceso y el contenedor de "vista docente" que spec-031
-(`[DONE]`) ya construyó (`TeacherLessonPanel`), sumándole un tercer bloque.
+minutado ni objetivos de sesión—, visible **solo** para el docente dueño del
+curso o un admin.
+
+> **Cambio de diseño (2026-08-08, aprobado por el usuario tras TC-001):** la
+> primera implementación embebía el apunte como bloque dentro de
+> `TeacherLessonPanel` (spec-031). Con contenido real, ese bloque alargaba
+> demasiado la página de lección. Se movió a una **ruta dedicada**
+> (`/[courseSlug]/[lessonSlug]/apuntes`), enlazada con un botón en el header
+> de `LessonArticle` — visible solo cuando hay apunte y solo para owner/admin.
+> El resto del diseño (gate interno, resolución por `articleSlug`, carpeta
+> `apuntes/`) no cambió. Ver "Fases de implementación" para el detalle del
+> ajuste.
 
 ## Alcance
 
@@ -37,9 +45,12 @@ Reutiliza el gate de acceso y el contenedor de "vista docente" que spec-031
   `hasCourseAccess(courseSlug).reason` es `"owner"` o `"admin"` — el gate vive
   **dentro** de la función, igual que `getAnswerKeyForLesson` (spec-031), no
   solo en la página.
-- Un componente de presentación (`TeacherClassNotes`) que renderiza el
-  Markdown vía el pipeline MDX existente (`MdxContent`), como bloque nuevo
-  dentro de `TeacherLessonPanel`, abierto por defecto.
+- Una ruta dedicada `/[courseSlug]/[lessonSlug]/apuntes` que renderiza el
+  Markdown vía el pipeline MDX existente (`MdxContent`), gateada de nuevo por
+  owner/admin (404 para cualquier otro caso, incluido un `enrolled` con
+  acceso a la lección). Un botón "Apuntes de clase" en el header de
+  `LessonArticle` enlaza a esta ruta, visible solo cuando existe apunte para
+  esa sección.
 - Aplica por igual a lecciones (`kind` ausente o `"lesson"`) y a guías
   (`kind: "guide"`) — ambas pueden tener ejercicios que documentar.
 - Reserva del slug `"apuntes"` en `RESERVED_LESSON_SLUGS`.
@@ -59,11 +70,9 @@ Reutiliza el gate de acceso y el contenedor de "vista docente" que spec-031
   existente de `lib/courses/data/*.ts`.
 - Edición de apuntes desde una UI: se escriben como `.md` versionados en git,
   igual que artículos y guías (Fase 1 del proyecto).
-- Persistencia de "colapsado/expandido" en cookie (patrón de spec-038 para la
-  clave de respuestas): el bloque nace expandido por defecto y sin memoria de
-  estado entre sesiones; si se pide luego, es un spec/ampliación posterior.
-- Un índice o ruta dedicada de apuntes. No hay navegación propia: el apunte
-  solo aparece embebido en la lección/guía a la que pertenece.
+- Un índice/listado de todos los apuntes de un curso. La única forma de
+  llegar a `/apuntes` es desde el botón del header de la lección/guía a la
+  que pertenece — no hay navegación propia agregada por curso.
 - Migración a la plataforma de contenido de `courses/*/projects/` u otras
   fuentes ajenas a `microdiseno/labs/`.
 
@@ -71,11 +80,12 @@ Reutiliza el gate de acceso y el contenedor de "vista docente" que spec-031
 
 | Archivo | Acción |
 |---|---|
-| `lib/courses/teacher-notes.ts` | Crear — `resolveTeacherNotesPath`, `getTeacherLessonNotes` (gate `owner`/`admin` interno) |
-| `components/courses/TeacherClassNotes.tsx` | Crear — bloque colapsable, renderiza `MdxContent` |
+| `lib/courses/teacher-notes.ts` | Crear — `resolveTeacherNotesPath`, `getTeacherLessonNotes` (contenido, gate interno) y `hasTeacherLessonNotes` (existencia liviana, mismo gate) |
+| `app/(cursos)/[courseSlug]/[lessonSlug]/apuntes/page.tsx` | Crear — ruta dedicada, gate owner/admin propio (404 en cualquier otro caso), renderiza `MdxContent` envuelto en `ErrorBoundary` |
 | `content/cursos/<curso>/apuntes/` | Crear — carpeta de contenido, uno o más `.md` |
-| `components/courses/TeacherLessonPanel.tsx` | Modificar — prop `teacherNotes: string \| null`, tercer bloque envuelto en `ErrorBoundary` |
-| `app/(cursos)/[courseSlug]/[lessonSlug]/page.tsx` | Modificar — resolver apuntes dentro de la rama `owner`/`admin` existente (líneas ~159-192), pasar la prop nueva |
+| `components/courses/LessonArticle.tsx` | Modificar — prop `teacherNotesHref?: string \| null`, botón en el header cuando está presente |
+| `components/courses/TeacherLessonPanel.tsx` | Sin cambios netos (el bloque embebido se agregó y se revirtió en la misma sesión) |
+| `app/(cursos)/[courseSlug]/[lessonSlug]/page.tsx` | Modificar — resolver `hasTeacherLessonNotes` dentro de la rama `owner`/`admin` existente, pasar `teacherNotesHref` a `LessonArticle` |
 | `lib/courses/index.ts` | Modificar — `RESERVED_LESSON_SLUGS` += `"apuntes"` |
 | `.claude/skills/lesson-authoring/SKILL.md` | Modificar — documentar el nuevo artefacto y su formato |
 | `CLAUDE.md` (§ Repositorios del ecosistema) | Modificar — añadir `apuntes/` al árbol de `content/cursos/<curso>/` |
@@ -124,39 +134,58 @@ system prompt.
   - [x] Cualquier otro error de lectura/parseo → `console.error` + `null`
         (fallar cerrado, nunca propagar ni tumbar la página).
 
-### Fase 2 — Componente de presentación
+### Fase 2 — Componente de presentación (revertida, ver Fase 3b)
 - [x] Leer `DESIGN.md` completo y las skills `frontend-design` y
       `tailwind-css-patterns` antes de escribir markup de esta fase.
-- [x] Crear `components/courses/TeacherClassNotes.tsx` (server component):
-      recibe `source: string`, renderiza `<MdxContent source={source} />`
-      dentro de un contenedor con la misma estructura visual que el bloque
-      "Asistencia" de `TeacherLessonPanel` (borde, cabecera con título
-      "Apuntes de clase", cuerpo).
-- [x] Colapsable con `<details>`/`<summary>` nativo, **abierto por defecto**.
-      Sin persistencia de estado en este spec (ver "No incluye").
-- [x] Usar exclusivamente tokens semánticos de `DESIGN.md`
-      (`bg-brand-softer`, `text-brand`, escala `gray-*` con `dark:`), sin
-      valores crudos de paleta ni toggle de tema manual.
+- [x] ~~Crear `components/courses/TeacherClassNotes.tsx` (bloque colapsable
+      embebido en `TeacherLessonPanel`)~~ — implementado, probado en TC-001,
+      y **revertido** en la Fase 3b tras el cambio de diseño: la lección
+      quedaba extremadamente larga con contenido real. El archivo se borró
+      (era código de esta misma sesión, sin uso fuera de ella).
 
-### Fase 3 — Integración en la vista docente
-- [x] En `app/(cursos)/[courseSlug]/[lessonSlug]/page.tsx`, declarar
-      `let teacherNotes: string | null = null` junto a las demás variables
-      de la vista docente.
-- [x] Dentro del bloque `access.ok && (access.reason === "owner" || access.reason === "admin")`,
-      sumar la resolución al `Promise.all` existente: solo si
-      `lesson.articleSlug` está definido; si no, `null`.
-- [x] Pasar `teacherNotes={teacherNotes}` a `<TeacherLessonPanel />`.
-- [x] En `TeacherLessonPanel.tsx`, añadir `teacherNotes: string | null` a
-      `TeacherLessonPanelProps` y renderizar `<TeacherClassNotes />` como
-      **primer** bloque del contenedor (antes de la clave de respuestas y de
-      asistencia — es lo primero que el docente consulta al iniciar la
-      clase), condicionado a `teacherNotes !== null`.
-- [x] Envolver ese bloque en `<ErrorBoundary title="Los apuntes de clase no están disponibles" description="Ocurrió un error inesperado. Intenta de nuevo." />`,
-      con el mismo criterio que ya usa `TeacherAttendanceControl`: un fallo
-      de compilación MDX del apunte no debe tumbar el resto de la vista
-      docente proyectada en clase.
-- [x] Verificar que la rama `enrolled` y `LessonClosureFlow` no se alteran:
-      ambas ramas siguen siendo mutuamente excluyentes por construcción.
+### Fase 3 — Integración en la vista docente (revertida, ver Fase 3b)
+- [x] ~~Embeber el apunte como bloque dentro de `TeacherLessonPanel`~~ —
+      implementado y revertido en la misma sesión (ver Fase 3b). No queda
+      código de esta fase en el árbol final.
+
+### Fase 3b — Ruta dedicada y botón en el header (reemplaza Fases 2-3)
+> Ajuste de diseño aprobado por el usuario en sesión (2026-08-08), después de
+> validar TC-001 con contenido real y confirmar que el bloque embebido
+> alargaba demasiado la página.
+- [x] En `lib/courses/teacher-notes.ts`, añadir `hasTeacherLessonNotes(courseSlug, articleSlug): Promise<boolean>`:
+      mismo gate `owner`/`admin` y mismo tratamiento de errores que
+      `getTeacherLessonNotes`, pero con `fs.access` en vez de `fs.readFile` +
+      `gray-matter` — decide si mostrar el botón sin leer ni parsear el
+      Markdown completo en cada carga de la lección.
+- [x] Crear `app/(cursos)/[courseSlug]/[lessonSlug]/apuntes/page.tsx`
+      (server component, `generateMetadata` propio):
+  - [x] Resolver `getLessonBySlug(courseSlug, lessonSlug)`; `notFound()` si no existe.
+  - [x] El `layout.tsx` del segmento `[lessonSlug]` ya exige acceso al curso
+        (`requireCourseAccess`); esta página añade su propio gate con
+        `hasCourseAccess(courseSlug)` — si `reason` no es `"owner"` ni
+        `"admin"` (incluido `"enrolled"`, que sí tiene acceso a la lección
+        pero no a esta ruta), `notFound()`. Un estudiante que adivine la URL
+        recibe 404, no un aviso de "sin acceso" que confirmaría que la ruta existe.
+  - [x] Resolver `getTeacherLessonNotes(courseSlug, lesson.articleSlug)`;
+        `null` → `notFound()`.
+  - [x] Renderizar encabezado ("Apuntes de clase" + título de la
+        lección/guía + enlace de vuelta) y `<MdxContent source={notes} />`
+        envuelto en `ErrorBoundary` (mismo criterio que el resto de la vista
+        docente: un fallo de compilación MDX no debe tumbar la página).
+- [x] En `components/courses/LessonArticle.tsx`, añadir prop
+      `teacherNotesHref?: string | null`: cuando está presente, renderiza un
+      botón/enlace "Apuntes de clase" en el header, junto al título.
+- [x] En `app/(cursos)/[courseSlug]/[lessonSlug]/page.tsx`, sustituir la
+      resolución de contenido completo por `hasTeacherLessonNotes`; construir
+      `teacherNotesHref = hasNotes ? "/${courseSlug}/${lessonSlug}/apuntes" : null`
+      y pasarlo a `<LessonArticle>`. Revertir el prop `teacherNotes` de
+      `<TeacherLessonPanel>` (vuelve a su forma previa a este spec).
+- [x] Confirmar que `RESERVED_LESSON_SLUGS += "apuntes"` (Fase 4) sigue
+      siendo correcto con el nuevo diseño: la ruta `/apuntes` es un segmento
+      estático **anidado bajo** `[lessonSlug]`, no compite con un
+      `lessonSlug` literal `"apuntes"` a ese mismo nivel — la reserva ya
+      hecha no era estrictamente necesaria para esto, pero tampoco estorba
+      (sigue protegiendo la carpeta de contenido de una colisión de nombre).
 
 ### Fase 4 — Reservas y validación del catálogo
 - [x] Añadir `"apuntes"` a `RESERVED_LESSON_SLUGS` en `lib/courses/index.ts`.
@@ -216,28 +245,34 @@ primer uso en producción de este spec (ver checklist pre-despliegue de
 ## Criterios de aceptación
 
 1. Un docente **owner** del curso que abre una lección con archivo
-   `content/cursos/<curso>/apuntes/<articleSlug>.md` ve el bloque "Apuntes de
-   clase" dentro de la vista docente, con el Markdown renderizado (código
-   resaltado, tablas, listas) y abierto por defecto.
-2. Un **admin** ve el mismo bloque en las mismas condiciones, en cualquier
-   curso.
-3. Un **estudiante matriculado** que abre la misma lección no ve el bloque, y
-   el contenido del apunte no aparece en el HTML ni en el payload RSC de la
-   respuesta.
-4. Un **visitante no autenticado** en la misma lección tampoco recibe el
-   contenido del apunte en la respuesta.
-5. Si no existe archivo de apuntes para el `articleSlug`, la página del
-   docente carga normalmente y el bloque simplemente no aparece: sin error,
-   sin 404, sin placeholder.
+   `content/cursos/<curso>/apuntes/<articleSlug>.md` ve un botón "Apuntes de
+   clase" en el header de la lección; al hacer clic, llega a
+   `/[courseSlug]/[lessonSlug]/apuntes` y ve el Markdown renderizado (código
+   resaltado, tablas, listas).
+2. Un **admin** ve el mismo botón y la misma página en las mismas
+   condiciones, en cualquier curso.
+3. Un **estudiante matriculado** que abre la misma lección no ve el botón, y
+   si navega directamente a `/[courseSlug]/[lessonSlug]/apuntes` recibe 404
+   — el contenido del apunte no aparece en el HTML ni en el payload RSC de
+   ninguna de las dos rutas.
+4. Un **visitante no autenticado** que navega directamente a
+   `/[courseSlug]/[lessonSlug]/apuntes` es redirigido a login (gate del
+   `layout.tsx` de `[lessonSlug]`), sin recibir el contenido del apunte en
+   ningún punto.
+5. Si no existe archivo de apuntes para el `articleSlug`, la lección carga
+   normalmente sin el botón, y navegar directamente a `/apuntes` para esa
+   sección da 404: sin error, sin placeholder.
 6. El comportamiento es idéntico para nodos `kind: "guide"` y para lecciones
    (`kind` ausente o `"lesson"`).
 7. Si el archivo de apuntes existe pero falla al compilarse, el
-   `ErrorBoundary` muestra el mensaje de fallo solo en ese bloque: el
-   artículo, la clave de respuestas, el panel de asistencia y la navegación
-   siguen funcionando.
+   `ErrorBoundary` de `/apuntes` muestra el mensaje de fallo dentro de esa
+   página, sin tumbar el resto de la app; la lección de origen (artículo,
+   clave de respuestas, asistencia) no se ve afectada en ningún caso, porque
+   ya no comparten el mismo árbol de render.
 8. Toda la funcionalidad de spec-031 sigue operativa sin regresión: clave de
    respuestas (con su estado colapsable de spec-038), selector de grupo y
-   código de asistencia.
+   código de asistencia — `TeacherLessonPanel` queda funcionalmente idéntico
+   a como estaba antes de este spec.
 9. `npx tsc --noEmit`, `npm run lint` y `npm run build` pasan sin errores, y
    el validador de `lib/courses/index.ts` no lanza pese a que la mayoría de
    nodos no tienen apuntes.
@@ -245,14 +280,19 @@ primer uso en producción de este spec (ver checklist pre-despliegue de
     fallar el arranque con el mensaje de slug reservado.
 11. No se modificó ningún archivo bajo `content/cursos/*/microdiseno/`, y
     ningún módulo de `app/` o `lib/` lee de esa carpeta.
-12. Un usuario `enrolled` que invocara directamente
-    `getTeacherLessonNotes(courseSlug, articleSlug)` como Server Action
-    recibiría `null`, nunca el contenido del apunte.
+12. Un usuario `enrolled` que invocara directamente `getTeacherLessonNotes`
+    o `hasTeacherLessonNotes` (`courseSlug, articleSlug`) como Server Action
+    recibiría `null`/`false` respectivamente, nunca el contenido del apunte
+    ni una señal de que existe.
+13. Un usuario `enrolled` con acceso válido a la lección que visita
+    `/[courseSlug]/[lessonSlug]/apuntes` directamente (URL adivinada o
+    compartida) recibe 404 — el gate de esta ruta es más estricto que el de
+    la lección misma, no se conforma con "tiene acceso al curso".
 
 ## Pruebas asociadas
 > Estos archivos se crean junto con el spec (ver "Artefactos que acompañan al spec").
 - **Manuales:** `docs/testing/test-044-apuntes-docente-leccion.md` — casos
-  `TC-001` a `TC-012`.
+  `TC-001` a `TC-013`.
 - **Automáticas (e2e/unit):** `{{ubicación e2e por definir}}/e2e-044-apuntes-docente-leccion.spec.ts`
   — un caso por criterio de aceptación, en rojo desde el inicio (cuando exista
   framework).
