@@ -115,9 +115,8 @@ matrícula.
 **En el Sprint 1** van a modelar la jerarquía de `Persona`, `Materia` y
 `Calificacion` con encapsulamiento y validaciones (nota en rango 0.0–5.0,
 código único), y un menú de consola para registrar estudiantes, profesores
-y materias. Es el proyecto con más relaciones entre entidades: exige tener
-claro desde el inicio que el sistema gestiona un único programa y un único
-semestre activo.
+y materias. El sistema gestiona un único programa y un único semestre
+activo.
 
 ### Liga de Fútbol
 
