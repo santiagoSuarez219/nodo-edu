@@ -49,7 +49,7 @@ export const programacionCientifica: Course = {
       articleSlug: "variables-tipos-de-datos-y-operadores-lab",
       kind: "guide",
       order: 2.5,
-      title: "Laboratorio — Variables, tipos de datos y operadores",
+      title: "Taller de variables, tipos de datos y operadores",
       topics: [],
     },
     {
