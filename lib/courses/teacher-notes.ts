@@ -14,12 +14,11 @@ import { hasCourseAccess } from "@/lib/enrollments/access";
 
 const CONTENT_ROOT = path.join(process.cwd(), "content", "cursos");
 
-// Evita que un `articleSlug` con separadores de ruta escape de la carpeta
-// `apuntes/` del curso (path traversal). Los slugs válidos del catálogo
-// nunca contienen `/` ni `..`; esto es una defensa, no una validación de
-// negocio.
-function isSafeArticleSlug(articleSlug: string): boolean {
-  return !articleSlug.includes("/") && !articleSlug.includes("\\") && !articleSlug.includes("..");
+// Evita que un segmento de ruta (courseSlug o articleSlug) escape de
+// CONTENT_ROOT (path traversal). Los slugs válidos del catálogo nunca
+// contienen separadores; esto es una defensa, no una validación de negocio.
+function isSafePathSegment(segment: string): boolean {
+  return !segment.includes("/") && !segment.includes("\\") && !segment.includes("..");
 }
 
 export function resolveTeacherNotesPath(courseSlug: string, articleSlug: string): string {
@@ -27,25 +26,29 @@ export function resolveTeacherNotesPath(courseSlug: string, articleSlug: string)
 }
 
 /**
+ * Gate compartido: `owner`/`admin` del curso y segmentos de ruta seguros.
+ * Ambas funciones públicas de este módulo lo evalúan antes de tocar el
+ * filesystem, para que invocar cualquiera directamente (ej. como Server
+ * Action) nunca filtre contenido ni señal de existencia a un estudiante.
+ */
+async function canReadTeacherNotes(courseSlug: string, articleSlug: string): Promise<boolean> {
+  const access = await hasCourseAccess(courseSlug);
+  if (!access.ok || (access.reason !== "owner" && access.reason !== "admin")) {
+    return false;
+  }
+  return isSafePathSegment(courseSlug) && isSafePathSegment(articleSlug);
+}
+
+/**
  * Devuelve el cuerpo Markdown de los apuntes docente de una sección, o
  * `null` si no hay apuntes para ella, si el usuario actual no es owner/admin
  * del curso, o si ocurre cualquier error de lectura/parseo.
- *
- * El gate de acceso vive DENTRO de esta función (no solo en la página que la
- * invoca) para que llamarla directamente como Server Action nunca filtre el
- * contenido a un estudiante — mismo patrón que `getAnswerKeyForLesson`
- * (spec-031).
  */
 export async function getTeacherLessonNotes(
   courseSlug: string,
   articleSlug: string
 ): Promise<string | null> {
-  const access = await hasCourseAccess(courseSlug);
-  if (!access.ok || (access.reason !== "owner" && access.reason !== "admin")) {
-    return null;
-  }
-
-  if (!isSafeArticleSlug(articleSlug)) return null;
+  if (!(await canReadTeacherNotes(courseSlug, articleSlug))) return null;
 
   const filePath = resolveTeacherNotesPath(courseSlug, articleSlug);
   try {
@@ -69,12 +72,7 @@ export async function hasTeacherLessonNotes(
   courseSlug: string,
   articleSlug: string
 ): Promise<boolean> {
-  const access = await hasCourseAccess(courseSlug);
-  if (!access.ok || (access.reason !== "owner" && access.reason !== "admin")) {
-    return false;
-  }
-
-  if (!isSafeArticleSlug(articleSlug)) return false;
+  if (!(await canReadTeacherNotes(courseSlug, articleSlug))) return false;
 
   const filePath = resolveTeacherNotesPath(courseSlug, articleSlug);
   try {

@@ -348,9 +348,10 @@ Es el **guion de la sesión**, no una copia de la guía del estudiante. Seccione
 ## 3b. Apuntes de clase — docente (spec-044)
 
 `content/cursos/<curso>/apuntes/<articleSlug>.md`. Opcional: no todas las
-secciones lo tienen, y su ausencia no es un error (el bloque simplemente no
-aparece). Se resuelve por convención de nombre sobre el `articleSlug` de la
-lección o guía — no lleva frontmatter obligatorio ni entrada en TS.
+secciones lo tienen, y su ausencia no es un error (el botón "Apuntes de
+clase" del header simplemente no aparece). Se resuelve por convención de
+nombre sobre el `articleSlug` de la lección o guía — no lleva frontmatter
+obligatorio ni entrada en TS.
 
 **No es lo mismo que el artefacto #3** (guía de laboratorio del docente en
 `microdiseno/labs/`). Son documentos con propósito distinto y nunca se migra
@@ -359,7 +360,7 @@ contenido de uno a otro sin recortarlo:
 | | Guía docente (`microdiseno/labs/`) | Apunte de clase (`apuntes/`) |
 |---|---|---|
 | Contenido | Ficha de sesión, objetivos, **minutado**, desarrollo paso a paso, puntos de control, diferenciación, cierre | **Solo** el desarrollo de ejercicios y código — nada más |
-| Se publica en la app | No, nunca (`CLAUDE.md`: `microdiseno/` no se publica) | Sí, pero solo a owner/admin (renderizado dentro de "Vista docente") |
+| Se publica en la app | No, nunca (`CLAUDE.md`: `microdiseno/` no se publica) | Sí, pero solo a owner/admin — ruta dedicada `/[courseSlug]/[lessonSlug]/apuntes`, enlazada desde un botón en el header de la lección/guía |
 | Para qué se usa | Planificar la sesión antes de dictarla | Consultarlo **durante** la clase, proyectado, como referencia rápida |
 
 Formato — solo el guion de ejercicios, sin ficha de sesión ni minutado:
