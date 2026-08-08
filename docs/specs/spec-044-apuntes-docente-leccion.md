@@ -1,4 +1,4 @@
-# spec-044 — [TESTING] Apuntes docente en la vista de lección/guía
+# spec-044 — [DONE] Apuntes docente en la vista de lección/guía
 
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.
@@ -244,11 +244,23 @@ primer uso en producción de este spec (ver checklist pre-despliegue de
       colateral no bloqueante registrado como `DEBT-058` en
       `docs/specs/backlog.md` (warning de hidratación preexistente en
       `RootLayout`, ajeno a este spec).
-- [ ] Invocar `@reviewer` antes de marcar el spec como `[DONE]`.
+- [x] Invocar `@reviewer` antes de marcar el spec como `[DONE]`. **Veredicto:
+      APROBADO** (tsc/lint/build en verde, 13/13 criterios cubiertos, gate de
+      `/apuntes` verificado como redundante y en el orden correcto —
+      `notFound()` antes de tocar el filesystem). Hallazgos menores
+      corregidos: guard compartido extraído en `teacher-notes.ts`
+      (`canReadTeacherNotes`, cierra la asimetría de validación entre
+      `courseSlug`/`articleSlug`) y dos frases desactualizadas de
+      `.claude/skills/lesson-authoring/SKILL.md` corregidas para reflejar la
+      ruta dedicada en vez del bloque embebido descartado.
 - [ ] Pruebas automáticas: pendientes del framework de testing (ver
       `CLAUDE.md` → Testing); los criterios de aceptación quedan descritos
       abajo y `e2e-044-apuntes-docente-leccion.spec.ts` se crea cuando exista
       el framework.
+
+**Cierre (2026-08-08):** 13/13 casos manuales aprobados, `@reviewer` con
+veredicto APROBADO tras corregir los hallazgos menores. Un hallazgo no
+bloqueante registrado como `DEBT-058`. Spec marcado como `[DONE]`.
 
 ## Criterios de aceptación
 
