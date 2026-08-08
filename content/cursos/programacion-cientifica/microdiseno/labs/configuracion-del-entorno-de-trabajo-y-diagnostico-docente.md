@@ -9,7 +9,7 @@
 | Modalidad | Presencial, 100% en Google Colab (nada se instala) |
 | Duración | 2 h (sesión única semanal) |
 | Momento evaluativo | Seguimiento continuo (no es un momento evaluativo ★) |
-| Lección teórica de la que depende | `fundamentos-de-control-de-versiones-colab-y-diagnostico.mdx` — el docente presenta esta misma lección en vivo (`presentation: true`, cada `##` es una diapositiva) |
+| Lección teórica de la que depende | `configuracion-del-entorno-de-trabajo-y-diagnostico.mdx` — el docente presenta esta misma lección en vivo (`presentation: true`, cada `##` es una diapositiva) |
 | Sprint del proyecto | Ninguno todavía. El proyecto integrador arranca en la Semana 12; esta sesión crea el repositorio del curso que se reutiliza durante todo el semestre |
 | Revisión en clase | No aplica — esta es la primera sesión, no hay contenido previo que revisar |
 

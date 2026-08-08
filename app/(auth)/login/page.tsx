@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
+import { getCurrentUser } from "@/lib/auth/session";
 import { AuthShell } from "@/components/auth/AuthShell";
 import { LoginForm } from "@/components/auth/LoginForm";
 
@@ -9,6 +11,12 @@ interface Props {
 }
 
 export default async function LoginPage({ searchParams }: Props) {
+  // spec-045: un usuario ya autenticado no debe ver el formulario de login;
+  // se redirige siempre a "/" (no a `redirectTo`, por decisión explícita del
+  // usuario — ver "No incluye" del spec).
+  const user = await getCurrentUser();
+  if (user) redirect("/");
+
   const { redirectTo, error } = await searchParams;
 
   return (

@@ -135,7 +135,9 @@ Este proyecto vive en un único repositorio. No hay monorepo ni submódulos.
 │   └── cursos/
 │       └── <curso>/       # Un directorio por curso
 │           ├── *.mdx      # Artículos/lecciones publicados
-│           └── microdiseno/  # Microdiseño curricular (info.md, cronograma, projects/) — no se publica
+│           ├── guias/     # Guías de laboratorio del estudiante (kind: "guide") — publicadas
+│           ├── apuntes/   # Apuntes docente por sección (spec-044) — solo visibles a owner/admin, nunca a estudiantes
+│           └── microdiseno/  # Microdiseño curricular (info.md, cronograma, labs/*-docente.md, projects/) — no se publica
 ├── courses/               # Material sin curso publicado equivalente (bancos de ejercicios, fuentes externas)
 ├── public/                # Assets estáticos
 └── docs/                  # Documentación
@@ -336,6 +338,8 @@ lib/
 └── progress/              # Progreso de lecciones por usuario
 
 content/cursos/<curso>/    # Artículos MDX del curso
+content/cursos/<curso>/guias/     # Guías de laboratorio del estudiante — publicadas
+content/cursos/<curso>/apuntes/   # Apuntes docente por sección (spec-044) — solo owner/admin
 content/cursos/<curso>/microdiseno/  # Info.md, cronograma, projects/ — no se publica
 courses/                   # Material sin curso publicado equivalente
 ```

@@ -5,6 +5,36 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+## DEBT-058 — Warning de hidratación por `<Script id="theme-init">` en `RootLayout`
+
+**Origen:** ronda manual de test-044 (TC-013), overlay de dev de Next.js al
+abrir cualquier página en modo desarrollo
+**Prioridad:** Baja — solo visible en el overlay de dev; no afecta build de
+producción (verificado en verde) ni el comportamiento observado para el
+usuario
+
+Next.js muestra en el overlay de dev un `Console Error`: *"Encountered a
+script tag while rendering React component. Scripts inside React components
+are never executed when rendering on the client. Consider using template tag
+instead."*, señalando `app/layout.tsx:48:9` — el script inline
+`id="theme-init"` que `DESIGN.md` documenta para evitar el FOUC del modo
+oscuro (`document.documentElement.classList.toggle('dark', ...)` antes del
+bundle).
+
+No es específico de ninguna ruta ni relacionado con spec-044 — apareció al
+navegar a `/apuntes`, pero se reproduce en cualquier página del sitio en modo
+`next dev`.
+
+**Acción:** Investigar si `next/script` con `strategy="beforeInteractive"` (ya
+usado, ver `app/layout.tsx:48`) sigue siendo la forma correcta de inyectar
+este script en Next 16, o si el warning indica que debe moverse fuera del
+árbol de componentes React (ej. inyectado directamente en el `<head>` del HTML
+servido, sin pasar por el componente `Script`). Confirmar que no degrada a un
+error real en algún flujo de producción antes de descartarlo como puramente
+cosmético.
+
+---
+
 ## DEBT-057 — `code_snippet`/`code_language` no se persisten para `code_write`/`coding_challenge`
 
 **Origen:** ronda manual de test-043 (preparación de datos para TC-043-007),

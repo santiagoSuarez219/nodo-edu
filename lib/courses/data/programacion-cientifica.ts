@@ -13,11 +13,11 @@ export const programacionCientifica: Course = {
   level: "introductorio",
   lessons: [
     {
-      id: "fundamentos-de-control-de-versiones-colab-y-diagnostico",
-      slug: "fundamentos-de-control-de-versiones-colab-y-diagnostico",
-      articleSlug: "fundamentos-de-control-de-versiones-colab-y-diagnostico",
+      id: "configuracion-del-entorno-de-trabajo-y-diagnostico",
+      slug: "configuracion-del-entorno-de-trabajo-y-diagnostico",
+      articleSlug: "configuracion-del-entorno-de-trabajo-y-diagnostico",
       order: 1,
-      title: "Fundamentos de control de versiones (Colab) y diagnóstico",
+      title: "Configuración del entorno de trabajo (Colab y GitHub) y diagnóstico",
       summary:
         "Presentación de Google Colab y GitHub: celdas de código y texto, y cómo subir y traer tu trabajo desde la interfaz de Colab (Flujo A), con diagnóstico inicial de nivel.",
       topics: [
@@ -34,12 +34,23 @@ export const programacionCientifica: Course = {
       articleSlug: "variables-tipos-de-datos-y-operadores",
       order: 2,
       title: "Variables, tipos de datos y operadores",
+      summary:
+        "Guarda y transforma tus datos en Python: variables con tipado dinámico, los cuatro tipos básicos (int, float, str, bool) y los operadores aritméticos, de comparación y lógicos, con ejemplos de precios de una tienda.",
       topics: [
         { title: "Repaso rápido de Google Colab (visto en la Semana 1) y alternativa local con Jupyter" },
         { title: "Variables y tipado dinámico en Python" },
         { title: "Tipos de datos básicos: int, float, str, bool" },
         { title: "Operadores aritméticos, de comparación y lógicos" },
       ],
+    },
+    {
+      id: "variables-tipos-de-datos-y-operadores-lab",
+      slug: "variables-tipos-de-datos-y-operadores-lab",
+      articleSlug: "variables-tipos-de-datos-y-operadores-lab",
+      kind: "guide",
+      order: 2.5,
+      title: "Laboratorio — Variables, tipos de datos y operadores",
+      topics: [],
     },
     {
       id: "condicionales-y-bucles",
