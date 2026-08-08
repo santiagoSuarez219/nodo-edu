@@ -23,6 +23,7 @@ const RESERVED_LESSON_SLUGS = new Set([
   "notebooks",
   "presentacion",
   "guias",
+  "apuntes",
 ]);
 
 (function validate() {

@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { getLessonBySlug, isGuide, buildCourseOutline } from "@/lib/courses";
 import { getLessonArticle } from "@/lib/courses/content";
+import { hasTeacherLessonNotes } from "@/lib/courses/teacher-notes";
 import { isLessonDisabled } from "@/lib/courses/availability";
 import { requireCourseAccess } from "@/lib/enrollments";
 import { hasCourseAccess } from "@/lib/enrollments/access";
@@ -155,15 +156,24 @@ export default async function LessonPage({ params }: LessonPageProps) {
   let teacherSessionsByCourseId: Record<string, OpenSessionResult> = {};
   let teacherAttendanceGroupId: string | null = null;
   let teacherAnswerKeyExpanded = false;
+  let teacherNotesHref: string | null = null;
 
   if (access.ok && (access.reason === "owner" || access.reason === "admin")) {
-    const [answerKey, academicCourses] = await Promise.all([
+    const [answerKey, academicCourses, hasNotes] = await Promise.all([
       isGuideNode
         ? Promise.resolve([] as AnswerKeyQuestion[])
         : getAnswerKeyForLesson(courseSlug, lessonSlug),
       resolveAcademicCoursesBySlug(courseSlug, access),
+      // spec-044: apuntes docente — aplica a lecciones y guías por igual.
+      // Solo comprueba existencia (sin leer el Markdown): el contenido se
+      // resuelve bajo demanda en la ruta dedicada `/apuntes`, para no
+      // engordar el payload de cada lección con texto que no se muestra ahí.
+      lesson.articleSlug
+        ? hasTeacherLessonNotes(courseSlug, lesson.articleSlug)
+        : Promise.resolve(false),
     ]);
     teacherAnswerKey = answerKey;
+    teacherNotesHref = hasNotes ? `/${courseSlug}/${lessonSlug}/apuntes` : null;
     // Solo id/name/code viajan al cliente — evita serializar enrollment_code
     // (dato sensible del docente) en el payload RSC sin necesidad.
     teacherCourses = academicCourses.map((academicCourse) => ({
@@ -198,6 +208,7 @@ export default async function LessonPage({ params }: LessonPageProps) {
         lesson={lesson}
         classIndex={classIndex}
         updatedAt={article?.frontmatter.updatedAt}
+        teacherNotesHref={teacherNotesHref}
       >
         {isBlockedForStudent ? (
           <LessonUnavailable
