@@ -233,9 +233,17 @@ primer uso en producción de este spec (ver checklist pre-despliegue de
 `CLAUDE.md`).
 
 ### Fase 7 — Pruebas
-- [ ] Ejecutar los casos manuales de
+- [x] Ejecutar los casos manuales de
       `docs/testing/test-044-apuntes-docente-leccion.md` (protocolo de
       "Pruebas manuales asistidas por Claude", entorno de desarrollo).
+      **Resultado: 13/13 aprobados** (ronda del 2026-08-08,
+      `http://localhost:3002`). Datos de prueba creados vía Supabase Auth
+      admin API + REST (`academic_courses`) + `students-mcp`, todos
+      eliminados al cerrar la ronda (verificado: `academic_courses` vacío,
+      solo `dev@nodo.local` permanece en `auth.users`). Un hallazgo
+      colateral no bloqueante registrado como `DEBT-058` en
+      `docs/specs/backlog.md` (warning de hidratación preexistente en
+      `RootLayout`, ajeno a este spec).
 - [ ] Invocar `@reviewer` antes de marcar el spec como `[DONE]`.
 - [ ] Pruebas automáticas: pendientes del framework de testing (ver
       `CLAUDE.md` → Testing); los criterios de aceptación quedan descritos
