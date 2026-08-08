@@ -1,4 +1,4 @@
-# spec-045 — [NOT STARTED] Redirigir `/login` a `/` cuando ya hay sesión iniciada
+# spec-045 — [TESTING] Redirigir `/login` a `/` cuando ya hay sesión iniciada
 
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.
@@ -58,13 +58,15 @@ agente, y ningún MCP existente cubre navegación de UI.
 ## Fases de implementación
 
 ### Fase 1 — Redirect en `LoginPage`
-- [ ] En `app/(auth)/login/page.tsx`, importar `getCurrentUser` de
+- [x] En `app/(auth)/login/page.tsx`, importar `getCurrentUser` de
       `@/lib/auth/session` y `redirect` de `next/navigation`.
-- [ ] Al inicio del componente (antes de leer `searchParams` o renderizar
+- [x] Al inicio del componente (antes de leer `searchParams` o renderizar
       `AuthShell`), llamar `await getCurrentUser()`; si devuelve un usuario,
       `redirect("/")` inmediatamente.
-- [ ] Verificar que el caso sin sesión no cambia: mismo render de
+- [x] Verificar que el caso sin sesión no cambia: mismo render de
       `AuthShell` + `LoginForm` + manejo de `?error=auth_callback_failed`.
+- [x] `npx tsc --noEmit`, `npx eslint "app/(auth)/login/page.tsx"` y
+      `npm run build` verificados sin errores.
 
 ### Fase 2 — Pruebas
 - [ ] Ejecutar los casos manuales de
@@ -96,5 +98,5 @@ agente, y ningún MCP existente cubre navegación de UI.
 
 ## Aprobación de implementación
 > Claude no escribe código de implementación hasta que esta sección esté marcada.
-- [ ] Paquete (spec + pruebas) aprobado por el usuario
-- **Fecha de aprobación:** {{fecha}}
+- [x] Paquete (spec + pruebas) aprobado por el usuario
+- **Fecha de aprobación:** 2026-08-08
