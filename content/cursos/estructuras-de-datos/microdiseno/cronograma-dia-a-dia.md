@@ -46,11 +46,19 @@ Tampoco tienen sesión propia. Cada estructura se introduce primero como contrat
 
 ## Semana 2 — POO: clases, objetos y encapsulamiento *(11–14 ago)* · Sprint 1
 
+> *Excepción de estructura semanal: esta semana usa T1/T2/T3 (tres sesiones
+> teóricas) en vez de T1/T2/P. El laboratorio de la semana se desplaza a
+> fecha por definir; se agenda una vez redactadas T1–T3 y la guía de
+> elección de proyecto de aula.*
+
 | Fecha | Día | Sesión | Contenido |
 |---|---|---|---|
-| 11 ago | Martes | T1 | Diagnóstico (cuestionario de 8 preguntas) y repaso: clase, objeto, atributo, método, constructor; instanciación y ciclo de vida del objeto. |
-| 13 ago | Jueves | T2 | Encapsulamiento: modificadores de acceso (`private`, `public`, `protected`, default); getters/setters; validación dentro de setters; constructores sobrecargados. |
-| 14 ago | Viernes | P | Lab: clase de dominio encapsulada en `model/domain/`; menú en `view/`; stubs de `service/` y `controller/`. |
+| 11 ago | Martes | T1 | Diagnóstico (cuestionario de 8 preguntas) + repaso de sintaxis de Java: variables/tipos/operadores, condicionales (`if`/`else`, `switch`) y bucles (`for`, `while`, `do-while`). |
+| 13 ago | Jueves | T2 | Repaso: clase, objeto, atributo, método, constructor; instanciación y ciclo de vida del objeto. |
+| 14 ago | Viernes | T3 | Encapsulamiento: modificadores de acceso (`private`, `public`, `protected`, default); getters/setters; validación dentro de setters; constructores sobrecargados. Cierre de sesión: presentación de la guía de elección de proyecto de aula (5 casos elegibles; el Sistema Bancario queda como caso de referencia del docente). |
+
+> **P — Laboratorio (pendiente de fecha):** clase de dominio encapsulada en
+> `model/domain/`; menú en `view/`; stubs de `service/` y `controller/`.
 
 > *Trabajo independiente guiado:* métodos y atributos estáticos (`static`), sobrecarga de métodos, clase `String` y wrapper classes (`Integer`, `Double`). Se revisan en asesoría y se dan por vistos en el laboratorio de la semana 3.
 

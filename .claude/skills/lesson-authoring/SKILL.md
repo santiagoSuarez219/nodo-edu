@@ -136,11 +136,19 @@ Medidas de referencia de una lección completa: ~170 líneas, 9 secciones `##`,
 - **Negrita** al introducir un término; `_cursiva_` para énfasis y anglicismos (`_staged_`).
 - Backticks para todo comando, archivo, clase o método.
 - Guion largo `—` para aclaraciones.
-- Referencias cruzadas explícitas a otras sesiones ("tema de la sesión T2", "se profundiza en el laboratorio").
+- Referencias cruzadas a otras **lecciones** por su título ("como viste en
+  Sintaxis de Java"). Nunca a laboratorios ni a sesiones futuras (ver abajo).
 - Español con acentuación completa. Nada de jerga sin definir antes.
 
 > Las guías de laboratorio usan **usted** ("Implemente", "Verifique"); las
 > lecciones usan **tú**. No mezclar.
+
+> **Las lecciones no anuncian laboratorios.** Nada de "esto lo implementas en el
+> laboratorio", "en la práctica del viernes" o "el sprint N te pedirá". No todas
+> las lecciones tienen laboratorio y eso se decide sobre la marcha: prometer una
+> práctica que quizá no exista confunde al estudiante. El puente teoría→práctica
+> lo tiende la **guía de laboratorio**, que referencia a la lección cuando se
+> crea — la dirección es siempre guía → lección, nunca lección → guía.
 
 ### 2.4 Diagramas Mermaid
 

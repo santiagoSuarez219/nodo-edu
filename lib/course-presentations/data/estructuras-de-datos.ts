@@ -157,6 +157,11 @@ export const estructurasDatos: CoursePresentation = {
         "Thomas H. Cormen, Charles E. Leiserson, Ronald L. Rivest, Clifford Stein",
       edition: "3rd Edition",
     },
+    {
+      title: "Ejercicios de programación orientada a objetos con Java y UML",
+      author: "Leornardo B. Angarita",
+      edition: "1st Edition",
+    },
   ],
   documents: [
     {

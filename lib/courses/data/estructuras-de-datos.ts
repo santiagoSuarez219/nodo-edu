@@ -36,15 +36,53 @@ export const estructurasDeDatos: Course = {
       ],
     },
     {
-      id: "diagnostico-y-revision-de-clases",
-      slug: "diagnostico-y-revision-de-clases",
-      articleSlug: "diagnostico-y-revision-de-clases",
+      id: "sintaxis-de-java",
+      slug: "sintaxis-de-java",
+      articleSlug: "sintaxis-de-java",
+      order: 3,
+      title: "Sintaxis de Java",
+      summary:
+        "Repaso de la sintaxis exacta de Java: tipos primitivos, operadores y casting, if/else, switch y los tres bucles — la base para escribir las clases del proyecto de aula.",
+      topics: [
+        { title: "Variables, tipos primitivos y operadores (con casting)" },
+        { title: "Estructuras de control: if/else, switch" },
+        { title: "Bucles: for, while, do-while" },
+      ],
+    },
+    {
+      id: "ejercicios-sintaxis-de-java",
+      slug: "ejercicios-sintaxis-de-java",
+      articleSlug: "ejercicios-sintaxis-de-java",
+      kind: "guide",
+      order: 3.5,
+      title: "Ejercicios propuestos — Sintaxis de Java",
+      summary:
+        "Seis ejercicios opcionales, sin nota, para practicar condicionales, bucles y variables locales por su cuenta.",
+      topics: [],
+    },
+    {
+      id: "repaso-de-clases-y-objetos",
+      slug: "repaso-de-clases-y-objetos",
+      articleSlug: "repaso-de-clases-y-objetos",
       order: 4,
-      title: "Diagnóstico y revisión de clases",
+      title: "Repaso de clases y objetos",
+      summary:
+        "Clase, objeto, atributo, método y constructor en Java, y el ciclo de vida de un objeto en memoria — la base sobre la que se construye el encapsulamiento.",
       topics: [
         { title: "Repaso: clase, objeto, atributo, método, constructor" },
         { title: "Instanciación y ciclo de vida de un objeto en Java" },
       ],
+    },
+    {
+      id: "ejercicios-clases-y-objetos",
+      slug: "ejercicios-clases-y-objetos",
+      articleSlug: "ejercicios-clases-y-objetos",
+      kind: "guide",
+      order: 4.5,
+      title: "Ejercicios propuestos — Clases y objetos",
+      summary:
+        "Siete ejercicios opcionales, sin nota, para modelar entidades completas: atributos, constructores, métodos y paso de objetos como parámetro.",
+      topics: [],
     },
     {
       id: "encapsulamiento",
@@ -52,11 +90,34 @@ export const estructurasDeDatos: Course = {
       articleSlug: "encapsulamiento",
       order: 5,
       title: "Encapsulamiento",
+      summary:
+        "Modificadores de acceso, getters y setters con validación, y constructores sobrecargados en Java — la capa que protege los datos de la clase de dominio del proyecto de aula.",
       topics: [
         { title: "Modificadores de acceso: private, public, protected, default" },
         { title: "Getters y setters: convenciones y casos de uso" },
         { title: "Validación dentro de setters" },
+        { title: "Constructores sobrecargados" },
       ],
+    },
+    {
+      id: "guia-eleccion-proyecto-de-aula",
+      slug: "guia-eleccion-proyecto-de-aula",
+      articleSlug: "guia-eleccion-proyecto-de-aula",
+      kind: "guide",
+      order: 5.5,
+      title: "Guía — Elección del proyecto de aula",
+      topics: [],
+    },
+    {
+      id: "ejercicios-encapsulamiento",
+      slug: "ejercicios-encapsulamiento",
+      articleSlug: "ejercicios-encapsulamiento",
+      kind: "guide",
+      order: 5.6,
+      title: "Ejercicios propuestos — Encapsulamiento",
+      summary:
+        "Tres ejercicios opcionales, sin nota, para practicar modificadores de acceso, métodos get/set y constructores encadenados.",
+      topics: [],
     },
     {
       id: "metodos-avanzados-y-clases-de-utilidad",

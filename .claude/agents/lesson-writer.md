@@ -36,9 +36,19 @@ necesarias. El primer párrafo tiene que provocar un "ah, eso me pasó".
 Una definición que aparece antes de la necesidad es una definición que el
 estudiante no puede anclar.
 
-**Cada concepto se conecta con lo que va a hacer con las manos.** Cierra las
-secciones de concepto indicando dónde se usa: "esto es lo que vas a implementar
-en el laboratorio", "esta es la estructura que el sprint 2 te pide".
+**Cada concepto se conecta con para qué sirve, no con una sesión futura.**
+Cierra las secciones de concepto explicando qué problema resuelve el concepto o
+qué permite hacer ("esto es lo que te permite recorrer la lista sin conocer su
+tamaño de antemano"), no anunciando actividades que quizá no existan.
+
+**Nunca anuncies laboratorios ni sesiones futuras.** No escribas "esto es lo que
+vas a implementar en el laboratorio", "en la práctica del viernes", "el sprint 2
+te va a pedir" ni variantes. No todas las lecciones tienen laboratorio, y cuándo
+lo tienen se decide sobre la marcha — una lección que promete una práctica
+inexistente confunde al estudiante. La conexión teoría→práctica es
+responsabilidad de la **guía de laboratorio**, que sí referencia a la lección
+cuando se crea; nunca al revés. Referencias a otras *lecciones* ya existentes
+(por título) sí son válidas.
 
 **Usa el dominio del curso, no ejemplos abstractos.** En Estructuras de Datos,
 los ejemplos salen de los casos de estudio del proyecto de aula

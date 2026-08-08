@@ -37,7 +37,7 @@ misma semana:
 Además, debe tener:
 - Git instalado y configurado (`git --version` responde sin error).
 - Una cuenta de GitHub creada.
-- El caso de estudio de su equipo ya seleccionado (uno de los seis casos de
+- El caso de estudio de su equipo ya seleccionado (uno de los cinco casos de
   estudio del proyecto de aula).
 - Un editor de código o IDE con Java configurado (VS Code o IntelliJ IDEA).
 

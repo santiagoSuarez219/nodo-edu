@@ -86,7 +86,7 @@ Si el estudiante reporta el martes que se quedó atascado antes del minuto 65
 > Ejemplo construido sobre el caso de estudio **Sistema Bancario** con la
 > entidad `Cliente`, reutilizando el mismo ejemplo de la lección T2 para que
 > el conflicto de la Tarea 3 sea reconocible. La lógica es idéntica para
-> cualquiera de los seis casos de estudio: solo cambia el nombre de la clase
+> cualquiera de los cinco casos de estudio elegibles: solo cambia el nombre de la clase
 > de dominio.
 
 ### Paso 1 — Repositorio y secuencia de commits
