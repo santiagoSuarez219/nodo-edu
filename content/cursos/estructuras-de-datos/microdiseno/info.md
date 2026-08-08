@@ -110,18 +110,28 @@ proyecto-aula/
 | ¿Es lógica de negocio, algoritmo o persistencia? | `service/` |
 | ¿Son datos o estructura de datos pura? | `model/` |
 
-### Casos de estudio disponibles
+### Caso de referencia del docente (no elegible)
+
+El **Sistema Bancario** es el caso que el docente desarrolla en clase sesión a
+sesión, y del que salen los ejemplos de las lecciones (`Cliente`, `Cuenta`,
+`saldo`). **Ningún equipo lo toma como su caso de estudio:** funciona como
+implementación de referencia que los equipos trasladan a su propio dominio.
+
+| Proyecto | Descripción breve |
+|----------|-------------------|
+| [Sistema Bancario](projects/01-sistema-bancario.md) | Gestión de clientes, cuentas y transacciones de un banco |
+
+### Casos de estudio elegibles
 
 Cada equipo selecciona uno de los siguientes casos de estudio al inicio del semestre. El dominio elegido se mantiene durante los cinco sprints.
 
 | # | Proyecto | Descripción breve |
 |---|----------|-------------------|
-| 1 | [Sistema Bancario](projects/01-sistema-bancario.md) | Gestión de clientes, cuentas y transacciones de un banco |
-| 2 | [Papelería](projects/02-papeleria.md) | Inventario, ventas y pedidos a proveedores de una papelería |
-| 3 | [Consultorio Médico](projects/03-consultorio-medico.md) | Pacientes, citas y historias clínicas de un consultorio |
-| 4 | [Clínica Veterinaria](projects/04-clinica-veterinaria.md) | Mascotas, dueños, consultas y cartilla de vacunación |
-| 5 | [Sistema Académico](projects/05-sistema-academico.md) | Estudiantes, materias, matrículas y calificaciones |
-| 6 | [Liga de Fútbol](projects/06-liga-futbol.md) | Equipos, jugadores, fixture y tabla de posiciones |
+| 1 | [Papelería](projects/02-papeleria.md) | Inventario, ventas y pedidos a proveedores de una papelería |
+| 2 | [Consultorio Médico](projects/03-consultorio-medico.md) | Pacientes, citas y historias clínicas de un consultorio |
+| 3 | [Clínica Veterinaria](projects/04-clinica-veterinaria.md) | Mascotas, dueños, consultas y cartilla de vacunación |
+| 4 | [Sistema Académico](projects/05-sistema-academico.md) | Estudiantes, materias, matrículas y calificaciones |
+| 5 | [Liga de Fútbol](projects/06-liga-futbol.md) | Equipos, jugadores, fixture y tabla de posiciones |
 
 Cada archivo de proyecto detalla la evaluación de viabilidad, las entidades del dominio y el plan de sprints acumulativos alineado con los módulos del curso.
 
@@ -163,18 +173,28 @@ Cada archivo de proyecto detalla la evaluación de viabilidad, las entidades del
 
 ### Semana 2 — Clases, objetos y encapsulamiento
 
-**T1 — Diagnóstico y revisión de clases**
+> *Excepción de estructura semanal: T1/T2/T3 en vez de T1/T2/P. El
+> laboratorio se desplaza a fecha por definir.*
+
+**T1 — Diagnóstico y sintaxis de Java**
 - Cuestionario diagnóstico de conocimientos previos (8 preguntas)
+- Repaso de sintaxis de Java: variables, tipos primitivos y operadores;
+  estructuras de control (`if`/`else`, `switch`); bucles (`for`, `while`,
+  `do-while`)
+
+**T2 — Repaso de clases y objetos**
 - Repaso: clase, objeto, atributo, método, constructor
 - Instanciación y ciclo de vida de un objeto en Java
 
-**T2 — Encapsulamiento**
+**T3 — Encapsulamiento y elección de proyecto de aula**
 - Modificadores de acceso: `private`, `public`, `protected`, default
 - Getters y setters: convenciones y casos de uso
 - Buenas prácticas de encapsulamiento; validación dentro de setters
 - Constructores sobrecargados
+- Presentación de los 5 casos de estudio elegibles del proyecto de aula; mecanismo de
+  elección/asignación de equipos
 
-**P — Laboratorio: Clase de dominio encapsulada**
+**P — Laboratorio: Clase de dominio encapsulada** *(fecha por definir)*
 - Modelar una clase con atributos privados y constructores sobrecargados
 - Implementar getters y setters con validaciones de negocio
 - Verificar el comportamiento con casos de prueba
