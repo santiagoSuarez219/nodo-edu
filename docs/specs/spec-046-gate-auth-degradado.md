@@ -1,4 +1,4 @@
-# spec-046 — [NOT STARTED] Gate de autenticación honesto ante una caída de Supabase Auth
+# spec-046 — [TESTING] Gate de autenticación honesto ante una caída de Supabase Auth
 
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.
@@ -251,8 +251,8 @@ cerrado" de D4, y se verifica en `TC-046-015`.
 
 | Archivo | Qué cambia |
 |---|---|
-| `lib/auth/errors.ts` *(nuevo)* | Type guards propios (`isAuthErrorLike`, `isRetryableAuthError`) y `classifyAuthError()`; sin imports de `@supabase/*` |
-| `lib/auth/types.ts` *(nuevo)* | `AuthCheckResult` discriminado |
+| `lib/auth/errors.ts` *(nuevo)* | Type guards propios (`isAuthErrorLike`) y `classifyAuthError()`; sin imports de `@supabase/*` |
+| `lib/auth/auth-check.ts` *(nuevo)* | `AuthCheckResult` discriminado. Nombre distinto de `lib/auth/types.ts` a propósito: ese archivo ya existía con `AuthResult` (resultado de server actions), un tipo homónimo pero no relacionado |
 | `lib/auth/middleware.ts` | Guardas de env (8-9), `try/catch` + lectura de `error` (28-30), reintento único (D2); `updateSupabaseSession` devuelve `{ supabaseResponse, auth, supabase }` en vez de `user` |
 | `middleware.ts` | Rama `unavailable` **antes** del gate (línea 18) → 503; `/api` exento (D3); `/servicio-no-disponible` añadido a `PUBLIC_PREFIXES` (5-9); matcher sin cambios |
 | `lib/auth/service-unavailable-page.ts` *(nuevo)* | Constructor del HTML inline del 503, aislado y testeable fuera de `middleware.ts` |
@@ -307,48 +307,71 @@ recogido como criterio de aceptación y como `TC-046-008`, no como fase de MCP.
 > la Fase 1, y el fix del middleware sin la página (Fase 4) dejaría a
 > `requireUser` redirigiendo a una ruta inexistente.
 
-### Fase 1 — Clasificación
-- [ ] Crear `lib/auth/types.ts` con `AuthCheckResult`.
-- [ ] Crear `lib/auth/errors.ts` con `isAuthErrorLike`, `isRetryableAuthError` y
-      `classifyAuthError()`, sin importar de `@supabase/*`.
-- [ ] Verificar que la clasificación falla cerrado (D4) ante entrada desconocida.
+### Fase 1 — Clasificación ✅
+- [x] Crear `lib/auth/auth-check.ts` con `AuthCheckResult` (renombrado de
+      `lib/auth/types.ts` planeado originalmente: ese archivo ya existía con
+      `AuthResult`, un tipo homónimo pero no relacionado — ver "Impacto en el
+      sistema").
+- [x] Crear `lib/auth/errors.ts` con `isAuthErrorLike` y `classifyAuthError()`,
+      sin importar de `@supabase/*`.
+- [x] Verificar que la clasificación falla cerrado (D4) ante entrada desconocida.
 
-### Fase 2 — Capa 1a: lectura honesta en el middleware
-- [ ] Validar `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
-      antes de construir el cliente; devolver `misconfigured` con log
+### Fase 2 — Capa 1a: lectura honesta en el middleware ✅
+- [x] Validar `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+      antes de construir el cliente; devuelve `misconfigured` con log
       `configuration_error` en vez de lanzar.
-- [ ] Mover `createServerClient` dentro del `try`.
-- [ ] Leer `error` de `getUser()` y clasificarlo.
-- [ ] Reintento único con backoff ~250 ms y `AbortSignal.timeout` ~2 s (D2).
-- [ ] Cambiar el contrato de retorno a `{ supabaseResponse, auth, supabase }`.
+- [x] Mover `createServerClient` dentro del flujo protegido (guarda de env
+      antes de construir el cliente).
+- [x] Leer `error` de `getUser()` y clasificarlo.
+- [x] Reintento único con backoff ~250 ms y `AbortSignal.timeout` ~2 s (D2) —
+      implementado vía `global.fetch` (no `auth.fetch`: es la única vía tipada
+      de `@supabase/supabase-js` para inyectar un fetch propio en este cliente).
+- [x] Cambiar el contrato de retorno a `{ supabaseResponse, auth, supabase }`.
 
-### Fase 3 — Capa 1b: respuesta 503
-- [ ] Crear `lib/auth/service-unavailable-page.ts` con el HTML inline, el copy
+### Fase 3 — Capa 1b: respuesta 503 ✅
+- [x] Crear `lib/auth/service-unavailable-page.ts` con el HTML inline, el copy
       acordado y el soporte de `prefers-color-scheme`.
-- [ ] Añadir la rama `unavailable` en `middleware.ts` **antes** del gate de
+- [x] Añadir la rama `unavailable` en `middleware.ts` **antes** del gate de
       `PUBLIC_PREFIXES`, con las cabeceras acordadas.
-- [ ] Mantener `/api` pasando sin 503 (D3).
+- [x] Mantener `/api` pasando sin 503 (D3).
 
-### Fase 4 — Página compartida
-- [ ] Crear `app/servicio-no-disponible/page.tsx` reutilizando `ErrorState`, con
+### Fase 4 — Página compartida ✅
+- [x] Crear `app/servicio-no-disponible/page.tsx` reutilizando `ErrorState`, con
       `force-dynamic` y `robots: { index: false }`.
-- [ ] Crear `app/servicio-no-disponible/RetryButton.tsx`.
-- [ ] Añadir la ruta a `PUBLIC_PREFIXES` (`middleware.ts:5-9`).
+- [x] Crear `app/servicio-no-disponible/RetryButton.tsx` — exporta
+      `ServiceUnavailableCard`, el client component que posee el callback
+      `onRetry` y por eso es quien renderiza `ErrorState` (ese prop es una
+      función y no puede cruzar el límite server/client).
+- [x] Añadir la ruta a `PUBLIC_PREFIXES` (`middleware.ts:5-9`).
 
-### Fase 5 — Capa 2: `lib/auth/session.ts`
-- [ ] Añadir `getAuthCheck()` `cache()`-ada.
-- [ ] `getCurrentUser` delega, conservando su firma y con el comentario `// DEBT:`.
-- [ ] `requireUser`, `requireRole` y `requireAnyRole` distinguen `anonymous`
+### Fase 5 — Capa 2: `lib/auth/session.ts` ✅
+- [x] Añadir `getAuthCheck()` `cache()`-ada.
+- [x] `getCurrentUser` delega, conservando su firma y con el comentario `// DEBT:`.
+- [x] `requireUser`, `requireRole` y `requireAnyRole` distinguen `anonymous`
       (→ `/login`) de `unavailable` (→ `/servicio-no-disponible?from=`).
-- [ ] Confirmar que **ninguna** página consumidora se modifica.
+- [x] Confirmado: ninguna página consumidora se modificó (`git diff --stat`
+      contra `development` solo toca los archivos de la tabla de "Impacto en
+      el sistema").
 
-### Fase 6 — Cierre documental
-- [ ] `docs/specs/backlog.md`: DEBT-042 → ✅ Resuelta (spec-046).
-- [ ] Anotar en DEBT-040 los dos residuos con puntero a spec-046: la consulta a
+### Fase 6 — Cierre documental ✅
+- [x] `docs/specs/backlog.md`: DEBT-042 → ✅ Resuelta (spec-046).
+- [x] Anotado en DEBT-040 los dos residuos con puntero a spec-046: la consulta a
       `user_roles` y la navbar de `app/layout.tsx:37-38,56`.
 
 ### Fase 7 — Pruebas
-- [ ] Ronda manual de `docs/testing/test-046-gate-auth-degradado.md`.
+- [ ] Ronda manual de `docs/testing/test-046-gate-auth-degradado.md` — **pendiente
+      de ejecución por el usuario**. Verificación técnica propia durante la
+      implementación (no sustituye la ronda manual, ver nota abajo): con el
+      túnel a `mirp-lab` cortado y una cookie de sesión real (obtenida vía
+      `@supabase/supabase-js` contra la instancia local, antes de cortar el
+      túnel), `curl` contra `/cuenta` devolvió `503` con
+      `Cache-Control: no-store, must-revalidate`, `Retry-After: 30`,
+      `X-Robots-Tag: noindex` y el copy acordado; `/login` durante la caída
+      también devolvió `503` (no el formulario); `/api/questions` sin API key
+      siguió devolviendo `401` en **JSON**, no HTML; una cookie corrupta llevó
+      a `/login` (no a 503); restaurado el túnel, la misma sesión entró a
+      `/admin/courses` y `/cuenta` con `200` sin necesidad de volver a iniciar
+      sesión.
 - [ ] (Cuando exista framework) e2e/unit sobre `classifyAuthError()` — función
       pura, testeable sin red.
 
@@ -390,5 +413,5 @@ recogido como criterio de aceptación y como `TC-046-008`, no como fase de MCP.
 
 > Claude no escribe código de implementación hasta que esta sección esté marcada.
 
-- [ ] Paquete (spec + pruebas) aprobado por el usuario
-- **Fecha de aprobación:** {{fecha}}
+- [x] Paquete (spec + pruebas) aprobado por el usuario
+- **Fecha de aprobación:** 2026-08-09

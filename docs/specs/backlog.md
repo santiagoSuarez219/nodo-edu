@@ -544,13 +544,12 @@ patrón D6 (fallar cerrado ante `unavailable`, mensaje distinto de
 
 ---
 
-## DEBT-042 — El middleware cierra la sesión de todos los usuarios ante cualquier caída de Supabase Auth
+## DEBT-042 — El middleware cierra la sesión de todos los usuarios ante cualquier caída de Supabase Auth — ✅ Resuelto (spec-046, 2026-08-09)
 
 **Origen:** Detectado durante la ronda manual de `test-037-manejo-de-errores.md`
 (`TC-037-004`, 2026-08-01), al recargar la página con el túnel a `mirp-lab`
 cortado
-**Prioridad:** Alta — bloquea el sitio **completo** (no un dominio puntual) y,
-mientras dura el fallo, impide incluso volver a iniciar sesión
+**Prioridad:** ~~Alta~~ → **Resuelto**
 
 `middleware.ts:18` hace `if (!isPublic && !user) redirect a /login` para
 prácticamente cualquier ruta del sitio (el `matcher` de `middleware.ts:52-54`
@@ -580,18 +579,30 @@ modos (con el riesgo de que páginas protegidas rendericen sin verificación
 real) es una opción tan delicada como bloquear a todo el sitio; ver
 **Acción**.
 
-**Acción:** Diseñar un spec dedicado (no una extensión de spec-037). Como
-mínimo: (1) envolver `supabase.auth.getUser()` en `updateSupabaseSession()`
-en un `try/catch` que distinga la excepción/fallo de red de "no hay sesión",
-y (2) decidir el comportamiento ante ese tercer caso — candidatos: dejar
-pasar la request con una advertencia degradada (arriesga exponer una ruta que
-debía estar protegida, si el fallo es transitorio y la sesión real no
-existe), mostrar una página de "servicio no disponible" en vez de redirigir a
-`/login` (evita el bucle de "no puedo entrar porque no puedo verificar, y no
-puedo verificar porque el servicio está caído"), o cachear brevemente el
-último `user` válido conocido para tolerar caídas cortas. Evaluar también si
-`/admin` (que además consulta `user_roles` sin manejo de error en
-`middleware.ts:35-39`) necesita su propio tratamiento.
+**Resolución (2026-08-09):** `docs/specs/spec-046-gate-auth-degradado.md` —
+`[IN PROGRESS]`. `lib/auth/errors.ts` clasifica el `error` real que devuelve
+`supabase.auth.getUser()` (el SDK ya lo distingue internamente — el bug era
+la destructuración, no la falta de `try/catch`) en `AuthCheckResult`
+(`lib/auth/auth-check.ts`): `authenticated` / `anonymous` / `unavailable`. Con
+`unavailable`, `lib/auth/middleware.ts` reintenta una vez (250ms, timeout 2s
+por intento) y `middleware.ts` responde **503 real** con HTML inline (no
+`rewrite` — verificado que en Next 16.2.4 no preserva el status) antes del
+gate, exento `/api`. La Capa 2 (`lib/auth/session.ts` → `requireUser` /
+`requireRole` / `requireAnyRole`) redirige a `/servicio-no-disponible` en vez
+de `/login` ante `unavailable`, sin tocar las ~20 páginas consumidoras.
+Verificado en vivo (túnel a `mirp-lab` cortado, cookie de sesión real): 503
+con `Cache-Control: no-store`, `Retry-After: 30`; `/api` sigue devolviendo
+JSON; recuperado el túnel, la misma sesión entra sin volver a iniciar sesión.
+
+**Residuo, fuera del alcance de spec-046, tratado en [[DEBT-040]]:** la
+consulta a `user_roles` de `middleware.ts:35-39` (bloque `/admin`) y de
+`requireRole`/`requireAnyRole` en `lib/auth/session.ts` sigue descartando
+`error` — un fallo de lectura de Postgres/RLS (con Auth sano) puede seguir
+expulsando a un docente legítimo a `/`. También queda fuera
+`app/layout.tsx:37-38,56`: con Auth caído, `getCurrentProfile()`/
+`getCurrentRoles()` ven `null` y la navbar entera desaparece — mismo
+antipatrón en versión visual, documentado con `// DEBT:` en
+`lib/auth/session.ts`.
 
 ---
 
@@ -664,6 +675,22 @@ donde el llamador necesite distinguirlos, y capturar/verificar siempre
 `error` antes de confiar en `data`. Priorizar `lib/submissions/index.ts` (nota
 real de estudiante en juego) y `lib/enrollments/access.ts` (control de acceso)
 sobre el resto.
+
+**Residuo anotado desde [[DEBT-042]] (spec-046, 2026-08-09):** dos sitios más,
+descubiertos y deliberadamente dejados fuera del alcance de spec-046 por ser
+consultas a Postgres/RLS, no a Supabase Auth:
+
+- **`middleware.ts:35-39`** (bloque `/admin`) y **`requireRole`/
+  `requireAnyRole`** en `lib/auth/session.ts` — la consulta a `user_roles`
+  sigue descartando `error`. Con Auth sano pero Postgres/RLS caído, un docente
+  u owner legítimo puede seguir siendo expulsado a `/` en vez de ver un aviso
+  de infraestructura. spec-046 redujo el escenario (si Auth también está
+  caído, el 503 corta antes de llegar aquí) pero no lo cerró.
+- **`app/layout.tsx:37-38,56`** — `getCurrentProfile()`/`getCurrentRoles()`
+  (`lib/auth/session.ts`) devuelven `null`/`[]` tanto si no hay sesión como si
+  no se pudo verificar (comentario `// DEBT:` en el propio código, apuntando
+  aquí). Con Auth caído, la navbar entera desaparece — la misma mentira de
+  esta deuda, en versión visual.
 
 ---
 
