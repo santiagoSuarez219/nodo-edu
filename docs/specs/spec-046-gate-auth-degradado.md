@@ -1,5 +1,16 @@
 # spec-046 — [TESTING] Gate de autenticación honesto ante una caída de Supabase Auth
 
+> Volvió brevemente a `[IN PROGRESS]` tras la ronda de pruebas manuales
+> (`docs/testing/test-046-gate-auth-degradado.md`, 2026-08-13): TC-046-003 y
+> TC-046-004 fallaron — un visitante sin sesión con Auth caído recibía
+> `/login` en vez del 503 esperado (viola la decisión D4, fail-closed). Causa
+> raíz: `supabase.auth.getUser()` no hace red cuando no hay cookie, así que
+> el middleware nunca detectaba `unavailable` para ese caso. Corregido en
+> `lib/auth/middleware.ts` (ping a `/auth/v1/health` en esa rama específica)
+> y verificado en una segunda ronda — los 16 casos manuales están ahora en
+> ✅. Vuelve a `[TESTING]` pendiente de revisión de código antes de `[DONE]`.
+> Ver el resumen de la ronda en el archivo de test para el detalle completo.
+
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.
 
@@ -149,10 +160,23 @@ la pérdida de un solo paquete convertiría el sitio entero en un 503.
   un middleware que ya reintentó, y `getAuthCheck` está `cache()`-ada por
   request, con lo que el reintento se multiplicaría por cada llamada.
 
-### D3 — `/api` queda exento del 503
+> **Corrección tras la revisión de código** (2026-08-13): el peor caso de
+> ~2,25 s de arriba quedó desactualizado por el fix de TC-046-003/004 (ver
+> nota en la sección "Diseño" → "Taxonomía real de `getUser()`"). Un
+> visitante **sin cookie de sesión** ahora dispara `checkAuthHealth()`, que
+> reutiliza este mismo mecanismo de reintento — así que su peor caso real es
+> **dos** intentos de ~2 s más el backoff de 250 ms, **~4,25 s** antes del
+> 503 (coincide con el comentario de `lib/auth/middleware.ts:14-17`, que ya
+> lo documentaba correctamente; era esta sección del spec la que había
+> quedado corta). `/api` no paga este costo: se cortocircuita en
+> `middleware.ts` antes de llegar a `updateSupabaseSession()` (ver D3).
 
-`middleware.ts:8` ya trata `/api` como público: son rutas de servicio (MCP)
-autenticadas por **API key, no por sesión**. No dependen de Supabase Auth y
+### D3 — `/api` queda exento del 503 (y del chequeo de Auth por completo)
+
+`middleware.ts` corta camino para cualquier `pathname` que empiece con
+`/api` **antes** de llamar a `updateSupabaseSession()` — no solo del 503, del
+chequeo de Auth entero. Son rutas de servicio (MCP) autenticadas por
+**API key, no por sesión**. No dependen de Supabase Auth y
 devolverles HTML en vez de JSON rompería los cinco MCPs del proyecto. La rama
 `unavailable` debe respetar esa exención. Es criterio de aceptación, no detalle.
 
@@ -169,7 +193,7 @@ un gate. El coste de un falso 503 es una pantalla molesta; el de un falso
 
 | Escenario | `error` devuelto | Clasificación |
 |---|---|---|
-| No hay cookie de sesión | `AuthSessionMissingError` (status 400) — `GoTrueClient.js:2625` | `anonymous` |
+| No hay cookie de sesión, Auth responde | `AuthSessionMissingError` (status 400) — `GoTrueClient.js:2625` | `anonymous` (tras ping a `/auth/v1/health`, ver corrección post-`TC-046-003/004`) |
 | JWT inválido / caducado / cookie corrupta | `AuthApiError` 401/403 (`bad_jwt`) | `anonymous` |
 | **Auth inalcanzable** (túnel caído, DNS, TLS, timeout) | `AuthRetryableFetchError` con `status: 0` — `lib/fetch.js:28` | `unavailable: 'network'` |
 | **Auth devuelve 5xx** (500-504, 520-530 de Cloudflare) | `AuthRetryableFetchError` con ese status — `lib/fetch.js:22-32` | `unavailable: 'server'` |
@@ -178,6 +202,21 @@ un gate. El coste de un falso 503 es una pantalla molesta; el de un falso
 
 El 5xx del servidor de Auth **ya cae del lado "no se pudo verificar"** por
 diseño del SDK; no hay que tratarlo aparte.
+
+> **Corrección tras la ronda de pruebas manuales** (`TC-046-003`/`TC-046-004`,
+> 2026-08-13): la fila "no hay cookie de sesión" de esta tabla era la causa
+> raíz del incumplimiento del criterio de aceptación #2. `AuthSessionMissingError`
+> se resuelve **localmente** en el SDK (`GoTrueClient._getUser`) sin llegar a
+> hacer ninguna petición de red — así que sin más, un visitante anónimo nunca
+> podía activar la rama `unavailable`, sin importar el estado real de Auth.
+> `lib/auth/middleware.ts` (`tryGetUser`) ahora hace un ping explícito a
+> `GET {supabaseUrl}/auth/v1/health` (sin autenticar, expuesto por GoTrue)
+> **solo** en esa rama, antes de confiar en `anonymous`; el retry de D2 se
+> reutiliza sin cambios porque el resultado del ping pasa por la misma
+> clasificación `AuthCheckResult`. El caso de JWT inválido/corrupto no
+> necesita este ping extra: esa rama ya hace una llamada de red real dentro
+> de `getUser()` para validar el token, así que un Auth caído ya cae en
+> `unavailable` por el camino existente (confirmado en `TC-046-015`).
 
 ### Tipo discriminado
 
@@ -254,7 +293,7 @@ cerrado" de D4, y se verifica en `TC-046-015`.
 | `lib/auth/errors.ts` *(nuevo)* | Type guards propios (`isAuthErrorLike`) y `classifyAuthError()`; sin imports de `@supabase/*` |
 | `lib/auth/auth-check.ts` *(nuevo)* | `AuthCheckResult` discriminado. Nombre distinto de `lib/auth/types.ts` a propósito: ese archivo ya existía con `AuthResult` (resultado de server actions), un tipo homónimo pero no relacionado |
 | `lib/auth/middleware.ts` | Guardas de env (8-9), `try/catch` + lectura de `error` (28-30), reintento único (D2); `updateSupabaseSession` devuelve `{ supabaseResponse, auth, supabase }` en vez de `user` |
-| `middleware.ts` | Rama `unavailable` **antes** del gate (línea 18) → 503; `/api` exento (D3); `/servicio-no-disponible` añadido a `PUBLIC_PREFIXES` (5-9); matcher sin cambios |
+| `middleware.ts` | `/api` cortocircuita antes de tocar Supabase (D3, corregido tras revisión de código); rama `unavailable` → 503 para el resto; `/servicio-no-disponible` añadido a `PUBLIC_PREFIXES`; matcher sin cambios |
 | `lib/auth/service-unavailable-page.ts` *(nuevo)* | Constructor del HTML inline del 503, aislado y testeable fuera de `middleware.ts` |
 | `lib/auth/session.ts` | `getAuthCheck()` nueva; `getCurrentUser` (8-14) delega; `requireUser` (43-50), `requireRole` (52-65), `requireAnyRole` (67-79) redirigen a `/servicio-no-disponible` ante `unavailable` |
 | `app/servicio-no-disponible/page.tsx` *(nuevo)* | Página React con `ErrorState`, `dynamic = 'force-dynamic'`, `robots: { index: false }` |
@@ -359,19 +398,20 @@ recogido como criterio de aceptación y como `TC-046-008`, no como fase de MCP.
       `user_roles` y la navbar de `app/layout.tsx:37-38,56`.
 
 ### Fase 7 — Pruebas
-- [ ] Ronda manual de `docs/testing/test-046-gate-auth-degradado.md` — **pendiente
-      de ejecución por el usuario**. Verificación técnica propia durante la
-      implementación (no sustituye la ronda manual, ver nota abajo): con el
-      túnel a `mirp-lab` cortado y una cookie de sesión real (obtenida vía
-      `@supabase/supabase-js` contra la instancia local, antes de cortar el
-      túnel), `curl` contra `/cuenta` devolvió `503` con
-      `Cache-Control: no-store, must-revalidate`, `Retry-After: 30`,
-      `X-Robots-Tag: noindex` y el copy acordado; `/login` durante la caída
-      también devolvió `503` (no el formulario); `/api/questions` sin API key
-      siguió devolviendo `401` en **JSON**, no HTML; una cookie corrupta llevó
-      a `/login` (no a 503); restaurado el túnel, la misma sesión entró a
-      `/admin/courses` y `/cuenta` con `200` sin necesidad de volver a iniciar
-      sesión.
+- [x] Ronda manual de `docs/testing/test-046-gate-auth-degradado.md` —
+      **16/16 casos ✅ Aprobados** (2026-08-13, con Claude como copiloto,
+      ejecución con autorización explícita del usuario en cada paso con
+      navegador). Primera ronda: 14 ✅ / 2 ❌ (TC-046-003, TC-046-004 — un
+      visitante sin cookie de sesión no activaba la rama `unavailable` con
+      Auth caído). Fix aplicado en `lib/auth/middleware.ts` (ping a
+      `/auth/v1/health`), y una segunda ronda confirmó los dos casos en
+      verde. La revisión de código posterior (`@reviewer`) encontró que ese
+      primer fix habría roto producción (Kong hosted exige `apikey`, a
+      diferencia del Kong local de `mirp-lab`) — corregido y re-verificado
+      contra el proyecto de producción real. Ver el resumen completo de la
+      ronda, el incidente de entorno (stack de Docker local contaminando el
+      aislamiento) y los hallazgos de la revisión en
+      `docs/testing/test-046-gate-auth-degradado.md`.
 - [ ] (Cuando exista framework) e2e/unit sobre `classifyAuthError()` — función
       pura, testeable sin red.
 

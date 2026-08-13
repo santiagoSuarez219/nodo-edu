@@ -5,6 +5,68 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+## DEBT-060 — No existe endpoint ni MCP para crear `academic_courses`
+
+**Origen:** preparación de datos de prueba para `docs/testing/test-046-gate-auth-degradado.md`
+(spec-046), 2026-08-13
+**Prioridad:** Baja — no bloquea flujos de producto; solo afecta la
+preparación de datos de prueba y el alta de cursos nuevos, que hoy pasa por
+SQL directo
+
+`students-mcp.enroll_student` y `create_student` requieren un
+`academic_course_id`/`enrollment_code` existente, pero ningún endpoint de
+`/api/*` ni MCP del proyecto permite **crear** una fila en `academic_courses`
+(solo `assignment-mcp.list_academic_courses` para leerlas). En una base de
+desarrollo recién reseteada, sin ningún curso académico sembrado, no hay
+forma de matricular un estudiante de prueba sin insertar la fila a mano en
+la base de datos.
+
+**Cómo se resolvió puntualmente:** se insertó un curso de prueba
+(`TEST046ED`, slug `estructuras-de-datos`) vía `psql` dentro del contenedor
+`supabase_db_02-Educational-Page` en `mirp-lab`, con confirmación explícita
+del usuario para saltarse la regla de "no manipular la base de datos
+directamente".
+
+**Acción:** evaluar si el alta de `academic_courses` debe exponerse como
+endpoint/MCP (probablemente en `courses-mcp`, que ya gestiona el dominio de
+cursos) o si es intencional que solo se cree desde el panel admin — y en ese
+caso, documentar el flujo de alta esperado.
+
+---
+
+## DEBT-059 — Sin protección ante picos de tráfico: 504 por timeout de función en Vercel
+
+**Origen:** alerta de Vercel (Runtime Errors/Logs), 2026-08-13
+**Prioridad:** Media — el pico ya bajó a baseline solo, pero el sitio no tiene
+ninguna mitigación si vuelve a ocurrir o si el origen no es benigno
+
+Un pico de tráfico orgánico (~19x el baseline reciente) saturó la función
+serverless y causó 504 (timeout de ejecución) en múltiples rutas de
+contenido, no en una ruta específica — descartando bug de ruta o mal deploy
+(afectó al único deployment sirviendo producción). El pico estuvo
+concentrado en dos IPs de la misma ISP residencial (UNE EPM
+Telecomunicaciones, Colombia), referidas desde `www.nod0.dev`, con user
+agents de navegador normal (desktop y mobile) sin firma de bot. La p95 de
+middleware subió en paralelo al tráfico, consistente con sobrecarga general
+y no con fallo de una dependencia externa. Tanto el volumen de requests
+como los 5xx volvieron a baseline hacia el final de la ventana observada.
+
+**Acción:** Evaluar mitigaciones antes del próximo pico:
+- Cachear las rutas de contenido MDX (mayormente estáticas) para reducir
+  carga por request repetido.
+- Revisar si el middleware (`lib/auth/middleware.ts` — `updateSupabaseSession`)
+  puede evitarse o abaratarse en rutas públicas de solo lectura, ya que su
+  p95 fue el síntoma que escaló con el tráfico.
+- Considerar rate limiting básico por IP en rutas de contenido si el patrón
+  se repite.
+- Confirmar `maxDuration` configurado para las funciones afectadas.
+
+No se investigó a fondo el origen del tráfico (¿publicación viral, refresh en
+loop, prueba de carga no anunciada?) — si vuelve a ocurrir, vale la pena
+revisar Web Analytics/Runtime Logs de Vercel para esa ventana específica.
+
+---
+
 ## DEBT-058 — Warning de hidratación por `<Script id="theme-init">` en `RootLayout`
 
 **Origen:** ronda manual de test-044 (TC-013), overlay de dev de Next.js al
