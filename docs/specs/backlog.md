@@ -5,6 +5,108 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+## DEBT-061 — Deuda menor de la revisión de código de spec-046
+
+**Origen:** segunda revisión de código (`@reviewer`) de
+`fix/middleware-auth-degradado`, 2026-08-13. Ninguno de los tres ítems
+bloquea el spec; se dejan anotados por decisión explícita del usuario
+(corrigió solo el más relevante, el open redirect — ver más abajo, ya
+resuelto — y pidió backlog para el resto).
+**Prioridad:** Baja
+
+- **`app/servicio-no-disponible/RetryButton.tsx`** — el archivo se llama
+  `RetryButton` pero exporta `ServiceUnavailableCard`; el nombre quedó
+  desactualizado respecto al contenido real. Renombrar a
+  `ServiceUnavailableCard.tsx` cuando se toque este archivo de nuevo.
+- **`lib/auth/service-unavailable-page.ts` → `escapeHtml`** — no escapa `'`
+  (comilla simple). Riesgo real nulo hoy (el único uso es un atributo
+  `href="…"` con comillas dobles, y `&lt;`/`&gt;`/`"`/`&amp;` sí se escapan),
+  pero es una función de escape incompleta a la espera de un segundo call
+  site que sí use comillas simples.
+- **Patrón `redirectTo` sin validar en todo el proyecto** — la revisión de
+  spec-046 encontró y corrigió un open redirect puntual en
+  `app/servicio-no-disponible/page.tsx` (`?from=`), pero el mismo patrón sin
+  validar existe en `lib/auth/actions.ts:47-49` (`redirectTo` de
+  `app/(auth)/login/page.tsx`) y no se tocó por estar fuera del alcance de
+  este spec. Vale una pasada dedicada a validar todos los `redirectTo`/`from`
+  del proyecto (misma regla: debe empezar por `/` y no por `//`).
+- **`/api/submissions/[submissionId]/submit`** (y potencialmente otras rutas
+  `/api` que autentican por sesión, no por API key) — durante una caída de
+  Auth responde `401 "no autorizado"` en vez de señalar que el servicio está
+  caído, el mismo tipo de mensaje deshonesto que spec-046 elimina en la UI.
+  Fuera de alcance por D3 del spec (que exime a `/api` del gate HTML), pero
+  sus consumidores JSON merecerían un `503 service_unavailable` explícito
+  ante esta misma causa.
+- **`checkAuthHealth()` sin cachear** (`lib/auth/middleware.ts`) — el ping a
+  `/auth/v1/health` se dispara en cada request sin cookie de sesión
+  (`/login`, `/registro`, crawlers…), sin ningún cacheo por instancia.
+  Consecuencia deliberada de D4, pero dado `DEBT-059` (pico de tráfico que ya
+  disparó la p95 del middleware), vale evaluar un cacheo corto del resultado.
+
+---
+
+## DEBT-060 — No existe endpoint ni MCP para crear `academic_courses`
+
+**Origen:** preparación de datos de prueba para `docs/testing/test-046-gate-auth-degradado.md`
+(spec-046), 2026-08-13
+**Prioridad:** Baja — no bloquea flujos de producto; solo afecta la
+preparación de datos de prueba y el alta de cursos nuevos, que hoy pasa por
+SQL directo
+
+`students-mcp.enroll_student` y `create_student` requieren un
+`academic_course_id`/`enrollment_code` existente, pero ningún endpoint de
+`/api/*` ni MCP del proyecto permite **crear** una fila en `academic_courses`
+(solo `assignment-mcp.list_academic_courses` para leerlas). En una base de
+desarrollo recién reseteada, sin ningún curso académico sembrado, no hay
+forma de matricular un estudiante de prueba sin insertar la fila a mano en
+la base de datos.
+
+**Cómo se resolvió puntualmente:** se insertó un curso de prueba
+(`TEST046ED`, slug `estructuras-de-datos`) vía `psql` dentro del contenedor
+`supabase_db_02-Educational-Page` en `mirp-lab`, con confirmación explícita
+del usuario para saltarse la regla de "no manipular la base de datos
+directamente".
+
+**Acción:** evaluar si el alta de `academic_courses` debe exponerse como
+endpoint/MCP (probablemente en `courses-mcp`, que ya gestiona el dominio de
+cursos) o si es intencional que solo se cree desde el panel admin — y en ese
+caso, documentar el flujo de alta esperado.
+
+---
+
+## DEBT-059 — Sin protección ante picos de tráfico: 504 por timeout de función en Vercel
+
+**Origen:** alerta de Vercel (Runtime Errors/Logs), 2026-08-13
+**Prioridad:** Media — el pico ya bajó a baseline solo, pero el sitio no tiene
+ninguna mitigación si vuelve a ocurrir o si el origen no es benigno
+
+Un pico de tráfico orgánico (~19x el baseline reciente) saturó la función
+serverless y causó 504 (timeout de ejecución) en múltiples rutas de
+contenido, no en una ruta específica — descartando bug de ruta o mal deploy
+(afectó al único deployment sirviendo producción). El pico estuvo
+concentrado en dos IPs de la misma ISP residencial (UNE EPM
+Telecomunicaciones, Colombia), referidas desde `www.nod0.dev`, con user
+agents de navegador normal (desktop y mobile) sin firma de bot. La p95 de
+middleware subió en paralelo al tráfico, consistente con sobrecarga general
+y no con fallo de una dependencia externa. Tanto el volumen de requests
+como los 5xx volvieron a baseline hacia el final de la ventana observada.
+
+**Acción:** Evaluar mitigaciones antes del próximo pico:
+- Cachear las rutas de contenido MDX (mayormente estáticas) para reducir
+  carga por request repetido.
+- Revisar si el middleware (`lib/auth/middleware.ts` — `updateSupabaseSession`)
+  puede evitarse o abaratarse en rutas públicas de solo lectura, ya que su
+  p95 fue el síntoma que escaló con el tráfico.
+- Considerar rate limiting básico por IP en rutas de contenido si el patrón
+  se repite.
+- Confirmar `maxDuration` configurado para las funciones afectadas.
+
+No se investigó a fondo el origen del tráfico (¿publicación viral, refresh en
+loop, prueba de carga no anunciada?) — si vuelve a ocurrir, vale la pena
+revisar Web Analytics/Runtime Logs de Vercel para esa ventana específica.
+
+---
+
 ## DEBT-058 — Warning de hidratación por `<Script id="theme-init">` en `RootLayout`
 
 **Origen:** ronda manual de test-044 (TC-013), overlay de dev de Next.js al
@@ -544,13 +646,12 @@ patrón D6 (fallar cerrado ante `unavailable`, mensaje distinto de
 
 ---
 
-## DEBT-042 — El middleware cierra la sesión de todos los usuarios ante cualquier caída de Supabase Auth
+## DEBT-042 — El middleware cierra la sesión de todos los usuarios ante cualquier caída de Supabase Auth — ✅ Resuelto (spec-046, 2026-08-09)
 
 **Origen:** Detectado durante la ronda manual de `test-037-manejo-de-errores.md`
 (`TC-037-004`, 2026-08-01), al recargar la página con el túnel a `mirp-lab`
 cortado
-**Prioridad:** Alta — bloquea el sitio **completo** (no un dominio puntual) y,
-mientras dura el fallo, impide incluso volver a iniciar sesión
+**Prioridad:** ~~Alta~~ → **Resuelto**
 
 `middleware.ts:18` hace `if (!isPublic && !user) redirect a /login` para
 prácticamente cualquier ruta del sitio (el `matcher` de `middleware.ts:52-54`
@@ -580,18 +681,30 @@ modos (con el riesgo de que páginas protegidas rendericen sin verificación
 real) es una opción tan delicada como bloquear a todo el sitio; ver
 **Acción**.
 
-**Acción:** Diseñar un spec dedicado (no una extensión de spec-037). Como
-mínimo: (1) envolver `supabase.auth.getUser()` en `updateSupabaseSession()`
-en un `try/catch` que distinga la excepción/fallo de red de "no hay sesión",
-y (2) decidir el comportamiento ante ese tercer caso — candidatos: dejar
-pasar la request con una advertencia degradada (arriesga exponer una ruta que
-debía estar protegida, si el fallo es transitorio y la sesión real no
-existe), mostrar una página de "servicio no disponible" en vez de redirigir a
-`/login` (evita el bucle de "no puedo entrar porque no puedo verificar, y no
-puedo verificar porque el servicio está caído"), o cachear brevemente el
-último `user` válido conocido para tolerar caídas cortas. Evaluar también si
-`/admin` (que además consulta `user_roles` sin manejo de error en
-`middleware.ts:35-39`) necesita su propio tratamiento.
+**Resolución (2026-08-09):** `docs/specs/spec-046-gate-auth-degradado.md` —
+`[IN PROGRESS]`. `lib/auth/errors.ts` clasifica el `error` real que devuelve
+`supabase.auth.getUser()` (el SDK ya lo distingue internamente — el bug era
+la destructuración, no la falta de `try/catch`) en `AuthCheckResult`
+(`lib/auth/auth-check.ts`): `authenticated` / `anonymous` / `unavailable`. Con
+`unavailable`, `lib/auth/middleware.ts` reintenta una vez (250ms, timeout 2s
+por intento) y `middleware.ts` responde **503 real** con HTML inline (no
+`rewrite` — verificado que en Next 16.2.4 no preserva el status) antes del
+gate, exento `/api`. La Capa 2 (`lib/auth/session.ts` → `requireUser` /
+`requireRole` / `requireAnyRole`) redirige a `/servicio-no-disponible` en vez
+de `/login` ante `unavailable`, sin tocar las ~20 páginas consumidoras.
+Verificado en vivo (túnel a `mirp-lab` cortado, cookie de sesión real): 503
+con `Cache-Control: no-store`, `Retry-After: 30`; `/api` sigue devolviendo
+JSON; recuperado el túnel, la misma sesión entra sin volver a iniciar sesión.
+
+**Residuo, fuera del alcance de spec-046, tratado en [[DEBT-040]]:** la
+consulta a `user_roles` de `middleware.ts:35-39` (bloque `/admin`) y de
+`requireRole`/`requireAnyRole` en `lib/auth/session.ts` sigue descartando
+`error` — un fallo de lectura de Postgres/RLS (con Auth sano) puede seguir
+expulsando a un docente legítimo a `/`. También queda fuera
+`app/layout.tsx:37-38,56`: con Auth caído, `getCurrentProfile()`/
+`getCurrentRoles()` ven `null` y la navbar entera desaparece — mismo
+antipatrón en versión visual, documentado con `// DEBT:` en
+`lib/auth/session.ts`.
 
 ---
 
@@ -664,6 +777,22 @@ donde el llamador necesite distinguirlos, y capturar/verificar siempre
 `error` antes de confiar en `data`. Priorizar `lib/submissions/index.ts` (nota
 real de estudiante en juego) y `lib/enrollments/access.ts` (control de acceso)
 sobre el resto.
+
+**Residuo anotado desde [[DEBT-042]] (spec-046, 2026-08-09):** dos sitios más,
+descubiertos y deliberadamente dejados fuera del alcance de spec-046 por ser
+consultas a Postgres/RLS, no a Supabase Auth:
+
+- **`middleware.ts:35-39`** (bloque `/admin`) y **`requireRole`/
+  `requireAnyRole`** en `lib/auth/session.ts` — la consulta a `user_roles`
+  sigue descartando `error`. Con Auth sano pero Postgres/RLS caído, un docente
+  u owner legítimo puede seguir siendo expulsado a `/` en vez de ver un aviso
+  de infraestructura. spec-046 redujo el escenario (si Auth también está
+  caído, el 503 corta antes de llegar aquí) pero no lo cerró.
+- **`app/layout.tsx:37-38,56`** — `getCurrentProfile()`/`getCurrentRoles()`
+  (`lib/auth/session.ts`) devuelven `null`/`[]` tanto si no hay sesión como si
+  no se pudo verificar (comentario `// DEBT:` en el propio código, apuntando
+  aquí). Con Auth caído, la navbar entera desaparece — la misma mentira de
+  esta deuda, en versión visual.
 
 ---
 
