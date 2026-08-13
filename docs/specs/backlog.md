@@ -5,6 +5,46 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+## DEBT-061 — Deuda menor de la revisión de código de spec-046
+
+**Origen:** segunda revisión de código (`@reviewer`) de
+`fix/middleware-auth-degradado`, 2026-08-13. Ninguno de los tres ítems
+bloquea el spec; se dejan anotados por decisión explícita del usuario
+(corrigió solo el más relevante, el open redirect — ver más abajo, ya
+resuelto — y pidió backlog para el resto).
+**Prioridad:** Baja
+
+- **`app/servicio-no-disponible/RetryButton.tsx`** — el archivo se llama
+  `RetryButton` pero exporta `ServiceUnavailableCard`; el nombre quedó
+  desactualizado respecto al contenido real. Renombrar a
+  `ServiceUnavailableCard.tsx` cuando se toque este archivo de nuevo.
+- **`lib/auth/service-unavailable-page.ts` → `escapeHtml`** — no escapa `'`
+  (comilla simple). Riesgo real nulo hoy (el único uso es un atributo
+  `href="…"` con comillas dobles, y `&lt;`/`&gt;`/`"`/`&amp;` sí se escapan),
+  pero es una función de escape incompleta a la espera de un segundo call
+  site que sí use comillas simples.
+- **Patrón `redirectTo` sin validar en todo el proyecto** — la revisión de
+  spec-046 encontró y corrigió un open redirect puntual en
+  `app/servicio-no-disponible/page.tsx` (`?from=`), pero el mismo patrón sin
+  validar existe en `lib/auth/actions.ts:47-49` (`redirectTo` de
+  `app/(auth)/login/page.tsx`) y no se tocó por estar fuera del alcance de
+  este spec. Vale una pasada dedicada a validar todos los `redirectTo`/`from`
+  del proyecto (misma regla: debe empezar por `/` y no por `//`).
+- **`/api/submissions/[submissionId]/submit`** (y potencialmente otras rutas
+  `/api` que autentican por sesión, no por API key) — durante una caída de
+  Auth responde `401 "no autorizado"` en vez de señalar que el servicio está
+  caído, el mismo tipo de mensaje deshonesto que spec-046 elimina en la UI.
+  Fuera de alcance por D3 del spec (que exime a `/api` del gate HTML), pero
+  sus consumidores JSON merecerían un `503 service_unavailable` explícito
+  ante esta misma causa.
+- **`checkAuthHealth()` sin cachear** (`lib/auth/middleware.ts`) — el ping a
+  `/auth/v1/health` se dispara en cada request sin cookie de sesión
+  (`/login`, `/registro`, crawlers…), sin ningún cacheo por instancia.
+  Consecuencia deliberada de D4, pero dado `DEBT-059` (pico de tráfico que ya
+  disparó la p95 del middleware), vale evaluar un cacheo corto del resultado.
+
+---
+
 ## DEBT-060 — No existe endpoint ni MCP para crear `academic_courses`
 
 **Origen:** preparación de datos de prueba para `docs/testing/test-046-gate-auth-degradado.md`

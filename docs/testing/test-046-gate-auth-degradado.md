@@ -416,7 +416,10 @@ y servidor reiniciado al terminar — verificado con `curl` (`307` normal).
   cascada); curso `TEST046ED` eliminado por `DELETE` directo en `mirp-lab`
   (mismo mecanismo que su creación — no hay endpoint/MCP de borrado, ver
   DEBT-060). Verificado: `/api/students` devuelve lista vacía y
-  `count(*) from academic_courses where code = 'TEST-046'` → `0`.
+  `count(*) from academic_courses where code = 'TEST046ED'` → `0` (la query
+  citaba antes `'TEST-046'`, un typo detectado en la segunda revisión de
+  código — el código real del curso era `TEST046ED`; la limpieza en sí fue
+  correcta, la corrigió la @reviewer de forma independiente).
 - ⚠️ Verificado: túnel SSH a `mirp-lab` restaurado, `.env.local` con
   `NEXT_PUBLIC_SUPABASE_URL` sin comentar, `npm run dev` respondiendo normal,
   y sin ningún stack de Docker local corriendo en paralelo
