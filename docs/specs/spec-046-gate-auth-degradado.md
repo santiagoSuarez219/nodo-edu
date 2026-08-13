@@ -1,4 +1,4 @@
-# spec-046 — [TESTING] Gate de autenticación honesto ante una caída de Supabase Auth
+# spec-046 — [DONE] Gate de autenticación honesto ante una caída de Supabase Auth
 
 > Volvió brevemente a `[IN PROGRESS]` tras la ronda de pruebas manuales
 > (`docs/testing/test-046-gate-auth-degradado.md`, 2026-08-13): TC-046-003 y
@@ -7,9 +7,22 @@
 > raíz: `supabase.auth.getUser()` no hace red cuando no hay cookie, así que
 > el middleware nunca detectaba `unavailable` para ese caso. Corregido en
 > `lib/auth/middleware.ts` (ping a `/auth/v1/health` en esa rama específica)
-> y verificado en una segunda ronda — los 16 casos manuales están ahora en
-> ✅. Vuelve a `[TESTING]` pendiente de revisión de código antes de `[DONE]`.
-> Ver el resumen de la ronda en el archivo de test para el detalle completo.
+> y verificado en una segunda ronda — los 16 casos manuales quedaron en ✅.
+>
+> Una primera revisión de código (`@reviewer`) encontró un bloqueante
+> crítico en ese primer fix: el ping no mandaba `apikey`, y el gateway de
+> Supabase hosted (a diferencia del Kong local de `mirp-lab`) la exige —
+> habría causado 503 para todo visitante anónimo en producción con Auth
+> sano. Corregido y verificado en vivo contra el proyecto real de
+> producción; también se cortocircuitó `/api` para no pagar el ping y se
+> dejó fuera del commit un archivo ajeno al spec. Una segunda revisión dio
+> **APROBADO**, con 3 hallazgos menores: se corrigió el más relevante (open
+> redirect sin validar en el botón "Reintentar" de la pantalla 503) y los
+> otros dos quedaron en `DEBT-061`. Commits: `067c857`, `6d23c0a`.
+>
+> Ver el resumen completo de la ronda, el incidente de entorno (un stack de
+> Docker local contaminó el aislamiento durante la verificación del primer
+> fix) y ambas revisiones de código en `docs/testing/test-046-gate-auth-degradado.md`.
 
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.
