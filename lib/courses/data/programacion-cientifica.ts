@@ -58,6 +58,8 @@ export const programacionCientifica: Course = {
       articleSlug: "condicionales-y-bucles",
       order: 3,
       title: "Condicionales y bucles",
+      summary:
+        "Convierte un True/False en una decisión con if, elif y else, y repite lógica sobre un inventario completo con for, range() y while, incluyendo break y continue.",
       topics: [
         { title: "Estructuras condicionales: if, elif, else" },
         { title: "Bucles: for, while; uso de range()" },
