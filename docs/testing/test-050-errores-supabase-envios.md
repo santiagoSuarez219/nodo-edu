@@ -1,6 +1,6 @@
-# test-047 — Fallos de infraestructura en envíos y control de acceso
+# test-050 — Fallos de infraestructura en envíos y control de acceso
 
-> Ronda asociada a `docs/specs/spec-047-errores-supabase-envios.md`.
+> Ronda asociada a `docs/specs/spec-050-errores-supabase-envios.md`.
 > **Estado: pendiente de implementación** — los casos nacen con el spec y se
 > ejecutan cuando el usuario apruebe e implemente el paquete.
 
@@ -33,8 +33,8 @@ ssh -f -N -L 54321:localhost:54321 -L 54322:localhost:54322 \
 > - **(b)** Cortar el túnel entero y aceptar que se está probando el escenario
 >   combinado (Auth + Postgres caídos), que es el que spec-046 ya cubre.
 >
-> **Recomendado: (a)** para TC-047-001..006 —son precisamente los casos que
-> spec-046 dejó fuera— y (b) solo para TC-047-009.
+> **Recomendado: (a)** para TC-050-001..006 —son precisamente los casos que
+> spec-046 dejó fuera— y (b) solo para TC-050-009.
 
 ## Datos de prueba
 
@@ -59,7 +59,7 @@ ssh -f -N -L 54321:localhost:54321 -L 54322:localhost:54322 \
 
 ## Casos de prueba
 
-### TC-047-001 — Enviar una evaluación con la lectura de respuestas caída no produce una nota
+### TC-050-001 — Enviar una evaluación con la lectura de respuestas caída no produce una nota
 **Cubre:** criterio de aceptación 1
 **Precondición:** estudiante con un intento `in_progress` y respuestas ya
 guardadas; `SELECT` revocado sobre `public.answers`.
@@ -76,7 +76,7 @@ escritura en `submissions.auto_score` / `final_score` ni en `student_grades`.
 **Estado:** ⬜ Pendiente
 **Hallazgos:** {{pendiente}}
 
-### TC-047-002 — Una evaluación con preguntas abiertas no se autocierra en 0
+### TC-050-002 — Una evaluación con preguntas abiertas no se autocierra en 0
 **Cubre:** criterio de aceptación 2 — *el caso más importante de la ronda*
 **Precondición:** evaluación que incluye al menos una pregunta `open_text`;
 intento `in_progress` con ambas respondidas.
@@ -93,9 +93,9 @@ en `student_grades` para esa matrícula e ítem.
 **Estado:** ⬜ Pendiente
 **Hallazgos:** {{pendiente}}
 
-### TC-047-003 — El estudiante no pierde sus respuestas tras un envío fallido
+### TC-050-003 — El estudiante no pierde sus respuestas tras un envío fallido
 **Cubre:** criterio de aceptación 7
-**Precondición:** la de TC-047-001, justo después de su paso 4.
+**Precondición:** la de TC-050-001, justo después de su paso 4.
 **Pasos:**
 1. Restaurar el acceso a la base.
 2. Recargar la página de la evaluación.
@@ -105,7 +105,7 @@ completa con normalidad y produce la nota correcta (no 0).
 **Estado:** ⬜ Pendiente
 **Hallazgos:** {{pendiente}}
 
-### TC-047-004 — `max_attempts` no se salta ante un fallo de conteo
+### TC-050-004 — `max_attempts` no se salta ante un fallo de conteo
 **Cubre:** criterio de aceptación 3
 **Precondición:** evaluación con `max_attempts = 1` y un intento ya
 **entregado** por el estudiante (sin `in_progress` pendiente).
@@ -120,7 +120,7 @@ debe seguir siendo 1.
 **Estado:** ⬜ Pendiente
 **Hallazgos:** {{pendiente}}
 
-### TC-047-005 — Finalizar una calificación con el contexto de revisión ilegible falla visiblemente
+### TC-050-005 — Finalizar una calificación con el contexto de revisión ilegible falla visiblemente
 **Cubre:** criterio de aceptación 4
 **Precondición:** envío en `status = 'submitted'` con una pregunta abierta ya
 calificada a mano por el docente (`manual_score` > 0).
@@ -137,7 +137,7 @@ sigue en `submitted`.
 **Estado:** ⬜ Pendiente
 **Hallazgos:** {{pendiente}}
 
-### TC-047-006 — Un docente dueño del curso no es expulsado como "no matriculado"
+### TC-050-006 — Un docente dueño del curso no es expulsado como "no matriculado"
 **Cubre:** criterio de aceptación 6
 **Precondición:** sesión iniciada como docente dueño de un curso; Auth sano.
 **Pasos:**
@@ -150,9 +150,9 @@ propio curso.
 **Estado:** ⬜ Pendiente
 **Hallazgos:** {{pendiente}}
 
-### TC-047-007 — Contenido docente sensible sigue fallando cerrado
+### TC-050-007 — Contenido docente sensible sigue fallando cerrado
 **Cubre:** D5 — verificar que el fix no abre nada de más
-**Precondición:** sesión de **estudiante**; base degradada como en TC-047-006.
+**Precondición:** sesión de **estudiante**; base degradada como en TC-050-006.
 **Pasos:**
 1. Como estudiante, intentar acceder a `/{courseSlug}/{lessonSlug}/apuntes`
    (contenido exclusivo de docente, spec-044).
@@ -162,7 +162,7 @@ estado `unavailable` nunca debe convertirse en acceso concedido.
 **Estado:** ⬜ Pendiente
 **Hallazgos:** {{pendiente}}
 
-### TC-047-008 — La ruta API responde 503, no 404
+### TC-050-008 — La ruta API responde 503, no 404
 **Cubre:** criterio de aceptación 5
 **Precondición:** intento válido `in_progress`; base degradada.
 **Pasos:**
@@ -173,7 +173,7 @@ estado `unavailable` nunca debe convertirse en acceso concedido.
 **Estado:** ⬜ Pendiente
 **Hallazgos:** {{pendiente}}
 
-### TC-047-009 — No hay regresión en el flujo normal
+### TC-050-009 — No hay regresión en el flujo normal
 **Cubre:** que el fix no rompa el camino feliz — el riesgo real de fallar cerrado
 **Precondición:** base **sana**, túnel activo, evaluación completa disponible.
 **Pasos:**
@@ -186,7 +186,7 @@ spec. Ningún mensaje de servicio no disponible en condiciones normales.
 **Estado:** ⬜ Pendiente
 **Hallazgos:** {{pendiente}}
 
-### TC-047-010 — Diagnóstico de datos ya corrompidos
+### TC-050-010 — Diagnóstico de datos ya corrompidos
 **Cubre:** criterio de aceptación 8
 **Precondición:** Fase 5 implementada; consulta lista.
 **Pasos:**

@@ -1,4 +1,4 @@
-# spec-047 — [NOT STARTED] Fallos de infraestructura en envíos y control de acceso: dejar de escribir notas falsas
+# spec-050 — [NOT STARTED] Fallos de infraestructura en envíos y control de acceso: dejar de escribir notas falsas
 
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.
@@ -258,7 +258,7 @@ explícita del usuario en la sesión en que se ejecute.
 
 ### Fase 6 — Verificación
 - [ ] `npm run lint` y `npm run build` en verde.
-- [ ] Ronda manual `docs/testing/test-047-errores-supabase-envios.md`.
+- [ ] Ronda manual `docs/testing/test-050-errores-supabase-envios.md`.
 - [ ] Invocar `@reviewer` sobre el diff contra `development` antes de `[DONE]`.
 
 ## Criterios de aceptación
@@ -286,8 +286,8 @@ explícita del usuario en la sesión en que se ejecute.
 > Estos archivos se crean junto con el spec (ver CLAUDE.md → "Artefactos que
 > acompañan al spec").
 
-- **Manuales:** `docs/testing/test-047-errores-supabase-envios.md` — casos
-  `TC-047-001` … `TC-047-010`. La técnica de simulación de fallo es la misma que
+- **Manuales:** `docs/testing/test-050-errores-supabase-envios.md` — casos
+  `TC-050-001` … `TC-050-010`. La técnica de simulación de fallo es la misma que
   ya usaron test-037 y test-046: **cortar el túnel SSH a `mirp-lab`** con la
   sesión ya iniciada.
 - **Automáticas (e2e/unit):** framework aún **por definir** (ver CLAUDE.md →

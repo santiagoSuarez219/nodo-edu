@@ -753,7 +753,7 @@ donde el llamador necesite distinguirlos, y capturar/verificar siempre
 real de estudiante en juego) y `lib/enrollments/access.ts` (control de acceso)
 sobre el resto.
 
-> **En curso (2026-08-14):** `docs/specs/spec-047-errores-supabase-envios.md`
+> **En curso (2026-08-14):** `docs/specs/spec-050-errores-supabase-envios.md`
 > — `[NOT STARTED]` — cubre **solo** el subconjunto prioritario
 > (`lib/submissions/index.ts`, `app/api/submissions/[submissionId]/submit`,
 > `lib/enrollments/access.ts`). Al verificar el código para redactarlo se
@@ -767,7 +767,7 @@ sobre el resto.
 > falla (suma `auto_score` en su lugar), y `getMaxPossiblePoints` devuelve `0`
 > ante un fallo de lectura, normalizando la nota a 0 en la libreta.
 >
-> **Esta deuda NO se cierra con spec-047**: quedan los ~35 sitios restantes,
+> **Esta deuda NO se cierra con spec-050**: quedan los ~35 sitios restantes,
 > incluidas las guardas de borrado de `lib/grades/index.ts:64` y
 > `lib/questions/index.ts:251`, más el residuo de `user_roles` anotado abajo.
 
