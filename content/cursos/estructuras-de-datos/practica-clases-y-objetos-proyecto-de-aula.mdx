@@ -12,7 +12,7 @@ slides_hint: "Cada sección ## es una diapositiva. Presentación sincrona."
 date: "2026-08-13"
 author: "Asistente de Docencia"
 summary: ""
-updatedAt: "2026-08-12"
+updatedAt: "2026-08-14"
 ---
 
 ## El objetivo de hoy: tu propia clase, en tu propio computador
@@ -20,6 +20,12 @@ updatedAt: "2026-08-12"
 Acabas de repasar clase, objeto, atributo, método y constructor con el
 ejemplo de `Cliente` del sistema bancario. Ahora te toca hacer exactamente lo
 mismo, pero con una entidad real de **tu** proyecto de aula.
+
+Antes de que empieces, el profesor modela en vivo, una por una, las clases
+que faltan del Sistema Bancario — el proyecto de referencia del curso.
+Escríbelas tú también en tu propio computador mientras el profesor las
+construye en el tablero; el objetivo es que veas el proceso completo, en
+vivo, antes de repetirlo por tu cuenta con tu propio proyecto.
 
 Tu equipo ya tiene asignado uno de los cinco casos de estudio del curso, y
 cada integrante va a modelar **una clase de dominio distinta**, en su propio
@@ -79,16 +85,34 @@ correctos, ya cumpliste la parte individual de la actividad.
 
 ## Reparte las entidades de tu proyecto
 
-Cada proyecto de aula tiene cuatro entidades candidatas para repartir entre
-el equipo. Busca la pestaña de tu proyecto: ahí tienes, para **una** de esas
+La primera pestaña es el **Sistema Bancario**: ahí tienes las cinco
+entidades que el profesor modela en vivo, una por una, durante la clase.
+Síguelas en tu propio computador mientras el profesor las escribe — es la
+misma actividad que vas a repetir después, solo que aquí el profesor va
+primero.
+
+Las siguientes cinco pestañas son los proyectos de aula de los equipos. Cada
+proyecto de aula tiene cuatro entidades candidatas para repartir entre el
+equipo. Busca la pestaña de tu proyecto: ahí tienes, para **una** de esas
 entidades, qué atributos debe tener y qué debe mostrar su método de
 información — no el código. Ese código lo escribes tú, con el mismo formato
-que `Cliente`: atributos, constructor y método de información. El resto de
-las entidades las modela cada integrante siguiendo exactamente ese mismo
-patrón, como en los ejercicios propuestos de "Ejercicios propuestos — Clases
-y objetos".
+que usó el profesor en su demostración: atributos, constructor y método de
+información. El resto de las entidades las modela cada integrante siguiendo
+exactamente ese mismo patrón, como en los ejercicios propuestos de
+"Ejercicios propuestos — Clases y objetos".
 
 <Tabs>
+  <Tab label="Sistema Bancario (demo del profesor)">
+
+Entidades que modela el profesor, una por una, en vivo: `Cliente`, `Cuenta`,
+`CuentaAhorros`, `CuentaCorriente` y `Transaccion` — hoy, sin herencia
+todavía, cada una como una clase independiente con sus propios atributos.
+
+Ejemplo guía — `Cuenta`: número de cuenta (`String`), saldo (`double`) y
+fecha de apertura (`String`). El método de información debe mostrar el
+número de cuenta, el saldo y la fecha de apertura.
+
+  </Tab>
   <Tab label="Papelería">
 
 Entidades para repartir: `Producto`, `Venta`, `Proveedor`, `Pedido`.
