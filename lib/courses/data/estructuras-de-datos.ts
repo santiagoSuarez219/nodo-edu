@@ -149,6 +149,8 @@ export const estructurasDeDatos: Course = {
       articleSlug: "herencia",
       order: 8,
       title: "Herencia",
+      summary:
+        "Superclases y subclases con extends, atributos protected, super() en el constructor y sobreescritura de métodos con @Override, aplicados a Cuenta, CuentaAhorros y CuentaCorriente del proyecto de aula.",
       topics: [
         { title: "Superclase y subclase: keyword extends" },
         { title: "Reutilización de código mediante herencia" },
@@ -161,11 +163,22 @@ export const estructurasDeDatos: Course = {
       articleSlug: "polimorfismo",
       order: 9,
       title: "Polimorfismo",
+      summary:
+        "Del if instanceof en cadena al binding dinámico: cómo cuentas distintas responden al mismo mensaje, y cuándo modelar el contrato con clase abstracta o con interfaz.",
       topics: [
         { title: "Polimorfismo en tiempo de ejecución (binding dinámico)" },
         { title: "Clases abstractas: keyword abstract" },
         { title: "Interfaces en Java: interface, implements" },
       ],
+    },
+    {
+      id: "lab-poo-jerarquia-de-clases",
+      slug: "lab-poo-jerarquia-de-clases",
+      articleSlug: "lab-poo-jerarquia-de-clases",
+      kind: "guide",
+      order: 9.5,
+      title: "Laboratorio — Jerarquía de Clases de Tres Niveles y Polimorfismo",
+      topics: [],
     },
     {
       id: "lab-01-listas-enlazadas",
