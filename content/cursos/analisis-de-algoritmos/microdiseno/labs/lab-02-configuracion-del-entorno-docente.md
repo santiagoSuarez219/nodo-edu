@@ -6,7 +6,9 @@
 - **Semana / sesión:** Semana 2 (10–16 de agosto de 2026), Sesión 2 (P) — laboratorio práctico
 - **Duración:** 2 horas
 - **Momento evaluativo:** Ninguno. No hay ★ esta semana; el primer laboratorio evaluativo (★ Laboratorio 1) es en la Semana 6. Esta sesión alimenta únicamente la nota de **Seguimiento** (ejercicios de clase, consistencia de commits).
-- **Lección teórica de la que depende:** "Sintaxis básica de Python" (Sesión 1 T, misma semana) — tipos de datos básicos, estructuras de control (`if`/`elif`/`else`, `for`, `while`), funciones (definición, parámetros, retorno, *docstrings*), estructuras nativas (listas, tuplas, diccionarios, conjuntos), comprensión de listas y manejo básico de excepciones (`try`/`except`) e `import`. También depende de "Buenas prácticas y entornos de trabajo en Python" (misma sesión T, segunda mitad) — PEP 8, `pip`, entornos virtuales y `requirements.txt`, que es lo que esta sesión práctica ejecuta directamente.
+- **Lecciones teóricas de las que depende (Sesión 1 T, misma semana, dos artículos):**
+  - **"Sintaxis básica de Python"** (primera mitad): tipos de datos básicos (`int`, `float`, `str`, `bool`, `None`), estructuras de control (`if`/`elif`/`else`, `for`, `while`), funciones (definición, parámetros, valores de retorno, *docstrings*), estructuras de datos nativas (listas, tuplas, diccionarios, conjuntos), comprensión de listas, y manejo básico de excepciones (`try`/`except`) e importación de módulos (`import`).
+  - **"Buenas prácticas y entornos de trabajo en Python"** (segunda mitad): buenas prácticas de código (PEP 8, *docstrings*, *type hints*), `pip` (instalación de paquetes desde PyPI), y entornos virtuales y gestión de dependencias (`venv`, `requirements.txt`). Esta segunda lección es la que esta sesión práctica ejecuta directamente, de punta a punta.
 - **Sprint del proyecto:** No aplica — este curso no tiene proyecto de aula (ver `info.md`). Esta sesión monta el **entorno técnico** (`venv`, `requirements.txt`, convenciones PEP 8) que el estudiante reutilizará sin volver a crearlo en cada una de las 14 sesiones prácticas restantes, incluidos los 5 informes evaluativos.
 
 ## Objetivo de la sesión
@@ -20,7 +22,12 @@ Al salir del aula, el estudiante debe poder:
 
 ## Conexión con la teoría
 
-La sesión T de hoy instaló tipos de datos, control de flujo, funciones, estructuras nativas, comprensión de listas y excepciones/`import` — todo en abstracto, ejecutado como mucho en un intérprete interactivo o un script suelto sin ningún cuidado de organización. Este laboratorio no agrega sintaxis nueva: le da a esa sintaxis un **hogar técnico** — un entorno aislado y reproducible, y las convenciones con las que se va a escribir código el resto del semestre, incluyendo los cinco informes evaluados.
+La sesión T de hoy cubrió, en dos artículos:
+
+- **"Sintaxis básica de Python"** — tipos de datos, control de flujo, funciones, estructuras nativas, comprensión de listas y excepciones/`import` — todo en abstracto, ejecutado como mucho en un intérprete interactivo o un script suelto sin ningún cuidado de organización.
+- **"Buenas prácticas y entornos de trabajo en Python"** — PEP 8, *docstrings*, *type hints*, `pip`/PyPI, entornos virtuales y `requirements.txt`.
+
+Este laboratorio no agrega sintaxis nueva: le da a la sintaxis de la primera lección un **hogar técnico** — el entorno aislado y reproducible, y las convenciones de estilo, que la segunda lección acaba de instalar y que se van a usar para escribir código el resto del semestre, incluyendo los cinco informes evaluados.
 
 Pregunta de apertura para el grupo: *"¿Qué pasaría si instalan una versión de `matplotlib` en su computador para este curso, y el próximo semestre otro curso o proyecto necesita una versión distinta e incompatible? ¿Por qué no basta con tener Python instalado una sola vez en la máquina?"* (Respuesta esperada: cada proyecto puede necesitar versiones distintas de las mismas librerías; instalarlo todo de forma global genera conflictos silenciosos y hace que el proyecto de otra persona —o del propio estudiante en el futuro— no sea reproducible.)
 
@@ -292,4 +299,4 @@ Se conecta directamente con la Semana 3 (insertion sort): el mismo `venv` y el m
 - Verificar que el repositorio de cada estudiante (Laboratorio 01, Semana 1) sigue accesible y que la carpeta `ejercicios-clase/` existe.
 - Tener listo el script mal escrito del Paso 3 (PEP 8) para proyectarlo tal cual, sin refactorizar de antemano frente al grupo.
 - Tener a la mano el enunciado exacto del ejercicio integrador (Paso 4) para proyectarlo o compartirlo por escrito.
-- Confirmar que la sesión T de la misma semana ("Sintaxis básica de Python" y "Buenas prácticas y entornos de trabajo en Python") ya cubrió control de flujo, funciones, estructuras nativas, comprensión de listas, excepciones/`import`, PEP 8 y entornos virtuales antes de esta sesión práctica; si quedó incompleta, reforzar brevemente esos conceptos al inicio del Bloque 4 o el Bloque 5.
+- Confirmar que la sesión T de la misma semana ya cubrió el temario completo de sus dos lecciones antes de esta sesión práctica — "Sintaxis básica de Python" (tipos de datos, control de flujo, funciones, estructuras nativas, comprensión de listas, excepciones/`import`) y "Buenas prácticas y entornos de trabajo en Python" (PEP 8, *docstrings*, *type hints*, `pip`/PyPI, entornos virtuales y `requirements.txt`); si alguna quedó incompleta, reforzar brevemente esos conceptos al inicio del Bloque 4 o el Bloque 5.
