@@ -197,6 +197,27 @@ diagrama que solo repite el texto es ruido.
 `python`, `bash`, `text`. El patrón es comentar los pasos dentro del bloque.
 Código inline con backticks simples.
 
+> ⚠️ **`analisis-de-algoritmos` — desde la Semana 3 (2026-08-13, por decisión
+> del docente):** todo bloque de código Python debe seguir el estándar que la
+> propia lección de la Semana 2, `buenas-practicas-y-entornos-python.mdx`,
+> establece: PEP 8 (`snake_case`, espacio alrededor de operadores, ≤79-99
+> caracteres/línea), ***type hints*** en cada parámetro y en el valor de
+> retorno, y **docstring Google-style** (`Args:`, `Returns:`) en cada función.
+> No es opcional a partir de esa semana — el curso ya predicó ese estándar, así
+> que su propio código de ejemplo tiene que cumplirlo.
+>
+> Aplica a **los cuatro artefactos con código**, no solo a la lección:
+> lección `.mdx`, guía del estudiante (**incluidos los esqueletos con `TODO`**:
+> la firma y el docstring van completos aunque el cuerpo esté por completar),
+> guía del docente y apuntes de clase. Los dos últimos se proyectan en clase y
+> el estudiante los copia, así que no hay artefacto exento.
+>
+> Excepción única: las funciones de test de `pytest` (`def test_...`) no llevan
+> type hints ni docstring — es la convención del framework.
+>
+> Aplica a `@lesson-writer` y `@lab-designer`; ver también
+> `.claude/skills/weekly-class-prep/SKILL.md` (calibración de este curso).
+
 **KaTeX** — `remark-math` + `rehype-katex` están activos: `$...$` inline,
 `$$...$$` en bloque.
 

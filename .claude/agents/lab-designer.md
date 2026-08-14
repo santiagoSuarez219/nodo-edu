@@ -56,6 +56,23 @@ Esto separa un laboratorio útil de un ejercicio suelto:
   tiempo y operaciones vs. n con matplotlib** y el **análisis empírico
   contrastado con la predicción teórica** — es la marca del curso. Usa la
   **rúbrica común de 5 criterios del microdiseño**, no inventes otra.
+  Desde la **Semana 3** hay además un **caso de estudio transversal**: el
+  *Sistema de consolidación diaria de lecturas de telemedición*
+  (`microdiseno/projects/caso-evaluacion-ra-2026-2.md`, léelo antes de escribir).
+  Cada laboratorio se ancla a él en tres puntos: el **objetivo** dice qué
+  operación del caso se está atacando; los **datos de prueba** representan
+  escenarios reales del caso, no listas abstractas (p. ej. "la red entregó las
+  lecturas ya ordenadas por marca de tiempo" en vez de "entrada ordenada"); y el
+  `README.md` del entregable **cierra extrapolando la medición a la escala real
+  del caso** (1.850.000 registros) para concluir si el algoritmo sirve o no. Esa
+  vuelta al caso es obligatoria: sin ella el estudiante produce una gráfica
+  correcta sin entender qué significa.
+  **Preséntalo como contexto, nunca como trabajo calificable adicional:** el caso
+  está en estado PROPUESTA hasta la reunión institucional del 19 de agosto de 2026.
+  Y **desde la Semana 3 todo el código Python de ambas guías sigue PEP 8 +
+  *type hints* + docstring Google-style**, incluidos los esqueletos con `TODO`
+  (firma y docstring completos, cuerpo por completar); única excepción, las
+  funciones `def test_...` de pytest. Ver `lesson-authoring` §2.5.
 
 ## Guía del docente
 
