@@ -1,4 +1,4 @@
-# spec-051 — [NOT STARTED] Ciclo de contraseña: restablecer por el docente, cambio forzado y cambio voluntario
+# spec-051 — [IN PROGRESS] Ciclo de contraseña: restablecer por el docente, cambio forzado y cambio voluntario
 
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.
@@ -302,5 +302,5 @@ verificar (infraestructura), y éxito. Nunca reportar éxito sin comprobar el
 
 > Claude no escribe código de implementación hasta que esta sección esté marcada.
 
-- [ ] Paquete (spec + pruebas) aprobado por el usuario
-- **Fecha de aprobación:** {{pendiente}}
+- [x] Paquete (spec + pruebas) aprobado por el usuario
+- **Fecha de aprobación:** 2026-08-15
