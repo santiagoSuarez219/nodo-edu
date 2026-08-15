@@ -198,22 +198,29 @@ verificar (infraestructura), y éxito. Nunca reportar éxito sin comprobar el
 
 ## Fases de implementación
 
-### Fase 1 — Schema y validación
-- [ ] `ChangePasswordSchema` en `lib/auth/schemas.ts`: `current_password`,
+### Fase 1 — Schema y validación ✅ (2026-08-15)
+- [x] `ChangePasswordSchema` en `lib/auth/schemas.ts`: `current_password`,
       `new_password` (min 8, D5), `new_password_confirmation`.
-- [ ] `.refine()` de coincidencia con la confirmación (patrón de `SignUpSchema`).
-- [ ] `.refine()` de que la nueva es distinta de la actual (D6).
+- [x] `.refine()` de coincidencia con la confirmación (patrón de `SignUpSchema`).
+- [x] `.refine()` de que la nueva es distinta de la actual (D6).
 
-### Fase 2 — Cambio voluntario
-- [ ] Server Action `changePassword` en `lib/auth/actions.ts`.
-- [ ] Verificar la contraseña actual sin desplazar la sesión (aviso de D4).
-      **Si no es viable, detenerse y reportar.**
-- [ ] `updateUser({ password })` **verificando `error`** (D9).
-- [ ] Limpiar `must_change_password` si estaba puesta.
-- [ ] Cerrar las demás sesiones, conservando la propia (D8).
-- [ ] `ChangePasswordForm.tsx` con `useActionState`, `autoComplete`
+### Fase 2 — Cambio voluntario ✅ (2026-08-15)
+- [x] Server Action `changePassword` en `lib/auth/actions.ts`.
+- [x] Verificar la contraseña actual sin desplazar la sesión (aviso de D4).
+      **Resuelto:** cliente desechable de `@supabase/supabase-js` con
+      `persistSession: false` — nunca toca el adaptador de cookies de
+      `@supabase/ssr`, así que no puede reescribir la sesión en curso.
+      Verificado con `npx tsc --noEmit` en verde; la prueba manual real queda
+      en TC-051-004/007.
+- [x] `updateUser({ password })` **verificando `error`** (D9).
+- [x] Limpiar `must_change_password` si estaba puesta —
+      `clearMustChangePasswordFlag()` en `lib/auth/service.ts`, no-op hasta
+      que la Fase 3/4 la escriban.
+- [x] Cerrar las demás sesiones, conservando la propia (D8) —
+      `signOut({ scope: 'others' })`.
+- [x] `ChangePasswordForm.tsx` con `useActionState`, `autoComplete`
       (`current-password` / `new-password`), errores con `aria-describedby`.
-- [ ] Montar la tarjeta en `app/cuenta/page.tsx`.
+- [x] Montar la tarjeta en `app/cuenta/page.tsx`.
 
 ### Fase 3 — Restablecimiento por el docente
 - [ ] `ResetStudentPasswordSchema` en `lib/students/schemas.ts`.

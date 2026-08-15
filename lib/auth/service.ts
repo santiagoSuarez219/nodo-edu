@@ -1,4 +1,4 @@
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient, type User } from "@supabase/supabase-js";
 
 // SupabaseClient explícito, NO ReturnType<typeof createClient>: para una
 // función genérica, ReturnType<T> no resuelve los parámetros de tipo por
@@ -21,4 +21,33 @@ export function createServiceSupabaseClient() {
   }
 
   return serviceClient;
+}
+
+// spec-051 (D2): la marca `must_change_password` vive en `app_metadata`
+// precisamente porque solo `service_role` puede escribirla — el propio
+// usuario no puede borrársela desde su sesión. Se pasa el `app_metadata`
+// actual completo y se sobreescribe con un spread en vez de mandar solo
+// `{ must_change_password: false }`: no está documentado si el servidor de
+// Auth mergea o reemplaza el objeto, así que el merge se hace aquí, en
+// código, sin depender de ese comportamiento.
+//
+// No-op si la marca no estaba puesta — seguro de llamar siempre, incluso
+// antes de que exista ningún flujo que la escriba (Fase 3/4 de spec-051).
+export async function clearMustChangePasswordFlag(
+  userId: string,
+  currentAppMetadata: User["app_metadata"]
+): Promise<void> {
+  if (!currentAppMetadata?.must_change_password) return;
+
+  const supabase = createServiceSupabaseClient();
+  const { error } = await supabase.auth.admin.updateUserById(userId, {
+    app_metadata: { ...currentAppMetadata, must_change_password: false },
+  });
+
+  if (error) {
+    console.error(
+      `clearMustChangePasswordFlag: no se pudo limpiar la marca para ${userId}:`,
+      error.message
+    );
+  }
 }
