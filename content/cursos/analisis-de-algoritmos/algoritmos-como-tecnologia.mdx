@@ -31,19 +31,12 @@ Lo que acabas de leer todavía no es un problema computacional: es una queja. "T
 
 Son cuatro preguntas:
 
-| Pregunta | Respuesta en este caso |
-|---|---|
-| ¿Qué entra? | Cerca de 1.850.000 registros de lectura, en el orden en que la red los entregó |
-| ¿Qué sale? | Los mismos registros, sin duplicados, ordenados por cuenta y por fecha |
-| ¿Qué restringe? | Cuatro horas de ventana; ninguna lectura válida puede perderse |
-| ¿Qué operación domina el costo? | Ordenar cerca de 1.850.000 registros |
-
-```mermaid
-flowchart LR
-  A["Situacion organizacional\n(el proceso tarda 9 horas)"] --> B["Modelado\n(entradas, salidas,\nrestricciones)"]
-  B --> C["Problema computacional\n(ordenar n registros)"]
-  C --> D["Algoritmo\nque se puede analizar\ny comparar"]
-```
+| Pregunta                        | Respuesta en este caso                                                         |
+| ------------------------------- | ------------------------------------------------------------------------------ |
+| ¿Qué entra?                     | Cerca de 1.850.000 registros de lectura, en el orden en que la red los entregó |
+| ¿Qué sale?                      | Los mismos registros, sin duplicados, ordenados por cuenta y por fecha         |
+| ¿Qué restringe?                 | Cuatro horas de ventana; ninguna lectura válida puede perderse                 |
+| ¿Qué operación domina el costo? | Ordenar cerca de 1.850.000 registros                                           |
 
 Fíjate en lo que hizo ese paso: convirtió una empresa entera, con su call center y su facturación, en una sola pregunta con forma matemática. Todo lo demás —el nombre de la empresa, el color de los medidores— dejó de importar para el análisis.
 
@@ -88,14 +81,25 @@ Si duplicas la computadora — el doble de velocidad de procesamiento — el Alg
 
 Por eso Cormen llama a los algoritmos una **tecnología**, en el mismo sentido que el hardware o las redes: una decisión de diseño con consecuencias medibles en tiempo, dinero y capacidad de resolver problemas que antes eran inviables. Elegir bien el algoritmo no es un lujo académico — es lo que determina si un sistema real escala o colapsa cuando su carga de datos crece.
 
+La misma idea aparece en problemas que no tienen nada que ver con ordenar nombres:
+
+<Callout tipo="nota">
+**Programar los horarios de una universidad** —asignar miles de grupos a cientos de docentes y salones sin que dos choquen en el mismo bloque— es, en el fondo, un problema de asignación con restricciones. "Probar combinaciones hasta que una funcione" no escala igual que una estrategia que descarta de entrada ramas completas de opciones inválidas.
+
+**Calcular la ruta más rápida para una ambulancia** sobre la red vial de una ciudad es un problema de caminos mínimos sobre un grafo. Recorrer todas las rutas posibles no escala igual que un algoritmo que aprovecha la estructura de la red para descartar caminos que nunca podrían ser los más cortos.
+
+</Callout>
+
+Se repite el mismo argumento en los dos: una organización real depende de que un algoritmo termine a tiempo, y la estrategia que elige para resolver el problema —no el hardware donde corre— es lo que decide si eso ocurre.
+
 ## La eficiencia también es energía y acceso
 
 "Consecuencias medibles" no es una figura retórica. El servidor donde corre el proceso nocturno consume unos 450 W bajo carga sostenida, y eso convierte el tiempo de ejecución en kilovatios-hora que alguien paga y que alguien genera:
 
-| Escenario | Tiempo por noche | Consumo en un año |
-|---|---|---|
-| El proceso actual | 9 h | ≈ 1.478 kWh |
-| El mismo trabajo en 10 minutos | 0,17 h | ≈ 27 kWh |
+| Escenario                      | Tiempo por noche | Consumo en un año |
+| ------------------------------ | ---------------- | ----------------- |
+| El proceso actual              | 9 h              | ≈ 1.478 kWh       |
+| El mismo trabajo en 10 minutos | 0,17 h           | ≈ 27 kWh          |
 
 Esa diferencia —del orden de lo que consume un hogar entero en un año— no la produjo un servidor más moderno ni una planta de energía nueva. La produjo cambiar el algoritmo. Cuando el proceso corre cada noche, durante años, la decisión de diseño que tomaste en una tarde se convierte en una cifra ambiental.
 
@@ -154,12 +158,12 @@ def insertion_sort(arreglo: list) -> list:
 Traza sobre `[5, 2, 4, 6, 1, 3]`, mostrando el arreglo al final de cada iteración de `i`:
 
 | `i` | `clave` | Arreglo tras la iteración |
-|---|---|---|
-| 1 | 2 | `[2, 5, 4, 6, 1, 3]` |
-| 2 | 4 | `[2, 4, 5, 6, 1, 3]` |
-| 3 | 6 | `[2, 4, 5, 6, 1, 3]` |
-| 4 | 1 | `[1, 2, 4, 5, 6, 3]` |
-| 5 | 3 | `[1, 2, 3, 4, 5, 6]` |
+| --- | ------- | ------------------------- |
+| 1   | 2       | `[2, 5, 4, 6, 1, 3]`      |
+| 2   | 4       | `[2, 4, 5, 6, 1, 3]`      |
+| 3   | 6       | `[2, 4, 5, 6, 1, 3]`      |
+| 4   | 1       | `[1, 2, 4, 5, 6, 3]`      |
+| 5   | 3       | `[1, 2, 3, 4, 5, 6]`      |
 
 Cada fila confirma la idea de la sección anterior: al terminar la iteración `i`, los primeros `i + 1` elementos siempre están ordenados entre sí — sin importar qué contenía el resto del arreglo.
 
@@ -192,13 +196,13 @@ Este argumento no depende de los valores concretos de la traza anterior: es vál
 
 ## Resumen operativo
 
-| Paso del algoritmo | Qué invariante se cumple | Por qué importa |
-|---|---|---|
-| Antes de `i = 1` (inicialización) | `arreglo[0..0]` está ordenado (un elemento) | Da el punto de partida: no hay que demostrar nada más para arrancar |
-| Al iniciar cada iteración `i` | `arreglo[0..i-1]` está ordenado | Es lo que le permite al `while` interno insertar `clave` en el lugar correcto |
-| Dentro del `while` (desplazamiento) | Los elementos mayores que `clave` se corren una posición, sin perder ninguno | El subarreglo ordenado nunca pierde elementos, solo cambia su disposición |
-| Al terminar la iteración `i` | `arreglo[0..i]` está ordenado | Preserva la invariante para que la siguiente iteración pueda apoyarse en ella |
-| Al terminar el `for` (`i = len(arreglo)`) | `arreglo[0..len(arreglo)-1]` está ordenado | Es la condición de terminación: el arreglo completo, ordenado — el algoritmo cumplió su promesa |
+| Paso del algoritmo                        | Qué invariante se cumple                                                     | Por qué importa                                                                                 |
+| ----------------------------------------- | ---------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| Antes de `i = 1` (inicialización)         | `arreglo[0..0]` está ordenado (un elemento)                                  | Da el punto de partida: no hay que demostrar nada más para arrancar                             |
+| Al iniciar cada iteración `i`             | `arreglo[0..i-1]` está ordenado                                              | Es lo que le permite al `while` interno insertar `clave` en el lugar correcto                   |
+| Dentro del `while` (desplazamiento)       | Los elementos mayores que `clave` se corren una posición, sin perder ninguno | El subarreglo ordenado nunca pierde elementos, solo cambia su disposición                       |
+| Al terminar la iteración `i`              | `arreglo[0..i]` está ordenado                                                | Preserva la invariante para que la siguiente iteración pueda apoyarse en ella                   |
+| Al terminar el `for` (`i = len(arreglo)`) | `arreglo[0..len(arreglo)-1]` está ordenado                                   | Es la condición de terminación: el arreglo completo, ordenado — el algoritmo cumplió su promesa |
 
 ## Síntesis
 
