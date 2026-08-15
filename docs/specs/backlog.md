@@ -1638,11 +1638,26 @@ nuevo para **reconstruir** el flujo de recuperación de contraseña desde cero
 "reactivar", hay que rehacer las rutas, formularios y Server Actions.
 
 > **Alcance acotado (2026-08-15).** Este ítem queda reducido a la
-> **recuperación por correo** ("olvidé mi contraseña"). El **cambio de
-> contraseña con sesión activa** —que spec-027 eliminó de paso junto con el
-> resto del flujo, pese a no depender de SMTP— se trata en
-> `docs/specs/spec-051-cambio-de-contrasena.md` (`[NOT STARTED]`), que no está
-> bloqueado por nada.
+> **recuperación por correo** ("olvidé mi contraseña"). Todo el circuito que
+> **no** necesita correo —el docente restablece con una contraseña genérica, el
+> estudiante entra y la plataforma le exige cambiarla— se trata en
+> `docs/specs/spec-051-restablecer-y-cambiar-contrasena.md` (`[NOT STARTED]`),
+> que no está bloqueado por nada.
+>
+> **Daño ya causado, motivo del spec-051 (2026-08-15).** Varios estudiantes
+> olvidaron su contraseña y **crearon cuentas nuevas** para poder seguir. No
+> fue un descuido: era la única salida. Verificado el 2026-08-15 sobre el
+> código, **nadie** podía restablecer una contraseña —ni el estudiante, ni el
+> docente, ni un agente: `UpdateStudentSchema`
+> (`lib/students/schemas.ts:15-25`) no acepta `password`, y `students-mcp` solo
+> lo recibe en `create_student`. La vía documentada arriba ("`update_student`
+> con nuevo `email`") consistía en **liberar el correo de la cuenta vieja** para
+> que el estudiante volviera a registrarse con él, que es exactamente cómo se
+> producen los duplicados observados. Cada duplicado deja una cuenta huérfana
+> con la matrícula, el progreso, las notas y la asistencia originales, mientras
+> la nueva arranca vacía. spec-051 corta la causa; **la reparación de los
+> historiales partidos queda pendiente** y se registrará con el diagnóstico de
+> su Fase 7.
 >
 > **Son dos bloqueos, no uno.** Además de SMTP ([[DEBT-001]]: 3 correos de auth
 > por hora en el plan gratuito, inservible para ~30 estudiantes al arranque de
