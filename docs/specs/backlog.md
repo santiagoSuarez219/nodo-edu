@@ -1637,6 +1637,21 @@ nuevo para **reconstruir** el flujo de recuperación de contraseña desde cero
 (la implementación anterior ya no existe en el código) — no es un simple
 "reactivar", hay que rehacer las rutas, formularios y Server Actions.
 
+> **Alcance acotado (2026-08-15).** Este ítem queda reducido a la
+> **recuperación por correo** ("olvidé mi contraseña"). El **cambio de
+> contraseña con sesión activa** —que spec-027 eliminó de paso junto con el
+> resto del flujo, pese a no depender de SMTP— se trata en
+> `docs/specs/spec-051-cambio-de-contrasena.md` (`[NOT STARTED]`), que no está
+> bloqueado por nada.
+>
+> **Son dos bloqueos, no uno.** Además de SMTP ([[DEBT-001]]: 3 correos de auth
+> por hora en el plan gratuito, inservible para ~30 estudiantes al arranque de
+> semestre), spec-027 **eliminó la verificación de correo**. Montar la
+> recuperación sobre direcciones no verificadas no es "poco fiable": el enlace
+> de restablecimiento viaja a un buzón que nadie comprobó que pertenezca a
+> quien dice ser su dueño. El propio spec-027 ya lo anota. Reintroducir la
+> verificación de correo es un spec aparte y es **prerrequisito** de este ítem.
+
 ---
 
 ## DEBT-010 — Error de consola "script tag while rendering" en el init de tema (Next 16)
