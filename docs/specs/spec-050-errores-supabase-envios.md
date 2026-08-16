@@ -1,4 +1,4 @@
-# spec-050 — [NOT STARTED] Fallos de infraestructura en envíos y control de acceso: dejar de escribir notas falsas
+# spec-050 — [IN PROGRESS] Fallos de infraestructura en envíos y control de acceso: dejar de escribir notas falsas
 
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.
@@ -301,5 +301,5 @@ explícita del usuario en la sesión en que se ejecute.
 
 > Claude no escribe código de implementación hasta que esta sección esté marcada.
 
-- [ ] Paquete (spec + pruebas) aprobado por el usuario
-- **Fecha de aprobación:** {{pendiente}}
+- [x] Paquete (spec + pruebas) aprobado por el usuario
+- **Fecha de aprobación:** 2026-08-16
