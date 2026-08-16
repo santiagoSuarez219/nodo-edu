@@ -487,9 +487,15 @@ function generateGenericPassword(): string {
 //
 // Autorización: esta función NO comprueba que quien la invoca sea dueño del
 // curso del estudiante — corre con service_role, que bypasea RLS. Esa
-// comprobación vive en el llamador (resetStudentPasswordAction, vía el
-// cliente de sesión, que sí respeta la policy "enrollments: select"). No
-// invocar esta función directamente desde una ruta sin haber verificado eso.
+// comprobación vive en el llamador (resetStudentPasswordAction), consultando
+// PRIMERO "academic_courses" con el cliente de sesión — la policy
+// "academic_courses: select own or admin" es la única autorización real
+// (docente dueño o admin). No usar la policy "enrollments: select" para esto:
+// tiene una tercera rama, student_id = auth.uid(), que aprobaría también al
+// propio estudiante — el bloqueante que encontró la revisión de código de
+// spec-051 (2026-08-16) antes de que este spec se marcara [DONE]. No invocar
+// esta función directamente desde una ruta sin haber verificado la propiedad
+// del curso primero.
 //
 // El `app_metadata` actual se lee y se mergea en código, no se asume que el
 // servidor de Auth lo haga (mismo criterio que clearMustChangePasswordFlag).

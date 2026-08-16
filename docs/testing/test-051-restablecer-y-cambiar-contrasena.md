@@ -1,7 +1,9 @@
 # test-051 — Restablecer y cambiar contraseña
 
 > Ronda asociada a `docs/specs/spec-051-restablecer-y-cambiar-contrasena.md`.
-> **Estado: cerrada — 14/14 casos aprobados (2026-08-16).**
+> **Estado: cerrada — 15/15 casos aprobados (2026-08-16)** — 14 de la ronda
+> original más TC-051-014, añadido tras el bloqueante que encontró
+> `@reviewer` antes del cierre.
 > **Datos de prueba conservados a pedido explícito del usuario**, para una
 > posible segunda ronda — no se ejecutó la limpieza. Los IDs de abajo siguen
 > siendo válidos en la base de desarrollo (`mirp-lab`) hasta que se decida
@@ -22,9 +24,10 @@
 
 **Estado final de las cuentas conservadas** (para retomar una segunda ronda
 sin sorpresas):
-- **A** (`tc051010@test.nodo.local`): contraseña `2GJ9XAJSEG`,
-  `must_change_password = true` — confinado en `/cambiar-contrasena` al
-  entrar.
+- **A** (`tc051010@test.nodo.local`): contraseña `86RY5DE69G` (la más
+  reciente — reset post-fix de TC-051-014, no la `2GJ9XAJSEG` de
+  TC-MCP-051-001, ya reemplazada), `must_change_password = true` — confinado
+  en `/cambiar-contrasena` al entrar.
 - **B** (`tc051005-b@test.nodo.local`): contraseña `EstudianteBTemp2026!`,
   sin marcar, nunca se tocó.
 - **Docente 2** (`docente2-tc051005@test.nodo.local`): contraseña

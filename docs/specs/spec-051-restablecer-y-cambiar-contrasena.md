@@ -1,4 +1,4 @@
-# spec-051 — [TESTING] Ciclo de contraseña: restablecer por el docente, cambio forzado y cambio voluntario
+# spec-051 — [DONE] Ciclo de contraseña: restablecer por el docente, cambio forzado y cambio voluntario
 
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.
@@ -351,7 +351,14 @@ verificar (infraestructura), y éxito. Nunca reportar éxito sin comprobar el
       durante la implementación de cada fase, y de nuevo al pasar a `[TESTING]`).
 - [x] Ronda manual `docs/testing/test-051-restablecer-y-cambiar-contrasena.md`
       — **14/14 casos aprobados** (2026-08-16).
-- [ ] Invocar `@reviewer` sobre el diff contra `development` — en curso.
+- [x] Invocar `@reviewer` sobre el diff contra `development` — **primera
+      pasada: CAMBIOS REQUERIDOS** (bloqueante de autorización, ver D1, más
+      dos hallazgos 🟠, ver D9). Corregidos los tres. **Segunda pasada:
+      ✅ APROBADO** (2026-08-16), con 4 hallazgos menores de documentación ya
+      corregidos (docblock desactualizado en `lib/students/service.ts`,
+      conteo de casos y contraseña de A desactualizados en el archivo de
+      test, `TC-051-014` faltante en "Pruebas asociadas") y 1 hallazgo 🔵
+      registrado como [[DEBT-064]] en vez de corregirse ahora.
 
 ### Fase 7 — Cierre y diagnóstico de duplicados ✅ (2026-08-16, completa)
 - [x] **Consulta de diagnóstico** (solo lectura) — `scripts/diagnostico-duplicados-spec051.sql`
@@ -409,7 +416,8 @@ verificar (infraestructura), y éxito. Nunca reportar éxito sin comprobar el
 ## Pruebas asociadas
 
 - **Manuales:** `docs/testing/test-051-restablecer-y-cambiar-contrasena.md` —
-  casos `TC-051-001` … `TC-051-013` y `TC-MCP-051-001`.
+  casos `TC-051-001` … `TC-051-013`, `TC-MCP-051-001`, y `TC-051-014`
+  (añadido tras el bloqueante que encontró `@reviewer` — ver D1).
 - **Automáticas (e2e/unit):** framework aún **por definir** (ver CLAUDE.md →
   "Testing"). Cuando exista: unitarias de `ChangePasswordSchema` y una de
   integración que confirme que una contraseña actual incorrecta no llega a

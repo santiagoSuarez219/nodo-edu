@@ -5,6 +5,28 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+## DEBT-064 — `verifyCurrentPassword` no cierra la sesión del cliente desechable si `updateUser` falla después
+
+**Origen:** segunda revisión de código (`@reviewer`) de `feat/reset-password`,
+2026-08-16 — hallazgo 🔵, no bloqueante.
+**Prioridad:** Baja
+
+`verifyCurrentPassword` (`lib/auth/actions.ts`) crea un cliente
+`@supabase/supabase-js` desechable para verificar la contraseña actual sin
+desplazar la sesión real (D4 de spec-051). Ese `signInWithPassword` emite una
+sesión/refresh token real en GoTrue. En el camino feliz completo queda barrida
+por el `signOut({scope:'others'})` que `changePassword` hace después sobre la
+sesión real — pero si la verificación tiene éxito y el `updateUser`
+**inmediatamente posterior** falla, la función retorna antes de llegar a ese
+`signOut`, y la sesión del cliente desechable queda huérfana hasta que expira
+por sí sola.
+
+**Acción:** envolver el `signInWithPassword` en un `try/finally` que llame
+`throwaway.auth.signOut()` sin importar el resultado. Anotado con `// DEBT:`
+en el propio código.
+
+---
+
 ## DEBT-063 — 3 estudiantes con cuentas duplicadas reales en producción (diagnóstico de la Fase 7 de spec-051)
 
 **Origen:** `scripts/diagnostico-duplicados-spec051.mjs` ejecutado contra

@@ -217,6 +217,14 @@ async function verifyCurrentPassword(
     auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
   });
 
+  // DEBT: signInWithPassword emite una sesión/refresh token real en GoTrue
+  // que nadie cierra explícitamente aquí. En el camino feliz queda barrida
+  // por el signOut({scope:'others'}) posterior de changePassword, pero si
+  // updateUser falla justo después de una verificación EXITOSA, esa sesión
+  // huérfana sobrevive hasta expirar por sí sola. Impacto bajo hoy; anotado
+  // por la segunda revisión de código de spec-051 (2026-08-16) como
+  // candidato a `throwaway.auth.signOut()` en un `finally` si el volumen de
+  // cambios de contraseña crece. Ver docs/specs/backlog.md.
   const { error } = await throwaway.auth.signInWithPassword({ email, password });
   if (!error) return { ok: true };
 
