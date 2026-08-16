@@ -93,15 +93,6 @@ export const analisisDeAlgoritmos: Course = {
       ],
     },
     {
-      id: "lab-03-insertion-sort",
-      slug: "lab-03-insertion-sort",
-      articleSlug: "lab-03-insertion-sort",
-      kind: "guide",
-      order: 3.5,
-      title: "Laboratorio 03 — Insertion sort en Python",
-      topics: [],
-    },
-    {
       id: "analisis-de-algoritmos-y-divide-y-venceras",
       slug: "analisis-de-algoritmos-y-divide-y-venceras",
       articleSlug: "analisis-de-algoritmos-y-divide-y-venceras",
