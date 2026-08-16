@@ -7,7 +7,7 @@ updatedAt: "2026-08-07"
 
 ## Objetivo
 
-Configure el entorno de trabajo en Python que usará durante **todo el semestre**: un entorno virtual aislado, un archivo de dependencias reproducible, y las convenciones de estilo (PEP 8) que se esperan en cada uno de sus cinco informes de laboratorio evaluativos. Cierre la sesión con un script pequeño que aplique la sintaxis vista en la lección teórica de esta semana.
+Configure el entorno de trabajo en Python que usará durante **todo el semestre**: un entorno virtual aislado, un archivo de dependencias reproducible, y las convenciones de estilo (PEP 8) que se esperan en cada uno de los codigos desarrollados en el curso. 
 
 Competencias esperadas:
 - Crear, activar y desactivar un entorno virtual con `venv`, y explicar por qué aislar las dependencias de un proyecto.
@@ -31,27 +31,26 @@ También necesita tener Python 3.x instalado en su equipo (`python3 --version` d
 
 ### Parte 1 — Entorno virtual con `venv`
 
-Dentro de su repositorio del curso, cree la carpeta de esta sesión y un entorno virtual dentro de ella.
-
 **Requisitos:**
-- Cree la carpeta `ejercicios-clase/semana-02/` dentro de su repositorio.
-- Dentro de esa carpeta, cree un entorno virtual con `python3 -m venv venv`.
-- Actívelo y verifique que su terminal muestra el prefijo `(venv)`.
-- Agregue `venv/` al `.gitignore` de su repositorio (esta carpeta **no** se versiona).
+- Cree la carpeta `ejercicios-clase/semana-02/` dentro de su repositorio (aquí irán los archivos de esta sesión).
+- En la **raíz** de su repositorio (no dentro de `ejercicios-clase/` ni de `semana-02/`), cree el entorno virtual con `python3 -m venv venv`. Si ya lo creó en una sesión anterior, no vuelva a crearlo: actívelo.
+- Actívelo desde la raíz del repositorio y verifique que su terminal muestra el prefijo `(venv)`.
+- Agregue `venv/` al `.gitignore` en la **raíz** del repositorio (esta carpeta **no** se versiona).
 - Verifique con `pip list` que el entorno recién creado está prácticamente vacío antes de instalar nada.
 
 **Restricciones:**
+- No cree un entorno virtual dentro de `ejercicios-clase/semana-02/` ni dentro de ninguna otra carpeta de semana: uno solo en la raíz sirve para todo el curso.
 - No instale ninguna librería antes de confirmar que el entorno está activado.
 - No suba la carpeta `venv/` a GitHub bajo ninguna circunstancia.
 
 ### Parte 2 — `requirements.txt` reproducible
 
-Con el entorno activado, instale la librería que usará para graficar durante el resto del curso y deje un registro exacto de las dependencias instaladas.
+Con el entorno (activado desde la raíz del repositorio) instale la librería que usará para graficar durante el resto del curso y deje un registro exacto de las dependencias instaladas.
 
 **Requisitos:**
 - Instale `matplotlib` dentro del entorno virtual activado.
-- Genere el archivo `requirements.txt` con `pip freeze > requirements.txt`.
-- Verifique la reproducibilidad de su entorno: desactive, borre la carpeta `venv/`, créela de nuevo y reinstale todo con `pip install -r requirements.txt`. Confirme con `pip list` que obtiene exactamente las mismas librerías que antes de borrar la carpeta.
+- Genere el archivo `requirements.txt` en la **raíz** de su repositorio con `pip freeze > requirements.txt` (no dentro de `semana-02/`).
+- Verifique la reproducibilidad de su entorno: desactive, borre la carpeta `venv/` de la raíz, créela de nuevo y reinstale todo con `pip install -r requirements.txt`. Confirme con `pip list` que obtiene exactamente las mismas librerías que antes de borrar la carpeta.
 
 **Restricciones:**
 - No edite `requirements.txt` a mano; debe ser el resultado directo de `pip freeze`.
@@ -145,30 +144,23 @@ if __name__ == "__main__":
 - No modifique las firmas de las funciones del esqueleto ni sus *docstrings*.
 - No use variables globales para pasar datos entre funciones: use parámetros y valores de retorno.
 
-## Entregable
-
-Cree la carpeta `ejercicios-clase/semana-02/` en su repositorio del curso (el mismo del Laboratorio 01) con la siguiente estructura:
+## Entregable: Repositorio de GitHub
 
 ```
 curso-analisis-algoritmos/
+├── requirements.txt          
 └── ejercicios-clase/
     └── semana-02/
-        ├── requirements.txt
         ├── refactor_pep8.py
         ├── clasificador_anios.py
         └── README.md
 ```
 
-- `requirements.txt`: generado con `pip freeze`, según la Parte 2.
-- `refactor_pep8.py`: el script refactorizado de la Parte 3.
-- `clasificador_anios.py`: el ejercicio integrador de la Parte 4.
-- `README.md`: breve documento (5-10 líneas) que explique los comandos que usó para crear y activar el entorno virtual, y cómo otra persona reproduciría su entorno con `requirements.txt`.
-
 Realice **al menos tres commits** descriptivos documentando el proceso (por ejemplo: entorno virtual y `requirements.txt`; refactor PEP 8; ejercicio integrador) y haga `push` a su repositorio antes del plazo indicado.
 
 ### Ejemplo de verificación
 
-Al ejecutar su script desde la carpeta `semana-02/` con el entorno virtual activado:
+Al ejecutar su script desde la carpeta `semana-02/`, con el entorno virtual de la raíz del repositorio activado:
 
 ```bash
 python clasificador_anios.py
@@ -184,16 +176,14 @@ Años bisiestos: [2024, 2000]
 Cantidad de años bisiestos: 2 de 4
 ```
 
-**Plazo de entrega:** antes del inicio de la sesión práctica de la Semana 3 (17 de agosto de 2026).
-
 ## Criterios de Evaluación
 
-Esta sesión **no es evaluativa** (no corresponde a ninguno de los cinco laboratorios de la evaluación del curso), pero se retroalimenta con los siguientes ejes y alimenta la nota de **Seguimiento**:
+Esta sesión hace parte de su nota de **seguimiento** y le servira para familiarizarse con el lenguaje de programacion y sus convenciones las cuales utilizaremos a lo largo del curso y haran parte de las notas de los eventos evaluativos. 
 
 | Criterio | Puntos | Descripción |
 |---|---|---|
-| **Entorno virtual creado y documentado** | 15 | El `README.md` describe los comandos usados para crear y activar el entorno; queda evidencia de que se verificó el prefijo `(venv)` antes de instalar dependencias. |
-| **`requirements.txt` correcto y reproducible** | 20 | El archivo existe, contiene `matplotlib` con versión fijada (formato `paquete==versión`), y al reinstalar con `pip install -r requirements.txt` en un entorno limpio se obtienen las mismas librerías. |
+| **Entorno virtual creado y documentado** | 15 | El `README.md` describe los comandos usados para crear y activar el entorno virtual único de la raíz del repositorio; queda evidencia de que se verificó el prefijo `(venv)` antes de instalar dependencias. |
+| **`requirements.txt` correcto y reproducible** | 20 | El archivo existe en la **raíz** del repositorio (no dentro de `semana-02/`), contiene `matplotlib` con versión fijada (formato `paquete==versión`), y al reinstalar con `pip install -r requirements.txt` en un entorno limpio se obtienen las mismas librerías. |
 | **Script cumple PEP 8 y usa ≥3 conceptos de sintaxis** | 30 | Nombres en `snake_case`, espaciado consistente, indentación de 4 espacios; el script del ejercicio integrador aplica correctamente al menos tres de los conceptos de la sesión teórica. |
 | **Documentación (*docstrings*, nombres claros)** | 20 | Toda función tiene *docstring* con descripción, parámetros y retorno; todas las funciones usan *type hints* en parámetros y valor de retorno. |
 | **Commit y organización del repositorio** | 15 | El código vive en `ejercicios-clase/semana-02/` con la estructura pedida; existen al menos tres commits descriptivos que documentan el proceso, no concentrados en uno solo. |
@@ -213,17 +203,13 @@ Esta sesión **no es evaluativa** (no corresponde a ninguno de los cinco laborat
 ### "`leer_anios()` entra en un bucle que no se detiene, aunque la entrada parezca válida"
 - Revise que está separando la entrada exactamente por comas y que no queda una coma final sin número después (por ejemplo `"2020,2024,"`). Imprima el resultado de `entrada.split(",")` antes de convertirlo para ver qué está intentando procesar.
 
-**Plazo de entrega:** antes del inicio de la sesión práctica de la Semana 3 (17 de agosto de 2026).
-
 ## Extensiones Sugeridas (Bonus)
 
 - Agrupe los años ingresados por década usando un diccionario construido con comprensión (por ejemplo `{2020: [2024], 1900: [1900]}`).
 - Valide con `try`/`except` que ningún año ingresado sea negativo, mostrando un mensaje de error propio en ese caso.
-- Calcule y muestre el promedio de los años bisiestos usando el módulo `statistics`.
 
 ## Recursos
 
 - **Apuntes del curso:** lecciones "Sintaxis básica de Python" y "Buenas prácticas y entornos de trabajo en Python" (Semana 2, Sesión 1).
 - **Guía de estilo oficial:** PEP 8 — Style Guide for Python Code (`https://peps.python.org/pep-0008/`).
-- **Documentación oficial:** módulo `venv` de la biblioteca estándar de Python.
 - **Editor de código recomendado:** Visual Studio Code, con la extensión oficial de Python.
