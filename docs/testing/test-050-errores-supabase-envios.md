@@ -306,10 +306,20 @@ envíos con variantes corrompidos, habrían quedado invisibles sin este fix).
   — verificado con una consulta final que confirma los 6 permisos tocados
   (`answers`, `assignment_questions`, `submissions`, `academic_courses`,
   `user_roles`, `get_submission_review_context`) de vuelta en su estado sano.
-- Limpieza de datos de prueba: ⬜ Pendiente — los recursos de la tabla "Datos
-  de prueba" (2 cursos... 3 estudiantes, 2 preguntas, la evaluación y el
-  ítem de calificación) siguen en la base de desarrollo. Pendiente de
-  confirmar con el usuario si se eliminan ahora o se conservan para una
-  segunda ronda (como se hizo en spec-051).
+- Limpieza de datos de prueba: ⬜ Pendiente — el usuario pidió **conservar**
+  los datos de esta ronda para una posible segunda ronda (mismo criterio que
+  spec-051). IDs a limpiar cuando corresponda: curso
+  `d435eacc-ee95-4461-8b33-aeba180b440e` (slug `estructuras-de-datos`, SQL
+  directo — DEBT-060), estudiantes `0f9e753d-1c82-4f25-bfd0-9ca30e0569c2`,
+  `3c6c194c-2be8-424e-bf8e-26e1a1d0bc69`, `853a4462-7899-4147-93df-163b61c3f27a`
+  (`delete_student`, students-mcp — elimina en cascada matrículas/envíos),
+  preguntas `2799e28a-b130-484b-a4a7-d2727de28658` y
+  `faeb32d0-440a-46f3-9173-e65154a52b0f` (`delete_question`, requiere borrar
+  antes la evaluación que las usa), evaluación
+  `0219cfd1-e25e-4973-bf8f-864542bb9361` (`delete_assignment_group` —
+  fallará con 409 porque ya tiene respuestas reales de estudiantes; requiere
+  borrar primero los envíos o decidir conservar la evaluación), ítem de
+  calificación `a0641b8e-2878-4281-8f4d-5b4d4e6b9fc9` (sin herramienta MCP —
+  eliminar desde la pestaña Calificaciones del panel docente o por SQL).
 - Reversión de los `REVOKE`/`GRANT` usados para simular fallos: ⬜ Pendiente
 - Limpieza de datos de prueba: ⬜ Pendiente
