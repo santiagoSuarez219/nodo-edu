@@ -26,7 +26,8 @@
 | Cambio voluntario (TC-051-001) | `TempInicial2026!+` |
 | Segunda genérica tras restablecimiento (TC-051-006) | `5R3YSWE93S` |
 | Cambio forzado, post-corte de túnel (TC-051-011/013) | `PostCorteFinal789` — **contraseña actual de A; `must_change_password` = false, ya no confinado** |
-| Estudiante B (`create_student`) | `EstudianteBTemp2026!` — **contraseña actual de B; no debe cambiar tras TC-051-005** |
+| Estudiante B (`create_student`) | `EstudianteBTemp2026!` — nunca cambió (TC-051-005) |
+| Reset vía ruta MCP (TC-MCP-051-001) | `2GJ9XAJSEG` — **contraseña actual de A; `must_change_password` = true al cierre de la ronda** |
 
 **Entorno de pruebas:** desarrollo — `npm run dev` en el puerto **3002**
 (`.env.local` ya apunta ahí), Supabase en `mirp-lab` vía túnel SSH (confirmado
@@ -352,13 +353,54 @@ estudiante entra con ella y queda confinado en `/cambiar-contrasena`
 (reverificar con TC-051-008).
 **Comprobación adicional:** invocar con un `student_id` inexistente devuelve un
 error claro, no un éxito silencioso.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{pendiente}}
+**Estado:** ✅ Aprobado (2026-08-16)
+**Hallazgos:** **Limitación de método:** la herramienta MCP `reset_student_password`
+en sí no está cargada en esta sesión (el cliente `students-mcp` se conectó
+antes de que la Fase 5 la agregara). Se probó su ruta HTTP real
+(`POST /api/students/{{id}}/reset-password`), que es exactamente lo que la
+herramienta invoca por debajo (`callStudentsApi("POST", "/{{id}}/reset-password", body)`)
+— fiel al comportamiento real, aunque no pasó por el protocolo MCP en sí.
+
+**Input de prueba:** `student_id` de A, sin `password`. **Output:**
+`{student_id, password: "2GJ9XAJSEG", must_change_password: true}` — formato
+correcto, sin caracteres ambiguos. A entró con esa contraseña y quedó
+confinado en `/cambiar-contrasena` (reverifica TC-051-008 con la vía MCP en
+vez de la UI docente).
+
+**Comprobación adicional:** `student_id` con UUID válido pero inexistente →
+`404 not_found`, `"Estudiante no encontrado."`. `student_id` con formato
+inválido (no UUID) → `404 not_found`, `"ID de estudiante inválido"`. Ningún
+caso responde con éxito silencioso.
 
 ## Resumen de la ronda
 
-- Aprobados: 0 — Fallidos: 0 — Pendientes: 14
-- Diagnóstico de cuentas duplicadas (Fase 7): {{pendiente}}
-- Contraseña del docente de desarrollo restaurada: ⬜ Pendiente
-- Hallazgos escalados a `docs/specs/backlog.md`: {{pendiente}}
-- Limpieza de datos de prueba: ⬜ Pendiente
+- **Aprobados: 14 — Fallidos: 0 — Pendientes: 0**
+- Todos los criterios de aceptación del spec quedaron verificados en vivo,
+  varios con medición real (no solo revisión de código): `pg_stat_statements`
+  para TC-051-012, `read_network_requests` para el diagnóstico de TC-051-013,
+  y el `access_token` real de un docente sin `admin` contra PostgREST para
+  TC-051-005.
+- **Un hallazgo no anticipado, escalado como [[DEBT-062]]:** el 503 inline de
+  spec-046 no es interpretable por el cliente de Next.js cuando la request es
+  un Server Action — el usuario ve el error boundary genérico de React en vez
+  del mensaje honesto. El servidor responde correctamente (confirmado por
+  `read_network_requests`); el defecto es transversal a cualquier Server
+  Action del proyecto invocada con Auth caído, no exclusivo de spec-051.
+- **Corrección de método durante TC-051-005:** `dev@nodo.local` tiene rol
+  `admin` además de `teacher` (lo asigna `scripts/seed-teacher.mjs`), así que
+  no sirve como "docente ajeno" para pruebas de seguridad — habría exhibido el
+  bypass legítimo de admin, no la comprobación de propiedad real. Se creó un
+  segundo docente sin `admin` para probar el límite real.
+- **Diagnóstico de cuentas duplicadas (Fase 7 del spec):** pendiente,
+  deliberadamente **fuera del alcance de esta ronda** — es una consulta de
+  cierre contra los datos ya corrompidos antes de spec-051, no un caso de
+  prueba de esta lista.
+- Contraseña del docente de desarrollo (`dev@nodo.local` / `DevLocal2026!`):
+  **no se tocó en ningún caso** — solo se usó para iniciar/cerrar sesión, sin
+  restablecerla ni cambiarla. No requiere restauración.
+- Hallazgos escalados a `docs/specs/backlog.md`: [[DEBT-062]].
+- **Limpieza de datos de prueba: ⬜ Pendiente** — ver tabla de arriba. Quedan
+  por eliminar: curso académico 1 y 2 (vía `psql`, ya que [[DEBT-060]] tampoco
+  ofrece endpoint de borrado), estudiantes A y B (`delete_student` sí tiene
+  endpoint), y docente 2 (vía `auth.admin.deleteUser`, sin endpoint dedicado —
+  mismo patrón manual que su creación).
