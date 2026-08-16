@@ -146,8 +146,13 @@ correctamente al estudiante marcado.
 2. Navegar a una lección y a `/cuenta`.
 **Resultado esperado:** el cambio se acepta y la navegación se normaliza de
 inmediato, **sin** pedir volver a iniciar sesión.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{pendiente}}
+**Estado:** ✅ Aprobado (2026-08-16)
+**Hallazgos:** Confirmado — tras el cambio, la navegación a una lección y a
+`/cuenta` funcionó de inmediato sin volver a iniciar sesión. Verifica en vivo
+que `getUser()` revalida contra el servidor de Auth en cada request (Fase 4):
+la marca `must_change_password` desapareció sin necesitar ningún revalidatePath
+ni truco de caché adicional. **Pendiente:** registrar la contraseña definitiva
+que A eligió en la tabla de "Contraseñas usadas en la ronda".
 
 ### TC-051-010 — Restablecer cierra las sesiones abiertas
 **Cubre:** criterio 10 y D8 — *requiere dos navegadores*
