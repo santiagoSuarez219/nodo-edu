@@ -18,8 +18,8 @@
 
 | Momento | Valor |
 |---------|-------|
-| Inicial de A (`create_student`) | `TempInicial2026!` |
-| Genérica tras el restablecimiento | `{{pendiente — se registra al ejecutar TC-051-010}}` |
+| Inicial de A (`create_student`) | `TempInicial2026!` (ya no sirve — reemplazada en TC-051-010) |
+| Genérica tras el restablecimiento (TC-051-010) | `U2FU6485F9` |
 | Definitiva que elige A | `{{valor}}` |
 
 **Entorno de pruebas:** desarrollo — `npm run dev` en el puerto **3002**
