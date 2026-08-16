@@ -178,12 +178,10 @@ Necesitas un argumento que no dependa de qué números elegiste, sino de la **es
 Una invariante de ciclo es una afirmación sobre el estado del programa que se cumple **antes de cada iteración** de un bucle. Demostrarla exige revisar tres momentos:
 
 ```mermaid
-stateDiagram-v2
-  [*] --> Inicializacion
-  Inicializacion --> Mantenimiento: "la invariante es cierta\nantes de la primera iteracion"
-  Mantenimiento --> Mantenimiento: "cada iteracion preserva\nla invariante"
-  Mantenimiento --> Terminacion: "el ciclo termina"
-  Terminacion --> [*]: "la invariante + la condicion\nde salida implican correccion"
+flowchart LR
+  A["Inicialización\nla invariante es cierta\nantes de la primera iteración"] --> B["Mantenimiento\ncada iteración preserva\nla invariante"]
+  B -->|"se repite"| B
+  B -->|"el ciclo termina"| C["Terminación\ninvariante + condición de salida\nimplican correctitud"]
 ```
 
 Para insertion sort, la invariante es: **al iniciar cada iteración del ciclo `for` (índice `i`), el subarreglo `arreglo[0..i-1]` contiene los mismos elementos que tenía originalmente esa porción, pero ordenados.**
@@ -192,7 +190,7 @@ Para insertion sort, la invariante es: **al iniciar cada iteración del ciclo `f
 - **Mantenimiento:** si al iniciar la iteración `arreglo[0..i-1]` está ordenado, el cuerpo del ciclo toma `clave = arreglo[i]` y la desplaza hacia atrás hasta su posición correcta dentro de esa porción ya ordenada. Al terminar la iteración, `arreglo[0..i]` queda ordenado — la invariante se preserva para la siguiente iteración (`i + 1`).
 - **Terminación:** el ciclo `for` termina cuando `i` supera `len(arreglo) - 1`, es decir, cuando `i = len(arreglo)`. En ese momento, la invariante dice que `arreglo[0..len(arreglo) - 1]` — el arreglo **completo** — está ordenado. Eso es exactamente lo que el algoritmo prometía entregar.
 
-Este argumento no depende de los valores concretos de la traza anterior: es válido para cualquier arreglo de cualquier tamaño, incluidos los 30.000 apellidos. Es el mismo principio que usarás para probar la corrección de cada algoritmo nuevo que veas en el curso — inducción matemática aplicada a un programa.
+Este argumento no depende de los valores concretos de la traza anterior: es válido para cualquier arreglo de cualquier tamaño, incluidos los 30.000 apellidos.
 
 ## Resumen operativo
 
