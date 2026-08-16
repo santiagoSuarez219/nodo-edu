@@ -276,8 +276,28 @@ postea a la página actual.
 2. Revisar los logs de consultas de Supabase para esos requests.
 **Resultado esperado:** el gate no genera ninguna consulta adicional: la marca
 se lee de `app_metadata`, que el middleware ya recibe en `getUser()`.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{pendiente}}
+**Estado:** ✅ Aprobado (2026-08-16) — medido en vivo, no solo por código
+**Hallazgos:** El navegador no sirve para esto (el middleware corre en el
+servidor; el tráfico de red del cliente no lo muestra), así que se buscó una
+vía real de medición en vez de conformarse con la revisión de código.
+`pg_stat_statements` está habilitado en `mirp-lab` — se reseteó
+(`pg_stat_statements_reset()`), se navegó por 4 rutas protegidas con un
+usuario autenticado sin marcar (docente 2: `/cuenta`, `/cuenta/cursos` ×2,
+`/admin/courses/{{curso2}}`), y se inspeccionaron las consultas capturadas.
+
+**Resultado definitivo:** la consulta que GoTrue ejecuta internamente para
+`getUser()` es:
+```sql
+SELECT users.aud, ..., users.raw_app_meta_data, users.raw_user_meta_data, ...
+FROM users AS users WHERE instance_id = $1 and id = $2 LIMIT $3
+```
+`raw_app_meta_data` (nombre real de columna detrás de `app_metadata`) **ya
+viene incluido** en esa misma consulta — 8 llamadas capturadas en las 4
+navegaciones (2 por página, consistente con el doble `getUser()` de
+`lib/auth/middleware.ts` + `lib/auth/session.ts`, preexistente de spec-046,
+no algo que este spec añadiera). Sin filtro `ilike '%must_change%'` con
+resultados: no existe ninguna consulta separada para la marca, en ningún
+punto de la traza.
 
 ### TC-051-013 — Fallo de infraestructura no se disfraza
 **Cubre:** criterio 11 y D9
