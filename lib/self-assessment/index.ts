@@ -387,6 +387,13 @@ export async function submitSelfAssessment(
   }
 
   const access = await hasCourseAccess(courseSlug);
+  // spec-050: "unavailable" (el chequeo de matrícula falló por
+  // infraestructura) ya no colapsa en "not_enrolled" — un estudiante
+  // matriculado real no debe leer "No estás matriculado en este curso"
+  // cuando lo que falló fue Postgres/RLS, no su matrícula.
+  if (!access.ok && access.reason === 'unavailable') {
+    return { ok: false, reason: 'unavailable' };
+  }
   if (!access.ok || access.reason !== 'enrolled') {
     return { ok: false, reason: 'not_enrolled' };
   }
