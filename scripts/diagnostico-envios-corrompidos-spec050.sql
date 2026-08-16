@@ -50,7 +50,10 @@ select
   s.graded_at,
   ac.name as curso,
   ac.course_slug,
-  asg.title as evaluacion,
+  -- Mismo problema que academic_course_id: en una evaluación con variantes
+  -- A/B/C, `assignments.title` (el de la variante) es NULL — el título real
+  -- está en `assignment_variant_groups.title`.
+  coalesce(asg.title, g.title) as evaluacion,
   p.full_name as estudiante,
   p.id as student_id,
   count(*) filter (where fa.flag_reason = 'A_multiple_choice_sin_evaluar') as respuestas_mc_sin_evaluar,
@@ -60,10 +63,18 @@ join flagged_answers fa on fa.submission_id = s.id and fa.flag_reason is not nul
 join public.enrollments e on e.id = s.enrollment_id
 join public.profiles p on p.id = e.student_id
 join public.assignments asg on asg.id = s.assignment_id
-join public.academic_courses ac on ac.id = asg.academic_course_id
+-- Una evaluación con variantes A/B/C (spec-039) deja `assignments.academic_course_id`
+-- en NULL: el curso vive en `assignment_variant_groups`, no en la fila de la
+-- variante. Sin este LEFT JOIN + COALESCE, un INNER JOIN directo a
+-- academic_courses descarta en silencio TODOS los envíos de evaluaciones con
+-- variantes — que son la mayoría en producción (assignment-mcp exige ≥2
+-- variantes). Comprobado en vivo: sin este fix, un envío corrompido plantado
+-- a propósito no aparecía en el listado (falso negativo).
+left join public.assignment_variant_groups g on g.id = asg.variant_group_id
+join public.academic_courses ac on ac.id = coalesce(asg.academic_course_id, g.academic_course_id)
 where s.status = 'graded'
   and (coalesce(s.auto_score, 0) = 0 or coalesce(s.final_score, 0) = 0)
-group by s.id, ac.name, ac.course_slug, asg.title, p.full_name, p.id
+group by s.id, ac.name, ac.course_slug, asg.title, g.title, p.full_name, p.id
 order by s.graded_at desc;
 
 -- Ventana del incidente de DEBT-059 (2026-08-13) — acotar manualmente si el

@@ -1,4 +1,4 @@
-# spec-050 — [IN PROGRESS] Fallos de infraestructura en envíos y control de acceso: dejar de escribir notas falsas
+# spec-050 — [TESTING] Fallos de infraestructura en envíos y control de acceso: dejar de escribir notas falsas
 
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.
@@ -294,16 +294,34 @@ explícita del usuario en la sesión en que se ejecute.
       en producción — la funcionalidad de asignaciones/envíos aún no tiene
       actividad real de calificación, así que no hay nada que pudiera estar
       corrompido.
+      **Corrección posterior (TC-050-010, Fase 6):** al validar la consulta
+      contra un caso plantado a propósito, el "0 filas" original resultó ser
+      un **falso negativo** — bug real en el `JOIN` a `academic_courses`, que
+      asumía `assignments.academic_course_id` siempre poblado. En una
+      evaluación con variantes A/B/C ese campo es `NULL` en la fila de la
+      variante (el curso vive en `assignment_variant_groups`), así que el
+      `INNER JOIN` descartaba en silencio todos los envíos de evaluaciones
+      con variantes — la mayoría, ya que `assignment-mcp` exige ≥2 variantes.
+      Corregido en ambos scripts con `LEFT JOIN` + `COALESCE`; reverificado
+      con el caso plantado (sí aparece) y de nuevo contra producción (sigue
+      en 0, ahora con la lógica correcta — ver `docs/testing/test-050-…md`
+      TC-050-010 para el detalle completo).
 - [x] Entregar el listado al usuario con curso, estudiante, evaluación y
-      fecha. Listado vacío en ambos entornos; reportado al usuario tal cual.
-      **No se modificó ninguna nota.**
+      fecha. Listado vacío en ambos entornos (con la consulta ya corregida);
+      reportado al usuario tal cual. **No se modificó ninguna nota.**
 - [x] Si aparecen envíos afectados, registrar en `docs/specs/backlog.md` el
       seguimiento de su corrección manual. No aplica — no aparecieron envíos
       afectados.
 
 ### Fase 6 — Verificación
-- [ ] `npm run lint` y `npm run build` en verde.
-- [ ] Ronda manual `docs/testing/test-050-errores-supabase-envios.md`.
+- [x] `npm run lint` y `npm run build` en verde (verificado en Fase 1-4, sin
+      cambios de código de producción desde entonces — solo specs/tests/scripts).
+- [x] Ronda manual `docs/testing/test-050-errores-supabase-envios.md`: **10/10
+      casos aprobados** (2026-08-16), incluyendo TC-050-002 (el más importante
+      de la ronda: una evaluación con preguntas abiertas no se autocierra en
+      0), TC-050-009 (camino feliz completo, sin regresión, nota propagada a
+      `student_grades`) y TC-050-010 (encontró y corrigió un bug real en la
+      propia consulta de diagnóstico de la Fase 5 — ver esa fase arriba).
 - [ ] Invocar `@reviewer` sobre el diff contra `development` antes de `[DONE]`.
 
 ## Criterios de aceptación

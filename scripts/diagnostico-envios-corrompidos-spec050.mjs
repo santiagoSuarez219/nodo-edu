@@ -107,12 +107,49 @@ async function main() {
   const assignmentIds = [...new Set(flaggedSubmissions.map((s) => s.assignment_id))];
   const { data: assignments, error: assignmentsError } = await supabase
     .from('assignments')
-    .select('id, title, academic_course_id')
+    .select('id, title, academic_course_id, variant_group_id')
     .in('id', assignmentIds);
   if (assignmentsError) throw assignmentsError;
   const assignmentById = new Map(assignments.map((a) => [a.id, a]));
 
-  const courseIds = [...new Set(assignments.map((a) => a.academic_course_id).filter(Boolean))];
+  // Una evaluación con variantes A/B/C (spec-039) deja `assignments.academic_course_id`
+  // en NULL: el curso vive en `assignment_variant_groups`, no en la fila de la
+  // variante. Sin este fallback, TODOS los envíos de evaluaciones con variantes
+  // (la mayoría — assignment-mcp exige ≥2 variantes) quedaban sin curso
+  // resoluble. Comprobado en vivo contra desarrollo: un envío corrompido
+  // plantado a propósito no aparecía en el listado sin este fix (falso
+  // negativo) — mismo bug corregido en el .sql hermano.
+  const variantGroupIds = [
+    ...new Set(assignments.map((a) => a.variant_group_id).filter(Boolean)),
+  ];
+  const { data: variantGroups, error: variantGroupsError } =
+    variantGroupIds.length > 0
+      ? await supabase
+          .from('assignment_variant_groups')
+          .select('id, academic_course_id, title')
+          .in('id', variantGroupIds)
+      : { data: [], error: null };
+  if (variantGroupsError) throw variantGroupsError;
+  const variantGroupById = new Map(variantGroups.map((g) => [g.id, g]));
+
+  function resolveCourseId(assignment) {
+    return (
+      assignment.academic_course_id ??
+      variantGroupById.get(assignment.variant_group_id)?.academic_course_id ??
+      null
+    );
+  }
+
+  // Mismo problema que academic_course_id: en una evaluación con variantes
+  // A/B/C, `assignments.title` (el de la variante) es NULL — el título real
+  // está en `assignment_variant_groups.title`.
+  function resolveTitle(assignment) {
+    return assignment.title ?? variantGroupById.get(assignment.variant_group_id)?.title ?? null;
+  }
+
+  const courseIds = [
+    ...new Set(assignments.map((a) => resolveCourseId(a)).filter(Boolean)),
+  ];
   const { data: courses, error: coursesError } = await supabase
     .from('academic_courses')
     .select('id, name, course_slug')
@@ -133,13 +170,13 @@ async function main() {
   for (const s of sorted) {
     const enrollment = enrollmentById.get(s.enrollment_id);
     const assignment = assignmentById.get(s.assignment_id);
-    const course = assignment ? courseById.get(assignment.academic_course_id) : undefined;
+    const course = assignment ? courseById.get(resolveCourseId(assignment)) : undefined;
     const profile = enrollment ? profileById.get(enrollment.student_id) : undefined;
     const flags = flagsBySubmission.get(s.id);
 
     console.log(`  submission_id: ${s.id}`);
     console.log(`    curso: ${course?.name ?? '?'} (${course?.course_slug ?? '?'})`);
-    console.log(`    evaluación: ${assignment?.title ?? '?'}`);
+    console.log(`    evaluación: ${(assignment ? resolveTitle(assignment) : null) ?? '?'}`);
     console.log(`    estudiante: ${profile?.full_name ?? '?'} (${enrollment?.student_id ?? '?'})`);
     console.log(`    auto_score=${s.auto_score} final_score=${s.final_score} graded_at=${s.graded_at}`);
     console.log(`    respuestas_mc_sin_evaluar=${flags.A_multiple_choice_sin_evaluar} respuestas_abiertas_sin_calificar=${flags.B_abierta_sin_calificar}`);
