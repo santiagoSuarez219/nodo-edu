@@ -8,11 +8,11 @@ resolverse antes de salir a producción o en una iteración posterior.
 ## DEBT-065 — Residuo de la revisión de código de spec-050: hallazgos menores dejados fuera de su alcance
 
 **Origen:** revisión de código (`@reviewer`) de `fix/errores-supabase-envios`
-(spec-050, 2026-08-16, dos pasadas). Cuatro hallazgos 🟡 menores que no
-bloqueaban el veredicto final tras corregir los 5 🟠 mayores de ambas pasadas,
-y que el propio spec dejó fuera de su alcance declarado (subconjunto "nota de
-estudiante en juego" + "control de acceso" de **[[DEBT-040]]**) en vez de
-ampliarlo sin aprobación.
+(spec-050, 2026-08-16, tres pasadas — APROBADO en la tercera). Cinco hallazgos
+🟡 menores que no bloquearon el veredicto final tras corregir los 5 🟠 mayores
+de las dos primeras pasadas, y que el propio spec dejó fuera de su alcance
+declarado (subconjunto "nota de estudiante en juego" + "control de acceso" de
+**[[DEBT-040]]**) en vez de ampliarlo sin aprobación.
 **Prioridad:** Baja — ninguno escribe una nota falsa; son mensajes de error
 poco honestos o UX confusa ante infraestructura degradada, no corrupción de
 datos.
@@ -45,6 +45,17 @@ datos.
   vacío sin ningún indicio de que la causa es infraestructura y no que el
   envío no tiene preguntas. Candidato a mensaje explícito, en línea con el
   resto de **[[DEBT-040]]**.
+- **`components/student/AssignmentPlayer.tsx:103-111`** (autoguardado por
+  debounce) — hueco hermano del que sí se corrigió en el *flush* del envío
+  (spec-050, 2ª pasada de `@reviewer`), un paso antes en el tiempo: el
+  callback del `setTimeout` ignora el resultado de `saveAnswerAction`, marca
+  `setSaveStatus("saved")` ("✓ Guardado") y borra la entrada del `Map` de
+  debounce pase lo que pase. Si el `upsert` falla por infraestructura, la
+  respuesta no queda en la base, la UI afirma lo contrario, y como la
+  entrada ya se borró, el *flush* de `handleSubmit` no la reintentará — el
+  envío se califica sobre una respuesta ausente. Preexistente a spec-050
+  (mismo código en `development`), señalado por `@reviewer` en su 3ª pasada
+  como vecino directo del código que sí se corrigió.
 
 **Acción:** Resolver en una futura ronda de **[[DEBT-040]]** o en un spec
 puntual si algún hallazgo se vuelve prioritario antes.

@@ -1,4 +1,4 @@
-# spec-050 — [TESTING] Fallos de infraestructura en envíos y control de acceso: dejar de escribir notas falsas
+# spec-050 — [DONE] Fallos de infraestructura en envíos y control de acceso: dejar de escribir notas falsas
 
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.
@@ -357,7 +357,22 @@ explícita del usuario en la sesión en que se ejecute.
       `finalizeGrading` ahora propaga antes de marcar `graded`, igual que
       `submitSubmission`. También corregido un desajuste de conteo en
       **[[DEBT-065]]** (decía "tres hallazgos", eran cuatro). Typecheck/lint/
-      build reverificados en verde. Pendiente tercera pasada de `@reviewer`.
+      build reverificados en verde.
+      **Tercera pasada (2026-08-16): ✅ APROBADO.** Sin hallazgos 🔴/🟠;
+      verificó explícitamente que el reintento del *flush* de
+      `AssignmentPlayer.tsx` sí reintenta la respuesta que había fallado
+      (trazó el flujo completo: primer intento falla → el `Map` conserva la
+      entrada → segundo clic en "Enviar" → el *flush* la reintenta), que
+      `finalizeGrading` queda simétrico con `submitSubmission`, y que no
+      queda ningún otro sitio en `lib/submissions/index.ts` con el mismo
+      antipatrón "escribir estado terminal antes de propagar/verificar".
+      Señaló dos gestos no bloqueantes antes del merge: (a) un quinto
+      hallazgo menor (hueco hermano en el autoguardado de
+      `AssignmentPlayer.tsx`, preexistente a este spec) — añadido a
+      **[[DEBT-065]]**; (b) reejecutar TC-050-009 porque se había probado
+      contra el orden antiguo de `finalizeGrading` — repetido con un cuarto
+      estudiante de prueba, mismo resultado correcto (ver
+      `docs/testing/test-050-errores-supabase-envios.md`). Ambos resueltos.
 
 ## Criterios de aceptación
 

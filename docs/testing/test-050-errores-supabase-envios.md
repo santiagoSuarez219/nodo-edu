@@ -45,8 +45,11 @@ ssh -f -N -L 54321:localhost:54321 -L 54322:localhost:54322 \
 |---------|---------------------------|---------------|-----------|
 | Docente de desarrollo (ya sembrado, **no** crear ni borrar) | `npm run seed:teacher` | `dev@nodo.local` / `DevLocal2026!` (`7207c852-dd6c-4df4-ac33-99985c36e26c`) | n/a |
 | Curso académico de prueba | `INSERT` manual vía `psql` en `mirp-lab` (sin endpoint, [[DEBT-060]]) | `d435eacc-ee95-4461-8b33-aeba180b440e` (`TEST050ED`, slug `estructuras-de-datos`, código `TEST050XY`) | ⬜ |
-| Estudiante de prueba | `students-mcp.create_student` | `0f9e753d-1c82-4f25-bfd0-9ca30e0569c2` (`test-spec050@nodo.local` / `TestSpec050!`) | ⬜ |
-| Matrícula del estudiante (creada junto con el estudiante) | `students-mcp.create_student` (`academic_course_id`) | `8f4edc46-76a7-4053-9111-7660ab0c0ab9` | ⬜ (en cascada por `delete_student`) |
+| Estudiante de prueba A | `students-mcp.create_student` | `0f9e753d-1c82-4f25-bfd0-9ca30e0569c2` (`test-spec050@nodo.local` / `TestSpec050!`) | ⬜ |
+| Matrícula del estudiante A (creada junto con el estudiante) | `students-mcp.create_student` (`academic_course_id`) | `8f4edc46-76a7-4053-9111-7660ab0c0ab9` | ⬜ (en cascada por `delete_student`) |
+| Estudiante de prueba B (TC-050-002, intento A ya agotado) | `students-mcp.create_student` | `3c6c194c-2be8-424e-bf8e-26e1a1d0bc69` (`test-spec050b@nodo.local` / `TestSpec050B!`), matrícula `58e6cc6a-e385-4be0-83ac-ddcd721d8412` | ⬜ (en cascada) |
+| Estudiante de prueba C (TC-050-009, camino feliz original) | `students-mcp.create_student` | `853a4462-7899-4147-93df-163b61c3f27a` (`test-spec050c@nodo.local` / `TestSpec050C!`), matrícula `e35d4f59-66f5-4ce4-a75d-0d609fb35aad` | ⬜ (en cascada) |
+| Estudiante de prueba D (re-verificación de TC-050-009 tras el fix de `finalizeGrading`) | `students-mcp.create_student` | `eebbb2a2-0ab7-417d-b159-22a0eff89de9` (`test-spec050d@nodo.local` / `TestSpec050D!`), matrícula `c70235dc-3d65-46cb-b43d-7a7950a06b33` | ⬜ (en cascada) |
 | Pregunta multiple_choice | `question-bank-mcp.create_question` + `publish_question` | `2799e28a-b130-484b-a4a7-d2727de28658` | ⬜ |
 | Pregunta abierta (`open_text`) | `question-bank-mcp.create_question` + `publish_question` | `faeb32d0-440a-46f3-9173-e65154a52b0f` | ⬜ |
 | Evaluación con variantes A/B (2 mín.) con ambas preguntas, publicada | `assignment-mcp.create_assignment_group` + `publish_assignment_group` | `0219cfd1-e25e-4973-bf8f-864542bb9361` (variante A: `569d5174-e0f2-47a1-8ff8-5d3af60e68ab`, variante B: `15787348-bb82-4d82-8365-beb5e4ed5e89`) | ⬜ |
@@ -257,6 +260,16 @@ Verificado por `psql`: `student_grades` tiene la fila propagada
 mensaje de servicio no disponible en ningún paso — sin regresión del camino
 feliz.
 
+**Re-verificación (2026-08-16, tras la 3ª pasada de `@reviewer`):** este caso
+se había ejecutado antes de que `finalizeGrading` cambiara de orden
+(propagar antes de marcar `graded`, en vez de después — hallazgo de la 2ª
+pasada). Con un cuarto estudiante de prueba
+(`test-spec050d@nodo.local`, `submission_id c773c4b7-0624-4612-b241-c35def58cfc7`)
+se repitió el camino feliz completo contra el código final: `auto_score=2.00`
+correcto, docente calificó la abierta (3/3) y finalizó sin fricción →
+`status='graded'`, `final_score=5.00`, `student_grades.score=5.00` para esa
+matrícula. El nuevo orden no cambia el resultado del camino feliz.
+
 ### TC-050-010 — Diagnóstico de datos ya corrompidos
 **Cubre:** criterio de aceptación 8
 **Precondición:** Fase 5 implementada; consulta lista.
@@ -315,7 +328,8 @@ envíos con variantes corrompidos, habrían quedado invisibles sin este fix).
   spec-051). IDs a limpiar cuando corresponda: curso
   `d435eacc-ee95-4461-8b33-aeba180b440e` (slug `estructuras-de-datos`, SQL
   directo — DEBT-060), estudiantes `0f9e753d-1c82-4f25-bfd0-9ca30e0569c2`,
-  `3c6c194c-2be8-424e-bf8e-26e1a1d0bc69`, `853a4462-7899-4147-93df-163b61c3f27a`
+  `3c6c194c-2be8-424e-bf8e-26e1a1d0bc69`, `853a4462-7899-4147-93df-163b61c3f27a`,
+  `eebbb2a2-0ab7-417d-b159-22a0eff89de9`
   (`delete_student`, students-mcp — elimina en cascada matrículas/envíos),
   preguntas `2799e28a-b130-484b-a4a7-d2727de28658` y
   `faeb32d0-440a-46f3-9173-e65154a52b0f` (`delete_question`, requiere borrar
