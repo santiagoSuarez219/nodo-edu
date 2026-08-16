@@ -5,6 +5,58 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+## DEBT-062 — El 503 inline de spec-046 rompe en Server Actions: el usuario ve un error genérico, no el mensaje honesto
+
+**Origen:** Ronda manual `test-051-restablecer-y-cambiar-contrasena.md`,
+TC-051-013, 2026-08-16 — reproducido dos veces de forma consistente.
+**Prioridad:** Media — no hay pérdida de datos (D9 se sostiene: ningún fallo
+de infraestructura escribió nada), pero el usuario ve una pantalla que no
+explica nada útil, justo en el escenario que spec-046 existe para cubrir.
+
+Cortando el túnel a `mirp-lab` con una sesión real y enviando
+`changePassword` (Server Action de spec-051) durante la caída,
+`read_network_requests` confirma que `POST /cambiar-contrasena` recibió
+**503** — el propio HTML inline de `lib/auth/service-unavailable-page.ts`
+que `middleware.ts` devuelve ante `auth.status === 'unavailable'` (spec-046).
+El servidor no mintió. Pero en pantalla apareció la genérica de
+`app/error.tsx`: *"Algo salió mal / Ocurrió un error inesperado."*, sin
+ninguna relación con "servicio no disponible".
+
+**Causa probable:** Next.js espera un formato de respuesta específico
+(RSC/streaming) para lo que el cliente reconoce como la respuesta de un
+Server Action. El HTML plano del 503 inline no cumple ese formato, así que
+el runtime del cliente no puede interpretarlo y dispara el error boundary
+genérico en vez de renderizar cualquier mensaje relacionado con el fallo real.
+No se investigó a fondo el mecanismo exacto (no se inspeccionó el body/headers
+completos de la respuesta 503 ni se comparó con lo que Next.js espera
+literalmente) — queda para quien tome este ítem.
+
+**Alcance del problema:** no es exclusivo de `changePassword`. El 503 inline
+de spec-046 se dispara para **cualquier** request que pase por el middleware
+mientras Auth está caído, incluidas las POST de **cualquier Server Action**
+del proyecto invocada en ese momento: `signIn`, `signOut`,
+`withdrawStudentAction`, `resetStudentPasswordAction`, etc. Todas comparten
+el mismo riesgo de mostrar el error genérico en vez del honesto.
+
+**Por qué no se corrigió en spec-051:** el defecto vive en la interacción
+entre el 503 inline de **spec-046** y el protocolo de Server Actions de
+Next.js — no es código de spec-051, que ya hace lo correcto (delega en el
+gate de middleware y no esconde el fallo). Corregirlo bien probablemente
+signifique que el middleware detecte si la request es una invocación de
+Server Action (header `Next-Action` presente) y responda con un formato que
+el cliente sepa interpretar, en vez del HTML plano actual — o que cada
+Server Action envuelva su llamada en un `try/catch` que traduzca cualquier
+excepción de red/parseo en un `AuthResult` de infraestructura, sin depender
+de que el 503 del middleware llegue intacto al código de la acción.
+
+**Acción:** diseñar un spec dedicado (toca `middleware.ts` y potencialmente
+el patrón de todas las Server Actions del proyecto — alcance transversal, no
+un parche de una función). Antes de implementar, confirmar el mecanismo
+exacto reproduciendo con las DevTools de Chrome abiertas (no solo la
+extensión) para ver el error real que lanza el cliente de Next.js.
+
+---
+
 ## DEBT-061 — Deuda menor de la revisión de código de spec-046
 
 **Origen:** segunda revisión de código (`@reviewer`) de

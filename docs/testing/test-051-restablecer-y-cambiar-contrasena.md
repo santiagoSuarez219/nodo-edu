@@ -22,7 +22,8 @@
 | Genérica tras el restablecimiento (TC-051-010) | `U2FU6485F9` |
 | Definitiva que elige A (TC-051-009) | `TempInicial2026!` — coincide con la inicial original de `create_student`, pero D6 solo exige distinta de la **actual** (`U2FU6485F9` en ese momento), así que se aceptó correctamente |
 | Cambio voluntario (TC-051-001) | `TempInicial2026!+` |
-| Segunda genérica tras restablecimiento (TC-051-006) | `5R3YSWE93S` — **contraseña actual de A; `must_change_password` = true** |
+| Segunda genérica tras restablecimiento (TC-051-006) | `5R3YSWE93S` |
+| Cambio forzado, post-corte de túnel (TC-051-011/013) | `PostCorteFinal789` — **contraseña actual de A; `must_change_password` = false, ya no confinado** |
 
 **Entorno de pruebas:** desarrollo — `npm run dev` en el puerto **3002**
 (`.env.local` ya apunta ahí), Supabase en `mirp-lab` vía túnel SSH (confirmado
@@ -252,8 +253,36 @@ se lee de `app_metadata`, que el middleware ya recibe en `getUser()`.
 > ⚠️ Cortar el túnel también tumba Auth, así que spec-046 puede responder 503
 > antes de llegar al formulario. Ese 503 **cuenta como resultado válido**
 > (es señalización honesta); anotarlo en Hallazgos.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{pendiente}}
+**Estado:** ✅ Aprobado (2026-08-16), con un hallazgo nuevo escalado al backlog
+**Hallazgos:** Ejecutado por Claude vía navegador, con autorización explícita
+del usuario para cortar/restaurar el túnel. **Lo importante primero: la
+contraseña nunca cambió durante los dos intentos con el túnel cortado** —
+verificado dos veces entrando de nuevo con la antigua (`5R3YSWE93S`), que
+siguió funcionando ambas veces. D9 se sostuvo: ningún fallo de infraestructura
+escribió nada.
+
+**Lo que se vio en pantalla no fue lo que anticipaba el caso.** No apareció el
+503 honesto de spec-046 ni el mensaje de "no se pudo verificar tu contraseña"
+de `changePassword` — apareció la pantalla **genérica** del error boundary de
+React: *"Algo salió mal / Ocurrió un error inesperado."* Se reprodujo dos
+veces de forma consistente.
+
+**Diagnóstico con `read_network_requests`:** el servidor sí respondió
+correctamente — `POST /cambiar-contrasena` devolvió **503**, el propio 503
+inline de spec-046. El problema está en el cliente: Next.js espera un formato
+de respuesta específico (RSC/streaming) para la respuesta de un Server Action,
+y el HTML plano del 503 de spec-046 no cumple ese formato — el runtime del
+cliente no puede interpretarlo y dispara el error boundary genérico
+(`app/error.tsx`) en vez de mostrar cualquier mensaje relacionado con
+"servicio no disponible".
+
+**Por qué no se corrige aquí:** es un hallazgo de **spec-046**, no de
+spec-051 — `changePassword` está devolviendo exactamente lo que debe (el 503
+llega, el servidor no miente), y el defecto vive en la interacción entre el
+503 inline de spec-046 y el protocolo de Server Actions de Next.js. Afecta
+potencialmente a **cualquier** Server Action del proyecto invocada mientras
+Auth está caído (`signIn`, `signOut`, `withdrawStudentAction`, etc.), no solo
+a `changePassword`. Escalado a `docs/specs/backlog.md` como deuda nueva.
 
 ## Casos de prueba — MCP
 
