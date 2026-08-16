@@ -192,26 +192,23 @@ gesto. En el **cambio voluntario** se cierran las demás y se conserva la
 propia — implementado con `signOut({scope:'others'})` sobre la sesión de quien
 cambia (Fase 2, ✅).
 
-> ⚠️ **Hallazgo de la Fase 3 (2026-08-16): en el restablecimiento por el
-> docente, esto no se pudo implementar y queda sin verificar.**
-> `signOut({scope:'others'})` opera sobre la sesión de **quien invoca**; en
-> este flujo quien invoca es el docente, no el estudiante. El SDK admin de
-> GoTrue (`supabase.auth.admin`) no expone ningún método para revocar las
-> sesiones de OTRO usuario por su `id` — solo `admin.signOut(jwt, scope)`, que
-> exige el JWT de esa sesión, que el docente no tiene. Tampoco es una opción
-> limpia: `auth.sessions`/`auth.refresh_tokens` viven en el schema `auth`, que
-> PostgREST no expone ni con `service_role` (mismo límite que ya documenta
-> `fetchEmailsById` en `lib/students/service.ts` sobre `auth.users`).
+> ✅ **Hallazgo de la Fase 3 (2026-08-16), confirmado por TC-051-010 el mismo
+> día: no hizo falta ningún código adicional.** `signOut({scope:'others'})`
+> opera sobre la sesión de **quien invoca**; en el restablecimiento por el
+> docente, quien invoca es el docente, no el estudiante, y el SDK admin de
+> GoTrue no expone ningún método para revocar las sesiones de OTRO usuario por
+> su `id` — solo `admin.signOut(jwt, scope)`, que exige un JWT que el docente
+> no tiene. Antes de la ronda manual no había ninguna confirmación en el SDK
+> ni en la documentación del proyecto de que `admin.updateUserById({password})`
+> invalidara sesiones activas del lado del servidor, así que no se asumió.
 >
-> Es posible que **GoTrue invalide las sesiones del lado del servidor al
-> cambiar la contraseña vía el API admin** (comportamiento estándar en muchos
-> proveedores de Auth), pero no hay ninguna confirmación de esto en el SDK ni
-> en la documentación del proyecto — no se asume. `resetServiceStudentPassword()`
-> deja esto anotado en su propio código y **TC-051-010 lo verifica en vivo**
-> con dos navegadores. Si el test muestra que la sesión anterior sigue viva,
-> es un hallazgo a escalar (posible spec de seguimiento: RPC `security
-> definer` que borre de `auth.sessions` por `user_id`, lo que sí requeriría
-> migración — fuera del "sin migración" declarado en el alcance de este spec).
+> **La ronda de pruebas lo confirmó en vivo:** con el estudiante A con sesión
+> abierta en un segundo navegador, restablecer su contraseña desde el panel
+> docente lo expulsó a `/login` de inmediato al recargar (TC-051-010,
+> ✅ Aprobado). GoTrue sí invalida las sesiones al cambiar la contraseña por la
+> API admin — comportamiento no documentado explícitamente en el SDK, pero
+> real. `resetServiceStudentPassword()` cumple D8 tal como está, sin necesitar
+> el RPC `security definer` que se había previsto como plan de contingencia.
 
 **D9 — Errores honestos.** Tres resultados distinguibles, en la línea de
 spec-037/046 y [[DEBT-040]]: contraseña actual incorrecta (negocio), no se pudo
@@ -247,10 +244,11 @@ verificar (infraestructura), y éxito. Nunca reportar éxito sin comprobar el
 ### Fase 3 — Restablecimiento por el docente ✅ (2026-08-16)
 - [x] `ResetStudentPasswordSchema` en `lib/students/schemas.ts`.
 - [x] `resetServiceStudentPassword()` en `lib/students/service.ts`: fija la
-      contraseña y marca `must_change_password`. **Cierre de sesiones sin
-      resolver — ver el hallazgo anotado en D8.** El `app_metadata` se lee con
-      `admin.getUserById` y se mergea en código antes de escribir, mismo
-      criterio que `clearMustChangePasswordFlag`.
+      contraseña y marca `must_change_password`. **Cierre de sesiones: sin
+      código explícito, confirmado suficiente por TC-051-010 (ver D8)** — GoTrue
+      invalida las sesiones activas al cambiar la contraseña por la API admin.
+      El `app_metadata` se lee con `admin.getUserById` y se mergea en código
+      antes de escribir, mismo criterio que `clearMustChangePasswordFlag`.
 - [x] Generador de contraseña legible para dictar en voz alta (D7) — evitar
       caracteres ambiguos (`l/1/I`, `O/0`). `generateGenericPassword()`: solo
       mayúsculas + dígitos del alfabeto sin ambigüedad, 10 caracteres,
@@ -344,13 +342,10 @@ verificar (infraestructura), y éxito. Nunca reportar éxito sin comprobar el
 8. Cambiada la contraseña, la marca desaparece y la navegación se normaliza sin
    volver a iniciar sesión.
 9. Un usuario marcado siempre puede cerrar sesión.
-10. Restablecer cierra las sesiones abiertas de esa cuenta (D8). **Pendiente
-    de verificación empírica (TC-051-010, ver hallazgo de la Fase 3 en D8)**:
-    el código fija la contraseña nueva, pero no invoca ningún cierre explícito
-    de sesión porque el SDK admin no lo permite por `user_id`. Si TC-051-010
-    muestra que la sesión anterior sigue viva, este criterio queda incumplido
-    y hay que decidir con el usuario si se acepta el riesgo residual o se abre
-    un spec de seguimiento (ver D8).
+10. Restablecer cierra las sesiones abiertas de esa cuenta (D8). ✅ Confirmado
+    por TC-051-010 (2026-08-16): GoTrue invalida las sesiones activas de un
+    usuario al cambiar su contraseña vía la API admin, sin necesitar ningún
+    cierre de sesión explícito en el código.
 11. Con Supabase Auth caído, se informa de un fallo de infraestructura,
     distinto de "contraseña incorrecta", y no se reporta éxito.
 12. El agente puede invocar `reset_student_password` y obtener la contraseña

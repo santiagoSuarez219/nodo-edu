@@ -152,8 +152,15 @@ inmediato, **sin** pedir volver a iniciar sesión.
 1. Como docente, restablecer la contraseña de A.
 2. En el navegador B, recargar una página protegida.
 **Resultado esperado:** B queda fuera y se le redirige a `/login`.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{pendiente}}
+**Estado:** ✅ Aprobado (2026-08-16)
+**Hallazgos:** Confirmado — al restablecer la contraseña de A desde el panel
+docente, el navegador B (con sesión abierta de A) quedó expulsado a `/login`
+al recargar. **Resuelve el hallazgo de D8** de la Fase 3/4 de spec-051: el
+servidor de Auth de Supabase (GoTrue) sí invalida las sesiones activas de un
+usuario al cambiar su contraseña vía la API admin
+(`auth.admin.updateUserById({password})`), aunque el SDK no lo documentaba en
+ningún sitio accesible. `resetServiceStudentPassword()` no necesita ningún
+cambio adicional para cumplir D8 — ya lo cumplía sin saberlo con certeza.
 
 ### TC-051-011 — Un usuario marcado siempre puede cerrar sesión
 **Cubre:** criterio 9
