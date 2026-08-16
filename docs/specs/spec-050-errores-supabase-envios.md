@@ -126,6 +126,7 @@ el gate de autenticación; este spec lo aplica donde hay una nota en juego.
 | `lib/enrollments/access.ts` | `CourseAccess` gana `reason: "unavailable"`; `requireCourseAccess` redirige a `/servicio-no-disponible` |
 | `components/student/AssignmentPlayer.tsx` | Mensaje honesto ante `503` (hoy: `"Error al enviar."` para todo) y **no** perder las respuestas del intento |
 | `components/admin/SubmissionReviewPanel.tsx` | Mensaje honesto si `finalizeGrading` devuelve `unavailable` |
+| `lib/self-assessment/index.ts`, `lib/self-assessment/types.ts`, `components/courses/SelfAssessmentSection.tsx` | Añadidos durante la Fase 4 al recorrer los 13 consumidores de `hasCourseAccess` (no estaban en el plan original): `submitSelfAssessment` colapsaba `reason: "unavailable"` en `"not_enrolled"`, mintiendo "no estás matriculado" ante un fallo de infraestructura — mismo defecto que el spec corrige, aplicado a la nota de autoevaluaciones (spec-040) en vez de a los envíos |
 
 **Consumidores de `hasCourseAccess` a verificar** (13 sitios, todos comprueban
 `access.ok`, así que el nuevo estado degrada cerrado sin romper tipos — hay que
@@ -322,7 +323,24 @@ explícita del usuario en la sesión en que se ejecute.
       0), TC-050-009 (camino feliz completo, sin regresión, nota propagada a
       `student_grades`) y TC-050-010 (encontró y corrigió un bug real en la
       propia consulta de diagnóstico de la Fase 5 — ver esa fase arriba).
-- [ ] Invocar `@reviewer` sobre el diff contra `development` antes de `[DONE]`.
+- [x] Invocar `@reviewer` sobre el diff contra `development` antes de `[DONE]`.
+      **Primera pasada (2026-08-16): CAMBIOS REQUERIDOS** — sin 🔴 bloqueantes,
+      3 🟠 mayores: (1) `submitSubmission` pasaba a `status: 'graded'` aunque
+      `propagateToGradeItem` fallara, contradiciendo el propio comentario/Fase
+      2 (que prometía un envío recuperable en `submitted` — `finalizeGrading`
+      en realidad lo rechaza fuera de ese estado); (2)
+      `AssignmentPlayer.tsx` descartaba el resultado de `saveAnswerAction` en
+      el *flush* final antes de enviar, dejando pasar un envío con la última
+      respuesta potencialmente sin guardar; (3) `.single()` en
+      `createSubmission`/`submitSubmission` convertía "0 filas" (`PGRST116`)
+      en `reason: "unavailable"`, mintiendo en la dirección opuesta a la que
+      el spec corrige. Los tres corregidos en
+      `lib/submissions/index.ts`/`components/student/AssignmentPlayer.tsx`;
+      typecheck/lint/build reverificados en verde. Hallazgos 🟡 menores no
+      corregidos (copy de `/servicio-no-disponible`, `checkSelfAssessmentAnswer`,
+      `startNewAttemptAction`) registrados en `docs/specs/backlog.md` como
+      **[[DEBT-065]]**, con la aprobación del usuario para no ampliar el
+      alcance de este spec. Pendiente segunda pasada de `@reviewer`.
 
 ## Criterios de aceptación
 

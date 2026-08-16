@@ -118,6 +118,13 @@ export function AssignmentPlayer({
     setIsSubmitting(true);
     setSubmitError(null);
 
+    // Flush de las respuestas con guardado pendiente (dentro de su ventana de
+    // debounce de 3s) antes de enviar. Si alguno de estos upserts falla por
+    // infraestructura, NO se debe continuar al envío: seguir de largo dejaría
+    // que el servidor califique sobre respuestas incompletas y escriba una
+    // nota real pero incorrecta — el mismo hueco que este spec existe para
+    // cerrar, solo que en la escritura previa al envío en vez de en la
+    // lectura (hallazgo de @reviewer, spec-050 Fase 6).
     for (const [questionId, timer] of debounceTimers.current.entries()) {
       clearTimeout(timer);
       debounceTimers.current.delete(questionId);
@@ -126,10 +133,18 @@ export function AssignmentPlayer({
       if (!q) continue;
       const answer = answers[questionId];
       if (answer) {
-        await saveAnswerAction(submission.id, questionId, q.assignment_question_id, {
+        const saveResult = await saveAnswerAction(submission.id, questionId, q.assignment_question_id, {
           selected_choice_ids: answer.selected_choice_ids,
           text_response: answer.text_response || undefined,
         });
+        if (!saveResult.ok) {
+          setSubmitError(
+            "No pudimos guardar tu última respuesta. Tus respuestas anteriores siguen guardadas — intenta enviar de nuevo en un momento."
+          );
+          setSaveStatus("unsaved");
+          setIsSubmitting(false);
+          return;
+        }
       }
     }
 

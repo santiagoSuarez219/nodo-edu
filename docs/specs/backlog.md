@@ -5,6 +5,51 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+## DEBT-065 — Residuo de la revisión de código de spec-050: hallazgos menores dejados fuera de su alcance
+
+**Origen:** revisión de código (`@reviewer`) de `fix/errores-supabase-envios`
+(spec-050, 2026-08-16). Tres hallazgos 🟡 menores que no bloqueaban el veredicto
+tras corregir los 3 🟠 mayores, y que el propio spec dejó fuera de su alcance
+declarado (subconjunto "nota de estudiante en juego" + "control de acceso" de
+**[[DEBT-040]]**) en vez de ampliarlo sin aprobación.
+**Prioridad:** Baja — ninguno escribe una nota falsa; son mensajes de error
+poco honestos o UX confusa ante infraestructura degradada, no corrupción de
+datos.
+
+- **`lib/self-assessment/index.ts:233-235`** (`checkSelfAssessmentAnswer`) —
+  colapsa `reason: "unavailable"` en `{ok:false, error:'No autorizado'}`. Es
+  la verificación de una respuesta individual dentro de una autoevaluación
+  (no la nota final, que sí quedó cubierta por spec-050 en
+  `submitSelfAssessment`), pero sigue siendo el mismo patrón de mensaje
+  engañoso ante un fallo de Postgres.
+- **`components/student/AssignmentPlayer.tsx` / `app/servicio-no-disponible`**
+  — el texto de esa página (`"El servicio de autenticación no está
+  respondiendo"`, de spec-046) es específico de una caída de Auth. spec-050 la
+  reutiliza también para fallos de lectura de Postgres con Auth sano (p. ej.
+  `hasCourseAccess` degradado — ver TC-050-006 en
+  `docs/testing/test-050-errores-supabase-envios.md`), donde el mensaje es
+  técnicamente inexacto aunque el comportamiento (fallar cerrado, redirigir
+  ahí y no a un "sin acceso" falso) sea correcto. Generalizar el copy para
+  cubrir ambos escenarios, o parametrizarlo por causa.
+- **`lib/submissions/actions.ts`** (`startNewAttemptAction`) — sigue
+  tragándose un `reason: "unavailable"` en silencio (`if (!result.ok)
+  return;`): el botón "Iniciar nuevo intento" simplemente no hace nada visible
+  ante un fallo de infraestructura. Además, `createSubmissionAction` y
+  `submitSubmissionAction` no tienen ningún consumidor en el repo — código
+  muerto preexistente a spec-050 que conviene resolver (usarlos donde
+  corresponda o eliminarlos) junto con este hallazgo.
+- **`lib/submissions/index.ts`** (`getSubmissionForReview`) — degrada a un
+  `Map` vacío cuando `getReviewContextByAssignmentQuestionId` falla (decisión
+  correcta: nunca inventa una nota), pero el docente ve un panel de revisión
+  vacío sin ningún indicio de que la causa es infraestructura y no que el
+  envío no tiene preguntas. Candidato a mensaje explícito, en línea con el
+  resto de **[[DEBT-040]]**.
+
+**Acción:** Resolver en una futura ronda de **[[DEBT-040]]** o en un spec
+puntual si algún hallazgo se vuelve prioritario antes.
+
+---
+
 ## DEBT-064 — `verifyCurrentPassword` no cierra la sesión del cliente desechable si `updateUser` falla después
 
 **Origen:** segunda revisión de código (`@reviewer`) de `feat/reset-password`,
@@ -875,23 +920,28 @@ donde el llamador necesite distinguirlos, y capturar/verificar siempre
 real de estudiante en juego) y `lib/enrollments/access.ts` (control de acceso)
 sobre el resto.
 
-> **En curso (2026-08-14):** `docs/specs/spec-050-errores-supabase-envios.md`
-> — `[NOT STARTED]` — cubre **solo** el subconjunto prioritario
-> (`lib/submissions/index.ts`, `app/api/submissions/[submissionId]/submit`,
-> `lib/enrollments/access.ts`). Al verificar el código para redactarlo se
-> confirmó que el impacto es mayor que el descrito arriba: `submitSubmission`
-> no solo escribe `auto_score = 0`, sino que marca **`status: 'graded'`,
-> `final_score: 0` y propaga a la libreta**, porque un `answerKey` vacío hace
-> que `hasOpenQuestions` sea `false` — una evaluación con preguntas abiertas se
-> autocierra en cero sin pasar por revisión. Se encontraron además dos
-> corrupciones no registradas aquí, en el camino del docente:
-> `finalizeGrading` ignora los `manual_score` si `get_submission_review_context`
-> falla (suma `auto_score` en su lugar), y `getMaxPossiblePoints` devuelve `0`
-> ante un fallo de lectura, normalizando la nota a 0 en la libreta.
+> **En `[TESTING]` (2026-08-16):** `docs/specs/spec-050-errores-supabase-envios.md`
+> cubre **solo** el subconjunto prioritario (`lib/submissions/index.ts`,
+> `app/api/submissions/[submissionId]/submit`, `lib/enrollments/access.ts`, y
+> —añadido durante la implementación— `lib/self-assessment/index.ts`). Al
+> verificar el código para redactarlo se confirmó que el impacto era mayor que
+> el descrito arriba: `submitSubmission` no solo escribía `auto_score = 0`,
+> sino que marcaba **`status: 'graded'`, `final_score: 0` y propagaba a la
+> libreta**, porque un `answerKey` vacío hacía que `hasOpenQuestions` fuera
+> `false` — una evaluación con preguntas abiertas se autocerraba en cero sin
+> pasar por revisión. Se encontraron además dos corrupciones no registradas
+> aquí, en el camino del docente: `finalizeGrading` ignoraba los
+> `manual_score` si `get_submission_review_context` fallaba (sumaba
+> `auto_score` en su lugar), y `getMaxPossiblePoints` devolvía `0` ante un
+> fallo de lectura, normalizando la nota a 0 en la libreta. Los cuatro quedaron
+> corregidos y verificados con la ronda manual (10/10 casos aprobados,
+> `docs/testing/test-050-errores-supabase-envios.md`).
 >
 > **Esta deuda NO se cierra con spec-050**: quedan los ~35 sitios restantes,
 > incluidas las guardas de borrado de `lib/grades/index.ts:64` y
-> `lib/questions/index.ts:251`, más el residuo de `user_roles` anotado abajo.
+> `lib/questions/index.ts:251`, más el residuo de `user_roles` anotado abajo y
+> el residuo anotado en **[[DEBT-065]]** (hallazgos menores de la revisión de
+> código de spec-050, dejados fuera de su alcance a propósito).
 
 **Residuo anotado desde [[DEBT-042]] (spec-046, 2026-08-09):** dos sitios más,
 descubiertos y deliberadamente dejados fuera del alcance de spec-046 por ser

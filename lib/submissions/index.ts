@@ -48,7 +48,12 @@ export async function createSubmission(
     .eq("id", variantGroupId)
     .single();
 
-  if (groupError) {
+  // .single() devuelve error también cuando hay 0 filas (PGRST116) — un grupo
+  // genuinamente inexistente u oculto por RLS. Reportar eso como "unavailable"
+  // sería el mismo error simétrico que este spec corrige: mentir "no pude
+  // consultar" cuando en realidad "no existe" (hallazgo de @reviewer,
+  // spec-050 Fase 6).
+  if (groupError && groupError.code !== "PGRST116") {
     return {
       ok: false,
       error: "No pudimos verificar la evaluación. Intenta de nuevo en un momento.",
@@ -225,7 +230,11 @@ export async function submitSubmission(
     .eq("id", submissionId)
     .single();
 
-  if (submissionError) {
+  // Mismo criterio que en createSubmission: PGRST116 (0 filas) es "no existe
+  // / sin acceso", no un fallo de infraestructura — reportarlo como
+  // "unavailable" mentiría en la dirección opuesta a la que corrige este
+  // spec (hallazgo de @reviewer, spec-050 Fase 6).
+  if (submissionError && submissionError.code !== "PGRST116") {
     return {
       ok: false,
       error: "No pudimos verificar tu intento. Intenta de nuevo en un momento.",
@@ -343,21 +352,41 @@ export async function submitSubmission(
   if (!hasOpenQuestions) {
     // El envío ya quedó guardado como 'submitted' con un auto_score real
     // (arriba) — lo que sigue es solo la transición a 'graded' y la
-    // propagación a la libreta. Si cualquiera de las dos falla, no hay
-    // ningún puntaje falso en juego (el auto_score ya escrito es el
-    // correcto): se registra el fallo y el envío queda visible para el
-    // docente en 'submitted', recuperable con finalizeGrading más tarde.
+    // propagación a la libreta. No hay ningún puntaje falso en juego (el
+    // auto_score ya escrito es el correcto) pase lo que pase de aquí en
+    // adelante.
+    //
+    // Orden importante (hallazgo de @reviewer, spec-050 Fase 6): la
+    // propagación se intenta ANTES de la transición a 'graded', y si falla
+    // el envío se queda en 'submitted' — NO se avanza a 'graded'. La
+    // versión anterior hacía ambas cosas sin condicionar una a la otra: el
+    // envío pasaba a 'graded' aunque la propagación fallara, y como
+    // finalizeGrading rechaza cualquier envío que no esté en 'submitted'
+    // ("El envío no está pendiente de revisión."), esa promesa de
+    // recuperación era falsa — el envío quedaba con una nota real pero sin
+    // fila en student_grades, sin ninguna vía para corregirlo salvo tocar
+    // la base directamente. Con el fallo detectado a tiempo, el envío
+    // sigue siendo un 'submitted' normal: un reintento futuro de este mismo
+    // flujo (o una limpieza manual) puede volver a intentar la propagación.
     const propagation = await propagateToGradeItem(supabase, submissionId);
-    const { error: gradedUpdateError } = await supabase
-      .from("submissions")
-      .update({ status: "graded", final_score: roundedScore, graded_at: new Date().toISOString() })
-      .eq("id", submissionId);
 
-    if (!propagation.ok || gradedUpdateError) {
+    if (!propagation.ok) {
       console.error(
-        "submitSubmission: no se pudo cerrar el envío a graded o propagar a la libreta:",
-        !propagation.ok ? propagation.error : gradedUpdateError?.message
+        "submitSubmission: no se pudo propagar la nota a la libreta; el envío se queda en 'submitted':",
+        propagation.error
       );
+    } else {
+      const { error: gradedUpdateError } = await supabase
+        .from("submissions")
+        .update({ status: "graded", final_score: roundedScore, graded_at: new Date().toISOString() })
+        .eq("id", submissionId);
+
+      if (gradedUpdateError) {
+        console.error(
+          "submitSubmission: la propagación a la libreta sí funcionó pero no se pudo cerrar el envío a graded; queda en 'submitted':",
+          gradedUpdateError.message
+        );
+      }
     }
   }
 

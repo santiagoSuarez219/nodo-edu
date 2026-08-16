@@ -1,8 +1,8 @@
 # test-050 — Fallos de infraestructura en envíos y control de acceso
 
 > Ronda asociada a `docs/specs/spec-050-errores-supabase-envios.md`.
-> **Estado: pendiente de implementación** — los casos nacen con el spec y se
-> ejecutan cuando el usuario apruebe e implemente el paquete.
+> **Estado: ejecutada — 10/10 casos aprobados (2026-08-16).** Ver "Resumen de
+> la ronda" al final del archivo.
 
 ## Técnica de simulación del fallo
 
@@ -194,8 +194,8 @@ real fue una lectura de Postgres (`academic_courses`/`user_roles`) — mensaje
 técnicamente inexacto aunque el destino y el comportamiento (fallar cerrado,
 no acceso falso) sean correctos. D5 del spec ya documentó la decisión de
 reutilizar esta página en vez de crear una nueva; el matiz de copy quedó sin
-contemplar. Reportado al usuario; candidato a `docs/specs/backlog.md` si se
-decide generalizar el texto.
+contemplar. Registrado en `docs/specs/backlog.md` como parte de
+[[DEBT-065]] (hallazgo confirmado también por `@reviewer` en la Fase 6).
 
 ### TC-050-007 — Contenido docente sensible sigue fallando cerrado
 **Cubre:** D5 — verificar que el fix no abre nada de más
@@ -294,14 +294,16 @@ envíos con variantes corrompidos, habrían quedado invisibles sin este fix).
 ## Resumen de la ronda
 
 - Aprobados: 10 — Fallidos: 0 — Pendientes: 0
-- Hallazgos escalados a `docs/specs/backlog.md`: ninguno nuevo. El bug de
+- Hallazgos escalados a `docs/specs/backlog.md`: **[[DEBT-065]]**, creada tras
+  la revisión de `@reviewer` sobre esta misma rama — agrupa el hallazgo de
+  copy de TC-050-006 (mensaje de `/servicio-no-disponible` específico de Auth
+  reutilizado para un caso de Postgres) junto con otros dos hallazgos menores
+  de la revisión de código (`checkSelfAssessmentAnswer` colapsando
+  `unavailable`, y `startNewAttemptAction`/acciones sin consumidor). El bug de
   TC-050-010 (JOIN roto en la consulta de diagnóstico para evaluaciones con
   variantes) se corrigió dentro de la misma sesión, en los propios scripts de
   diagnóstico — no es deuda del código de producción, así que no aplica
-  backlog. El hallazgo de copy de TC-050-006 (mensaje de
-  `/servicio-no-disponible` específico de Auth reutilizado para un caso de
-  Postgres) queda reportado al usuario; pendiente de decidir si amerita una
-  entrada de backlog.
+  backlog.
 - Reversión de los `REVOKE`/`GRANT` usados para simular fallos: ✅ Completada
   — verificado con una consulta final que confirma los 6 permisos tocados
   (`answers`, `assignment_questions`, `submissions`, `academic_courses`,
@@ -321,5 +323,3 @@ envíos con variantes corrompidos, habrían quedado invisibles sin este fix).
   borrar primero los envíos o decidir conservar la evaluación), ítem de
   calificación `a0641b8e-2878-4281-8f4d-5b4d4e6b9fc9` (sin herramienta MCP —
   eliminar desde la pestaña Calificaciones del panel docente o por SQL).
-- Reversión de los `REVOKE`/`GRANT` usados para simular fallos: ⬜ Pendiente
-- Limpieza de datos de prueba: ⬜ Pendiente
