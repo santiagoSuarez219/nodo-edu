@@ -57,8 +57,13 @@ arriba).
 2. Cerrar sesión y entrar con la contraseña que ya se tenía.
 **Resultado esperado:** rechazo con mensaje específico en el campo de
 contraseña actual, no un error genérico. El paso 2 confirma que no cambió.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{pendiente}}
+**Estado:** ✅ Aprobado (2026-08-16)
+**Hallazgos:** Ejecutado por Claude vía navegador (autorización explícita del
+usuario para este caso). Mensaje exacto mostrado: **"La contraseña actual no
+es correcta."**, asociado al campo `Contraseña actual` — no un banner
+genérico. Confirmado con `zoom`/captura. Paso 2: cerrada la sesión, `A` volvió
+a entrar con `TempInicial2026!+` sin problema — el intento fallido no tocó
+la contraseña real.
 
 ### TC-051-003 — Validaciones del formulario
 **Cubre:** criterio 7 y D5/D6. Un subcaso por paso, verificando el mensaje:
