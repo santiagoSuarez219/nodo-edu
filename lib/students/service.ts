@@ -1,3 +1,4 @@
+import { randomBytes } from "node:crypto";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createServiceSupabaseClient } from "@/lib/auth/service";
 import type {
@@ -7,6 +8,7 @@ import type {
   CreateStudentInput,
   UpdateStudentInput,
   DeleteStudentResult,
+  ResetStudentPasswordResult,
 } from "./types";
 
 // spec-027 (hallazgo de la ronda de pruebas manuales, TC-027-003): el trigger
@@ -460,6 +462,86 @@ export async function unenrollServiceStudent(
   if (error) return { ok: false, error: "No se pudo retirar la matrícula." };
   if (!data) return { ok: false, error: "Matrícula no encontrada." };
   return { ok: true, enrollment: data };
+}
+
+// spec-051 (D7): sin caracteres ambiguos al dictar en voz alta — sin l/1/I,
+// O/0, y sin minúsculas (una "ele" hablada y una "i" mayúscula suenan igual
+// en español; forzar solo mayúsculas + dígitos elimina esa ambigüedad de
+// viva voz, que es justo el canal por el que esta contraseña se entrega).
+const READABLE_PASSWORD_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+const GENERIC_PASSWORD_LENGTH = 10;
+
+function generateGenericPassword(): string {
+  const bytes = randomBytes(GENERIC_PASSWORD_LENGTH);
+  let password = "";
+  for (let i = 0; i < GENERIC_PASSWORD_LENGTH; i++) {
+    password += READABLE_PASSWORD_CHARS[bytes[i] % READABLE_PASSWORD_CHARS.length];
+  }
+  return password;
+}
+
+// spec-051 (Fase 3): restablece la contraseña de un estudiante y lo marca
+// para cambio forzado (`must_change_password` en app_metadata — ver D2 de
+// spec-051 y clearMustChangePasswordFlag en lib/auth/service.ts, que es quien
+// la limpia cuando el estudiante por fin cambia la contraseña).
+//
+// Autorización: esta función NO comprueba que quien la invoca sea dueño del
+// curso del estudiante — corre con service_role, que bypasea RLS. Esa
+// comprobación vive en el llamador (resetStudentPasswordAction), consultando
+// PRIMERO "academic_courses" con el cliente de sesión — la policy
+// "academic_courses: select own or admin" es la única autorización real
+// (docente dueño o admin). No usar la policy "enrollments: select" para esto:
+// tiene una tercera rama, student_id = auth.uid(), que aprobaría también al
+// propio estudiante — el bloqueante que encontró la revisión de código de
+// spec-051 (2026-08-16) antes de que este spec se marcara [DONE]. No invocar
+// esta función directamente desde una ruta sin haber verificado la propiedad
+// del curso primero.
+//
+// El `app_metadata` actual se lee y se mergea en código, no se asume que el
+// servidor de Auth lo haga (mismo criterio que clearMustChangePasswordFlag).
+//
+// Sesiones: a diferencia del cambio voluntario (lib/auth/actions.ts →
+// changePassword), que corre bajo la sesión del propio usuario y puede usar
+// signOut({scope:'others'}), aquí quien actúa es el docente — el SDK admin de
+// GoTrue no expone ningún método para revocar las sesiones de OTRO usuario
+// por su id (solo admin.signOut(jwt, scope), que requiere el JWT de esa
+// sesión, que el docente no tiene). Si cambiar la contraseña por esta vía
+// invalida del lado del servidor las sesiones activas del estudiante es un
+// comportamiento de GoTrue que este código no controla ni puede confirmar sin
+// probarlo en vivo — ver TC-051-010.
+export async function resetServiceStudentPassword(
+  studentId: string,
+  password?: string
+): Promise<
+  { ok: true; result: ResetStudentPasswordResult } | { ok: false; error: string }
+> {
+  const supabase = createServiceSupabaseClient();
+
+  const { data: userData, error: getUserError } =
+    await supabase.auth.admin.getUserById(studentId);
+  if (getUserError || !userData.user) {
+    return { ok: false, error: "Estudiante no encontrado." };
+  }
+
+  const newPassword = password ?? generateGenericPassword();
+
+  const { error } = await supabase.auth.admin.updateUserById(studentId, {
+    password: newPassword,
+    app_metadata: { ...userData.user.app_metadata, must_change_password: true },
+  });
+
+  if (error) {
+    return { ok: false, error: error.message };
+  }
+
+  return {
+    ok: true,
+    result: {
+      student_id: studentId,
+      password: newPassword,
+      must_change_password: true,
+    },
+  };
 }
 
 // spec-040 Fase 7: lectura de la nota de autoevaluaciones de un estudiante

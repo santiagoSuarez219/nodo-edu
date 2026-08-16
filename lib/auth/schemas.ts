@@ -22,6 +22,26 @@ export const SignUpSchema = z
     path: ["password_confirmation"],
   });
 
+// spec-051: usada tanto por el cambio voluntario (/cuenta) como por el cambio
+// forzado (/cambiar-contrasena) — mismo schema, misma política de contraseñas
+// que SignUpSchema (D5). El refine de "distinta de la actual" (D6) es lo que
+// impide que el cambio forzado se "cumpla" reescribiendo la misma contraseña
+// genérica que entregó el docente.
+export const ChangePasswordSchema = z
+  .object({
+    current_password: z.string().min(1, "Ingresa tu contraseña actual"),
+    new_password: z.string().min(8, "La contraseña debe tener al menos 8 caracteres"),
+    new_password_confirmation: z.string().min(1, "Confirma tu nueva contraseña"),
+  })
+  .refine((data) => data.new_password === data.new_password_confirmation, {
+    message: "Las contraseñas no coinciden",
+    path: ["new_password_confirmation"],
+  })
+  .refine((data) => data.new_password !== data.current_password, {
+    message: "La nueva contraseña debe ser distinta de la actual",
+    path: ["new_password"],
+  });
+
 export const UpdateProfileSchema = z.object({
   full_name: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
   career: z.string().optional(),
@@ -43,4 +63,5 @@ export const UpdateProfileSchema = z.object({
 
 export type SignInInput = z.infer<typeof SignInSchema>;
 export type SignUpInput = z.infer<typeof SignUpSchema>;
+export type ChangePasswordInput = z.infer<typeof ChangePasswordSchema>;
 export type UpdateProfileInput = z.infer<typeof UpdateProfileSchema>;

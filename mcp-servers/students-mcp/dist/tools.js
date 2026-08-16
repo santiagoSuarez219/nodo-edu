@@ -125,6 +125,21 @@ export const tools = [
         },
     },
     {
+        name: "reset_student_password",
+        description: "Restablece la contraseña de un estudiante y lo marca para que deba cambiarla en su próximo inicio de sesión — el mismo circuito que usa un docente cuando un estudiante olvidó la suya (spec-051). Sin `password`, se genera una legible para dictar en voz alta (sin caracteres ambiguos: l/1/I, O/0). La respuesta devuelve la contraseña UNA sola vez — no vuelve a consultarse por ningún otro medio, así que hay que entregarla al docente en la misma respuesta y no reintentar 'por si acaso' (cada reintento genera/fija una contraseña nueva y descarta la anterior). No usar en lote sin que el docente lo pida explícitamente por cada estudiante.",
+        inputSchema: {
+            type: "object",
+            properties: {
+                id: { type: "string", description: "UUID del estudiante" },
+                password: {
+                    type: "string",
+                    description: "Contraseña específica a fijar (mínimo 8 caracteres) — opcional, útil solo si el docente quiere dictar la MISMA contraseña a varios estudiantes en la misma sesión de clase. Si se omite, se genera una aleatoria.",
+                },
+            },
+            required: ["id"],
+        },
+    },
+    {
         name: "get_student_self_assessment_summary",
         description: "Consulta la nota de autoevaluaciones de un estudiante en un curso: nota 0-5 (null si aún no hay preguntas evaluables, nunca 0.00), acumulado de preguntas correctas sobre el total y desglose por lección (respondida o no, correctas/total). Sirve para explicar de dónde sale la nota. Es una herramienta de SOLO LECTURA: la nota se calcula automáticamente a partir de las lecciones vistas y respondidas, y no se puede modificar desde aquí.",
         inputSchema: {
@@ -173,6 +188,10 @@ export async function processToolCall(toolName, toolInput) {
                 academic_course_id: String(toolInput.academic_course_id),
             });
             return await callStudentsApi("DELETE", `/${toolInput.id}/enrollments?${params}`);
+        }
+        case "reset_student_password": {
+            const body = toolInput.password ? { password: toolInput.password } : {};
+            return await callStudentsApi("POST", `/${toolInput.id}/reset-password`, body);
         }
         case "get_student_self_assessment_summary": {
             const params = new URLSearchParams({

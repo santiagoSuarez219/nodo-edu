@@ -5,6 +5,128 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+## DEBT-064 — `verifyCurrentPassword` no cierra la sesión del cliente desechable si `updateUser` falla después
+
+**Origen:** segunda revisión de código (`@reviewer`) de `feat/reset-password`,
+2026-08-16 — hallazgo 🔵, no bloqueante.
+**Prioridad:** Baja
+
+`verifyCurrentPassword` (`lib/auth/actions.ts`) crea un cliente
+`@supabase/supabase-js` desechable para verificar la contraseña actual sin
+desplazar la sesión real (D4 de spec-051). Ese `signInWithPassword` emite una
+sesión/refresh token real en GoTrue. En el camino feliz completo queda barrida
+por el `signOut({scope:'others'})` que `changePassword` hace después sobre la
+sesión real — pero si la verificación tiene éxito y el `updateUser`
+**inmediatamente posterior** falla, la función retorna antes de llegar a ese
+`signOut`, y la sesión del cliente desechable queda huérfana hasta que expira
+por sí sola.
+
+**Acción:** envolver el `signInWithPassword` en un `try/finally` que llame
+`throwaway.auth.signOut()` sin importar el resultado. Anotado con `// DEBT:`
+en el propio código.
+
+---
+
+## DEBT-063 — 3 estudiantes con cuentas duplicadas reales en producción (diagnóstico de la Fase 7 de spec-051)
+
+**Origen:** `scripts/diagnostico-duplicados-spec051.mjs` ejecutado contra
+producción (`bgiimadnmqnoqmdbudpo`) el 2026-08-16, con autorización explícita
+del usuario — solo lectura, ningún dato modificado.
+**Prioridad:** Media-Alta — son estudiantes reales con historial partido
+(matrícula, progreso, notas, asistencia divididos entre dos o tres cuentas);
+no es urgente reparar hoy, pero cada semana que pasa complica más el cruce.
+
+**Tres estudiantes identificados** (nombres reales — ver el historial de git
+de este archivo para el detalle completo; se resume aquí lo necesario para
+priorizar, no se vuelca el listado completo con IDs en texto libre):
+
+1. **Kevin Andres Garcia Avendaño** — el caso más claro: **tres** cuentas con
+   la misma parte local de correo (`kevingarcia1130885`) y tres dominios
+   institucionales ligeramente distintos (`correo.it.edu.co`,
+   `correo.itm.edu`, `correo.itm.edu.co` — probablemente typos sucesivos del
+   mismo dominio real). Mismo `full_name` en al menos dos de las tres.
+2. **Sebastian Rios** (`sebastianrios1131136`) — dos cuentas, una con
+   `coreo.itm.edu.co` (typo, falta la "r") y otra con `correo.itm.edu.co`
+   (correcto). El caso más simple de diagnosticar: un typo de dominio en el
+   registro original.
+3. **Roberto Echeverri Arroyave** y **David Morales Vargas** — dos cuentas
+   cada uno, mismo `full_name`, correos no capturados por la heurística B
+   (dominios ya distintos, no solo typos). Roberto además aparece en la
+   Heurística C1: una de sus dos cuentas tiene matrícula activa **sin ningún
+   `lesson_progress`** — el patrón exacto de "cuenta nueva recién creada"
+   que motivó spec-051.
+
+**Lo que NO se encontró:** ningún cruce en la Heurística C2 (cuenta con
+progreso y SIN matrícula activa) ni en el cruce final — las cuentas "viejas"
+de estos tres casos siguen con matrícula activa, no fueron retiradas. Repartir
+cuál cuenta es la "buena" y cuál la abandonada requiere criterio del docente,
+no es deducible solo de los datos.
+
+**Acción:** spec de seguimiento (no este ítem) que, por cada caso:
+1. Confirme con el docente cuál cuenta es la real/activa y cuál el duplicado.
+2. Decida qué fusionar — probablemente matrícula, progreso, notas y
+   asistencia de la cuenta duplicada hacia la real — o si alguna cuenta debe
+   simplemente eliminarse (`delete_student`, si no tiene entregas reales que
+   se pierdan).
+3. Documente el criterio para que, si vuelve a aparecer, no haya que
+   redecidir desde cero.
+
+No se toca nada aquí: **diagnóstico only**, según D6 de spec-051.
+
+---
+
+## DEBT-062 — El 503 inline de spec-046 rompe en Server Actions: el usuario ve un error genérico, no el mensaje honesto
+
+**Origen:** Ronda manual `test-051-restablecer-y-cambiar-contrasena.md`,
+TC-051-013, 2026-08-16 — reproducido dos veces de forma consistente.
+**Prioridad:** Media — no hay pérdida de datos (D9 se sostiene: ningún fallo
+de infraestructura escribió nada), pero el usuario ve una pantalla que no
+explica nada útil, justo en el escenario que spec-046 existe para cubrir.
+
+Cortando el túnel a `mirp-lab` con una sesión real y enviando
+`changePassword` (Server Action de spec-051) durante la caída,
+`read_network_requests` confirma que `POST /cambiar-contrasena` recibió
+**503** — el propio HTML inline de `lib/auth/service-unavailable-page.ts`
+que `middleware.ts` devuelve ante `auth.status === 'unavailable'` (spec-046).
+El servidor no mintió. Pero en pantalla apareció la genérica de
+`app/error.tsx`: *"Algo salió mal / Ocurrió un error inesperado."*, sin
+ninguna relación con "servicio no disponible".
+
+**Causa probable:** Next.js espera un formato de respuesta específico
+(RSC/streaming) para lo que el cliente reconoce como la respuesta de un
+Server Action. El HTML plano del 503 inline no cumple ese formato, así que
+el runtime del cliente no puede interpretarlo y dispara el error boundary
+genérico en vez de renderizar cualquier mensaje relacionado con el fallo real.
+No se investigó a fondo el mecanismo exacto (no se inspeccionó el body/headers
+completos de la respuesta 503 ni se comparó con lo que Next.js espera
+literalmente) — queda para quien tome este ítem.
+
+**Alcance del problema:** no es exclusivo de `changePassword`. El 503 inline
+de spec-046 se dispara para **cualquier** request que pase por el middleware
+mientras Auth está caído, incluidas las POST de **cualquier Server Action**
+del proyecto invocada en ese momento: `signIn`, `signOut`,
+`withdrawStudentAction`, `resetStudentPasswordAction`, etc. Todas comparten
+el mismo riesgo de mostrar el error genérico en vez del honesto.
+
+**Por qué no se corrigió en spec-051:** el defecto vive en la interacción
+entre el 503 inline de **spec-046** y el protocolo de Server Actions de
+Next.js — no es código de spec-051, que ya hace lo correcto (delega en el
+gate de middleware y no esconde el fallo). Corregirlo bien probablemente
+signifique que el middleware detecte si la request es una invocación de
+Server Action (header `Next-Action` presente) y responda con un formato que
+el cliente sepa interpretar, en vez del HTML plano actual — o que cada
+Server Action envuelva su llamada en un `try/catch` que traduzca cualquier
+excepción de red/parseo en un `AuthResult` de infraestructura, sin depender
+de que el 503 del middleware llegue intacto al código de la acción.
+
+**Acción:** diseñar un spec dedicado (toca `middleware.ts` y potencialmente
+el patrón de todas las Server Actions del proyecto — alcance transversal, no
+un parche de una función). Antes de implementar, confirmar el mecanismo
+exacto reproduciendo con las DevTools de Chrome abiertas (no solo la
+extensión) para ver el error real que lanza el cliente de Next.js.
+
+---
+
 ## DEBT-061 — Deuda menor de la revisión de código de spec-046
 
 **Origen:** segunda revisión de código (`@reviewer`) de
@@ -810,6 +932,17 @@ que queda como el ítem canónico. No abrir trabajo contra este número.
 **Origen:** Revisión de `spec-036` (2026-08-01), al detectar que su
 `CourseLifecycleActions` sería la **tercera** copia del mismo diálogo
 **Prioridad:** Media — no hay bug hoy; el riesgo es que las copias diverjan
+
+> **Van CUATRO, no tres (2026-08-16).** `components/admin/ResetPasswordButton.tsx`
+> (spec-051, Fase 3 — restablecer contraseña desde `EnrollmentTable`) es la
+> cuarta copia. Se evaluó extraer `ConfirmDialog` en ese mismo momento y se
+> decidió no hacerlo: este caso tiene una segunda fase que las otras tres no
+> tienen (mostrar la contraseña generada tras confirmar), y forzar esa forma en
+> un componente pensado para un confirmar/cancelar simple arriesgaba
+> sobre-ajustar la API sin que las tres copias existentes migraran en el mismo
+> cambio — un refactor amplio no pedido por spec-051. Motivo documentado en el
+> propio archivo. La próxima vez que se toque cualquiera de las cuatro,
+> conviene evaluar la extracción en serio.
 
 `components/student/AssignmentPlayer.tsx:262` y
 `components/admin/AdminAttendancePanel.tsx:239` contienen el mismo diálogo de
@@ -1629,6 +1762,54 @@ recuperación de cuentas (vía `students-mcp` → `update_student` con nuevo
 nuevo para **reconstruir** el flujo de recuperación de contraseña desde cero
 (la implementación anterior ya no existe en el código) — no es un simple
 "reactivar", hay que rehacer las rutas, formularios y Server Actions.
+
+> **Alcance acotado (2026-08-15).** Este ítem queda reducido a la
+> **recuperación por correo** ("olvidé mi contraseña"). Todo el circuito que
+> **no** necesita correo —el docente restablece con una contraseña genérica, el
+> estudiante entra y la plataforma le exige cambiarla— se trata en
+> `docs/specs/spec-051-restablecer-y-cambiar-contrasena.md` (`[NOT STARTED]`),
+> que no está bloqueado por nada.
+>
+> **Daño ya causado, motivo del spec-051 (2026-08-15).** Varios estudiantes
+> olvidaron su contraseña y **crearon cuentas nuevas** para poder seguir. No
+> fue un descuido: era la única salida. Verificado el 2026-08-15 sobre el
+> código, **nadie** podía restablecer una contraseña —ni el estudiante, ni el
+> docente, ni un agente: `UpdateStudentSchema`
+> (`lib/students/schemas.ts:15-25`) no acepta `password`, y `students-mcp` solo
+> lo recibe en `create_student`. La vía documentada arriba ("`update_student`
+> con nuevo `email`") consistía en **liberar el correo de la cuenta vieja** para
+> que el estudiante volviera a registrarse con él, que es exactamente cómo se
+> producen los duplicados observados. Cada duplicado deja una cuenta huérfana
+> con la matrícula, el progreso, las notas y la asistencia originales, mientras
+> la nueva arranca vacía. spec-051 corta la causa; **la reparación de los
+> historiales partidos queda pendiente** y se registrará con el diagnóstico de
+> su Fase 7.
+>
+> **spec-051 completado (2026-08-16), `[DONE]`.** El circuito sin correo —
+> restablecer + cambio forzado + cambio voluntario— ya está en producción de
+> código, con 14/14 casos de la ronda manual aprobados
+> (`docs/testing/test-051-restablecer-y-cambiar-contrasena.md`). **Este ítem
+> queda confirmado, acotado únicamente a la recuperación por correo** — nada
+> más pendiente aquí depende de spec-051.
+>
+> **Diagnóstico de la Fase 7 (2026-08-16):** consulta de solo lectura en
+> `scripts/diagnostico-duplicados-spec051.sql` (tres heurísticas: mismo
+> `full_name`, mismo correo por parte local, y el cruce más fuerte —cuenta
+> con matrícula activa sin ningún `lesson_progress` frente a cuenta con
+> progreso sin matrícula activa, ambas restringidas a rol `student`—).
+> Ejecutada contra **desarrollo**: sin duplicados. **Pendiente ejecutarla
+> contra producción**, con confirmación explícita del usuario antes de
+> correrla ahí (son datos reales de estudiantes). Si aparece algo, la
+> reparación de esos historiales partidos se registra como ítem nuevo del
+> backlog en ese momento — esta consulta solo diagnostica, no corrige nada.
+>
+> **Son dos bloqueos, no uno.** Además de SMTP ([[DEBT-001]]: 3 correos de auth
+> por hora en el plan gratuito, inservible para ~30 estudiantes al arranque de
+> semestre), spec-027 **eliminó la verificación de correo**. Montar la
+> recuperación sobre direcciones no verificadas no es "poco fiable": el enlace
+> de restablecimiento viaja a un buzón que nadie comprobó que pertenezca a
+> quien dice ser su dueño. El propio spec-027 ya lo anota. Reintroducir la
+> verificación de correo es un spec aparte y es **prerrequisito** de este ítem.
 
 ---
 
