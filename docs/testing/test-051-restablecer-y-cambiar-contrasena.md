@@ -1,20 +1,34 @@
 # test-051 — Restablecer y cambiar contraseña
 
 > Ronda asociada a `docs/specs/spec-051-restablecer-y-cambiar-contrasena.md`.
-> **Estado: en curso** — arrancada el 2026-08-16, empezando por TC-051-010.
+> **Estado: cerrada — 14/14 casos aprobados (2026-08-16).**
+> **Datos de prueba conservados a pedido explícito del usuario**, para una
+> posible segunda ronda — no se ejecutó la limpieza. Los IDs de abajo siguen
+> siendo válidos en la base de desarrollo (`mirp-lab`) hasta que se decida
+> borrarlos.
 
 ## Datos de prueba
 
 | Recurso | Endpoint / MCP de creación | Identificador | Eliminado |
 |---------|---------------------------|---------------|-----------|
-| Curso académico 1 (`TEST051`, docente dev@nodo.local) | *(sin endpoint — [[DEBT-060]]; insertado vía `psql` en `mirp-lab`, confirmado por el usuario)* | `53c1a445-cf85-43ec-8167-8eeefa1f7902` | ⬜ |
-| Estudiante A — `tc051010@test.nodo.local` | `POST /api/students` (matriculado directo en el curso 1) | `19f5e6cd-fc8d-4ad5-87c8-c39b6315048a` | ⬜ |
-| Matrícula de A en curso 1 | (incluida en el alta anterior) | `513851fa-421f-4b9f-91f5-6ef14178e0ae` | ⬜ |
-| Docente 2 — `docente2-tc051005@test.nodo.local` (rol `teacher`, **sin** `admin` a propósito) | Script `node` inline con `service_role`, mismo patrón que `scripts/seed-teacher.mjs` pero sin asignar `admin` | `ffd142f7-72ac-45e1-a729-07b0edb751c5` | ⬜ |
-| Curso académico 2 (`TEST051-B`, docente 2) | *(sin endpoint — [[DEBT-060]]; insertado vía `psql`, confirmado por el usuario)* | `0f4605e1-2305-4fef-8620-0b7b1dba6abd` | ⬜ |
-| Estudiante B — `tc051005-b@test.nodo.local` | `POST /api/students` (matriculado directo en el curso 2) | `9da22d9a-cc5e-412b-86ca-13bcaaec2ee3` | ⬜ |
-| Matrícula de B en curso 2 | (incluida en el alta anterior) | `51f9e6e8-0a27-4444-be17-81c3093b9e73` | ⬜ |
-| Docente de desarrollo | ya sembrado (`dev@nodo.local` / `DevLocal2026!`) | `7207c852-dd6c-4df4-ac33-99985c36e26c` | n/a |
+| Curso académico 1 (`TEST051`, docente dev@nodo.local) | *(sin endpoint — [[DEBT-060]]; insertado vía `psql` en `mirp-lab`, confirmado por el usuario)* | `53c1a445-cf85-43ec-8167-8eeefa1f7902` | 🟡 Conservado |
+| Estudiante A — `tc051010@test.nodo.local` | `POST /api/students` (matriculado directo en el curso 1) | `19f5e6cd-fc8d-4ad5-87c8-c39b6315048a` | 🟡 Conservado |
+| Matrícula de A en curso 1 | (incluida en el alta anterior) | `513851fa-421f-4b9f-91f5-6ef14178e0ae` | 🟡 Conservado |
+| Docente 2 — `docente2-tc051005@test.nodo.local` (rol `teacher`, **sin** `admin` a propósito) | Script `node` inline con `service_role`, mismo patrón que `scripts/seed-teacher.mjs` pero sin asignar `admin` | `ffd142f7-72ac-45e1-a729-07b0edb751c5` | 🟡 Conservado |
+| Curso académico 2 (`TEST051-B`, docente 2) | *(sin endpoint — [[DEBT-060]]; insertado vía `psql`, confirmado por el usuario)* | `0f4605e1-2305-4fef-8620-0b7b1dba6abd` | 🟡 Conservado |
+| Estudiante B — `tc051005-b@test.nodo.local` | `POST /api/students` (matriculado directo en el curso 2) | `9da22d9a-cc5e-412b-86ca-13bcaaec2ee3` | 🟡 Conservado |
+| Matrícula de B en curso 2 | (incluida en el alta anterior) | `51f9e6e8-0a27-4444-be17-81c3093b9e73` | 🟡 Conservado |
+| Docente de desarrollo | ya sembrado (`dev@nodo.local` / `DevLocal2026!`) — nunca se tocó, no aplica limpieza | `7207c852-dd6c-4df4-ac33-99985c36e26c` | n/a |
+
+**Estado final de las cuentas conservadas** (para retomar una segunda ronda
+sin sorpresas):
+- **A** (`tc051010@test.nodo.local`): contraseña `2GJ9XAJSEG`,
+  `must_change_password = true` — confinado en `/cambiar-contrasena` al
+  entrar.
+- **B** (`tc051005-b@test.nodo.local`): contraseña `EstudianteBTemp2026!`,
+  sin marcar, nunca se tocó.
+- **Docente 2** (`docente2-tc051005@test.nodo.local`): contraseña
+  `Docente2Temp2026!`, rol `teacher` sin `admin`.
 
 **Contraseñas usadas en la ronda** (anotarlas para poder revertir):
 
@@ -399,8 +413,11 @@ caso responde con éxito silencioso.
   **no se tocó en ningún caso** — solo se usó para iniciar/cerrar sesión, sin
   restablecerla ni cambiarla. No requiere restauración.
 - Hallazgos escalados a `docs/specs/backlog.md`: [[DEBT-062]].
-- **Limpieza de datos de prueba: ⬜ Pendiente** — ver tabla de arriba. Quedan
-  por eliminar: curso académico 1 y 2 (vía `psql`, ya que [[DEBT-060]] tampoco
-  ofrece endpoint de borrado), estudiantes A y B (`delete_student` sí tiene
-  endpoint), y docente 2 (vía `auth.admin.deleteUser`, sin endpoint dedicado —
-  mismo patrón manual que su creación).
+- **Limpieza de datos de prueba: 🟡 Conservados a pedido del usuario
+  (2026-08-16)**, no ejecutada — decisión explícita, no un olvido. Cuando se
+  cierre definitivamente: curso académico 1 y 2 (vía `psql`, ya que
+  [[DEBT-060]] tampoco ofrece endpoint de borrado), estudiantes A y B
+  (`delete_student` sí tiene endpoint), y docente 2 (vía
+  `auth.admin.deleteUser`, sin endpoint dedicado — mismo patrón manual que su
+  creación). IDs completos y estado de cada cuenta en la sección "Datos de
+  prueba" de arriba.
