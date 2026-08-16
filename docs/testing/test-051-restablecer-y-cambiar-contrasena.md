@@ -21,7 +21,8 @@
 | Inicial de A (`create_student`) | `TempInicial2026!` (ya no sirve — reemplazada en TC-051-010) |
 | Genérica tras el restablecimiento (TC-051-010) | `U2FU6485F9` |
 | Definitiva que elige A (TC-051-009) | `TempInicial2026!` — coincide con la inicial original de `create_student`, pero D6 solo exige distinta de la **actual** (`U2FU6485F9` en ese momento), así que se aceptó correctamente |
-| Cambio voluntario (TC-051-001) | `TempInicial2026!+` — **contraseña actual de A a partir de este punto** |
+| Cambio voluntario (TC-051-001) | `TempInicial2026!+` |
+| Segunda genérica tras restablecimiento (TC-051-006) | `5R3YSWE93S` — **contraseña actual de A; `must_change_password` = true** |
 
 **Entorno de pruebas:** desarrollo — `npm run dev` en el puerto **3002**
 (`.env.local` ya apunta ahí), Supabase en `mirp-lab` vía túnel SSH (confirmado
@@ -130,8 +131,14 @@ entrando con la suya.
 **Resultado esperado:** la contraseña se muestra **una sola vez**, legible para
 dictarla en voz alta (sin caracteres ambiguos). Tras recargar ya no aparece por
 ningún lado (D7).
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{pendiente}}
+**Estado:** ✅ Aprobado (2026-08-16)
+**Hallazgos:** Ejecutado por Claude vía navegador. Diálogo de confirmación
+correcto (nombre del estudiante incluido: "¿Restablecer la contraseña de
+Estudiante Prueba TC-051-010?"). Contraseña generada: `5R3YSWE93S` — solo
+mayúsculas y dígitos, sin `l/1/I/O/0`, coherente con `READABLE_PASSWORD_CHARS`.
+Tras "Listo" y recargar la página, el texto de la contraseña no aparece en
+ningún sitio (confirmado con `get_page_text` de la página completa). Esta es
+la contraseña **actual** de A a partir de ahora.
 
 ### TC-051-007 — La contraseña genérica no queda registrada en ningún sitio
 **Cubre:** D7
@@ -141,8 +148,18 @@ ningún lado (D7).
 **Resultado esperado:** la contraseña no aparece en logs, ni en la respuesta de
 ninguna consulta posterior, ni en `profiles`. Solo existió en la respuesta
 directa del restablecimiento.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{pendiente}}
+**Estado:** ✅ Aprobado (2026-08-16), con una comprobación pendiente del usuario
+**Hallazgos:** Verificado por Claude: `GET /api/students/{{id}}` no incluye
+`password` en ningún campo de la respuesta (`AdminStudentDetail` nunca lo tuvo,
+por diseño de spec-027). Confirmado además contra el esquema real en
+`mirp-lab`: ni `public.profiles` ni `public.students` tienen columna de
+contraseña — vive únicamente hasheada en `auth.users`, gestionada por GoTrue,
+inalcanzable por consulta directa. **Pendiente de que el usuario confirme:**
+la consola del navegador (revisada, sin coincidencias, pero el tracking de
+consola solo arrancó después de ejecutar TC-051-006, así que no cubre
+retroactivamente ese momento) y, sobre todo, **la terminal donde corre
+`npm run dev`** — Claude no tiene acceso a ese proceso, y es la única vía
+"logs del servidor" mencionada en el caso que queda sin cubrir.
 
 ## Casos de prueba — Cambio forzado
 
