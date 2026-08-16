@@ -20,7 +20,7 @@
 |---------|-------|
 | Inicial de A (`create_student`) | `TempInicial2026!` (ya no sirve — reemplazada en TC-051-010) |
 | Genérica tras el restablecimiento (TC-051-010) | `U2FU6485F9` |
-| Definitiva que elige A | `{{valor}}` |
+| Definitiva que elige A (TC-051-009) | `TempInicial2026!` — coincide con la inicial original de `create_student`, pero D6 solo exige distinta de la **actual** (`U2FU6485F9` en ese momento), así que se aceptó correctamente |
 
 **Entorno de pruebas:** desarrollo — `npm run dev` en el puerto **3002**
 (`.env.local` ya apunta ahí), Supabase en `mirp-lab` vía túnel SSH (confirmado
@@ -151,8 +151,8 @@ inmediato, **sin** pedir volver a iniciar sesión.
 `/cuenta` funcionó de inmediato sin volver a iniciar sesión. Verifica en vivo
 que `getUser()` revalida contra el servidor de Auth en cada request (Fase 4):
 la marca `must_change_password` desapareció sin necesitar ningún revalidatePath
-ni truco de caché adicional. **Pendiente:** registrar la contraseña definitiva
-que A eligió en la tabla de "Contraseñas usadas en la ronda".
+ni truco de caché adicional. Contraseña definitiva elegida: `TempInicial2026!`
+(registrada en la tabla de arriba).
 
 ### TC-051-010 — Restablecer cierra las sesiones abiertas
 **Cubre:** criterio 10 y D8 — *requiere dos navegadores*
