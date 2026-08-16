@@ -221,8 +221,15 @@ cambio adicional para cumplir D8 — ya lo cumplía sin saberlo con certeza.
 **Resultado esperado:** la sesión se cierra y se llega a `/login`. Sin esta
 exención, un usuario marcado que no recuerde la genérica queda atrapado sin
 salida.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{pendiente}}
+**Estado:** ✅ Aprobado (2026-08-16)
+**Hallazgos:** Ejecutado por Claude vía navegador. A, marcado y confinado en
+`/cambiar-contrasena` (contraseña `5R3YSWE93S`, sin cambiarla), pulsó "Cerrar
+sesión" desde el menú del navbar — visible con normalidad ahí, sin necesitar
+ningún control especial en la página. Cerró sesión limpiamente y llegó a
+`/login`. Confirma en vivo el razonamiento de D3/Fase 4: no hizo falta una
+exención de middleware aparte para "cerrar sesión" — la del propio
+`/cambiar-contrasena` ya bastaba, porque el formulario de logout siempre
+postea a la página actual.
 
 ### TC-051-012 — El gate no añade consultas a base de datos
 **Cubre:** criterio 13 y D2 — relacionado con [[DEBT-059]]
