@@ -189,7 +189,29 @@ genera aleatoria por defecto; el docente puede fijar una si lo prefiere
 **D8 — Restablecer cierra las sesiones abiertas de esa cuenta.** Si el motivo
 es que la cuenta está comprometida o compartida, dejar sesiones vivas vacía el
 gesto. En el **cambio voluntario** se cierran las demás y se conserva la
-propia; en el **restablecimiento por el docente** se cierran todas.
+propia — implementado con `signOut({scope:'others'})` sobre la sesión de quien
+cambia (Fase 2, ✅).
+
+> ⚠️ **Hallazgo de la Fase 3 (2026-08-16): en el restablecimiento por el
+> docente, esto no se pudo implementar y queda sin verificar.**
+> `signOut({scope:'others'})` opera sobre la sesión de **quien invoca**; en
+> este flujo quien invoca es el docente, no el estudiante. El SDK admin de
+> GoTrue (`supabase.auth.admin`) no expone ningún método para revocar las
+> sesiones de OTRO usuario por su `id` — solo `admin.signOut(jwt, scope)`, que
+> exige el JWT de esa sesión, que el docente no tiene. Tampoco es una opción
+> limpia: `auth.sessions`/`auth.refresh_tokens` viven en el schema `auth`, que
+> PostgREST no expone ni con `service_role` (mismo límite que ya documenta
+> `fetchEmailsById` en `lib/students/service.ts` sobre `auth.users`).
+>
+> Es posible que **GoTrue invalide las sesiones del lado del servidor al
+> cambiar la contraseña vía el API admin** (comportamiento estándar en muchos
+> proveedores de Auth), pero no hay ninguna confirmación de esto en el SDK ni
+> en la documentación del proyecto — no se asume. `resetServiceStudentPassword()`
+> deja esto anotado en su propio código y **TC-051-010 lo verifica en vivo**
+> con dos navegadores. Si el test muestra que la sesión anterior sigue viva,
+> es un hallazgo a escalar (posible spec de seguimiento: RPC `security
+> definer` que borre de `auth.sessions` por `user_id`, lo que sí requeriría
+> migración — fuera del "sin migración" declarado en el alcance de este spec).
 
 **D9 — Errores honestos.** Tres resultados distinguibles, en la línea de
 spec-037/046 y [[DEBT-040]]: contraseña actual incorrecta (negocio), no se pudo
@@ -222,19 +244,34 @@ verificar (infraestructura), y éxito. Nunca reportar éxito sin comprobar el
       (`current-password` / `new-password`), errores con `aria-describedby`.
 - [x] Montar la tarjeta en `app/cuenta/page.tsx`.
 
-### Fase 3 — Restablecimiento por el docente
-- [ ] `ResetStudentPasswordSchema` en `lib/students/schemas.ts`.
-- [ ] `resetServiceStudentPassword()` en `lib/students/service.ts`: fija la
-      contraseña, marca `must_change_password` y cierra las sesiones (D8).
-- [ ] Generador de contraseña legible para dictar en voz alta (D7) — evitar
-      caracteres ambiguos (`l/1/I`, `O/0`).
-- [ ] Server Action para la UI docente, autorizando **docente dueño del curso o
-      admin**, con el mismo criterio que `withdrawStudentAction`.
-- [ ] Botón "Restablecer contraseña" en `EnrollmentTable.tsx`, con diálogo de
-      confirmación y la contraseña resultante visible una sola vez.
-      > Usa el patrón de diálogo accesible ya presente en el proyecto. Ver
-      > [[DEBT-038]]: está duplicado en dos componentes; **esta sería la tercera
-      > copia**. Evaluar extraer `ConfirmDialog` aquí, o registrar por qué no.
+### Fase 3 — Restablecimiento por el docente ✅ (2026-08-16)
+- [x] `ResetStudentPasswordSchema` en `lib/students/schemas.ts`.
+- [x] `resetServiceStudentPassword()` en `lib/students/service.ts`: fija la
+      contraseña y marca `must_change_password`. **Cierre de sesiones sin
+      resolver — ver el hallazgo anotado en D8.** El `app_metadata` se lee con
+      `admin.getUserById` y se mergea en código antes de escribir, mismo
+      criterio que `clearMustChangePasswordFlag`.
+- [x] Generador de contraseña legible para dictar en voz alta (D7) — evitar
+      caracteres ambiguos (`l/1/I`, `O/0`). `generateGenericPassword()`: solo
+      mayúsculas + dígitos del alfabeto sin ambigüedad, 10 caracteres,
+      `node:crypto.randomBytes`.
+- [x] Server Action `resetStudentPasswordAction` en `lib/students/actions.ts`.
+      **No reutiliza el criterio de `withdrawStudentAction`** (ese delega la
+      autorización a RLS porque escribe con el cliente de sesión); aquí la
+      escritura real es con `service_role`, así que la autorización se verifica
+      explícitamente ANTES, consultando `enrollments` con el cliente de sesión
+      (reutiliza la policy `enrollments: select` — mismo patrón que D1 de
+      spec-052 para no reimplementar en código una regla que RLS ya expresa).
+- [x] Botón "Restablecer contraseña" en `EnrollmentTable.tsx`
+      (`ResetPasswordButton.tsx`), con diálogo de dos fases (confirmar → mostrar
+      la contraseña una sola vez).
+      > **Van CUATRO copias del diálogo, no tres** — `CourseLifecycleActions`
+      > (spec-036) ya era la tercera; [[DEBT-038]] no estaba actualizado.
+      > Evaluado extraer `ConfirmDialog`: **no se hizo**. Este diálogo tiene una
+      > segunda fase (mostrar el resultado) que las otras tres no tienen;
+      > forzarlas a una API común sin migrarlas en el mismo cambio habría sido
+      > un refactor amplio no pedido por este spec. Motivo documentado en el
+      > propio componente y en el backlog.
 
 ### Fase 4 — Cambio forzado
 - [ ] Ruta `app/cambiar-contrasena/page.tsx` reutilizando `ChangePasswordForm`,
@@ -288,7 +325,13 @@ verificar (infraestructura), y éxito. Nunca reportar éxito sin comprobar el
 8. Cambiada la contraseña, la marca desaparece y la navegación se normaliza sin
    volver a iniciar sesión.
 9. Un usuario marcado siempre puede cerrar sesión.
-10. Restablecer cierra las sesiones abiertas de esa cuenta (D8).
+10. Restablecer cierra las sesiones abiertas de esa cuenta (D8). **Pendiente
+    de verificación empírica (TC-051-010, ver hallazgo de la Fase 3 en D8)**:
+    el código fija la contraseña nueva, pero no invoca ningún cierre explícito
+    de sesión porque el SDK admin no lo permite por `user_id`. Si TC-051-010
+    muestra que la sesión anterior sigue viva, este criterio queda incumplido
+    y hay que decidir con el usuario si se acepta el riesgo residual o se abre
+    un spec de seguimiento (ver D8).
 11. Con Supabase Auth caído, se informa de un fallo de infraestructura,
     distinto de "contraseña incorrecta", y no se reporta éxito.
 12. El agente puede invocar `reset_student_password` y obtener la contraseña

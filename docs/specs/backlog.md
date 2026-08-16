@@ -818,6 +818,17 @@ que queda como el ítem canónico. No abrir trabajo contra este número.
 `CourseLifecycleActions` sería la **tercera** copia del mismo diálogo
 **Prioridad:** Media — no hay bug hoy; el riesgo es que las copias diverjan
 
+> **Van CUATRO, no tres (2026-08-16).** `components/admin/ResetPasswordButton.tsx`
+> (spec-051, Fase 3 — restablecer contraseña desde `EnrollmentTable`) es la
+> cuarta copia. Se evaluó extraer `ConfirmDialog` en ese mismo momento y se
+> decidió no hacerlo: este caso tiene una segunda fase que las otras tres no
+> tienen (mostrar la contraseña generada tras confirmar), y forzar esa forma en
+> un componente pensado para un confirmar/cancelar simple arriesgaba
+> sobre-ajustar la API sin que las tres copias existentes migraran en el mismo
+> cambio — un refactor amplio no pedido por spec-051. Motivo documentado en el
+> propio archivo. La próxima vez que se toque cualquiera de las cuatro,
+> conviene evaluar la extracción en serio.
+
 `components/student/AssignmentPlayer.tsx:262` y
 `components/admin/AdminAttendancePanel.tsx:239` contienen el mismo diálogo de
 confirmación **carácter por carácter**: overlay `<button>` a pantalla completa

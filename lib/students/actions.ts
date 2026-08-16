@@ -1,10 +1,12 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { getCurrentUser } from "@/lib/auth/session";
+import { getCurrentUser, requireUser } from "@/lib/auth/session";
 import { createServerSupabaseClient } from "@/lib/auth/server";
 import { UpdateProfileSchema } from "@/lib/auth/schemas";
+import { resetServiceStudentPassword } from "./service";
 import type { AuthResult } from "@/lib/auth/types";
+import type { ResetStudentPasswordResult } from "./types";
 
 export async function updateAccountAction(
   _prev: AuthResult,
@@ -56,4 +58,38 @@ export async function updateAccountAction(
 
   revalidatePath("/cuenta");
   return { ok: true };
+}
+
+// spec-051 (Fase 3): restablece la contraseña de un estudiante desde la lista
+// de matriculados del docente (EnrollmentTable). `resetServiceStudentPassword`
+// corre con service_role y NO comprueba propiedad — se verifica aquí, con el
+// cliente de SESIÓN, reutilizando exactamente la policy "enrollments: select"
+// (docente dueño del curso o admin): si esta consulta no devuelve fila, quien
+// invoca no tiene autoridad sobre este estudiante en este curso, sin importar
+// qué studentId le hayan pasado a la acción. Mismo patrón que D1 de spec-052
+// para la pestaña de asistencia — dejar que RLS haga la autorización en vez
+// de reimplementar la regla en código.
+export async function resetStudentPasswordAction(
+  studentId: string,
+  academicCourseId: string
+): Promise<AuthResult<ResetStudentPasswordResult>> {
+  await requireUser();
+
+  const supabase = await createServerSupabaseClient();
+  const { data: authorized } = await supabase
+    .from("enrollments")
+    .select("id")
+    .eq("student_id", studentId)
+    .eq("academic_course_id", academicCourseId)
+    .maybeSingle();
+
+  if (!authorized) {
+    return { ok: false, error: "No tienes acceso a este estudiante." };
+  }
+
+  const result = await resetServiceStudentPassword(studentId);
+  if (!result.ok) return { ok: false, error: result.error };
+
+  revalidatePath(`/admin/courses/${academicCourseId}`);
+  return { ok: true, data: result.result };
 }
