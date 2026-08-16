@@ -134,6 +134,28 @@ no ve ni recupera la contraseña anterior (no existe forma: están hasheadas).
 Pone una genérica, se la entrega al estudiante en clase, y la plataforma obliga
 a cambiarla. El docente **nunca** termina conociendo la contraseña definitiva.
 
+> 🔴 **Bloqueante encontrado y corregido en la revisión de código
+> (2026-08-16, `@reviewer`).** `resetStudentPasswordAction`
+> (`lib/students/actions.ts`) autorizaba consultando `enrollments` con el
+> cliente de sesión, confiando en que la policy `enrollments: select`
+> implicaba "docente dueño o admin". Falso: esa policy tiene una **tercera**
+> rama, `student_id = auth.uid()`. Un estudiante autenticado que invocara la
+> acción con su **propio** `studentId` y el `academicCourseId` de un curso en
+> el que está matriculado pasaba el gate y `resetServiceStudentPassword`
+> —que corre con `service_role` y no comprueba nada por sí sola— le devolvía
+> una contraseña nueva en claro para su propia cuenta: exactamente el
+> escenario que D4 existe para impedir (alguien con acceso a una sesión
+> ajena ya no necesitaría la contraseña actual).
+>
+> **Fix:** se antepuso una consulta a `academic_courses` por `id` con el
+> cliente de sesión — la policy "academic_courses: select own or admin" es la
+> única autorización real. Un estudiante nunca tiene fila propia ahí (no es
+> `teacher_id` de nada), así que la comprobación se cierra antes de llegar a
+> `enrollments`, sin importar qué `studentId` use. Verificado en vivo con el
+> `access_token` real de A contra `academic_courses`: `[]` — bloqueado. El
+> camino legítimo (docente dueño, y por separado un admin) se reverificó sin
+> regresión. Ver TC-051-014.
+
 **D2 — La marca de "debe cambiar" vive en `app_metadata`, no en una tabla.**
 Se usa `auth.users.app_metadata.must_change_password`, escrita con
 `supabase.auth.admin.updateUserById(...)` (el mismo camino que ya usa
@@ -214,6 +236,22 @@ cambia (Fase 2, ✅).
 spec-037/046 y [[DEBT-040]]: contraseña actual incorrecta (negocio), no se pudo
 verificar (infraestructura), y éxito. Nunca reportar éxito sin comprobar el
 `error` de `updateUser`.
+
+> 🟠 **Dos hallazgos de la revisión de código (2026-08-16, `@reviewer`),
+> corregidos:**
+> - Un `429` (rate limit de GoTrue sobre `signInWithPassword`, que
+>   `verifyCurrentPassword` consume en cada intento de cambio) caía en la
+>   rama "todo lo demás es incorrecta" y se reportaba como "La contraseña
+>   actual no es correcta" — falso, la contraseña era correcta. Se añadió
+>   `error.status === 429` a la clasificación de infraestructura.
+> - Si `clearMustChangePasswordFlag` fallaba, `changePassword` no se
+>   enteraba y reportaba éxito igual — la contraseña sí había cambiado, pero
+>   la marca `must_change_password` seguía puesta y el usuario quedaba
+>   encerrado en `/cambiar-contrasena`, sin poder repetir la contraseña que
+>   acababa de fijar (D6 lo rechaza). Ahora `clearMustChangePasswordFlag`
+>   devuelve `boolean`, `changePassword` lo propaga en
+>   `data: {flagCleared}`, y `ChangePasswordForm` muestra un aviso distinto
+>   (ámbar, no verde) cuando `flagCleared === false`.
 
 ## Fases de implementación
 
@@ -309,22 +347,32 @@ verificar (infraestructura), y éxito. Nunca reportar éxito sin comprobar el
       responde ("✓ Students MCP iniciado").
 
 ### Fase 6 — Verificación
-- [ ] `npm run lint` y `npm run build` en verde.
-- [ ] Ronda manual `docs/testing/test-051-restablecer-y-cambiar-contrasena.md`.
-- [ ] Invocar `@reviewer` sobre el diff contra `development`.
+- [x] `npm run lint` y `npm run build` en verde (verificado repetidamente
+      durante la implementación de cada fase, y de nuevo al pasar a `[TESTING]`).
+- [x] Ronda manual `docs/testing/test-051-restablecer-y-cambiar-contrasena.md`
+      — **14/14 casos aprobados** (2026-08-16).
+- [ ] Invocar `@reviewer` sobre el diff contra `development` — en curso.
 
-### Fase 7 — Cierre y diagnóstico de duplicados
-- [ ] **Consulta de diagnóstico** (solo lectura) que liste cuentas candidatas a
-      duplicado: mismo `full_name`, o correos con la misma parte local, o
-      matrículas activas sin ningún `lesson_progress` frente a cuentas con
-      progreso y sin matrícula activa.
-- [ ] Ejecutarla primero en desarrollo; contra producción **solo con
-      confirmación explícita** del usuario.
-- [ ] Entregar el listado. **No fusionar ni borrar nada.**
+### Fase 7 — Cierre y diagnóstico de duplicados ✅ (2026-08-16, con una acción condicionada a confirmación)
+- [x] **Consulta de diagnóstico** (solo lectura) — `scripts/diagnostico-duplicados-spec051.sql`.
+      Tres heurísticas: mismo `full_name`, mismo correo por parte local, y el
+      cruce más fuerte (matrícula activa sin ningún `lesson_progress` frente a
+      progreso sin matrícula activa), todas restringidas a rol `student` tras
+      corregir un falso positivo detectado en la primera corrida (`dev@nodo.local`,
+      un docente sin matrícula pero con progreso de haber navegado lecciones,
+      salía como "cuenta vieja abandonada" sin ese filtro).
+- [x] Ejecutada en **desarrollo**: sin duplicados (el único resultado de la
+      heurística C1 es el estudiante de prueba de la propia ronda manual, un
+      caso esperado, no un hallazgo).
+- [ ] **Contra producción: pendiente, requiere confirmación explícita del
+      usuario antes de ejecutarla** — son datos reales de estudiantes.
+- [x] Entregar el listado — hecho para desarrollo (arriba). **No se fusionó ni
+      borró nada.**
 - [ ] Registrar en `docs/specs/backlog.md` la reparación de los duplicados
-      encontrados.
-- [ ] Anotar en [[DEBT-011]] que el circuito sin correo ya está resuelto, y que
-      su alcance queda en la recuperación por correo.
+      encontrados — condicionado al resultado en producción; si aparece algo,
+      se registra en ese momento.
+- [x] Anotado en [[DEBT-011]] que el circuito sin correo ya está resuelto, y
+      que su alcance queda en la recuperación por correo.
 
 ## Criterios de aceptación
 

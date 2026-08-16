@@ -1,10 +1,9 @@
 "use client";
 
 import { useActionState, useEffect, useRef } from "react";
-import { changePassword } from "@/lib/auth/actions";
-import type { AuthResult } from "@/lib/auth/types";
+import { changePassword, type ChangePasswordResult } from "@/lib/auth/actions";
 
-const initial: AuthResult = { ok: true };
+const initial: ChangePasswordResult = { ok: true };
 
 export function ChangePasswordForm() {
   const [state, formAction, isPending] = useActionState(changePassword, initial);
@@ -28,13 +27,30 @@ export function ChangePasswordForm() {
       </h2>
 
       <form ref={formRef} action={formAction} className="flex flex-col gap-5">
-        {state !== initial && state.ok && (
+        {state !== initial && state.ok && state.data?.flagCleared !== false && (
           <div
             role="status"
             className="rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 px-4 py-3 text-sm text-green-700 dark:text-green-400"
           >
             Contraseña actualizada. Cerramos tus demás sesiones abiertas por
             seguridad — esta sigue activa.
+          </div>
+        )}
+
+        {/* La contraseña sí cambió (updateUser no falló), pero no se pudo
+            limpiar la marca de cambio forzado — sin este aviso, un usuario
+            que llegó aquí obligado no entendería por qué la plataforma
+            vuelve a pedírselo. Si vuelve a pasar, D6 exige elegir una
+            TERCERA contraseña distinta a la que acaba de fijar. */}
+        {state !== initial && state.ok && state.data?.flagCleared === false && (
+          <div
+            role="status"
+            className="rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 px-4 py-3 text-sm text-yellow-800 dark:text-yellow-300"
+          >
+            Tu contraseña se actualizó, pero no pudimos completar la
+            operación por un problema técnico. Si la plataforma te vuelve a
+            pedir que la cambies, elige una distinta a la que acabas de
+            poner.
           </div>
         )}
 

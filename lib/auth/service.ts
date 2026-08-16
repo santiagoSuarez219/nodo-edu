@@ -33,11 +33,18 @@ export function createServiceSupabaseClient() {
 //
 // No-op si la marca no estaba puesta — seguro de llamar siempre, incluso
 // antes de que exista ningún flujo que la escriba (Fase 3/4 de spec-051).
+//
+// Devuelve `true` si la marca quedó limpia (o no estaba puesta) y `false` si
+// el `update` falló. Revisión de código (2026-08-16, @reviewer): antes esta
+// función no devolvía nada — `changePassword` no podía saber que la marca
+// había quedado sin limpiar y reportaba éxito igual, dejando al usuario
+// encerrado en /cambiar-contrasena con una contraseña que ya no puede
+// repetir (D6 rechaza la nueva = la actual). El llamador ahora puede avisar.
 export async function clearMustChangePasswordFlag(
   userId: string,
   currentAppMetadata: User["app_metadata"]
-): Promise<void> {
-  if (!currentAppMetadata?.must_change_password) return;
+): Promise<boolean> {
+  if (!currentAppMetadata?.must_change_password) return true;
 
   const supabase = createServiceSupabaseClient();
   const { error } = await supabase.auth.admin.updateUserById(userId, {
@@ -49,5 +56,7 @@ export async function clearMustChangePasswordFlag(
       `clearMustChangePasswordFlag: no se pudo limpiar la marca para ${userId}:`,
       error.message
     );
+    return false;
   }
+  return true;
 }

@@ -1722,6 +1722,24 @@ nuevo para **reconstruir** el flujo de recuperación de contraseña desde cero
 > historiales partidos queda pendiente** y se registrará con el diagnóstico de
 > su Fase 7.
 >
+> **spec-051 completado (2026-08-16), `[DONE]`.** El circuito sin correo —
+> restablecer + cambio forzado + cambio voluntario— ya está en producción de
+> código, con 14/14 casos de la ronda manual aprobados
+> (`docs/testing/test-051-restablecer-y-cambiar-contrasena.md`). **Este ítem
+> queda confirmado, acotado únicamente a la recuperación por correo** — nada
+> más pendiente aquí depende de spec-051.
+>
+> **Diagnóstico de la Fase 7 (2026-08-16):** consulta de solo lectura en
+> `scripts/diagnostico-duplicados-spec051.sql` (tres heurísticas: mismo
+> `full_name`, mismo correo por parte local, y el cruce más fuerte —cuenta
+> con matrícula activa sin ningún `lesson_progress` frente a cuenta con
+> progreso sin matrícula activa, ambas restringidas a rol `student`—).
+> Ejecutada contra **desarrollo**: sin duplicados. **Pendiente ejecutarla
+> contra producción**, con confirmación explícita del usuario antes de
+> correrla ahí (son datos reales de estudiantes). Si aparece algo, la
+> reparación de esos historiales partidos se registra como ítem nuevo del
+> backlog en ese momento — esta consulta solo diagnostica, no corrige nada.
+>
 > **Son dos bloqueos, no uno.** Además de SMTP ([[DEBT-001]]: 3 correos de auth
 > por hora en el plan gratuito, inservible para ~30 estudiantes al arranque de
 > semestre), spec-027 **eliminó la verificación de correo**. Montar la

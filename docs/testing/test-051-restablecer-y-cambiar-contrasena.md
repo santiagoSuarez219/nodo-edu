@@ -41,7 +41,8 @@ sin sorpresas):
 | Segunda genérica tras restablecimiento (TC-051-006) | `5R3YSWE93S` |
 | Cambio forzado, post-corte de túnel (TC-051-011/013) | `PostCorteFinal789` — **contraseña actual de A; `must_change_password` = false, ya no confinado** |
 | Estudiante B (`create_student`) | `EstudianteBTemp2026!` — nunca cambió (TC-051-005) |
-| Reset vía ruta MCP (TC-MCP-051-001) | `2GJ9XAJSEG` — **contraseña actual de A; `must_change_password` = true al cierre de la ronda** |
+| Reset vía ruta MCP (TC-MCP-051-001) | `2GJ9XAJSEG` |
+| Reset post-fix del bloqueante (TC-051-014, cierre por UI) | `86RY5DE69G` — **contraseña actual de A; `must_change_password` = true al cierre de la ronda** |
 
 **Entorno de pruebas:** desarrollo — `npm run dev` en el puerto **3002**
 (`.env.local` ya apunta ahí), Supabase en `mirp-lab` vía túnel SSH (confirmado
@@ -172,6 +173,15 @@ intento nunca llegó a `resetServiceStudentPassword()`.
 El escenario original del caso (docente 1 contra B) también se puede validar
 por separado si hace falta un docente admin+teacher específicamente, pero no
 aporta nada que docente 2 no haya probado ya de forma más rigurosa.
+
+> **Nota post-revisión (2026-08-16).** Esta verificación se hizo **antes**
+> del fix del bloqueante que encontró `@reviewer` (ver TC-051-014): el código
+> de entonces solo comprobaba `enrollments`, no `academic_courses`. El
+> resultado de este caso sigue siendo válido —docente 2 estaba bloqueado por
+> la propia policy de `enrollments` en la rama de propiedad del curso, que
+> nunca cambió—, pero **no** cubría el vector que sí resultó vulnerable
+> (estudiante contra sí mismo). Ese vector específico lo cierra TC-051-014,
+> añadido después del fix.
 
 ### TC-051-006 — Restablecimiento desde la lista de estudiantes
 **Cubre:** criterio 4
@@ -386,29 +396,69 @@ vez de la UI docente).
 inválido (no UUID) → `404 not_found`, `"ID de estudiante inválido"`. Ningún
 caso responde con éxito silencioso.
 
+## Caso añadido tras la revisión de código
+
+### TC-051-014 — Un estudiante no puede restablecerse la contraseña a sí mismo
+**Cubre:** el bloqueante encontrado por `@reviewer` (2026-08-16) — ver D1 de
+spec-051. Nace **después** del cierre original de la ronda (13 casos), como
+consecuencia directa de la revisión de código antes de marcar `[DONE]`.
+**Precondición:** el fix ya aplicado (`lib/students/actions.ts` consulta
+`academic_courses` antes que `enrollments`).
+**Pasos:**
+1. Obtener el `access_token` real de A (`/auth/v1/token?grant_type=password`).
+2. Con ese token, reproducir el primer paso de `resetStudentPasswordAction`:
+   `GET /rest/v1/academic_courses?id=eq.{{curso1}}` — el curso en el que A
+   está matriculado.
+**Resultado esperado:** `[]` — vacío. Un estudiante nunca tiene fila propia en
+`academic_courses` (no es `teacher_id` de ningún curso), así que la
+comprobación de propiedad lo bloquea antes de llegar siquiera a comprobar la
+matrícula, sin importar qué `studentId` use.
+**Estado:** ✅ Aprobado (2026-08-16)
+**Hallazgos:** Confirmado — `[]` vacío con el token real de A. **Re-verificado
+sin regresión** el camino legítimo tras el fix: docente 1 (dueño) contra su
+propio curso 1 → fila devuelta (permitido); docente 2 (ajeno, sin `admin`)
+contra el curso 1 → `[]` (bloqueado, mismo resultado que TC-051-005 antes del
+fix). Cierre por UI real: docente 1 restableció a A desde el panel
+(`86RY5DE69G`) sin ningún problema — el fix no rompió el flujo normal.
+
 ## Resumen de la ronda
 
-- **Aprobados: 14 — Fallidos: 0 — Pendientes: 0**
+- **Aprobados: 15 — Fallidos: 0 — Pendientes: 0** (14 de la ronda original +
+  TC-051-014, añadido tras la revisión de código).
 - Todos los criterios de aceptación del spec quedaron verificados en vivo,
   varios con medición real (no solo revisión de código): `pg_stat_statements`
   para TC-051-012, `read_network_requests` para el diagnóstico de TC-051-013,
   y el `access_token` real de un docente sin `admin` contra PostgREST para
-  TC-051-005.
-- **Un hallazgo no anticipado, escalado como [[DEBT-062]]:** el 503 inline de
-  spec-046 no es interpretable por el cliente de Next.js cuando la request es
-  un Server Action — el usuario ve el error boundary genérico de React en vez
-  del mensaje honesto. El servidor responde correctamente (confirmado por
-  `read_network_requests`); el defecto es transversal a cualquier Server
-  Action del proyecto invocada con Auth caído, no exclusivo de spec-051.
+  TC-051-005 y TC-051-014.
+- **🔴 Bloqueante encontrado por `@reviewer` antes de marcar `[DONE]`, y
+  corregido en la misma sesión:** `resetStudentPasswordAction` autorizaba
+  contra `enrollments`, cuya policy incluye la rama `student_id = auth.uid()`
+  — un estudiante podía restablecer su propia contraseña sin conocer la
+  actual, evadiendo D4 por completo. Fix: autorizar primero contra
+  `academic_courses` (docente dueño o admin), donde ningún estudiante tiene
+  fila propia. Ver D1 de spec-051 y TC-051-014. Sin este hallazgo, el spec no
+  se habría podido marcar `[DONE]` con este defecto dentro.
+- **🟠 Dos hallazgos más de la misma revisión, también corregidos:** un `429`
+  de rate limit se reportaba como "contraseña actual incorrecta" (ahora
+  clasificado como infraestructura); y si fallaba la limpieza de
+  `must_change_password` tras un cambio exitoso, se reportaba éxito igual,
+  dejando al usuario encerrado. Ver D9 de spec-051.
+- **Un hallazgo no anticipado, escalado como [[DEBT-062]]** (este sí queda
+  como deuda, no se corrigió en el spec — ver su propia entrada arriba, en
+  TC-051-013): el 503 inline de spec-046 no es interpretable por el cliente
+  de Next.js cuando la request es un Server Action — el usuario ve el error
+  boundary genérico de React en vez del mensaje honesto. El servidor responde
+  correctamente; el defecto es transversal a cualquier Server Action del
+  proyecto invocada con Auth caído, no exclusivo de spec-051.
 - **Corrección de método durante TC-051-005:** `dev@nodo.local` tiene rol
   `admin` además de `teacher` (lo asigna `scripts/seed-teacher.mjs`), así que
   no sirve como "docente ajeno" para pruebas de seguridad — habría exhibido el
   bypass legítimo de admin, no la comprobación de propiedad real. Se creó un
   segundo docente sin `admin` para probar el límite real.
-- **Diagnóstico de cuentas duplicadas (Fase 7 del spec):** pendiente,
-  deliberadamente **fuera del alcance de esta ronda** — es una consulta de
-  cierre contra los datos ya corrompidos antes de spec-051, no un caso de
-  prueba de esta lista.
+- **Diagnóstico de cuentas duplicadas (Fase 7 del spec):** ejecutado en
+  desarrollo — `scripts/diagnostico-duplicados-spec051.sql`, sin duplicados
+  reales. Contra producción: autorizado explícitamente por el usuario;
+  pendiente de ejecución (ver Fase 7 del spec para el detalle del método).
 - Contraseña del docente de desarrollo (`dev@nodo.local` / `DevLocal2026!`):
   **no se tocó en ningún caso** — solo se usó para iniciar/cerrar sesión, sin
   restablecerla ni cambiarla. No requiere restauración.

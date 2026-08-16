@@ -226,9 +226,17 @@ async function verifyCurrentPassword(
   // incorrecta. No se reutiliza classifyAuthError() directamente porque su
   // resultado (anonymous/unavailable) no distingue "credencial incorrecta" —
   // aquí sí hace falta esa tercera rama.
+  //
+  // Revisión de código (2026-08-16, @reviewer): 429 quedaba dentro del "todo
+  // lo demás es incorrecta" — GoTrue limita los intentos de
+  // signInWithPassword, y este verificador consume esa misma cuota en cada
+  // cambio de contraseña. Sin este caso aparte, un 429 se reportaba como
+  // "La contraseña actual no es correcta" siendo falso: la contraseña era
+  // correcta, solo se agotó el límite de intentos. Se clasifica como
+  // infraestructura para que D9 no mienta.
   if (!isAuthErrorLike(error)) return { ok: false, reason: "unavailable" };
   if (error.name === "AuthRetryableFetchError") return { ok: false, reason: "unavailable" };
-  if (typeof error.status === "number" && error.status >= 500) {
+  if (typeof error.status === "number" && (error.status >= 500 || error.status === 429)) {
     return { ok: false, reason: "unavailable" };
   }
   return { ok: false, reason: "incorrect" };
@@ -240,10 +248,18 @@ const INFRA_ERROR_MESSAGE =
 // Cambio con sesión activa (spec-051, Fase 2) — cubre tanto el cambio
 // voluntario desde /cuenta como el cambio forzado desde /cambiar-contrasena
 // (Fase 4): ambos usan el mismo ChangePasswordSchema y esta misma acción.
+// spec-051 (revisión de código, 2026-08-16): `flagCleared` deja que el
+// llamador (ChangePasswordForm) distinga un cambio completamente exitoso de
+// uno donde la contraseña sí cambió pero la marca `must_change_password` no
+// se pudo limpiar — sin este dato, ese segundo caso se veía idéntico al
+// primero y el usuario quedaba encerrado en /cambiar-contrasena sin saber
+// por qué.
+export type ChangePasswordResult = AuthResult<{ flagCleared: boolean }>;
+
 export async function changePassword(
-  _prev: AuthResult,
+  _prev: ChangePasswordResult,
   formData: FormData
-): Promise<AuthResult> {
+): Promise<ChangePasswordResult> {
   // Mismo patrón que updateAccountAction (lib/students/actions.ts): usa
   // getCurrentUser(), no requireUser(). Colapsa "sin sesión" y "no se pudo
   // verificar" en el mismo mensaje genérico — gap ya documentado en
@@ -293,7 +309,7 @@ export async function changePassword(
     return { ok: false, error: INFRA_ERROR_MESSAGE };
   }
 
-  await clearMustChangePasswordFlag(user.id, user.app_metadata);
+  const flagCleared = await clearMustChangePasswordFlag(user.id, user.app_metadata);
 
   // D8: se cierran las demás sesiones, se conserva la propia — 'others' deja
   // viva exactamente la sesión desde la que se hizo el cambio.
@@ -306,5 +322,5 @@ export async function changePassword(
   }
 
   revalidatePath("/cuenta");
-  return { ok: true };
+  return { ok: true, data: { flagCleared } };
 }
