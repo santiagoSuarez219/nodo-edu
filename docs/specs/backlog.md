@@ -5,6 +5,54 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+## DEBT-063 — 3 estudiantes con cuentas duplicadas reales en producción (diagnóstico de la Fase 7 de spec-051)
+
+**Origen:** `scripts/diagnostico-duplicados-spec051.mjs` ejecutado contra
+producción (`bgiimadnmqnoqmdbudpo`) el 2026-08-16, con autorización explícita
+del usuario — solo lectura, ningún dato modificado.
+**Prioridad:** Media-Alta — son estudiantes reales con historial partido
+(matrícula, progreso, notas, asistencia divididos entre dos o tres cuentas);
+no es urgente reparar hoy, pero cada semana que pasa complica más el cruce.
+
+**Tres estudiantes identificados** (nombres reales — ver el historial de git
+de este archivo para el detalle completo; se resume aquí lo necesario para
+priorizar, no se vuelca el listado completo con IDs en texto libre):
+
+1. **Kevin Andres Garcia Avendaño** — el caso más claro: **tres** cuentas con
+   la misma parte local de correo (`kevingarcia1130885`) y tres dominios
+   institucionales ligeramente distintos (`correo.it.edu.co`,
+   `correo.itm.edu`, `correo.itm.edu.co` — probablemente typos sucesivos del
+   mismo dominio real). Mismo `full_name` en al menos dos de las tres.
+2. **Sebastian Rios** (`sebastianrios1131136`) — dos cuentas, una con
+   `coreo.itm.edu.co` (typo, falta la "r") y otra con `correo.itm.edu.co`
+   (correcto). El caso más simple de diagnosticar: un typo de dominio en el
+   registro original.
+3. **Roberto Echeverri Arroyave** y **David Morales Vargas** — dos cuentas
+   cada uno, mismo `full_name`, correos no capturados por la heurística B
+   (dominios ya distintos, no solo typos). Roberto además aparece en la
+   Heurística C1: una de sus dos cuentas tiene matrícula activa **sin ningún
+   `lesson_progress`** — el patrón exacto de "cuenta nueva recién creada"
+   que motivó spec-051.
+
+**Lo que NO se encontró:** ningún cruce en la Heurística C2 (cuenta con
+progreso y SIN matrícula activa) ni en el cruce final — las cuentas "viejas"
+de estos tres casos siguen con matrícula activa, no fueron retiradas. Repartir
+cuál cuenta es la "buena" y cuál la abandonada requiere criterio del docente,
+no es deducible solo de los datos.
+
+**Acción:** spec de seguimiento (no este ítem) que, por cada caso:
+1. Confirme con el docente cuál cuenta es la real/activa y cuál el duplicado.
+2. Decida qué fusionar — probablemente matrícula, progreso, notas y
+   asistencia de la cuenta duplicada hacia la real — o si alguna cuenta debe
+   simplemente eliminarse (`delete_student`, si no tiene entregas reales que
+   se pierdan).
+3. Documente el criterio para que, si vuelve a aparecer, no haya que
+   redecidir desde cero.
+
+No se toca nada aquí: **diagnóstico only**, según D6 de spec-051.
+
+---
+
 ## DEBT-062 — El 503 inline de spec-046 rompe en Server Actions: el usuario ve un error genérico, no el mensaje honesto
 
 **Origen:** Ronda manual `test-051-restablecer-y-cambiar-contrasena.md`,

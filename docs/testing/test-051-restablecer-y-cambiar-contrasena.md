@@ -456,9 +456,12 @@ fix). Cierre por UI real: docente 1 restableció a A desde el panel
   bypass legítimo de admin, no la comprobación de propiedad real. Se creó un
   segundo docente sin `admin` para probar el límite real.
 - **Diagnóstico de cuentas duplicadas (Fase 7 del spec):** ejecutado en
-  desarrollo — `scripts/diagnostico-duplicados-spec051.sql`, sin duplicados
-  reales. Contra producción: autorizado explícitamente por el usuario;
-  pendiente de ejecución (ver Fase 7 del spec para el detalle del método).
+  desarrollo (`scripts/diagnostico-duplicados-spec051.sql`, sin duplicados) y
+  en **producción**, con autorización explícita del usuario
+  (`scripts/diagnostico-duplicados-spec051.mjs`, solo lectura). **Encontró 3
+  estudiantes reales con cuentas duplicadas** — detalle completo en
+  [[DEBT-063]] del backlog. No se modificó ni fusionó ningún dato; queda como
+  spec de seguimiento aparte.
 - Contraseña del docente de desarrollo (`dev@nodo.local` / `DevLocal2026!`):
   **no se tocó en ningún caso** — solo se usó para iniciar/cerrar sesión, sin
   restablecerla ni cambiarla. No requiere restauración.

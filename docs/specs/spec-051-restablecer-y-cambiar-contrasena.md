@@ -353,24 +353,29 @@ verificar (infraestructura), y éxito. Nunca reportar éxito sin comprobar el
       — **14/14 casos aprobados** (2026-08-16).
 - [ ] Invocar `@reviewer` sobre el diff contra `development` — en curso.
 
-### Fase 7 — Cierre y diagnóstico de duplicados ✅ (2026-08-16, con una acción condicionada a confirmación)
-- [x] **Consulta de diagnóstico** (solo lectura) — `scripts/diagnostico-duplicados-spec051.sql`.
-      Tres heurísticas: mismo `full_name`, mismo correo por parte local, y el
-      cruce más fuerte (matrícula activa sin ningún `lesson_progress` frente a
-      progreso sin matrícula activa), todas restringidas a rol `student` tras
-      corregir un falso positivo detectado en la primera corrida (`dev@nodo.local`,
-      un docente sin matrícula pero con progreso de haber navegado lecciones,
-      salía como "cuenta vieja abandonada" sin ese filtro).
+### Fase 7 — Cierre y diagnóstico de duplicados ✅ (2026-08-16, completa)
+- [x] **Consulta de diagnóstico** (solo lectura) — `scripts/diagnostico-duplicados-spec051.sql`
+      (desarrollo, `psql` vía `mirp-lab`) y su equivalente
+      `scripts/diagnostico-duplicados-spec051.mjs` (producción, sin acceso a
+      `psql` directo — reimplementado con `@supabase/supabase-js` y
+      `auth.admin.listUsers()`, mismo patrón que `fetchEmailsById` en
+      `lib/students/service.ts`). Tres heurísticas: mismo `full_name`, mismo
+      correo por parte local, y el cruce más fuerte (matrícula activa sin
+      ningún `lesson_progress` frente a progreso sin matrícula activa), todas
+      restringidas a rol `student` tras corregir un falso positivo detectado
+      en la primera corrida en desarrollo (`dev@nodo.local`, un docente sin
+      matrícula pero con progreso de haber navegado lecciones, salía como
+      "cuenta vieja abandonada" sin ese filtro).
 - [x] Ejecutada en **desarrollo**: sin duplicados (el único resultado de la
       heurística C1 es el estudiante de prueba de la propia ronda manual, un
       caso esperado, no un hallazgo).
-- [ ] **Contra producción: pendiente, requiere confirmación explícita del
-      usuario antes de ejecutarla** — son datos reales de estudiantes.
-- [x] Entregar el listado — hecho para desarrollo (arriba). **No se fusionó ni
+- [x] Ejecutada en **producción**, con confirmación explícita del usuario:
+      **3 estudiantes con cuentas duplicadas reales** — ver [[DEBT-063]] para
+      el detalle. Solo lectura, cero filas modificadas.
+- [x] Entregado el listado, en desarrollo y en producción. **No se fusionó ni
       borró nada.**
-- [ ] Registrar en `docs/specs/backlog.md` la reparación de los duplicados
-      encontrados — condicionado al resultado en producción; si aparece algo,
-      se registra en ese momento.
+- [x] Registrado en `docs/specs/backlog.md`: [[DEBT-063]], con los tres casos
+      y la acción de seguimiento (spec de reparación, fuera de este spec).
 - [x] Anotado en [[DEBT-011]] que el circuito sin correo ya está resuelto, y
       que su alcance queda en la recuperación por correo.
 
