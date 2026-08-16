@@ -269,19 +269,37 @@ explícita del usuario en la sesión en que se ejecute.
       rama `reason: "unavailable"` en `SubmitSelfAssessmentResult`
       (`lib/self-assessment/types.ts`) con su propio mensaje.
 
-### Fase 5 — Diagnóstico de datos ya corrompidos
-- [ ] Escribir la consulta de detección: envíos `status = 'graded'` con
+### Fase 5 — Diagnóstico de datos ya corrompidos ✅
+- [x] Escribir la consulta de detección: envíos `status = 'graded'` con
       `final_score = 0` / `auto_score = 0` cuyo conjunto de `answers` no
       justifique el cero (respuestas presentes sin `is_correct` evaluado,
       o preguntas abiertas sin `manual_score` pero cerradas automáticamente).
-- [ ] Cruzar con la ventana del incidente de [[DEBT-059]] (2026-08-13) y con
-      cualquier otra ventana de 5xx conocida.
-- [ ] Ejecutarla **primero contra la base de desarrollo** en `mirp-lab`; contra
-      producción solo con confirmación explícita del usuario (D7).
-- [ ] Entregar el listado al usuario con curso, estudiante, evaluación y fecha.
-      **No modificar ninguna nota.**
-- [ ] Si aparecen envíos afectados, registrar en `docs/specs/backlog.md` el
-      seguimiento de su corrección manual.
+      `scripts/diagnostico-envios-corrompidos-spec050.sql` (dev, vía
+      `docker exec ... psql` en `mirp-lab`) y su equivalente
+      `scripts/diagnostico-envios-corrompidos-spec050.mjs` (producción, vía
+      `@supabase/supabase-js` + service role — sin psql directo, mismo patrón
+      que `scripts/diagnostico-duplicados-spec051.mjs`). Dos patrones
+      marcados: (A) `multiple_choice` con `selected_choice_ids` no vacío pero
+      `is_correct IS NULL`; (B) pregunta abierta (`OPEN_QUESTION_TYPES` de
+      `lib/submissions/index.ts`) sin `manual_score` y sin `reviewed_at` en un
+      envío ya `graded`.
+- [x] Cruzar con la ventana del incidente de [[DEBT-059]] (2026-08-13) y con
+      cualquier otra ventana de 5xx conocida. No aplicó: no apareció ningún
+      envío afectado en ningún entorno (ver abajo), así que no hubo nada que
+      acotar por fecha. El filtro por ventana queda comentado en el `.sql`
+      por si se necesita en una corrida futura.
+- [x] Ejecutada **primero contra la base de desarrollo** en `mirp-lab`
+      (2026-08-16): 0 filas. Con confirmación explícita del usuario, ejecutada
+      también contra **producción** (2026-08-16): 0 envíos `graded` en total
+      en producción — la funcionalidad de asignaciones/envíos aún no tiene
+      actividad real de calificación, así que no hay nada que pudiera estar
+      corrompido.
+- [x] Entregar el listado al usuario con curso, estudiante, evaluación y
+      fecha. Listado vacío en ambos entornos; reportado al usuario tal cual.
+      **No se modificó ninguna nota.**
+- [x] Si aparecen envíos afectados, registrar en `docs/specs/backlog.md` el
+      seguimiento de su corrección manual. No aplica — no aparecieron envíos
+      afectados.
 
 ### Fase 6 — Verificación
 - [ ] `npm run lint` y `npm run build` en verde.
