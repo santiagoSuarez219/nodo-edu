@@ -21,6 +21,7 @@
 | Inicial de A (`create_student`) | `TempInicial2026!` (ya no sirve — reemplazada en TC-051-010) |
 | Genérica tras el restablecimiento (TC-051-010) | `U2FU6485F9` |
 | Definitiva que elige A (TC-051-009) | `TempInicial2026!` — coincide con la inicial original de `create_student`, pero D6 solo exige distinta de la **actual** (`U2FU6485F9` en ese momento), así que se aceptó correctamente |
+| Cambio voluntario (TC-051-001) | `TempInicial2026!+` — **contraseña actual de A a partir de este punto** |
 
 **Entorno de pruebas:** desarrollo — `npm run dev` en el puerto **3002**
 (`.env.local` ya apunta ahí), Supabase en `mirp-lab` vía túnel SSH (confirmado
@@ -46,8 +47,8 @@ sigue activa. En el paso 3, la anterior es rechazada y la nueva entra.
 **Estado:** ✅ Aprobado (2026-08-16)
 **Hallazgos:** Confirmado — cambio voluntario exitoso desde `/cuenta`, sesión
 actual conservada, `TempInicial2026!` rechazada tras cerrar sesión y la nueva
-aceptada. **Pendiente:** registrar el valor de la contraseña nueva en la tabla
-de "Contraseñas usadas en la ronda" — no se recibió en este turno.
+aceptada. Contraseña nueva: `TempInicial2026!+` (registrada en la tabla de
+arriba).
 
 ### TC-051-002 — Contraseña actual incorrecta
 **Cubre:** criterio 2 y D4
