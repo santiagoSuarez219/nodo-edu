@@ -1,29 +1,31 @@
 # test-051 — Restablecer y cambiar contraseña
 
 > Ronda asociada a `docs/specs/spec-051-restablecer-y-cambiar-contrasena.md`.
-> **Estado: pendiente de implementación** — los casos nacen con el spec y se
-> ejecutan cuando el usuario apruebe e implemente el paquete.
+> **Estado: en curso** — arrancada el 2026-08-16, empezando por TC-051-010.
 
 ## Datos de prueba
 
 | Recurso | Endpoint / MCP de creación | Identificador | Eliminado |
 |---------|---------------------------|---------------|-----------|
-| Estudiante A (curso 1) | `students-mcp.create_student` | `{{id}}` | ⬜ |
-| Estudiante B (curso 2, docente distinto) | `students-mcp.create_student` | `{{id}}` | ⬜ |
-| Curso académico 1 + matrícula de A | `students-mcp.enroll_student` | `{{id}}` | ⬜ |
-| Curso académico 2 (otro docente) + matrícula de B | `students-mcp.enroll_student` | `{{id}}` | ⬜ |
-| Docente de desarrollo | ya sembrado (`dev@nodo.local`) | — | n/a |
+| Curso académico 1 (`TEST051`, docente dev@nodo.local) | *(sin endpoint — [[DEBT-060]]; insertado vía `psql` en `mirp-lab`, confirmado por el usuario)* | `53c1a445-cf85-43ec-8167-8eeefa1f7902` | ⬜ |
+| Estudiante A — `tc051010@test.nodo.local` | `POST /api/students` (matriculado directo en el curso 1) | `19f5e6cd-fc8d-4ad5-87c8-c39b6315048a` | ⬜ |
+| Matrícula de A en curso 1 | (incluida en el alta anterior) | `513851fa-421f-4b9f-91f5-6ef14178e0ae` | ⬜ |
+| Estudiante B (curso 2, docente distinto) | *(pendiente — se crea al llegar a TC-051-005)* | `{{id}}` | ⬜ |
+| Curso académico 2 (otro docente) + matrícula de B | *(pendiente)* | `{{id}}` | ⬜ |
+| Docente de desarrollo | ya sembrado (`dev@nodo.local` / `DevLocal2026!`) | `7207c852-dd6c-4df4-ac33-99985c36e26c` | n/a |
 
 **Contraseñas usadas en la ronda** (anotarlas para poder revertir):
 
 | Momento | Valor |
 |---------|-------|
-| Inicial de A (`create_student`) | `{{valor}}` |
-| Genérica tras el restablecimiento | `{{valor}}` |
+| Inicial de A (`create_student`) | `TempInicial2026!` |
+| Genérica tras el restablecimiento | `{{pendiente — se registra al ejecutar TC-051-010}}` |
 | Definitiva que elige A | `{{valor}}` |
 
-**Entorno de pruebas:** desarrollo (`mirp-lab`)
-**Fecha de la ronda:** {{pendiente}}
+**Entorno de pruebas:** desarrollo — `npm run dev` en el puerto **3002**
+(`.env.local` ya apunta ahí), Supabase en `mirp-lab` vía túnel SSH (confirmado
+activo).
+**Fecha de la ronda:** 2026-08-16
 
 > Se necesitan **dos navegadores** (o uno normal + uno de incógnito) para
 > TC-051-010, que comprueba el cierre de las otras sesiones.
