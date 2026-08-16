@@ -291,14 +291,24 @@ verificar (infraestructura), y éxito. Nunca reportar éxito sin comprobar el
       JWT local cacheado), así que la siguiente navegación tras limpiar la
       marca ya no la ve. Confirmación empírica pendiente: TC-051-009.
 
-### Fase 5 — MCP: actualizar `students-mcp`
-- [ ] Herramienta `reset_student_password` en `mcp-servers/students-mcp/`.
-- [ ] Ruta `/api/students/*` correspondiente, autenticada con
-      `STUDENTS_ADMIN_API_KEY`.
-- [ ] Actualizar `docs/mcps/README.md`.
-- [ ] Actualizar `docs/mcps/students-agent.system-prompt.md`: la herramienta y
-      el refuerzo de la restricción de no imprimir contraseñas.
-- [ ] Verificar el MCP con `./mcp-servers/run-local-mcp.sh students-mcp`.
+### Fase 5 — MCP: actualizar `students-mcp` ✅ (2026-08-16)
+- [x] Herramienta `reset_student_password` en `mcp-servers/students-mcp/`
+      (`tools.ts`) — `id` requerido, `password` opcional.
+- [x] Ruta `POST /api/students/[studentId]/reset-password`, autenticada con
+      `STUDENTS_ADMIN_API_KEY`, mismo patrón que el resto de `/api/students/*`
+      (`ResetStudentPasswordSchema`, `resetServiceStudentPassword`).
+- [x] Actualizado `docs/mcps/README.md`.
+- [x] Actualizado `docs/mcps/students-agent.system-prompt.md`. **No fue solo
+      "reforzar"**: la restricción existente decía literalmente que la API
+      "nunca devuelve" una contraseña — cierto para `create_student`/
+      `update_student`, falso para esta herramienta nueva por diseño (D7).
+      Se reescribió para distinguir ambos casos en vez de dejar una
+      contradicción, más una restricción de "nunca en lote" (mismo criterio
+      que `delete_student`) y una de "nunca especulativo" (solo cuando el
+      docente reporte que un estudiante concreto no puede entrar).
+- [x] Verificado: `npm run build` en `mcp-servers/students-mcp` sin errores,
+      `./mcp-servers/run-local-mcp.sh students-mcp </dev/null` inicia y
+      responde ("✓ Students MCP iniciado").
 
 ### Fase 6 — Verificación
 - [ ] `npm run lint` y `npm run build` en verde.
