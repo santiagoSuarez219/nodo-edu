@@ -126,26 +126,39 @@ export function AssignmentPlayer({
     // cerrar, solo que en la escritura previa al envío en vez de en la
     // lectura (hallazgo de @reviewer, spec-050 Fase 6).
     for (const [questionId, timer] of debounceTimers.current.entries()) {
+      // `clearTimeout` sí es incondicional (evita un guardado duplicado
+      // disparado por el propio debounce mientras este flush está en
+      // curso), pero la entrada del Map **no** se borra hasta confirmar
+      // éxito: si se borrara antes de intentar el guardado, un reintento
+      // del envío (justo lo que invita el mensaje de error de abajo) vería
+      // el Map ya vacío y no volvería a intentar esta respuesta — anulando
+      // el propio fix (hallazgo de @reviewer, spec-050 Fase 6, 2ª pasada).
       clearTimeout(timer);
-      debounceTimers.current.delete(questionId);
 
       const q = questions.find((qq) => qq.question_id === questionId);
-      if (!q) continue;
-      const answer = answers[questionId];
-      if (answer) {
-        const saveResult = await saveAnswerAction(submission.id, questionId, q.assignment_question_id, {
-          selected_choice_ids: answer.selected_choice_ids,
-          text_response: answer.text_response || undefined,
-        });
-        if (!saveResult.ok) {
-          setSubmitError(
-            "No pudimos guardar tu última respuesta. Tus respuestas anteriores siguen guardadas — intenta enviar de nuevo en un momento."
-          );
-          setSaveStatus("unsaved");
-          setIsSubmitting(false);
-          return;
-        }
+      if (!q) {
+        debounceTimers.current.delete(questionId);
+        continue;
       }
+      const answer = answers[questionId];
+      if (!answer) {
+        debounceTimers.current.delete(questionId);
+        continue;
+      }
+
+      const saveResult = await saveAnswerAction(submission.id, questionId, q.assignment_question_id, {
+        selected_choice_ids: answer.selected_choice_ids,
+        text_response: answer.text_response || undefined,
+      });
+      if (!saveResult.ok) {
+        setSubmitError(
+          "No pudimos guardar tu última respuesta. Tus respuestas anteriores siguen guardadas — intenta enviar de nuevo en un momento."
+        );
+        setSaveStatus("unsaved");
+        setIsSubmitting(false);
+        return;
+      }
+      debounceTimers.current.delete(questionId);
     }
 
     const res = await fetch(`/api/submissions/${submission.id}/submit`, {

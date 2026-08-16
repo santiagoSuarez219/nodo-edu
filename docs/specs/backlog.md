@@ -8,10 +8,11 @@ resolverse antes de salir a producción o en una iteración posterior.
 ## DEBT-065 — Residuo de la revisión de código de spec-050: hallazgos menores dejados fuera de su alcance
 
 **Origen:** revisión de código (`@reviewer`) de `fix/errores-supabase-envios`
-(spec-050, 2026-08-16). Tres hallazgos 🟡 menores que no bloqueaban el veredicto
-tras corregir los 3 🟠 mayores, y que el propio spec dejó fuera de su alcance
-declarado (subconjunto "nota de estudiante en juego" + "control de acceso" de
-**[[DEBT-040]]**) en vez de ampliarlo sin aprobación.
+(spec-050, 2026-08-16, dos pasadas). Cuatro hallazgos 🟡 menores que no
+bloqueaban el veredicto final tras corregir los 5 🟠 mayores de ambas pasadas,
+y que el propio spec dejó fuera de su alcance declarado (subconjunto "nota de
+estudiante en juego" + "control de acceso" de **[[DEBT-040]]**) en vez de
+ampliarlo sin aprobación.
 **Prioridad:** Baja — ninguno escribe una nota falsa; son mensajes de error
 poco honestos o UX confusa ante infraestructura degradada, no corrupción de
 datos.

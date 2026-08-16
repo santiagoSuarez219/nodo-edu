@@ -627,16 +627,15 @@ export async function finalizeGrading(
   }
   const roundedScore = Math.round(finalScore * 100) / 100;
 
-  const { data: updated, error } = await supabase
-    .from("submissions")
-    .update({ status: "graded", final_score: roundedScore, graded_at: new Date().toISOString() })
-    .eq("id", submissionId)
-    .select("id")
-    .maybeSingle();
-
-  if (error) return { ok: false, error: error.message, reason: "unavailable" };
-  if (!updated) return { ok: false, error: "No tienes acceso a este envío.", reason: "business" };
-
+  // Mismo orden que submitSubmission (hallazgo de @reviewer, spec-050 Fase 6,
+  // 2ª pasada): propagar ANTES de marcar `graded`, no después. La versión
+  // anterior escribía `status: 'graded'` primero y, si la propagación
+  // fallaba, devolvía un error — pero el envío ya había quedado `graded` sin
+  // fila en la libreta y sin ninguna vía de recuperación, porque este mismo
+  // guard de arriba (`submission.status !== "submitted"`) rechaza cualquier
+  // reintento. Con la propagación primero, un fallo deja el envío tal como
+  // estaba (`submitted`, sin `final_score` escrito) — recuperable con un
+  // reintento normal de "Finalizar calificación".
   const propagation = await propagateFinalScoreToGradeItem(
     supabase,
     submission.assignment_id,
@@ -647,10 +646,20 @@ export async function finalizeGrading(
   if (!propagation.ok) {
     return {
       ok: false,
-      error: `La calificación se guardó, pero no se pudo actualizar la libreta de calificaciones: ${propagation.error}`,
+      error: `No pudimos actualizar la libreta de calificaciones. Intenta de nuevo — tus calificaciones manuales ya guardadas no se perdieron: ${propagation.error}`,
       reason: "unavailable",
     };
   }
+
+  const { data: updated, error } = await supabase
+    .from("submissions")
+    .update({ status: "graded", final_score: roundedScore, graded_at: new Date().toISOString() })
+    .eq("id", submissionId)
+    .select("id")
+    .maybeSingle();
+
+  if (error) return { ok: false, error: error.message, reason: "unavailable" };
+  if (!updated) return { ok: false, error: "No tienes acceso a este envío.", reason: "business" };
 
   return { ok: true, final_score: roundedScore };
 }

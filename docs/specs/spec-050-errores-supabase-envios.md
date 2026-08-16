@@ -340,7 +340,24 @@ explícita del usuario en la sesión en que se ejecute.
       corregidos (copy de `/servicio-no-disponible`, `checkSelfAssessmentAnswer`,
       `startNewAttemptAction`) registrados en `docs/specs/backlog.md` como
       **[[DEBT-065]]**, con la aprobación del usuario para no ampliar el
-      alcance de este spec. Pendiente segunda pasada de `@reviewer`.
+      alcance de este spec.
+      **Segunda pasada (2026-08-16): CAMBIOS REQUERIDOS** de nuevo — sin 🔴
+      bloqueantes, 2 🟠 mayores: (1) el fix del *flush* de
+      `AssignmentPlayer.tsx` se anulaba a sí mismo en el reintento, porque el
+      bucle borraba la entrada del `Map` de debounce **antes** de confirmar
+      que el guardado tuvo éxito — en el segundo clic en "Enviar" (justo lo
+      que invita el mensaje de error) el `Map` ya estaba vacío y no había
+      nada que reintentar; (2) `finalizeGrading` tenía el mismo problema de
+      orden que se corrigió en `submitSubmission` en la primera pasada, pero
+      no se le había aplicado ahí: escribía `status: 'graded'` **antes** de
+      `propagateFinalScoreToGradeItem`, así que un fallo de propagación dejaba
+      el envío `graded` sin fila en la libreta y sin vía de recuperación
+      (`finalizeGrading` rechaza cualquier envío fuera de `submitted`). Ambos
+      corregidos: la entrada del `Map` solo se borra tras confirmar éxito, y
+      `finalizeGrading` ahora propaga antes de marcar `graded`, igual que
+      `submitSubmission`. También corregido un desajuste de conteo en
+      **[[DEBT-065]]** (decía "tres hallazgos", eran cuatro). Typecheck/lint/
+      build reverificados en verde. Pendiente tercera pasada de `@reviewer`.
 
 ## Criterios de aceptación
 

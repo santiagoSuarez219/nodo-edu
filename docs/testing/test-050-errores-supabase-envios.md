@@ -297,9 +297,11 @@ envíos con variantes corrompidos, habrían quedado invisibles sin este fix).
 - Hallazgos escalados a `docs/specs/backlog.md`: **[[DEBT-065]]**, creada tras
   la revisión de `@reviewer` sobre esta misma rama — agrupa el hallazgo de
   copy de TC-050-006 (mensaje de `/servicio-no-disponible` específico de Auth
-  reutilizado para un caso de Postgres) junto con otros dos hallazgos menores
+  reutilizado para un caso de Postgres) junto con otros tres hallazgos menores
   de la revisión de código (`checkSelfAssessmentAnswer` colapsando
-  `unavailable`, y `startNewAttemptAction`/acciones sin consumidor). El bug de
+  `unavailable`, `startNewAttemptAction`/acciones sin consumidor, y
+  `getSubmissionForReview` sin indicio visible de infraestructura degradada
+  en el panel del docente). El bug de
   TC-050-010 (JOIN roto en la consulta de diagnóstico para evaluaciones con
   variantes) se corrigió dentro de la misma sesión, en los propios scripts de
   diagnóstico — no es deuda del código de producción, así que no aplica
