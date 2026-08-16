@@ -198,49 +198,76 @@ explícita del usuario en la sesión en que se ejecute.
 
 ## Fases de implementación
 
-### Fase 1 — Tipo de resultado y helper de error de API
-- [ ] Añadir a `lib/submissions/types.ts` el tipo de resultado con
+### Fase 1 — Tipo de resultado y helper de error de API ✅ (2026-08-16)
+- [x] Añadido a `lib/submissions/types.ts`: `SubmissionFailure`, con
       `reason: "business" | "unavailable"` en la rama `ok: false` (D4).
-- [ ] `lib/api/errors.ts`: `serviceUnavailableError(message?)` y
+- [x] `lib/api/errors.ts`: `serviceUnavailableError(message?)` y
       `service_unavailable: 503` en `errorCodeToStatus`.
-- [ ] Verificar que `AuthResult` (`lib/auth/types.ts`) sigue siendo compatible
-      con lo que devuelven las server actions, o extenderlo si no.
+- [x] `AuthResult` no se tocó (uso demasiado amplio en el proyecto); las 3
+      Server Actions que necesitan `reason` usan su propio
+      `SubmissionActionResult<T>` local en `lib/submissions/actions.ts`.
 
-### Fase 2 — `submitSubmission`: no escribir notas falsas
-- [ ] Verificar `error` en las tres lecturas (`answers`, `assignment_questions`,
+### Fase 2 — `submitSubmission`: no escribir notas falsas ✅ (2026-08-16)
+- [x] Verificado `error` en las tres lecturas (`answers`, `assignment_questions`,
       `get_variant_answer_key`) y en el lookup inicial del `submission`.
-- [ ] Abortar con `unavailable` antes de cualquier `update` si alguna falló (D1),
+- [x] Aborta con `unavailable` antes de cualquier `update` si alguna falló (D1),
       dejando el intento en `in_progress`.
-- [ ] Calcular `hasOpenQuestions` solo sobre una lectura exitosa (D2).
-- [ ] Verificar `error` en los `update` de `answers` y `submissions` y en el
-      cierre a `graded`; hoy los cuatro se ignoran.
-- [ ] `propagateToGradeItem`: dejar de tragarse el error en un `console.error` —
-      si la propagación falla, el llamador debe enterarse.
+- [x] `hasOpenQuestions` solo se calcula sobre lecturas ya confirmadas
+      exitosas (D2).
+- [x] Verificado `error` en los `update` de `answers`, `submissions` (cierre a
+      `submitted`) y el cierre a `graded`.
+- [x] `propagateToGradeItem` devuelve `{ok, error}` en vez de tragarse el
+      error en un `console.error` silencioso — `submitSubmission` lo revisa
+      y registra el fallo con contexto. No aborta el envío completo si falla
+      (el `auto_score` ya escrito para `submitted` es real; solo la
+      transición a `graded` queda pendiente, recuperable con
+      `finalizeGrading`).
 
-### Fase 3 — `createSubmission` y camino del docente
-- [ ] `createSubmission`: verificar `error` del `count` y fallar cerrado (D3);
-      verificar también el `error` de la lectura del grupo y del `in_progress`.
-- [ ] `getReviewContextByAssignmentQuestionId`: devolver un resultado que
-      distinga "mapa vacío" de "no pude leer".
-- [ ] `finalizeGrading`: abortar con `unavailable` si el contexto de revisión no
-      se pudo leer, en vez de sumar `auto_score` en lugar de `manual_score`.
-- [ ] `getMaxPossiblePoints`: propagar el fallo en vez de devolver `0`;
-      `propagateFinalScoreToGradeItem` aborta si no pudo calcular el máximo.
+### Fase 3 — `createSubmission` y camino del docente ✅ (2026-08-16)
+- [x] `createSubmission`: verificado `error` del `count` (falla cerrado, D3),
+      de la lectura del grupo y del `in_progress`.
+- [x] `getReviewContextByAssignmentQuestionId`: devuelve
+      `{ok:true; data} | {ok:false; error}`, distinguiendo "mapa vacío" de
+      "no pude leer".
+- [x] `finalizeGrading`: aborta con `unavailable` si el contexto de revisión
+      no se pudo leer, en vez de sumar `auto_score` en lugar de
+      `manual_score`.
+- [x] `getMaxPossiblePoints`: propaga el fallo en vez de devolver `0`;
+      `propagateFinalScoreToGradeItem` aborta ante ese fallo — pero preserva
+      el comportamiento original para un máximo genuinamente `0` (sin
+      preguntas con puntos), que no es el bug que este spec corrige.
+      También se corrigió un hallazgo hermano no listado originalmente: el
+      fallo de lectura del propio `grade_item_id` del grupo se leía como
+      "este grupo no tiene ítem configurado" y devolvía `{ok:true}` sin
+      propagar nada — mismo patrón, mismo archivo, ahora aborta.
 
-### Fase 4 — Superficies: ruta API, acciones y UI
-- [ ] `app/api/submissions/[submissionId]/submit/route.ts`: verificar el `error`
-      del lookup (`:23`) y no responder `404` ante un fallo de lectura; mapear
-      `unavailable` a `503` con `Retry-After`, coherente con spec-046.
-- [ ] `lib/submissions/actions.ts`: propagar `reason` en las 3 acciones.
-- [ ] `AssignmentPlayer.tsx`: mensaje distinto ante `503` ("no pudimos registrar
-      tu envío, tus respuestas siguen guardadas, vuelve a intentarlo") y
-      confirmar que **no** se pierde el estado del intento.
-- [ ] `SubmissionReviewPanel.tsx`: mensaje honesto ante `unavailable` al
-      finalizar una calificación.
-- [ ] `lib/enrollments/access.ts`: `reason: "unavailable"` + redirección a
-      `/servicio-no-disponible` (D5).
-- [ ] Recorrer los 13 consumidores de `hasCourseAccess` y confirmar uno por uno
-      que degradan cerrado y sin mensaje engañoso.
+### Fase 4 — Superficies: ruta API, acciones y UI ✅ (2026-08-16)
+- [x] `app/api/submissions/[submissionId]/submit/route.ts`: verificado el
+      `error` del lookup y ya no responde `404` ante un fallo de lectura;
+      mapea `unavailable` a `503` con `Retry-After: 30`, coherente con
+      spec-046.
+- [x] `lib/submissions/actions.ts`: `SubmissionActionResult<T>` propaga
+      `reason` en las 3 acciones (`createSubmissionAction`,
+      `submitSubmissionAction`, `finalizeGradingAction`).
+- [x] `AssignmentPlayer.tsx` y `SubmissionReviewPanel.tsx`: **sin cambio de
+      código** — ambos ya mostraban `result.error`/`body.error.message`
+      verbatim; al hacer honesto el mensaje en el origen (Fase 2/3/ruta API),
+      el mensaje correcto llega solo, sin tocar la UI. Confirmado por lectura
+      que `AssignmentPlayer` no borra el estado `answers` en el camino de
+      error (criterio 7).
+- [x] `lib/enrollments/access.ts`: `reason: "unavailable"` en `CourseAccess` +
+      redirección a `/servicio-no-disponible` en `requireCourseAccess` (D5).
+- [x] Recorridos los 13 consumidores de `hasCourseAccess`/`requireCourseAccess`
+      uno por uno. 12 degradan cerrado sin mensaje engañoso (confirmado por
+      lectura, sin cambios necesarios). **Uno sí tenía el mensaje engañoso
+      real**: `lib/self-assessment/index.ts` → `submitSelfAssessment` colapsaba
+      `unavailable` en `reason: 'not_enrolled'`, y
+      `components/courses/SelfAssessmentSection.tsx` lo traducía a **"No estás
+      matriculado en este curso"** — exactamente el tipo de mentira que este
+      spec existe para eliminar, ahora aplicándose a la nota de
+      autoevaluaciones (spec-040) en vez de a los envíos. Corregido: nueva
+      rama `reason: "unavailable"` en `SubmitSelfAssessmentResult`
+      (`lib/self-assessment/types.ts`) con su propio mensaje.
 
 ### Fase 5 — Diagnóstico de datos ya corrompidos
 - [ ] Escribir la consulta de detección: envíos `status = 'graded'` con

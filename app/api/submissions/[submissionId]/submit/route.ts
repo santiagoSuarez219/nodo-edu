@@ -2,7 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth/session";
 import { createServerSupabaseClient } from "@/lib/auth/server";
 import { submitSubmission } from "@/lib/submissions";
-import { apiError, notFoundError, unauthorizedError, badRequestError } from "@/lib/api/errors";
+import {
+  apiError,
+  notFoundError,
+  unauthorizedError,
+  badRequestError,
+  serviceUnavailableError,
+} from "@/lib/api/errors";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -20,11 +26,22 @@ export async function POST(_req: NextRequest, { params }: RouteContext) {
   const { submissionId } = await params;
   const supabase = await createServerSupabaseClient();
 
-  const { data: submission } = await supabase
+  const { data: submission, error: submissionError } = await supabase
     .from("submissions")
     .select("id, enrollment:enrollments(student_id)")
     .eq("id", submissionId)
     .maybeSingle();
+
+  // spec-050: antes esto descartaba `error` y respondía 404 "Intento no
+  // encontrado" tanto si el intento genuinamente no existía como si la
+  // consulta había fallado por infraestructura — mentira en el segundo caso,
+  // el intento sí existe.
+  if (submissionError) {
+    return NextResponse.json(serviceUnavailableError(), {
+      status: 503,
+      headers: { "Retry-After": "30" },
+    });
+  }
 
   if (!submission) {
     return NextResponse.json(notFoundError("Intento no encontrado"), { status: 404 });
@@ -39,6 +56,12 @@ export async function POST(_req: NextRequest, { params }: RouteContext) {
 
   const result = await submitSubmission(submissionId);
   if (!result.ok) {
+    if (result.reason === "unavailable") {
+      return NextResponse.json(serviceUnavailableError(result.error), {
+        status: 503,
+        headers: { "Retry-After": "30" },
+      });
+    }
     return NextResponse.json(badRequestError(result.error), { status: 400 });
   }
 

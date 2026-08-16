@@ -30,6 +30,7 @@ export function errorCodeToStatus(code: string): number {
     validation_error: 422,
     configuration_error: 500,
     internal_error: 500,
+    service_unavailable: 503,
   };
 
   return statusMap[code] ?? 500;
@@ -65,4 +66,14 @@ export function configurationError(message: string) {
 
 export function internalError(message = "Error interno del servidor") {
   return apiError("internal_error", message);
+}
+
+// spec-050: para cuando una lectura o escritura falló y no se pudo
+// determinar el resultado real (p. ej. `reason: "unavailable"` de
+// SubmissionFailure) — deliberadamente distinto de `bad_request`/`not_found`,
+// que implicarían que el recurso no existe o la petición está mal formada.
+export function serviceUnavailableError(
+  message = "El servicio no está disponible en este momento. Intenta de nuevo en unos minutos."
+) {
+  return apiError("service_unavailable", message);
 }
