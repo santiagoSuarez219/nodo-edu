@@ -43,8 +43,11 @@ activo).
 3. Cerrar sesión, intentar entrar con la **anterior**, y luego con la **nueva**.
 **Resultado esperado:** mensaje de éxito y campos limpios; la sesión actual
 sigue activa. En el paso 3, la anterior es rechazada y la nueva entra.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{pendiente}}
+**Estado:** ✅ Aprobado (2026-08-16)
+**Hallazgos:** Confirmado — cambio voluntario exitoso desde `/cuenta`, sesión
+actual conservada, `TempInicial2026!` rechazada tras cerrar sesión y la nueva
+aceptada. **Pendiente:** registrar el valor de la contraseña nueva en la tabla
+de "Contraseñas usadas en la ronda" — no se recibió en este turno.
 
 ### TC-051-002 — Contraseña actual incorrecta
 **Cubre:** criterio 2 y D4
