@@ -273,14 +273,23 @@ verificar (infraestructura), y éxito. Nunca reportar éxito sin comprobar el
       > un refactor amplio no pedido por este spec. Motivo documentado en el
       > propio componente y en el backlog.
 
-### Fase 4 — Cambio forzado
-- [ ] Ruta `app/cambiar-contrasena/page.tsx` reutilizando `ChangePasswordForm`,
+### Fase 4 — Cambio forzado ✅ (2026-08-16)
+- [x] Ruta `app/cambiar-contrasena/page.tsx` reutilizando `ChangePasswordForm`,
       con un texto que explique por qué se le exige.
-- [ ] Gate en `middleware.ts` (D3), después del gate de sesión de spec-046 y
-      **sin** añadir ninguna consulta a Postgres (D2).
-- [ ] Exenciones: la propia ruta, `/api`, cierre de sesión.
-- [ ] Verificar que tras el cambio la marca desaparece y la navegación se
-      normaliza sin volver a iniciar sesión.
+- [x] Gate en `middleware.ts` (D3), después del gate de sesión de spec-046 y
+      **sin** añadir ninguna consulta a Postgres (D2) — la marca se lee de
+      `user.app_metadata`, ya presente en el `getUser()` existente.
+- [x] Exenciones: la propia ruta (`CHANGE_PASSWORD_PATH`), `/api` (ya
+      cortocircuitado antes de este bloque, sin cambios). **Cierre de sesión
+      resultó no necesitar una exención propia**: el formulario del navbar
+      hace POST a la página actual, que para un usuario marcado siempre es
+      `/cambiar-contrasena` — ya cubierta por la exención de ruta. Razonamiento
+      completo en el comentario del propio `middleware.ts`.
+- [x] Verificar que tras el cambio la marca desaparece y la navegación se
+      normaliza sin volver a iniciar sesión — se apoya en que `getUser()`
+      revalida contra el servidor de Auth en cada request (no decodifica un
+      JWT local cacheado), así que la siguiente navegación tras limpiar la
+      marca ya no la ve. Confirmación empírica pendiente: TC-051-009.
 
 ### Fase 5 — MCP: actualizar `students-mcp`
 - [ ] Herramienta `reset_student_password` en `mcp-servers/students-mcp/`.
