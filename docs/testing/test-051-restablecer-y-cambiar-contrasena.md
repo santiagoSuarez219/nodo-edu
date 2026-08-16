@@ -121,8 +121,42 @@ TC-051-010"), sin redirect a `/login`. Confirma que `verifyCurrentPassword()`
    directamente con su `student_id`.
 **Resultado esperado:** rechazo. La contraseña de B **no** cambia y B sigue
 entrando con la suya.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{pendiente}}
+**Estado:** ✅ Aprobado (2026-08-16), con una corrección al planteamiento del
+caso
+**Hallazgos:** Ejecutado por Claude vía navegador y API.
+
+**Corrección necesaria antes de ejecutar:** `dev@nodo.local` (docente del
+curso 1) tiene rol `admin` además de `teacher` — se lo asignó
+`scripts/seed-teacher.mjs`, pensado para el único docente de desarrollo. La
+policy RLS de `enrollments`/`academic_courses` permite explícitamente a un
+admin ver y actuar sobre **cualquier** curso — es el bypass correcto, no un
+bug. Probar el caso tal cual estaba escrito (docente 1 = `dev@nodo.local`
+contra B) habría dado un "éxito" que en realidad solo demuestra el bypass de
+admin, no la comprobación de propiedad — un falso positivo de seguridad. Se
+creó **docente 2** (`ffd142f7-72ac-45e1-a729-07b0edb751c5`, rol `teacher`
+puro, sin `admin`) para probar el límite real, invirtiendo el sentido del
+ataque: docente 2 contra el estudiante **A** (curso 1, ajeno a docente 2).
+
+**Verificado en dos capas:**
+1. **Página del panel** — docente 2, con sesión real, navegó directo a
+   `/admin/courses/{{curso1}}`: **404**. Ni siquiera puede confirmar que el
+   curso existe, no solo que no puede actuar sobre él.
+2. **El guard exacto que usa `resetStudentPasswordAction`** — se reprodujo la
+   consulta literal (`enrollments` filtrado por `student_id` de A y
+   `academic_course_id` del curso 1) contra PostgREST, autenticada con el
+   `access_token` real de docente 2 (obtenido vía
+   `/auth/v1/token?grant_type=password`): **`[]`**, vacío — exactamente la
+   condición que dispara `{ok: false, error: "No tienes acceso a este
+   estudiante."}` en el código. La policy `enrollments: select` bloquea antes
+   de que el código de la acción tenga que decidir nada.
+
+**Confirmado que nada cambió:** login de A con su contraseña real
+(`PostCorteFinal789`) → `200`. La contraseña nunca estuvo en riesgo porque el
+intento nunca llegó a `resetServiceStudentPassword()`.
+
+El escenario original del caso (docente 1 contra B) también se puede validar
+por separado si hace falta un docente admin+teacher específicamente, pero no
+aporta nada que docente 2 no haya probado ya de forma más rigurosa.
 
 ### TC-051-006 — Restablecimiento desde la lista de estudiantes
 **Cubre:** criterio 4
