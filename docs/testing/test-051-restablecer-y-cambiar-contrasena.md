@@ -124,15 +124,19 @@ directa del restablecimiento.
 ### TC-051-008 — El estudiante queda confinado hasta cambiarla
 **Cubre:** criterio 6 — *el caso central del spec*
 **Precondición:** estudiante A recién restablecido; contraseña genérica de
-TC-051-006.
+TC-051-006 — **cubierta por la de TC-051-010** (`U2FU6485F9`), ya que la ronda
+empezó por ese caso.
 **Pasos:**
 1. Entrar como A con la contraseña genérica.
 2. Intentar navegar a `/cuenta`, a una lección y a `/cuenta/cursos`,
    escribiendo las URL directamente.
 **Resultado esperado:** toda navegación redirige a `/cambiar-contrasena`, con
 un texto que explica por qué. No se alcanza ninguna otra página.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{pendiente}}
+**Estado:** ✅ Aprobado (2026-08-16)
+**Hallazgos:** Confirmado — `/cuenta`, `/cuenta/cursos` y una lección
+(`/estructuras-de-datos`) redirigieron las tres a `/cambiar-contrasena`
+escribiendo la URL directamente. El gate del middleware (Fase 4) confina
+correctamente al estudiante marcado.
 
 ### TC-051-009 — Cambiarla libera la navegación sin volver a entrar
 **Cubre:** criterio 8
