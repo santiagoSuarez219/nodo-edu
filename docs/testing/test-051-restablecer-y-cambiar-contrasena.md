@@ -10,8 +10,10 @@
 | Curso académico 1 (`TEST051`, docente dev@nodo.local) | *(sin endpoint — [[DEBT-060]]; insertado vía `psql` en `mirp-lab`, confirmado por el usuario)* | `53c1a445-cf85-43ec-8167-8eeefa1f7902` | ⬜ |
 | Estudiante A — `tc051010@test.nodo.local` | `POST /api/students` (matriculado directo en el curso 1) | `19f5e6cd-fc8d-4ad5-87c8-c39b6315048a` | ⬜ |
 | Matrícula de A en curso 1 | (incluida en el alta anterior) | `513851fa-421f-4b9f-91f5-6ef14178e0ae` | ⬜ |
-| Estudiante B (curso 2, docente distinto) | *(pendiente — se crea al llegar a TC-051-005)* | `{{id}}` | ⬜ |
-| Curso académico 2 (otro docente) + matrícula de B | *(pendiente)* | `{{id}}` | ⬜ |
+| Docente 2 — `docente2-tc051005@test.nodo.local` (rol `teacher`, **sin** `admin` a propósito) | Script `node` inline con `service_role`, mismo patrón que `scripts/seed-teacher.mjs` pero sin asignar `admin` | `ffd142f7-72ac-45e1-a729-07b0edb751c5` | ⬜ |
+| Curso académico 2 (`TEST051-B`, docente 2) | *(sin endpoint — [[DEBT-060]]; insertado vía `psql`, confirmado por el usuario)* | `0f4605e1-2305-4fef-8620-0b7b1dba6abd` | ⬜ |
+| Estudiante B — `tc051005-b@test.nodo.local` | `POST /api/students` (matriculado directo en el curso 2) | `9da22d9a-cc5e-412b-86ca-13bcaaec2ee3` | ⬜ |
+| Matrícula de B en curso 2 | (incluida en el alta anterior) | `51f9e6e8-0a27-4444-be17-81c3093b9e73` | ⬜ |
 | Docente de desarrollo | ya sembrado (`dev@nodo.local` / `DevLocal2026!`) | `7207c852-dd6c-4df4-ac33-99985c36e26c` | n/a |
 
 **Contraseñas usadas en la ronda** (anotarlas para poder revertir):
@@ -24,6 +26,7 @@
 | Cambio voluntario (TC-051-001) | `TempInicial2026!+` |
 | Segunda genérica tras restablecimiento (TC-051-006) | `5R3YSWE93S` |
 | Cambio forzado, post-corte de túnel (TC-051-011/013) | `PostCorteFinal789` — **contraseña actual de A; `must_change_password` = false, ya no confinado** |
+| Estudiante B (`create_student`) | `EstudianteBTemp2026!` — **contraseña actual de B; no debe cambiar tras TC-051-005** |
 
 **Entorno de pruebas:** desarrollo — `npm run dev` en el puerto **3002**
 (`.env.local` ya apunta ahí), Supabase en `mirp-lab` vía túnel SSH (confirmado
