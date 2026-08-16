@@ -12,7 +12,7 @@ slides_hint: "Cada sección ## es una diapositiva. Presentación sincrona."
 date: "2026-08-07"
 author: "Asistente de Docencia"
 summary: ""
-updatedAt: "2026-08-07"
+updatedAt: "2026-08-16"
 ---
 
 Ya escribes funciones que resuelven un algoritmo — pero un compañero que abre tu repositorio, o tú mismo dentro de tres semanas revisando un informe viejo, necesitan más que código que funcione: necesitan código legible, y un entorno que puedan reconstruir sin adivinar qué versión de `matplotlib` tenías instalada. Esta lección cierra esas dos piezas: cómo escribir Python que otros puedan leer, y cómo empaquetar las dependencias de un proyecto para que corra en cualquier máquina.
@@ -50,6 +50,28 @@ def es_primo(numero: int) -> bool:
         if numero % i == 0:
             return False
     return True
+```
+
+> **`if __name__ == "__main__":`** protege el punto de entrada de un script: el código dentro de ese bloque (normalmente una llamada a `main()`) solo se ejecuta cuando el archivo corre directamente, no cuando otro módulo lo importa. Es la convención estándar para separar "definir funciones" de "ejecutar el programa. En palabras simples utilice esta convención para ejecutar el programa."
+
+```python
+def es_primo(numero: int) -> bool:
+    """Determina si un numero es primo."""
+    if numero < 2:
+        return False
+    for i in range(2, numero):
+        if numero % i == 0:
+            return False
+    return True
+
+
+def main() -> None:
+    """Punto de entrada del script."""
+    print(es_primo(17))
+
+
+if __name__ == "__main__":
+    main()
 ```
 
 Dos anotaciones más documentan la intención del código sin obligar a leer su cuerpo completo:
