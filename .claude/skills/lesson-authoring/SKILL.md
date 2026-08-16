@@ -1,6 +1,6 @@
 ---
 name: lesson-authoring
-description: Formato exacto de los artefactos de una lección en Nodo — lección MDX publicable, registro en lib/courses/data, guía de laboratorio docente (privada) y de estudiante (publicada), y creación de preguntas/quices vía MCP. Leer completo antes de escribir cualquier lección o guía.
+description: Formato exacto de los artefactos de una lección en Nodo — lección MDX publicable, registro en lib/courses/data, apuntes de clase del docente (privados, paso a paso de código), guía de laboratorio del estudiante (publicada, solo si la sesión es trabajo independiente) y creación de preguntas/quices vía MCP. Leer completo antes de escribir cualquier lección, apunte o guía.
 ---
 
 # Lesson Authoring — formato de los artefactos de una lección
@@ -14,17 +14,23 @@ gana el código y hay que actualizar este archivo.
 
 ---
 
-## 1. Los seis artefactos de una lección
+## 1. Los cinco artefactos de una lección
 
 | # | Artefacto | Ubicación | ¿Se publica? |
 |---|-----------|-----------|--------------|
 | 1 | Lección teórica | `content/cursos/<curso>/<slug>.mdx` | Sí |
 | 1b | Registro de la lección | `lib/courses/data/<curso>.ts` | Requisito para publicar |
 | 2 | Cuestionario de cierre | Banco de preguntas (Supabase, vía `question-bank-mcp`) | Sí, al publicar cada pregunta |
-| 3 | Guía de laboratorio — docente | `content/cursos/<curso>/microdiseno/labs/<slug>-docente.md` | **No** |
-| 3b | Apuntes de clase — docente (spec-044) | `content/cursos/<curso>/apuntes/<articleSlug>.md` | Sí, pero **solo visible a owner/admin** (nunca a estudiantes) |
-| 4 | Guía de laboratorio — estudiante | `content/cursos/<curso>/guias/<slug>.md` | Sí (`kind: "guide"`) |
+| 3 | Apuntes de clase — docente (spec-044) | `content/cursos/<curso>/apuntes/<articleSlug>.md` | Sí, pero **solo visible a owner/admin** (nunca a estudiantes) |
+| 4 | Guía de laboratorio — estudiante | `content/cursos/<curso>/guias/<slug>.md` | Sí (`kind: "guide"`), **solo si la sesión es trabajo independiente del estudiante** |
 | 5 | Quiz calificable A/B/C | Assignments (Supabase, vía `assignment-mcp`) | Solo a demanda |
+
+> ⚠️ **No toda sesión práctica tiene los cinco.** Muchas prácticas se
+> desarrollan en vivo por el docente (demo o ejercicio guiado en clase) en vez
+> de asignarse como trabajo independiente. Esas sesiones producen **apuntes de
+> clase (#3)** pero **no** guía de laboratorio del estudiante (#4). Antes de
+> crear el artefacto #4, confirmar con el usuario si la sesión es trabajo
+> independiente o desarrollo en vivo — nunca asumirlo (ver §4).
 
 Cursos válidos (slugs exactos): `estructuras-de-datos`, `programacion-cientifica`,
 `analisis-de-algoritmos`.
@@ -206,11 +212,11 @@ Código inline con backticks simples.
 > No es opcional a partir de esa semana — el curso ya predicó ese estándar, así
 > que su propio código de ejemplo tiene que cumplirlo.
 >
-> Aplica a **los cuatro artefactos con código**, no solo a la lección:
-> lección `.mdx`, guía del estudiante (**incluidos los esqueletos con `TODO`**:
-> la firma y el docstring van completos aunque el cuerpo esté por completar),
-> guía del docente y apuntes de clase. Los dos últimos se proyectan en clase y
-> el estudiante los copia, así que no hay artefacto exento.
+> Aplica a **los tres artefactos con código**, no solo a la lección: lección
+> `.mdx`, guía del estudiante (**incluidos los esqueletos con `TODO`**: la
+> firma y el docstring van completos aunque el cuerpo esté por completar) y
+> apuntes de clase. Estos últimos se proyectan en clase y el estudiante los
+> copia, así que no hay artefacto exento.
 >
 > Excepción única: las funciones de test de `pytest` (`def test_...`) no llevan
 > type hints ni docstring — es la convención del framework.
@@ -313,98 +319,50 @@ Por eso: escribir primero el archivo, después la entrada. Y verificar con
 
 ---
 
-## 3. Guía de laboratorio del docente (privada)
+## 3. Apuntes de clase — docente (spec-044)
 
-`content/cursos/<curso>/microdiseno/labs/<slug>-docente.md`. `microdiseno/` no
-se publica (`CLAUDE.md`), así que este archivo es solo para consulta del docente.
-No lleva frontmatter ni entrada en TS.
+`content/cursos/<curso>/apuntes/<articleSlug>.md`. Es el **único** artefacto
+docente de una sesión práctica: reemplaza lo que antes eran dos documentos
+separados (una guía de laboratorio del docente con ficha de sesión, minutado
+y soluciones, en `microdiseno/labs/`, y estos apuntes). Producir ambos es
+redundante — ya no se crea la guía docente con minutado; todo vive aquí.
 
-Es el **guion de la sesión**, no una copia de la guía del estudiante. Secciones:
+Se resuelve por convención de nombre sobre el `articleSlug` de la lección o
+guía a la que acompaña. No lleva frontmatter obligatorio ni entrada en TS.
+Se publica, pero **solo es visible a owner/admin** (nunca a estudiantes) —
+ruta dedicada `/[courseSlug]/[lessonSlug]/apuntes`, enlazada desde un botón
+en el header de la lección/guía.
 
-```
-# Lab NN — <tema> · Guía del docente
-
-## Ficha de la sesión
-  Curso · Semana/sesión · Duración · Momento evaluativo (o Seguimiento) ·
-  Lección teórica de la que depende · Sprint del proyecto (si aplica)
-
-## Objetivo de la sesión
-  Qué debe poder hacer el estudiante al salir del aula. 2-4 bullets verificables.
-
-## Conexión con la teoría
-  Qué concepto de la lección se materializa aquí y con qué pregunta se abre la sesión.
-
-## Minutado
-  | Tiempo | Bloque | Qué hace el docente | Qué hace el estudiante |
-  Debe sumar la duración real de la sesión.
-
-## Desarrollo paso a paso
-  ### Paso N — <nombre>
-  Enunciado, código de partida (esqueleto), y la solución de referencia
-  completa en bloque de código. Es material del docente: aquí SÍ va la solución.
-
-## Puntos de control
-  Qué revisar en pantalla del estudiante y en qué minuto. Señal de que va bien.
-
-## Errores frecuentes y cómo intervenir
-  | Síntoma observable | Causa probable | Intervención sugerida |
-
-## Preguntas socráticas
-  Preguntas para lanzar al grupo cuando se estanca, con la respuesta esperada.
-
-## Diferenciación
-  Qué darle a quien termina temprano (extensión) y a quien se queda atrás
-  (andamiaje mínimo aceptable). Crítico en Programación Científica, cuyo grupo
-  es explícitamente heterogéneo.
-
-## Cierre de la sesión
-  Cómo se conecta con la siguiente sesión y qué queda como trabajo independiente.
-
-## Materiales y preparación previa
-  Qué debe tener listo el docente antes de entrar (datasets, repos, ramas).
-```
-
----
-
-## 3b. Apuntes de clase — docente (spec-044)
-
-`content/cursos/<curso>/apuntes/<articleSlug>.md`. Opcional: no todas las
-secciones lo tienen, y su ausencia no es un error (el botón "Apuntes de
-clase" del header simplemente no aparece). Se resuelve por convención de
-nombre sobre el `articleSlug` de la lección o guía — no lleva frontmatter
-obligatorio ni entrada en TS.
-
-**No es lo mismo que el artefacto #3** (guía de laboratorio del docente en
-`microdiseno/labs/`). Son documentos con propósito distinto y nunca se migra
-contenido de uno a otro sin recortarlo:
-
-| | Guía docente (`microdiseno/labs/`) | Apunte de clase (`apuntes/`) |
-|---|---|---|
-| Contenido | Ficha de sesión, objetivos, **minutado**, desarrollo paso a paso, puntos de control, diferenciación, cierre | **Solo** el desarrollo de ejercicios y código — nada más |
-| Se publica en la app | No, nunca (`CLAUDE.md`: `microdiseno/` no se publica) | Sí, pero solo a owner/admin — ruta dedicada `/[courseSlug]/[lessonSlug]/apuntes`, enlazada desde un botón en el header de la lección/guía |
-| Para qué se usa | Planificar la sesión antes de dictarla | Consultarlo **durante** la clase, proyectado, como referencia rápida |
-
-Formato — solo el guion de ejercicios, sin ficha de sesión ni minutado:
+Es el **guion de la sesión que se proyecta en clase**, centrado en el código:
+paso a paso detallado, con las soluciones completas y con las líneas
+documentadas (comentarios que expliquen qué hace cada línea no obvia), no un
+enunciado a medio resolver. Formato:
 
 ```
-> (Opcional) una nota de contexto breve para el docente, en blockquote.
+> (Opcional) una nota de contexto breve: de qué depende la sesión, qué hilo
+> conecta los pasos, si la sesión es dictada en vivo por el docente en vez de
+> ser trabajo independiente del estudiante.
 
 ## Paso N — <nombre del ejercicio o parte>
 
-Enunciado breve + código de partida y/o solución de referencia en bloque de
-código con lenguaje explícito (` ```java `, ` ```python `, etc.).
+Enunciado breve + el código **completo y documentado** (solución de
+referencia, no un esqueleto con `TODO`) en bloque de código con lenguaje
+explícito (` ```java `, ` ```python `, etc.). Comentarios en las líneas que
+no son obvias — es lo que el docente explica en voz alta mientras proyecta.
 
 Punto a resaltar: qué observar o señalar en pantalla mientras se demuestra.
 
-## Errores frecuentes y cómo intervenir   (opcional)
-  | Síntoma observable | Causa probable | Intervención sugerida |
+## Preguntas socráticas   (opcional)
+  Preguntas para lanzar al grupo si se estanca, con la respuesta esperada.
+  Van al final, una vez cerrado el desarrollo paso a paso.
 ```
 
 **Prohibido en este artefacto:** ficha de sesión, objetivos de sesión,
-minutado, puntos de control por minuto, diferenciación pedagógica, cierre de
-sesión. Todo eso sigue viviendo exclusivamente en la guía docente de
-`microdiseno/labs/` (artefacto #3), que no se toca ni se recorta al escribir
-un apunte de clase.
+**minutado**, puntos de control por minuto, diferenciación pedagógica
+(andamiaje/extensión), errores frecuentes en tabla, cierre de sesión. Ese
+aparato de planificación de sesión ya no se produce como artefacto aparte —
+si algo de eso es indispensable para dictar la clase, se resuelve en la
+conversación con el usuario, no en un documento versionado.
 
 ⚠️ El pipeline compila `.md` como MDX (igual que las guías de laboratorio,
 ver §4): todo placeholder o genérico (`<tu-usuario>`, `List<Nodo>`) fuera de
@@ -414,6 +372,16 @@ backticks o dentro de un bloque de código.
 ---
 
 ## 4. Guía de laboratorio del estudiante (publicada)
+
+> ⚠️ **Confirmar antes de crearla, siempre.** No toda sesión práctica es
+> trabajo independiente del estudiante: muchas se desarrollan en vivo por el
+> docente (demo, ejercicio guiado, o para explicar el flujo de trabajo del
+> curso). Antes de escribir este artefacto, preguntar explícitamente al
+> usuario si la sesión es trabajo independiente que el estudiante entrega, o
+> si el docente la va a dictar en vivo. Si es en vivo, **no se crea esta
+> guía**: el desarrollo paso a paso va en los apuntes de clase (§3) y no hay
+> artefacto #4 para esa sesión. No asumir por el tipo de sesión (`P` en el
+> cronograma no implica automáticamente trabajo independiente).
 
 `content/cursos/<curso>/guias/<slug>.md` — **`.md`, no `.mdx`**, en la
 subcarpeta `guias/` (`lib/courses/content.ts:24-26`).
@@ -604,7 +572,7 @@ y que `mcp-servers/<nombre>/dist/` está compilado.
 - [ ] Ningún `$` sin escapar; ningún `<`/`{` suelto en prosa (crítico en `.md` de guías).
 - [ ] Solo `Callout`, `Tabs`, `Tab`, `YouTubeEmbed` como JSX.
 - [ ] Entrada en `lib/courses/data/<curso>.ts` con `articleSlug`, `order` único y `summary` escrito.
-- [ ] Guía del estudiante con `kind: "guide"`; guía del docente en `microdiseno/labs/` y **sin** entrada TS.
+- [ ] Si la sesión es en vivo: apuntes de clase escritos, sin guía de estudiante. Si es trabajo independiente (confirmado con el usuario): guía del estudiante con `kind: "guide"` y apuntes de clase **sin** entrada TS.
 - [ ] Rúbrica suma 100 y cada criterio es verificable.
 - [ ] Preguntas de cierre: solo `multiple_choice`, publicadas y **montadas** en la lección (`mount_question_in_lesson`), verificado con `list_lesson_questions`.
 - [ ] `npm run build` pasa (el validador de cursos corre ahí).

@@ -155,12 +155,18 @@ Presenta al usuario un plan compacto, en este formato:
 1. ## <título> — <qué instala> — [diagrama: tipo, para qué]
    ...
 
-### Guía de laboratorio (docente)
+### Sesión práctica
 
-Ejercicio/sprint: <qué se hace en clase> · Minutado grueso: <N bloques>
+¿Trabajo independiente del estudiante o desarrollo en vivo del docente?
+<confirmar con el usuario si el cronograma no lo deja explícito>
+
+### Apuntes de clase (docente)
+
+Ejercicio: <qué se desarrolla y se proyecta en clase, con código completo>
 
 ### Guía de laboratorio (estudiante)
 
+<Solo si la sesión es trabajo independiente>
 Entregable: <qué entrega> · Rúbrica: <ejes de evaluación>
 
 ### Cuestionario de cierre
@@ -182,7 +188,10 @@ no dependen entre sí, y pásales el plan aprobado íntegro más las rutas exact
 de los archivos que deben leer:
 
 - **`@lesson-writer`** → la lección `.mdx` y la entrada en `lib/courses/data/`.
-- **`@lab-designer`** → la guía del docente y la del estudiante con su rúbrica.
+- **`@lab-designer`** → los apuntes de clase del docente y, solo si el plan
+  confirmó trabajo independiente, la guía del estudiante con su rúbrica. Si el
+  plan no dejó eso resuelto, `@lab-designer` debe preguntarlo antes de crear
+  la guía — no lo decidas tú por él.
 - **`@assessment-builder`** → cuestionario de cierre y, si se pidió, el quiz A/B/C.
 
 `@lesson-writer` y `@lab-designer` pueden ir en paralelo.
@@ -194,8 +203,9 @@ deben evaluar el contenido realmente escrito y necesitan el `lesson_slug` final.
 1. Ejecuta `npm run build` (o `npx tsc --noEmit` si el build es muy lento): el
    validador de `lib/courses/index.ts` falla si un `articleSlug` apunta a un
    archivo inexistente o si hay `order` duplicado.
-2. Verifica que la guía del docente **no** tenga entrada en TS y que la del
-   estudiante **sí**, con `kind: "guide"`.
+2. Verifica que los apuntes de clase **no** tengan entrada en TS, y que la
+   guía de estudiante —si se creó— **sí** la tenga, con `kind: "guide"`. Si
+   la sesión era en vivo, confirma que **no** se creó guía de estudiante.
 3. Revisa coherencia cruzada: ¿el laboratorio usa el concepto que instaló la
    teoría? ¿el cuestionario pregunta sobre secciones que existen? ¿la rúbrica
    evalúa lo que la guía pidió?
