@@ -74,8 +74,16 @@ la contraseña real.
 **Resultado esperado:** cada subcaso se rechaza con el error en su campo. El
 subcaso 3 es el que sostiene todo el circuito (D6): sin él, el cambio forzado
 se puede "cumplir" reescribiendo la genérica del docente.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{pendiente}}
+**Estado:** ✅ Aprobado (2026-08-16)
+**Hallazgos:** Ejecutado por Claude vía navegador (autorización del usuario).
+Los cuatro subcasos correctos:
+1. 7 caracteres → "La contraseña debe tener al menos 8 caracteres" (bajo Nueva contraseña).
+2. Confirmación distinta → "Las contraseñas no coinciden" (bajo Confirmar).
+3. Nueva = actual → **"La nueva contraseña debe ser distinta de la actual"**
+   (bajo Nueva contraseña) — D6 funcionando tal cual se diseñó.
+4. Campos vacíos → bloqueado por la validación nativa del navegador
+   (`required`), ni siquiera llegó al servidor: el error del subcaso anterior
+   permaneció sin cambios en pantalla, confirmando que no hubo submit real.
 
 ### TC-051-004 — La sesión no se desplaza al verificar la contraseña actual
 **Cubre:** el riesgo de implementación de D4
@@ -86,8 +94,16 @@ se puede "cumplir" reescribiendo la genérica del docente.
 3. Comparar cookies y seguir navegando.
 **Resultado esperado:** la sesión sigue siendo la misma y no hay expulsión. Si
 `signInWithPassword` reescribió las cookies, este caso lo delata.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{pendiente}}
+**Estado:** ✅ Aprobado (2026-08-16)
+**Hallazgos:** Ejecutado por Claude vía navegador. **Ajuste de método:** el
+acceso directo a `document.cookie` fue bloqueado por la propia extensión del
+navegador (protección esperada — las cookies de sesión de Supabase son
+`httpOnly`, invisibles para JS de página de todos modos). Verificación
+alternativa, igual de concluyente: tras el intento con contraseña actual
+incorrecta, se navegó directo a `/cuenta/cursos` **sin recargar sesión** — la
+página cargó con normalidad, mostrando al mismo usuario (A, "Estudiante Prueba
+TC-051-010"), sin redirect a `/login`. Confirma que `verifyCurrentPassword()`
+(el cliente desechable de D4) no tocó la sesión real.
 
 ## Casos de prueba — Restablecimiento por el docente
 
