@@ -68,3 +68,14 @@ export interface DeleteStudentResult {
   full_name: string;
   enrollments_removed: number;
 }
+
+// spec-051: tipo dedicado y separado de AdminStudentDetail/AdminStudentSummary
+// a propósito — la contraseña se muestra una sola vez, en la respuesta directa
+// del restablecimiento, nunca en una lectura general (ver el comentario de
+// arriba: "Deliberadamente sin enrollment_code ni password en ninguna
+// salida").
+export interface ResetStudentPasswordResult {
+  student_id: string;
+  password: string;
+  must_change_password: true;
+}

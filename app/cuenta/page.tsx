@@ -3,6 +3,7 @@ import { requireUser } from "@/lib/auth/session";
 import { getProfileWithStudent } from "@/lib/students/index";
 import { AccountInfoCard } from "@/components/account/AccountInfoCard";
 import { AccountForm } from "@/components/account/AccountForm";
+import { ChangePasswordForm } from "@/components/account/ChangePasswordForm";
 import { notFound } from "next/navigation";
 
 export const metadata: Metadata = { title: "Mi cuenta" };
@@ -26,6 +27,7 @@ export default async function CuentaPage() {
 
       <AccountInfoCard email={user.email!} profile={data} />
       <AccountForm profile={data} student={data.student} />
+      <ChangePasswordForm />
     </main>
   );
 }

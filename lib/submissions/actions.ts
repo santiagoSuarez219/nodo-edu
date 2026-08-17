@@ -7,12 +7,22 @@ import { getOrAllocateVariant } from "@/lib/assignments";
 import { runCode, type CodeRunResult } from "@/lib/code-runner";
 import { createSubmission, finalizeGrading, gradeAnswer, saveAnswer, submitSubmission } from "./index";
 import type { AuthResult } from "@/lib/auth/types";
+import type { SubmissionFailure } from "./types";
+
+// spec-050: `AuthResult` (usado por el resto del proyecto) no tiene campo
+// `reason` — devolver el `SubmissionFailure` de la capa de datos tal cual
+// sigue siendo estructuralmente válido como `AuthResult`, pero el tipo
+// declarado de la acción pierde `reason` y el cliente (AssignmentPlayer) no
+// puede distinguir un 503 de un rechazo de negocio. Estas tres acciones usan
+// su propio tipo de retorno, extendiendo `SubmissionFailure` en vez de
+// `AuthResult`, para que ese dato llegue completo hasta el componente.
+type SubmissionActionResult<T> = { ok: true; data: T } | SubmissionFailure;
 
 export async function createSubmissionAction(
   assignmentId: string,
   variantGroupId: string,
   enrollmentId: string
-): Promise<AuthResult<{ id: string }>> {
+): Promise<SubmissionActionResult<{ id: string }>> {
   await requireUser();
   const result = await createSubmission(assignmentId, variantGroupId, enrollmentId);
   if (!result.ok) return result;
@@ -31,7 +41,7 @@ export async function saveAnswerAction(
 
 export async function submitSubmissionAction(
   submissionId: string
-): Promise<AuthResult<{ auto_score: number }>> {
+): Promise<SubmissionActionResult<{ auto_score: number }>> {
   await requireUser();
   const result = await submitSubmission(submissionId);
   if (!result.ok) return result;
@@ -98,7 +108,7 @@ export async function finalizeGradingAction(
   submissionId: string,
   academicCourseId: string,
   groupId: string
-): Promise<AuthResult<{ final_score: number }>> {
+): Promise<SubmissionActionResult<{ final_score: number }>> {
   await requireUser();
   const result = await finalizeGrading(submissionId);
   if (!result.ok) return result;

@@ -5,6 +5,185 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+## DEBT-065 — Residuo de la revisión de código de spec-050: hallazgos menores dejados fuera de su alcance
+
+**Origen:** revisión de código (`@reviewer`) de `fix/errores-supabase-envios`
+(spec-050, 2026-08-16, tres pasadas — APROBADO en la tercera). Cinco hallazgos
+🟡 menores que no bloquearon el veredicto final tras corregir los 5 🟠 mayores
+de las dos primeras pasadas, y que el propio spec dejó fuera de su alcance
+declarado (subconjunto "nota de estudiante en juego" + "control de acceso" de
+**[[DEBT-040]]**) en vez de ampliarlo sin aprobación.
+**Prioridad:** Baja — ninguno escribe una nota falsa; son mensajes de error
+poco honestos o UX confusa ante infraestructura degradada, no corrupción de
+datos.
+
+- **`lib/self-assessment/index.ts:233-235`** (`checkSelfAssessmentAnswer`) —
+  colapsa `reason: "unavailable"` en `{ok:false, error:'No autorizado'}`. Es
+  la verificación de una respuesta individual dentro de una autoevaluación
+  (no la nota final, que sí quedó cubierta por spec-050 en
+  `submitSelfAssessment`), pero sigue siendo el mismo patrón de mensaje
+  engañoso ante un fallo de Postgres.
+- **`components/student/AssignmentPlayer.tsx` / `app/servicio-no-disponible`**
+  — el texto de esa página (`"El servicio de autenticación no está
+  respondiendo"`, de spec-046) es específico de una caída de Auth. spec-050 la
+  reutiliza también para fallos de lectura de Postgres con Auth sano (p. ej.
+  `hasCourseAccess` degradado — ver TC-050-006 en
+  `docs/testing/test-050-errores-supabase-envios.md`), donde el mensaje es
+  técnicamente inexacto aunque el comportamiento (fallar cerrado, redirigir
+  ahí y no a un "sin acceso" falso) sea correcto. Generalizar el copy para
+  cubrir ambos escenarios, o parametrizarlo por causa.
+- **`lib/submissions/actions.ts`** (`startNewAttemptAction`) — sigue
+  tragándose un `reason: "unavailable"` en silencio (`if (!result.ok)
+  return;`): el botón "Iniciar nuevo intento" simplemente no hace nada visible
+  ante un fallo de infraestructura. Además, `createSubmissionAction` y
+  `submitSubmissionAction` no tienen ningún consumidor en el repo — código
+  muerto preexistente a spec-050 que conviene resolver (usarlos donde
+  corresponda o eliminarlos) junto con este hallazgo.
+- **`lib/submissions/index.ts`** (`getSubmissionForReview`) — degrada a un
+  `Map` vacío cuando `getReviewContextByAssignmentQuestionId` falla (decisión
+  correcta: nunca inventa una nota), pero el docente ve un panel de revisión
+  vacío sin ningún indicio de que la causa es infraestructura y no que el
+  envío no tiene preguntas. Candidato a mensaje explícito, en línea con el
+  resto de **[[DEBT-040]]**.
+- **`components/student/AssignmentPlayer.tsx:103-111`** (autoguardado por
+  debounce) — hueco hermano del que sí se corrigió en el *flush* del envío
+  (spec-050, 2ª pasada de `@reviewer`), un paso antes en el tiempo: el
+  callback del `setTimeout` ignora el resultado de `saveAnswerAction`, marca
+  `setSaveStatus("saved")` ("✓ Guardado") y borra la entrada del `Map` de
+  debounce pase lo que pase. Si el `upsert` falla por infraestructura, la
+  respuesta no queda en la base, la UI afirma lo contrario, y como la
+  entrada ya se borró, el *flush* de `handleSubmit` no la reintentará — el
+  envío se califica sobre una respuesta ausente. Preexistente a spec-050
+  (mismo código en `development`), señalado por `@reviewer` en su 3ª pasada
+  como vecino directo del código que sí se corrigió.
+
+**Acción:** Resolver en una futura ronda de **[[DEBT-040]]** o en un spec
+puntual si algún hallazgo se vuelve prioritario antes.
+
+---
+
+## DEBT-064 — `verifyCurrentPassword` no cierra la sesión del cliente desechable si `updateUser` falla después
+
+**Origen:** segunda revisión de código (`@reviewer`) de `feat/reset-password`,
+2026-08-16 — hallazgo 🔵, no bloqueante.
+**Prioridad:** Baja
+
+`verifyCurrentPassword` (`lib/auth/actions.ts`) crea un cliente
+`@supabase/supabase-js` desechable para verificar la contraseña actual sin
+desplazar la sesión real (D4 de spec-051). Ese `signInWithPassword` emite una
+sesión/refresh token real en GoTrue. En el camino feliz completo queda barrida
+por el `signOut({scope:'others'})` que `changePassword` hace después sobre la
+sesión real — pero si la verificación tiene éxito y el `updateUser`
+**inmediatamente posterior** falla, la función retorna antes de llegar a ese
+`signOut`, y la sesión del cliente desechable queda huérfana hasta que expira
+por sí sola.
+
+**Acción:** envolver el `signInWithPassword` en un `try/finally` que llame
+`throwaway.auth.signOut()` sin importar el resultado. Anotado con `// DEBT:`
+en el propio código.
+
+---
+
+## DEBT-063 — 3 estudiantes con cuentas duplicadas reales en producción (diagnóstico de la Fase 7 de spec-051)
+
+**Origen:** `scripts/diagnostico-duplicados-spec051.mjs` ejecutado contra
+producción (`bgiimadnmqnoqmdbudpo`) el 2026-08-16, con autorización explícita
+del usuario — solo lectura, ningún dato modificado.
+**Prioridad:** Media-Alta — son estudiantes reales con historial partido
+(matrícula, progreso, notas, asistencia divididos entre dos o tres cuentas);
+no es urgente reparar hoy, pero cada semana que pasa complica más el cruce.
+
+**Tres estudiantes identificados** (nombres reales — ver el historial de git
+de este archivo para el detalle completo; se resume aquí lo necesario para
+priorizar, no se vuelca el listado completo con IDs en texto libre):
+
+1. **Kevin Andres Garcia Avendaño** — el caso más claro: **tres** cuentas con
+   la misma parte local de correo (`kevingarcia1130885`) y tres dominios
+   institucionales ligeramente distintos (`correo.it.edu.co`,
+   `correo.itm.edu`, `correo.itm.edu.co` — probablemente typos sucesivos del
+   mismo dominio real). Mismo `full_name` en al menos dos de las tres.
+2. **Sebastian Rios** (`sebastianrios1131136`) — dos cuentas, una con
+   `coreo.itm.edu.co` (typo, falta la "r") y otra con `correo.itm.edu.co`
+   (correcto). El caso más simple de diagnosticar: un typo de dominio en el
+   registro original.
+3. **Roberto Echeverri Arroyave** y **David Morales Vargas** — dos cuentas
+   cada uno, mismo `full_name`, correos no capturados por la heurística B
+   (dominios ya distintos, no solo typos). Roberto además aparece en la
+   Heurística C1: una de sus dos cuentas tiene matrícula activa **sin ningún
+   `lesson_progress`** — el patrón exacto de "cuenta nueva recién creada"
+   que motivó spec-051.
+
+**Lo que NO se encontró:** ningún cruce en la Heurística C2 (cuenta con
+progreso y SIN matrícula activa) ni en el cruce final — las cuentas "viejas"
+de estos tres casos siguen con matrícula activa, no fueron retiradas. Repartir
+cuál cuenta es la "buena" y cuál la abandonada requiere criterio del docente,
+no es deducible solo de los datos.
+
+**Acción:** spec de seguimiento (no este ítem) que, por cada caso:
+1. Confirme con el docente cuál cuenta es la real/activa y cuál el duplicado.
+2. Decida qué fusionar — probablemente matrícula, progreso, notas y
+   asistencia de la cuenta duplicada hacia la real — o si alguna cuenta debe
+   simplemente eliminarse (`delete_student`, si no tiene entregas reales que
+   se pierdan).
+3. Documente el criterio para que, si vuelve a aparecer, no haya que
+   redecidir desde cero.
+
+No se toca nada aquí: **diagnóstico only**, según D6 de spec-051.
+
+---
+
+## DEBT-062 — El 503 inline de spec-046 rompe en Server Actions: el usuario ve un error genérico, no el mensaje honesto
+
+**Origen:** Ronda manual `test-051-restablecer-y-cambiar-contrasena.md`,
+TC-051-013, 2026-08-16 — reproducido dos veces de forma consistente.
+**Prioridad:** Media — no hay pérdida de datos (D9 se sostiene: ningún fallo
+de infraestructura escribió nada), pero el usuario ve una pantalla que no
+explica nada útil, justo en el escenario que spec-046 existe para cubrir.
+
+Cortando el túnel a `mirp-lab` con una sesión real y enviando
+`changePassword` (Server Action de spec-051) durante la caída,
+`read_network_requests` confirma que `POST /cambiar-contrasena` recibió
+**503** — el propio HTML inline de `lib/auth/service-unavailable-page.ts`
+que `middleware.ts` devuelve ante `auth.status === 'unavailable'` (spec-046).
+El servidor no mintió. Pero en pantalla apareció la genérica de
+`app/error.tsx`: *"Algo salió mal / Ocurrió un error inesperado."*, sin
+ninguna relación con "servicio no disponible".
+
+**Causa probable:** Next.js espera un formato de respuesta específico
+(RSC/streaming) para lo que el cliente reconoce como la respuesta de un
+Server Action. El HTML plano del 503 inline no cumple ese formato, así que
+el runtime del cliente no puede interpretarlo y dispara el error boundary
+genérico en vez de renderizar cualquier mensaje relacionado con el fallo real.
+No se investigó a fondo el mecanismo exacto (no se inspeccionó el body/headers
+completos de la respuesta 503 ni se comparó con lo que Next.js espera
+literalmente) — queda para quien tome este ítem.
+
+**Alcance del problema:** no es exclusivo de `changePassword`. El 503 inline
+de spec-046 se dispara para **cualquier** request que pase por el middleware
+mientras Auth está caído, incluidas las POST de **cualquier Server Action**
+del proyecto invocada en ese momento: `signIn`, `signOut`,
+`withdrawStudentAction`, `resetStudentPasswordAction`, etc. Todas comparten
+el mismo riesgo de mostrar el error genérico en vez del honesto.
+
+**Por qué no se corrigió en spec-051:** el defecto vive en la interacción
+entre el 503 inline de **spec-046** y el protocolo de Server Actions de
+Next.js — no es código de spec-051, que ya hace lo correcto (delega en el
+gate de middleware y no esconde el fallo). Corregirlo bien probablemente
+signifique que el middleware detecte si la request es una invocación de
+Server Action (header `Next-Action` presente) y responda con un formato que
+el cliente sepa interpretar, en vez del HTML plano actual — o que cada
+Server Action envuelva su llamada en un `try/catch` que traduzca cualquier
+excepción de red/parseo en un `AuthResult` de infraestructura, sin depender
+de que el 503 del middleware llegue intacto al código de la acción.
+
+**Acción:** diseñar un spec dedicado (toca `middleware.ts` y potencialmente
+el patrón de todas las Server Actions del proyecto — alcance transversal, no
+un parche de una función). Antes de implementar, confirmar el mecanismo
+exacto reproduciendo con las DevTools de Chrome abiertas (no solo la
+extensión) para ver el error real que lanza el cliente de Next.js.
+
+---
+
 ## DEBT-061 — Deuda menor de la revisión de código de spec-046
 
 **Origen:** segunda revisión de código (`@reviewer`) de
@@ -107,33 +286,19 @@ revisar Web Analytics/Runtime Logs de Vercel para esa ventana específica.
 
 ---
 
-## DEBT-058 — Warning de hidratación por `<Script id="theme-init">` en `RootLayout`
+## DEBT-058 — 🔁 Duplicado de **[[DEBT-010]]** (fusionado el 2026-08-14)
 
-**Origen:** ronda manual de test-044 (TC-013), overlay de dev de Next.js al
-abrir cualquier página en modo desarrollo
-**Prioridad:** Baja — solo visible en el overlay de dev; no afecta build de
-producción (verificado en verde) ni el comportamiento observado para el
-usuario
+Este ítem se abrió durante la ronda manual de `test-044` (TC-013) describiendo
+el `Console Error` de `<Script id="theme-init">` en `app/layout.tsx`. **Es
+exactamente el mismo problema que ya registraba [[DEBT-010]]** (2026-07-24):
+mismo archivo, mismo mensaje de error, misma acción propuesta. Es la segunda
+vez que ocurre — [[DEBT-039]] se fusionó por el mismo motivo el 2026-08-01.
 
-Next.js muestra en el overlay de dev un `Console Error`: *"Encountered a
-script tag while rendering React component. Scripts inside React components
-are never executed when rendering on the client. Consider using template tag
-instead."*, señalando `app/layout.tsx:48:9` — el script inline
-`id="theme-init"` que `DESIGN.md` documenta para evitar el FOUC del modo
-oscuro (`document.documentElement.classList.toggle('dark', ...)` antes del
-bundle).
-
-No es específico de ninguna ruta ni relacionado con spec-044 — apareció al
-navegar a `/apuntes`, pero se reproduce en cualquier página del sitio en modo
-`next dev`.
-
-**Acción:** Investigar si `next/script` con `strategy="beforeInteractive"` (ya
-usado, ver `app/layout.tsx:48`) sigue siendo la forma correcta de inyectar
-este script en Next 16, o si el warning indica que debe moverse fuera del
-árbol de componentes React (ej. inyectado directamente en el `<head>` del HTML
-servido, sin pasar por el componente `Script`). Confirmar que no degrada a un
-error real en algún flujo de producción antes de descartarlo como puramente
-cosmético.
+La evidencia nueva que aportaba esta entrada —la reproducción en el overlay de
+dev al navegar a `/apuntes` y la confirmación de que el build de producción
+pasa en verde, lo que acota el síntoma a `next dev`— se incorporó a
+**[[DEBT-010]]**, que queda como el ítem canónico. No abrir trabajo contra este
+número.
 
 ---
 
@@ -323,10 +488,7 @@ inmediata tras un refresco (spec-041, Decisión 8, punto 1).
 **Origen:** Ronda manual `test-041-refrescar-codigo-asistencia.md`, TC-011,
 2026-08-06 — falló al confirmar que rotar el código de un grupo no afecta al
 otro.
-**Prioridad:** Media — reproducible en el flujo normal de un docente con
-varios grupos; no hay pérdida de datos, pero el panel proyectado en clase
-puede mostrar "sin sesión de asistencia abierta" para una sesión que sí está
-abierta.
+**Prioridad:** ~~Media~~ → **Resuelto**
 
 **Resuelto (2026-08-06):** al reproducir el mismo síntoma con `openSession`
 durante el re-test de TC-011 (abrir sesión en ambos grupos y cambiar entre
@@ -349,32 +511,24 @@ nuevo, releyendo ese mismo snapshot congelado — porque cambiar de grupo es
 puramente cliente (cookie + `useState`), sin navegación, así que el snapshot
 del servidor nunca se refresca.
 
-`openSession` no llama `revalidatePath` en absoluto; `closeSession` llama
+`openSession` no llamaba `revalidatePath` en absoluto; `closeSession` llamaba
 `revalidatePath('/admin/courses', 'layout')` — la subruta que creó spec-010 y
 que **ya no existe** desde que spec-031 movió el panel a la vista de lección
-(`/${courseSlug}/${lessonSlug}`). Revalidar esa ruta muerta no tiene ningún
-efecto sobre la página real donde vive el panel hoy.
+(`/${courseSlug}/${lessonSlug}`). Revalidar esa ruta muerta no tenía ningún
+efecto sobre la página real donde vive el panel.
 
-**Resultado:** si el docente abre o cierra una sesión en un grupo y luego
-cambia a otro grupo y vuelve, el panel remontado puede mostrar un estado que
-no coincide con la base de datos (ej. "sin sesión abierta" para una sesión
-que sí está abierta).
+**Síntoma que producía:** si el docente abría o cerraba una sesión en un grupo
+y luego cambiaba a otro grupo y volvía, el panel remontado podía mostrar un
+estado que no coincidía con la base de datos (ej. "sin sesión abierta" para
+una sesión que sí lo estaba).
 
-**No corregido aquí:** `spec-041` (2026-08-06) encontró y corrigió el mismo
-defecto en `extendSessionCode`/`rotateSessionCode` — las dos acciones que ese
-spec introdujo — pasándoles `courseSlug`/`lessonSlug` y apuntando
-`revalidatePath` a la ruta real (ver `lib/attendance/index.ts`). Se decidió
-explícitamente **no** extender el fix a `openSession`/`closeSession` en esa
-misma sesión para no ampliar el alcance del spec más allá de lo que su propia
-ronda de pruebas (`test-041`) cubre; queda registrado aquí para una
-corrección posterior con el mismo patrón.
-
-**Fix:** aplicar el mismo cambio que ya recibieron `extendSessionCode` /
-`rotateSessionCode`: agregar `courseSlug`/`lessonSlug` a las firmas de
-`openSession` y `closeSession`, enhebrarlos desde `AdminAttendancePanel`
-(que ya los recibe como prop tras el fix de spec-041) hasta las llamadas, y
-usar `revalidatePath(\`/${courseSlug}/${lessonSlug}\`)` en vez de
-`/admin/courses`.
+> **Nota histórica.** Al registrarse este ítem se decidió explícitamente **no**
+> extender a `openSession`/`closeSession` el fix que spec-041 ya había aplicado
+> a `extendSessionCode`/`rotateSessionCode`, para no ampliar el alcance del
+> spec más allá de lo que cubría su ronda de pruebas. Esa decisión se revirtió
+> el mismo día, al reproducirse el síntoma con `openSession` durante el re-test
+> de TC-011 (ver arriba): las cuatro acciones quedaron corregidas dentro de
+> spec-041.
 
 ---
 
@@ -778,6 +932,29 @@ donde el llamador necesite distinguirlos, y capturar/verificar siempre
 real de estudiante en juego) y `lib/enrollments/access.ts` (control de acceso)
 sobre el resto.
 
+> **En `[TESTING]` (2026-08-16):** `docs/specs/spec-050-errores-supabase-envios.md`
+> cubre **solo** el subconjunto prioritario (`lib/submissions/index.ts`,
+> `app/api/submissions/[submissionId]/submit`, `lib/enrollments/access.ts`, y
+> —añadido durante la implementación— `lib/self-assessment/index.ts`). Al
+> verificar el código para redactarlo se confirmó que el impacto era mayor que
+> el descrito arriba: `submitSubmission` no solo escribía `auto_score = 0`,
+> sino que marcaba **`status: 'graded'`, `final_score: 0` y propagaba a la
+> libreta**, porque un `answerKey` vacío hacía que `hasOpenQuestions` fuera
+> `false` — una evaluación con preguntas abiertas se autocerraba en cero sin
+> pasar por revisión. Se encontraron además dos corrupciones no registradas
+> aquí, en el camino del docente: `finalizeGrading` ignoraba los
+> `manual_score` si `get_submission_review_context` fallaba (sumaba
+> `auto_score` en su lugar), y `getMaxPossiblePoints` devolvía `0` ante un
+> fallo de lectura, normalizando la nota a 0 en la libreta. Los cuatro quedaron
+> corregidos y verificados con la ronda manual (10/10 casos aprobados,
+> `docs/testing/test-050-errores-supabase-envios.md`).
+>
+> **Esta deuda NO se cierra con spec-050**: quedan los ~35 sitios restantes,
+> incluidas las guardas de borrado de `lib/grades/index.ts:64` y
+> `lib/questions/index.ts:251`, más el residuo de `user_roles` anotado abajo y
+> el residuo anotado en **[[DEBT-065]]** (hallazgos menores de la revisión de
+> código de spec-050, dejados fuera de su alcance a propósito).
+
 **Residuo anotado desde [[DEBT-042]] (spec-046, 2026-08-09):** dos sitios más,
 descubiertos y deliberadamente dejados fuera del alcance de spec-046 por ser
 consultas a Postgres/RLS, no a Supabase Auth:
@@ -817,6 +994,17 @@ que queda como el ítem canónico. No abrir trabajo contra este número.
 **Origen:** Revisión de `spec-036` (2026-08-01), al detectar que su
 `CourseLifecycleActions` sería la **tercera** copia del mismo diálogo
 **Prioridad:** Media — no hay bug hoy; el riesgo es que las copias diverjan
+
+> **Van CUATRO, no tres (2026-08-16).** `components/admin/ResetPasswordButton.tsx`
+> (spec-051, Fase 3 — restablecer contraseña desde `EnrollmentTable`) es la
+> cuarta copia. Se evaluó extraer `ConfirmDialog` en ese mismo momento y se
+> decidió no hacerlo: este caso tiene una segunda fase que las otras tres no
+> tienen (mostrar la contraseña generada tras confirmar), y forzar esa forma en
+> un componente pensado para un confirmar/cancelar simple arriesgaba
+> sobre-ajustar la API sin que las tres copias existentes migraran en el mismo
+> cambio — un refactor amplio no pedido por spec-051. Motivo documentado en el
+> propio archivo. La próxima vez que se toque cualquiera de las cuatro,
+> conviene evaluar la extracción en serio.
 
 `components/student/AssignmentPlayer.tsx:262` y
 `components/admin/AdminAttendancePanel.tsx:239` contienen el mismo diálogo de
@@ -1637,16 +1825,66 @@ nuevo para **reconstruir** el flujo de recuperación de contraseña desde cero
 (la implementación anterior ya no existe en el código) — no es un simple
 "reactivar", hay que rehacer las rutas, formularios y Server Actions.
 
+> **Alcance acotado (2026-08-15).** Este ítem queda reducido a la
+> **recuperación por correo** ("olvidé mi contraseña"). Todo el circuito que
+> **no** necesita correo —el docente restablece con una contraseña genérica, el
+> estudiante entra y la plataforma le exige cambiarla— se trata en
+> `docs/specs/spec-051-restablecer-y-cambiar-contrasena.md` (`[NOT STARTED]`),
+> que no está bloqueado por nada.
+>
+> **Daño ya causado, motivo del spec-051 (2026-08-15).** Varios estudiantes
+> olvidaron su contraseña y **crearon cuentas nuevas** para poder seguir. No
+> fue un descuido: era la única salida. Verificado el 2026-08-15 sobre el
+> código, **nadie** podía restablecer una contraseña —ni el estudiante, ni el
+> docente, ni un agente: `UpdateStudentSchema`
+> (`lib/students/schemas.ts:15-25`) no acepta `password`, y `students-mcp` solo
+> lo recibe en `create_student`. La vía documentada arriba ("`update_student`
+> con nuevo `email`") consistía en **liberar el correo de la cuenta vieja** para
+> que el estudiante volviera a registrarse con él, que es exactamente cómo se
+> producen los duplicados observados. Cada duplicado deja una cuenta huérfana
+> con la matrícula, el progreso, las notas y la asistencia originales, mientras
+> la nueva arranca vacía. spec-051 corta la causa; **la reparación de los
+> historiales partidos queda pendiente** y se registrará con el diagnóstico de
+> su Fase 7.
+>
+> **spec-051 completado (2026-08-16), `[DONE]`.** El circuito sin correo —
+> restablecer + cambio forzado + cambio voluntario— ya está en producción de
+> código, con 14/14 casos de la ronda manual aprobados
+> (`docs/testing/test-051-restablecer-y-cambiar-contrasena.md`). **Este ítem
+> queda confirmado, acotado únicamente a la recuperación por correo** — nada
+> más pendiente aquí depende de spec-051.
+>
+> **Diagnóstico de la Fase 7 (2026-08-16):** consulta de solo lectura en
+> `scripts/diagnostico-duplicados-spec051.sql` (tres heurísticas: mismo
+> `full_name`, mismo correo por parte local, y el cruce más fuerte —cuenta
+> con matrícula activa sin ningún `lesson_progress` frente a cuenta con
+> progreso sin matrícula activa, ambas restringidas a rol `student`—).
+> Ejecutada contra **desarrollo**: sin duplicados. **Pendiente ejecutarla
+> contra producción**, con confirmación explícita del usuario antes de
+> correrla ahí (son datos reales de estudiantes). Si aparece algo, la
+> reparación de esos historiales partidos se registra como ítem nuevo del
+> backlog en ese momento — esta consulta solo diagnostica, no corrige nada.
+>
+> **Son dos bloqueos, no uno.** Además de SMTP ([[DEBT-001]]: 3 correos de auth
+> por hora en el plan gratuito, inservible para ~30 estudiantes al arranque de
+> semestre), spec-027 **eliminó la verificación de correo**. Montar la
+> recuperación sobre direcciones no verificadas no es "poco fiable": el enlace
+> de restablecimiento viaja a un buzón que nadie comprobó que pertenezca a
+> quien dice ser su dueño. El propio spec-027 ya lo anota. Reintroducir la
+> verificación de correo es un spec aparte y es **prerrequisito** de este ítem.
+
 ---
 
 ## DEBT-010 — Error de consola "script tag while rendering" en el init de tema (Next 16)
 
-> **Ítem canónico.** El 2026-08-01 se abrió **[[DEBT-039]]** describiendo este
-> mismo problema; se fusionó aquí y aquel número quedó como puntero. Toda la
-> evidencia acumulada vive en este ítem.
+> **Ítem canónico.** El 2026-08-01 se abrió **[[DEBT-039]]** y el 2026-08-13
+> **[[DEBT-058]]**, ambos describiendo este mismo problema; se fusionaron aquí
+> y aquellos números quedaron como punteros. Toda la evidencia acumulada vive
+> en este ítem.
 
 **Origen:** Reportado por el usuario durante la ronda de pruebas de `test-020-assignment-review.md`, ajeno al scope de spec-020
-**Reconfirmado:** Ronda manual de `test-036` (TC-036-012, 2026-08-01)
+**Reconfirmado:** Ronda manual de `test-036` (TC-036-012, 2026-08-01) y ronda
+manual de `test-044` (TC-013, 2026-08-13)
 **Prioridad:** Media — error de consola en toda la app; relacionado con DEBT-008
 
 Next.js 16.2.4 (Turbopack) reporta en consola:
@@ -1675,6 +1913,15 @@ app en curso— y se confirmó después navegando directamente: el error aparece
 en **cualquier** página que use el layout raíz, no solo en el panel admin. Es
 decir, contamina la consola en cada carga de la app y es sospechoso del
 colgado transitorio de aquel caso.
+
+**Evidencia adicional (2026-08-13, ex-[[DEBT-058]]):** vuelto a observar en el
+overlay de dev de Next.js durante `test-044` (TC-013) al navegar a `/apuntes`,
+señalando ya `app/layout.tsx:48:9` (la línea se corrió por ediciones
+posteriores del layout). Dato nuevo que acota el alcance: el **build de
+producción pasa en verde** y no se observó ningún cambio de comportamiento
+para el usuario, así que el síntoma está confinado a `next dev` — lo que
+sostiene la prioridad Media (ruido permanente en consola) sin escalarla, pero
+no descarta la sospecha del colgado transitorio de TC-036-012.
 
 **Acción:** Investigar en la misma iteración de temas/DESIGN.md prevista para
 DEBT-008 — revisar si `next/script` con `beforeInteractive` sigue siendo la

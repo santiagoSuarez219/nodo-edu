@@ -1,5 +1,21 @@
 export type SubmissionStatus = "in_progress" | "submitted" | "graded" | "expired";
 
+// spec-050 (D4): se extiende el shape existente `{ok:false; error}` en vez de
+// migrar al `{status:'ok'|'unavailable'}` de spec-037 — los ~10 consumidores
+// actuales de estas funciones solo comprueban `.ok` y siguen funcionando sin
+// tocarse (degradan cerrado); quien necesite distinguir un fallo de negocio
+// de uno de infraestructura (la ruta API para el 503, el jugador para el
+// mensaje) lee `reason`. "business": la operación se rechazó por una regla
+// del dominio (límite de intentos, envío ya cerrado, etc.) — el mensaje es
+// seguro de mostrar tal cual. "unavailable": una lectura o escritura falló
+// sin que se pudiera determinar el resultado real — nunca debe escribirse
+// ningún puntaje derivado de datos leídos bajo este estado (D1).
+export type SubmissionFailure = {
+  ok: false;
+  error: string;
+  reason: "business" | "unavailable";
+};
+
 export interface Submission {
   id: string;
   assignment_id: string;

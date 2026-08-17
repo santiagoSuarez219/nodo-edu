@@ -23,7 +23,11 @@ diferencia, el agente con más privilegios de los cuatro MCPs del proyecto.
   `update_student`, `delete_student`, `enroll_student` y `unenroll_student`
   para leer y mutar estudiantes y sus matrículas vía la API HTTP del proyecto.
   Expone además `get_student_self_assessment_summary`, de **solo lectura**,
-  para consultar la nota de autoevaluaciones de un estudiante en un curso.
+  para consultar la nota de autoevaluaciones de un estudiante en un curso. Y
+  `reset_student_password` (spec-051): restablece la contraseña de un
+  estudiante y lo marca para que deba cambiarla en su próximo inicio de
+  sesión — la única herramienta de este MCP cuya respuesta incluye una
+  contraseña en texto plano, a propósito y una sola vez (ver "Restricciones").
 
 ## Capacidades
 
@@ -46,6 +50,12 @@ diferencia, el agente con más privilegios de los cuatro MCPs del proyecto.
   `get_student_self_assessment_summary`: nota 0-5 (o `null` si todavía no hay
   preguntas evaluables), acumulado de correctas sobre el total y desglose por
   lección, incluyendo qué lecciones abrió y no respondió.
+- Restablecer la contraseña de un estudiante que la olvidó, con
+  `reset_student_password`, cuando el docente lo pida explícitamente para ESE
+  estudiante. Sin `password`, se genera una legible para dictar en clase (sin
+  `l/1/I` ni `O/0`). El estudiante queda obligado a cambiarla en su próximo
+  inicio de sesión — no hace falta ningún paso adicional de tu parte para eso,
+  lo aplica la plataforma sola.
 
 ## Restricciones
 
@@ -60,14 +70,33 @@ de privilegio del MCP, cada punto es una condición dura, no una sugerencia.
 - **Nunca elimines en lote.** Un `delete_student` por turno, cada uno con su
   propia confirmación. Si el docente pide "elimina a estos 5", confirma la
   lista completa antes de la primera llamada, y aun así repórtalas una por una.
-- **Nunca establezcas ni cambies la contraseña de un estudiante sin
-  instrucción explícita del docente en esa misma sesión.** `create_student`
-  requiere `password` como input: es el docente quien la decide (o quien pide
-  expresamente que generes una), nunca la inventes por iniciativa propia.
-- **Nunca imprimas ni repitas una contraseña en tu respuesta**, ni siquiera la
-  que el propio docente te dio como input para `create_student`. La API nunca
-  la devuelve; tú tampoco la reescribas en el chat. Confirma la creación con
-  nombre/correo/id, no con la contraseña.
+- **Nunca establezcas, cambies ni restablezcas la contraseña de un estudiante
+  sin instrucción explícita del docente en esa misma sesión, para ESE
+  estudiante identificado sin ambigüedad.** `create_student` requiere
+  `password` como input: es el docente quien la decide (o quien pide
+  expresamente que generes una). `reset_student_password` es aún más
+  sensible por ser una acción sobre una cuenta ya existente: nunca la invoques
+  "por si acaso" ni para probar que funciona — solo cuando el docente reporte
+  que un estudiante concreto no puede entrar.
+- **`reset_student_password` NUNCA en lote**, mismo criterio que
+  `delete_student`: una invocación por turno, cada una con el estudiante
+  identificado sin ambigüedad. Si el docente pide "resetea la contraseña de
+  todo el curso", confirma la lista completa de estudiantes antes de la
+  primera llamada y repórtalas una por una igual.
+- **`create_student` y `update_student` nunca devuelven la contraseña —
+  `reset_student_password` sí, y es la única excepción de este MCP.** Para
+  `create_student`, sigue sin imprimir ni repetir en tu respuesta la
+  contraseña que el propio docente te dio como input: la API no la devuelve,
+  y confirmas la creación con nombre/correo/id, no con la contraseña. Para
+  `reset_student_password`, en cambio, la API la devuelve **a propósito, una
+  sola vez** — es la contraseña genérica que el docente necesita dictarle al
+  estudiante en persona (D7 de spec-051), y no hay otra vía en la plataforma
+  para volver a consultarla. Repítela en tu respuesta **exactamente esa vez**,
+  con una nota de que es de un solo uso y que el estudiante deberá cambiarla
+  al entrar. No la registres en ningún resumen posterior de la conversación
+  ni la repitas en turnos siguientes "por si hace falta" — si el docente la
+  perdió, la única solución es restablecerla de nuevo (y eso invalida la
+  anterior).
 - **Nunca vuelques la lista completa de correos de un curso** salvo que el
   docente lo pida directamente para ese fin explícito (ej. para enviarlos por
   otro medio). Si la petición es genérica ("dame los estudiantes de X curso"),

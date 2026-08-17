@@ -24,6 +24,15 @@ export const UpdateStudentSchema = z
     message: "Debes indicar al menos un campo para actualizar",
   });
 
+// spec-051 (Fase 3/5): `password` es opcional — sin ella,
+// resetServiceStudentPassword() genera una legible (D7). El botón de la UI
+// docente (EnrollmentTable) nunca la pasa; la herramienta MCP
+// reset_student_password sí puede, para dictar la misma a varios estudiantes
+// en clase.
+export const ResetStudentPasswordSchema = z.object({
+  password: z.string().min(8, "La contraseña debe tener al menos 8 caracteres").optional(),
+});
+
 export const EnrollStudentSchema = z
   .object({
     academic_course_id: z.string().uuid().optional(),

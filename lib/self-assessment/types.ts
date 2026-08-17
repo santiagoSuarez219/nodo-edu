@@ -78,7 +78,13 @@ export type SubmitSelfAssessmentResult =
         // spec-040: intento único — ya existe una fila previa (comprobada
         // antes de insertar, o capturada del error 23505 en una carrera).
         | "already_submitted"
-        | "error";
+        | "error"
+        // spec-050: distinto de "not_enrolled" — la comprobación de
+        // matrícula (hasCourseAccess) falló por infraestructura, no porque
+        // el estudiante genuinamente no esté matriculado. Sin esta rama,
+        // un estudiante real recibía "No estás matriculado en este curso"
+        // ante un fallo de lectura de Postgres/RLS.
+        | "unavailable";
     };
 
 // spec-040 D3: revisión permanente del intento, para que sobreviva a la

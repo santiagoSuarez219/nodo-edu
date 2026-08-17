@@ -85,6 +85,19 @@ export const estructurasDeDatos: Course = {
       topics: [],
     },
     {
+      id: "practica-clases-y-objetos-proyecto-de-aula",
+      slug: "practica-clases-y-objetos-proyecto-de-aula",
+      articleSlug: "practica-clases-y-objetos-proyecto-de-aula",
+      order: 4.6,
+      title: "Práctica en clase — Modela una clase de tu proyecto de aula",
+      summary:
+        "Actividad de la sesión de hoy: modelas en tu propio computador una entidad de dominio de tu proyecto de aula y la subes con add, commit, push y pull al repositorio compartido de tu equipo.",
+      topics: [
+        { title: "Clase de dominio con atributos, constructor y método de información" },
+        { title: "Flujo de Git en equipo: add, commit, push, pull sobre archivos separados" },
+      ],
+    },
+    {
       id: "encapsulamiento",
       slug: "encapsulamiento",
       articleSlug: "encapsulamiento",

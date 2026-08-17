@@ -8,6 +8,7 @@ const PUBLIC_PREFIXES = [
   "/registro",
   "/servicio-no-disponible", // spec-046 — destino del propio gate, debe quedar exento o entra en bucle
 ];
+const CHANGE_PASSWORD_PATH = "/cambiar-contrasena"; // spec-051 — mismo motivo: debe quedar exento o entra en bucle
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -44,6 +45,39 @@ export async function middleware(request: NextRequest) {
   }
 
   const user = auth.status === "authenticated" ? auth.user : null;
+
+  // spec-051 (D2/D3): gate de cambio forzado de contraseña. La marca
+  // `must_change_password` vive en `app_metadata`, que `auth.user` ya trae
+  // completo desde el `getUser()` de arriba — cero consultas adicionales a
+  // Postgres (a diferencia del bloque /admin de más abajo, que sí paga una
+  // consulta a `user_roles`). `getUser()` revalida contra el servidor de Auth
+  // en cada llamada (no decodifica un JWT local cacheado — por eso el resto
+  // de este archivo puede permitirse reintentos/timeouts), así que en cuanto
+  // la Fase 3 o el propio cambio (Fase 2) limpian la marca, la siguiente
+  // request ya no la ve.
+  //
+  // Va antes del gate de sesión de abajo para que un usuario marcado no vea
+  // ninguna otra página, ni siquiera /login o /registro si de algún modo
+  // llega ahí con sesión viva. Exención de la propia ruta: sin ella, redirigir
+  // a /cambiar-contrasena entraría en bucle contra sí misma.
+  //
+  // Sin exención aparte para "cerrar sesión": el formulario del navbar
+  // (components/navbar/{Navbar,UserMenu}.tsx) es un Server Action que hace
+  // POST a la URL de la página actual — que para un usuario marcado siempre
+  // es /cambiar-contrasena, porque este mismo gate no lo deja estar en
+  // ninguna otra — así que ya queda cubierto por la exención de ruta. Para
+  // cuando el redirect("/") de signOut() vuelve a pasar por este middleware,
+  // las cookies de sesión ya se limpiaron: auth.status deja de ser
+  // "authenticated" y este bloque ni se evalúa.
+  if (
+    user &&
+    user.app_metadata?.must_change_password &&
+    pathname !== CHANGE_PASSWORD_PATH
+  ) {
+    const changePasswordUrl = request.nextUrl.clone();
+    changePasswordUrl.pathname = CHANGE_PASSWORD_PATH;
+    return NextResponse.redirect(changePasswordUrl);
+  }
 
   // Todo el sitio requiere sesión activa, salvo las rutas de auth
   const isPublic = PUBLIC_PREFIXES.some((p) => pathname.startsWith(p));
