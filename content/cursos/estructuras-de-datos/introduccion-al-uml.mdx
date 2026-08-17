@@ -45,9 +45,9 @@ línea de Java.
 ```mermaid
 classDiagram
   class Cliente {
-    -String identificacion
-    -String nombre
-    +String getNombre()
+    -identificacion : String
+    -nombre : String
+    +getNombre() String
   }
 ```
 
@@ -75,12 +75,12 @@ compartimentos**, siempre en el mismo orden:
 ```mermaid
 classDiagram
   class Cuenta {
-    -String numeroCuenta
-    -double saldo
-    -Cliente titular
-    +double getSaldo()
-    +void depositar(double monto)
-    +void retirar(double monto)
+    -numeroCuenta : String
+    -saldo : double
+    -titular : Cliente
+    +getSaldo() double
+    +depositar(monto: double) void
+    +retirar(monto: double) void
   }
 ```
 
@@ -173,14 +173,14 @@ ahora — así se ve un diagrama real de un proyecto.
 ```mermaid
 classDiagram
   class Cuenta {
-    -String numeroCuenta
-    -double saldo
-    -Cliente titular
+    -numeroCuenta : String
+    -saldo : double
+    -titular : Cliente
     +Cuenta(numeroCuenta: String, titular: Cliente)
-    +double getSaldo()
-    +String getNumeroCuenta()
-    +void depositar(monto: double)
-    +boolean retirar(monto: double)
+    +getSaldo() double
+    +getNumeroCuenta() String
+    +depositar(monto: double) void
+    +retirar(monto: double) boolean
   }
 ```
 
