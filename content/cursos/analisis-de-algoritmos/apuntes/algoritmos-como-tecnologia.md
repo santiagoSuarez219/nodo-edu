@@ -1,13 +1,27 @@
-> Sesión dictada en vivo por el docente: no es trabajo independiente del
-> estudiante. Sirve además para explicar el flujo de trabajo del curso
-> (entorno, commits, carpeta `ejercicios-clase/`). Punto de partida: el
-> `insertion_sort` sin instrumentar de la lección "Algoritmos como tecnología",
-> con su traza sobre `[5, 2, 4, 6, 1, 3]`. El hilo de la sesión es el caso de
-> la empresa de energía que la lección modeló: 1.850.000 lecturas por noche,
-> ventana de cuatro horas. Todo lo que se mide hoy termina extrapolado a esa
-> cifra en el Paso 4.
+> Cubre las dos sesiones de la Semana 3: la **T** (teórica) y la **P**
+> (práctica, dictada en vivo por el docente — no es trabajo independiente del
+> estudiante). Sirve además para explicar el flujo de trabajo del curso
+> (entorno, commits, carpeta `ejercicios-clase/`).
 
-## Paso 1 — Insertion sort instrumentado
+## Sesión T — la lección se presenta tal como está publicada
+
+No hay código adicional que proyectar en la sesión teórica: el `.mdx` de
+"Algoritmos como tecnología" ya trae el `insertion_sort` completo y
+comentado, su traza sobre `[5, 2, 4, 6, 1, 3]` y la demostración de la
+invariante de ciclo (inicialización, mantenimiento, terminación). Dictarla
+es presentar esa página en orden, deteniéndose en la tabla de modelado
+("¿Qué entra? ¿Qué sale? ¿Qué restringe? ¿Qué operación domina el costo?")
+y en el argumento de "algoritmos como tecnología" (Algoritmo A vs. Algoritmo
+B, la cuenta de energía, quién paga cuando el algoritmo se equivoca).
+
+Punto a resaltar: el hilo de toda la sesión — T y P — es el mismo caso, la
+empresa de energía con 1.850.000 medidores y una ventana de cuatro horas.
+Todo lo que se mide hoy en la sesión P termina extrapolado a esa cifra en el
+Paso 4.
+
+## Sesión P — insertion sort instrumentado
+
+### Paso 1 — Insertion sort instrumentado
 
 Partir del `insertion_sort` de la lección y agregarle dos contadores: uno de
 comparaciones (cada vez que se compara `arreglo[j]` contra `clave`) y otro de
@@ -55,7 +69,7 @@ elemento. Son dos preguntas distintas, no una sola línea que suma a ambos
 contadores — el error más frecuente es incrementar los dos contadores en la
 misma línea.
 
-## Paso 2 — Verificar la invariante con `assert`
+### Paso 2 — Verificar la invariante con `assert`
 
 Extender la función para verificar, en 2 o 3 valores de `i`, que
 `arreglo[0:i]` está ordenado antes de procesar `arreglo[i]` — la invariante
@@ -120,7 +134,7 @@ no tiene sentido — el ciclo `for` nunca llega ahí. Demostrar en vivo qué pas
 con `puntos_de_control={n}`: es redundante, no un error, porque el `for`
 nunca alcanza ese valor.
 
-## Paso 3 — Entradas, gráfica y clasificación de casos
+### Paso 3 — Entradas, gráfica y clasificación de casos
 
 Generar entrada ordenada, invertida y aleatoria para una lista creciente de
 tamaños de `n`, medir comparaciones con `insertion_sort_instrumentado`,
@@ -213,7 +227,7 @@ que todos los elementos ya colocados — el `while` recorre hasta el
 principio en cada iteración, así que la curva es una parábola muy por
 encima de la recta (peor caso). La entrada aleatoria queda entre ambas.
 
-## Paso 4 — Volver al caso: extrapolar a 1.850.000 registros (Opcional)
+### Paso 4 — Volver al caso: extrapolar a 1.850.000 registros (Opcional)
 
 Cerrar la sesión devolviendo la medición al caso de la empresa. No se corre
 insertion sort con ese tamaño: se extrapola desde lo medido.

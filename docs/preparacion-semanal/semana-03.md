@@ -30,7 +30,7 @@ Ninguna sesión de la semana está marcada `★`.
 |---|---|---|---|
 | `analisis-de-algoritmos` | Lección teórica | `content/cursos/analisis-de-algoritmos/algoritmos-como-tecnologia.mdx` | ✅ |
 | `analisis-de-algoritmos` | Registro TS | `lib/courses/data/analisis-de-algoritmos.ts` (`order: 3`) | ✅ |
-| `analisis-de-algoritmos` | Apuntes de clase (sesión práctica completa, sin guía de estudiante — ver decisiones) | `content/cursos/analisis-de-algoritmos/apuntes/lab-03-insertion-sort.md` | Solo owner/admin |
+| `analisis-de-algoritmos` | Apuntes de clase (sesiones T + P unificadas — ver decisiones) | `content/cursos/analisis-de-algoritmos/apuntes/algoritmos-como-tecnologia.md` | Solo owner/admin |
 | `analisis-de-algoritmos` | Guía de laboratorio — estudiante | — | **No se creó** (sesión en vivo, ver decisiones) |
 | `analisis-de-algoritmos` | Ajuste de redacción, Laboratorio 02 (fuera de Semana 3) | `content/cursos/analisis-de-algoritmos/guias/lab-02-configuracion-del-entorno.md` | ✅ |
 | `analisis-de-algoritmos` | Fix de definición, "Buenas prácticas..." (fuera de Semana 3) | `content/cursos/analisis-de-algoritmos/buenas-practicas-y-entornos-python.mdx` | ✅ |
@@ -154,6 +154,17 @@ No aplica — ninguna sesión de la semana está marcada `★`.
   **Motivo:** hallazgo de `@reviewer` (la lección prometía un tema que no
   estaba escrito, sin ninguna nota visible para el estudiante). No se agregó
   el contenido faltante: se redujo la promesa a lo que existe.
+- **Apuntes de la sesión P (`apuntes/lab-03-insertion-sort.md`) reubicados a
+  `apuntes/algoritmos-como-tecnologia.md`, fusionados con la sesión T**
+  (2026-08-17, hallazgo del usuario tras el despliegue). La ruta `/apuntes`
+  resuelve por `articleSlug` contra la entrada en `lib/courses/data/<curso>.ts`;
+  al quitarse la entrada `kind: "guide"` del laboratorio (decisión anterior),
+  el archivo quedó con nombre huérfano — inalcanzable desde la UI, sin
+  ningún error visible. `algoritmos-como-tecnologia` sí tiene entrada TS
+  (la lección T), así que unificar ahí los apuntes de ambas sesiones los
+  hace accesibles en `/analisis-de-algoritmos/algoritmos-como-tecnologia/apuntes`.
+  La sesión T no necesitó apuntes propios: la lección `.mdx` ya trae el
+  código completo y comentado que se proyecta en clase.
 - **Correcciones de la pasada de `@reviewer`** aplicadas una por una con el
   usuario, sobre contenido ya publicado: apertura de `polimorfismo.mdx`
   corregida (ya no afirma que Herencia dejó `liquidarMes()` — ese método es
