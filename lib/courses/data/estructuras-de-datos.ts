@@ -232,6 +232,17 @@ export const estructurasDeDatos: Course = {
       ],
     },
     {
+      id: "lab-m1-diseno-oo-completo",
+      slug: "lab-m1-diseno-oo-completo",
+      articleSlug: "lab-m1-diseno-oo-completo",
+      kind: "guide",
+      order: 12.5,
+      title: "Laboratorio Evaluativo — Diseño OO Completo (Momento 1)",
+      summary:
+        "Diseñe el diagrama UML completo de las cuatro capas de su proyecto de aula e impleméntelo en Java con encapsulamiento, herencia y polimorfismo. Cierra el Momento evaluativo 1 (15 %).",
+      topics: [],
+    },
+    {
       id: "tipos-abstractos-de-datos-tad",
       slug: "tipos-abstractos-de-datos-tad",
       articleSlug: "tipos-abstractos-de-datos-tad",
