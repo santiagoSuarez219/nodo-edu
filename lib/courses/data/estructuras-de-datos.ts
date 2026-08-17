@@ -125,6 +125,8 @@ export const estructurasDeDatos: Course = {
       articleSlug: "metodos-avanzados-y-clases-de-utilidad",
       order: 6,
       title: "Métodos avanzados y clases de utilidad",
+      summary:
+        "Sobrecarga de métodos y atributos/métodos static, sobre la clase Cuenta del sistema bancario.",
       topics: [
         { title: "Sobrecarga de métodos (method overloading)" },
         { title: "Métodos y atributos estáticos (static)" },
@@ -137,6 +139,8 @@ export const estructurasDeDatos: Course = {
       articleSlug: "introduccion-al-uml",
       order: 7,
       title: "Introducción al UML",
+      summary:
+        "El diagrama de clases UML —nombre, atributos, métodos y visibilidad— para diseñar en papel una clase de dominio antes de escribirla en Java, con Cliente y Cuenta del proyecto de aula.",
       topics: [
         { title: "Para qué sirve el UML en el desarrollo de software" },
         { title: "Diagrama de clases: clase, atributos, métodos, visibilidad" },
