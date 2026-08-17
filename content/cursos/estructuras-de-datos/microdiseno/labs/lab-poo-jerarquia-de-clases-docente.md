@@ -22,7 +22,7 @@ Al salir del aula, cada estudiante debe poder:
 
 ## Conexión con la teoría
 
-La lección "Herencia" dejó la jerarquía `Cuenta → CuentaAhorros/CuentaCorriente` (dos niveles) y la lección "Polimorfismo" agregó la interfaz `Auditable` y la clase abstracta `Cuenta` con `calcularInteres()` abstracto. Esta sesión da el paso que ninguna de las dos lecciones dio todavía: **un tercer nivel** de herencia (un `ClienteVIP` que a su vez es un `Cliente`) y la prueba explícita del polimorfismo con un arreglo de referencias recorrido en un `for`.
+La lección "Herencia" dejó la jerarquía `Tarjeta → TarjetaDebito/TarjetaCredito` (dos niveles) y la lección "Polimorfismo" agregó la interfaz `Auditable` y la clase abstracta `Tarjeta` con `liquidarMes()` abstracto. Esta sesión da el paso que ninguna de las dos lecciones dio todavía: **un tercer nivel** de herencia (un `ClienteVIP` que a su vez es un `Cliente`) y la prueba explícita del polimorfismo con un arreglo de referencias recorrido en un `for`.
 
 Pregunta de apertura para el grupo: *"Si `ClienteVIP extends Cliente` y `Cliente extends Persona`, y las tres sobreescriben `generarResumen()`, ¿qué versión se ejecuta cuando la referencia declarada es `Reportable` pero el objeto real es un `ClienteVIP`?"* — la respuesta que deben poder justificar (no solo recordar) es "la de `ClienteVIP`, porque el binding es dinámico y mira el tipo real del objeto, no el tipo de la referencia".
 

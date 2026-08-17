@@ -154,7 +154,7 @@ export const estructurasDeDatos: Course = {
       order: 8,
       title: "Herencia",
       summary:
-        "Superclases y subclases con extends, atributos protected, super() en el constructor y sobreescritura de métodos con @Override, aplicados a Cuenta, CuentaAhorros y CuentaCorriente del proyecto de aula.",
+        "Superclases y subclases con extends, atributos protected, super() en el constructor y sobreescritura de métodos con @Override, aplicados a Tarjeta, TarjetaDebito y TarjetaCredito del proyecto de aula.",
       topics: [
         { title: "Superclase y subclase: keyword extends" },
         { title: "Reutilización de código mediante herencia" },
@@ -168,7 +168,7 @@ export const estructurasDeDatos: Course = {
       order: 9,
       title: "Polimorfismo",
       summary:
-        "Del if instanceof en cadena al binding dinámico: cómo cuentas distintas responden al mismo mensaje, y cuándo modelar el contrato con clase abstracta o con interfaz.",
+        "Del if instanceof en cadena al binding dinámico: cómo tarjetas distintas responden al mismo mensaje, y cuándo modelar el contrato con clase abstracta o con interfaz.",
       topics: [
         { title: "Polimorfismo en tiempo de ejecución (binding dinámico)" },
         { title: "Clases abstractas: keyword abstract" },
