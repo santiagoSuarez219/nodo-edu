@@ -173,8 +173,10 @@ Cada archivo de proyecto detalla la evaluación de viabilidad, las entidades del
 
 ### Semana 2 — Clases, objetos y encapsulamiento
 
-> *Excepción de estructura semanal: T1/T2/T3 en vez de T1/T2/P. El
-> laboratorio se desplaza a fecha por definir.*
+> *Excepción de estructura semanal: T1/T2/T3/T4/T5 en vez de T1/T2/P. Los
+> tres días de clase habituales (martes/jueves/viernes) solo alcanzan para
+> T1–T3; T4 y T5 son sesiones formales de la semana con fecha por definir,
+> igual que el laboratorio.*
 
 **T1 — Diagnóstico y sintaxis de Java**
 - Cuestionario diagnóstico de conocimientos previos (8 preguntas)
@@ -200,7 +202,15 @@ Cada archivo de proyecto detalla la evaluación de viabilidad, las entidades del
 - Verificar el comportamiento con casos de prueba
 - *Capas involucradas:* la clase modelada va en `model/domain/`; el menú de consola va en `view/`; se crea un stub vacío en `service/` y en `controller/`
 
-> **Trabajo independiente guiado:** métodos y atributos estáticos (`static`), sobrecarga de métodos, clase `String` y wrapper classes (`Integer`, `Double`). Se revisan en asesoría y se dan por vistos en el laboratorio de la semana 3.
+**T4 — Métodos avanzados y clases de utilidad** *(fecha por definir)*
+- Sobrecarga de métodos (*method overloading*)
+- Métodos y atributos estáticos (`static`)
+- Clase `String` y wrapper classes (`Integer`, `Double`)
+
+**T5 — Introducción al UML** *(fecha por definir)*
+- Para qué sirve el UML en el desarrollo de software
+- Diagrama de clases: clase, atributos, métodos, visibilidad
+- Lectura e interpretación de un diagrama de clases
 
 ### Semana 3 — Herencia y polimorfismo
 
