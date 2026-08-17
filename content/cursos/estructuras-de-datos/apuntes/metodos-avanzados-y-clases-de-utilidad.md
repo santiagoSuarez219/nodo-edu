@@ -1,8 +1,6 @@
 > Sesión T4, teórica pero con código en vivo sobre `Cuenta` del Sistema
-> Bancario — el mismo caso de referencia de Encapsulamiento. Cubre solo
-> sobrecarga y `static`: la mitad de `String`/wrapper classes de esta
-> lección todavía no está escrita, así que no hay apuntes de esa parte
-> todavía.
+> Bancario — el mismo caso de referencia de Encapsulamiento. Cubre
+> sobrecarga y `static`.
 
 ## Paso 1 — De dos métodos a uno sobrecargado
 

@@ -16,14 +16,16 @@ tarjetas[1] = new TarjetaCredito();
 for (Tarjeta tarjeta : tarjetas) {
     if (tarjeta instanceof TarjetaDebito) {
         TarjetaDebito td = (TarjetaDebito) tarjeta;
-        td.setSaldo(td.getSaldo() + td.getSaldo() * 0.02);   // cashback
+        td.saldo += td.saldo * 0.02;   // cashback
     } else if (tarjeta instanceof TarjetaCredito) {
         TarjetaCredito tc = (TarjetaCredito) tarjeta;
-        tc.setSaldo(tc.getSaldo() - 5000); // cuota de manejo
+        tc.saldo -= 5000; // cuota de manejo
     }
 }
 ```
 
+Punto a resaltar: `abonar()`/`pagar()` (de Herencia) no sirven aquí — el
+banco necesita algo nuevo para el cierre de mes, todavía sin método.
 Preguntar en voz alta: "¿qué hay que tocar si mañana aparece
 `TarjetaPrepago`?" antes de mostrar la solución polimórfica:
 

@@ -125,6 +125,51 @@ ni `ClienteVIP p` — el arreglo declarado con el tipo de la interfaz es la
 prueba de que ni la interfaz ni la clase abstracta necesitan conocer, en
 tiempo de compilación, qué subtipo concreto van a recorrer.
 
+## Diagrama de clases para la lectura guiada
+
+Proyectar este diagrama junto al código de los pasos anteriores. El
+objetivo es que el grupo aprenda a **leer** las partes marcadas, no a
+dibujarlo — construir un UML completo de las cuatro capas es contenido de
+la Semana 4.
+
+```mermaid
+classDiagram
+  class Reportable {
+    <<interface>>
+    +generarResumen() String
+  }
+  class Persona {
+    <<abstract>>
+    #nombre : String
+    #identificacion : String
+    +generarResumen() String
+  }
+  class Cliente {
+    #numeroCuenta : String
+    +generarResumen() String
+  }
+  class ClienteVIP {
+    -limiteCredito : double
+    +generarResumen() String
+  }
+  class ClienteRegular {
+    -numeroTransaccionesMes : int
+    +generarResumen() String
+  }
+  Reportable <|.. Persona
+  Persona <|-- Cliente
+  Cliente <|-- ClienteVIP
+  Cliente <|-- ClienteRegular
+```
+
+Guion de lectura, señalando cada elemento en orden:
+
+1. **`<<interface>>` sobre `Reportable`** — así se marca una interfaz en UML; no tiene atributos, solo la firma del método.
+2. **`<<abstract>>` sobre `Persona`** — clase que no se puede instanciar directamente.
+3. **Flecha punteada con triángulo hueco (`<|..`), de `Persona` a `Reportable`** — es **realización**: "`Persona` implementa el contrato de `Reportable`". Es la flecha que más se confunde con la de herencia — resaltar que es **punteada**.
+4. **Flechas sólidas con triángulo hueco (`<|--`)** — son **herencia**: `Cliente` extiende `Persona`, `ClienteVIP` y `ClienteRegular` extienden `Cliente`. Continua, no punteada.
+5. **Tres niveles en la misma cadena de flechas sólidas** — así se ve una jerarquía de tres niveles en UML: no hay notación especial, solo dos flechas de herencia encadenadas.
+
 ## Errores frecuentes y cómo intervenir
 
 | Síntoma observable | Causa probable | Intervención sugerida |
@@ -134,3 +179,10 @@ tiempo de compilación, qué subtipo concreto van a recorrer.
 | Casteos dentro del `for` que recorre el arreglo | El arreglo se declaró con un tipo demasiado específico (`Object[]` o el tipo concreto) | Cambiar el tipo del arreglo al de la interfaz o clase abstracta común |
 | `error: Cliente is not abstract and does not override abstract method` | Una clase concreta no implementó un método abstracto heredado | Revisar que todas las clases hoja tengan el método concreto |
 | El constructor de la subclase no compila o los atributos heredados quedan en `null`/`0` | Falta `super(...)` como primera línea del constructor, o el orden de argumentos es incorrecto | Volver al patrón de `super(...)` de la lección de Herencia |
+
+## Preguntas socráticas
+
+- *"¿Por qué `Persona` es `abstract` si ya tiene una implementación completa de `generarResumen()`?"* — Respuesta esperada: porque no tiene sentido instanciar "una persona genérica" en el dominio del banco; ser `abstract` no depende de tener métodos sin cuerpo, sino de si la clase representa un concepto completo por sí sola.
+- *"Si cambio el arreglo de `Reportable[]` a `Cliente[]`, ¿sigue compilando el mismo `for`? ¿Y si lo cambio a `Persona[]`?"* — Respuesta esperada: sí en ambos casos, porque `ClienteVIP` y `ClienteRegular` son también `Cliente` y también `Persona` — el polimorfismo funciona con cualquier tipo de referencia que sea ancestro común del objeto real.
+- *"¿Qué pasaría si `ClienteVIP` no sobreescribiera `generarResumen()`?"* — Respuesta esperada: se ejecutaría la versión heredada de `Cliente` (o de `Persona`, si `Cliente` tampoco la sobreescribiera) — no es un error, es exactamente cómo funciona la herencia cuando no hay sobreescritura.
+- *"¿Podría `Persona` implementar dos interfaces a la vez?"* — Respuesta esperada: sí, `implements InterfazA, InterfazB` — a diferencia de `extends`, que admite una sola superclase.

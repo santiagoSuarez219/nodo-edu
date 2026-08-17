@@ -1,5 +1,5 @@
 ---
-title: "Laboratorio — Jerarquía de clases y polimorfismo"
+title: "Laboratorio — Jerarquía de Clases de Tres Niveles y Polimorfismo"
 updatedAt: "2026-08-13"
 ---
 

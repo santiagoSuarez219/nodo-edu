@@ -7,7 +7,7 @@ updatedAt: "2026-08-07"
 
 ## Objetivo
 
-Configure el entorno de trabajo en Python que usará durante **todo el semestre**: un entorno virtual aislado, un archivo de dependencias reproducible, y las convenciones de estilo (PEP 8) que se esperan en cada uno de los codigos desarrollados en el curso. 
+Configure el entorno de trabajo en Python que usará durante **todo el semestre**: un entorno virtual aislado, un archivo de dependencias reproducible, y las convenciones de estilo (PEP 8) que se esperan en cada uno de los códigos desarrollados en el curso.
 
 Competencias esperadas:
 - Crear, activar y desactivar un entorno virtual con `venv`, y explicar por qué aislar las dependencias de un proyecto.
@@ -148,7 +148,7 @@ if __name__ == "__main__":
 
 ```
 curso-analisis-algoritmos/
-├── requirements.txt          
+├── requirements.txt
 └── ejercicios-clase/
     └── semana-02/
         ├── refactor_pep8.py
@@ -156,7 +156,16 @@ curso-analisis-algoritmos/
         └── README.md
 ```
 
-Realice **al menos tres commits** descriptivos documentando el proceso (por ejemplo: entorno virtual y `requirements.txt`; refactor PEP 8; ejercicio integrador) y haga `push` a su repositorio antes del plazo indicado.
+- `requirements.txt`: generado con `pip freeze`, según la Parte 2.
+- `refactor_pep8.py`: el script refactorizado de la Parte 3.
+- `clasificador_anios.py`: el ejercicio integrador de la Parte 4.
+- `README.md`: breve documento (5-10 líneas) que explique los comandos que
+  usó para crear y activar el entorno virtual, y cómo otra persona
+  reproduciría su entorno con `requirements.txt`.
+
+Realice **al menos tres commits** descriptivos documentando el proceso (por
+ejemplo: entorno virtual y `requirements.txt`; refactor PEP 8; ejercicio
+integrador) y haga `push` a su repositorio.
 
 ### Ejemplo de verificación
 
@@ -178,7 +187,7 @@ Cantidad de años bisiestos: 2 de 4
 
 ## Criterios de Evaluación
 
-Esta sesión hace parte de su nota de **seguimiento** y le servira para familiarizarse con el lenguaje de programacion y sus convenciones las cuales utilizaremos a lo largo del curso y haran parte de las notas de los eventos evaluativos. 
+Esta sesión hace parte de su nota de **seguimiento** y le servirá para familiarizarse con el lenguaje de programación y sus convenciones, las cuales usaremos a lo largo del curso y harán parte de las notas de los eventos evaluativos.
 
 | Criterio | Puntos | Descripción |
 |---|---|---|

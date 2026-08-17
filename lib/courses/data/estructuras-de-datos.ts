@@ -130,7 +130,6 @@ export const estructurasDeDatos: Course = {
       topics: [
         { title: "Sobrecarga de métodos (method overloading)" },
         { title: "Métodos y atributos estáticos (static)" },
-        { title: "Clase String y wrapper classes" },
       ],
     },
     {
@@ -182,6 +181,8 @@ export const estructurasDeDatos: Course = {
       kind: "guide",
       order: 9.5,
       title: "Laboratorio — Jerarquía de Clases de Tres Niveles y Polimorfismo",
+      summary:
+        "Extienda una jerarquía de dos niveles a tres, defina una interfaz simple, y demuestre binding dinámico con un arreglo de referencias, sobre el caso de estudio de su proyecto de aula.",
       topics: [],
     },
     {

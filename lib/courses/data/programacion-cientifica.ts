@@ -74,6 +74,8 @@ export const programacionCientifica: Course = {
       kind: "guide",
       order: 3.5,
       title: "Taller de condicionales y bucles",
+      summary:
+        "Diez ejercicios que retoman el inventario, las temperaturas, la factura y la ferretería del taller anterior, ahora decidiendo con if/elif/else y repitiendo con for, while, break y continue.",
       topics: [],
     },
     {

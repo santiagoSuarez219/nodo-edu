@@ -11,26 +11,28 @@ presentation: true
 slides_hint: "Cada sección ## es una diapositiva. Presentación sincrona."
 date: "2026-08-13"
 author: "Asistente de Docencia"
-summary: ""
+summary: "Del if instanceof en cadena al binding dinámico: cómo tarjetas distintas responden al mismo mensaje, y cuándo modelar el contrato con clase abstracta o con interfaz."
 updatedAt: "2026-08-17"
 ---
 
 ## El problema: preguntarle a cada tarjeta qué tipo es
 
 En la lección de Herencia dejaste `TarjetaDebito` y `TarjetaCredito`
-extendiendo de `Tarjeta`, cada una con su propia forma de sobreescribir
-`liquidarMes()`. Llega el cierre de mes y el banco necesita liquidar
-**todas** las tarjetas, guardadas juntas en un mismo `Tarjeta[]`. La primera
-idea, sin pensarlo mucho, es preguntar tipo por tipo:
+extendiendo de `Tarjeta`, cada una sobreescribiendo `abonar()`/`pagar()` a su
+manera. Llega el cierre de mes y el banco necesita hacer algo nuevo con cada
+tarjeta —acreditar cashback a las de débito, cobrar cuota de manejo a las de
+crédito—, guardadas juntas en un mismo `Tarjeta[]`. Todavía no existe un
+método para eso, así que la primera idea, sin pensarlo mucho, es preguntar
+tipo por tipo y resolverlo ahí mismo:
 
 ```java
 for (Tarjeta tarjeta : tarjetas) {
     if (tarjeta instanceof TarjetaDebito) {
         TarjetaDebito td = (TarjetaDebito) tarjeta;
-        td.setSaldo(td.getSaldo() + td.getSaldo() * 0.02);   // cashback
+        td.saldo += td.saldo * 0.02;   // cashback
     } else if (tarjeta instanceof TarjetaCredito) {
         TarjetaCredito tc = (TarjetaCredito) tarjeta;
-        tc.setSaldo(tc.getSaldo() - 5000); // cuota de manejo
+        tc.saldo -= 5000; // cuota de manejo
     }
 }
 ```
@@ -42,7 +44,7 @@ nada avise del error.
 
 ```mermaid
 flowchart TB
-  A["tarjeta.liquidarMes()"] --> B{"instanceof TarjetaDebito?"}
+  A["Cierre de mes de una tarjeta"] --> B{"instanceof TarjetaDebito?"}
   B -->|"si"| C["cast + logica debito"]
   B -->|"no"| D{"instanceof TarjetaCredito?"}
   D -->|"si"| E["cast + logica credito"]
@@ -53,8 +55,12 @@ flowchart TB
 
 ## La solución: polimorfismo en tiempo de ejecución
 
-En vez de preguntar el tipo, cada tarjeta responde al mismo mensaje con su
-propio comportamiento:
+La solución ideal sería que cada tarjeta supiera liquidar su propio mes
+—sin que el código que recorre el arreglo tenga que preguntarle el tipo—
+con un mismo mensaje, `liquidarMes()`. Todavía no existe ese método; lo vas
+a construir en un momento. Primero, mira cómo se vería usarlo: en vez de
+preguntar el tipo, cada tarjeta respondería al mismo mensaje con su propio
+comportamiento:
 
 ```java
 for (Tarjeta tarjeta : tarjetas) {
@@ -104,7 +110,7 @@ cada subclase tenga que reescribirlo.
 classDiagram
   class Tarjeta {
     <<abstract>>
-    #double saldo
+    #saldo : double
     +consultarSaldo() double
     +liquidarMes()* void
   }
@@ -125,7 +131,7 @@ classDiagram
 ## Interfaces en Java: el contrato puro
 
 **En la práctica**, una `interface` declara un contrato sin ningún estado ni
-implementación propia , y **cualquier clase** puede `implements`-arla sin
+implementación propia, y **cualquier clase** puede `implements`-arla sin
 importar su jerarquía de herencia:
 
 ```java

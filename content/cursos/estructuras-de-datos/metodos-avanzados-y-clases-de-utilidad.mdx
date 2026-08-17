@@ -11,7 +11,7 @@ presentation: true
 slides_hint: "Cada sección ## es una diapositiva. Presentación sincrona."
 date: "2026-08-16"
 author: "Asistente de Docencia"
-summary: "Sobrecarga de métodos, atributos y métodos static, y la diferencia entre == y equals en String e Integer, sobre la clase Cuenta del sistema bancario."
+summary: "Sobrecarga de métodos y atributos/métodos static, sobre la clase Cuenta del sistema bancario."
 updatedAt: "2026-08-16"
 ---
 
@@ -135,12 +135,12 @@ leer `saldo` ni `numeroCuenta` de ninguna cuenta en particular.
 ```mermaid
 classDiagram
   class Cuenta {
-    -int totalCuentasCreadas$
-    +getTotalCuentasCreadas()$ int
-    -generarNumeroDeCuenta()$ String
-    -String numeroCuenta
-    -double saldo
-    +depositar(double monto) void
+    -totalCuentasCreadas : int$
+    +getTotalCuentasCreadas() int$
+    -generarNumeroDeCuenta() String$
+    -numeroCuenta : String
+    -saldo : double
+    +depositar(monto: double) void
     +getSaldo() double
   }
 ```
