@@ -78,6 +78,19 @@ Ninguna sesión de la semana está marcada `★`.
 
 **Las 6 lecciones teóricas de la semana (incluidas T4/T5 de Semana 2) ya tienen su cuestionario de cierre completo.**
 
+> **Replicadas a producción (2026-08-17)**, vía `question-bank-mcp-prod`: las
+> 26 preguntas se crearon con el mismo contenido, se publicaron y se montaron
+> en el mismo orden que en desarrollo, verificado con `list_lesson_questions`
+> contra producción. Las 12 keywords nuevas del catálogo (`modelado-de-problemas`,
+> `algoritmos`, `insertion-sort`, `invariante-de-ciclo`, `impacto-social`, `uml`,
+> `diagrama-de-clases`, `miembros-estaticos-static`, `constructores`,
+> `clases-abstractas`, `atributos`, `clases`) también se crearon en producción
+> antes de crear las preguntas. `herencia`, `polimorfismo` y
+> `condicionales-y-bucles` tenían preguntas preexistentes sin publicar
+> (ejercicios de código del banco anterior a esta semana) — quedaron
+> mezcladas en `list_lesson_questions` pero no afectan la autoevaluación del
+> estudiante porque `is_published: false`.
+
 Keywords nuevas creadas en el catálogo compartido:
 `modelado-de-problemas`, `algoritmos`, `ordenamiento`, `insertion-sort`,
 `invariante-de-ciclo`, `impacto-social` (AA); `uml`, `diagrama-de-clases`
