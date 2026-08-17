@@ -68,6 +68,15 @@ export const programacionCientifica: Course = {
       ],
     },
     {
+      id: "condicionales-y-bucles-lab",
+      slug: "condicionales-y-bucles-lab",
+      articleSlug: "condicionales-y-bucles-lab",
+      kind: "guide",
+      order: 3.5,
+      title: "Taller de condicionales y bucles",
+      topics: [],
+    },
+    {
       id: "estructuras-de-datos-nativas",
       slug: "estructuras-de-datos-nativas",
       articleSlug: "estructuras-de-datos-nativas",

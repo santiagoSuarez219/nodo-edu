@@ -276,28 +276,6 @@ Anidar más de dos o tres niveles suele ser señal de que conviene reordenar la 
 
 > Si ya programaste en otro lenguaje (Java, C, JavaScript), la diferencia clave es esta: ahí las llaves `{ }` delimitan el bloque y la indentación es solo cosmética; en Python, la indentación **es** el delimitador. No hay llaves que salven una sangría inconsistente.
 
-## Resumen operativo
-
-| Elemento | Sintaxis mínima | Para qué sirve |
-|---|---|---|
-| Condicional simple | `if condicion:` | Ejecuta un bloque solo si la condición es `True` |
-| Dos caminos | `if condicion:` / `else:` | Un camino si es `True`, el otro si es `False` |
-| Más de dos caminos | `if:` / `elif condicion:` / `else:` | Ejecuta como máximo un bloque de la cadena |
-| Repetir un número conocido de veces | `for i in range(n):` | Recorre `0, 1, …, n-1` |
-| Repetir mientras algo sea cierto | `while condicion:` | Repite hasta que la condición sea `False` |
-| Salir del bucle | `break` | Corta el bucle por completo, sin terminar las vueltas restantes |
-| Saltar una vuelta | `continue` | Salta el resto de la vuelta actual, sigue con la siguiente |
-
-## Practica tú mismo
-
-Antes de seguir a la próxima lección, resuelve estos tres ejercicios en un notebook de Colab. Están ordenados de menor a mayor dificultad — si ya tienes experiencia previa, avanza directo al que te rete de verdad.
-
-**1. Validar disponibilidad (básico).** Dada la variable `cantidad_en_stock = 4`, escribe un `if`/`else` que imprima `"Disponible"` si la cantidad es mayor que cero, o `"Agotado"` en caso contrario. Prueba tu código cambiando el valor de `cantidad_en_stock` a `0` y confirma que el mensaje cambia.
-
-**2. Clasificar por rango de precio (intermedio).** Tienes `precio = 45000` y `disponible = True`. Clasifica el producto con `elif` anidado en cuatro categorías: si `disponible` es `False`, imprime `"No disponible"` sin evaluar nada más; si está disponible, clasifica el precio en `"Económico"` (menor a 20000), `"Medio"` (entre 20000 y 50000) o `"Premium"` (mayor a 50000). Prueba con al menos tres combinaciones distintas de `precio` y `disponible`.
-
-**3. Contar productos agotados (con bucle).** Dada la lista `inventario = [5, 0, 3, 0, 0, 8, 2]`, usa un `for` para recorrerla y contar cuántas posiciones tienen `0` unidades, guardando el total en una variable `productos_agotados`. Luego, usando `continue`, calcula también la suma de las unidades de los productos que **sí** tienen stock, sin sumar los agotados. Imprime ambos resultados al final.
-
 ## Síntesis
 
 - El problema de entrada —tener un `True`/`False` pero no poder actuar sobre él— se resuelve con `if`: ejecuta un bloque solo cuando la condición se cumple.
