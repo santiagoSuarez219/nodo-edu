@@ -2,7 +2,7 @@
 
 **Preparada el:** 2026-08-16 (actualizada el 2026-08-17)
 **Rama:** `feat/semana-03-material`
-**Estado:** ⬜ En preparación (contenido y los 6 cuestionarios de cierre listos; pasada de `@reviewer` completa, hallazgos corregidos) · ⬜ Mergeada a `development` · ⬜ Desplegada y abierta
+**Estado:** ✅ En preparación (contenido y los 6 cuestionarios de cierre listos; pasada de `@reviewer` completa, hallazgos corregidos) · ✅ Mergeada a `development` · ✅ Desplegada y abierta
 
 > Esta rama excede el nombre "Semana 3": también agrega dos sesiones nuevas
 > a la Semana 2 de Estructuras de Datos (`metodos-avanzados-y-clases-de-utilidad`
@@ -180,10 +180,28 @@ No aplica — ninguna sesión de la semana está marcada `★`.
 
 ## Despliegue y apertura
 
-- **Merge a `development`:** pendiente
-- **Deploy a producción:** pendiente
-- **Lecciones abiertas:** ninguna todavía (no se ha llegado a F7)
-- [ ] Verificado que las lecciones de semanas futuras siguen cerradas — no aplica aún
+- **Merge a `development`:** ✅ completo (todos los commits de esta rama ya
+  estaban en `development` antes de este cierre)
+- **Deploy a producción:** ✅ `deploy/2026-08-17` → `main` (commit `8b3cdf9`),
+  push a `origin/main` el 2026-08-17. Conflicto de merge en
+  `practica-clases-y-objetos-proyecto-de-aula.mdx` (un commit `70997f5` había
+  llegado a `main` sin pasar por `development`) resuelto tomando la versión
+  de `development` — superset sin pérdida de contenido, confirmado con
+  usuario.
+- **Preguntas del banco replicadas a producción:** ✅ 2026-08-17, ver nota en
+  "Evaluaciones creadas" arriba.
+- **Lecciones abiertas (2026-08-17, vía `courses-mcp-prod`):**
+  `analisis-de-algoritmos/algoritmos-como-tecnologia`,
+  `estructuras-de-datos/metodos-avanzados-y-clases-de-utilidad`,
+  `estructuras-de-datos/introduccion-al-uml`, `estructuras-de-datos/herencia`,
+  `estructuras-de-datos/polimorfismo`,
+  `programacion-cientifica/condicionales-y-bucles`. Las guías
+  `lab-poo-jerarquia-de-clases` y `condicionales-y-bucles-lab` ya estaban
+  abiertas de antes.
+- [x] Verificado que las lecciones de semanas futuras siguen cerradas
+  (`analisis-de-algoritmos-y-divide-y-venceras`,
+  `composicion-agregacion-y-diagramas-de-paquetes`,
+  `estructuras-de-datos-nativas`, etc. — no se tocaron)
 
 ## Pendientes para la semana siguiente
 
