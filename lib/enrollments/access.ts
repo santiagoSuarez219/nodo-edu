@@ -6,7 +6,7 @@ import { getEnrollmentsByStudent } from "./index";
 
 export type CourseAccess =
   | { ok: true; reason: "enrolled" | "owner" | "admin" }
-  | { ok: false; reason: "unauthenticated" | "not-enrolled" | "no-course" };
+  | { ok: false; reason: "unauthenticated" | "not-enrolled" | "no-course" | "unavailable" };
 
 export const hasCourseAccess = cache(async (courseSlug: string): Promise<CourseAccess> => {
   const user = await getCurrentUser();
@@ -18,13 +18,19 @@ export const hasCourseAccess = cache(async (courseSlug: string): Promise<CourseA
   const supabase = await createServerSupabaseClient();
 
   // Check if user is admin
-  const { data: adminRole } = await supabase
+  const { data: adminRole, error: adminRoleError } = await supabase
     .from("user_roles")
     .select("role")
     .eq("user_id", user.id)
     .eq("role", "admin")
     .maybeSingle();
 
+  // spec-050 (D5): antes esto descartaba `error` — un fallo de lectura de
+  // Postgres/RLS con Auth sano caía derecho a las comprobaciones de abajo, y
+  // terminaba reportando "not-enrolled" a un admin/docente legítimo.
+  if (adminRoleError) {
+    return { ok: false, reason: "unavailable" };
+  }
   if (adminRole) {
     return { ok: true, reason: "admin" };
   }
@@ -34,18 +40,26 @@ export const hasCourseAccess = cache(async (courseSlug: string): Promise<CourseA
   // ver spec-031) — .maybeSingle() falla con más de una fila (PGRST116) y
   // dejaba al docente sin acceso, así que solo comprobamos que exista al
   // menos una.
-  const { data: ownedCourses } = await supabase
+  const { data: ownedCourses, error: ownedCoursesError } = await supabase
     .from("academic_courses")
     .select("id")
     .eq("course_slug", courseSlug)
     .eq("teacher_id", user.id)
     .limit(1);
 
+  if (ownedCoursesError) {
+    return { ok: false, reason: "unavailable" };
+  }
   if (ownedCourses && ownedCourses.length > 0) {
     return { ok: true, reason: "owner" };
   }
 
-  // Check if user has an active enrollment in the course
+  // DEBT-040 (residual, fuera del alcance de spec-050): getEnrollmentsByStudent
+  // (lib/enrollments/index.ts) sigue descartando `error` y degradando a `[]`
+  // ante un fallo de lectura — indistinguible de "sin matrículas". Las dos
+  // comprobaciones de arriba (admin, dueño del curso) sí quedan cubiertas por
+  // este spec, que es lo que pide el criterio 6; corregir también esta
+  // función queda para el resto de DEBT-040.
   const enrollments = await getEnrollmentsByStudent();
   const activeEnrollment = enrollments.find(
     (e) => e.academic_course?.course_slug === courseSlug && e.status === "active"
@@ -66,6 +80,12 @@ export async function requireCourseAccess(
 
   if (access.ok) {
     return;
+  }
+
+  // D5: reutiliza /servicio-no-disponible de spec-046 en vez de inventar una
+  // página nueva — mismo destino que requireUser() en lib/auth/session.ts.
+  if (access.reason === "unavailable") {
+    redirect(`/servicio-no-disponible?from=${encodeURIComponent(currentPath)}`);
   }
 
   if (access.reason === "unauthenticated") {

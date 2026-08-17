@@ -138,10 +138,11 @@ export const estructurasDeDatos: Course = {
       articleSlug: "metodos-avanzados-y-clases-de-utilidad",
       order: 6,
       title: "Métodos avanzados y clases de utilidad",
+      summary:
+        "Sobrecarga de métodos y atributos/métodos static, sobre la clase Cuenta del sistema bancario.",
       topics: [
         { title: "Sobrecarga de métodos (method overloading)" },
         { title: "Métodos y atributos estáticos (static)" },
-        { title: "Clase String y wrapper classes" },
       ],
     },
     {
@@ -150,6 +151,8 @@ export const estructurasDeDatos: Course = {
       articleSlug: "introduccion-al-uml",
       order: 7,
       title: "Introducción al UML",
+      summary:
+        "El diagrama de clases UML —nombre, atributos, métodos y visibilidad— para diseñar en papel una clase de dominio antes de escribirla en Java, con Cliente y Cuenta del proyecto de aula.",
       topics: [
         { title: "Para qué sirve el UML en el desarrollo de software" },
         { title: "Diagrama de clases: clase, atributos, métodos, visibilidad" },
@@ -162,6 +165,8 @@ export const estructurasDeDatos: Course = {
       articleSlug: "herencia",
       order: 8,
       title: "Herencia",
+      summary:
+        "Superclases y subclases con extends, atributos protected, super() en el constructor y sobreescritura de métodos con @Override, aplicados a Tarjeta, TarjetaDebito y TarjetaCredito del proyecto de aula.",
       topics: [
         { title: "Superclase y subclase: keyword extends" },
         { title: "Reutilización de código mediante herencia" },
@@ -174,11 +179,24 @@ export const estructurasDeDatos: Course = {
       articleSlug: "polimorfismo",
       order: 9,
       title: "Polimorfismo",
+      summary:
+        "Del if instanceof en cadena al binding dinámico: cómo tarjetas distintas responden al mismo mensaje, y cuándo modelar el contrato con clase abstracta o con interfaz.",
       topics: [
         { title: "Polimorfismo en tiempo de ejecución (binding dinámico)" },
         { title: "Clases abstractas: keyword abstract" },
         { title: "Interfaces en Java: interface, implements" },
       ],
+    },
+    {
+      id: "lab-poo-jerarquia-de-clases",
+      slug: "lab-poo-jerarquia-de-clases",
+      articleSlug: "lab-poo-jerarquia-de-clases",
+      kind: "guide",
+      order: 9.5,
+      title: "Laboratorio — Jerarquía de Clases de Tres Niveles y Polimorfismo",
+      summary:
+        "Extienda una jerarquía de dos niveles a tres, defina una interfaz simple, y demuestre binding dinámico con un arreglo de referencias, sobre el caso de estudio de su proyecto de aula.",
+      topics: [],
     },
     {
       id: "lab-01-listas-enlazadas",

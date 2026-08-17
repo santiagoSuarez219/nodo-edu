@@ -76,8 +76,15 @@ export const analisisDeAlgoritmos: Course = {
       articleSlug: "algoritmos-como-tecnologia",
       order: 3,
       title: "Algoritmos como tecnología",
+      summary:
+        "De una empresa que no alcanza a cerrar la noche a un problema con forma matemática: cómo se modela una situación organizacional, qué es un algoritmo, por qué su eficiencia se mide también en energía y en personas, y cómo insertion sort se demuestra correcto con una invariante de ciclo.",
       topics: [
+        {
+          title:
+            "De un requisito de negocio a un problema computacional: entradas, salidas, restricciones y operación crítica",
+        },
         { title: "Qué es un algoritmo; por qué importa la eficiencia además de la corrección" },
+        { title: "Impacto de la decisión algorítmica: consumo energético y consecuencias sobre las personas" },
         { title: "Insertion sort: descripción del algoritmo y su invariante de ciclo" },
         {
           title:

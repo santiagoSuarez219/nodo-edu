@@ -1,4 +1,5 @@
 import { withdrawStudentAction } from "@/lib/enrollments/actions";
+import { ResetPasswordButton } from "./ResetPasswordButton";
 import type { EnrollmentWithStudent } from "@/lib/enrollments/types";
 
 interface Props {
@@ -82,14 +83,21 @@ export function EnrollmentTable({ enrollments, academicCourseId }: Props) {
                         {gradeDisplay(enrollment.total_grade)}
                       </td>
                       <td className="px-5 py-4 text-right">
-                        <form action={withdrawAction}>
-                          <button
-                            type="submit"
-                            className="text-sm font-medium text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 hover:underline transition-colors"
-                          >
-                            Retirar
-                          </button>
-                        </form>
+                        <div className="flex items-center justify-end gap-4">
+                          <ResetPasswordButton
+                            studentId={enrollment.student_id}
+                            studentName={enrollment.profile.full_name}
+                            academicCourseId={academicCourseId}
+                          />
+                          <form action={withdrawAction}>
+                            <button
+                              type="submit"
+                              className="text-sm font-medium text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 hover:underline transition-colors"
+                            >
+                              Retirar
+                            </button>
+                          </form>
+                        </div>
                       </td>
                     </tr>
                   );

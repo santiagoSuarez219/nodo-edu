@@ -78,6 +78,30 @@ una diapositiva, es dos secciones.
 - Ningún `$` sin escapar en prosa (`remark-math` está activo y lo interpretará
   como fórmula). En Análisis de Algoritmos sí usa `$...$` deliberadamente para
   recurrencias y cotas.
+- **En `analisis-de-algoritmos`, desde la Semana 3, todo código Python debe
+  seguir PEP 8 + *type hints* en parámetros y retorno + docstring Google-style
+  (`Args:`/`Returns:`) en cada función** — el estándar que la propia lección de
+  la Semana 2 (`buenas-practicas-y-entornos-python.mdx`) ya le predicó al
+  estudiante. No repitas el bloque "estilo a evitar" de esa lección ni omitas
+  hints/docstrings por brevedad: el código de ejemplo del curso tiene que
+  cumplir lo que el curso mismo enseñó.
+- **En `analisis-de-algoritmos`, desde la Semana 3, ancla la lección al caso de
+  estudio transversal del curso** — el *Sistema de consolidación diaria de
+  lecturas de telemedición*, en
+  `content/cursos/analisis-de-algoritmos/microdiseno/projects/caso-evaluacion-ra-2026-2.md`.
+  Léelo antes de escribir. La lección abre con una operación del caso, la modela
+  y de ahí saca el problema computacional que va a resolver. **Preséntalo como
+  contexto narrativo, nunca como trabajo calificable:** el caso está en estado
+  PROPUESTA hasta la reunión institucional del 19 de agosto de 2026.
+- **Dos hilos transversales de ese mismo curso, también desde la Semana 3:**
+  - **Modelado** — una sección temprana que traduzca la situación organizacional
+    a entradas, salidas, restricciones y operación crítica. Va antes de la
+    teoría, porque es lo que la motiva.
+  - **Ética e impacto** — el costo energético del algoritmo (tiempo de ejecución
+    × potencia del servidor, proyectado a un año) y quién asume el costo cuando
+    el algoritmo se equivoca sobre datos de personas. **Siempre con cifras
+    calculables**, nunca como reflexión genérica: si el estudiante no puede
+    verificarlo con un número, está mal planteado.
 - Solo `Callout`, `Tabs`, `Tab`, `YouTubeEmbed` como JSX. Cualquier otro nombre
   rompe el render de la página. Para definiciones, el blockquote es el patrón
   por defecto.

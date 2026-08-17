@@ -81,6 +81,9 @@ export function SelfAssessmentSection({
         already_submitted:
           'Ya enviaste esta autoevaluación. Solo se permite un intento porque hace parte de tu nota del curso.',
         error: 'Ocurrió un error al enviar. Intenta de nuevo.',
+        // spec-050: distinto de not_enrolled — no se pudo verificar tu
+        // matrícula (infraestructura), no es que no estés matriculado.
+        unavailable: 'No pudimos verificar tu matrícula. Intenta de nuevo en un momento.',
       };
       setAwaitingConfirmation(false);
       setSubmitError(errorMessages[result.reason] || 'Error desconocido');

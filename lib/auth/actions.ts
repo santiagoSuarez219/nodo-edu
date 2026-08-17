@@ -3,8 +3,12 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
+import { createClient } from "@supabase/supabase-js";
 import { createServerSupabaseClient } from "./server";
-import { SignInSchema, SignUpSchema } from "./schemas";
+import { SignInSchema, SignUpSchema, ChangePasswordSchema } from "./schemas";
+import { getCurrentUser } from "./session";
+import { clearMustChangePasswordFlag } from "./service";
+import { isAuthErrorLike } from "./errors";
 import type { AuthResult } from "./types";
 import {
   resolveCourseForRegistration,
@@ -183,4 +187,148 @@ export async function signOut(): Promise<void> {
   await supabase.auth.signOut();
   revalidatePath("/", "layout");
   redirect("/");
+}
+
+type PasswordVerification =
+  | { ok: true }
+  | { ok: false; reason: "incorrect" | "unavailable" };
+
+// spec-051 (D2/D4): verifica la contraseña actual con un cliente que NO
+// persiste sesión — sin el adaptador de cookies de @supabase/ssr. Llamar
+// signInWithPassword() sobre el cliente normal de servidor (createServerSupabaseClient)
+// emitiría una sesión nueva y reescribiría las cookies de la request,
+// desplazando la sesión en curso. Este cliente vive solo en memoria, para
+// esta única llamada, y nunca toca las cookies de Next.
+async function verifyCurrentPassword(
+  email: string,
+  password: string
+): Promise<PasswordVerification> {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+
+  if (!supabaseUrl || !supabaseKey) {
+    console.error(
+      "[auth] changePassword: faltan NEXT_PUBLIC_SUPABASE_URL o NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY"
+    );
+    return { ok: false, reason: "unavailable" };
+  }
+
+  const throwaway = createClient(supabaseUrl, supabaseKey, {
+    auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+  });
+
+  // DEBT: signInWithPassword emite una sesión/refresh token real en GoTrue
+  // que nadie cierra explícitamente aquí. En el camino feliz queda barrida
+  // por el signOut({scope:'others'}) posterior de changePassword, pero si
+  // updateUser falla justo después de una verificación EXITOSA, esa sesión
+  // huérfana sobrevive hasta expirar por sí sola. Impacto bajo hoy; anotado
+  // por la segunda revisión de código de spec-051 (2026-08-16) como
+  // candidato a `throwaway.auth.signOut()` en un `finally` si el volumen de
+  // cambios de contraseña crece. Ver docs/specs/backlog.md.
+  const { error } = await throwaway.auth.signInWithPassword({ email, password });
+  if (!error) return { ok: true };
+
+  // Mismo criterio de clasificación que lib/auth/errors.ts: fallo de red o
+  // 5xx del propio servidor de Auth es infraestructura; un 4xx (incluida
+  // "Invalid login credentials") es la contraseña actual, que sí es
+  // incorrecta. No se reutiliza classifyAuthError() directamente porque su
+  // resultado (anonymous/unavailable) no distingue "credencial incorrecta" —
+  // aquí sí hace falta esa tercera rama.
+  //
+  // Revisión de código (2026-08-16, @reviewer): 429 quedaba dentro del "todo
+  // lo demás es incorrecta" — GoTrue limita los intentos de
+  // signInWithPassword, y este verificador consume esa misma cuota en cada
+  // cambio de contraseña. Sin este caso aparte, un 429 se reportaba como
+  // "La contraseña actual no es correcta" siendo falso: la contraseña era
+  // correcta, solo se agotó el límite de intentos. Se clasifica como
+  // infraestructura para que D9 no mienta.
+  if (!isAuthErrorLike(error)) return { ok: false, reason: "unavailable" };
+  if (error.name === "AuthRetryableFetchError") return { ok: false, reason: "unavailable" };
+  if (typeof error.status === "number" && (error.status >= 500 || error.status === 429)) {
+    return { ok: false, reason: "unavailable" };
+  }
+  return { ok: false, reason: "incorrect" };
+}
+
+const INFRA_ERROR_MESSAGE =
+  "No se pudo verificar tu contraseña en este momento. Intenta de nuevo en unos minutos.";
+
+// Cambio con sesión activa (spec-051, Fase 2) — cubre tanto el cambio
+// voluntario desde /cuenta como el cambio forzado desde /cambiar-contrasena
+// (Fase 4): ambos usan el mismo ChangePasswordSchema y esta misma acción.
+// spec-051 (revisión de código, 2026-08-16): `flagCleared` deja que el
+// llamador (ChangePasswordForm) distinga un cambio completamente exitoso de
+// uno donde la contraseña sí cambió pero la marca `must_change_password` no
+// se pudo limpiar — sin este dato, ese segundo caso se veía idéntico al
+// primero y el usuario quedaba encerrado en /cambiar-contrasena sin saber
+// por qué.
+export type ChangePasswordResult = AuthResult<{ flagCleared: boolean }>;
+
+export async function changePassword(
+  _prev: ChangePasswordResult,
+  formData: FormData
+): Promise<ChangePasswordResult> {
+  // Mismo patrón que updateAccountAction (lib/students/actions.ts): usa
+  // getCurrentUser(), no requireUser(). Colapsa "sin sesión" y "no se pudo
+  // verificar" en el mismo mensaje genérico — gap ya documentado en
+  // DEBT-040/lib/auth/session.ts, no exclusivo de esta acción.
+  const user = await getCurrentUser();
+  if (!user || !user.email) {
+    return { ok: false, error: "No autenticado." };
+  }
+
+  const parsed = ChangePasswordSchema.safeParse({
+    current_password: formData.get("current_password"),
+    new_password: formData.get("new_password"),
+    new_password_confirmation: formData.get("new_password_confirmation"),
+  });
+
+  if (!parsed.success) {
+    return {
+      ok: false,
+      error: "Revisa los campos del formulario.",
+      fieldErrors: parsed.error.flatten().fieldErrors as Record<string, string[]>,
+    };
+  }
+
+  const verification = await verifyCurrentPassword(user.email, parsed.data.current_password);
+  if (!verification.ok) {
+    if (verification.reason === "unavailable") {
+      return { ok: false, error: INFRA_ERROR_MESSAGE };
+    }
+    return {
+      ok: false,
+      error: "La contraseña actual no es correcta.",
+      fieldErrors: { current_password: ["La contraseña actual no es correcta."] },
+    };
+  }
+
+  // Cliente con la sesión real (cookies) para el cambio en sí: la identidad
+  // ya quedó demostrada por verifyCurrentPassword(), así que aquí no hay
+  // riesgo de desplazar nada — es la misma sesión que se conserva (D8).
+  const supabase = await createServerSupabaseClient();
+  const { error: updateError } = await supabase.auth.updateUser({
+    password: parsed.data.new_password,
+  });
+
+  // D9: nunca reportar éxito sin verificar `error`.
+  if (updateError) {
+    console.error("changePassword: updateUser falló:", updateError.message);
+    return { ok: false, error: INFRA_ERROR_MESSAGE };
+  }
+
+  const flagCleared = await clearMustChangePasswordFlag(user.id, user.app_metadata);
+
+  // D8: se cierran las demás sesiones, se conserva la propia — 'others' deja
+  // viva exactamente la sesión desde la que se hizo el cambio.
+  const { error: signOutError } = await supabase.auth.signOut({ scope: "others" });
+  if (signOutError) {
+    // El cambio de contraseña ya ocurrió (lo de arriba es lo que importa);
+    // no cerrar las otras sesiones es una degradación, no un fallo del
+    // cambio en sí. Se registra y se sigue reportando éxito.
+    console.error("changePassword: no se pudieron cerrar las otras sesiones:", signOutError.message);
+  }
+
+  revalidatePath("/cuenta");
+  return { ok: true, data: { flagCleared } };
 }

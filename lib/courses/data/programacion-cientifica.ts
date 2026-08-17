@@ -58,12 +58,25 @@ export const programacionCientifica: Course = {
       articleSlug: "condicionales-y-bucles",
       order: 3,
       title: "Condicionales y bucles",
+      summary:
+        "Convierte un True/False en una decisión con if, elif y else, y repite lógica sobre un inventario completo con for, range() y while, incluyendo break y continue.",
       topics: [
         { title: "Estructuras condicionales: if, elif, else" },
         { title: "Bucles: for, while; uso de range()" },
         { title: "Control de flujo: break, continue" },
         { title: "Buenas prácticas: legibilidad e indentación en Python" },
       ],
+    },
+    {
+      id: "condicionales-y-bucles-lab",
+      slug: "condicionales-y-bucles-lab",
+      articleSlug: "condicionales-y-bucles-lab",
+      kind: "guide",
+      order: 3.5,
+      title: "Taller de condicionales y bucles",
+      summary:
+        "Diez ejercicios que retoman el inventario, las temperaturas, la factura y la ferretería del taller anterior, ahora decidiendo con if/elif/else y repitiendo con for, while, break y continue.",
+      topics: [],
     },
     {
       id: "estructuras-de-datos-nativas",
