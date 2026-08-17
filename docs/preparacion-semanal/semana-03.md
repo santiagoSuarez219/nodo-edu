@@ -2,7 +2,7 @@
 
 **Preparada el:** 2026-08-16 (actualizada el 2026-08-17)
 **Rama:** `feat/semana-03-material`
-**Estado:** ⬜ En preparación (contenido y los 6 cuestionarios de cierre listos; pasada de `@reviewer` completa, hallazgos corregidos) · ⬜ Mergeada a `development` · ⬜ Desplegada y abierta
+**Estado:** ✅ En preparación (contenido y los 6 cuestionarios de cierre listos; pasada de `@reviewer` completa, hallazgos corregidos) · ✅ Mergeada a `development` · ✅ Desplegada y abierta
 
 > Esta rama excede el nombre "Semana 3": también agrega dos sesiones nuevas
 > a la Semana 2 de Estructuras de Datos (`metodos-avanzados-y-clases-de-utilidad`
@@ -30,7 +30,7 @@ Ninguna sesión de la semana está marcada `★`.
 |---|---|---|---|
 | `analisis-de-algoritmos` | Lección teórica | `content/cursos/analisis-de-algoritmos/algoritmos-como-tecnologia.mdx` | ✅ |
 | `analisis-de-algoritmos` | Registro TS | `lib/courses/data/analisis-de-algoritmos.ts` (`order: 3`) | ✅ |
-| `analisis-de-algoritmos` | Apuntes de clase (sesión práctica completa, sin guía de estudiante — ver decisiones) | `content/cursos/analisis-de-algoritmos/apuntes/lab-03-insertion-sort.md` | Solo owner/admin |
+| `analisis-de-algoritmos` | Apuntes de clase (sesiones T + P unificadas — ver decisiones) | `content/cursos/analisis-de-algoritmos/apuntes/algoritmos-como-tecnologia.md` | Solo owner/admin |
 | `analisis-de-algoritmos` | Guía de laboratorio — estudiante | — | **No se creó** (sesión en vivo, ver decisiones) |
 | `analisis-de-algoritmos` | Ajuste de redacción, Laboratorio 02 (fuera de Semana 3) | `content/cursos/analisis-de-algoritmos/guias/lab-02-configuracion-del-entorno.md` | ✅ |
 | `analisis-de-algoritmos` | Fix de definición, "Buenas prácticas..." (fuera de Semana 3) | `content/cursos/analisis-de-algoritmos/buenas-practicas-y-entornos-python.mdx` | ✅ |
@@ -77,6 +77,19 @@ Ninguna sesión de la semana está marcada `★`.
 | `programacion-cientifica` / `condicionales-y-bucles` | `c15d252e-be9b-4101-998a-7108bb3ad1ef`, `42e0a509-a14d-42f0-98ab-e6ccc8982138`, `60135610-8468-4dde-88c4-ae0ec021d0bb` | ✅ (3/3) | ✅ (3/3, orden 0–2) |
 
 **Las 6 lecciones teóricas de la semana (incluidas T4/T5 de Semana 2) ya tienen su cuestionario de cierre completo.**
+
+> **Replicadas a producción (2026-08-17)**, vía `question-bank-mcp-prod`: las
+> 26 preguntas se crearon con el mismo contenido, se publicaron y se montaron
+> en el mismo orden que en desarrollo, verificado con `list_lesson_questions`
+> contra producción. Las 12 keywords nuevas del catálogo (`modelado-de-problemas`,
+> `algoritmos`, `insertion-sort`, `invariante-de-ciclo`, `impacto-social`, `uml`,
+> `diagrama-de-clases`, `miembros-estaticos-static`, `constructores`,
+> `clases-abstractas`, `atributos`, `clases`) también se crearon en producción
+> antes de crear las preguntas. `herencia`, `polimorfismo` y
+> `condicionales-y-bucles` tenían preguntas preexistentes sin publicar
+> (ejercicios de código del banco anterior a esta semana) — quedaron
+> mezcladas en `list_lesson_questions` pero no afectan la autoevaluación del
+> estudiante porque `is_published: false`.
 
 Keywords nuevas creadas en el catálogo compartido:
 `modelado-de-problemas`, `algoritmos`, `ordenamiento`, `insertion-sort`,
@@ -141,6 +154,17 @@ No aplica — ninguna sesión de la semana está marcada `★`.
   **Motivo:** hallazgo de `@reviewer` (la lección prometía un tema que no
   estaba escrito, sin ninguna nota visible para el estudiante). No se agregó
   el contenido faltante: se redujo la promesa a lo que existe.
+- **Apuntes de la sesión P (`apuntes/lab-03-insertion-sort.md`) reubicados a
+  `apuntes/algoritmos-como-tecnologia.md`, fusionados con la sesión T**
+  (2026-08-17, hallazgo del usuario tras el despliegue). La ruta `/apuntes`
+  resuelve por `articleSlug` contra la entrada en `lib/courses/data/<curso>.ts`;
+  al quitarse la entrada `kind: "guide"` del laboratorio (decisión anterior),
+  el archivo quedó con nombre huérfano — inalcanzable desde la UI, sin
+  ningún error visible. `algoritmos-como-tecnologia` sí tiene entrada TS
+  (la lección T), así que unificar ahí los apuntes de ambas sesiones los
+  hace accesibles en `/analisis-de-algoritmos/algoritmos-como-tecnologia/apuntes`.
+  La sesión T no necesitó apuntes propios: la lección `.mdx` ya trae el
+  código completo y comentado que se proyecta en clase.
 - **Correcciones de la pasada de `@reviewer`** aplicadas una por una con el
   usuario, sobre contenido ya publicado: apertura de `polimorfismo.mdx`
   corregida (ya no afirma que Herencia dejó `liquidarMes()` — ese método es
@@ -167,10 +191,28 @@ No aplica — ninguna sesión de la semana está marcada `★`.
 
 ## Despliegue y apertura
 
-- **Merge a `development`:** pendiente
-- **Deploy a producción:** pendiente
-- **Lecciones abiertas:** ninguna todavía (no se ha llegado a F7)
-- [ ] Verificado que las lecciones de semanas futuras siguen cerradas — no aplica aún
+- **Merge a `development`:** ✅ completo (todos los commits de esta rama ya
+  estaban en `development` antes de este cierre)
+- **Deploy a producción:** ✅ `deploy/2026-08-17` → `main` (commit `8b3cdf9`),
+  push a `origin/main` el 2026-08-17. Conflicto de merge en
+  `practica-clases-y-objetos-proyecto-de-aula.mdx` (un commit `70997f5` había
+  llegado a `main` sin pasar por `development`) resuelto tomando la versión
+  de `development` — superset sin pérdida de contenido, confirmado con
+  usuario.
+- **Preguntas del banco replicadas a producción:** ✅ 2026-08-17, ver nota en
+  "Evaluaciones creadas" arriba.
+- **Lecciones abiertas (2026-08-17, vía `courses-mcp-prod`):**
+  `analisis-de-algoritmos/algoritmos-como-tecnologia`,
+  `estructuras-de-datos/metodos-avanzados-y-clases-de-utilidad`,
+  `estructuras-de-datos/introduccion-al-uml`, `estructuras-de-datos/herencia`,
+  `estructuras-de-datos/polimorfismo`,
+  `programacion-cientifica/condicionales-y-bucles`. Las guías
+  `lab-poo-jerarquia-de-clases` y `condicionales-y-bucles-lab` ya estaban
+  abiertas de antes.
+- [x] Verificado que las lecciones de semanas futuras siguen cerradas
+  (`analisis-de-algoritmos-y-divide-y-venceras`,
+  `composicion-agregacion-y-diagramas-de-paquetes`,
+  `estructuras-de-datos-nativas`, etc. — no se tocaron)
 
 ## Pendientes para la semana siguiente
 
