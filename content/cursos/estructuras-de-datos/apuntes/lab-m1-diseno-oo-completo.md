@@ -7,6 +7,14 @@
 > esa traducción UML → código, más la clase de prueba de creación de objetos
 > que pide la rúbrica ("Pruebas en el App"). Proyectar el diagrama entregado
 > primero, después bajar a la implementación paso a paso.
+>
+> El Sistema Bancario es el proyecto de referencia del docente, no uno de
+> los cinco casos de estudio de equipo — este paso a paso no cambia. Para
+> contexto al explicar en clase: en la guía publicada, cada uno de los cinco
+> proyectos de equipo ahora parte explícitamente de las cinco clases que ya
+> construyeron en la práctica de Semana 2 ("Modela una clase de tu proyecto
+> de aula"), no de cero — el laboratorio las evoluciona con encapsulamiento,
+> herencia e interfaces en vez de introducir un diseño desconectado.
 
 ## Paso 1 — Diagrama de paquetes: las cuatro capas
 
