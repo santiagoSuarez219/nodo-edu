@@ -468,6 +468,85 @@ microdiseño (corrección conceptual, calidad de la explicación teórica,
 corrección de la implementación, calidad del análisis de gráficas,
 documentación y organización del informe): **respetarla**, no inventar otra.
 
+### 4.2 Laboratorio evaluativo `★` de Estructuras de Datos
+
+Los laboratorios que cierran un **momento evaluativo** (`★` en el cronograma)
+de `estructuras-de-datos` siguen un patrón propio, fijado con el docente en
+el M1 (agosto 2026). **Sobreescribe varias reglas de §4** — donde este
+apartado contradiga al anterior, gana este.
+
+**El UML se entrega resuelto; no se diseña.** Lo que se evalúa es leer un
+diagrama de clases y traducirlo a código, no producirlo. Por eso la guía
+**sí lleva diagramas Mermaid `classDiagram`** (excepción explícita al "cero
+diagramas Mermaid" de §4): el diagrama *es* la especificación del entregable.
+
+**La guía no lleva código. Ninguno.** Ni esqueletos, ni firmas sueltas, ni
+bloques con `TODO` (excepción explícita al "esqueleto de código (SIN la
+solución)" de §4). El diagrama Mermaid ya declara clases, atributos con
+visibilidad, firmas de método y relaciones; la prosa de **"Requisitos de
+implementación"** aporta lo que el diagrama no puede expresar: qué valida
+cada constructor, qué método queda sin resolver en la clase abstracta, y la
+regla de negocio concreta de cada subtipo. Entre ambos basta — si hace falta
+un esqueleto para que el enunciado se entienda, el enunciado está mal escrito.
+Los únicos bloques con backticks permitidos son el árbol ASCII del entregable
+y la fórmula de la nota.
+
+**Una sola guía genérica con una sección por proyecto.** La plataforma no
+segmenta contenido publicado por equipo ni por proyecto: toda guía con
+`kind: "guide"` la ven todos los matriculados. No se crean 5 guías, una por
+caso de estudio. Se crea **una** con una subsección `###` por proyecto
+elegible, cada una con su diagrama y sus requisitos, precedida de una
+instrucción de "ubique la sección de su proyecto y trabaje solo sobre ella".
+
+**Continuidad obligatoria con lo ya construido.** El diagrama de cada
+proyecto debe reutilizar **los nombres exactos de las clases que ese equipo
+ya escribió** en las sesiones previas del sprint (revisar la lección o
+práctica correspondiente antes de diseñar el UML), evolucionándolas —
+encapsular, promover una a abstracta, agregar `extends`/`implements` — en vez
+de introducir un conjunto nuevo y desconectado. Indicar por clase, en la
+prosa, si **ya existe** de la sesión anterior o si es un **archivo nuevo**;
+y si un atributo previo se reemplaza por una relación de objetos, decirlo
+explícitamente ("elimine el atributo `equipo:String`, ahora es composición
+con `Equipo`"). Todas las clases previas siguen siendo entregables aunque no
+participen de la jerarquía: se entregan igual, ya encapsuladas.
+
+**Rúbrica de 3 criterios en escala 0–5, escalada al peso del momento.** No
+la rúbrica de 5 dimensiones de §4.1. La columna `Puntos` es el **peso
+porcentual** del criterio, no un puntaje absoluto — sigue sumando 100 y
+cerrando con `| **TOTAL** | **100** | |`, pero cada criterio se califica de
+**0 a 5**:
+
+| Criterio | Peso | Qué verifica |
+|---|---|---|
+| Codificación correcta del UML | 60 | Clases, constructores, atributos, métodos, getters/setters y herencia fieles al diagrama entregado |
+| Pruebas en el App — creación de objetos | 20 | Una clase con `main` que instancia cada subtipo concreto y ejercita el método polimórfico sin `instanceof`, imprimiendo por consola |
+| Buenas prácticas de programación | 20 | Commits descriptivos y frecuentes, uso correcto de ramas, nombres siguiendo convenciones de Java |
+
+Debajo de la tabla va siempre la fórmula del escalado, con un ejemplo
+numérico resuelto:
+
+```
+nota_laboratorio (0-5) = 0.60 × item1 + 0.20 × item2 + 0.20 × item3
+nota_final_curso (%)   = (nota_laboratorio / 5) × <peso del momento>%
+```
+
+El "peso del momento" sale de la tabla de evaluación de
+`microdiseno/info.md` — leerla, no asumirlo. Si el laboratorio deja de valer
+lo que dice esa tabla, **actualizar `info.md` en el mismo cambio** (tabla de
+evaluación y descripción de la sesión `P ★` de esa semana), verificando que
+el total del curso siga en 100 %.
+
+**Secciones que no van en este artefacto:** "Ejemplo de archivo de prueba
+esperado" (el entregable ya lo describe) ni "Extensiones Sugeridas (Bonus)".
+Sí van "Dificultades Comunes", con al menos una entrada sobre lectura de
+notación UML y otra sobre atributos de la sesión previa que el diagrama ya
+no contempla.
+
+**Los apuntes docente resuelven solo el Sistema Bancario.** Es el caso de
+referencia del docente y no es elegible por ningún equipo; los apuntes nunca
+resuelven los 5 proyectos (además, solo existe un archivo de apuntes por
+`articleSlug`). Ver §3.
+
 ---
 
 ## 5. Cuestionario de cierre de lección (formativo, sin nota)
