@@ -232,6 +232,17 @@ export const estructurasDeDatos: Course = {
       ],
     },
     {
+      id: "lab-m1-diseno-oo-completo",
+      slug: "lab-m1-diseno-oo-completo",
+      articleSlug: "lab-m1-diseno-oo-completo",
+      kind: "guide",
+      order: 12.5,
+      title: "Laboratorio Evaluativo — Codificación de Diseño OO (Momento 1)",
+      summary:
+        "Lea el diagrama UML ya resuelto de su proyecto de aula y codifíquelo en Java con encapsulamiento, herencia, clases abstractas e interfaces. Cierra el Momento evaluativo 1 (5 %).",
+      topics: [],
+    },
+    {
       id: "tipos-abstractos-de-datos-tad",
       slug: "tipos-abstractos-de-datos-tad",
       articleSlug: "tipos-abstractos-de-datos-tad",
