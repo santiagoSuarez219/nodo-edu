@@ -237,9 +237,9 @@ export const estructurasDeDatos: Course = {
       articleSlug: "lab-m1-diseno-oo-completo",
       kind: "guide",
       order: 12.5,
-      title: "Laboratorio Evaluativo — Diseño OO Completo (Momento 1)",
+      title: "Laboratorio Evaluativo — Codificación de Diseño OO (Momento 1)",
       summary:
-        "Diseñe el diagrama UML completo de las cuatro capas de su proyecto de aula e impleméntelo en Java con encapsulamiento, herencia y polimorfismo. Cierra el Momento evaluativo 1 (15 %).",
+        "Lea el diagrama UML ya resuelto de su proyecto de aula y codifíquelo en Java con encapsulamiento, herencia, clases abstractas e interfaces. Cierra el Momento evaluativo 1 (5 %).",
       topics: [],
     },
     {

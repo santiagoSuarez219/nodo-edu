@@ -1,34 +1,33 @@
 ---
-title: "Laboratorio Evaluativo — Diseño OO Completo (Momento 1)"
-updatedAt: "2026-08-17"
+title: "Laboratorio Evaluativo — Codificación de Diseño OO (Momento 1)"
+updatedAt: "2026-08-18"
 ---
 
-# Laboratorio Evaluativo — Diseño OO Completo (Momento 1)
+# Laboratorio Evaluativo — Codificación de Diseño OO (Momento 1)
 
 ## Objetivo
 
-Diseñar el diagrama UML completo de su proyecto de aula, mostrando las
-cuatro capas (`view`, `controller`, `service`, `model`) con las clases que
-ya tiene hasta hoy, e implementarlo en Java aplicando encapsulamiento,
-herencia y polimorfismo. Este diagrama es el **plano de referencia** que
-va a usar el resto del semestre: cada laboratorio posterior le agrega
-clases y relaciones sobre esta misma base, así que su corrección y
-completitud importan más que cualquier laboratorio anterior.
+Leer e interpretar el diagrama UML de su proyecto de aula — entregado ya
+resuelto en este documento, en la sección correspondiente a su caso de
+estudio — e implementarlo fielmente en Java, aplicando encapsulamiento,
+herencia, clases abstractas e interfaces.
 
-Este laboratorio cierra el **Momento evaluativo 1 — Programación orientada
-a objetos (15 %)**.
+**El UML no se diseña en este laboratorio: se entrega resuelto.** Su trabajo
+es traducir el diagrama a código correcto, no decidir la estructura de
+clases. Este laboratorio cierra el **Momento evaluativo 1 — Programación
+orientada a objetos (5 %)**.
 
 Competencias esperadas:
-- Diseñar un diagrama de clases UML con las cuatro capas del proyecto, sus
-  relaciones (asociación, agregación, composición) y multiplicidades
-  correctas.
-- Diseñar el TAD de al menos una entidad de su dominio mediante una
-  interfaz, y hacerla implementar por una clase abstracta.
-- Implementar encapsulamiento, herencia y polimorfismo fieles a ese
-  diagrama.
-- Coordinar las cuatro capas de forma que ninguna se salte a la siguiente
-  (la `view` nunca llama directo al `model`, por ejemplo).
-- Ejecutar una revisión entre pares que contraste diseño contra código.
+- Leer un diagrama de clases UML e identificar interfaz, clase abstracta,
+  subclases concretas y relación de composición con su multiplicidad.
+- Traducir la notación de visibilidad (`+`, `-`, `#`) a modificadores de
+  acceso de Java.
+- Implementar una interfaz mediante una clase abstracta que resuelve parte
+  del contrato y deja el resto pendiente para sus subtipos concretos.
+- Implementar herencia y polimorfismo fieles al diagrama, sin usar
+  `instanceof` para distinguir subtipos donde el diagrama pide polimorfismo.
+- Escribir una clase de prueba que demuestre la creación de objetos de cada
+  subtipo y el comportamiento polimórfico esperado.
 
 ---
 
@@ -38,206 +37,907 @@ Antes de comenzar, debe dominar:
 - La lección "Encapsulamiento": modificadores de acceso, getters y
   setters con validación.
 - La lección "Introducción al UML": anatomía de una clase en UML,
-  visibilidad, atributos y métodos.
+  visibilidad, atributos y métodos, notación `<<interface>>` y realización.
 - La lección "Herencia": `extends`, sobreescritura con `@Override`,
   invocación del constructor de la superclase con `super(...)`.
 - La lección "Polimorfismo": binding dinámico, clases abstractas
   (`abstract`) e interfaces (`interface`, `implements`).
 - La guía "Laboratorio — Jerarquía de Clases de Tres Niveles y
-  Polimorfismo": la jerarquía de su entidad principal que su equipo ya
-  extendió a tres niveles.
+  Polimorfismo": ya practicó la lectura de un diagrama de clases y el
+  polimorfismo sobre arreglos de referencias.
 - La lección "Composición, agregación y diagramas de paquetes":
   diferencias conceptuales entre asociación, agregación y composición;
-  multiplicidades, roles y flechas de navegación en UML.
-- La lección "Diseño con TAD y orientación a objetos": cómo modelar el
-  TAD de una estructura mediante clases e interfaces.
+  multiplicidades y notación `*--` en UML.
 - La guía "Guía — Elección del proyecto de aula": debe tener su caso de
-  estudio asignado y las entidades del dominio modeladas parcialmente
-  desde la Semana 2.
+  estudio asignado.
+
+---
+
+## Ubique su sección
+
+Cada uno de los cinco proyectos elegibles tiene su diagrama UML ya resuelto
+en la sección siguiente. **Ubique la sección de su proyecto asignado y
+trabaje únicamente sobre ella** — no necesita leer ni implementar las otras
+cuatro.
+
+---
+
+## Diagrama UML por proyecto
+
+### 1. Papelería
+
+```mermaid
+classDiagram
+  class Vendible {
+    <<interface>>
+    +vender(cantidad: int) void
+    +calcularPrecioFinal() double
+  }
+  class Producto {
+    <<abstract>>
+    -codigo : String
+    -nombre : String
+    -precio : double
+    -cantidadStock : int
+    +vender(cantidad: int) void
+  }
+  class ProductoOficina {
+    -categoria : String
+    +calcularPrecioFinal() double
+  }
+  class ProductoEscolar {
+    -nivelEscolar : String
+    +calcularPrecioFinal() double
+  }
+  class ItemVenta {
+    -cantidad : int
+  }
+  class Venta {
+  }
+  Vendible <|.. Producto
+  Producto <|-- ProductoOficina
+  Producto <|-- ProductoEscolar
+  Venta "1" *-- "1..*" ItemVenta
+  ItemVenta --> Producto
+```
+
+**Requisitos de implementación:**
+- Todas las clases van en el paquete `model.domain`.
+- Los atributos son `private`; el acceso externo es siempre por getters (y
+  setters solo donde el diagrama lo requiera).
+- El constructor de `Producto` valida `precio > 0` y `cantidadStock >= 0`,
+  lanzando `IllegalArgumentException` en caso contrario.
+- `Producto.vender(cantidad)` valida que `cantidad` sea positiva y que haya
+  stock suficiente antes de descontarlo; si no hay stock suficiente, lanza
+  `IllegalStateException`.
+- `calcularPrecioFinal()` queda **sin implementar en `Producto`**: cada
+  subtipo la resuelve con su propia regla. `ProductoOficina` aplica un
+  recargo fijo del 8 % sobre `precio` (mayor margen por manejo de insumos
+  especializados). `ProductoEscolar` aplica un descuento del 10 % sobre
+  `precio` cuando `nivelEscolar` sea `"primaria"`, y ningún descuento en
+  cualquier otro caso.
+- `ItemVenta` referencia un `Producto` por asociación (no composición): el
+  producto existe independientemente de la venta.
+
+```java
+package model.domain;
+
+public interface Vendible {
+    void vender(int cantidad);
+    double calcularPrecioFinal();
+}
+```
+
+```java
+package model.domain;
+
+public abstract class Producto implements Vendible {
+    private String codigo;
+    private String nombre;
+    private double precio;
+    private int cantidadStock;
+
+    public Producto(String codigo, String nombre, double precio, int cantidadStock) {
+        // TODO: validar precio > 0 y cantidadStock >= 0
+    }
+
+    @Override
+    public void vender(int cantidad) {
+        // TODO: validar cantidad positiva y stock suficiente, descontar cantidadStock
+    }
+
+    // calcularPrecioFinal() queda sin resolver: cada subtipo la implementa
+
+    // TODO: getters de codigo, nombre, precio, cantidadStock
+}
+```
+
+```java
+package model.domain;
+
+public class ProductoOficina extends Producto {
+    private String categoria;
+
+    public ProductoOficina(String codigo, String nombre, double precio, int cantidadStock, String categoria) {
+        super(codigo, nombre, precio, cantidadStock);
+        // TODO: asignar categoria
+    }
+
+    @Override
+    public double calcularPrecioFinal() {
+        // TODO: aplicar recargo del 8% sobre el precio base
+        return 0;
+    }
+}
+```
+
+```java
+package model.domain;
+
+public class ProductoEscolar extends Producto {
+    private String nivelEscolar;
+
+    public ProductoEscolar(String codigo, String nombre, double precio, int cantidadStock, String nivelEscolar) {
+        super(codigo, nombre, precio, cantidadStock);
+        // TODO: asignar nivelEscolar
+    }
+
+    @Override
+    public double calcularPrecioFinal() {
+        // TODO: aplicar descuento del 10% si nivelEscolar es "primaria"
+        return 0;
+    }
+}
+```
+
+```java
+package model.domain;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Venta {
+    private final List<ItemVenta> items;
+
+    public Venta() {
+        this.items = new ArrayList<>();
+    }
+
+    public void agregarItem(ItemVenta item) {
+        // TODO: agregar item a la lista (composicion: el ItemVenta solo existe dentro de una Venta)
+    }
+
+    // TODO: getter de items
+}
+```
+
+```java
+package model.domain;
+
+public class ItemVenta {
+    private Producto producto;
+    private int cantidad;
+
+    public ItemVenta(Producto producto, int cantidad) {
+        // TODO: validar cantidad positiva, asignar producto y cantidad
+    }
+
+    // TODO: getters de producto y cantidad
+}
+```
+
+---
+
+### 2. Consultorio Médico
+
+```mermaid
+classDiagram
+  class RolClinico {
+    <<interface>>
+    +datosResumen() String
+    +rolEnConsulta() String
+  }
+  class Persona {
+    <<abstract>>
+    -identificacion : String
+    -nombre : String
+    -telefono : String
+    +datosResumen() String
+  }
+  class Paciente {
+    -fechaNacimiento : LocalDate
+    -tipoSangre : String
+    +rolEnConsulta() String
+  }
+  class Medico {
+    -especialidad : String
+    -numeroRegistro : String
+    +rolEnConsulta() String
+  }
+  class Consulta {
+    -motivo : String
+    -diagnostico : String
+    -tratamiento : String
+    -fecha : LocalDate
+  }
+  RolClinico <|.. Persona
+  Persona <|-- Paciente
+  Persona <|-- Medico
+  Paciente "1" *-- "0..*" Consulta
+  Consulta --> Medico
+```
+
+**Requisitos de implementación:**
+- Todas las clases van en el paquete `model.domain`.
+- Atributos `private`; acceso por getters y setters donde el diagrama lo
+  requiera.
+- El constructor de `Persona` valida que `identificacion` no sea nula ni
+  esté vacía, lanzando `IllegalArgumentException` en caso contrario.
+- `datosResumen()` queda implementado en `Persona` (igual para todos los
+  subtipos): retorna una cadena que combine `identificacion`, `nombre` y
+  `telefono`.
+- `rolEnConsulta()` queda **sin implementar en `Persona`**: `Paciente` la
+  resuelve incluyendo `tipoSangre` y la edad calculada a partir de
+  `fechaNacimiento`; `Medico` la resuelve incluyendo `especialidad` y
+  `numeroRegistro`.
+- Una `Consulta` no existe fuera de un `Paciente` (composición); referencia
+  a `Medico` por asociación, no por composición.
+
+```java
+package model.domain;
+
+public interface RolClinico {
+    String datosResumen();
+    String rolEnConsulta();
+}
+```
+
+```java
+package model.domain;
+
+public abstract class Persona implements RolClinico {
+    private String identificacion;
+    private String nombre;
+    private String telefono;
+
+    public Persona(String identificacion, String nombre, String telefono) {
+        // TODO: validar identificacion no nula ni vacia
+    }
+
+    @Override
+    public String datosResumen() {
+        // TODO: combinar identificacion, nombre y telefono en una cadena
+        return null;
+    }
+
+    // rolEnConsulta() queda sin resolver: cada subtipo la implementa
+
+    // TODO: getters de identificacion, nombre, telefono
+}
+```
+
+```java
+package model.domain;
+
+import java.time.LocalDate;
+
+public class Paciente extends Persona {
+    private LocalDate fechaNacimiento;
+    private String tipoSangre;
+
+    public Paciente(String identificacion, String nombre, String telefono, LocalDate fechaNacimiento, String tipoSangre) {
+        super(identificacion, nombre, telefono);
+        // TODO: asignar fechaNacimiento y tipoSangre
+    }
+
+    @Override
+    public String rolEnConsulta() {
+        // TODO: incluir tipoSangre y la edad calculada a partir de fechaNacimiento
+        return null;
+    }
+}
+```
+
+```java
+package model.domain;
+
+public class Medico extends Persona {
+    private String especialidad;
+    private String numeroRegistro;
+
+    public Medico(String identificacion, String nombre, String telefono, String especialidad, String numeroRegistro) {
+        super(identificacion, nombre, telefono);
+        // TODO: asignar especialidad y numeroRegistro
+    }
+
+    @Override
+    public String rolEnConsulta() {
+        // TODO: incluir especialidad y numeroRegistro
+        return null;
+    }
+}
+```
+
+```java
+package model.domain;
+
+import java.time.LocalDate;
+
+public class Consulta {
+    private String motivo;
+    private String diagnostico;
+    private String tratamiento;
+    private LocalDate fecha;
+    private Medico medico;
+
+    public Consulta(String motivo, String diagnostico, String tratamiento, LocalDate fecha, Medico medico) {
+        // TODO: asignar los cinco atributos
+    }
+
+    // TODO: getters de motivo, diagnostico, tratamiento, fecha, medico
+}
+```
+
+---
+
+### 3. Clínica Veterinaria
+
+```mermaid
+classDiagram
+  class FichaClinica {
+    <<interface>>
+    +actualizarFicha() void
+    +resumenFicha() String
+  }
+  class Animal {
+    <<abstract>>
+    -numeroFicha : String
+    -nombre : String
+    -especie : String
+    -fechaNacimiento : LocalDate
+    +actualizarFicha() void
+  }
+  class Perro {
+    -raza : String
+    +resumenFicha() String
+  }
+  class Gato {
+    -tipo : String
+    +resumenFicha() String
+  }
+  class Dueño {
+  }
+  FichaClinica <|.. Animal
+  Animal <|-- Perro
+  Animal <|-- Gato
+  Dueño "1" *-- "1..*" Animal
+```
+
+**Requisitos de implementación:**
+- Todas las clases van en el paquete `model.domain`.
+- Atributos `private`; acceso por getters y setters donde el diagrama lo
+  requiera.
+- El constructor de `Animal` valida que `numeroFicha` no sea nulo ni esté
+  vacío.
+- `actualizarFicha()` queda implementado en `Animal` (igual para todos los
+  subtipos): defina en su implementación qué significa "actualizar" para su
+  dominio (por ejemplo, refrescar un dato derivado); no requiere una regla
+  numérica específica, pero debe compilar y ser invocable desde cualquier
+  subtipo sin sobreescritura.
+- `resumenFicha()` queda **sin implementar en `Animal`**: `Perro` la
+  resuelve incluyendo `raza`; `Gato` la resuelve incluyendo `tipo`
+  (`"indoor"` o `"outdoor"`).
+- Un `Animal` no existe fuera de un `Dueño` (composición), con multiplicidad
+  `"1"` a `"1..*"` explícita en el diagrama: un dueño tiene uno o más
+  animales, y un animal pertenece exactamente a un dueño.
+
+```java
+package model.domain;
+
+public interface FichaClinica {
+    void actualizarFicha();
+    String resumenFicha();
+}
+```
+
+```java
+package model.domain;
+
+import java.time.LocalDate;
+
+public abstract class Animal implements FichaClinica {
+    private String numeroFicha;
+    private String nombre;
+    private String especie;
+    private LocalDate fechaNacimiento;
+
+    public Animal(String numeroFicha, String nombre, String especie, LocalDate fechaNacimiento) {
+        // TODO: validar numeroFicha no nulo ni vacio
+    }
+
+    @Override
+    public void actualizarFicha() {
+        // TODO: implementar la actualizacion comun a todos los subtipos
+    }
+
+    // resumenFicha() queda sin resolver: cada subtipo la implementa
+
+    // TODO: getters de numeroFicha, nombre, especie, fechaNacimiento
+}
+```
+
+```java
+package model.domain;
+
+import java.time.LocalDate;
+
+public class Perro extends Animal {
+    private String raza;
+
+    public Perro(String numeroFicha, String nombre, String especie, LocalDate fechaNacimiento, String raza) {
+        super(numeroFicha, nombre, especie, fechaNacimiento);
+        // TODO: asignar raza
+    }
+
+    @Override
+    public String resumenFicha() {
+        // TODO: incluir raza en el resumen
+        return null;
+    }
+}
+```
+
+```java
+package model.domain;
+
+import java.time.LocalDate;
+
+public class Gato extends Animal {
+    private String tipo;
+
+    public Gato(String numeroFicha, String nombre, String especie, LocalDate fechaNacimiento, String tipo) {
+        super(numeroFicha, nombre, especie, fechaNacimiento);
+        // TODO: asignar tipo ("indoor" o "outdoor")
+    }
+
+    @Override
+    public String resumenFicha() {
+        // TODO: incluir tipo en el resumen
+        return null;
+    }
+}
+```
+
+```java
+package model.domain;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Dueño {
+    private String identificacion;
+    private String nombre;
+    private final List<Animal> animales;
+
+    public Dueño(String identificacion, String nombre) {
+        // TODO: validar identificacion y asignar atributos; inicializar la lista de animales
+        this.animales = new ArrayList<>();
+    }
+
+    public void agregarAnimal(Animal animal) {
+        // TODO: agregar animal a la lista (composicion: no existe fuera de este Dueño)
+    }
+
+    // TODO: getters de identificacion, nombre, animales
+}
+```
+
+---
+
+### 4. Sistema Académico
+
+```mermaid
+classDiagram
+  class RolAcademico {
+    <<interface>>
+    +datosResumen() String
+    +identificarRol() String
+  }
+  class Persona {
+    <<abstract>>
+    -identificacion : String
+    -nombre : String
+    -correo : String
+    +datosResumen() String
+  }
+  class Estudiante {
+    -codigo : String
+    -semestreActual : int
+    +identificarRol() String
+  }
+  class Profesor {
+    -codigo : String
+    -departamento : String
+    +identificarRol() String
+  }
+  class Matricula {
+  }
+  class Calificacion {
+    -notaParcial1 : double
+    -notaParcial2 : double
+    -notaFinal : double
+    -observaciones : String
+  }
+  class Materia {
+  }
+  RolAcademico <|.. Persona
+  Persona <|-- Estudiante
+  Persona <|-- Profesor
+  Matricula "1" *-- "1..*" Calificacion
+  Matricula --> Estudiante
+  Calificacion --> Materia
+```
+
+**Requisitos de implementación:**
+- Todas las clases van en el paquete `model.domain`.
+- Atributos `private`; acceso por getters y setters donde el diagrama lo
+  requiera.
+- El constructor de `Persona` valida que `correo` contenga el carácter
+  `@`, lanzando `IllegalArgumentException` en caso contrario.
+- `datosResumen()` queda implementado en `Persona`: retorna una cadena que
+  combine `identificacion`, `nombre` y `correo`.
+- `identificarRol()` queda **sin implementar en `Persona`**: `Estudiante` la
+  resuelve incluyendo `codigo` y `semestreActual`; `Profesor` la resuelve
+  incluyendo `codigo` y `departamento`.
+- Una `Calificacion` no existe fuera de una `Matricula` (composición);
+  `Matricula` referencia a `Estudiante` por asociación, y `Calificacion`
+  referencia a `Materia` por asociación.
+
+```java
+package model.domain;
+
+public interface RolAcademico {
+    String datosResumen();
+    String identificarRol();
+}
+```
+
+```java
+package model.domain;
+
+public abstract class Persona implements RolAcademico {
+    private String identificacion;
+    private String nombre;
+    private String correo;
+
+    public Persona(String identificacion, String nombre, String correo) {
+        // TODO: validar que correo contenga '@'
+    }
+
+    @Override
+    public String datosResumen() {
+        // TODO: combinar identificacion, nombre y correo en una cadena
+        return null;
+    }
+
+    // identificarRol() queda sin resolver: cada subtipo la implementa
+
+    // TODO: getters de identificacion, nombre, correo
+}
+```
+
+```java
+package model.domain;
+
+public class Estudiante extends Persona {
+    private String codigo;
+    private int semestreActual;
+
+    public Estudiante(String identificacion, String nombre, String correo, String codigo, int semestreActual) {
+        super(identificacion, nombre, correo);
+        // TODO: asignar codigo y semestreActual
+    }
+
+    @Override
+    public String identificarRol() {
+        // TODO: incluir codigo y semestreActual
+        return null;
+    }
+}
+```
+
+```java
+package model.domain;
+
+public class Profesor extends Persona {
+    private String codigo;
+    private String departamento;
+
+    public Profesor(String identificacion, String nombre, String correo, String codigo, String departamento) {
+        super(identificacion, nombre, correo);
+        // TODO: asignar codigo y departamento
+    }
+
+    @Override
+    public String identificarRol() {
+        // TODO: incluir codigo y departamento
+        return null;
+    }
+}
+```
+
+```java
+package model.domain;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Matricula {
+    private Estudiante estudiante;
+    private final List<Calificacion> calificaciones;
+
+    public Matricula(Estudiante estudiante) {
+        // TODO: validar estudiante no nulo; asignar; inicializar la lista de calificaciones
+        this.calificaciones = new ArrayList<>();
+    }
+
+    public void agregarCalificacion(Calificacion calificacion) {
+        // TODO: agregar calificacion a la lista (composicion: no existe fuera de esta Matricula)
+    }
+
+    // TODO: getters de estudiante, calificaciones
+}
+```
+
+```java
+package model.domain;
+
+public class Calificacion {
+    private double notaParcial1;
+    private double notaParcial2;
+    private double notaFinal;
+    private String observaciones;
+    private Materia materia;
+
+    public Calificacion(double notaParcial1, double notaParcial2, double notaFinal, String observaciones, Materia materia) {
+        // TODO: asignar los cinco atributos
+    }
+
+    // TODO: getters de notaParcial1, notaParcial2, notaFinal, observaciones, materia
+}
+```
+
+---
+
+### 5. Liga de Fútbol
+
+```mermaid
+classDiagram
+  class EstadisticasJugador {
+    <<interface>>
+    +registrarParticipacion(minutos: int) void
+    +resumenEstadistico() String
+  }
+  class Jugador {
+    <<abstract>>
+    -numeroCamiseta : int
+    -posicion : String
+    -golesTotales : int
+    +registrarParticipacion(minutos: int) void
+  }
+  class Portero {
+    -partidosSinGolesEncajados : int
+    +resumenEstadistico() String
+  }
+  class JugadorDeCampo {
+    -asistencias : int
+    +resumenEstadistico() String
+  }
+  class Equipo {
+  }
+  EstadisticasJugador <|.. Jugador
+  Jugador <|-- Portero
+  Jugador <|-- JugadorDeCampo
+  Equipo "1" *-- "1..*" Jugador
+```
+
+> `Jugador` no hereda de una clase `Persona` en este laboratorio —
+> simplificación deliberada para mantener dos niveles de jerarquía,
+> consistentes con los otros cuatro proyectos.
+
+**Requisitos de implementación:**
+- Todas las clases van en el paquete `model.domain`.
+- Atributos `private`; acceso por getters y setters donde el diagrama lo
+  requiera.
+- El constructor de `Jugador` valida que `numeroCamiseta` sea positivo,
+  lanzando `IllegalArgumentException` en caso contrario.
+- `registrarParticipacion(minutos)` queda implementado en `Jugador` (igual
+  para todos los subtipos): valida que `minutos` sea positivo antes de
+  registrar la participación (defina cómo la registra, por ejemplo con un
+  contador acumulado).
+- `resumenEstadistico()` queda **sin implementar en `Jugador`**: `Portero`
+  la resuelve incluyendo `partidosSinGolesEncajados`; `JugadorDeCampo` la
+  resuelve incluyendo `asistencias` y `golesTotales`.
+- Un `Jugador` no existe fuera de un `Equipo` (composición).
+
+```java
+package model.domain;
+
+public interface EstadisticasJugador {
+    void registrarParticipacion(int minutos);
+    String resumenEstadistico();
+}
+```
+
+```java
+package model.domain;
+
+public abstract class Jugador implements EstadisticasJugador {
+    private int numeroCamiseta;
+    private String posicion;
+    private int golesTotales;
+
+    public Jugador(int numeroCamiseta, String posicion) {
+        // TODO: validar numeroCamiseta positivo; asignar posicion; golesTotales inicia en 0
+    }
+
+    @Override
+    public void registrarParticipacion(int minutos) {
+        // TODO: validar minutos positivo y registrar la participacion
+    }
+
+    // resumenEstadistico() queda sin resolver: cada subtipo la implementa
+
+    // TODO: getters de numeroCamiseta, posicion, golesTotales
+}
+```
+
+```java
+package model.domain;
+
+public class Portero extends Jugador {
+    private int partidosSinGolesEncajados;
+
+    public Portero(int numeroCamiseta, String posicion) {
+        super(numeroCamiseta, posicion);
+        // TODO: inicializar partidosSinGolesEncajados en 0
+    }
+
+    @Override
+    public String resumenEstadistico() {
+        // TODO: incluir partidosSinGolesEncajados
+        return null;
+    }
+}
+```
+
+```java
+package model.domain;
+
+public class JugadorDeCampo extends Jugador {
+    private int asistencias;
+
+    public JugadorDeCampo(int numeroCamiseta, String posicion) {
+        super(numeroCamiseta, posicion);
+        // TODO: inicializar asistencias en 0
+    }
+
+    @Override
+    public String resumenEstadistico() {
+        // TODO: incluir asistencias y golesTotales
+        return null;
+    }
+}
+```
+
+```java
+package model.domain;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Equipo {
+    private String nombre;
+    private final List<Jugador> jugadores;
+
+    public Equipo(String nombre) {
+        // TODO: validar nombre no nulo ni vacio; inicializar la lista de jugadores
+        this.jugadores = new ArrayList<>();
+    }
+
+    public void agregarJugador(Jugador jugador) {
+        // TODO: agregar jugador a la lista (composicion: no existe fuera de este Equipo)
+    }
+
+    // TODO: getters de nombre, jugadores
+}
+```
 
 ---
 
 ## Desarrollo del Laboratorio
 
-### Parte 1 — Diagrama UML completo de las cuatro capas
+### Parte 1 — Codifique el diagrama de su proyecto
 
-Diseñe el diagrama de clases completo de su proyecto de aula tal como
-está **hoy**, organizado por las cuatro capas de la arquitectura
-(`view`, `controller`, `service`, `model`). No es un diagrama de una sola
-clase nueva: es el mapa acumulado de todo lo que su equipo construyó
-desde la Semana 2, más lo que agregue en este laboratorio.
+Implemente en `model/domain/` la interfaz, la clase abstracta, las dos
+subclases concretas y la clase de composición del diagrama de su proyecto,
+siguiendo los requisitos de implementación de esa sección. Respete
+exactamente los nombres de clase, atributo y método del diagrama — la
+rúbrica evalúa la fidelidad de la codificación al UML entregado, no una
+variación libre sobre él.
 
 **Requisitos:**
-- Debe mostrar explícitamente las cuatro capas, aunque `view` y
-  `controller` tengan pocas clases todavía.
-- Debe incluir al menos una relación de herencia: la jerarquía de tres
-  niveles de la entidad principal de su caso de estudio.
-- Debe incluir al menos una interfaz, marcada con la notación
-  `<<interface>>`, y la clase que la implementa mediante una relación de
-  realización (línea punteada).
-- Debe incluir al menos una relación de asociación, agregación o
-  composición entre dos entidades de su dominio, con su multiplicidad
-  correctamente anotada en ambos extremos.
-- Debe representar la visibilidad de cada atributo y método (`+`, `-`,
-  `#`) siguiendo la notación vista en clase.
-- Entréguelo como un archivo aparte de su código (imagen, PDF o diagrama
-  en texto), no como comentarios dentro del código Java.
+- Todos los atributos son `private`; el acceso externo es siempre por
+  métodos.
+- Cada subclase invoca `super(...)` en su constructor.
+- El método marcado en la interfaz pero no implementado en la clase
+  abstracta queda declarado sin cuerpo en la clase abstracta (el compilador
+  obliga a cada subtipo concreto a resolverlo con `@Override`).
+- Los setters (donde el diagrama los requiera) validan antes de asignar.
 
-### Parte 2 — Defina el TAD de su entidad principal
+### Parte 2 — Escriba la clase de prueba
 
-Diseñe una interfaz que capture el comportamiento común de la entidad
-principal de su caso de estudio — la misma jerarquía que extendió en el
-laboratorio anterior. La interfaz debe tener al menos dos métodos que
-representen operaciones reales de su dominio (por ejemplo, una operación
-que modifica el estado del objeto y otra que solo lo consulta).
-
-```java
-public interface MiOperacionesEntidad {
-    void operacionQueModificaEstado(/* parametros de su dominio */);
-    TipoDeRetorno operacionQueConsultaEstado();
-}
-```
-
-Haga que la clase **abstracta** de su jerarquía (el primer nivel, el que
-extendieron sus subtipos desde la Semana 2) implemente esta interfaz.
-Al menos uno de los métodos debe quedar **sin implementar** en la clase
-abstracta, de modo que cada subtipo concreto lo resuelva con su propia
-regla de negocio — el mismo patrón que `retirar()` en una jerarquía de
-cuentas bancarias, donde cada tipo de cuenta valida el sobregiro distinto.
+Escriba una clase de prueba, con un método `main`, que:
+- Cree al menos una instancia de cada uno de los dos subtipos concretos de
+  su proyecto.
+- Las agregue a la clase de composición correspondiente (por ejemplo,
+  agregue sus `Producto` a una `Venta` a través de `ItemVenta`, o sus
+  `Animal` a un `Dueño`).
+- Ejercite el método polimórfico (el que quedó sin resolver en la clase
+  abstracta) sobre cada instancia **sin usar `instanceof`** — recórralas
+  como referencias del tipo abstracto o de la interfaz y deje que cada una
+  resuelva su propia versión.
+- Imprima por consola el resultado de cada llamada, de modo que se vea en
+  pantalla que las dos implementaciones se comportan distinto.
 
 ```java
-public abstract class MiClaseBase implements MiOperacionesEntidad {
-    // atributos heredados por toda la jerarquia, encapsulados
-
-    @Override
-    public TipoDeRetorno operacionQueConsultaEstado() {
-        // TODO: implemente aqui si el comportamiento es igual
-        // para todos los subtipos
-        return null;
+public class PruebaCreacionObjetos {
+    public static void main(String[] args) {
+        // TODO: construya al menos una instancia de cada subtipo concreto de su proyecto
+        // TODO: agreguelas a la clase de composicion correspondiente
+        // TODO: recorra las instancias como referencias del tipo abstracto/interfaz
+        //       e invoque el metodo polimorfico sin usar instanceof
+        // TODO: imprima por consola el resultado de cada llamada
     }
-
-    // operacionQueModificaEstado() queda sin implementar aqui:
-    // cada subtipo concreto la resuelve con su propia regla
 }
 ```
 
-**Requisitos:**
-- La interfaz debe estar en el paquete `model/domain/` de su repositorio.
-- Al menos dos de sus subtipos concretos (los del tercer nivel de la
-  jerarquía) deben implementar el método que la clase base dejó sin
-  resolver, con lógica distinta entre ellos.
-- Use `@Override` en cada implementación.
-
-### Parte 3 — Coordine las cuatro capas para una operación completa
-
-Elija una operación concreta de su dominio que atraviese las cuatro capas
-de principio a fin (por ejemplo: registrar una nueva entidad, o ejecutar
-la operación que definió en la Parte 2 sobre una entidad ya existente).
-Implemente el flujo completo:
-
-- **`service`**: un método que reciba los objetos del `model` ya
-  construidos y coordine la operación de negocio, sin decidir tipos
-  concretos cuando pueda delegar en polimorfismo.
-- **`controller`**: un método que reciba datos primitivos (`String`,
-  `double`, etc.), construya o busque los objetos del `model` que
-  necesite, y llame al `service`. El `controller` es el único lugar del
-  proyecto que puede decidir qué subtipo concreto instanciar.
-- **`view`**: una opción de menú que pida los datos por consola y
-  delegue en el `controller`. La `view` nunca instancia clases de
-  `model/domain/` directamente.
-
-```java
-// view/MenuPrincipal.java (esqueleto)
-private void miOpcionDeMenu() {
-    // TODO: pedir los datos necesarios por consola
-    // TODO: llamar al metodo correspondiente del controller
-    // TODO: mostrar el resultado o la confirmacion al usuario
-}
-```
-
-**Requisitos:**
-- El `service` debe invocar el método polimórfico definido en la
-  Parte 2 sin usar `instanceof` para distinguir el subtipo concreto.
-- El `controller` no debe contener lógica de negocio (validaciones de
-  dominio, cálculos): esa lógica va en el `service`.
-- El menú de consola debe ejecutarse sin errores para al menos dos
-  operaciones distintas (la registrada en esta parte y al menos una ya
-  existente de laboratorios anteriores).
-
-### Parte 4 — Revisión entre pares
-
-Intercambie su diagrama de la Parte 1 y su repositorio con otro equipo.
-Revise el trabajo del equipo que le corresponda respondiendo, por
-escrito, esta pregunta guía: **¿el código que está viendo es exactamente
-lo que el diagrama promete, ni más ni menos?** Verifique en particular:
-
-- ¿La clase que el diagrama marca como abstracta lo es también en el
-  código?
-- ¿El método que el diagrama deja pendiente en la clase base aparece
-  implementado en cada subtipo concreto, con una lógica distinta entre
-  ellos?
-- ¿Alguna clase de `view` o `controller` instancia objetos de
-  `model/domain/` sin pasar por el `service` cuando no debería?
-
-**Requisitos:**
-- Entregue la revisión como un párrafo corto por cada pregunta, con el
-  nombre del equipo revisado.
-- Si encuentra una inconsistencia entre diagrama y código, descríbala
-  concretamente (qué clase, qué línea, qué se esperaba según el
-  diagrama).
+> **Extensión opcional, no evaluada:** si su equipo ya tiene avanzada la
+> coordinación de las capas `service`, `controller` y `view` sobre estas
+> clases, puede integrarlas al menú de consola del proyecto. No es requisito
+> de este laboratorio ni forma parte de su rúbrica.
 
 ---
 
 ## Entregable
 
 Estructura de archivos dentro de su repositorio del proyecto de aula (los
-nombres exactos de clase dependen de su caso de estudio):
+nombres exactos de clase dependen de su proyecto — use los del diagrama de
+su sección):
 
 ```
 proyecto-aula/
-  docs/
-    diagrama-uml-momento1.png (o .pdf, o .md con el diagrama en texto)
   src/
     model/
       domain/
-        <InterfazTAD>.java
-        <ClaseBaseAbstracta>.java
-        <SegundoNivel>.java
-        <TercerNivelA>.java
-        <TercerNivelB>.java
-      structures/
-    service/
-      <NombreService>.java
-    controller/
-      <NombreController>.java
-    view/
-      MenuPrincipal.java
-    Main.java
-  revision-entre-pares.md
+        <Interfaz>.java
+        <ClaseAbstracta>.java
+        <SubtipoConcretoA>.java
+        <SubtipoConcretoB>.java
+        <ClaseDeComposicion>.java
+    PruebaCreacionObjetos.java
 ```
 
 **Formato de entrega:** commit sobre la rama de su proyecto de aula, con
-mensaje descriptivo (por ejemplo, `feat: diseno OO completo momento 1`).
-No se entrega por archivo `.zip` aparte — el entregable **es** el estado
-del repositorio en esa rama al momento del plazo, junto con el archivo
-del diagrama en `docs/` y el archivo `revision-entre-pares.md` con las
-respuestas de la Parte 4.
+mensaje descriptivo (por ejemplo, `feat: codificacion UML momento 1`). No se
+entrega por archivo `.zip` aparte — el entregable **es** el estado del
+repositorio en esa rama al momento del plazo.
 
 ### Ejemplo de archivo de prueba esperado
 
-Para que el docente verifique el flujo de la Parte 3, incluya una clase
-de prueba que ejercite el `Main` o el método coordinado directamente:
-
-```java
-public class PruebaFlujoCompleto {
-    public static void main(String[] args) {
-        // TODO: construya los objetos necesarios de su dominio
-        // TODO: invoque la operacion coordinada de la Parte 3
-        // TODO: imprima por consola el resultado, mostrando que
-        // paso correctamente por controller, service y model
-    }
-}
-```
+El docente verifica la Parte 2 ejecutando directamente su
+`PruebaCreacionObjetos`. Debe compilar y ejecutar sin errores, mostrando por
+consola al menos dos resultados distintos (uno por cada subtipo concreto).
 
 ---
 
@@ -245,55 +945,64 @@ public class PruebaFlujoCompleto {
 
 | Criterio | Puntos | Descripción |
 |---|---|---|
-| **Fidelidad del diagrama UML a las cuatro capas** | 35 | El diagrama muestra explícitamente `view`, `controller`, `service` y `model`, incluye toda las clases del proyecto hasta hoy (no solo las nuevas), representa la interfaz con `<<interface>>` y su realización, la herencia de la jerarquía de tres niveles, y al menos una relación de asociación/agregación/composición con multiplicidad correcta en ambos extremos. |
-| **Encapsulamiento** | 15 | Todos los atributos de las clases de `model/domain/` son `private` o `protected`; el acceso externo es siempre por métodos; los setters validan antes de asignar. |
-| **Herencia** | 15 | La jerarquía de tres niveles del código coincide exactamente con la del diagrama; cada subclase invoca `super(...)` en su constructor. |
-| **Polimorfismo** | 15 | El método sin implementar de la clase base está correctamente sobreescrito con `@Override` en cada subtipo concreto, con lógica distinta entre ellos; el `service` lo invoca sin usar `instanceof`. |
-| **Calidad de código y organización en capas** | 10 | Cada clase está en el paquete que le corresponde; el `controller` no contiene lógica de negocio; la `view` no instancia clases de `model/domain/` directamente. |
-| **Funcionamiento del menú de consola** | 10 | El menú ejecuta sin errores la operación nueva de la Parte 3 y al menos una operación de un laboratorio anterior. |
+| **Codificación correcta del UML** | 60 | Las clases, constructores, atributos, métodos, getters y setters, y la relación de herencia coinciden exactamente con el diagrama entregado: la interfaz declara los métodos del contrato, la clase abstracta implementa solo el método que le corresponde y deja el otro pendiente, y cada subtipo concreto lo resuelve con `@Override` y lógica distinta entre ellos. |
+| **Pruebas en el App — creación de objetos** | 20 | `PruebaCreacionObjetos` compila y se ejecuta sin errores, instancia al menos un objeto de cada subtipo concreto, las integra a la clase de composición, y ejercita el método polimórfico sobre cada una sin usar `instanceof`, imprimiendo el resultado por consola. |
+| **Buenas prácticas de programación** | 20 | Commits descriptivos y frecuentes (no un único commit al final); uso correcto de ramas (trabajo sobre la rama del proyecto, no directo en `main`); nombres de clases, métodos y variables descriptivos y siguiendo las convenciones de Java (`PascalCase` para clases, `camelCase` para métodos y variables). |
 | **TOTAL** | **100** | |
+
+Cada ítem se califica en una escala de **0 a 5**. La nota final del
+laboratorio es el promedio ponderado de los tres ítems, escalado al 5 % de
+la nota del curso:
+
+```
+nota_laboratorio (0-5) = 0.60 × item1 + 0.20 × item2 + 0.20 × item3
+nota_final_curso (%)   = (nota_laboratorio / 5) × 5%
+```
+
+**Ejemplo:** si obtiene 4.5 en "Codificación correcta del UML", 5 en
+"Pruebas en el App" y 4 en "Buenas prácticas":
+
+```
+nota_laboratorio = 0.60 × 4.5 + 0.20 × 5 + 0.20 × 4 = 2.7 + 1.0 + 0.8 = 4.5
+nota_final_curso = (4.5 / 5) × 5% = 4.5%
+```
 
 ---
 
 ## Dificultades Comunes
 
-### "No sé si mi relación es asociación, agregación o composición"
-- Pregúntese: si el objeto "todo" se elimina, ¿el objeto "parte" tiene
-  sentido por sí solo? Si no, es composición. Si el objeto "parte" puede
-  seguir existiendo o ser compartido por otro "todo", es agregación. Si
-  simplemente una clase usa a otra sin ser dueña de su ciclo de vida, es
-  asociación.
+### "No sé qué hacer con un método marcado en la interfaz pero no implementado en la clase abstracta"
+- Es el comportamiento esperado: la clase abstracta puede dejar métodos de
+  la interfaz sin resolver. Simplemente no escriba el método en la clase
+  abstracta (o decláralo como `abstract` explícitamente); el compilador
+  obliga a cada subclase **concreta** a implementarlo.
 
-### "Mi clase abstracta compila aunque dejé un método de la interfaz sin implementar"
-- Es el comportamiento esperado: una clase abstracta puede dejar métodos
-  de una interfaz sin resolver. El error solo aparece cuando intenta
-  instanciar la clase abstracta directamente, o cuando una clase
-  **concreta** no implementa el método heredado.
+### "Mi clase abstracta no compila porque le falta un método"
+- Revise si el método faltante es el que el diagrama deja pendiente a
+  propósito. Si es así, no lo implemente ahí: impleméntelo en cada
+  subclase concreta con `@Override`.
 
-### "El diagrama que dibujé no incluye clases de laboratorios anteriores"
-- Revíselo: el diagrama de este laboratorio debe ser **acumulado**, no
-  solo de lo nuevo. Si su jerarquía de tres niveles de la semana pasada no
-  aparece, el diagrama no es el plano de referencia completo que este
-  laboratorio pide.
+### "No entiendo la multiplicidad de la relación de composición"
+- Lea la notación como "del lado del diamante relleno, cuántas instancias
+  del otro extremo puede tener". Por ejemplo, `Dueño "1" *-- "1..*" Animal`
+  se lee: un `Animal` pertenece exactamente a `1` `Dueño`, y un `Dueño`
+  tiene `1` o más `Animal`.
 
-### "No sé en qué capa va el método que decide qué subtipo concreto crear"
-- Va en el `controller`. Es el único punto del proyecto donde es
-  aceptable escribir `new MiSubtipoConcreto(...)` a partir de una decisión
-  tomada por el usuario (por ejemplo, la opción de menú elegida).
+### "¿Puedo cambiar los nombres de las clases o métodos del diagrama?"
+- No. La rúbrica evalúa fidelidad al diagrama entregado: use exactamente
+  los nombres de clase, atributo y método que aparecen en la sección de su
+  proyecto.
 
 ---
 
 ## Extensiones Sugeridas (Bonus)
 
-- Agregar al diagrama un segundo método a su interfaz TAD y su
-  implementación correspondiente en cada subtipo.
-- Documentar en el diagrama una segunda relación de composición o
-  agregación entre otras dos entidades de su dominio, además de la
-  mínima requerida.
-- Escribir, además de `PruebaFlujoCompleto`, una segunda clase de prueba
-  que recorra un arreglo de referencias de su interfaz TAD con
-  instancias de sus distintos subtipos concretos, como en el laboratorio
-  de la Semana 3.
+- Escribir una segunda clase de prueba que recorra un arreglo o lista de
+  referencias del tipo abstracto/interfaz, mezclando instancias de los dos
+  subtipos concretos, como en el laboratorio de la Semana 3.
+- Adelantar la integración de estas clases con las capas `service`,
+  `controller` y `view` de su proyecto de aula (no evaluado en este
+  laboratorio).
 
 ---
 
@@ -301,13 +1010,11 @@ public class PruebaFlujoCompleto {
 
 - **Lecciones del curso:** "Encapsulamiento", "Herencia", "Polimorfismo",
   "Introducción al UML", "Composición, agregación y diagramas de
-  paquetes", "Diseño con TAD y orientación a objetos".
+  paquetes".
 - **Guía anterior:** "Laboratorio — Jerarquía de Clases de Tres Niveles y
-  Polimorfismo", de donde sale la jerarquía que este laboratorio
-  extiende con el TAD.
+  Polimorfismo", donde practicó la lectura de un diagrama de clases similar.
 - **Guía de proyecto:** "Guía — Elección del proyecto de aula", para
-  recordar las entidades y la arquitectura de cuatro capas de su caso de
-  estudio.
+  confirmar cuál de los cinco casos de estudio le corresponde.
 
 **Plazo de entrega:** antes de finalizar la sesión del viernes 28 de
 agosto (bloque de laboratorio evaluativo ★ M1).
