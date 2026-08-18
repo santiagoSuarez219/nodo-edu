@@ -1,10 +1,12 @@
-> Sesión evaluativa (Momento 1, 15 %). Se resuelve aquí el Sistema Bancario
-> completo, como referencia de lo que cada equipo debe producir sobre su
-> propio caso de estudio: el diagrama UML de las cuatro capas (`view` /
-> `controller` / `service` / `model`) del proyecto tal como está hoy, y su
-> implementación en Java con encapsulamiento, herencia y polimorfismo.
-> Proyectar el diagrama completo primero, después bajar capa por capa hasta
-> el menú de consola funcional.
+> Sesión evaluativa (Momento 1, 5 % — el 10 % restante del tema se evalúa
+> la semana siguiente con un quiz de opción múltiple). Cada equipo recibe el
+> diagrama UML **ya resuelto** de su proyecto (ver la guía publicada, sección
+> "Diagrama UML por proyecto") y debe traducirlo a código: la interfaz, la
+> clase abstracta, las dos subclases concretas y la relación de composición.
+> Aquí se resuelve el Sistema Bancario completo como demostración íntegra de
+> esa traducción UML → código, más la clase de prueba de creación de objetos
+> que pide la rúbrica ("Pruebas en el App"). Proyectar el diagrama entregado
+> primero, después bajar a la implementación paso a paso.
 
 ## Paso 1 — Diagrama de paquetes: las cuatro capas
 
@@ -308,7 +310,64 @@ temporal, no un `ListaSimple<T>` propia todavía. Eso llega recién en el
 Sprint 2 (Semana 5); adelantarlo hoy sería contenido que el curso no ha
 enseñado.
 
-## Paso 7 — Capa `service`: coordina, no decide sola
+## Paso 7 — Clase de prueba de creación de objetos
+
+Esto es lo que resuelve el ítem **"Pruebas en el App" (20 %)** de la
+rúbrica: una clase con `main` que instancia cada subtipo concreto, los
+agrega a la clase de composición, y ejercita el método polimórfico
+(`retirar()`) sobre cada uno **sin `instanceof`**, imprimiendo el resultado.
+
+```java
+import model.domain.Cliente;
+import model.domain.Cuenta;
+import model.domain.CuentaAhorros;
+import model.domain.CuentaCorriente;
+
+import java.util.List;
+
+public class PruebaCreacionObjetos {
+    public static void main(String[] args) {
+        // Se crea un Cliente y se le agregan una cuenta de cada subtipo
+        // concreto -- exactamente lo que pide la Parte 2 de la guia.
+        Cliente cliente = new Cliente("CC-123", "Ana Torres", "3001234567", "Calle 10 #5-20");
+
+        CuentaAhorros ahorros = new CuentaAhorros("AH-001", 100000, 0.02);
+        CuentaCorriente corriente = new CuentaCorriente("CC-001", 50000, 200000);
+
+        cliente.agregarCuenta(ahorros);
+        cliente.agregarCuenta(corriente);
+
+        // Se recorren las cuentas como referencias del tipo abstracto
+        // Cuenta -- ni una sola vez se pregunta de que subtipo es cada una.
+        List<Cuenta> cuentas = cliente.getCuentas();
+        for (Cuenta cuenta : cuentas) {
+            probarRetiro(cuenta, 30000);
+        }
+    }
+
+    private static void probarRetiro(Cuenta cuenta, double monto) {
+        // Este metodo no sabe (ni le importa) si 'cuenta' es CuentaAhorros
+        // o CuentaCorriente: retirar() resuelve la regla de cada subtipo
+        // por si sola gracias al polimorfismo. Sin instanceof en ningun lado.
+        cuenta.retirar(monto);
+        System.out.println(cuenta.getClass().getSimpleName()
+            + " " + cuenta.getNumeroCuenta()
+            + " -> saldo tras retirar " + monto + ": " + cuenta.consultarSaldo());
+    }
+}
+```
+
+Punto a resaltar: `cuenta.getClass().getSimpleName()` se usa solo para el
+mensaje impreso, no para decidir comportamiento — eso es distinto de un
+`instanceof` que ramifica la lógica. La regla de retiro sigue viviendo
+exclusivamente dentro de cada subtipo.
+
+> Lo siguiente (capas `service`/`controller`/`view` y revisión entre pares)
+> ya no es parte de los criterios evaluados de este laboratorio (ver rúbrica
+> ajustada), pero se mantiene como demostración de hacia dónde va el
+> proyecto en las siguientes semanas.
+
+## Paso 8 — Capa `service`: coordina, no decide sola
 
 ```java
 package service;
@@ -362,7 +421,7 @@ public class CuentaService {
 }
 ```
 
-## Paso 8 — Capa `controller`: traduce input en llamadas al `service`
+## Paso 9 — Capa `controller`: traduce input en llamadas al `service`
 
 ```java
 package controller;
@@ -407,7 +466,7 @@ Punto a resaltar: `BancoController` conoce `CuentaAhorros` y
 `CuentaCorriente` (tiene que decidir cuál construir según la opción de
 menú), pero `CuentaService` no — ahí es donde vive el polimorfismo real.
 
-## Paso 9 — Capa `view`: el menú de consola
+## Paso 10 — Capa `view`: el menú de consola
 
 ```java
 package view;
@@ -477,7 +536,7 @@ public class MenuPrincipal {
 }
 ```
 
-## Paso 10 — `Main.java`: se ensamblan las cuatro capas
+## Paso 11 — `Main.java`: se ensamblan las cuatro capas
 
 ```java
 import controller.BancoController;
@@ -498,7 +557,7 @@ public class Main {
 }
 ```
 
-## Paso 11 — Revisión entre pares
+## Paso 12 — Revisión entre pares
 
 Con el diseño y el código completos, cada equipo intercambia su diagrama y
 su repositorio con otro equipo (dominios distintos, así que la revisión se
