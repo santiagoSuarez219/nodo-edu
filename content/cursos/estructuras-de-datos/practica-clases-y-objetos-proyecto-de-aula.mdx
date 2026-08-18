@@ -12,7 +12,7 @@ slides_hint: "Cada sección ## es una diapositiva. Presentación sincrona."
 date: "2026-08-13"
 author: "Asistente de Docencia"
 summary: ""
-updatedAt: "2026-08-14"
+updatedAt: "2026-08-18"
 ---
 
 ## El objetivo de hoy: tu propia clase, en tu propio computador
@@ -28,17 +28,20 @@ de tu equipo. Trabajar cada quien en un archivo separado no es un detalle
 menor: es justamente lo que evita que dos personas terminen editando la
 misma línea del mismo archivo al mismo tiempo.
 
-Si tu equipo tiene 3 integrantes y el proyecto tiene 4 entidades, repártanse
-así: cada uno toma una, y la cuarta queda para quien termine primero o se
-divide entre dos si prefieren trabajar en pareja sobre esa clase. Pónganse
-de acuerdo **antes** de empezar a escribir código, para no duplicar trabajo.
+Esta vez el proyecto tiene **cinco entidades**, no cuatro: la práctica busca
+que cada equipo profundice más en la creación de clases, así que hay una
+entidad extra para repartir. Si tu equipo tiene 5 integrantes, cada uno toma
+una. Si son menos, repártanse las cinco de todas formas: alguien toma dos, o
+dos personas trabajan en pareja sobre la que sobra. Pónganse de acuerdo
+**antes** de empezar a escribir código, para no duplicar trabajo.
 
 ```mermaid
 flowchart LR
-  Equipo["Tu equipo\n(3-4 integrantes)"] --> E1["Estudiante 1\nmodela una entidad"]
+  Equipo["Tu equipo\n(3-5 integrantes)"] --> E1["Estudiante 1\nmodela una entidad"]
   Equipo --> E2["Estudiante 2\nmodela otra entidad"]
   Equipo --> E3["Estudiante 3\nmodela otra entidad"]
-  Equipo --> E4["Entidad restante:\nse reparte o se hace en pareja"]
+  Equipo --> E4["Estudiante 4\nmodela otra entidad\n(o se reparte si el equipo es mas chico)"]
+  Equipo --> E5["Quinta entidad:\nse reparte entre los que terminen primero\no se hace en pareja"]
 ```
 
 ## Qué debe tener tu clase
@@ -86,7 +89,7 @@ misma actividad que vas a repetir después, solo que aquí el profesor va
 primero.
 
 Las siguientes cinco pestañas son los proyectos de aula de los equipos. Cada
-proyecto de aula tiene cuatro entidades candidatas para repartir entre el
+proyecto de aula tiene cinco entidades candidatas para repartir entre el
 equipo. Busca la pestaña de tu proyecto: ahí tienes, para **una** de esas
 entidades, qué atributos debe tener y qué debe mostrar su método de
 información — no el código. Ese código lo escribes tú, con el mismo formato
@@ -99,7 +102,7 @@ exactamente ese mismo patrón, como en los ejercicios propuestos de
   <Tab label="Sistema Bancario (demo del profesor)">
 
 Entidades: `Cliente`, `Cuenta`,
-`Tarjeta`, y `Transaccion`.
+`Tarjeta`, `Transaccion` y `Sucursal`.
 
 Ejemplo guía — `Cuenta`: número de cuenta (`String`), saldo (`double`) y
 fecha de apertura (`String`). El método de información debe mostrar el
@@ -108,7 +111,8 @@ número de cuenta, el saldo y la fecha de apertura.
   </Tab>
   <Tab label="Papelería">
 
-Entidades para repartir: `Producto`, `Venta`, `Proveedor`, `Pedido`.
+Entidades para repartir: `Producto`, `Venta`, `Proveedor`, `Pedido` e
+`ItemVenta`.
 
 Ejemplo guía — `Producto`: código (`String`), nombre (`String`), precio
 unitario (`double`) y cantidad en stock (`int`). El método de información
@@ -117,7 +121,8 @@ debe mostrar el nombre, el código, el precio y el stock disponible.
   </Tab>
   <Tab label="Consultorio Médico">
 
-Entidades para repartir: `Paciente`, `Medico`, `Cita`, `Consulta`.
+Entidades para repartir: `Paciente`, `Medico`, `Cita`, `Consulta` y
+`Persona`.
 
 Ejemplo guía — `Paciente`: identificación (`String`), nombre (`String`), edad
 (`int`) y EPS (`String`). El método de información debe mostrar el nombre, la
@@ -126,7 +131,8 @@ edad y la EPS.
   </Tab>
   <Tab label="Clínica Veterinaria">
 
-Entidades para repartir: `Animal`, `Dueño`, `Veterinario`, `Consulta`.
+Entidades para repartir: `Animal`, `Dueño`, `Veterinario`, `Consulta` y
+`Vacuna`.
 
 Ejemplo guía — `Animal`: nombre (`String`), especie (`String`), raza
 (`String`) y edad en años (`int`). El método de información debe mostrar el
@@ -135,7 +141,8 @@ nombre, la especie, la raza y la edad.
   </Tab>
   <Tab label="Sistema Académico">
 
-Entidades para repartir: `Estudiante`, `Profesor`, `Materia`, `Matricula`.
+Entidades para repartir: `Estudiante`, `Profesor`, `Materia`, `Matricula` y
+`Calificacion`.
 
 Ejemplo guía — `Estudiante`: código (`String`), nombre (`String`), semestre
 (`int`) y promedio (`double`). El método de información debe mostrar el
@@ -144,7 +151,8 @@ nombre, el código, el semestre y el promedio.
   </Tab>
   <Tab label="Liga de Fútbol">
 
-Entidades para repartir: `Jugador`, `Equipo`, `Partido`, `Gol`.
+Entidades para repartir: `Jugador`, `Equipo`, `Partido`, `Gol` y
+`Arbitro`.
 
 Ejemplo guía — `Jugador`: nombre (`String`), dorsal (`int`), posición
 (`String`) y equipo (`String`). El método de información debe mostrar el
@@ -217,3 +225,8 @@ pase.
 - Hiciste `pull` y confirmaste que en tu copia local aparecen los archivos
   `.java` de tus compañeros, cada uno en su propio archivo dentro de
   `model/domain/`.
+
+Guarda bien estas cinco clases: no son un ejercicio aislado. En el
+laboratorio evaluativo de la Semana 4 (Momento 1) las retomas y las
+extiendes con encapsulamiento, herencia e interfaces, así que conviene
+llegar con todo commiteado y funcionando.

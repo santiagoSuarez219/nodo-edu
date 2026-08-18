@@ -11,7 +11,8 @@
 
 | Actividad                                                                 | Porcentaje | Momento                          |
 | ------------------------------------------------------------------------- | ---------- | -------------------------------- |
-| **Momento evaluativo 1:** Programación orientada a objetos (encapsulamiento, herencia, polimorfismo y UML) | 15%        | Semana 4 (28 de agosto)          |
+| **Momento evaluativo 1:** Programación orientada a objetos — codificación de UML entregado (encapsulamiento, herencia, clases abstractas e interfaces) | 5%        | Semana 4 (28 de agosto)          |
+| **Quiz de opción múltiple — POO (complemento M1)**                        | 10%        | Semana 5 (una semana después del cierre del tema) |
 | **Momento evaluativo 2:** Listas — listas enlazadas y ordenamiento        | 15%        | Semana 7 (18 de septiembre)      |
 | **Momento evaluativo 3:** Pilas y colas — **examen institucional**         | 20%        | Semana 9 (2 de octubre)          |
 | **Momento evaluativo 4:** Manejo de archivos                              | 10%        | Semana 11 (16 de octubre)        |
@@ -243,11 +244,11 @@ Cada archivo de proyecto detalla la evaluación de viabilidad, las entidades del
 - Modelar el TAD de una estructura de datos con clases e interfaces
 - Puente entre el diseño OO y la implementación de estructuras de datos
 
-**P ★ — Laboratorio evaluativo (Momento 1): Diseño OO completo**
-- Diseñar el diagrama UML completo del proyecto de aula, mostrando las cuatro capas, sus clases actuales y las relaciones entre ellas; este diagrama será el plano de referencia para el resto del semestre
-- Implementar el diseño en Java respetando el diagrama, aplicando encapsulamiento, herencia y polimorfismo
-- Revisión entre pares: ¿el código refleja fielmente el diseño?
-- Evaluación con rúbrica socializada previamente con el grupo (cierre del **Momento evaluativo 1 — POO**)
+**P ★ — Laboratorio evaluativo (Momento 1): Codificación de diseño OO**
+- A cada equipo se le entrega **ya resuelto** el diagrama UML de su proyecto de aula (interfaz, clase abstracta, dos subclases concretas y una relación de composición); el laboratorio no diseña el UML, lo lee y lo traduce fielmente a código Java
+- Implementar el diagrama aplicando encapsulamiento, herencia, clases abstractas e interfaces
+- Escribir una clase de prueba que instancie cada subtipo concreto y ejercite el método polimórfico sin `instanceof`
+- Evaluación con rúbrica socializada previamente con el grupo (cierre del **Momento evaluativo 1 — POO, 5 %**); el 10 % restante del tema se evalúa la semana siguiente con un quiz de opción múltiple complementario
 
 ---
 

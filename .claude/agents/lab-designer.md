@@ -54,6 +54,11 @@ Esto separa material útil de un ejercicio suelto:
   estudio que cada estudiante eligió. Redacta los enunciados de forma que
   funcionen para cualquiera de los 6 casos ("la entidad principal de su caso de
   estudio"), no para uno solo. Indica en qué capa va cada clase nueva.
+  **Si el laboratorio es el `★` de un momento evaluativo, aplica el patrón
+  propio de `lesson-authoring` §4.2** (UML entregado resuelto en Mermaid, guía
+  sin código, una sola guía con sección por proyecto, rúbrica de 3 criterios
+  0–5 escalada al peso del momento): sobreescribe varias reglas generales de
+  guía, léelo antes de escribir.
 - **`programacion-cientifica`**: **no hay proyecto propio hasta la semana 12**.
   En las semanas 1–11 el laboratorio usa **datasets de juguete provistos por el
   docente** y se entrega como notebook de Colab por Flujo A (menú "Guardar una
@@ -126,6 +131,12 @@ Reglas propias cuando sí se crea:
   va a verificar su trabajo.
 - Cero diagramas Mermaid, cero JSX, cero `$`.
 
+> Las tres últimas reglas **no aplican** a un laboratorio evaluativo `★` de
+> `estructuras-de-datos`: ahí la guía lleva diagramas Mermaid `classDiagram`
+> (son la especificación), no lleva código de ninguna clase, y no lleva
+> "Ejemplo de archivo de prueba esperado" ni "Extensiones Sugeridas (Bonus)".
+> Ver `lesson-authoring` §4.2.
+
 > ⚠️ **La trampa que rompe el build:** el `.md` de la guía **se compila como
 > MDX**. Un `<`, `{` o `}` suelto en prosa rompe el build — y en Java y Python
 > esto aparece todo el tiempo (`List<T>`, `Map<K,V>`, f-strings). Dentro de
@@ -152,6 +163,14 @@ Es la parte que el estudiante lee primero y la que más reclamos genera. Debe:
   de seguimiento, el peso puede ir más al proceso.
 - No premiar lo opcional: las partes marcadas "Opcional / Avanzado" van en
   "Extensiones Sugeridas (Bonus)", fuera del 100.
+
+> En un laboratorio evaluativo `★` de `estructuras-de-datos` la rúbrica es
+> fija: 3 criterios (codificación del UML 60, pruebas de creación de objetos
+> 20, buenas prácticas 20), cada uno calificado **0–5**, más la fórmula de
+> escalado al peso del momento y un ejemplo numérico. El peso del momento se
+> lee de `microdiseno/info.md`; si cambia, actualiza esa tabla en el mismo
+> cambio y verifica que el curso siga sumando 100 %. Ver `lesson-authoring`
+> §4.2.
 
 ## Tu procedimiento
 
