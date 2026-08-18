@@ -512,16 +512,10 @@ proyecto-aula/
     PruebaCreacionObjetos.java
 ```
 
-**Formato de entrega:** commit sobre la rama de su proyecto de aula, con
+**Formato de entrega:** commit sobre la rama main de su proyecto de aula, con
 mensaje descriptivo (por ejemplo, `feat: codificacion UML momento 1`). No se
 entrega por archivo `.zip` aparte — el entregable **es** el estado del
 repositorio en esa rama al momento del plazo.
-
-### Ejemplo de archivo de prueba esperado
-
-El docente verifica la Parte 2 ejecutando directamente su
-`PruebaCreacionObjetos`. Debe compilar y ejecutar sin errores, mostrando por
-consola al menos dos resultados distintos (uno por cada subtipo concreto).
 
 ---
 
@@ -586,17 +580,6 @@ nota_final_curso = (4.5 / 5) × 5% = 4.5%
 
 ---
 
-## Extensiones Sugeridas (Bonus)
-
-- Escribir una segunda clase de prueba que recorra un arreglo o lista de
-  referencias del tipo abstracto/interfaz, mezclando instancias de los dos
-  subtipos concretos, como en el laboratorio de la Semana 3.
-- Adelantar la integración de estas clases con las capas `service`,
-  `controller` y `view` de su proyecto de aula (no evaluado en este
-  laboratorio).
-
----
-
 ## Recursos
 
 - **Lecciones del curso:** "Encapsulamiento", "Herencia", "Polimorfismo",
@@ -610,5 +593,4 @@ nota_final_curso = (4.5 / 5) × 5% = 4.5%
 - **Guía de proyecto:** "Guía — Elección del proyecto de aula", para
   confirmar cuál de los cinco casos de estudio le corresponde.
 
-**Plazo de entrega:** antes de finalizar la sesión del viernes 28 de
-agosto (bloque de laboratorio evaluativo ★ M1).
+**Plazo de entrega:** Miercoles 2 de septiembre
