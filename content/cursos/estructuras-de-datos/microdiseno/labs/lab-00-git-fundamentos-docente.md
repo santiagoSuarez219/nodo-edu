@@ -33,7 +33,7 @@ Al terminar el trabajo independiente, el estudiante debe poder:
   delimitadores (`<<<<<<<`, `=======`, `>>>>>>>`) y resolverlo sin dejar
   residuos en el archivo.
 - Tener montada la estructura de paquetes del proyecto de aula
-  (`model/domain`, `model/structures`, `service`, `controller`, `view`) con
+  (`model/domain`, `model/structures`, `service`, `view`) con
   un `Main.java` que compila y ejecuta, lista para recibir código desde la
   Semana 2.
 
@@ -53,7 +53,7 @@ mismo orden que la guía del estudiante:
    atributos `telefono` / `direccion`) que se resuelve en este laboratorio.
    No es coincidencia: se reutiliza a propósito para que el estudiante
    reconozca el patrón exacto que ya vio resuelto en la teoría.
-4. Montar la estructura de paquetes de cuatro capas — presentada en T2,
+4. Montar la estructura de paquetes de tres capas — presentada en T2,
    sección "La estructura que vas a versionar".
 
 Si el docente necesita reforzar algo el martes siguiente, la pregunta de
@@ -335,7 +335,6 @@ nada; `git status` reporta el working tree limpio.
 ```bash
 mkdir -p src/main/java/proyecto/model/structures
 mkdir -p src/main/java/proyecto/service
-mkdir -p src/main/java/proyecto/controller
 mkdir -p src/main/java/proyecto/view
 
 cat > src/main/java/proyecto/Main.java << 'EOF'
@@ -344,7 +343,7 @@ package proyecto;
 public class Main {
     public static void main(String[] args) {
         System.out.println("Bienvenido al Sistema Bancario — Proyecto de Aula");
-        System.out.println("Estructura de paquetes lista: model/domain, model/structures, service, controller, view");
+        System.out.println("Estructura de paquetes lista: model/domain, model/structures, service, view");
     }
 }
 EOF
@@ -353,7 +352,6 @@ EOF
 # un .gitkeep por carpeta evita que desaparezcan al clonar el repo en otra maquina.
 touch src/main/java/proyecto/model/structures/.gitkeep
 touch src/main/java/proyecto/service/.gitkeep
-touch src/main/java/proyecto/controller/.gitkeep
 touch src/main/java/proyecto/view/.gitkeep
 
 git add src/main/java/proyecto
@@ -375,8 +373,6 @@ proyecto-aula/
         │       └── .gitkeep
         ├── service/
         │   └── .gitkeep
-        ├── controller/
-        │   └── .gitkeep
         └── view/
             └── .gitkeep
 ```
@@ -395,7 +391,7 @@ cada equipo que muestre su repositorio (local o el enlace de GitHub):
 | `git log --oneline` | 4 o más commits con mensajes en modo imperativo, específicos ("Valida que el nombre..." y no "cambios") |
 | `git log --oneline --graph --all` | Al menos una rama `feature/` visible, fusionada a `main` |
 | El archivo donde se resolvió el conflicto | Sin delimitadores residuales; el diff del commit de resolución muestra un cambio deliberado, no solo "acepté una versión y borré la otra sin pensar" |
-| El árbol de carpetas del proyecto | Las cinco carpetas existen (incluidas las vacías) y `Main.java` está en la raíz del paquete |
+| El árbol de carpetas del proyecto | Las cuatro carpetas existen (incluidas las vacías) y `Main.java` está en la raíz del paquete |
 | `java -cp out proyecto.Main` (o el comando que use el estudiante) | Compila y corre sin error, imprime el mensaje de bienvenida |
 
 ## Errores frecuentes y cómo intervenir
@@ -408,7 +404,7 @@ cada equipo que muestre su repositorio (local o el enlace de GitHub):
 | El conflicto de la Tarea 3 nunca aparece, el merge se completa solo | Las dos ediciones no cayeron en la misma línea/zona del archivo — Git combina automáticamente cambios en zonas distintas | Pedir que ambas ediciones se hagan **en el mismo punto exacto** del archivo, como en el ejemplo de esta guía |
 | Tras "resolver" el conflicto, el archivo sigue con `<<<<<<<` o `=======` | Guardó sin borrar los delimitadores, o resolvió aceptando una versión sin fusionar el contenido de ambas | Ejecutar `grep -rn "<<<<<<<\|=======\|>>>>>>>" src/` para localizar el residuo exacto |
 | `javac` falla con "package proyecto.model.domain does not exist" o similar | La carpeta no coincide con la declaración `package` del archivo, o el comando de compilación no incluyó todos los `.java` | Confirmar que la ruta de carpetas refleja exactamente el `package` declarado en cada archivo |
-| Las carpetas vacías (`service/`, `controller/`, `view/`) "desaparecen" tras clonar en otra máquina | Git no versiona carpetas vacías; sin un archivo dentro (`.gitkeep`), la carpeta no se sube | Recordar el propósito del `.gitkeep`: es un archivo vacío cuyo único fin es que la carpeta tenga contenido rastreable |
+| Las carpetas vacías (`service/`, `view/`) "desaparecen" tras clonar en otra máquina | Git no versiona carpetas vacías; sin un archivo dentro (`.gitkeep`), la carpeta no se sube | Recordar el propósito del `.gitkeep`: es un archivo vacío cuyo único fin es que la carpeta tenga contenido rastreable |
 
 ## Preguntas socráticas
 

@@ -49,7 +49,8 @@ llevan rúbrica ni "entregable".
 Esto separa material útil de un ejercicio suelto:
 
 - **`estructuras-de-datos`**: hay proyecto de aula semestral en 5 sprints con 6
-  casos de estudio y arquitectura `View → Controller → Service → Model`. **Todo
+  casos de estudio y arquitectura de 3 capas `View → Service → Model` (la `View`
+  llama directo al `Service`; no hay capa de controlador). **Todo
   laboratorio debe ser un incremento del sprint vigente**, sobre el caso de
   estudio que cada estudiante eligió. Redacta los enunciados de forma que
   funcionen para cualquiera de los 6 casos ("la entidad principal de su caso de

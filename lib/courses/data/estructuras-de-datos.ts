@@ -227,7 +227,7 @@ export const estructurasDeDatos: Course = {
       order: 12,
       title: "Diseño con TAD y orientación a objetos",
       summary:
-        "Separa el contrato de la implementación con interface, traduce un diagrama de clases con relaciones a Java, y organiza las clases del proyecto en paquetes que reflejan sus cuatro capas.",
+        "Separa el contrato de la implementación con interface, traduce un diagrama de clases con relaciones a Java, y organiza las clases del proyecto en paquetes que reflejan sus tres capas.",
       topics: [
         { title: "Diagrama de clases con relaciones: lectura e implementación en Java" },
         { title: "Modelar un TAD de diseño OO con clases e interfaces" },

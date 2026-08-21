@@ -192,7 +192,7 @@ Cualquier tipo de diagrama de Mermaid v11 sirve. Referencia completa en
 | Estructura de carpetas, jerarquía, contenedores | `flowchart TB` + `subgraph` |
 | Modelo de clases, herencia, composición (POO/UML) | `classDiagram` |
 | Ciclo de vida, estados de un objeto o proceso | `stateDiagram-v2` |
-| Interacción entre capas (View→Controller→Service) | `sequenceDiagram` |
+| Interacción entre capas (View→Service→Model) | `sequenceDiagram` |
 | Comparar crecimiento asintótico, benchmarks | `xychart-beta` |
 | Mapa conceptual de cierre de módulo | `mindmap` |
 | Cronograma de sprints del proyecto | `gantt` |

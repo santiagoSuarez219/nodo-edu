@@ -13,18 +13,19 @@ agrega funcionalidad al mismo repositorio, de modo que al final del curso
 tendrán una aplicación completa que integra todas las estructuras de datos
 vistas.
 
-El proyecto sigue una arquitectura de cuatro capas:
+El proyecto sigue una arquitectura de tres capas:
 
 ```
-View -> Controller -> Service -> Model
+View -> Service -> Model
 ```
 
-`View` gestiona los menús y la presentación en consola; `Controller` recibe
-el input del usuario y coordina con el `Service`; `Service` contiene la
-lógica de negocio, los algoritmos y la persistencia; `Model` contiene las
-clases de dominio del caso de estudio (`model/domain/`) y las estructuras de
-datos genéricas (`model/structures/`) que van a implementar a lo largo del
-curso.
+`Model` contiene las clases: las entidades del caso de estudio
+(`model/domain/`) y las estructuras de datos propias (`model/structures/`)
+que van a implementar a lo largo del curso. `Service` contiene la lógica
+—reglas de negocio, algoritmos y persistencia— aplicando los métodos de los
+modelos. `View` concentra toda la interacción con el usuario: los menús, la
+lectura de datos por consola y la presentación de resultados; llama
+directamente al `Service`.
 
 El trabajo está organizado en cinco sprints, cada uno alineado con un módulo
 del curso:

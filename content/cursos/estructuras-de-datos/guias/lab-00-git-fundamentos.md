@@ -11,7 +11,7 @@ Este laboratorio se realiza como **trabajo independiente
 guiado**: usted lo trabaja por su cuenta, con esta guía como única referencia,
 en un bloque de aproximadamente 2 horas. Va a construir, con sus propias manos, el repositorio de Git que va a alojar el proyecto de aula durante todo el semestre: un historial de commits real,
 al menos una rama fusionada, un conflicto de fusión resuelto correctamente, y
-el esqueleto de paquetes de las cuatro capas sobre el que se construirá cada
+el esqueleto de paquetes de las tres capas sobre el que se construirá cada
 laboratorio de las próximas 16 semanas.
 
 Competencias esperadas:
@@ -20,7 +20,7 @@ Competencias esperadas:
 - Crear y fusionar ramas siguiendo el flujo tipo feature branch.
 - Reconocer, interpretar y resolver un conflicto de fusión.
 - Organizar un proyecto Java en capas (`model/domain`, `model/structures`,
-  `service`, `controller`, `view`) desde el primer commit.
+  `service`, `view`) desde el primer commit.
 
 ## Requisitos Previos
 
@@ -152,12 +152,11 @@ proyecto-aula/
     │   ├── domain/
     │   └── structures/
     ├── service/
-    ├── controller/
     └── view/
 ```
 
-Cree las cinco carpetas (`model/domain`, `model/structures`, `service`,
-`controller`, `view`) dentro del paquete de su proyecto, y un `Main.java` en
+Cree las cuatro carpetas (`model/domain`, `model/structures`, `service`,
+`view`) dentro del paquete de su proyecto, y un `Main.java` en
 la raíz del paquete con la siguiente firma:
 
 ```java
@@ -172,7 +171,7 @@ public class Main {
 ```
 
 **Requisitos:**
-- Las cinco carpetas deben existir, aunque algunas queden vacías por ahora.
+- Las cuatro carpetas deben existir, aunque algunas queden vacías por ahora.
   Git no versiona carpetas vacías: agregue un archivo `.gitkeep` dentro de
   cada carpeta que no tenga contenido todavía, para que sí quede rastreada.
 - `Main.java` debe compilar y ejecutar sin errores, e imprimir al menos un
@@ -203,8 +202,6 @@ proyecto-aula/
         │   └── structures/
         │       └── .gitkeep
         ├── service/
-        │   └── .gitkeep
-        ├── controller/
         │   └── .gitkeep
         └── view/
             └── .gitkeep
@@ -249,7 +246,7 @@ la nota final del curso), no como un momento evaluativo independiente.
 | **Secuencia de commits** | 20 | El historial (`git log --oneline`) tiene al menos 3 commits, cada uno con mensaje descriptivo en modo imperativo que corresponde a una unidad de cambio real, no a relleno genérico. |
 | **Rama y fusión** | 20 | Existe al menos una rama con el prefijo `feature/`, con al menos un commit propio, fusionada a `main` mediante `git merge` visible en `git log --graph --all`. |
 | **Resolución de conflicto** | 25 | El repositorio muestra evidencia de un `CONFLICT` real resuelto: existe un commit posterior a un merge conflictivo, y ningún archivo del proyecto conserva delimitadores `<<<<<<<`, `=======` o `>>>>>>>` residuales. |
-| **Estructura de paquetes** | 20 | Las cinco carpetas (`model/domain`, `model/structures`, `service`, `controller`, `view`) existen dentro del paquete del proyecto, y `Main.java` compila y ejecuta sin errores desde la raíz del paquete. |
+| **Estructura de paquetes** | 20 | Las cuatro carpetas (`model/domain`, `model/structures`, `service`, `view`) existen dentro del paquete del proyecto, y `Main.java` compila y ejecuta sin errores desde la raíz del paquete. |
 | **Entrega y estado del repositorio** | 15 | El repositorio está publicado en GitHub, accesible para el docente, con `git status` limpio en el momento de la entrega (nada pendiente de comitear). |
 | **TOTAL** | **100** | |
 

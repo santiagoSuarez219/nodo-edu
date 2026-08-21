@@ -80,11 +80,17 @@ El proyecto de aula es un sistema de consola en Java que se construye de forma i
 
 ### Arquitectura
 
-El proyecto sigue una arquitectura de cuatro capas inspirada en el patrón **MVC + Service**:
+El proyecto sigue una arquitectura de **tres capas** — la expresión mínima de la separación de responsabilidades, suficiente para que el código quede ordenado sin cargar al estudiante con el patrón MVC completo:
 
 ```
-View → Controller → Service → Model
+View → Service → Model
 ```
+
+- **Model** — las clases: entidades del caso de estudio y estructuras de datos propias.
+- **Service** — la lógica: resuelve las reglas de negocio, los algoritmos y la persistencia, aplicando los métodos de los modelos.
+- **View** — toda la interacción con el usuario: menús, lectura de datos por consola y presentación de resultados.
+
+La `View` llama directamente al `Service`: no hay una capa intermedia que traduzca el input.
 
 ### Estructura de paquetes
 
@@ -95,8 +101,7 @@ proyecto-aula/
 │   │   ├── domain/        # clases de dominio del caso de estudio
 │   │   └── structures/    # estructuras de datos genéricas (Nodo, Lista, Pila, Cola, Árbol)
 │   ├── service/           # lógica de negocio, algoritmos y persistencia
-│   ├── controller/        # recibe el input del usuario y coordina con el service
-│   ├── view/              # menús y presentación en consola
+│   ├── view/              # menús, entrada y presentación en consola
 │   └── Main.java
 ├── data/                  # archivos de texto y binarios para persistencia
 └── README.md
@@ -106,8 +111,7 @@ proyecto-aula/
 
 | Pregunta | Capa |
 |----------|------|
-| ¿Depende de cómo se muestra al usuario? | `view/` |
-| ¿Depende de cómo llega el input? | `controller/` |
+| ¿Es interacción con el usuario: mostrar algo o pedir un dato? | `view/` |
 | ¿Es lógica de negocio, algoritmo o persistencia? | `service/` |
 | ¿Son datos o estructura de datos pura? | `model/` |
 
@@ -166,7 +170,7 @@ Cada archivo de proyecto detalla la evaluación de viabilidad, las entidades del
 - Crear un repositorio local y vincularlo a GitHub
 - Realizar una secuencia de commits con mensajes descriptivos
 - Crear y fusionar ramas; identificar y resolver un conflicto de merge
-- Crear la estructura de paquetes del proyecto de aula (`model/domain`, `model/structures`, `service`, `controller`, `view`) con un `Main.java` que imprima un mensaje de bienvenida
+- Crear la estructura de paquetes del proyecto de aula (`model/domain`, `model/structures`, `service`, `view`) con un `Main.java` que imprima un mensaje de bienvenida
 
 ---
 
@@ -201,7 +205,7 @@ Cada archivo de proyecto detalla la evaluación de viabilidad, las entidades del
 - Modelar una clase con atributos privados y constructores sobrecargados
 - Implementar getters y setters con validaciones de negocio
 - Verificar el comportamiento con casos de prueba
-- *Capas involucradas:* la clase modelada va en `model/domain/`; el menú de consola va en `view/`; se crea un stub vacío en `service/` y en `controller/`
+- *Capas involucradas:* la clase modelada va en `model/domain/`; el menú de consola va en `view/`; se crea un stub vacío en `service/`
 
 **T4 — Métodos avanzados y clases de utilidad** *(fecha por definir)*
 - Sobrecarga de métodos (*method overloading*)
@@ -274,7 +278,7 @@ Cada archivo de proyecto detalla la evaluación de viabilidad, las entidades del
 - Implementar la clase `Nodo<T>` y la clase `ListaSimple<T>` genérica
 - Implementar inserción y recorrido completo
 - Validar con casos de prueba que cubran listas vacías, de un elemento y con varios elementos
-- *Capas involucradas:* `Nodo<T>` y `ListaSimple<T>` van en `model/structures/`; el `Service` las usa para gestionar entidades del dominio; `Controller` y `View` no referencian las estructuras directamente
+- *Capas involucradas:* `Nodo<T>` y `ListaSimple<T>` van en `model/structures/`; el `Service` las usa para gestionar entidades del dominio; la `View` no referencia las estructuras directamente
 
 ### Semana 6 — Operaciones, lista doble y circular
 
@@ -311,7 +315,7 @@ Cada archivo de proyecto detalla la evaluación de viabilidad, las entidades del
 **P ★ — Laboratorio evaluativo (Momento 2): Caso de estudio con listas**
 - Implementar una solución completa para un caso de estudio dado
 - La solución debe incluir diseño UML, código en Java y al menos una estrategia de ordenamiento
-- *Capas involucradas:* los algoritmos de ordenamiento van en el `Service`; la `View` recibe la lista ya ordenada y la muestra; el `Controller` coordina la interacción
+- *Capas involucradas:* los algoritmos de ordenamiento van en el `Service`; la `View` recibe la lista ya ordenada y la muestra
 - Evaluación con rúbrica socializada previamente con el grupo (cierre del **Momento evaluativo 2 — Listas**)
 
 ---
@@ -353,7 +357,7 @@ Cada archivo de proyecto detalla la evaluación de viabilidad, las entidades del
 **P — Laboratorio: Caso de estudio con pilas y colas**
 - Implementar una solución que combine pila y cola para un caso de estudio dado
 - Incluir diseño UML y código en Java
-- *Capas involucradas:* `Cola<T>` va en `model/structures/`; la solución debe mostrar `Pila<T>` y `Cola<T>` integradas a través del `Service`; `Controller` y `View` no conocen las estructuras directamente
+- *Capas involucradas:* `Cola<T>` va en `model/structures/`; la solución debe mostrar `Pila<T>` y `Cola<T>` integradas a través del `Service`; la `View` no conoce las estructuras directamente
 - Se califica dentro del **Seguimiento continuo** y sirve de preparación para el examen institucional
 
 **★ Momento evaluativo 3 — Examen institucional de pilas y colas (20 %)**
@@ -486,12 +490,12 @@ Cada archivo de proyecto detalla la evaluación de viabilidad, las entidades del
 - Síntesis del curso: hilo conductor entre todos los módulos
 
 **T2 — Integración y criterios de sustentación**
-- Revisión de la separación de las cuatro capas en el proyecto de aula
+- Revisión de la separación de las tres capas en el proyecto de aula
 - Criterios y rúbrica de la sustentación, socializados con el grupo
 
 **P — Laboratorio: Integración final**
 - El proyecto debe articular al menos tres estructuras vistas en el curso sobre el caso de estudio elegido
-- Verificar que las cuatro capas están correctamente separadas
+- Verificar que las tres capas están correctamente separadas
 - Ensayo de sustentación y retroalimentación entre pares
 
 ### Semana de exámenes ★ — Sustentación del proyecto final

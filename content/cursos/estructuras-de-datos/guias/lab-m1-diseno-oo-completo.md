@@ -489,7 +489,7 @@ Escriba una clase de prueba, con un método `main`, que:
   fuera de `model/domain/`, junto al `Main.java` de su proyecto.
 
 > **Extensión opcional, no evaluada:** si su equipo ya tiene avanzada la
-> coordinación de las capas `service`, `controller` y `view` sobre estas
+> coordinación de las capas `service` y `view` sobre estas
 > clases, puede integrarlas al menú de consola del proyecto. No es requisito
 > de este laboratorio ni forma parte de su rúbrica.
 

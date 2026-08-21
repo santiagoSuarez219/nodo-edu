@@ -16,7 +16,7 @@
 > de aula"), no de cero — el laboratorio las evoluciona con encapsulamiento,
 > herencia e interfaces en vez de introducir un diseño desconectado.
 
-## Paso 1 — Diagrama de paquetes: las cuatro capas
+## Paso 1 — Diagrama de paquetes: las tres capas
 
 Antes del detalle de clases, ubicar cada paquete y quién depende de quién.
 Flecha = "conoce a / llama a".
@@ -25,9 +25,6 @@ Flecha = "conoce a / llama a".
 flowchart TB
   subgraph View["view"]
     MenuPrincipal["MenuPrincipal"]
-  end
-  subgraph Controller["controller"]
-    BancoController["BancoController"]
   end
   subgraph Service["service"]
     ClienteService["ClienteService"]
@@ -42,10 +39,13 @@ flowchart TB
       Vacio["(vacio en este sprint)"]
     end
   end
-  View --> Controller
-  Controller --> Service
+  View --> Service
   Service --> Domain
 ```
+
+La `View` habla directo con el `Service`: no hay capa intermedia. Cada
+flecha es una dependencia real y unidireccional — el `Service` nunca
+conoce a la `View`, y el `Model` no conoce a nadie por encima suyo.
 
 Punto a resaltar: `model/structures/` existe como paquete desde ya (así lo
 pide la estructura de carpetes de la Semana 1), pero queda vacío hasta el
@@ -370,7 +370,7 @@ mensaje impreso, no para decidir comportamiento — eso es distinto de un
 `instanceof` que ramifica la lógica. La regla de retiro sigue viviendo
 exclusivamente dentro de cada subtipo.
 
-> Lo siguiente (capas `service`/`controller`/`view` y revisión entre pares)
+> Lo siguiente (capas `service`/`view` y revisión entre pares)
 > ya no es parte de los criterios evaluados de este laboratorio (ver rúbrica
 > ajustada), pero se mantiene como demostración de hacia dónde va el
 > proyecto en las siguientes semanas.
@@ -389,12 +389,15 @@ import java.util.Optional;
 public class ClienteService {
     private final List<Cliente> clientes = new ArrayList<>();
 
-    public Cliente registrar(Cliente cliente) {
+    public Cliente registrar(String identificacion, String nombre, String telefono, String direccion) {
+        // El Service es el unico que construye entidades del dominio: la
+        // View le pasa datos crudos, nunca objetos Cliente ya armados.
         boolean existe = clientes.stream()
-            .anyMatch(c -> c.getIdentificacion().equals(cliente.getIdentificacion()));
+            .anyMatch(c -> c.getIdentificacion().equals(identificacion));
         if (existe) {
             throw new IllegalStateException("Ya existe un cliente con esa identificacion");
         }
+        Cliente cliente = new Cliente(identificacion, nombre, telefono, direccion);
         clientes.add(cliente);
         return cliente;
     }
@@ -404,6 +407,11 @@ public class ClienteService {
             .filter(c -> c.getIdentificacion().equals(identificacion))
             .findFirst();
     }
+
+    public Cliente buscarPorIdentificacionOFallar(String identificacion) {
+        return buscarPorIdentificacion(identificacion)
+            .orElseThrow(() -> new IllegalArgumentException("Cliente no encontrado: " + identificacion));
+    }
 }
 ```
 
@@ -412,13 +420,36 @@ package service;
 
 import model.domain.Cliente;
 import model.domain.Cuenta;
+import model.domain.CuentaAhorros;
+import model.domain.CuentaCorriente;
 
 public class CuentaService {
-    public void abrirCuenta(Cliente cliente, Cuenta cuenta) {
+    private final ClienteService clienteService;
+
+    public CuentaService(ClienteService clienteService) {
+        // Un Service puede apoyarse en otro Service de la misma capa;
+        // lo que no puede es conocer la View que esta por encima.
+        this.clienteService = clienteService;
+    }
+
+    public CuentaAhorros abrirCuentaAhorros(String identificacion, String numeroCuenta,
+                                            double saldoInicial, double tasaInteres) {
         // El Service valida la regla de negocio ("una cuenta se abre a
-        // nombre de un cliente ya registrado") y delega la mutacion al
-        // Model. El Controller nunca llama a Cliente.agregarCuenta directo.
+        // nombre de un cliente ya registrado"), construye el subtipo
+        // concreto y delega la mutacion al Model. La View nunca llama a
+        // Cliente.agregarCuenta directo.
+        Cliente cliente = clienteService.buscarPorIdentificacionOFallar(identificacion);
+        CuentaAhorros cuenta = new CuentaAhorros(numeroCuenta, saldoInicial, tasaInteres);
         cliente.agregarCuenta(cuenta);
+        return cuenta;
+    }
+
+    public CuentaCorriente abrirCuentaCorriente(String identificacion, String numeroCuenta,
+                                                double saldoInicial, double cupoSobregiro) {
+        Cliente cliente = clienteService.buscarPorIdentificacionOFallar(identificacion);
+        CuentaCorriente cuenta = new CuentaCorriente(numeroCuenta, saldoInicial, cupoSobregiro);
+        cliente.agregarCuenta(cuenta);
+        return cuenta;
     }
 
     public void retirar(Cuenta cuenta, double monto) {
@@ -429,67 +460,33 @@ public class CuentaService {
 }
 ```
 
-## Paso 9 — Capa `controller`: traduce input en llamadas al `service`
+Punto a resaltar: los métodos de apertura son el **único** lugar donde se
+nombra un subtipo concreto (`CuentaAhorros`, `CuentaCorriente`), porque
+alguien tiene que decidir cuál construir según lo que pidió el usuario. De
+ahí en adelante todo se maneja como `Cuenta` — `retirar()` no vuelve a
+preguntar de qué tipo es. Esa decisión vive en el `Service`, junto a la
+regla de negocio que la acompaña.
 
-```java
-package controller;
-
-import model.domain.Cliente;
-import model.domain.Cuenta;
-import model.domain.CuentaAhorros;
-import model.domain.CuentaCorriente;
-import service.ClienteService;
-import service.CuentaService;
-
-import java.util.Optional;
-
-public class BancoController {
-    private final ClienteService clienteService;
-    private final CuentaService cuentaService;
-
-    public BancoController(ClienteService clienteService, CuentaService cuentaService) {
-        this.clienteService = clienteService;
-        this.cuentaService = cuentaService;
-    }
-
-    public Cliente registrarCliente(String identificacion, String nombre, String telefono, String direccion) {
-        return clienteService.registrar(new Cliente(identificacion, nombre, telefono, direccion));
-    }
-
-    public Cuenta abrirCuentaAhorros(String identificacion, String numeroCuenta, double saldoInicial, double tasaInteres) {
-        Cliente cliente = buscarClienteOFallar(identificacion);
-        CuentaAhorros cuenta = new CuentaAhorros(numeroCuenta, saldoInicial, tasaInteres);
-        cuentaService.abrirCuenta(cliente, cuenta);
-        return cuenta;
-    }
-
-    private Cliente buscarClienteOFallar(String identificacion) {
-        Optional<Cliente> cliente = clienteService.buscarPorIdentificacion(identificacion);
-        return cliente.orElseThrow(() -> new IllegalArgumentException("Cliente no encontrado: " + identificacion));
-    }
-}
-```
-
-Punto a resaltar: `BancoController` conoce `CuentaAhorros` y
-`CuentaCorriente` (tiene que decidir cuál construir según la opción de
-menú), pero `CuentaService` no — ahí es donde vive el polimorfismo real.
-
-## Paso 10 — Capa `view`: el menú de consola
+## Paso 9 — Capa `view`: el menú de consola
 
 ```java
 package view;
 
-import controller.BancoController;
 import model.domain.Cliente;
+import service.ClienteService;
+import service.CuentaService;
 
 import java.util.Scanner;
 
 public class MenuPrincipal {
-    private final BancoController controller;
+    private final ClienteService clienteService;
+    private final CuentaService cuentaService;
     private final Scanner entrada;
 
-    public MenuPrincipal(BancoController controller) {
-        this.controller = controller;
+    public MenuPrincipal(ClienteService clienteService, CuentaService cuentaService) {
+        // La View recibe los services que necesita y los invoca directo.
+        this.clienteService = clienteService;
+        this.cuentaService = cuentaService;
         this.entrada = new Scanner(System.in);
     }
 
@@ -515,7 +512,7 @@ public class MenuPrincipal {
     }
 
     private void registrarCliente() {
-        // La View solo recolecta datos y se los entrega al Controller;
+        // La View solo recolecta datos y se los entrega al Service;
         // nunca instancia Cliente ni Cuenta directamente.
         System.out.print("Identificacion: ");
         String identificacion = entrada.nextLine();
@@ -525,7 +522,7 @@ public class MenuPrincipal {
         String telefono = entrada.nextLine();
         System.out.print("Direccion: ");
         String direccion = entrada.nextLine();
-        Cliente cliente = controller.registrarCliente(identificacion, nombre, telefono, direccion);
+        Cliente cliente = clienteService.registrar(identificacion, nombre, telefono, direccion);
         System.out.println("Cliente registrado: " + cliente.getNombre());
     }
 
@@ -538,34 +535,37 @@ public class MenuPrincipal {
         double saldoInicial = Double.parseDouble(entrada.nextLine());
         System.out.print("Tasa de interes: ");
         double tasaInteres = Double.parseDouble(entrada.nextLine());
-        controller.abrirCuentaAhorros(identificacion, numeroCuenta, saldoInicial, tasaInteres);
+        cuentaService.abrirCuentaAhorros(identificacion, numeroCuenta, saldoInicial, tasaInteres);
         System.out.println("Cuenta de ahorros abierta");
     }
 }
 ```
 
-## Paso 11 — `Main.java`: se ensamblan las cuatro capas
+Punto a resaltar: los dos métodos privados terminan igual — leen del
+`Scanner`, llaman **un** método del `Service` y muestran el resultado. Si
+alguna vez aparece un `if` con una regla de negocio dentro de esta clase,
+está en la capa equivocada.
+
+## Paso 10 — `Main.java`: se ensamblan las tres capas
 
 ```java
-import controller.BancoController;
 import service.ClienteService;
 import service.CuentaService;
 import view.MenuPrincipal;
 
 public class Main {
     public static void main(String[] args) {
-        // El unico lugar del proyecto donde las cuatro capas se conocen
+        // El unico lugar del proyecto donde las tres capas se conocen
         // todas a la vez: aqui se cablean, en ningun otro sitio.
         ClienteService clienteService = new ClienteService();
-        CuentaService cuentaService = new CuentaService();
-        BancoController controller = new BancoController(clienteService, cuentaService);
-        MenuPrincipal menu = new MenuPrincipal(controller);
+        CuentaService cuentaService = new CuentaService(clienteService);
+        MenuPrincipal menu = new MenuPrincipal(clienteService, cuentaService);
         menu.iniciar();
     }
 }
 ```
 
-## Paso 12 — Revisión entre pares
+## Paso 11 — Revisión entre pares
 
 Con el diseño y el código completos, cada equipo intercambia su diagrama y
 su repositorio con otro equipo (dominios distintos, así que la revisión se
@@ -574,9 +574,8 @@ dominio). La pregunta que guía la revisión es una sola: **¿el código que
 estoy viendo es exactamente lo que el diagrama promete, ni más ni menos?**
 En el Sistema Bancario, eso significa comprobar que `Cuenta` en el código
 es abstracta como en el diagrama, que `retirar()` no aparece implementado
-en `Cuenta` sino en cada subtipo, y que ninguna clase de `view` o
-`controller` construye un objeto `Cuenta` directamente sin pasar por el
-`service`.
+en `Cuenta` sino en cada subtipo, y que ninguna clase de `view` construye
+un objeto `Cuenta` directamente sin pasar por el `service`.
 
 ## Preguntas socráticas
 
@@ -601,10 +600,12 @@ en `Cuenta` sino en cada subtipo, y que ninguna clase de `view` o
   mano lo que el polimorfismo ya resuelve automáticamente al invocar
   `cuenta.retirar(monto)` — cada subtipo ejecuta su propia versión sin que
   el `Service` necesite saberlo.
-- *"¿Qué pasaría si `BancoController` llamara `cliente.getCuentas().add(cuenta)`
-  directamente en vez de pasar por `CuentaService.abrirCuenta()`?"* —
-  Respuesta esperada: seguiría funcionando hoy, pero rompería la
-  separación de capas: cualquier regla de negocio futura sobre abrir
-  cuentas (por ejemplo, un tope de cuentas por cliente) tendría que
-  agregarse en `Controller` en vez de en `Service`, contaminando una capa
-  que solo debería traducir input.
+- *"¿Qué pasaría si `MenuPrincipal` construyera la cuenta y llamara
+  `cliente.getCuentas().add(cuenta)` directamente, en vez de pasar por
+  `CuentaService.abrirCuentaAhorros()`?"* — Respuesta esperada: seguiría
+  funcionando hoy, pero rompería la separación de responsabilidades:
+  cualquier regla de negocio futura sobre abrir cuentas (por ejemplo, un
+  tope de cuentas por cliente) tendría que escribirse dentro del menú, y
+  habría que repetirla en cada opción que abra cuentas. La `View` solo debe
+  pedir datos y mostrar resultados; en el momento en que decide algo del
+  negocio, el `Service` deja de ser la única fuente de esas reglas.

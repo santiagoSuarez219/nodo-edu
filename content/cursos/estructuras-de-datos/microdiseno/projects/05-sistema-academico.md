@@ -46,7 +46,7 @@ Es el proyecto con mayor riqueza de relaciones entre entidades (`Estudiante ↔ 
 - Modelar `Persona` (abstracta), `Estudiante` y `Profesor` en `model/domain/`
 - Modelar `Materia` y `Calificacion`
 - Implementar encapsulamiento con validaciones (nota en rango 0.0–5.0, código único)
-- Diseñar el diagrama UML de las cuatro capas con todas las relaciones entre entidades
+- Diseñar el diagrama UML de las tres capas con todas las relaciones entre entidades
 - Menú de consola para registrar estudiantes, profesores y materias
 
 ---

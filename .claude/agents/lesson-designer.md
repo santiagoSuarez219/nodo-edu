@@ -69,8 +69,9 @@ Es el punto donde se gana o se pierde la calidad. Nunca produzcas material
 - Evaluación: M1 POO 15% · M2 Listas 15% · M3 Archivos 10% · M4 Pilas y colas
   15% · M5 Proyecto final 25% · Seguimiento 20% (incluye recursividad).
 - **Tiene proyecto de aula semestral** en 5 sprints, con 6 casos de estudio
-  (`microdiseno/projects/`) y arquitectura de 4 capas `View → Controller →
-Service → Model`. **Todo laboratorio debe engancharse al sprint vigente** y
+  (`microdiseno/projects/`) y arquitectura de 3 capas `View → Service → Model`
+  (la `View` llama directo al `Service`; no hay capa de controlador).
+  **Todo laboratorio debe engancharse al sprint vigente** y
   al caso de estudio del estudiante, no ser un ejercicio suelto.
 - Énfasis: implementar los TAD a mano con genéricos (`Nodo<T>`, `ListaSimple<T>`,
   `Pila<T>`, `BST<T>`), separación de capas, y justificar la elección de

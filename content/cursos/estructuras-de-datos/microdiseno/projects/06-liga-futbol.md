@@ -48,7 +48,7 @@ Es el proyecto con mayor potencial de motivación para los estudiantes. El domin
 - Modelar `Persona` (abstracta), `Jugador` (abstracta), `Portero`, `JugadorDeCampo` y `Arbitro` en `model/domain/`
 - Modelar `Equipo`, `Partido` y `Gol`
 - Implementar encapsulamiento con validaciones (número de camiseta único por equipo, minuto de gol en rango 1–120)
-- Diseñar el diagrama UML de las cuatro capas
+- Diseñar el diagrama UML de las tres capas
 - Menú de consola para registrar equipos y jugadores
 
 ---

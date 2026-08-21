@@ -42,7 +42,7 @@ Tampoco tienen sesión propia. Cada estructura se introduce primero como contrat
 |---|---|---|---|
 | 4 ago | Martes | T1 | Fundamentos de control de versiones: repositorio, commit, staging, HEAD, historial; `init`, `add`, `commit`, `status`, `log`, `diff`. |
 | 6 ago | Jueves | T2 | GitHub y ramas: `push`/`pull`/`fetch`/`clone`; `branch`/`checkout`/`merge`; flujo con feature branch y resolución de conflictos. |
-| 7 ago | Viernes | — | **Festivo (Batalla de Boyacá).** El laboratorio de Git se realiza como **trabajo independiente guiado**: crear el repo, secuencia de commits, ramas y un conflicto, y montar la estructura de paquetes del proyecto (`model/domain`, `model/structures`, `service`, `controller`, `view`) con un `Main.java` de bienvenida. |
+| 7 ago | Viernes | — | **Festivo (Batalla de Boyacá).** El laboratorio de Git se realiza como **trabajo independiente guiado**: crear el repo, secuencia de commits, ramas y un conflicto, y montar la estructura de paquetes del proyecto (`model/domain`, `model/structures`, `service`, `view`) con un `Main.java` de bienvenida. |
 
 ## Semana 2 — POO: clases, objetos y encapsulamiento *(11–14 ago)* · Sprint 1
 
@@ -63,7 +63,7 @@ Tampoco tienen sesión propia. Cada estructura se introduce primero como contrat
 | — | Fecha por definir | T5 | Introducción al UML: para qué sirve el UML en el desarrollo de software; diagrama de clases (clase, atributos, métodos, visibilidad); lectura e interpretación de un diagrama de clases. |
 
 > **P — Laboratorio (pendiente de fecha):** clase de dominio encapsulada en
-> `model/domain/`; menú en `view/`; stubs de `service/` y `controller/`.
+> `model/domain/`; menú en `view/`; stubs de `service/`.
 
 ## Semana 3 — POO: herencia y polimorfismo *(18–21 ago)* · Sprint 1
 
@@ -79,7 +79,7 @@ Tampoco tienen sesión propia. Cada estructura se introduce primero como contrat
 |---|---|---|---|
 | 25 ago | Martes | T1 | Asociación, agregación y composición: diferencias conceptuales. UML: diagrama de clases, visibilidad, multiplicidades y flechas de navegación. |
 | 27 ago | Jueves | T2 | Diagramas de paquetes y organización de clases en Java. Del diagrama al código: modelar un TAD con clases e interfaces y llevarlo a la implementación. |
-| 28 ago | Viernes | **P ★** | **Lab evaluativo (M1): Diseño OO completo** — diagrama UML de las cuatro capas del proyecto + implementación con encapsulamiento, herencia y polimorfismo. Revisión entre pares. **Cierre del Momento 1 — POO (15 %).** |
+| 28 ago | Viernes | **P ★** | **Lab evaluativo (M1): Diseño OO completo** — diagrama UML de las tres capas del proyecto + implementación con encapsulamiento, herencia y polimorfismo. Revisión entre pares. **Cierre del Momento 1 — POO (15 %).** |
 
 > *Hito institucional:* primera evaluación de estudiantes a docentes (31 ago – 5 sep).
 
@@ -182,7 +182,7 @@ Tampoco tienen sesión propia. Cada estructura se introduce primero como contrat
 | Fecha | Día | Sesión | Contenido |
 |---|---|---|---|
 | 17 nov | Martes | T1 | Aplicaciones de los BST: diccionarios, índices, autocompletado. Síntesis del curso: hilo conductor entre todos los módulos. |
-| 19 nov | Jueves | T2 | Integración: revisión de la separación de las cuatro capas en el proyecto; criterios y rúbrica de la sustentación, socializados con el grupo. |
+| 19 nov | Jueves | T2 | Integración: revisión de la separación de las tres capas en el proyecto; criterios y rúbrica de la sustentación, socializados con el grupo. |
 | 20 nov | Viernes | P | Lab: integración final — el proyecto debe articular al menos tres estructuras vistas en el curso sobre el caso de estudio elegido; ensayo de sustentación y retroalimentación entre pares. |
 
 > *Hito institucional:* fecha límite de cancelación de asignaturas y matrícula (hasta 22 nov).
