@@ -212,11 +212,12 @@ export const estructurasDeDatos: Course = {
       slug: "composicion-agregacion-y-diagramas-de-paquetes",
       articleSlug: "composicion-agregacion-y-diagramas-de-paquetes",
       order: 11,
-      title: "Composición, agregación y diagramas de paquetes",
+      title: "Asociación, agregación y composición",
+      summary:
+        "Las tres formas de que un objeto 'tenga' a otro en UML — asociación, agregación y composición —, con multiplicidades, roles nombrados y su traducción directa a código Java.",
       topics: [
         { title: "Asociación, agregación y composición: diferencias conceptuales" },
         { title: "Representación en UML: multiplicidades, roles, navegación" },
-        { title: "Diagramas de paquetes: organización de clases en Java" },
       ],
     },
     {
@@ -225,10 +226,13 @@ export const estructurasDeDatos: Course = {
       articleSlug: "diseno-con-tad-y-orientacion-a-objetos",
       order: 12,
       title: "Diseño con TAD y orientación a objetos",
+      summary:
+        "Separa el contrato de la implementación con interface, traduce un diagrama de clases con relaciones a Java, y organiza las clases del proyecto en paquetes que reflejan sus cuatro capas.",
       topics: [
         { title: "Diagrama de clases con relaciones: lectura e implementación en Java" },
         { title: "Modelar el TAD de una estructura de datos con clases e interfaces" },
         { title: "Puente entre el diseño OO y la implementación de estructuras de datos" },
+        { title: "Diagramas de paquetes: organización de clases en Java" },
       ],
     },
     {
