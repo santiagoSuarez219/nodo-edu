@@ -199,12 +199,11 @@ classDiagram
 
 ## Multiplicidades: cuántas instancias hay a cada lado
 
-**Situación:** en la liga de fútbol, el objeto `Jugador` no representa a la
-persona en general, sino su fichaje por un `Equipo` concreto: si el equipo se
-disuelve, ese fichaje deja de existir con él, igual que `Cuenta` y sus
-`Movimiento`s —es una composición—, pero el diagrama todavía no dice cuántos
-jugadores puede tener un equipo, ni si un equipo puede existir sin ninguno
-todavía fichado.
+**Situación:** en la liga de fútbol, el objeto `Jugador` modela a la persona
+en su rol de fichado por un `Equipo` concreto: si el equipo se disuelve, ese
+fichaje deja de existir con él, igual que `Cuenta` y sus `Movimiento`s —es
+una composición—, pero el diagrama todavía no dice cuántos jugadores puede
+tener un equipo, ni si un equipo puede existir sin ninguno todavía fichado.
 
 **En la práctica**, cada extremo de la línea lleva un número o rango entre
 comillas: `"1"` (exactamente uno), `"0..*"` (cero o muchos), `"1..*"` (uno o

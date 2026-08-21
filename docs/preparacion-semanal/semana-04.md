@@ -148,9 +148,10 @@ de codificación, preparado fuera de esta ronda).
   relación `Banco`/`CuentaAhorros` **como agregación** (código que recibe la
   cuenta ya construida) y la traduce a Java, y cierra con paquetes/carpetas
   que el lab también asume instalados
-- [ ] `@reviewer`: 1.ª pasada CAMBIOS REQUERIDOS (referencias rotas + menores,
+- [x] `@reviewer`: 1.ª pasada CAMBIOS REQUERIDOS (referencias rotas + menores,
   corregidos) · 2.ª pasada CAMBIOS REQUERIDOS (bloqueante conceptual T1/T2 +
-  riesgo operativo, corregidos) · 3.ª pasada pendiente de invocar
+  riesgo operativo, corregidos) · 3.ª pasada CAMBIOS REQUERIDOS (residuo
+  `*--` + menores, corregidos) · 4.ª pasada **✅ APROBADO**
 
 ## Despliegue y apertura
 
