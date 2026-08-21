@@ -11,7 +11,7 @@ presentation: true
 slides_hint: "Cada sección ## es una diapositiva. Presentación sincrona."
 date: "2026-08-21"
 author: "Asistente de Docencia"
-summary: ""
+summary: "Por qué insertion sort no tiene un solo tiempo de ejecución, cómo se formalizan el peor caso, el mejor caso y el caso promedio, y cómo divide y vencerás —con merge sort como primer ejemplo— ataca el problema de raíz en vez de acelerar el recorrido."
 updatedAt: "2026-08-21"
 ---
 
@@ -151,23 +151,6 @@ antes de poder devolver el suyo — las llamadas se van apilando hasta llegar
 al caso base, y desde ahí la pila se "deshace" hacia atrás, multiplicando en
 cada paso.
 
-```mermaid
-flowchart TB
-  A["factorial(4)"] --> B["factorial(3)"]
-  B --> C["factorial(2)"]
-  C --> D["factorial(1)"]
-  D --> E["factorial(0) = 1\n(caso base)"]
-  E --> F["factorial(1) = 1 * 1 = 1"]
-  F --> G["factorial(2) = 2 * 1 = 2"]
-  G --> H["factorial(3) = 3 * 2 = 6"]
-  H --> I["factorial(4) = 4 * 6 = 24"]
-```
-
-Esa es la idea que vas a reutilizar enseguida: cada llamada recursiva resuelve
-un subproblema más pequeño del mismo tipo, y el resultado final se construye
-combinando esos resultados más pequeños. Divide y vencerás es exactamente esa
-idea, aplicada a un problema completo en vez de a un solo valor.
-
 ## Cuando dividir el problema ayuda más que recorrerlo
 
 Insertion sort ataca el arreglo completo con un único recorrido: cada
@@ -294,17 +277,16 @@ def merge(izquierda: list[int], derecha: list[int]) -> list[int]:
 Cada llamada a `merge_sort` sobre un arreglo de tamaño `n` hace dos llamadas
 recursivas sobre arreglos de tamaño `n / 2`, y después un `merge` que recorre
 ambas mitades una sola vez: un costo lineal en `n`. Esa relación se escribe
-como una recurrencia:
+como una recurrencia sobre `T(n)`, el tiempo de ejecución (o, de forma
+equivalente, el número de operaciones básicas) que le toma al algoritmo
+resolver una entrada de tamaño `n` — no un número fijo, sino una función de
+`n`:
 
 $$T(n) = 2T(n/2) + \Theta(n)$$
 
-En prosa: el trabajo de ordenar `n` elementos es el trabajo de ordenar **dos**
-subproblemas de la mitad del tamaño, más el costo de combinarlos, que crece
-proporcional a `n`. Esta lección no resuelve esa recurrencia — averiguar a
-qué función de `n` es equivalente $T(n)$ requiere herramientas propias
-(sustitución, árbol de recursión, método maestro) que verás en el Módulo 5,
-Semana 6. Por ahora, retenla como la pregunta abierta que vas a poder
-responder con precisión más adelante en el curso.
+En prosa: el trabajo de ordenar `n` elementos, `T(n)`, es el trabajo de
+ordenar **dos** subproblemas de la mitad del tamaño —cada uno cuesta
+`T(n/2)`—, más el costo de combinarlos, que crece proporcional a `n`.
 
 ## El costo real de seguir con insertion sort
 
