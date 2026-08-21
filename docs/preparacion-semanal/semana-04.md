@@ -143,7 +143,7 @@ de codificación, preparado fuera de esta ronda).
   placeholders, `updatedAt` de hoy en ambas, `title`/`summary`/`topics` de TS
   coherentes con el `.mdx`
 - [x] Coherencia cruzada: T1 instala las notaciones UML (`-->`, `o--`, `*--`,
-  multiplicidades, roles) que el lab M1 del viernes ya exige leer, con
+  multiplicidades) que el lab M1 del viernes ya exige leer, con
   `Equipo`/`Jugador` como composición pura, alineado con el lab; T2 retoma la
   relación `Banco`/`CuentaAhorros` **como agregación** (código que recibe la
   cuenta ya construida) y la traduce a Java, y cierra con paquetes/carpetas
@@ -151,7 +151,40 @@ de codificación, preparado fuera de esta ronda).
 - [x] `@reviewer`: 1.ª pasada CAMBIOS REQUERIDOS (referencias rotas + menores,
   corregidos) · 2.ª pasada CAMBIOS REQUERIDOS (bloqueante conceptual T1/T2 +
   riesgo operativo, corregidos) · 3.ª pasada CAMBIOS REQUERIDOS (residuo
-  `*--` + menores, corregidos) · 4.ª pasada **✅ APROBADO**
+  `*--` + menores, corregidos) · 4.ª pasada **✅ APROBADO** · **5.ª pasada
+  pendiente** tras ajustes de contenido pedidos por el usuario (ver abajo)
+
+## Ajustes de contenido pedidos por el usuario (post-aprobación, 2026-08-21)
+
+> El usuario pidió estos cambios **después** de que `@reviewer` aprobara en
+> su 4.ª pasada, antes de dar la aprobación de merge. Requieren una 5.ª
+> pasada de `@reviewer` antes de proceder.
+
+- **Ejemplo de agregación de T1 cambiado dos veces**, a pedido del usuario:
+  primero de `Banco`/`Cliente` a `Universidad`/`Profesor` (para no usar la
+  entidad `Banco`), y luego a **`Sucursal`/`Cliente`** (para mantener el
+  ejemplo dentro del dominio del Sistema Bancario, coherente con el resto
+  del curso, sin usar `Banco` directamente). Actualizada la situación,
+  código, diagrama, tabla resumen y síntesis.
+- **Sección de multiplicidades cambiada de dominio**: de `Equipo`/`Jugador`
+  (fútbol) a `Cuenta "1" *-- "0..*" Movimiento` (bancario), a pedido del
+  usuario para mantener todo el ejemplo concreto dentro del Sistema
+  Bancario. Se quitó la referencia colgante a `Equipo`/`Jugador` que quedó
+  en la síntesis tras el cambio.
+- **Sección "Roles y navegación" eliminada por completo**, a pedido
+  explícito del usuario — junto con su fila en la tabla resumen y su bullet
+  en la síntesis (ajustado el conteo final de "cinco piezas" a "cuatro
+  piezas"). **Se detectó y confirmó con el usuario** que el caso 5 (Liga de
+  Fútbol) del laboratorio M1 ya desplegado dependía exactamente de esta
+  notación (`Partido --> Equipo : equipoLocal/equipoVisitante`). Con
+  aprobación explícita del usuario ("Elimina y ajusta lab M1"), se modificó
+  `guias/lab-m1-diseno-oo-completo.md`: el diagrama del caso 5 ahora usa una
+  relación genérica sin roles nombrados (`Partido "1" --> "2" Equipo`), y la
+  distinción local/visitante se explica en la prosa de "Requisitos de
+  implementación" en vez de en la notación del diagrama.
+- **Referencias colgantes a "roles" corregidas** en el `summary` del
+  frontmatter de T1 y en el `summary`/`topics` de su entrada TS (`order:
+  11`), que todavía mencionaban roles nombrados tras quitar la sección.
 
 ## Despliegue y apertura
 

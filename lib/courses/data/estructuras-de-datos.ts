@@ -214,10 +214,10 @@ export const estructurasDeDatos: Course = {
       order: 11,
       title: "Asociación, agregación y composición",
       summary:
-        "Las tres formas de que un objeto 'tenga' a otro en UML — asociación, agregación y composición —, con multiplicidades, roles nombrados y su traducción directa a código Java.",
+        "Las tres formas de que un objeto 'tenga' a otro en UML — asociación, agregación y composición —, con multiplicidades y su traducción directa a código Java.",
       topics: [
         { title: "Asociación, agregación y composición: diferencias conceptuales" },
-        { title: "Representación en UML: multiplicidades, roles, navegación" },
+        { title: "Representación en UML: multiplicidades" },
       ],
     },
     {

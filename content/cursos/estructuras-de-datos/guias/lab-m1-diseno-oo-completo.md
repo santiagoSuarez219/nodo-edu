@@ -400,8 +400,7 @@ classDiagram
   Persona <|-- Jugador
   Persona <|-- Arbitro
   Equipo "1" *-- "1..*" Jugador
-  Partido --> Equipo : equipoLocal
-  Partido --> Equipo : equipoVisitante
+  Partido "1" --> "2" Equipo
   Gol --> Jugador
 ```
 
@@ -432,8 +431,11 @@ classDiagram
   existe fuera de un `Equipo` (composición) — es la relación que reemplaza
   al atributo `equipo:String` que `Jugador` tenía antes.
 - `Partido` y `Gol` **ya existen** de la práctica; se encapsulan y quedan
-  asociados a `Equipo` (dos veces, como `equipoLocal` y `equipoVisitante`)
-  y a `Jugador` respectivamente.
+  asociados a `Equipo` y a `Jugador` respectivamente. El diagrama muestra la
+  relación `Partido "1" --> "2" Equipo` de forma genérica —cada `Partido` se
+  asocia con dos `Equipo`s—, pero necesitas distinguir cuál juega de local y
+  cuál de visitante: implementa esa relación con **dos campos separados**,
+  ambos de tipo `Equipo`: `equipoLocal` y `equipoVisitante`.
 
 **Archivos de este proyecto:** `RolEnPartido.java`, `Persona.java`,
 `Jugador.java`, `Arbitro.java`, `Equipo.java`, `Partido.java`, `Gol.java`.
