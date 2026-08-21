@@ -56,10 +56,10 @@ del agente antes de invocarlo. No improvisar su comportamiento.
 | `@reviewer`   | Revisión de código antes de marcar un spec como `[DONE]`                     |
 | `@tester`     | Generación y ejecución de casos de prueba e2e                                 |
 | `@mcp-builder`| Evaluación, diseño, creación y actualización de MCPs y sus system prompts     |
-| `@lesson-designer`   | Orquestar la producción del material de una lección: lee microdiseño y cronograma, calibra al nivel del curso, produce el plan y delega |
+| `@lesson-designer`   | Diseñar el plan de una lección: lee microdiseño y cronograma, calibra al nivel del curso y se detiene en el plan aprobable |
 | `@lesson-writer`     | Redactar la lección teórica `.mdx` publicable y su registro en `lib/courses/data/`                                    |
-| `@lab-designer`      | Diseñar la guía de laboratorio del docente (privada, con soluciones) y la del estudiante (publicada, con rúbrica)     |
-| `@assessment-builder`| Crear el cuestionario de cierre y los quices A/B/C vía `question-bank-mcp` y `assignment-mcp`                         |
+| `@lab-designer`      | Escribir los apuntes de clase del docente (privados, con soluciones) y la guía del estudiante (publicada, con rúbrica) — **solo los que el usuario pida** |
+| `@assessment-builder`| Proponer el cuestionario de cierre y los quices A/B/C y, tras la aprobación, crearlos vía `question-bank-mcp` y `assignment-mcp` |
 
 > Si en `/.claude/agents/` existen agentes adicionales específicos del proyecto,
 > tienen precedencia sobre la tabla anterior.
@@ -84,6 +84,7 @@ procedimientos para un tipo de tarea concreto.
 
 | Skill                       | Cuándo aplicarla                                              |
 |-----------------------------|--------------------------------------------------------------|
+| `class-material-prep`       | Producir el material de clase de **un** curso, etapa por etapa, y desplegarlo |
 | `lesson-authoring`          | Escribir lecciones, guías de laboratorio y evaluaciones de un curso |
 | `frontend-design`           | Construir UI de alta calidad: componentes, páginas, layouts  |
 | `tailwind-css-patterns`     | Estilar con Tailwind CSS (responsive, grid/flex, tokens)     |
