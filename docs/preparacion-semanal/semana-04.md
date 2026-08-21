@@ -186,6 +186,35 @@ de codificación, preparado fuera de esta ronda).
   frontmatter de T1 y en el `summary`/`topics` de su entrada TS (`order:
   11`), que todavía mencionaban roles nombrados tras quitar la sección.
 
+## Refactor de arquitectura y reconversión de T2 (2026-08-21, posterior)
+
+> Dos decisiones de fondo del docente, tomadas después de cerrar el material
+> de la semana. Ver el commit `113786a` y siguientes.
+
+- **Arquitectura simplificada de cuatro capas a tres** (`View → Service →
+  Model`; desaparece `controller/`). Aplicada retroactivamente a 20 archivos
+  del curso: microdiseño (autorizado expresamente pese a ser entrada del
+  flujo), guías publicadas, lecciones, apuntes, los 6 casos de proyecto y
+  las instrucciones a agentes/skills. Sin avisos de transición al estudiante
+  — el docente lo anuncia en clase.
+- **T2 reconvertida de lección teórica a laboratorio práctico guiado en
+  clase**, publicado, sobre el Sistema Bancario. Sirve de ejemplo trabajado
+  para el laboratorio evaluativo M1 del viernes 28: implementa exactamente
+  lo que M1 le pide al estudiante (UML → TAD → clase abstracta → subtipos
+  polimórficos → composición → `PruebaCreacionObjetos`), y cierra con una
+  tabla de correspondencia paso a paso. **Slug conservado** para no dejar
+  huérfana la fila de `disabled_lessons`.
+- **`apuntes/lab-m1-diseno-oo-completo.md` recortado, no eliminado**: los
+  pasos 1-7 pasaron a la lección publicada; el apunte conserva solo lo que
+  no entra ahí (capas `service`/`view` completas, revisión entre pares y las
+  5 preguntas socráticas). De 612 a 257 líneas, sin pérdida de contenido.
+- **Matiz de composición agregado a T2**: `Cliente.agregarCuenta()` recibe
+  una `Cuenta` ya construida, lo que por la regla de T1 se leería como
+  agregación. T2 explica ahora que lo que define la composición es la
+  propiedad exclusiva y el ciclo de vida, no quién ejecuta el `new`. Sin
+  esto, la lección contradecía la pregunta 5 del cuestionario de T1, **ya
+  publicada y montada**.
+
 ## Despliegue y apertura
 
 - **Merge a `development`:** pendiente
