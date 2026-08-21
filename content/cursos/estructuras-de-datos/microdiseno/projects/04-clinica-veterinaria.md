@@ -47,7 +47,7 @@ El dominio veterinario añade un nivel de modelado interesante respecto al consu
 - Modelar `Animal` (abstracta), `Perro`, `Gato` en `model/domain/`
 - Modelar `Dueño` y `Veterinario`
 - Implementar encapsulamiento con validaciones (número de ficha único, fecha de nacimiento coherente)
-- Diseñar el diagrama UML de las cuatro capas incluyendo la relación `Dueño → Animal`
+- Diseñar el diagrama UML de las tres capas incluyendo la relación `Dueño → Animal`
 - Menú de consola para registrar dueños y mascotas
 
 ---

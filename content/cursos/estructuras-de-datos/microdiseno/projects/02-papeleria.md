@@ -48,7 +48,7 @@ El dominio es cotidiano y fácil de entender. El riesgo es que el caso de uso pu
 - Modelar `Producto` (abstracta), `ProductoOficina`, `ProductoEscolar`, `ProductoArte` en `model/domain/`
 - Implementar encapsulamiento con validaciones (precio positivo, stock no negativo)
 - Modelar `Proveedor` e `ItemVenta`
-- Diseñar el diagrama UML de las cuatro capas
+- Diseñar el diagrama UML de las tres capas
 - Menú de consola para agregar, listar y buscar productos
 
 ---

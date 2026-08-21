@@ -33,7 +33,7 @@ Al terminar el trabajo independiente, el estudiante debe poder:
   delimitadores (`<<<<<<<`, `=======`, `>>>>>>>`) y resolverlo sin dejar
   residuos en el archivo.
 - Tener montada la estructura de paquetes del proyecto de aula
-  (`model/domain`, `model/structures`, `service`, `controller`, `view`) con
+  (`model/domain`, `model/structures`, `service`, `view`) con
   un `Main.java` que compila y ejecuta, lista para recibir código desde la
   Semana 2.
 
@@ -53,7 +53,7 @@ mismo orden que la guía del estudiante:
    atributos `telefono` / `direccion`) que se resuelve en este laboratorio.
    No es coincidencia: se reutiliza a propósito para que el estudiante
    reconozca el patrón exacto que ya vio resuelto en la teoría.
-4. Montar la estructura de paquetes de cuatro capas — presentada en T2,
+4. Montar la estructura de paquetes de tres capas — presentada en T2,
    sección "La estructura que vas a versionar".
 
 Si el docente necesita reforzar algo el martes siguiente, la pregunta de
@@ -99,13 +99,14 @@ echo "# Proyecto de Aula — Sistema Bancario" > README.md
 git add README.md
 git commit -m "Agrega README inicial del proyecto"
 
-mkdir -p src/main/java/proyecto
-git add src
+# Git no versiona carpetas vacias: el .gitkeep hace commiteable este paso
+mkdir -p src/model/domain
+touch src/model/domain/.gitkeep
+git add src/model/domain/.gitkeep
 git commit -m "Crea estructura base de directorios"
 
-mkdir -p src/main/java/proyecto/model/domain
-cat > src/main/java/proyecto/model/domain/Cliente.java << 'EOF'
-package proyecto.model.domain;
+cat > src/model/domain/Cliente.java << 'EOF'
+package model.domain;
 
 public class Cliente {
     private String nombre;
@@ -119,12 +120,14 @@ public class Cliente {
     }
 }
 EOF
-git add src/main/java/proyecto/model/domain/Cliente.java
+# la carpeta ya tiene contenido real: el .gitkeep deja de hacer falta
+rm src/model/domain/.gitkeep
+git add -A src/model/domain
 git commit -m "Agrega clase Cliente en model/domain"
 
 # cuarto commit: un ajuste real, no relleno
-cat > src/main/java/proyecto/model/domain/Cliente.java << 'EOF'
-package proyecto.model.domain;
+cat > src/model/domain/Cliente.java << 'EOF'
+package model.domain;
 
 public class Cliente {
     private String nombre;
@@ -141,7 +144,7 @@ public class Cliente {
     }
 }
 EOF
-git add src/main/java/proyecto/model/domain/Cliente.java
+git add src/model/domain/Cliente.java
 git commit -m "Valida que el nombre del cliente no sea vacio"
 ```
 
@@ -154,8 +157,8 @@ más antiguo, cada uno describiendo una unidad de cambio real (no "commit 1",
 ```bash
 git checkout -b feature/cliente-telefono
 
-cat > src/main/java/proyecto/model/domain/Cliente.java << 'EOF'
-package proyecto.model.domain;
+cat > src/model/domain/Cliente.java << 'EOF'
+package model.domain;
 
 public class Cliente {
     private String nombre;
@@ -181,7 +184,7 @@ public class Cliente {
     }
 }
 EOF
-git add src/main/java/proyecto/model/domain/Cliente.java
+git add src/model/domain/Cliente.java
 git commit -m "Agrega atributo telefono a Cliente"
 
 git checkout main
@@ -213,7 +216,7 @@ Editar `Cliente.java` agregando, **en el mismo lugar donde antes se agregó
 `telefono`**, un nuevo atributo `direccion`:
 
 ```java
-package proyecto.model.domain;
+package model.domain;
 
 public class Cliente {
     private String nombre;
@@ -242,7 +245,7 @@ public class Cliente {
 ```
 
 ```bash
-git add src/main/java/proyecto/model/domain/Cliente.java
+git add src/model/domain/Cliente.java
 git commit -m "Agrega atributo direccion a Cliente"
 
 # Volver a main y editar la MISMA linea de forma distinta
@@ -259,7 +262,7 @@ distinto (`ciudad`, por ejemplo) para forzar el choque:
 ```
 
 ```bash
-git add src/main/java/proyecto/model/domain/Cliente.java
+git add src/model/domain/Cliente.java
 git commit -m "Agrega atributo ciudad a Cliente directamente en main"
 
 git merge feature/cliente-direccion
@@ -268,8 +271,8 @@ git merge feature/cliente-direccion
 Git detiene el merge:
 
 ```text
-Auto-merging src/main/java/proyecto/model/domain/Cliente.java
-CONFLICT (content): Merge conflict in src/main/java/proyecto/model/domain/Cliente.java
+Auto-merging src/model/domain/Cliente.java
+CONFLICT (content): Merge conflict in src/model/domain/Cliente.java
 Automatic merge failed; fix conflicts and then commit the result.
 ```
 
@@ -289,7 +292,7 @@ Resolución — conservar ambos atributos y sus accesores, borrar los tres
 delimitadores:
 
 ```java
-package proyecto.model.domain;
+package model.domain;
 
 public class Cliente {
     private String nombre;
@@ -323,7 +326,7 @@ public class Cliente {
 ```
 
 ```bash
-git add src/main/java/proyecto/model/domain/Cliente.java
+git add src/model/domain/Cliente.java
 git commit -m "Resuelve conflicto: conserva atributos ciudad y direccion"
 ```
 
@@ -333,30 +336,28 @@ nada; `git status` reporta el working tree limpio.
 ### Paso 4 — Estructura de paquetes completa y `Main.java`
 
 ```bash
-mkdir -p src/main/java/proyecto/model/structures
-mkdir -p src/main/java/proyecto/service
-mkdir -p src/main/java/proyecto/controller
-mkdir -p src/main/java/proyecto/view
+mkdir -p src/model/structures
+mkdir -p src/service
+mkdir -p src/view
 
-cat > src/main/java/proyecto/Main.java << 'EOF'
-package proyecto;
-
+# Main.java va directo en src/, SIN linea package: queda en el paquete por
+# defecto y por eso se ejecuta como `java -cp out Main`.
+cat > src/Main.java << 'EOF'
 public class Main {
     public static void main(String[] args) {
         System.out.println("Bienvenido al Sistema Bancario — Proyecto de Aula");
-        System.out.println("Estructura de paquetes lista: model/domain, model/structures, service, controller, view");
+        System.out.println("Estructura de paquetes lista: model/domain, model/structures, service, view");
     }
 }
 EOF
 
 # Los paquetes vacios no se rastrean en Git (Git no versiona carpetas vacias);
 # un .gitkeep por carpeta evita que desaparezcan al clonar el repo en otra maquina.
-touch src/main/java/proyecto/model/structures/.gitkeep
-touch src/main/java/proyecto/service/.gitkeep
-touch src/main/java/proyecto/controller/.gitkeep
-touch src/main/java/proyecto/view/.gitkeep
+touch src/model/structures/.gitkeep
+touch src/service/.gitkeep
+touch src/view/.gitkeep
 
-git add src/main/java/proyecto
+git add src
 git commit -m "Crea estructura de paquetes completa y Main.java de bienvenida"
 ```
 
@@ -366,23 +367,21 @@ git commit -m "Crea estructura de paquetes completa y Main.java de bienvenida"
 proyecto-aula/
 ├── README.md
 └── src/
-    └── main/java/proyecto/
-        ├── Main.java
-        ├── model/
-        │   ├── domain/
-        │   │   └── Cliente.java
-        │   └── structures/
-        │       └── .gitkeep
-        ├── service/
-        │   └── .gitkeep
-        ├── controller/
-        │   └── .gitkeep
-        └── view/
-            └── .gitkeep
+    ├── Main.java
+    ├── model/
+    │   ├── domain/
+    │   │   └── Cliente.java
+    │   └── structures/
+    │       └── .gitkeep
+    ├── service/
+    │   └── .gitkeep
+    └── view/
+        └── .gitkeep
 ```
 
 Verificación: `javac -d out $(find src -name "*.java")` compila sin errores;
-`java -cp out proyecto.Main` imprime el mensaje de bienvenida.
+`java -cp out Main` imprime el mensaje de bienvenida (sin nombre de paquete
+delante, porque `Main` está en el paquete por defecto).
 
 ## Puntos de control (para la revisión del martes de la Semana 2)
 
@@ -395,8 +394,8 @@ cada equipo que muestre su repositorio (local o el enlace de GitHub):
 | `git log --oneline` | 4 o más commits con mensajes en modo imperativo, específicos ("Valida que el nombre..." y no "cambios") |
 | `git log --oneline --graph --all` | Al menos una rama `feature/` visible, fusionada a `main` |
 | El archivo donde se resolvió el conflicto | Sin delimitadores residuales; el diff del commit de resolución muestra un cambio deliberado, no solo "acepté una versión y borré la otra sin pensar" |
-| El árbol de carpetas del proyecto | Las cinco carpetas existen (incluidas las vacías) y `Main.java` está en la raíz del paquete |
-| `java -cp out proyecto.Main` (o el comando que use el estudiante) | Compila y corre sin error, imprime el mensaje de bienvenida |
+| El árbol de carpetas del proyecto | Las cuatro carpetas existen dentro de `src/` (incluidas las vacías) y `Main.java` está directamente en `src/`, sin línea `package` |
+| `java -cp out Main` (o el comando que use el estudiante) | Compila y corre sin error, imprime el mensaje de bienvenida |
 
 ## Errores frecuentes y cómo intervenir
 
@@ -407,8 +406,8 @@ cada equipo que muestre su repositorio (local o el enlace de GitHub):
 | El merge de la Tarea 2 no genera ni fast-forward ni conflicto, simplemente no cambia nada | Editó el archivo en la rama pero olvidó `git add` antes del `commit`, o comiteó en `main` por error en vez de en la rama | Revisar con `git log --all --graph` en qué rama quedaron realmente los commits |
 | El conflicto de la Tarea 3 nunca aparece, el merge se completa solo | Las dos ediciones no cayeron en la misma línea/zona del archivo — Git combina automáticamente cambios en zonas distintas | Pedir que ambas ediciones se hagan **en el mismo punto exacto** del archivo, como en el ejemplo de esta guía |
 | Tras "resolver" el conflicto, el archivo sigue con `<<<<<<<` o `=======` | Guardó sin borrar los delimitadores, o resolvió aceptando una versión sin fusionar el contenido de ambas | Ejecutar `grep -rn "<<<<<<<\|=======\|>>>>>>>" src/` para localizar el residuo exacto |
-| `javac` falla con "package proyecto.model.domain does not exist" o similar | La carpeta no coincide con la declaración `package` del archivo, o el comando de compilación no incluyó todos los `.java` | Confirmar que la ruta de carpetas refleja exactamente el `package` declarado en cada archivo |
-| Las carpetas vacías (`service/`, `controller/`, `view/`) "desaparecen" tras clonar en otra máquina | Git no versiona carpetas vacías; sin un archivo dentro (`.gitkeep`), la carpeta no se sube | Recordar el propósito del `.gitkeep`: es un archivo vacío cuyo único fin es que la carpeta tenga contenido rastreable |
+| `javac` falla con "package model.domain does not exist" o similar | La carpeta no coincide con la declaración `package` del archivo (tomando `src/` como raíz), o el comando de compilación no incluyó todos los `.java` | Confirmar que la ruta de carpetas refleja exactamente el `package` declarado en cada archivo: `package model.domain;` ↔ `src/model/domain/` |
+| Las carpetas vacías (`service/`, `view/`) "desaparecen" tras clonar en otra máquina | Git no versiona carpetas vacías; sin un archivo dentro (`.gitkeep`), la carpeta no se sube | Recordar el propósito del `.gitkeep`: es un archivo vacío cuyo único fin es que la carpeta tenga contenido rastreable |
 
 ## Preguntas socráticas
 

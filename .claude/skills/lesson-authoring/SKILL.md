@@ -177,7 +177,11 @@ Reglas verificadas:
 - `securityLevel: "strict"` (`MermaidDiagram.tsx:36-44`): sin HTML crudo ni `click` handlers.
 - `fontFamily` fijado a JetBrains Mono; el tema sigue claro/oscuro automáticamente.
 - Si el diagrama no parsea, se muestra una tarjeta de error con el fuente — no rompe la página, pero **es un defecto**: valida la sintaxis mentalmente antes de escribir.
-- `end` en minúscula rompe el parser: escribir `End`.
+- El cierre de `subgraph` en un `flowchart` debe ser `end` en minúscula
+  exacta — `End`/`END` rompen el parser. Lo que sí hay que evitar es que un
+  **nodo** tenga como *id* la palabra `end` (en minúscula): ahí se confunde
+  con el cierre — renombra el id; si es solo el *texto* visible del nodo
+  (`B["end"]`), las comillas ya lo resuelven.
 
 Cualquier tipo de diagrama de Mermaid v11 sirve. Referencia completa en
 `content/cursos/mermaid_guia_completa.md`. Los tipos que más rinden aquí:
@@ -188,7 +192,7 @@ Cualquier tipo de diagrama de Mermaid v11 sirve. Referencia completa en
 | Estructura de carpetas, jerarquía, contenedores | `flowchart TB` + `subgraph` |
 | Modelo de clases, herencia, composición (POO/UML) | `classDiagram` |
 | Ciclo de vida, estados de un objeto o proceso | `stateDiagram-v2` |
-| Interacción entre capas (View→Controller→Service) | `sequenceDiagram` |
+| Interacción entre capas (View→Service→Model) | `sequenceDiagram` |
 | Comparar crecimiento asintótico, benchmarks | `xychart-beta` |
 | Mapa conceptual de cierre de módulo | `mindmap` |
 | Cronograma de sprints del proyecto | `gantt` |

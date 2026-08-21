@@ -1,6 +1,6 @@
 ---
 title: "Laboratorio 00 — Git: repositorio y flujo de trabajo"
-updatedAt: "2026-07-30"
+updatedAt: "2026-08-21"
 ---
 
 # Laboratorio 00 — Git: repositorio y flujo de trabajo
@@ -11,7 +11,7 @@ Este laboratorio se realiza como **trabajo independiente
 guiado**: usted lo trabaja por su cuenta, con esta guía como única referencia,
 en un bloque de aproximadamente 2 horas. Va a construir, con sus propias manos, el repositorio de Git que va a alojar el proyecto de aula durante todo el semestre: un historial de commits real,
 al menos una rama fusionada, un conflicto de fusión resuelto correctamente, y
-el esqueleto de paquetes de las cuatro capas sobre el que se construirá cada
+el esqueleto de paquetes de las tres capas sobre el que se construirá cada
 laboratorio de las próximas 16 semanas.
 
 Competencias esperadas:
@@ -20,7 +20,7 @@ Competencias esperadas:
 - Crear y fusionar ramas siguiendo el flujo tipo feature branch.
 - Reconocer, interpretar y resolver un conflicto de fusión.
 - Organizar un proyecto Java en capas (`model/domain`, `model/structures`,
-  `service`, `controller`, `view`) desde el primer commit.
+  `service`, `view`) desde el primer commit.
 
 ## Requisitos Previos
 
@@ -64,7 +64,7 @@ sugerido:
 1. Un commit inicial con un `README.md` que describa brevemente el proyecto y
    el caso de estudio elegido.
 2. Un commit que cree la estructura base de carpetas del proyecto Java
-   (`src/main/java/<paquete>/`).
+   (`src/`).
 3. Un commit que agregue la primera clase de dominio de su caso de estudio
    (por ejemplo, la entidad principal — `Cliente`, `Producto`, `Paciente`,
    `Mascota`, `Estudiante` o `Equipo`, según corresponda).
@@ -146,23 +146,20 @@ a usar durante todo el semestre:
 
 ```
 proyecto-aula/
-└── src/main/java/<paquete>/
+└── src/
     ├── Main.java
     ├── model/
     │   ├── domain/
     │   └── structures/
     ├── service/
-    ├── controller/
     └── view/
 ```
 
-Cree las cinco carpetas (`model/domain`, `model/structures`, `service`,
-`controller`, `view`) dentro del paquete de su proyecto, y un `Main.java` en
-la raíz del paquete con la siguiente firma:
+Cree las cuatro carpetas (`model/domain`, `model/structures`, `service`,
+`view`) dentro de `src/`, y un `Main.java` directamente en `src/`, con la
+siguiente firma:
 
 ```java
-package <su-paquete>;
-
 public class Main {
     public static void main(String[] args) {
         // TODO: imprimir un mensaje de bienvenida que incluya
@@ -171,8 +168,15 @@ public class Main {
 }
 ```
 
+`Main.java` **no lleva línea `package`**: vive directamente en `src/`, es
+decir, en el paquete por defecto. Por eso se ejecuta como `java -cp out Main`
+y no con un nombre de paquete delante. Las clases que sí viven dentro de una
+carpeta declaran el paquete correspondiente a esa ruta: una clase en
+`src/model/domain/` empieza con `package model.domain;`, una en `src/service/`
+con `package service;`, y una en `src/view/` con `package view;`.
+
 **Requisitos:**
-- Las cinco carpetas deben existir, aunque algunas queden vacías por ahora.
+- Las cuatro carpetas deben existir, aunque algunas queden vacías por ahora.
   Git no versiona carpetas vacías: agregue un archivo `.gitkeep` dentro de
   cada carpeta que no tenga contenido todavía, para que sí quede rastreada.
 - `Main.java` debe compilar y ejecutar sin errores, e imprimir al menos un
@@ -195,19 +199,16 @@ siguiente estructura mínima:
 proyecto-aula/
 ├── README.md
 └── src/
-    └── main/java/<paquete>/
-        ├── Main.java
-        ├── model/
-        │   ├── domain/
-        │   │   └── <ClaseDeDominio>.java
-        │   └── structures/
-        │       └── .gitkeep
-        ├── service/
-        │   └── .gitkeep
-        ├── controller/
-        │   └── .gitkeep
-        └── view/
-            └── .gitkeep
+    ├── Main.java
+    ├── model/
+    │   ├── domain/
+    │   │   └── <ClaseDeDominio>.java
+    │   └── structures/
+    │       └── .gitkeep
+    ├── service/
+    │   └── .gitkeep
+    └── view/
+        └── .gitkeep
 ```
 
 Formato de entrega: cree el repositorio en GitHub (público o privado, con el
@@ -229,7 +230,7 @@ grep -rn "<<<<<<<\|=======\|>>>>>>>" src/
 
 # 3. El proyecto compila y el Main ejecuta
 javac -d out $(find src -name "*.java")
-java -cp out <su-paquete>.Main
+java -cp out Main
 
 # 4. No queda nada pendiente de comitear
 git status
@@ -249,7 +250,7 @@ la nota final del curso), no como un momento evaluativo independiente.
 | **Secuencia de commits** | 20 | El historial (`git log --oneline`) tiene al menos 3 commits, cada uno con mensaje descriptivo en modo imperativo que corresponde a una unidad de cambio real, no a relleno genérico. |
 | **Rama y fusión** | 20 | Existe al menos una rama con el prefijo `feature/`, con al menos un commit propio, fusionada a `main` mediante `git merge` visible en `git log --graph --all`. |
 | **Resolución de conflicto** | 25 | El repositorio muestra evidencia de un `CONFLICT` real resuelto: existe un commit posterior a un merge conflictivo, y ningún archivo del proyecto conserva delimitadores `<<<<<<<`, `=======` o `>>>>>>>` residuales. |
-| **Estructura de paquetes** | 20 | Las cinco carpetas (`model/domain`, `model/structures`, `service`, `controller`, `view`) existen dentro del paquete del proyecto, y `Main.java` compila y ejecuta sin errores desde la raíz del paquete. |
+| **Estructura de paquetes** | 20 | Las cuatro carpetas (`model/domain`, `model/structures`, `service`, `view`) existen dentro de `src/`, y `Main.java` está en `src/` (paquete por defecto), compila y ejecuta sin errores con `java -cp out Main`. |
 | **Entrega y estado del repositorio** | 15 | El repositorio está publicado en GitHub, accesible para el docente, con `git status` limpio en el momento de la entrega (nada pendiente de comitear). |
 | **TOTAL** | **100** | |
 
@@ -273,9 +274,10 @@ la nota final del curso), no como un momento evaluativo independiente.
 
 ### "`javac` no encuentra mis clases o falla con un error de paquete"
 - Verifique que la ruta de carpetas coincide exactamente con la línea
-  `package` declarada en cada archivo `.java`. Si el archivo declara
-  `package proyecto.model.domain;`, debe vivir en
-  `src/main/java/proyecto/model/domain/`.
+  `package` declarada en cada archivo `.java`, tomando `src/` como raíz. Si el
+  archivo declara `package model.domain;`, debe vivir en `src/model/domain/`.
+  `Main.java` es la excepción: no declara `package` y vive directamente en
+  `src/`, por eso se ejecuta como `java -cp out Main`.
 
 ## Extensiones Sugeridas (Bonus)
 

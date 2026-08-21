@@ -213,6 +213,9 @@ No aplica — ninguna sesión de la semana está marcada `★`.
   (`analisis-de-algoritmos-y-divide-y-venceras`,
   `composicion-agregacion-y-diagramas-de-paquetes`,
   `estructuras-de-datos-nativas`, etc. — no se tocaron)
+  > Nota (2026-08-21): `composicion-agregacion-y-diagramas-de-paquetes` fue
+  > renombrada en la Semana 4 a `asociacion-agregacion-y-composicion` — ver
+  > `semana-04.md`. Este registro histórico no se modifica, solo se anota.
 
 ## Pendientes para la semana siguiente
 

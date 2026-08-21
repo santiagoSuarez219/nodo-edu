@@ -45,7 +45,7 @@ El dominio médico ofrece casos de uso muy naturales para las estructuras del cu
 - Modelar `Persona` (abstracta), `Paciente` y `Medico` en `model/domain/`
 - Modelar `Cita` y `Consulta`
 - Implementar encapsulamiento con validaciones (identificación única, fecha de cita no en el pasado)
-- Diseñar el diagrama UML de las cuatro capas
+- Diseñar el diagrama UML de las tres capas
 - Menú de consola para registrar pacientes y médicos
 
 ---

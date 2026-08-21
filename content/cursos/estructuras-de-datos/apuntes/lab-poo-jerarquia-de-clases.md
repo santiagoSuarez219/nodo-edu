@@ -129,7 +129,7 @@ tiempo de compilación, qué subtipo concreto van a recorrer.
 
 Proyectar este diagrama junto al código de los pasos anteriores. El
 objetivo es que el grupo aprenda a **leer** las partes marcadas, no a
-dibujarlo — construir un UML completo de las cuatro capas es contenido de
+dibujarlo — construir un UML completo de las tres capas es contenido de
 la Semana 4.
 
 ```mermaid

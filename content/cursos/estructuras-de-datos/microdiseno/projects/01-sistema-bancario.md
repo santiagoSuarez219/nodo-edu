@@ -41,10 +41,10 @@ El dominio bancario es familiar para los estudiantes y ofrece casos de uso natur
 
 **Entregable:** esqueleto del sistema con las capas definidas y las entidades del dominio modeladas.
 
-- Configurar el repositorio Git con la estructura de paquetes (`model/domain`, `model/structures`, `service`, `controller`, `view`)
+- Configurar el repositorio Git con la estructura de paquetes (`model/domain`, `model/structures`, `service`, `view`)
 - Modelar `Cliente`, `Cuenta` (abstracta), `CuentaAhorros` y `CuentaCorriente` en `model/domain/`
 - Implementar encapsulamiento con validaciones (saldo no negativo, identificación no vacía)
-- Diseñar el diagrama UML de las cuatro capas con las entidades del sprint
+- Diseñar el diagrama UML de las tres capas con las entidades del sprint
 - Menú de consola funcional en `view/` con opciones básicas (crear cliente, crear cuenta)
 - Stub de `ClienteService` y `CuentaService` en `service/`
 
@@ -67,7 +67,7 @@ El dominio bancario es familiar para los estudiantes y ofrece casos de uso natur
 
 - Implementar `Pila<Transaccion>` para registrar las últimas operaciones y ofrecer la opción "deshacer última transacción"
 - Implementar `Cola<Cliente>` para simular la cola de atención en ventanilla (turno, siguiente cliente)
-- Integrar ambas estructuras a través del `Service`; el `Controller` solo llama métodos del servicio
+- Integrar ambas estructuras a través del `Service`; la `View` solo llama métodos del servicio
 
 ---
 
@@ -83,9 +83,9 @@ El dominio bancario es familiar para los estudiantes y ofrece casos de uso natur
 
 ### Sprint 5 — Árboles e integración final *(Semanas 14–16)*
 
-**Entregable:** proyecto completo con búsqueda eficiente por BST y demostración de las cuatro capas correctamente separadas.
+**Entregable:** proyecto completo con búsqueda eficiente por BST y demostración de las tres capas correctamente separadas.
 
 - Implementar `BST<Cliente>` ordenado por número de identificación para búsqueda en O(log n)
 - Comparar tiempos de búsqueda entre `ListaSimple` y `BST` con `System.nanoTime()`
-- Revisión final de la separación de capas: ninguna clase de `view/` o `controller/` referencia estructuras de `model/structures/` directamente
+- Revisión final de la separación de capas: ninguna clase de `view/` referencia estructuras de `model/structures/` directamente
 - Presentación del diagrama UML actualizado con todas las clases del proyecto
