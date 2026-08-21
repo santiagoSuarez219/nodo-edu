@@ -143,9 +143,11 @@ de codificación, preparado fuera de esta ronda).
   placeholders, `updatedAt` de hoy en ambas, `title`/`summary`/`topics` de TS
   coherentes con el `.mdx`
 - [x] Coherencia cruzada: T1 instala las notaciones UML (`-->`, `o--`, `*--`,
-  multiplicidades, roles) que el lab M1 del viernes ya exige leer; T2 retoma
-  esa misma relación de composición y la traduce a Java, y cierra con
-  paquetes/carpetas que el lab también asume instalados
+  multiplicidades, roles) que el lab M1 del viernes ya exige leer, con
+  `Equipo`/`Jugador` como composición pura, alineado con el lab; T2 retoma la
+  relación `Banco`/`CuentaAhorros` **como agregación** (código que recibe la
+  cuenta ya construida) y la traduce a Java, y cierra con paquetes/carpetas
+  que el lab también asume instalados
 - [ ] `@reviewer`: 1.ª pasada CAMBIOS REQUERIDOS (referencias rotas + menores,
   corregidos) · 2.ª pasada CAMBIOS REQUERIDOS (bloqueante conceptual T1/T2 +
   riesgo operativo, corregidos) · 3.ª pasada pendiente de invocar
