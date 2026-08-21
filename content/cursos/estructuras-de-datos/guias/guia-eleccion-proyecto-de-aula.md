@@ -1,6 +1,6 @@
 ---
 title: "Guía — Elección del proyecto de aula"
-updatedAt: "2026-08-07"
+updatedAt: "2026-08-21"
 ---
 
 # Guía — Elección del proyecto de aula

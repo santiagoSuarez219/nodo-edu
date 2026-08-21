@@ -1,6 +1,6 @@
 ---
 title: "Laboratorio 00 — Git: repositorio y flujo de trabajo"
-updatedAt: "2026-07-30"
+updatedAt: "2026-08-21"
 ---
 
 # Laboratorio 00 — Git: repositorio y flujo de trabajo

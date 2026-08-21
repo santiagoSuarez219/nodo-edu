@@ -1,6 +1,6 @@
 ---
 title: "Laboratorio Evaluativo — Codificación de Diseño OO (Momento 1)"
-updatedAt: "2026-08-18"
+updatedAt: "2026-08-21"
 ---
 
 # Laboratorio Evaluativo — Codificación de Diseño OO (Momento 1)
@@ -586,7 +586,7 @@ nota_final_curso = (4.5 / 5) × 5% = 4.5%
 
 - **Lecciones del curso:** "Encapsulamiento", "Herencia", "Polimorfismo",
   "Introducción al UML", "Asociación, agregación y composición", "Diseño
-  con TAD y orientación a objetos".
+  con TAD y orientación a objetos — laboratorio guiado".
 - **Práctica anterior:** "Práctica en clase — Modela una clase de tu
   proyecto de aula" (Semana 2), donde escribió las cinco clases que este
   laboratorio evoluciona.

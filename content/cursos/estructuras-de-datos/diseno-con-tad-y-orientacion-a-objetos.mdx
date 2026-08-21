@@ -113,18 +113,21 @@ classDiagram
   OperacionesCuenta <|.. Cuenta
   Cuenta <|-- CuentaAhorros
   Cuenta <|-- CuentaCorriente
-  Cliente "1" *-- "1..*" Cuenta
+  Cliente "1" *-- "0..*" Cuenta
 ```
 
 Antes de tocar el teclado, léelo de arriba hacia abajo: `OperacionesCuenta
 <|.. Cuenta` es realización (línea punteada) — el TAD se declara primero
 como contrato, después `Cuenta` lo implementa. `Cuenta <|-- CuentaAhorros`
 y su hermana son herencia (línea sólida): la jerarquía de dos niveles.
-`Cliente "1" *-- "1..*" Cuenta` es composición: el diamante relleno del
+`Cliente "1" *-- "0..*" Cuenta` es composición: el diamante relleno del
 lado de `Cliente` dice que una cuenta no existe fuera de su cliente. Y
 `retirar()` no aparece resuelto en `Cuenta` — cada subtipo lo implementa
 con su propia regla, sin sobregiro en un caso y con cupo en el otro. Eso es
 lo que obliga a `Cuenta` a quedar abstracta.
+
+El diagrama omite getters y setters por legibilidad: el código sí los lleva,
+como verás en `Cliente`.
 
 ## Paso 3 — El TAD `OperacionesCuenta`: el contrato primero
 
@@ -315,6 +318,9 @@ public class Cliente {
     }
 
     public void setNombre(String nombre) {
+        if (nombre == null || nombre.isBlank()) {
+            throw new IllegalArgumentException("El nombre no puede estar vacio");
+        }
         this.nombre = nombre;
     }
 
@@ -323,6 +329,9 @@ public class Cliente {
     }
 
     public void setTelefono(String telefono) {
+        if (telefono == null || telefono.isBlank()) {
+            throw new IllegalArgumentException("El telefono no puede estar vacio");
+        }
         this.telefono = telefono;
     }
 }
@@ -375,9 +384,12 @@ public class PruebaCreacionObjetos {
 
         // Se recorren las cuentas como referencias del tipo abstracto
         // Cuenta -- ni una sola vez se pregunta de que subtipo es cada una.
+        // Se pide un retiro de 120000: mas que el saldo de ambas cuentas.
+        // La de ahorros lo rechaza; la corriente lo acepta contra su cupo
+        // de sobregiro. Misma llamada, dos comportamientos distintos.
         List<Cuenta> cuentas = cliente.getCuentas();
         for (Cuenta cuenta : cuentas) {
-            probarRetiro(cuenta, 30000);
+            probarRetiro(cuenta, 120000);
         }
     }
 
@@ -385,10 +397,15 @@ public class PruebaCreacionObjetos {
         // Este metodo no sabe (ni le importa) si 'cuenta' es CuentaAhorros
         // o CuentaCorriente: retirar() resuelve la regla de cada subtipo
         // por si sola gracias al polimorfismo. Sin instanceof en ningun lado.
-        cuenta.retirar(monto);
-        System.out.println(cuenta.getClass().getSimpleName()
-            + " " + cuenta.getNumeroCuenta()
-            + " -> saldo tras retirar " + monto + ": " + cuenta.consultarSaldo());
+        String etiqueta = cuenta.getClass().getSimpleName() + " " + cuenta.getNumeroCuenta();
+        try {
+            cuenta.retirar(monto);
+            System.out.println(etiqueta
+                + " -> retiro de " + monto + " aceptado; saldo: " + cuenta.consultarSaldo());
+        } catch (IllegalStateException e) {
+            System.out.println(etiqueta
+                + " -> retiro de " + monto + " rechazado: " + e.getMessage());
+        }
     }
 }
 ```
@@ -396,9 +413,16 @@ public class PruebaCreacionObjetos {
 `cuenta.getClass().getSimpleName()` se usa solo para el mensaje impreso, no
 para decidir comportamiento — eso es distinto de un `instanceof` que
 ramifica la lógica. La regla de retiro sigue viviendo exclusivamente dentro
-de cada subtipo, y al correr este `main` vas a ver dos mensajes con
-distinto comportamiento aunque la llamada (`cuenta.retirar(30000)`) sea
-idéntica en las dos.
+de cada subtipo, y al correr este `main` la misma llamada
+(`cuenta.retirar(120000)`) produce dos salidas visiblemente distintas:
+
+```
+CuentaAhorros AH-001 -> retiro de 120000.0 rechazado: Saldo insuficiente: las cuentas de ahorro no permiten sobregiro
+CuentaCorriente CC-001 -> retiro de 120000.0 aceptado; saldo: -70000.0
+```
+
+Eso es exactamente lo que tu laboratorio pide demostrar por consola: que las
+dos implementaciones **se comportan distinto** ante la misma llamada.
 
 ## Dónde encajan `service` y `view`
 

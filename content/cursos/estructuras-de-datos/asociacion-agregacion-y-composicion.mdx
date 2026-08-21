@@ -11,7 +11,7 @@ presentation: true
 slides_hint: "Cada sección ## es una diapositiva. Presentación sincrona."
 date: "2026-08-25"
 author: "Asistente de Docencia"
-summary: 'Las tres formas de que un objeto "tenga" a otro en UML — asociación, agregación y composición —, con multiplicidades y su traducción directa a código Java.'
+summary: "Las tres formas de que un objeto 'tenga' a otro en UML — asociación, agregación y composición —, con multiplicidades y su traducción directa a código Java."
 updatedAt: "2026-08-21"
 ---
 
@@ -22,7 +22,7 @@ updatedAt: "2026-08-21"
   proyecto.
 </Callout>
 
-## El problema: ¿existe una relacion entre `Cliente` y `Cuenta`?
+## El problema: ¿existe una relación entre `Cliente` y `Cuenta`?
 
 En Introducción al UML modelaste `Cliente` y `Cuenta` por separado: cada
 clase con su recuadro de tres compartimentos, cada atributo con su tipo,
@@ -41,11 +41,14 @@ contestar.
 
 ## La solución: tres formas de "tener" un objeto en UML
 
-UML distingue tres relaciones según qué tan atado está el ciclo de vida de un objeto al del otro: si solo se conocen, si uno reúne al otro sin poseerlo, o si uno no tiene sentido sin el
-otro.
+UML distingue tres relaciones según qué tan atado está el ciclo de vida de
+un objeto al del otro: si solo se conocen, si uno reúne al otro sin
+poseerlo, o si uno no tiene sentido sin el otro.
 
 Las tres se dibujan como una línea entre dos clases, pero la punta que toca
-al "todo" cambia: una flecha simple, un diamante hueco, un diamante relleno. Esa punta es la única diferencia visual — y encierra una decisión de diseño completa.
+al "todo" cambia: una flecha simple, un diamante hueco, un diamante
+relleno. Esa punta es la única diferencia visual — y encierra una decisión
+de diseño completa.
 
 > **Relación de clases en UML:** vínculo entre dos clases que indica que los
 > objetos de una conocen, reúnen o dependen de los objetos de la otra. UML
@@ -191,10 +194,14 @@ classDiagram
   Cuenta *-- Movimiento
 ```
 
-> **Composición:** relación "tiene un" en la que el todo **crea y controla**
-> por completo el ciclo de vida de la parte — si el todo deja de existir, la
-> parte deja de existir con él. Se dibuja con un diamante relleno junto al
-> todo (`*--`).
+> **Composición:** relación "tiene un" en la que el todo es **dueño
+> exclusivo** de la parte y controla su ciclo de vida — si el todo deja de
+> existir, la parte deja de existir con él, y ninguna otra clase la conserva
+> ni puede reasignarla a otro todo. El indicio más frecuente en el código es
+> que el todo la cree él mismo con `new`, como aquí, pero **el criterio es la
+> propiedad exclusiva y el ciclo de vida**, no quién ejecuta el `new`: verás
+> composiciones donde la parte se construye afuera y se le entrega al todo
+> que la posee. Se dibuja con un diamante relleno junto al todo (`*--`).
 
 ## Multiplicidades: cuántas instancias hay a cada lado
 
@@ -227,12 +234,17 @@ empieza con `historial` vacío, y eso es válido porque el diagrama permite
 
 ## Resumen operativo
 
-| Notación UML     | Nombre        | Ejemplo de código Java                           | ¿Existe la parte sin el todo?      |
-| ---------------- | ------------- | ------------------------------------------------ | ---------------------------------- |
-| `-->`            | Asociación    | `private Cliente titular;` (recibido, no creado) | Sí, siempre                        |
-| `o--`            | Agregación    | `clientes.add(cliente);` (recibido en un método) | Sí — puede pasar a otro todo       |
-| `*--`            | Composición   | `new Movimiento(...)` (creado dentro del todo)   | No — muere con el todo             |
-| `"1" ... "1..*"` | Multiplicidad | —                                                | Cuántas instancias, no de qué tipo |
+| Notación UML     | Nombre        | Indicio típico en el código                      | Criterio: ¿existe la parte sin el todo? |
+| ---------------- | ------------- | ------------------------------------------------ | --------------------------------------- |
+| `-->`            | Asociación    | `private Cliente titular;` (recibido, no creado) | Sí, siempre                             |
+| `o--`            | Agregación    | `clientes.add(cliente);` (recibido en un método) | Sí — puede pasar a otro todo            |
+| `*--`            | Composición   | `new Movimiento(...)` (creado dentro del todo)   | No — muere con el todo                  |
+| `"1" ... "1..*"` | Multiplicidad | —                                                | Cuántas instancias, no de qué tipo      |
+
+La tercera columna es un **indicio**, no la definición. Quien decide es la
+última: si la parte puede sobrevivir al todo y pasar a otro, es agregación;
+si muere con él y nadie más la conserva, es composición — aunque el objeto
+se haya construido afuera y se le haya entregado al todo que lo posee.
 
 ## Síntesis
 

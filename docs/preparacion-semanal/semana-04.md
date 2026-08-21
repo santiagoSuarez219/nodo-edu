@@ -16,7 +16,7 @@
 | Curso | Sesión | Tema | ★/◇ |
 |---|---|---|---|
 | `estructuras-de-datos` | T1 (25 ago) | Asociación, agregación y composición (UML de relaciones) | — |
-| `estructuras-de-datos` | T2 (27 ago) | Diseño con TAD y orientación a objetos + diagramas de paquetes | — |
+| `estructuras-de-datos` | T2 (27 ago) | Diseño con TAD y orientación a objetos — laboratorio guiado en clase sobre el Sistema Bancario | — |
 | `estructuras-de-datos` | P (28 ago) | Lab evaluativo M1 — ya escrito y desplegado, no tocado en esta ronda | **★ M1** |
 
 ## Artefactos producidos
@@ -24,12 +24,16 @@
 | Curso | Artefacto | Ruta | Publicado |
 |---|---|---|---|
 | `estructuras-de-datos` | Lección teórica — T1 | `content/cursos/estructuras-de-datos/asociacion-agregacion-y-composicion.mdx` | ✅ |
-| `estructuras-de-datos` | Lección teórica — T2 | `content/cursos/estructuras-de-datos/diseno-con-tad-y-orientacion-a-objetos.mdx` | ✅ |
+| `estructuras-de-datos` | Laboratorio guiado en clase — T2 | `content/cursos/estructuras-de-datos/diseno-con-tad-y-orientacion-a-objetos.mdx` | ✅ |
 | `estructuras-de-datos` | Registro TS (T1, T2) | `lib/courses/data/estructuras-de-datos.ts` (`order: 11`, `order: 12`) | ✅ |
 
-> Sin apuntes de clase ni guía de laboratorio nuevos: T1 y T2 son sesiones
-> teóricas puras, sin código en vivo ni sesión práctica propia. El
-> laboratorio de la semana (viernes) ya existía antes de esta ronda.
+> Sin guía de laboratorio nueva en `guias/`: T1 es una sesión teórica y T2 se
+> reconvirtió en laboratorio guiado publicado como lección (ver "Refactor de
+> arquitectura y reconversión de T2"), con su paso a paso de código dentro de
+> la propia lección. El apunte docente
+> `apuntes/lab-m1-diseno-oo-completo.md` se recortó en esa reconversión. El
+> laboratorio evaluativo de la semana (viernes) ya existía antes de esta
+> ronda.
 
 ## Evaluaciones creadas
 
@@ -37,8 +41,18 @@
 
 | Lección | IDs de preguntas | Publicadas | Montadas (verificado con `list_lesson_questions`) |
 |---|---|---|---|
-| `asociacion-agregacion-y-composicion` | **Pendiente** — servidor no disponible en esta ronda | ⬜ | ⬜ |
-| `diseno-con-tad-y-orientacion-a-objetos` | **Pendiente** — servidor no disponible en esta ronda | ⬜ | ⬜ |
+| `asociacion-agregacion-y-composicion` | `817516a4-f95f-4d9b-b78a-3417b4553318`, `c4ebd71c-cb88-4267-9b37-00d86bf2b132`, `2280e46c-6bdb-42a5-a3e1-93650e11bd25`, `1e108051-46c5-4d1a-8c11-5621324572d7`, `4afe3975-3c3c-44b4-a220-4d0717cdd06e` | ✅ (5/5) | ✅ (5/5, orden 0–4) |
+| `diseno-con-tad-y-orientacion-a-objetos` | — | **No aplica** | **No aplica** |
+
+> **T1:** creadas, publicadas y montadas el 2026-08-21 en el entorno de
+> **desarrollo**, con el contenido aprobado por el usuario. Verificado con
+> `list_questions` filtrando por lección. **Falta replicarlas a producción**
+> antes o durante F7, como se hizo en la Semana 3.
+>
+> **T2 no lleva cuestionario de cierre** — decisión explícita del usuario.
+> Las 5 preguntas que se habían redactado como borrador se eliminaron del
+> banco y se verificó su borrado (404). La keyword `paquetes-java` quedó en
+> el catálogo compartido, que es vocabulario reutilizable.
 
 ### Quiz calificable A/B/C
 
@@ -144,10 +158,14 @@ de codificación, preparado fuera de esta ronda).
   coherentes con el `.mdx`
 - [x] Coherencia cruzada: T1 instala las notaciones UML (`-->`, `o--`, `*--`,
   multiplicidades) que el lab M1 del viernes ya exige leer, con
-  `Equipo`/`Jugador` como composición pura, alineado con el lab; T2 retoma la
-  relación `Banco`/`CuentaAhorros` **como agregación** (código que recibe la
-  cuenta ya construida) y la traduce a Java, y cierra con paquetes/carpetas
-  que el lab también asume instalados
+  `Equipo`/`Jugador` como composición pura, alineado con el lab; T2 es el
+  **ejemplo trabajado** de ese mismo lab sobre el Sistema Bancario (UML →
+  TAD → clase abstracta → subtipos polimórficos → composición
+  `Cliente`/`Cuenta` → `PruebaCreacionObjetos`), arranca con el diagrama de
+  paquetes de las tres capas que el lab también asume instaladas, retoma la
+  composición `Cliente`/`Cuenta` precisando que la define la propiedad
+  exclusiva y no quién ejecuta el `new`, y cierra con una tabla de
+  correspondencia paso a paso con lo que el lab le pide al estudiante
 - [x] `@reviewer`: 1.ª pasada CAMBIOS REQUERIDOS (referencias rotas + menores,
   corregidos) · 2.ª pasada CAMBIOS REQUERIDOS (bloqueante conceptual T1/T2 +
   riesgo operativo, corregidos) · 3.ª pasada CAMBIOS REQUERIDOS (residuo
