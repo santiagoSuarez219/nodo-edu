@@ -583,8 +583,8 @@ nota_final_curso = (4.5 / 5) × 5% = 4.5%
 ## Recursos
 
 - **Lecciones del curso:** "Encapsulamiento", "Herencia", "Polimorfismo",
-  "Introducción al UML", "Composición, agregación y diagramas de
-  paquetes".
+  "Introducción al UML", "Asociación, agregación y composición", "Diseño
+  con TAD y orientación a objetos".
 - **Práctica anterior:** "Práctica en clase — Modela una clase de tu
   proyecto de aula" (Semana 2), donde escribió las cinco clases que este
   laboratorio evoluciona.

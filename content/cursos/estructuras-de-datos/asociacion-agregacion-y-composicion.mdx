@@ -15,6 +15,10 @@ summary: "Las tres formas de que un objeto \"tenga\" a otro en UML — asociaci�
 updatedAt: "2026-08-21"
 ---
 
+<Callout tipo="nota">
+Repositorio de referencia del proyecto (Sistema Bancario): [github.com/santiagoSuarez219/estructura-de-datos-sistema-bancario](https://github.com/santiagoSuarez219/estructura-de-datos-sistema-bancario). Clónalo para seguir los ejemplos de esta lección sobre el código real del proyecto.
+</Callout>
+
 ## El problema: ¿el Cliente es dueño de su Cuenta, o solo la conoce?
 
 En Introducción al UML modelaste `Cliente` y `Cuenta` por separado: cada
@@ -38,19 +42,6 @@ UML no trata todo "tener un" por igual. Distingue tres relaciones según qué
 tan atado está el ciclo de vida de un objeto al del otro: si solo se
 conocen, si uno reúne al otro sin poseerlo, o si uno no tiene sentido sin el
 otro.
-
-```mermaid
-classDiagram
-  class ClaseA
-  class ClaseB
-  class ClaseC
-  class ClaseD
-  class ClaseE
-  class ClaseF
-  ClaseA --> ClaseB : asociacion
-  ClaseC o-- ClaseD : agregacion
-  ClaseE *-- ClaseF : composicion
-```
 
 Las tres se dibujan como una línea entre dos clases, pero la punta que toca
 al "todo" cambia: una flecha simple para asociación, un diamante hueco para
@@ -286,6 +277,6 @@ punta de flecha en ningún extremo, indicando navegación bidireccional.
   instancias participan a cada lado de cualquiera de las tres relaciones.
 - Los **roles nombrados** distinguen relaciones repetidas entre las mismas
   dos clases, como los dos vínculos de `Partido` hacia `Equipo`.
-- Con estas seis piezas —tres tipos de relación, sus dos notaciones
-  restantes y su lectura— ya puedes leer cualquier diagrama de relaciones
-  de tu proyecto de aula, aunque combine varias clases a la vez.
+- Con estas cinco piezas —los tres tipos de relación, más multiplicidades
+  y roles nombrados— ya puedes leer cualquier diagrama de relaciones de tu
+  proyecto de aula, aunque combine varias clases a la vez.

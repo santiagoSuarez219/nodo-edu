@@ -177,7 +177,10 @@ Reglas verificadas:
 - `securityLevel: "strict"` (`MermaidDiagram.tsx:36-44`): sin HTML crudo ni `click` handlers.
 - `fontFamily` fijado a JetBrains Mono; el tema sigue claro/oscuro automáticamente.
 - Si el diagrama no parsea, se muestra una tarjeta de error con el fuente — no rompe la página, pero **es un defecto**: valida la sintaxis mentalmente antes de escribir.
-- `end` en minúscula rompe el parser: escribir `End`.
+- El cierre de `subgraph`/bloques debe ser `end` en minúscula exacta — `End`
+  o `END` rompen el parser. Lo que sí hay que evitar es nombrar un **nodo**
+  `end` (como id o como texto), porque ahí sí se confunde con el cierre;
+  usa mayúscula o comillas solo en ese caso.
 
 Cualquier tipo de diagrama de Mermaid v11 sirve. Referencia completa en
 `content/cursos/mermaid_guia_completa.md`. Los tipos que más rinden aquí:

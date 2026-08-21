@@ -208,9 +208,9 @@ export const estructurasDeDatos: Course = {
       topics: [],
     },
     {
-      id: "composicion-agregacion-y-diagramas-de-paquetes",
-      slug: "composicion-agregacion-y-diagramas-de-paquetes",
-      articleSlug: "composicion-agregacion-y-diagramas-de-paquetes",
+      id: "asociacion-agregacion-y-composicion",
+      slug: "asociacion-agregacion-y-composicion",
+      articleSlug: "asociacion-agregacion-y-composicion",
       order: 11,
       title: "Asociación, agregación y composición",
       summary:
@@ -230,8 +230,8 @@ export const estructurasDeDatos: Course = {
         "Separa el contrato de la implementación con interface, traduce un diagrama de clases con relaciones a Java, y organiza las clases del proyecto en paquetes que reflejan sus cuatro capas.",
       topics: [
         { title: "Diagrama de clases con relaciones: lectura e implementación en Java" },
-        { title: "Modelar el TAD de una estructura de datos con clases e interfaces" },
-        { title: "Puente entre el diseño OO y la implementación de estructuras de datos" },
+        { title: "Modelar un TAD de diseño OO con clases e interfaces" },
+        { title: "Del diagrama de clases al código Java por capas" },
         { title: "Diagramas de paquetes: organización de clases en Java" },
       ],
     },

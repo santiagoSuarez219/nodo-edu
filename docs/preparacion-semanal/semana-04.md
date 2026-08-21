@@ -23,7 +23,7 @@
 
 | Curso | Artefacto | Ruta | Publicado |
 |---|---|---|---|
-| `estructuras-de-datos` | Lección teórica — T1 | `content/cursos/estructuras-de-datos/composicion-agregacion-y-diagramas-de-paquetes.mdx` | ✅ |
+| `estructuras-de-datos` | Lección teórica — T1 | `content/cursos/estructuras-de-datos/asociacion-agregacion-y-composicion.mdx` | ✅ |
 | `estructuras-de-datos` | Lección teórica — T2 | `content/cursos/estructuras-de-datos/diseno-con-tad-y-orientacion-a-objetos.mdx` | ✅ |
 | `estructuras-de-datos` | Registro TS (T1, T2) | `lib/courses/data/estructuras-de-datos.ts` (`order: 11`, `order: 12`) | ✅ |
 
@@ -37,7 +37,7 @@
 
 | Lección | IDs de preguntas | Publicadas | Montadas (verificado con `list_lesson_questions`) |
 |---|---|---|---|
-| `composicion-agregacion-y-diagramas-de-paquetes` | **Pendiente** — servidor no disponible en esta ronda | ⬜ | ⬜ |
+| `asociacion-agregacion-y-composicion` | **Pendiente** — servidor no disponible en esta ronda | ⬜ | ⬜ |
 | `diseno-con-tad-y-orientacion-a-objetos` | **Pendiente** — servidor no disponible en esta ronda | ⬜ | ⬜ |
 
 ### Quiz calificable A/B/C
@@ -69,6 +69,33 @@ de codificación, preparado fuera de esta ronda).
   `flowchart` de T2** tras F4: Mermaid exige el keyword en minúscula; con
   mayúscula el diagrama no habría renderizado. El propio `@lesson-writer`
   reportó haber hecho ese cambio pero lo aplicó con mayúscula por error.
+- **Correcciones tras la primera pasada de `@reviewer` (CAMBIOS REQUERIDOS),
+  aplicadas con aprobación del usuario:**
+  - Referencia cruzada rota en T2 (`diseno-con-tad-y-orientacion-a-objetos.mdx`)
+    al título viejo de T1, corregida al nuevo título.
+  - Referencia rota en `guias/lab-m1-diseno-oo-completo.md` (Recursos): citaba
+    el título viejo de T1; se actualizó a los dos títulos vigentes (T1 y T2),
+    ya que ambos son prerrequisito real del laboratorio.
+  - **Slug/archivo/id de T1 renombrado** de `composicion-agregacion-y-diagramas-de-paquetes`
+    a `asociacion-agregacion-y-composicion`, alineado con el título ya
+    aprobado — se hizo ahora porque es gratis (sin preguntas creadas ni
+    lección abierta a estudiantes).
+  - Topic sin respaldo de T2 reformulado: "Puente entre el diseño OO y la
+    implementación de estructuras de datos" → "Del diagrama de clases al
+    código Java por capas"; y el topic 2 ajustado de "Modelar el TAD de una
+    estructura de datos..." a "Modelar un TAD de diseño OO..." para no
+    prometer contenido de estructuras de datos que esta lección no cubre.
+  - T1: se quitó el primer diagrama Mermaid genérico (`ClaseA`...`ClaseF`,
+    redundante con la tabla de resumen), se corrigió "estas seis piezas" a
+    "estas cinco piezas" en la síntesis (error aritmético), y se agregó el
+    `<Callout>` de repositorio de referencia que sí llevan el resto de
+    lecciones del curso.
+  - **`lesson-authoring/SKILL.md` y `mermaid_guia_completa.md` corregidos**:
+    ambos afirmaban que `end` en minúscula rompe el parser y que había que
+    escribir `End`/`END` — es falso para el cierre de `subgraph`/bloques (que
+    exige `end` en minúscula exacta) y solo aplica a un **nodo** llamado
+    `end`. Esta documentación errónea fue la causa original del bug
+    corregido en F4.
 
 ## Verificación
 
