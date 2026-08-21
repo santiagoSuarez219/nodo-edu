@@ -96,6 +96,43 @@ de codificación, preparado fuera de esta ronda).
     exige `end` en minúscula exacta) y solo aplica a un **nodo** llamado
     `end`. Esta documentación errónea fue la causa original del bug
     corregido en F4.
+- **Correcciones tras la segunda pasada de `@reviewer` (CAMBIOS REQUERIDOS de
+  nuevo), aplicadas con aprobación del usuario:**
+  - **Bloqueante conceptual en T1:** la sección de agregación usaba
+    `Equipo o-- Jugador`, contradiciendo al laboratorio M1 ya desplegado, que
+    define ese mismo par como **composición** (`Equipo "1" *-- "1..*"
+    Jugador`, "un Jugador no existe fuera de un Equipo"). Se cambió el
+    ejemplo de agregación a `Banco o-- Cliente` (mismo dominio bancario, sin
+    colisionar con el lab) y se dejó `Equipo`/`Jugador` exclusivamente como
+    composición en la sección de multiplicidades, alineado con el lab.
+  - **Mayor en T2:** `Banco "1" *-- "0..*" CuentaAhorros` estaba rotulado
+    composición, pero el código (`agregarCuenta` recibe la cuenta ya
+    construida) es el patrón de agregación según el propio criterio de T1.
+    Se cambió la notación a `o--` y se ajustó la prosa (agregación: la
+    cuenta podría trasladarse a otro banco en una fusión, sin dejar de
+    existir).
+  - Topic solapado de T2 reformulado de nuevo: "Del diagrama de clases al
+    código Java por capas" (que duplicaba el topic 1) → "El Service programa
+    contra la interfaz, no contra la implementación" (cubre la sección más
+    valiosa de la lección, que no tenía topic propio).
+  - Precisión adicional en `lesson-authoring/SKILL.md` y
+    `mermaid_guia_completa.md`: la regla de `end` en minúscula aplica al
+    cierre de `subgraph` en un `flowchart` (no a todo bloque — un `loop`/`alt`
+    de `sequenceDiagram` sí acepta `End`); y la solución para un nodo llamado
+    `end` depende de si es su *id* (hay que renombrarlo) o solo su *texto*
+    visible (ahí sí bastan las comillas).
+  - **Anotada nota histórica** en `semana-03.md` (sin modificar su contenido
+    sustantivo) señalando el rename del slug de T1.
+- **Riesgo operativo detectado, sin ejecutar (pendiente de servidor):** el
+  renombrado del slug de T1 (`composicion-agregacion-y-diagramas-de-paquetes`
+  → `asociacion-agregacion-y-composicion`) deja huérfana la fila de
+  `disabled_lessons` que mantenía esa lección cerrada en producción (creada
+  el 2026-08-17, ver `semana-03.md`). Si se despliega sin corregir esto, la
+  lección se abriría a los estudiantes automáticamente al no tener fila con
+  el slug nuevo — saltándose F7. **Antes o durante el despliegue** hay que,
+  vía `courses-mcp-prod`: (a) crear la fila deshabilitada para
+  `estructuras-de-datos/asociacion-agregacion-y-composicion`, y (b) eliminar
+  la fila huérfana del slug viejo. Ver sección "Despliegue y apertura".
 
 ## Verificación
 
@@ -109,13 +146,22 @@ de codificación, preparado fuera de esta ronda).
   multiplicidades, roles) que el lab M1 del viernes ya exige leer; T2 retoma
   esa misma relación de composición y la traduce a Java, y cierra con
   paquetes/carpetas que el lab también asume instalados
-- [ ] `@reviewer`: pendiente (F6, aún no invocado)
+- [ ] `@reviewer`: 1.ª pasada CAMBIOS REQUERIDOS (referencias rotas + menores,
+  corregidos) · 2.ª pasada CAMBIOS REQUERIDOS (bloqueante conceptual T1/T2 +
+  riesgo operativo, corregidos) · 3.ª pasada pendiente de invocar
 
 ## Despliegue y apertura
 
 - **Merge a `development`:** pendiente
 - **Deploy a producción:** pendiente
 - **Lecciones abiertas:** pendiente (fase F7, requiere confirmación explícita)
+- [ ] **Compensación de `disabled_lessons` por el rename de slug** (ver
+  "Riesgo operativo" arriba) — ejecutar vía `courses-mcp-prod` antes o junto
+  con la apertura de F7, no dejarlo para después del deploy:
+  - [ ] Crear fila deshabilitada para
+    `estructuras-de-datos/asociacion-agregacion-y-composicion`
+  - [ ] Eliminar la fila huérfana de
+    `estructuras-de-datos/composicion-agregacion-y-diagramas-de-paquetes`
 - [ ] Verificado que las lecciones de semanas futuras siguen cerradas
 
 ## Pendientes para la semana siguiente

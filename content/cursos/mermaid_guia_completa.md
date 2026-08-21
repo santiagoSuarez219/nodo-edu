@@ -108,8 +108,9 @@ flowchart LR
 
 | Elemento | Problema | Solución |
 |---|---|---|
-| Cierre de `subgraph`/bloque en mayúscula (`End`/`END`) | Rompe el parser — el cierre exige `end` exacto en minúscula | Escribir siempre `end` en minúscula |
-| Un **nodo** llamado `end` (id o texto, no el cierre de bloque) | Se confunde con la palabra reservada de cierre | Renombrar el nodo o encerrarlo en comillas |
+| Cierre de `subgraph` en un `flowchart` escrito en mayúscula (`End`/`END`) | Rompe el parser — el cierre exige `end` exacto en minúscula | Escribir siempre `end` en minúscula |
+| Un **nodo** con *id* `end` (en minúscula) | Se confunde con la palabra reservada de cierre | Renombrar el id del nodo |
+| Un nodo cuyo *texto* visible es `end` (id distinto) | No rompe, pero puede confundir a quien lea el fuente | Encerrar el texto en comillas, ej. `B["end"]` |
 | `o`/`x` como primera letra tras `---` | Se interpreta como edge circular/cruzado | Agregar espacio o usar mayúscula |
 | `%%{ }%%` dentro de comentarios | Se confunde con directiva | Evitar llaves `{}` en comentarios |
 | Caracteres especiales en texto | Rompen el parser | Encerrar en comillas `" "` |

@@ -122,10 +122,10 @@ classDiagram
 
 ## Del diagrama de clases al código: leer relaciones e implementarlas en Java
 
-En Asociación, agregación y composición viste cómo UML anota una
-relación de composición entre dos clases con multiplicidades. Ese mismo
-diagrama, cuando te lo entregan ya resuelto, se lee de izquierda a derecha
-para decidir qué escribir en Java:
+En Asociación, agregación y composición viste cómo UML anota multiplicidades
+sobre una relación entre dos clases. Ese mismo diagrama, cuando te lo
+entregan ya resuelto, se lee de izquierda a derecha para decidir qué
+escribir en Java:
 
 ```mermaid
 classDiagram
@@ -137,14 +137,15 @@ classDiagram
     -numeroCuenta : String
     -saldo : double
   }
-  Banco "1" *-- "0..*" CuentaAhorros : contiene
+  Banco "1" o-- "0..*" CuentaAhorros : contiene
 ```
 
-La multiplicidad `"1" *-- "0..*"` dice: un `Banco` contiene cero o más
-`CuentaAhorros`, y cada `CuentaAhorros` pertenece exactamente a un `Banco`
-(composición: si el `Banco` desaparece, sus cuentas desaparecen con él). Esa
-lectura se traduce, casi línea por línea, a una colección como campo y a un
-método que agrega a esa colección:
+La multiplicidad `"1" o-- "0..*"` dice: un `Banco` reúne cero o más
+`CuentaAhorros`, y cada `CuentaAhorros` pertenece a un único `Banco` en un
+momento dado (agregación: si el banco cierra, la cuenta podría trasladarse a
+otro banco en una fusión, sin dejar de existir). Esa lectura se traduce,
+casi línea por línea, a una colección como campo y a un método que agrega
+una cuenta ya construida a esa colección:
 
 ```java
 public class Banco {
@@ -374,7 +375,7 @@ del mismo paquete, ningún `import` es necesario.
 |---|---|---|
 | `interface` (`<<interface>>`) | Contrato puro, sin estado ni implementación | `Operable` en `model.domain` |
 | `class ... implements` | Representación concreta de un TAD | `CuentaAhorros`, `CuentaCorriente` en `model.domain` |
-| `Banco "1" *-- "0..*" Cuenta` | Composición: colección como campo | `List<Operable> cuentas` en `Banco` |
+| `Banco "1" o-- "0..*" Cuenta` | Agregación: colección como campo, recibida ya construida | `List<Operable> cuentas` en `Banco` |
 | Paquete (`package nombre;`) | Agrupación de clases por responsabilidad | `model.domain`, `service`, `controller`, `view` |
 | Dependencia entre paquetes | Un paquete usa clases de otro vía `import` | `service` importa de `model.domain` |
 

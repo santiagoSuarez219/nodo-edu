@@ -231,7 +231,7 @@ export const estructurasDeDatos: Course = {
       topics: [
         { title: "Diagrama de clases con relaciones: lectura e implementación en Java" },
         { title: "Modelar un TAD de diseño OO con clases e interfaces" },
-        { title: "Del diagrama de clases al código Java por capas" },
+        { title: "El Service programa contra la interfaz, no contra la implementación" },
         { title: "Diagramas de paquetes: organización de clases en Java" },
       ],
     },

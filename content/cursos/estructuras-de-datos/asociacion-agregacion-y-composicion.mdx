@@ -97,45 +97,47 @@ classDiagram
 
 ## Agregación: "tiene un" débil, el todo no controla el ciclo de vida
 
-**Situación:** un `Equipo` de la liga reúne a varios `Jugador`es. Pero un
-`Jugador` puede ser fichado por otro equipo en el siguiente semestre — el
-jugador sigue existiendo, con su misma identidad, aunque cambie de equipo o
-aunque el equipo entero desaparezca por quiebra.
+**Situación:** un `Banco` reúne a varios `Cliente`s registrados. Pero un
+`Cliente` puede cerrar todas sus cuentas y trasladarse a otro banco —sigue
+existiendo, con su misma identidad, aunque cambie de banco o aunque el banco
+original cierre sus puertas.
 
-**En la práctica**, `Equipo` guarda una lista de `Jugador`es, pero **no los
-instancia**: los recibe ya creados y solo los agrega a su colección.
+**En la práctica**, `Banco` guarda una lista de `Cliente`s, pero **no los
+instancia**: los recibe ya creados (ya se registraron en otra parte del
+sistema) y solo los agrega a su colección.
 
 ```java
-public class Equipo {
+public class Banco {
     private String nombre;
-    private List<Jugador> jugadores;
+    private List<Cliente> clientes;
 
-    public Equipo(String nombre) {
+    public Banco(String nombre) {
         this.nombre = nombre;
-        this.jugadores = new ArrayList<>();   // lista vacia: sin jugadores todavia
+        this.clientes = new ArrayList<>();   // lista vacia: sin clientes todavia
     }
 
-    public void ficharJugador(Jugador jugador) {
-        jugadores.add(jugador);   // el Jugador ya existia antes de ficharlo
+    public void registrarCliente(Cliente cliente) {
+        clientes.add(cliente);   // el Cliente ya existia antes de registrarlo
     }
 }
 ```
 
-`Equipo` nunca ejecuta `new Jugador(...)`: la responsabilidad de crear al
-`Jugador` es de quien construye el objeto y se lo entrega a `ficharJugador()`.
+`Banco` nunca ejecuta `new Cliente(...)`: la responsabilidad de crear al
+`Cliente` es de quien construye el objeto y se lo entrega a
+`registrarCliente()`.
 
 ```mermaid
 classDiagram
-  class Equipo {
+  class Banco {
     -nombre : String
-    -jugadores : List~Jugador~
-    +ficharJugador(jugador) void
+    -clientes : List~Cliente~
+    +registrarCliente(cliente) void
   }
-  class Jugador {
+  class Cliente {
+    -identificacion : String
     -nombre : String
-    -posicion : String
   }
-  Equipo o-- Jugador
+  Banco o-- Cliente
 ```
 
 > **Agregación:** relación "tiene un" en la que el todo reúne a la parte,
@@ -197,9 +199,11 @@ classDiagram
 
 ## Multiplicidades: cuántas instancias hay a cada lado
 
-**Situación:** el diagrama de `Equipo`/`Jugador` ya muestra la relación,
-pero no dice cuántos jugadores puede tener un equipo, ni si un equipo puede
-existir sin ninguno todavía fichado.
+**Situación:** en la liga de fútbol, un `Jugador` solo tiene sentido dentro
+de su `Equipo` —si el equipo se disuelve, el jugador deja de estar fichado
+por él, igual que `Cuenta` y sus `Movimiento`s: es una composición—, pero el
+diagrama todavía no dice cuántos jugadores puede tener un equipo, ni si un
+equipo puede existir sin ninguno todavía fichado.
 
 **En la práctica**, cada extremo de la línea lleva un número o rango entre
 comillas: `"1"` (exactamente uno), `"0..*"` (cero o muchos), `"1..*"` (uno o
@@ -257,7 +261,7 @@ punta de flecha en ningún extremo, indicando navegación bidireccional.
 | Notación UML | Nombre | Ejemplo de código Java | ¿Existe la parte sin el todo? |
 |---|---|---|---|
 | `-->` | Asociación | `private Cliente titular;` (recibido, no creado) | Sí, siempre |
-| `o--` | Agregación | `jugadores.add(jugador);` (recibido en un método) | Sí — puede pasar a otro todo |
+| `o--` | Agregación | `clientes.add(cliente);` (recibido en un método) | Sí — puede pasar a otro todo |
 | `*--` | Composición | `new Movimiento(...)` (creado dentro del todo) | No — muere con el todo |
 | `"1" ... "1..*"` | Multiplicidad | — | Cuántas instancias, no de qué tipo |
 | `: equipoLocal` | Rol nombrado | `private Equipo equipoLocal;` | Distingue relaciones repetidas |
@@ -268,11 +272,11 @@ punta de flecha en ningún extremo, indicando navegación bidireccional.
   través de una referencia, sin que ninguna controle la existencia de la
   otra — como `Cuenta` y su `titular`.
 - La **agregación** es un "tiene un" débil: el todo reúne partes que
-  recibe ya creadas y que pueden sobrevivirlo — como `Equipo` con sus
-  `Jugador`es fichados.
+  recibe ya creadas y que pueden sobrevivirlo — como `Banco` con sus
+  `Cliente`s registrados.
 - La **composición** es un "tiene un" fuerte: el todo crea y destruye a
   la parte, que no tiene sentido fuera de él — como `Cuenta` con su
-  historial de `Movimiento`s.
+  historial de `Movimiento`s, o `Equipo` con sus `Jugador`es fichados.
 - Las **multiplicidades** (`"1"`, `"0..*"`, `"1..*"`) precisan cuántas
   instancias participan a cada lado de cualquiera de las tres relaciones.
 - Los **roles nombrados** distinguen relaciones repetidas entre las mismas
