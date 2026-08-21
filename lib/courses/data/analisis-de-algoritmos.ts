@@ -98,6 +98,8 @@ export const analisisDeAlgoritmos: Course = {
       articleSlug: "analisis-de-algoritmos-y-divide-y-venceras",
       order: 4,
       title: "Análisis de algoritmos y divide y vencerás",
+      summary:
+        "Por qué insertion sort no tiene un solo tiempo de ejecución, cómo se formalizan el peor caso, el mejor caso y el caso promedio, y cómo divide y vencerás —con merge sort como primer ejemplo— ataca el problema de raíz en vez de acelerar el recorrido.",
       topics: [
         { title: "Análisis del peor caso, mejor caso y caso promedio" },
         { title: "Orden de crecimiento: intuición previa a la notación formal" },
