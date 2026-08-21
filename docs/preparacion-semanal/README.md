@@ -1,8 +1,13 @@
 # Preparación semanal de clase
 
-Índice de bitácoras producidas por el flujo `weekly-class-prep`
-(`.claude/skills/weekly-class-prep/SKILL.md`). Una fila por semana calendario
+Índice de bitácoras producidas por el flujo `class-material-prep`
+(`.claude/skills/class-material-prep/SKILL.md`). Una fila por semana calendario
 preparada, con el estado más reciente de cada una.
+
+Cada ronda cubre **un curso**, así que una misma semana puede tener varias
+rondas registradas en el mismo archivo — una sección por curso. Las bitácoras
+anteriores a la Semana 5 se produjeron con el flujo semanal previo, que cubría
+las seis sesiones de los tres cursos en una sola pasada.
 
 | Semana | Rango de fechas | Rama | Estado |
 |---|---|---|---|

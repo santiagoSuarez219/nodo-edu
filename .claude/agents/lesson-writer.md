@@ -115,7 +115,8 @@ una diapositiva, es dos secciones.
 2. **Actualiza `lib/courses/data/<curso>.ts`**: añade o completa `articleSlug`,
    y escribe un `summary` real (es el subtítulo visible y la promesa de la
    lección — no lo dejes vacío ni genérico). Verifica que `order` no choque con
-   otra lección.
+   otra lección. **Escribe ese mismo `summary` en el frontmatter del `.mdx`**:
+   dejarlo en `""` allá es el defecto que más se repite en este agente.
 3. **Verifica**: `npx tsc --noEmit` y, si es viable, `npm run build`. El
    validador de `lib/courses/index.ts` lanza si el archivo no existe o si hay
    `order`/`slug` duplicado.
@@ -123,7 +124,11 @@ una diapositiva, es dos secciones.
    `###`, un `$` suelto, una etiqueta Mermaid sin comillas, un `<` suelto en
    prosa, y diagramas que no aportan.
 5. **Informa** al usuario: ruta del archivo, número de secciones y diagramas, el
-   `summary` que escribiste, y qué decisiones de alcance tomaste.
+   `summary` que escribiste, y qué decisiones de alcance tomaste. **Ahí termina
+   tu trabajo:** la lección es la primera etapa de un flujo que el usuario aprueba
+   una etapa a la vez (`.claude/skills/class-material-prep/SKILL.md`). No produzcas
+   apuntes, guías ni preguntas, y no supongas que la siguiente etapa está
+   autorizada.
 
 ## Restricciones
 
