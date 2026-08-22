@@ -1,7 +1,7 @@
 # Semana 05 — 31 de agosto al 6 de septiembre
 
-**Rama:** `feat/semana-05-analisis-de-algoritmos`
-**Estado:** ✅ Contenido y cuestionario de cierre listos · pendiente pasada de `@reviewer` y merge
+**Rama:** `feat/semana-05-analisis-de-algoritmos` (borrada tras el merge)
+**Estado:** ✅ Contenido y cuestionario de cierre listos · ✅ `@reviewer` (1.ª pasada CAMBIOS REQUERIDOS, corregidos) · ✅ Mergeada a `development`
 
 > Esta rama también absorbió trabajo que quedó pendiente de rondas
 > anteriores del mismo curso, descubierto al arrancar la Semana 5: cambios
@@ -132,13 +132,25 @@ Semana 6, Laboratorio 1).
   la Semana 4 con nombre formal (`Θ(n²)`), adelanta `Θ(n log n)` para merge
   sort sin revelar el método (Semana 6), y el cuestionario evalúa
   exactamente las 5 ideas centrales del contenido ya simplificado
-- [ ] `npm run lint` — no ejecutado en esta ronda, pendiente antes de merge
-- [ ] `@reviewer`: pendiente
+- [x] `npm run lint` en verde (0 errores, 8 advertencias preexistentes sin relación)
+- [x] `@reviewer`: 1.ª pasada **CAMBIOS REQUERIDOS** (4 hallazgos bloqueantes:
+  promesa de columna inexistente en la tabla de jerarquía, LaTeX crudo dentro
+  de backticks sin renderizar, y ambos apuntes de docente desincronizados con
+  las lecciones ya simplificadas/editadas — referenciaban diagramas Mermaid
+  eliminados; 3 mayores: bitácora sin commitear, tipo de commit `content` no
+  documentado en `CLAUDE.md`, tabla de jerarquía sin `n log n`) — los 7
+  corregidos uno por uno, más los menores relevantes (LaTeX en backticks del
+  apunte, atribución incorrecta a la síntesis, guiones largos sin espacio).
+  Commit de las correcciones: `e00fa8b`.
+
+**Merge a `development`:** ✅ completo, sin conflictos (commit
+`merge: week 5 lesson on asymptotic notation, plus retroactive fixes to
+weeks 3-4`). `npm run build` verificado en verde sobre `development` ya
+mergeada. Rama `feat/semana-05-analisis-de-algoritmos` borrada (solo local,
+nunca se pusheó a remoto).
 
 ## Pendientes
 
-- Pasada de `@reviewer` sobre el diff contra `development`.
-- `npm run lint`.
 - Diseñar la Sesión P de la Semana 5 (laboratorio de clasificación
   asintótica) en una ronda futura.
 - Replicar el cuestionario de cierre y la keyword `notacion-asintotica` a
