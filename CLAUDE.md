@@ -1203,7 +1203,12 @@ Claude **nunca** debe:
 ```
 
 Tipos válidos: `feat`, `fix`, `refactor`, `chore`, `docs`, `test`,
-`style`, `perf`, `ci`.
+`style`, `perf`, `ci`, `content`.
+
+`content` es para cambios de material de curso (`.mdx` de lecciones, apuntes
+de docente, guías de estudiante) que no son documentación del proyecto
+(`docs`) ni una funcionalidad de código (`feat`/`fix`) — el flujo
+`class-material-prep` lo usa para cada ronda semanal.
 
 Ejemplos:
 ```
@@ -1214,4 +1219,5 @@ docs(courses): add estructura-de-datos project specs
 docs(mcps): update content-agent system prompt with new tools
 feat(mcp): add lesson-read tool to courses-mcp server
 test(enrollment): add manual test cases for spec-003 course enrollment
+content(analisis-de-algoritmos): add week 5 lesson on asymptotic notation
 ```

@@ -42,8 +42,8 @@ una función de tiempo cuando `n` crece.
 Imagina que mediste el trabajo exacto de dos algoritmos sobre el mismo
 problema y obtuviste `f(n) = 2n²` para el primero y `g(n) = n² + 100n + 500`
 para el segundo. A simple vista `g(n)` parece más complicada — tiene tres
-términos en vez de uno—, y para `n` pequeño incluso puede ser más grande que
-`f(n)`. Evalúa ambas para valores crecientes de `n`:
+términos en vez de uno —, y para `n` pequeño incluso puede ser más grande
+que `f(n)`. Evalúa ambas para valores crecientes de `n`:
 
 | `n`    | `f(n) = 2n²` | `g(n) = n² + 100n + 500` | ¿Cuál domina? |
 | ------ | ------------ | ------------------------ | ------------- |
@@ -127,7 +127,7 @@ con la notación **Θ** (theta):
 
 `f(n)` pertenece a `Θ(g(n))` si queda **encajonada** entre dos múltiplos de
 `g(n)` — uno por debajo, uno por arriba — a partir de `n₀`. Es exactamente
-`f(n) \in O(g(n))` y `f(n) \in \Omega(g(n))` a la vez.
+$f(n) \in O(g(n))$ y $f(n) \in \Omega(g(n))$ a la vez.
 
 ```mermaid
 flowchart LR
@@ -140,16 +140,17 @@ flowchart LR
 
 No todas las funciones de tiempo que vas a encontrar en el curso son
 polinomios. La siguiente tabla ordena las familias más comunes de menor a
-mayor crecimiento, con su valor para `n = 20` como referencia de escala:
+mayor crecimiento:
 
-| Familia     | Función típica |
-| ----------- | -------------- |
-| Logarítmica | `log₂ n`       |
-| Lineal      | `n`            |
-| Cuadrática  | `n²`           |
-| Cúbica      | `n³`           |
-| Exponencial | `2ⁿ`           |
-| Factorial   | `n!`           |
+| Familia          | Función típica |
+| ---------------- | -------------- |
+| Logarítmica      | `log₂ n`       |
+| Lineal           | `n`            |
+| Linearítmica     | `n log n`      |
+| Cuadrática       | `n²`           |
+| Cúbica           | `n³`           |
+| Exponencial      | `2ⁿ`           |
+| Factorial        | `n!`           |
 
 ## Comparando merge sort e insertion sort con el vocabulario nuevo
 
@@ -234,5 +235,5 @@ Jerarquía de funciones comunes, de menor a mayor crecimiento:
   saltos de escala, no graduales: logarítmica, lineal, cuadrática, cúbica,
   exponencial y factorial.
 - Insertion sort queda descrito con precisión — `Θ(n)` en su mejor caso,
-  `Θ(n²)` en su peor caso— y merge sort, una vez resuelta su recurrencia,
+  `Θ(n²)` en su peor caso — y merge sort, una vez resuelta su recurrencia,
   resulta `Θ(n log n)` en todos los casos.

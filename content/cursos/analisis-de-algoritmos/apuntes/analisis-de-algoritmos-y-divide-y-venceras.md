@@ -8,11 +8,11 @@
 
 El `.mdx` de "Análisis de algoritmos y divide y vencerás" ya trae completo y
 comentado todo lo necesario para dictar la sesión: la tabla de peor/mejor/caso
-promedio sobre `insertion_sort`, el `factorial` recursivo con su traza en
-Mermaid, y `merge_sort` + `merge` con la comparación visual del árbol de
-división. No hace falta escribir código adicional para esta sesión — el
-material ya es autosuficiente. Dictarla es presentar la página en orden,
-deteniéndose en estos puntos:
+promedio sobre `insertion_sort`, el `factorial` recursivo como primer
+contacto con la recursividad, y `merge_sort` + `merge` con la comparación
+visual del árbol de división. No hace falta escribir código adicional para
+esta sesión — el material ya es autosuficiente. Dictarla es presentar la
+página en orden, deteniéndose en estos puntos:
 
 - **Peor/mejor/caso promedio sobre `insertion_sort`:** conecta directo con lo
   que el grupo ya vio en la Semana 3 (invariante de ciclo). Insiste en que el
@@ -22,10 +22,11 @@ deteniéndose en estos puntos:
   que el grupo note en voz alta que de `n=20` a `n=40` el trabajo no se
   duplica, se cuadruplica. Todavía no se nombra la notación O() — eso es
   Semana 5 — así que basta con "crece como el cuadrado de `n`".
-- **`factorial` y su traza en Mermaid:** es el primer contacto del curso con
-  recursividad. Remarca las dos partes obligatorias — caso base y caso
-  recursivo — y sigue la pila con el dedo en la pantalla: sube hasta
-  `factorial(0)`, después baja multiplicando. Sin esta idea instalada,
+- **`factorial`:** es el primer contacto del curso con recursividad. Remarca
+  las dos partes obligatorias — caso base y caso recursivo — y traza en el
+  tablero, a mano, la pila de llamadas para `factorial(4)`: sube hasta
+  `factorial(0)`, después baja multiplicando (la lección no trae un diagrama
+  para esto, así que hay que dibujarlo en vivo). Sin esta idea instalada,
   `merge_sort` es solo memorizar un patrón.
 - **`merge_sort` + `merge`:** el diagrama `flowchart TB` de dividir
   `[5, 2, 4, 6, 1, 3]` hasta listas de un elemento y volver a combinar es la

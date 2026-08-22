@@ -8,25 +8,23 @@
 ## Sesión T — la lección se presenta tal como está publicada
 
 El `.mdx` de "Notación O, Θ y Ω" ya trae completo el desarrollo formal: las
-tres definiciones con su cuantificador existencial, los diagramas
-`flowchart` de cota superior/inferior/ajustada, la tabla de jerarquía de
-funciones estándar y el cierre que retoma merge sort e insertion sort con el
-vocabulario nuevo. Dictarla es presentar la página en orden, arrancando con
-el bloque de código de abajo como apoyo de la segunda sección — antes de
-llegar a las definiciones formales de `O`, `Ω` y `Θ`.
+tres definiciones con su cuantificador existencial, el diagrama `flowchart`
+de cota ajustada, la tabla de jerarquía de funciones estándar y el cierre
+que retoma merge sort e insertion sort con el vocabulario nuevo. Dictarla es
+presentar la página en orden, arrancando con el bloque de código de abajo
+como apoyo de la segunda sección — antes de llegar a las definiciones
+formales de `O`, `Ω` y `Θ`.
 
 ### Apoyo de código — por qué el término dominante gana
 
 La sección "Por qué ignoramos constantes y términos pequeños" de la lección
-ya trae la tabla (`n = 10, 100, 1.000, 10.000`) y el diagrama `xychart-beta`
-con el cruce cerca de `n = 105`. Este bloque es solo el complemento numérico
-que pidió el docente para proyectar **antes** de esa tabla — o junto a
-ella —, con `f(n) = 2n²` y `g(n) = n² + 100n + 500` evaluadas en código real
-en lugar de ya calculadas en la página. Es deliberadamente simple: dos
-funciones, un bucle, una tabla impresa por consola. No hace falta una
-gráfica de matplotlib aquí — el `xychart-beta` ya publicado en el `.mdx`
-cubre la parte visual; duplicarlo con una figura no aporta nada nuevo, y el
-print deja ver el número exacto que la gráfica solo insinúa.
+ya trae la tabla (`n = 10, 100, 1.000, 10.000`). Este bloque es solo el
+complemento numérico que pidió el docente para proyectar **antes** de esa
+tabla — o junto a ella —, con `f(n) = 2n²` y `g(n) = n² + 100n + 500`
+evaluadas en código real en lugar de ya calculadas en la página. Es
+deliberadamente simple: dos funciones, un bucle, una tabla impresa por
+consola — no hace falta una gráfica de matplotlib, el print ya deja ver el
+número exacto del argumento de la lección.
 
 ```python
 def f(n: int) -> int:
@@ -78,7 +76,7 @@ Salida esperada (los mismos valores que ya están en la tabla de la lección,
 ahora calculados en vivo):
 
 ```
-      n |    f(n)=2n^2 |         g(n) | resto=100n+500 | % del total de g(n)
+      n |    f(n)=2n^2 |         g(n) |  resto=100n+500 |  % del total de g(n)
      10 |          200 |         1600 |            1500 |                93.8%
     100 |        20000 |        20500 |           10500 |                51.2%
    1000 |      2000000 |      1100500 |          100500 |                 9.1%
@@ -97,19 +95,12 @@ notar que la función "más complicada" (tres términos) da un valor mayor. Es
 el momento de preguntar qué pasa si siguen aumentando `n`: la tabla ya
 publicada en la lección (que este código reproduce) muestra que entre
 `n = 100` y `n = 1.000` la relación se invierte — `f(n)` pasa a ser mayor y
-ya no vuelve a ceder terreno. Antes de mostrar el `xychart-beta` de la
-lección con el cruce fino cerca de `n = 105`, esta tabla ya deja instalada
-la idea con valores gruesos.
+ya no vuelve a ceder terreno.
 
-Punto a resaltar: no cambies el rango de `tamanos` para "ajustar" el cruce —
-el `xychart-beta` ya publicado usa un rango distinto (`n = 20..200`) elegido
-para mostrar el cruce cerca de `n = 105` con precisión visual. Este bloque
-usa el rango de la tabla en prosa (`10, 100, 1.000, 10.000`) porque es el que
-el grupo ya vio en la sección: mantenerlo evita que dos números
-aparentemente contradictorios (un cruce en `n≈105` en la gráfica y un cruce
-entre `n=100` y `n=1.000` en esta tabla) generen confusión — ambos son
-correctos, solo describen el mismo fenómeno con distinta resolución de
-muestreo.
+Punto a resaltar: no cambies el rango de `tamanos` para "ajustar" el
+cruce — el rango de la tabla en prosa (`10, 100, 1.000, 10.000`) es el que
+el grupo ya vio en la sección, así que mantenerlo evita introducir números
+nuevos que no están en la página.
 
 ### El resto de la sesión — la lección ya es autosuficiente
 
@@ -128,7 +119,7 @@ formal, no cómputo. Puntos a resaltar al dictarlas:
   definición con la desigualdad invertida. Vale la pena escribir ambas
   fórmulas una debajo de la otra en el tablero o remarcarlas en pantalla, no
   solo leerlas por separado, para que el grupo vea de un vistazo que
-  únicamente cambió `f(n) \le c\,g(n)` por `c\,g(n) \le f(n)`. El ejemplo de
+  únicamente cambió $f(n) \le c\,g(n)$ por $c\,g(n) \le f(n)$. El ejemplo de
   la lección es el mejor caso de insertion sort en `Ω(n)`: usa la pregunta
   "¿por qué nunca puede bajar de lineal?" (hay que revisar cada uno de los
   `n` elementos al menos una vez) antes de que el grupo la vea respondida en
@@ -144,14 +135,12 @@ formal, no cómputo. Puntos a resaltar al dictarlas:
   mejor caso y `Θ(n²)` en su peor caso — y eso es correcto, no una
   contradicción: cada cota ajustada describe un caso distinto del mismo
   algoritmo.
-- **Jerarquía de funciones estándar:** la tabla con `n = 20` como referencia
-  de escala es el material más fácil de subestimar — insiste en los saltos
-  de escala ("de cuadrática a exponencial, más de 2.600 veces; de
-  exponencial a factorial, más de dos billones") antes de mostrar el
-  `xychart-beta` con rango `n = 2..10`. Explica por qué ese gráfico usa un
-  rango tan chico: con `n` más grande, las curvas logarítmica y lineal se
-  vuelven invisibles junto a la factorial — es una decisión deliberada de
-  visualización, no un error de escala.
+- **Jerarquía de funciones estándar:** la tabla de familias es el material
+  más fácil de subestimar — insiste en que la separación entre familias no
+  es gradual, es un salto de escala: proponle al grupo evaluar un par de
+  familias consecutivas en un `n` concreto (por ejemplo `n = 20`) para que
+  vean en vivo cuánto se dispara el valor al pasar de una familia a la
+  siguiente, en vez de solo leer el orden de la tabla.
 - **Comparación final merge sort vs. insertion sort:** aquí es donde el
   vocabulario nuevo paga su lugar. Antes de mostrar el bloque de código con
   `trabajo_cuadratico` y `trabajo_linearitmico`, pregunta al grupo: "¿cómo se
@@ -162,13 +151,15 @@ formal, no cómputo. Puntos a resaltar al dictarlas:
   para `n = 1.850.000`. Cierra retomando el cálculo de energía de la Semana
   4 (1.451 kWh/año de diferencia): con el vocabulario de hoy, esa brecha
   tiene nombre — es la distancia entre `Θ(n²)` y `Θ(n log n)`.
-- **Enlace hacia la Semana 6:** remarca, tal como cierra la síntesis de la
-  lección, que `T(n) = 2T(n/2) + Θ(n)` queda **anticipada** como
-  `Θ(n log n)` sin demostrarse todavía — la demostración formal (sustitución,
-  árbol de recursión, método maestro) es exactamente el contenido de la
-  Semana 6, y reutiliza `O`, `Θ` y `Ω` tal como quedaron definidas hoy, sin
-  volver a introducirlas. Vale la pena decirlo explícitamente para que el
-  grupo no espere ver la resolución de la recurrencia en esta sesión.
+- **Enlace hacia la Semana 6:** la síntesis de la lección afirma directamente
+  que `T(n) = 2T(n/2) + Θ(n)` resulta `Θ(n log n)` en todos los casos, sin
+  marcar en la página que esa resolución queda pendiente — así que es el
+  docente quien debe decirlo en voz alta: ese resultado queda **anticipado**
+  hoy sin demostrarse todavía. La demostración formal (sustitución, árbol de
+  recursión, método maestro) es exactamente el contenido de la Semana 6, y
+  reutiliza `O`, `Θ` y `Ω` tal como quedaron definidas hoy, sin volver a
+  introducirlas. Vale la pena decirlo explícitamente para que el grupo no
+  espere ver la resolución de la recurrencia en esta sesión.
 
 ## Preguntas socráticas
 
