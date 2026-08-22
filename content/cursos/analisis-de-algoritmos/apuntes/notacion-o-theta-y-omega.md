@@ -1,9 +1,9 @@
-> Cubre **solo la Sesión T** (teórica) de la Semana 5. La Sesión P
+> Cubre la **única sesión** de la Semana 5 (T — teórica). La Sesión P
 > (laboratorio de clasificación asintótica y verificación empírica con
-> gráficas) queda fuera de este apunte — se cubre en una ronda posterior. No
-> hay guía de estudiante para esta sesión T: la lección ya trae todo el
-> desarrollo formal, y el único apoyo adicional que pidió el docente es el
-> bloque de código de apertura de más abajo.
+> gráficas) se **eliminó del curso** (decisión del docente, 2026-08-22) — no
+> se dicta en ninguna semana. No hay guía de estudiante para esta sesión T:
+> la lección ya trae todo el desarrollo formal, y el único apoyo adicional
+> que pidió el docente es el bloque de código de apertura de más abajo.
 
 ## Sesión T — la lección se presenta tal como está publicada
 
