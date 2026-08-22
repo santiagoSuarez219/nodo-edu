@@ -81,17 +81,6 @@ Si duplicas la computadora — el doble de velocidad de procesamiento — el Alg
 
 Por eso Cormen llama a los algoritmos una **tecnología**, en el mismo sentido que el hardware o las redes: una decisión de diseño con consecuencias medibles en tiempo, dinero y capacidad de resolver problemas que antes eran inviables. Elegir bien el algoritmo no es un lujo académico — es lo que determina si un sistema real escala o colapsa cuando su carga de datos crece.
 
-La misma idea aparece en problemas que no tienen nada que ver con ordenar nombres:
-
-<Callout tipo="nota">
-**Programar los horarios de una universidad** —asignar miles de grupos a cientos de docentes y salones sin que dos choquen en el mismo bloque— es, en el fondo, un problema de asignación con restricciones. "Probar combinaciones hasta que una funcione" no escala igual que una estrategia que descarta de entrada ramas completas de opciones inválidas.
-
-**Calcular la ruta más rápida para una ambulancia** sobre la red vial de una ciudad es un problema de caminos mínimos sobre un grafo. Recorrer todas las rutas posibles no escala igual que un algoritmo que aprovecha la estructura de la red para descartar caminos que nunca podrían ser los más cortos.
-
-</Callout>
-
-Se repite el mismo argumento en los dos: una organización real depende de que un algoritmo termine a tiempo, y la estrategia que elige para resolver el problema —no el hardware donde corre— es lo que decide si eso ocurre.
-
 ## La eficiencia también es energía y acceso
 
 "Consecuencias medibles" no es una figura retórica. El servidor donde corre el proceso nocturno consume unos 450 W bajo carga sostenida, y eso convierte el tiempo de ejecución en kilovatios-hora que alguien paga y que alguien genera:
@@ -101,7 +90,7 @@ Se repite el mismo argumento en los dos: una organización real depende de que u
 | El proceso actual              | 9 h              | ≈ 1.478 kWh       |
 | El mismo trabajo en 10 minutos | 0,17 h           | ≈ 27 kWh          |
 
-Esa diferencia —del orden de lo que consume un hogar entero en un año— no la produjo un servidor más moderno ni una planta de energía nueva. La produjo cambiar el algoritmo. Cuando el proceso corre cada noche, durante años, la decisión de diseño que tomaste en una tarde se convierte en una cifra ambiental.
+Esa diferencia no la produjo un servidor más moderno ni una planta de energía nueva. La produjo cambiar el algoritmo. Cuando el proceso corre cada noche, durante años, la decisión de diseño que tomaste en una tarde se convierte en una cifra ambiental.
 
 Hay un segundo costo, menos visible y más incómodo. Ese mismo proceso decide qué se factura y qué cuentas quedan señaladas como consumo atípico. Si la depuración descarta por error una lectura legítima, alguien recibe una factura que no corresponde. Si la detección de atípicos señala mal a un usuario, una familia queda marcada como posible fraude y tiene que demostrar que no lo es. En ambos casos el error lo comete el algoritmo, pero el costo de probarlo lo asume la persona.
 

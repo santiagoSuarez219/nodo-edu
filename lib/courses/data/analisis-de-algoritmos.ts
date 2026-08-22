@@ -112,6 +112,8 @@ export const analisisDeAlgoritmos: Course = {
       articleSlug: "notacion-o-theta-y-omega",
       order: 5,
       title: "Notación O, Θ y Ω",
+      summary:
+        "El vocabulario formal para comparar el crecimiento de dos funciones de tiempo sin depender de la máquina ni de la constante: O, Θ y Ω aplicadas a insertion sort y a la recurrencia sin resolver de merge sort.",
       topics: [
         { title: "Notación asintótica: definiciones formales de O, Θ y Ω" },
         { title: "Notaciones estándar y funciones comunes: polinomios, logaritmos, exponenciales" },

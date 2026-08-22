@@ -5,82 +5,149 @@
 
 ## Sesión T — la lección se presenta tal como está publicada
 
-No hay código adicional que proyectar en la sesión teórica: el `.mdx` de
-"Algoritmos como tecnología" ya trae el `insertion_sort` completo y
-comentado, su traza sobre `[5, 2, 4, 6, 1, 3]` y la demostración de la
-invariante de ciclo (inicialización, mantenimiento, terminación). Dictarla
-es presentar esa página en orden, deteniéndose en la tabla de modelado
-("¿Qué entra? ¿Qué sale? ¿Qué restringe? ¿Qué operación domina el costo?")
-y en el argumento de "algoritmos como tecnología" (Algoritmo A vs. Algoritmo
-B, la cuenta de energía, quién paga cuando el algoritmo se equivoca).
+El `.mdx` de "Algoritmos como tecnología" ya trae el `insertion_sort`
+completo y comentado, su traza sobre `[5, 2, 4, 6, 1, 3]` y la demostración
+de la invariante de ciclo (inicialización, mantenimiento, terminación).
+Dictarla es presentar esa página en orden, deteniéndose en la tabla de
+modelado ("¿Qué entra? ¿Qué sale? ¿Qué restringe? ¿Qué operación domina el
+costo?") y en el argumento de "algoritmos como tecnología" (Algoritmo A vs.
+Algoritmo B, la cuenta de energía, quién paga cuando el algoritmo se
+equivoca).
 
 Punto a resaltar: el hilo de toda la sesión — T y P — es el mismo caso, la
 empresa de energía con 1.850.000 medidores y una ventana de cuatro horas.
 Todo lo que se mide hoy en la sesión P termina extrapolado a esa cifra en el
-Paso 4.
+Paso 3.
 
-## Sesión P — insertion sort instrumentado
+### Apoyo visual — Algoritmo A vs. Algoritmo B
 
-### Paso 1 — Insertion sort instrumentado
-
-Partir del `insertion_sort` de la lección y agregarle dos contadores: uno de
-comparaciones (cada vez que se compara `arreglo[j]` contra `clave`) y otro de
-desplazamientos (cada vez que se mueve un elemento una posición a la
-derecha). La función debe seguir ordenando exactamente igual que antes; el
-conteo es un efecto adicional, no un cambio de comportamiento.
+La sección "Algoritmos como tecnología" de la lección compara el Algoritmo A
+(las cartas en la mano, el que ya conocen) contra el Algoritmo B (uno tipo
+divide y vencerás, que se ve más adelante) de forma puramente conceptual, sin
+gráfica. Este bloque es solo para proyectar en pantalla mientras se explica
+el argumento — **no se ejecuta ningún algoritmo real**, ni se mide tiempo: es
+la ilustración matemática directa de las dos formas de crecimiento
+(`n` al cuadrado contra `n` por el logaritmo de `n`) que ya se nombraron en
+prosa en la lección. Todavía no se usa notación O/Θ/Ω — eso llega en la
+Semana 5 — así que en el código y al explicarlo alcanza con decir "trabajo
+aproximado" o "cómo crece el trabajo".
 
 ```python
-def insertion_sort_instrumentado(arreglo: list) -> tuple[list, int, int]:
-    """Ordena `arreglo` in place por insercion, contando operaciones.
+import math
+
+import matplotlib.pyplot as plt
+
+
+def trabajo_aproximado_a(n: int) -> float:
+    """Estima el trabajo del Algoritmo A (cartas en la mano) para tamano n.
+
+    Es la misma forma de crecimiento del insertion sort ya visto: cuadratica.
 
     Args:
-        arreglo: lista de elementos comparables; se modifica in place.
+        n: tamano de la entrada.
 
     Returns:
-        Tupla (arreglo, comparaciones, desplazamientos).
+        Trabajo aproximado, proporcional a n al cuadrado.
     """
-    comparaciones = 0
-    desplazamientos = 0
-    n = len(arreglo)
-    for i in range(1, n):
-        clave = arreglo[i]
-        j = i - 1
-        while j >= 0:
-            comparaciones += 1          # cada vez que se compara arreglo[j] con clave
-            if arreglo[j] <= clave:
-                break                    # clave encontro su lugar: no hay mas comparaciones
-            arreglo[j + 1] = arreglo[j]  # desplazamiento: mover un elemento a la derecha
-            desplazamientos += 1
-            j -= 1
-        arreglo[j + 1] = clave
-    return arreglo, comparaciones, desplazamientos
+    return n ** 2
+
+
+def trabajo_aproximado_b(n: int) -> float:
+    """Estima el trabajo del Algoritmo B (divide y venceras) para tamano n.
+
+    Args:
+        n: tamano de la entrada.
+
+    Returns:
+        Trabajo aproximado, proporcional a n por el logaritmo de n.
+    """
+    return n * math.log2(n)
+
+
+def graficar_comparacion(tamanos: list[int], ruta_salida: str) -> None:
+    """Grafica el trabajo aproximado de A y B para una lista de tamanos.
+
+    Incluye una tercera curva: el Algoritmo A corriendo en un hardware el
+    doble de rapido (la mitad del trabajo original), para mostrar que ni
+    siquiera esa mejora lo salva de perder frente al Algoritmo B.
+
+    Args:
+        tamanos: tamanos de entrada a evaluar, en orden creciente.
+        ruta_salida: ruta del archivo donde se guarda la figura.
+    """
+    trabajo_a = [trabajo_aproximado_a(n) for n in tamanos]
+    trabajo_a_hardware_rapido = [valor / 2 for valor in trabajo_a]
+    trabajo_b = [trabajo_aproximado_b(n) for n in tamanos]
+
+    plt.figure(figsize=(8, 5))
+    plt.plot(tamanos, trabajo_a, marker="o", label="Algoritmo A (n^2)")
+    plt.plot(
+        tamanos,
+        trabajo_a_hardware_rapido,
+        marker="o",
+        linestyle="--",
+        label="Algoritmo A en hardware 2x mas rapido (n^2 / 2)",
+    )
+    plt.plot(tamanos, trabajo_b, marker="o", label="Algoritmo B (n log n)")
+    plt.xlabel("Tamano de la entrada (n)")
+    plt.ylabel("Trabajo aproximado")
+    plt.title("Algoritmo A vs. Algoritmo B: como crece el trabajo")
+    plt.legend()
+    plt.grid(True)
+    plt.savefig(ruta_salida)
+
+
+if __name__ == "__main__":
+    tamanos = [10, 100, 500, 1_000, 5_000, 10_000, 30_000]
+    graficar_comparacion(tamanos, "graficas/algoritmo_a_vs_b.png")
 ```
 
-Caso de referencia (verificar en vivo contra la pantalla proyectada):
+Punto a resaltar: para `n` pequeño las dos curvas casi no se distinguen —
+incluso puede que el Algoritmo A se vea competitivo. El cruce ocurre en algún
+punto de la gráfica, y a partir de ahí la distancia entre ambas curvas se
+abre cada vez más rápido. Ese es el punto exacto en el que "el Algoritmo B en
+una computadora modesta termina superando al Algoritmo A en la computadora
+más rápida disponible": ningún factor constante de hardware compensa una vez
+que `n` cruzó ese umbral.
+
+Punto a resaltar: esta gráfica es la contraparte visual del argumento de
+duplicar la computadora vs. duplicar `n` del `.mdx`. Duplicar la velocidad
+del hardware solo desplaza la curva del Algoritmo A hacia abajo un factor
+constante; no cambia su forma. Duplicar `n` sí cambia dónde cae cada curva,
+y lo hace de forma muy distinta para cada una — por eso ninguna mejora de
+hardware compensa indefinidamente la diferencia de forma entre las dos
+curvas.
+
+Punto a resaltar: la curva punteada (Algoritmo A con hardware 2x más rápido)
+es literalmente la curva original de A a mitad de altura — un desplazamiento
+constante hacia abajo, no un cambio de forma. Sigue siendo una parábola, así
+que el Algoritmo B vuelve a cruzarla, solo que un poco más adelante en `n`.
+Es la evidencia visual de que comprar hardware más rápido pospone el problema
+una sola vez; no lo resuelve. Para el caso de la empresa: si compran un
+servidor el doble de rápido, insertion sort tarda la mitad esta noche, pero
+en cuanto el parque de medidores vuelva a crecer, el problema reaparece —
+mientras que pasar al Algoritmo B cambia la forma de la curva, no solo su
+altura.
+
+## Sesión P — insertion sort: funcionamiento y validación de la invariante
+
+> El conteo de operaciones (comparaciones/desplazamientos), la clasificación
+> empírica de mejor/peor/caso promedio y la extrapolación al caso de la
+> empresa quedan fuera de este apunte — se cubren en un apunte posterior.
+> Ver nota de alcance abajo.
+
+Partir del `insertion_sort` de la lección y extenderlo para verificar, en 2 o
+3 valores de `i`, que `arreglo[0:i]` está ordenado antes de procesar
+`arreglo[i]` — la invariante de ciclo de la lección teórica. Es código real,
+no la demostración en papel. Este paso todavía no cuenta nada: el foco es el
+algoritmo y su corrección, no su costo.
 
 ```python
->>> insertion_sort_instrumentado([5, 2, 4, 6, 1, 3])
-([1, 2, 3, 4, 5, 6], 9, 8)
-```
-
-Punto a resaltar: cada vuelta del `while` es **siempre** una comparación;
-solo es también un desplazamiento cuando la comparación obliga a mover el
-elemento. Son dos preguntas distintas, no una sola línea que suma a ambos
-contadores — el error más frecuente es incrementar los dos contadores en la
-misma línea.
-
-### Paso 2 — Verificar la invariante con `assert`
-
-Extender la función para verificar, en 2 o 3 valores de `i`, que
-`arreglo[0:i]` está ordenado antes de procesar `arreglo[i]` — la invariante
-de ciclo de la lección teórica. Es código real, no la demostración en papel.
-
-```python
-def insertion_sort_instrumentado(
+def insertion_sort_con_invariante(
     arreglo: list, puntos_de_control: set[int] | None = None
-) -> tuple[list, int, int]:
-    """Ordena `arreglo` in place por insercion, contando operaciones y
-    verificando opcionalmente la invariante de ciclo.
+) -> list:
+    """Ordena `arreglo` in place por insercion, verificando opcionalmente
+    la invariante de ciclo en los puntos indicados.
 
     Args:
         arreglo: lista de elementos comparables; se modifica in place.
@@ -89,10 +156,8 @@ def insertion_sort_instrumentado(
             arreglo[i]. None desactiva la verificacion.
 
     Returns:
-        Tupla (arreglo, comparaciones, desplazamientos).
+        La misma lista, modificada in place y ordenada de menor a mayor.
     """
-    comparaciones = 0
-    desplazamientos = 0
     n = len(arreglo)
     puntos_de_control = puntos_de_control or set()
 
@@ -103,16 +168,19 @@ def insertion_sort_instrumentado(
             )
         clave = arreglo[i]
         j = i - 1
-        while j >= 0:
-            comparaciones += 1
-            if arreglo[j] <= clave:
-                break
+        while j >= 0 and arreglo[j] > clave:
             arreglo[j + 1] = arreglo[j]
-            desplazamientos += 1
             j -= 1
         arreglo[j + 1] = clave
 
-    return arreglo, comparaciones, desplazamientos
+    return arreglo
+```
+
+Caso de referencia (verificar en vivo contra la pantalla proyectada):
+
+```python
+>>> insertion_sort_con_invariante([5, 2, 4, 6, 1, 3])
+[1, 2, 3, 4, 5, 6]
 ```
 
 Caso de prueba, verificando la invariante en una iteración intermedia y en
@@ -124,7 +192,7 @@ def test_invariante_de_ciclo_en_puntos_intermedios():
     n = len(arreglo)
     puntos = {2, n // 2, n - 1}  # incluye una iteracion intermedia real
 
-    resultado, _, _ = insertion_sort_instrumentado(arreglo, puntos_de_control=puntos)
+    resultado = insertion_sort_con_invariante(arreglo, puntos_de_control=puntos)
     assert resultado == sorted([5, 2, 4, 6, 1, 3])
 ```
 
@@ -133,141 +201,6 @@ La invariante se enuncia **antes** de procesar `arreglo[i]`, así que `i = n`
 no tiene sentido — el ciclo `for` nunca llega ahí. Demostrar en vivo qué pasa
 con `puntos_de_control={n}`: es redundante, no un error, porque el `for`
 nunca alcanza ese valor.
-
-### Paso 3 — Entradas, gráfica y clasificación de casos
-
-Generar entrada ordenada, invertida y aleatoria para una lista creciente de
-tamaños de `n`, medir comparaciones con `insertion_sort_instrumentado`,
-graficar con `matplotlib` (operaciones vs. `n`, no tiempo) y clasificar
-mejor/peor caso. Amarrar cada entrada al caso al presentarla: la
-**ordenada** es la red entregando las lecturas ya en orden de marca de
-tiempo; la **aleatoria** es la red real, con reintentos y varias pasarelas
-en paralelo; la **invertida** es el peor caso teórico, que en producción no
-ocurre pero acota el desastre posible.
-
-```python
-import random
-
-import matplotlib.pyplot as plt
-
-
-def generar_entradas(n: int) -> dict[str, list[int]]:
-    """Genera tres entradas de tamano n: ordenada, invertida y aleatoria.
-
-    Cada una representa un escenario de entrega de la red de telemedicion.
-
-    Args:
-        n: tamano de cada una de las tres listas generadas.
-
-    Returns:
-        Diccionario con las claves "ordenada", "invertida" y "aleatoria".
-    """
-    ordenada = list(range(n))
-    invertida = list(range(n, 0, -1))
-    aleatoria = ordenada.copy()
-    random.shuffle(aleatoria)
-    return {"ordenada": ordenada, "invertida": invertida, "aleatoria": aleatoria}
-
-
-def medir_comparaciones(tamanos: list[int]) -> dict[str, list[int]]:
-    """Mide comparaciones de insertion sort para cada tipo de entrada.
-
-    Args:
-        tamanos: lista de tamanos de entrada a medir.
-
-    Returns:
-        Diccionario con una clave por tipo de entrada y, como valor, la
-        lista de comparaciones medidas para cada tamano en `tamanos`.
-    """
-    resultados = {"ordenada": [], "invertida": [], "aleatoria": []}
-    for n in tamanos:
-        entradas = generar_entradas(n)
-        for tipo, arreglo in entradas.items():
-            _, comparaciones, _ = insertion_sort_instrumentado(list(arreglo))
-            resultados[tipo].append(comparaciones)
-    return resultados
-
-
-def graficar_operaciones(
-    tamanos: list[int], resultados: dict[str, list[int]], ruta_salida: str
-) -> None:
-    """Grafica comparaciones vs. n para cada tipo de entrada.
-
-    Args:
-        tamanos: tamanos de entrada usados en el eje x.
-        resultados: diccionario devuelto por medir_comparaciones.
-        ruta_salida: ruta del archivo donde se guarda la figura.
-    """
-    plt.figure(figsize=(8, 5))
-    for tipo, valores in resultados.items():
-        plt.plot(tamanos, valores, marker="o", label=tipo)
-    plt.xlabel("Tamano de la entrada (n)")
-    plt.ylabel("Numero de comparaciones")
-    plt.title("Insertion sort: comparaciones vs. n")
-    plt.legend()
-    plt.grid(True)
-    plt.savefig(ruta_salida)
-
-
-if __name__ == "__main__":
-    tamanos = [10, 50, 100, 200, 400, 800]
-    resultados = medir_comparaciones(tamanos)
-    graficar_operaciones(tamanos, resultados, "graficas/operaciones_vs_n.png")
-
-    print(f"Ordenada  (n={tamanos[-1]}): {resultados['ordenada'][-1]} comparaciones")
-    print(f"Invertida (n={tamanos[-1]}): {resultados['invertida'][-1]} comparaciones")
-    print(f"Aleatoria (n={tamanos[-1]}): {resultados['aleatoria'][-1]} comparaciones")
-```
-
-Punto a resaltar: en la entrada **ordenada**, cada `clave` ya es mayor o
-igual que su predecesor — el `while` hace una sola comparación y cero
-desplazamientos por iteración, así que la curva de comparaciones vs. `n` es
-una recta (mejor caso). En la entrada **invertida**, cada `clave` es menor
-que todos los elementos ya colocados — el `while` recorre hasta el
-principio en cada iteración, así que la curva es una parábola muy por
-encima de la recta (peor caso). La entrada aleatoria queda entre ambas.
-
-### Paso 4 — Volver al caso: extrapolar a 1.850.000 registros (Opcional)
-
-Cerrar la sesión devolviendo la medición al caso de la empresa. No se corre
-insertion sort con ese tamaño: se extrapola desde lo medido.
-
-```python
-def estimar_comparaciones(n: int) -> float:
-    """Estima las comparaciones de insertion sort en el caso promedio.
-
-    En el caso promedio cada clave recorre aproximadamente la mitad del
-    subarreglo ya ordenado, de donde sale la aproximacion n^2 / 4.
-
-    Args:
-        n: cantidad de registros a ordenar.
-
-    Returns:
-        Numero estimado de comparaciones.
-    """
-    return n ** 2 / 4
-
-
-if __name__ == "__main__":
-    registros_por_noche = 1_850_000
-    estimado = estimar_comparaciones(registros_por_noche)
-    print(f"Comparaciones estimadas: {estimado:.3e}")
-
-    for por_segundo in (1e7, 1e8):
-        horas = estimado / por_segundo / 3600
-        print(f"A {por_segundo:.0e} comparaciones/s: {horas:.1f} horas")
-```
-
-Salida aproximada: `8.556e+11` comparaciones — cerca de un billón. A `1e7`
-comparaciones por segundo son unas 23,8 horas; a `1e8`, unas 2,4 horas.
-
-Punto a resaltar: **el factor constante no es lo que se corrige, es el
-exponente.** Las estimaciones de los estudiantes van a diferir mucho según
-cuántas comparaciones por segundo supongan, y eso está bien. Lo que cada uno
-debe poder defender es que el crecimiento es cuadrático — y por lo tanto que
-si la empresa pasa de 1.850.000 a 3.000.000 de cuentas, el trabajo no crece
-un 62%, sino más del 160%. Ese es el argumento de "algoritmos como
-tecnología" de la lección, ahora con un número que el estudiante produjo.
 
 ## Preguntas socráticas
 
