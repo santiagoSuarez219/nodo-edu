@@ -18,8 +18,10 @@
 
 **Alcance confirmado por el usuario:** Semana 5, **solo Sesión T** (Notación
 O, Θ y Ω). La Sesión P (laboratorio de clasificación asintótica y
-verificación empírica con gráficas) queda explícitamente fuera de esta
-ronda, para una ronda futura.
+verificación empírica con gráficas) inicialmente quedó fuera de esta ronda
+para una ronda futura — **actualización del 2026-08-22: el docente decidió
+eliminarla del curso por completo**, no se dicta en ninguna semana (ver
+"Decisión posterior" al final de este documento).
 
 ### Sesiones cubiertas
 
@@ -149,10 +151,33 @@ weeks 3-4`). `npm run build` verificado en verde sobre `development` ya
 mergeada. Rama `feat/semana-05-analisis-de-algoritmos` borrada (solo local,
 nunca se pusheó a remoto).
 
+## Decisión posterior (2026-08-22): eliminación de la Sesión P
+
+> El docente notó que, con la Sesión P de la Semana 5 pendiente de diseño,
+> faltaban dos sesiones completas (esa P, más la T de la Semana 6) para
+> llegar al Laboratorio evaluativo 1 (Semana 6 P ★) — más de lo esperado.
+> Decidió eliminar esa sesión del curso por completo, no reubicarla.
+
+- **Contenido eliminado:** el laboratorio de clasificación asintótica y
+  verificación empírica con gráficas (clasificar funciones por su notación
+  más ajustada, graficar con `matplotlib`, verificar empíricamente insertion
+  sort y merge sort). No se dicta en ninguna otra semana del semestre.
+- **Archivos editados** (rama `fix/elimina-laboratorio-clasificacion-asintotica`,
+  fuera de esta rama de la Semana 5 ya mergeada): `microdiseno/cronograma-dia-a-dia.md`
+  y `microdiseno/info.md` — ambos son entrada del flujo, editados solo por
+  autorización explícita del usuario, confirmada dos veces (una para
+  eliminar el contenido, otra para no ajustar el total institucional de
+  horas/sesiones del curso — ver siguiente punto). También se actualizó la
+  nota de alcance de `apuntes/notacion-o-theta-y-omega.md`.
+- **Sin ajustar:** el encabezado del curso sigue declarando "68 h (34
+  sesiones de 2 h)" — el usuario confirmó explícitamente no tocarlo, pese a
+  que ahora el curso dicta 33 sesiones reales. Es un dato institucional
+  (créditos), no una cuenta derivada del cronograma.
+- La Semana 5 queda con una sola sesión (T); no se agregó contenido de
+  reemplazo para la Sesión P.
+
 ## Pendientes
 
-- Diseñar la Sesión P de la Semana 5 (laboratorio de clasificación
-  asintótica) en una ronda futura.
 - Replicar el cuestionario de cierre y la keyword `notacion-asintotica` a
   producción durante el despliegue (D3).
 - Decidir en qué apunte futuro se resuelve la discrepancia de alcance con
