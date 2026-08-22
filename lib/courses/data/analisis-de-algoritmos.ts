@@ -126,6 +126,8 @@ export const analisisDeAlgoritmos: Course = {
       articleSlug: "como-resolver-recurrencias",
       order: 6,
       title: "Cómo resolver recurrencias",
+      summary:
+        "Tres métodos —sustitución, árbol de recursión y método maestro— para pasar de una recurrencia como T(n) = 2T(n/2) + Θ(n) a una fórmula cerrada, cerrando la promesa pendiente de que merge sort es Θ(n log n).",
       topics: [
         { title: "Planteamiento de la recurrencia de un algoritmo recursivo" },
         { title: "El método de sustitución" },
