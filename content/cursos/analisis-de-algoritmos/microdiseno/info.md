@@ -173,6 +173,7 @@ curso-analisis-algoritmos/
 ### Semana 4 — Analizando y diseñando algoritmos
 
 **T — Análisis de algoritmos y divide y vencer**
+- Complejidad temporal vs. complejidad espacial: qué mide cada una
 - Análisis del peor caso, mejor caso y caso promedio
 - Orden de crecimiento: intuición previa a la notación formal
 - Diseño de algoritmos por divide y vencer: introducción con merge sort (dividir, conquistar, combinar)
@@ -193,10 +194,11 @@ curso-analisis-algoritmos/
 - Notaciones estándar y funciones comunes: polinomios, logaritmos, exponenciales, factoriales
 - Comparación de tasas de crecimiento y jerarquía de funciones
 
-**P — Laboratorio: Clasificación asintótica**
-- Clasificar un conjunto de funciones según su notación asintótica más ajustada
-- Graficar con `matplotlib` el crecimiento de varias funciones para visualizar la jerarquía
-- Verificar empíricamente, con mediciones de tiempo, la notación asignada a insertion sort y merge sort
+> **Sin sesión P esta semana** (decisión del docente, 2026-08-22): el
+> laboratorio de clasificación asintótica que ocupaba este espacio —
+> clasificar funciones por su notación más ajustada, graficar con
+> `matplotlib` y verificar empíricamente la notación de insertion sort y
+> merge sort — se eliminó del curso. No se reubica en ninguna otra semana.
 
 ---
 

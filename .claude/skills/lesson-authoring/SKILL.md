@@ -21,16 +21,21 @@ gana el código y hay que actualizar este archivo.
 | 1 | Lección teórica | `content/cursos/<curso>/<slug>.mdx` | Sí |
 | 1b | Registro de la lección | `lib/courses/data/<curso>.ts` | Requisito para publicar |
 | 2 | Cuestionario de cierre | Banco de preguntas (Supabase, vía `question-bank-mcp`) | Sí, al publicar cada pregunta |
-| 3 | Apuntes de clase — docente (spec-044) | `content/cursos/<curso>/apuntes/<articleSlug>.md` | Sí, pero **solo visible a owner/admin** (nunca a estudiantes) |
+| 3 | Apuntes de clase — docente (spec-044) | `content/cursos/<curso>/apuntes/<articleSlug>.md` | Sí, pero **solo visible a owner/admin** (nunca a estudiantes) — se escriben **solo si el usuario los pide** |
 | 4 | Guía de laboratorio — estudiante | `content/cursos/<curso>/guias/<slug>.md` | Sí (`kind: "guide"`), **solo si la sesión es trabajo independiente del estudiante** |
 | 5 | Quiz calificable A/B/C | Assignments (Supabase, vía `assignment-mcp`) | Solo a demanda |
 
-> ⚠️ **No toda sesión práctica tiene los cinco.** Muchas prácticas se
-> desarrollan en vivo por el docente (demo o ejercicio guiado en clase) en vez
-> de asignarse como trabajo independiente. Esas sesiones producen **apuntes de
-> clase (#3)** pero **no** guía de laboratorio del estudiante (#4). Antes de
-> crear el artefacto #4, confirmar con el usuario si la sesión es trabajo
-> independiente o desarrollo en vivo — nunca asumirlo (ver §4).
+> ⚠️ **Solo la lección (#1 + #1b) es automática.** Los demás artefactos se
+> producen a pedido, uno por etapa aprobada (ver
+> `.claude/skills/class-material-prep/SKILL.md`):
+> - **#3 apuntes de clase:** se le pregunta al usuario si la sesión los
+>   necesita. No se escriben "porque hay sesión práctica".
+> - **#4 guía del estudiante:** muchas prácticas se desarrollan en vivo por el
+>   docente (demo o ejercicio guiado) en vez de asignarse como trabajo
+>   independiente. Confirmar con el usuario cuál es el caso antes de crearla —
+>   nunca asumirlo (ver §4). Si es en vivo, no hay guía.
+> - **#2 cuestionario:** se redacta como propuesta y se aprueba **antes** de
+>   crear nada en el banco (ver §5).
 
 Cursos válidos (slugs exactos): `estructuras-de-datos`, `programacion-cientifica`,
 `analisis-de-algoritmos`.
@@ -177,7 +182,11 @@ Reglas verificadas:
 - `securityLevel: "strict"` (`MermaidDiagram.tsx:36-44`): sin HTML crudo ni `click` handlers.
 - `fontFamily` fijado a JetBrains Mono; el tema sigue claro/oscuro automáticamente.
 - Si el diagrama no parsea, se muestra una tarjeta de error con el fuente — no rompe la página, pero **es un defecto**: valida la sintaxis mentalmente antes de escribir.
-- `end` en minúscula rompe el parser: escribir `End`.
+- El cierre de `subgraph` en un `flowchart` debe ser `end` en minúscula
+  exacta — `End`/`END` rompen el parser. Lo que sí hay que evitar es que un
+  **nodo** tenga como *id* la palabra `end` (en minúscula): ahí se confunde
+  con el cierre — renombra el id; si es solo el *texto* visible del nodo
+  (`B["end"]`), las comillas ya lo resuelven.
 
 Cualquier tipo de diagrama de Mermaid v11 sirve. Referencia completa en
 `content/cursos/mermaid_guia_completa.md`. Los tipos que más rinden aquí:
@@ -188,7 +197,7 @@ Cualquier tipo de diagrama de Mermaid v11 sirve. Referencia completa en
 | Estructura de carpetas, jerarquía, contenedores | `flowchart TB` + `subgraph` |
 | Modelo de clases, herencia, composición (POO/UML) | `classDiagram` |
 | Ciclo de vida, estados de un objeto o proceso | `stateDiagram-v2` |
-| Interacción entre capas (View→Controller→Service) | `sequenceDiagram` |
+| Interacción entre capas (View→Service→Model) | `sequenceDiagram` |
 | Comparar crecimiento asintótico, benchmarks | `xychart-beta` |
 | Mapa conceptual de cierre de módulo | `mindmap` |
 | Cronograma de sprints del proyecto | `gantt` |
@@ -556,8 +565,14 @@ Es la sección de autoevaluación al final de la lección (spec-011). **No se
 **montadas** en la lección (spec-042 — el montaje sustituyó a
 `course_slug`/`lesson_slug` como campos de la pregunta).
 
-Procedimiento con `question-bank-mcp` — **tres pasos, en orden**:
+Procedimiento con `question-bank-mcp` — **la propuesta primero, después tres
+pasos en orden**:
 
+0. **Redactar la propuesta completa y mostrarla al usuario en el chat**
+   (enunciado, todas las opciones, la correcta, dificultad, keywords) y esperar
+   su aprobación. Hasta ese momento no se llama a ninguna herramienta de
+   escritura del MCP. El usuario puede cambiar el texto, quitar preguntas o
+   decidir que la lección no lleva cuestionario.
 1. `create_question` por cada pregunta, con `keywords: string[]` (deben existir
    en el catálogo — confirmar con `list_keywords` antes; nunca inventar un
    slug de keyword, y si falta una proponerle al usuario crearla con
@@ -637,6 +652,15 @@ Están registrados en `.mcp.json` y arrancan vía `mcp-servers/run-local-mcp.sh`
 que carga `.env.local` y deriva el origen de la app desde
 `QUESTION_BANK_API_BASE_URL` (ojo: el puerto puede no ser 3000).
 
+**Dos entornos, dos juegos de MCP.** Desde el 2026-07-31 desarrollo y producción
+son bases distintas: `question-bank-mcp` / `assignment-mcp` apuntan a la base de
+**desarrollo**, y las variantes `question-bank-mcp-prod` / `assignment-mcp-prod`
+a **producción**. Las preguntas viven en Supabase, no en git: **no viajan con el
+deploy de código**. Lo creado en desarrollo hay que recrearlo en producción
+(keywords incluidas — pueden no existir allá), y eso solo ocurre en la fase de
+despliegue de `.claude/skills/class-material-prep/SKILL.md`, con confirmación
+explícita del usuario.
+
 Si las herramientas MCP no aparecen: verificar que `npm run dev` está arriba,
 que `.env.local` tiene `QUESTION_BANK_API_KEY` y `QUESTION_BANK_AGENT_TEACHER_ID`,
 y que `mcp-servers/<nombre>/dist/` está compilado.
@@ -651,7 +675,7 @@ y que `mcp-servers/<nombre>/dist/` está compilado.
 - [ ] Ningún `$` sin escapar; ningún `<`/`{` suelto en prosa (crítico en `.md` de guías).
 - [ ] Solo `Callout`, `Tabs`, `Tab`, `YouTubeEmbed` como JSX.
 - [ ] Entrada en `lib/courses/data/<curso>.ts` con `articleSlug`, `order` único y `summary` escrito.
-- [ ] Si la sesión es en vivo: apuntes de clase escritos, sin guía de estudiante. Si es trabajo independiente (confirmado con el usuario): guía del estudiante con `kind: "guide"` y apuntes de clase **sin** entrada TS.
+- [ ] Se escribieron **exactamente** los artefactos autorizados: apuntes solo si el usuario los pidió (y **sin** entrada TS), guía del estudiante solo si confirmó trabajo independiente (con `kind: "guide"`).
 - [ ] Rúbrica suma 100 y cada criterio es verificable.
 - [ ] Preguntas de cierre: solo `multiple_choice`, publicadas y **montadas** en la lección (`mount_question_in_lesson`), verificado con `list_lesson_questions`.
 - [ ] `npm run build` pasa (el validador de cursos corre ahí).

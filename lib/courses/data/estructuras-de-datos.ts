@@ -208,15 +208,16 @@ export const estructurasDeDatos: Course = {
       topics: [],
     },
     {
-      id: "composicion-agregacion-y-diagramas-de-paquetes",
-      slug: "composicion-agregacion-y-diagramas-de-paquetes",
-      articleSlug: "composicion-agregacion-y-diagramas-de-paquetes",
+      id: "asociacion-agregacion-y-composicion",
+      slug: "asociacion-agregacion-y-composicion",
+      articleSlug: "asociacion-agregacion-y-composicion",
       order: 11,
-      title: "Composición, agregación y diagramas de paquetes",
+      title: "Asociación, agregación y composición",
+      summary:
+        "Las tres formas de que un objeto 'tenga' a otro en UML — asociación, agregación y composición —, con multiplicidades y su traducción directa a código Java.",
       topics: [
         { title: "Asociación, agregación y composición: diferencias conceptuales" },
-        { title: "Representación en UML: multiplicidades, roles, navegación" },
-        { title: "Diagramas de paquetes: organización de clases en Java" },
+        { title: "Representación en UML: multiplicidades" },
       ],
     },
     {
@@ -224,11 +225,14 @@ export const estructurasDeDatos: Course = {
       slug: "diseno-con-tad-y-orientacion-a-objetos",
       articleSlug: "diseno-con-tad-y-orientacion-a-objetos",
       order: 12,
-      title: "Diseño con TAD y orientación a objetos",
+      title: "Diseño con TAD y orientación a objetos — laboratorio guiado",
+      summary:
+        "Laboratorio guiado en clase: traduce el diagrama UML del Sistema Bancario a TAD, clase abstracta, subtipos polimórficos y composición en Java — exactamente lo que el laboratorio evaluativo te pide a ti sobre tu propio proyecto.",
       topics: [
-        { title: "Diagrama de clases con relaciones: lectura e implementación en Java" },
-        { title: "Modelar el TAD de una estructura de datos con clases e interfaces" },
-        { title: "Puente entre el diseño OO y la implementación de estructuras de datos" },
+        { title: "Diagrama de paquetes y organización de clases en Java" },
+        { title: "Traducción del diagrama UML a interfaz, clase abstracta y subtipos concretos" },
+        { title: "Composición en código: Cliente y Cuenta" },
+        { title: "Clase de prueba de creación de objetos sin instanceof" },
       ],
     },
     {

@@ -213,6 +213,21 @@ No aplica — ninguna sesión de la semana está marcada `★`.
   (`analisis-de-algoritmos-y-divide-y-venceras`,
   `composicion-agregacion-y-diagramas-de-paquetes`,
   `estructuras-de-datos-nativas`, etc. — no se tocaron)
+  > Nota (2026-08-21): `composicion-agregacion-y-diagramas-de-paquetes` fue
+  > renombrada en la Semana 4 a `asociacion-agregacion-y-composicion` — ver
+  > `semana-04.md`. Este registro histórico no se modifica, solo se anota.
+
+## Nota posterior (2026-08-21/22, ver `semana-05.md`)
+
+Durante la preparación de la Semana 5 de `analisis-de-algoritmos`, a pedido
+explícito del usuario, se recortó el apunte de docente
+`apuntes/algoritmos-como-tecnologia.md`: la Sesión P quedó solo con el
+algoritmo y la validación de la invariante de ciclo. El conteo de
+operaciones, la clasificación mejor/peor/caso promedio y la extrapolación al
+caso de la empresa que este registro documenta arriba **se reubicaron, sin
+cambios de lógica, al apunte de la Semana 4** (`apuntes/analisis-de-algoritmos-y-divide-y-venceras.md`,
+creado en esa misma ronda). Este registro histórico no se reescribe; ver
+`semana-05.md` para el detalle completo.
 
 ## Pendientes para la semana siguiente
 

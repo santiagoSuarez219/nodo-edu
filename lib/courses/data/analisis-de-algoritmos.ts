@@ -98,7 +98,10 @@ export const analisisDeAlgoritmos: Course = {
       articleSlug: "analisis-de-algoritmos-y-divide-y-venceras",
       order: 4,
       title: "Análisis de algoritmos y divide y vencerás",
+      summary:
+        "Por qué insertion sort no tiene un solo tiempo de ejecución, cómo se formalizan el peor caso, el mejor caso y el caso promedio, y cómo divide y vencerás —con merge sort como primer ejemplo— ataca el problema de raíz en vez de acelerar el recorrido.",
       topics: [
+        { title: "Complejidad temporal vs. complejidad espacial: qué mide cada una" },
         { title: "Análisis del peor caso, mejor caso y caso promedio" },
         { title: "Orden de crecimiento: intuición previa a la notación formal" },
         { title: "Diseño por divide y vencerás: introducción con merge sort" },
@@ -110,6 +113,8 @@ export const analisisDeAlgoritmos: Course = {
       articleSlug: "notacion-o-theta-y-omega",
       order: 5,
       title: "Notación O, Θ y Ω",
+      summary:
+        "El vocabulario formal para comparar el crecimiento de dos funciones de tiempo sin depender de la máquina ni de la constante: O, Θ y Ω aplicadas a insertion sort y a la recurrencia sin resolver de merge sort.",
       topics: [
         { title: "Notación asintótica: definiciones formales de O, Θ y Ω" },
         { title: "Notaciones estándar y funciones comunes: polinomios, logaritmos, exponenciales" },
@@ -122,6 +127,8 @@ export const analisisDeAlgoritmos: Course = {
       articleSlug: "como-resolver-recurrencias",
       order: 6,
       title: "Cómo resolver recurrencias",
+      summary:
+        "Tres métodos —sustitución, árbol de recursión y método maestro— para pasar de una recurrencia como T(n) = 2T(n/2) + Θ(n) a una fórmula cerrada, cerrando la promesa pendiente de que merge sort es Θ(n log n).",
       topics: [
         { title: "Planteamiento de la recurrencia de un algoritmo recursivo" },
         { title: "El método de sustitución" },

@@ -1,6 +1,6 @@
 ---
 title: "Laboratorio Evaluativo — Codificación de Diseño OO (Momento 1)"
-updatedAt: "2026-08-18"
+updatedAt: "2026-08-21"
 ---
 
 # Laboratorio Evaluativo — Codificación de Diseño OO (Momento 1)
@@ -400,8 +400,7 @@ classDiagram
   Persona <|-- Jugador
   Persona <|-- Arbitro
   Equipo "1" *-- "1..*" Jugador
-  Partido --> Equipo : equipoLocal
-  Partido --> Equipo : equipoVisitante
+  Partido "1" --> "2" Equipo
   Gol --> Jugador
 ```
 
@@ -432,8 +431,11 @@ classDiagram
   existe fuera de un `Equipo` (composición) — es la relación que reemplaza
   al atributo `equipo:String` que `Jugador` tenía antes.
 - `Partido` y `Gol` **ya existen** de la práctica; se encapsulan y quedan
-  asociados a `Equipo` (dos veces, como `equipoLocal` y `equipoVisitante`)
-  y a `Jugador` respectivamente.
+  asociados a `Equipo` y a `Jugador` respectivamente. El diagrama muestra la
+  relación `Partido "1" --> "2" Equipo` de forma genérica —cada `Partido` se
+  asocia con dos `Equipo`s—, pero necesitas distinguir cuál juega de local y
+  cuál de visitante: implementa esa relación con **dos campos separados**,
+  ambos de tipo `Equipo`: `equipoLocal` y `equipoVisitante`.
 
 **Archivos de este proyecto:** `RolEnPartido.java`, `Persona.java`,
 `Jugador.java`, `Arbitro.java`, `Equipo.java`, `Partido.java`, `Gol.java`.
@@ -487,7 +489,7 @@ Escriba una clase de prueba, con un método `main`, que:
   fuera de `model/domain/`, junto al `Main.java` de su proyecto.
 
 > **Extensión opcional, no evaluada:** si su equipo ya tiene avanzada la
-> coordinación de las capas `service`, `controller` y `view` sobre estas
+> coordinación de las capas `service` y `view` sobre estas
 > clases, puede integrarlas al menú de consola del proyecto. No es requisito
 > de este laboratorio ni forma parte de su rúbrica.
 
@@ -583,8 +585,8 @@ nota_final_curso = (4.5 / 5) × 5% = 4.5%
 ## Recursos
 
 - **Lecciones del curso:** "Encapsulamiento", "Herencia", "Polimorfismo",
-  "Introducción al UML", "Composición, agregación y diagramas de
-  paquetes".
+  "Introducción al UML", "Asociación, agregación y composición", "Diseño
+  con TAD y orientación a objetos — laboratorio guiado".
 - **Práctica anterior:** "Práctica en clase — Modela una clase de tu
   proyecto de aula" (Semana 2), donde escribió las cinco clases que este
   laboratorio evoluciona.

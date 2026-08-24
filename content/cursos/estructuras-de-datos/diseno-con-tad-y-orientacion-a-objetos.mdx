@@ -1,5 +1,493 @@
 ---
-title: "Diseño con TAD y orientación a objetos"
-summary: ""
-updatedAt: 2026-07-18
+title: "Diseño con TAD y orientación a objetos — laboratorio guiado"
+course: "Estructura de Datos"
+course_code: "ED"
+level: "Primeros semestres"
+type: "Laboratorio guiado en clase"
+language: "Java 21"
+difficulty: "Básico"
+estimated_time: "50 minutos de clase (sesión T2, Semana 4)"
+presentation: true
+slides_hint: "Cada sección ## es una diapositiva. Presentación sincrona."
+date: "2026-08-27"
+author: "Asistente de Docencia"
+summary: "Laboratorio guiado en clase: traduce el diagrama UML del Sistema Bancario a TAD, clase abstracta, subtipos polimórficos y composición en Java — exactamente lo que el laboratorio evaluativo te pide a ti sobre tu propio proyecto."
+updatedAt: "2026-08-21"
 ---
+
+<Callout tipo="nota">
+  Repositorio de referencia del proyecto (Sistema Bancario):
+  [github.com/santiagoSuarez219/estructura-de-datos-sistema-bancario](https://github.com/santiagoSuarez219/estructura-de-datos-sistema-bancario).
+  Clónalo para seguir los pasos de esta sesión sobre el código real del
+  proyecto.
+</Callout>
+
+## Hoy resolvemos el mismo problema que tú vas a resolver
+
+Tienes ya el diagrama UML de tu propio proyecto de aula, resuelto y listo
+para traducir a Java: una interfaz, una clase abstracta, dos subtipos
+concretos y una composición. Antes de que te sientes a codificarlo,
+recorremos ese mismo camino completo aquí, en clase, sobre el **Sistema
+Bancario** — el proyecto de referencia del docente. Cada paso que ves hoy es
+literalmente el mismo paso que vas a dar tú, cambiando solo los nombres de
+las clases por los de tu dominio.
+
+No hay atajos ni resúmenes: leemos el diagrama, escribimos el TAD, la clase
+abstracta, los dos subtipos, la composición y la clase que prueba que todo
+compila y se comporta distinto según el subtipo. Al final, un mapa exacto de
+qué paso de hoy corresponde a qué parte de tu propio laboratorio.
+
+## Paso 1 — Diagrama de paquetes: las tres capas del proyecto
+
+Antes de escribir una sola clase, ubicamos dónde vive cada cosa. El
+proyecto de aula sigue una arquitectura de tres capas — `View → Service →
+Model` — y cada capa es un paquete real en el código:
+
+```mermaid
+flowchart TB
+  subgraph View["view"]
+    MenuPrincipal["MenuPrincipal"]
+  end
+  subgraph Service["service"]
+    ClienteService["ClienteService"]
+    CuentaService["CuentaService"]
+  end
+  subgraph Model["model"]
+    subgraph Domain["model.domain"]
+      Cliente["Cliente"]
+      Cuenta["Cuenta (TAD)"]
+    end
+    subgraph Structures["model.structures"]
+      Vacio["(vacio en este sprint)"]
+    end
+  end
+  View --> Service
+  Service --> Domain
+```
+
+La `View` habla directo con el `Service`: no hay capa intermedia. Cada
+flecha es una dependencia real y unidireccional — el `Service` nunca conoce
+a la `View`, y el `Model` no conoce a nadie por encima suyo.
+`model/structures/` existe como paquete desde ya, pero queda vacío hasta el
+próximo sprint: el diagrama de paquetes no miente sobre el estado real del
+proyecto, y hoy solo trabajamos `model.domain`.
+
+## Paso 2 — El diagrama UML de partida: se lee antes de escribir código
+
+Este es el plano que hoy traducimos a Java, tal como a ti te va a llegar el
+tuyo: ya resuelto, con la interfaz, la jerarquía y la composición
+completas.
+
+```mermaid
+classDiagram
+  class OperacionesCuenta {
+    <<interface>>
+    +depositar(monto: double) void
+    +retirar(monto: double) void
+    +consultarSaldo() double
+  }
+  class Cuenta {
+    <<abstract>>
+    -numeroCuenta : String
+    -saldo : double
+    -fechaApertura : LocalDate
+    +depositar(monto: double) void
+    +consultarSaldo() double
+    #debitar(monto: double) void
+  }
+  class CuentaAhorros {
+    -tasaInteres : double
+    +retirar(monto: double) void
+  }
+  class CuentaCorriente {
+    -cupoSobregiro : double
+    +retirar(monto: double) void
+  }
+  class Cliente {
+    -identificacion : String
+    -nombre : String
+    -telefono : String
+    -direccion : String
+    +agregarCuenta(cuenta: Cuenta) void
+  }
+  OperacionesCuenta <|.. Cuenta
+  Cuenta <|-- CuentaAhorros
+  Cuenta <|-- CuentaCorriente
+  Cliente "1" *-- "0..*" Cuenta
+```
+
+Antes de tocar el teclado, léelo de arriba hacia abajo: `OperacionesCuenta
+<|.. Cuenta` es realización (línea punteada) — el TAD se declara primero
+como contrato, después `Cuenta` lo implementa. `Cuenta <|-- CuentaAhorros`
+y su hermana son herencia (línea sólida): la jerarquía de dos niveles.
+`Cliente "1" *-- "0..*" Cuenta` es composición: el diamante relleno del
+lado de `Cliente` dice que una cuenta no existe fuera de su cliente. Y
+`retirar()` no aparece resuelto en `Cuenta` — cada subtipo lo implementa
+con su propia regla, sin sobregiro en un caso y con cupo en el otro. Eso es
+lo que obliga a `Cuenta` a quedar abstracta.
+
+El diagrama omite getters y setters por legibilidad: el código sí los lleva,
+como verás en `Cliente`.
+
+## Paso 3 — El TAD `OperacionesCuenta`: el contrato primero
+
+```java
+package model.domain;
+
+public interface OperacionesCuenta {
+    void depositar(double monto);
+    void retirar(double monto);
+    double consultarSaldo();
+}
+```
+
+Tres operaciones, nada más. Cualquier tipo de cuenta que exista en el
+sistema, presente o futuro, tiene que poder responder a las tres — este es
+el TAD: declara **qué** se puede hacer, sin decir todavía **cómo**.
+
+## Paso 4 — `Cuenta`, clase abstracta que implementa el TAD
+
+```java
+package model.domain;
+
+import java.time.LocalDate;
+
+public abstract class Cuenta implements OperacionesCuenta {
+    private final String numeroCuenta;
+    private double saldo;
+    private final LocalDate fechaApertura;
+
+    public Cuenta(String numeroCuenta, double saldoInicial) {
+        if (saldoInicial < 0) {
+            // Validacion en el constructor: nunca se construye una cuenta
+            // con saldo negativo, sin importar el subtipo.
+            throw new IllegalArgumentException("El saldo inicial no puede ser negativo");
+        }
+        this.numeroCuenta = numeroCuenta;
+        this.saldo = saldoInicial;
+        this.fechaApertura = LocalDate.now();
+    }
+
+    @Override
+    public void depositar(double monto) {
+        // Depositar es igual para cualquier cuenta: se resuelve una sola
+        // vez aqui y las subclases lo heredan sin sobreescribirlo.
+        if (monto <= 0) {
+            throw new IllegalArgumentException("El monto a depositar debe ser positivo");
+        }
+        this.saldo += monto;
+    }
+
+    @Override
+    public double consultarSaldo() {
+        return saldo;
+    }
+
+    protected void debitar(double monto) {
+        // 'protected': solo las subclases pueden mover saldo directamente,
+        // despues de validar su propia regla de retiro.
+        this.saldo -= monto;
+    }
+
+    protected double getSaldo() {
+        return saldo;
+    }
+
+    public String getNumeroCuenta() {
+        return numeroCuenta;
+    }
+
+    public LocalDate getFechaApertura() {
+        return fechaApertura;
+    }
+}
+```
+
+`retirar()` no se escribe aquí. `Cuenta` sigue siendo abstracta porque deja
+sin resolver un método de la interfaz — el compilador obliga a que cada
+subclase concreta lo implemente con su propia regla de negocio.
+
+## Paso 5 — `CuentaAhorros` y `CuentaCorriente`: la implementación polimórfica
+
+```java
+package model.domain;
+
+public class CuentaAhorros extends Cuenta {
+    private double tasaInteres;
+
+    public CuentaAhorros(String numeroCuenta, double saldoInicial, double tasaInteres) {
+        super(numeroCuenta, saldoInicial);
+        this.tasaInteres = tasaInteres;
+    }
+
+    @Override
+    public void retirar(double monto) {
+        if (monto <= 0) {
+            throw new IllegalArgumentException("El monto a retirar debe ser positivo");
+        }
+        if (monto > getSaldo()) {
+            // Regla propia de la cuenta de ahorros: no hay sobregiro.
+            throw new IllegalStateException("Saldo insuficiente: las cuentas de ahorro no permiten sobregiro");
+        }
+        debitar(monto);
+    }
+
+    public double getTasaInteres() {
+        return tasaInteres;
+    }
+}
+```
+
+```java
+package model.domain;
+
+public class CuentaCorriente extends Cuenta {
+    private double cupoSobregiro;
+
+    public CuentaCorriente(String numeroCuenta, double saldoInicial, double cupoSobregiro) {
+        super(numeroCuenta, saldoInicial);
+        this.cupoSobregiro = cupoSobregiro;
+    }
+
+    @Override
+    public void retirar(double monto) {
+        if (monto <= 0) {
+            throw new IllegalArgumentException("El monto a retirar debe ser positivo");
+        }
+        if (monto > getSaldo() + cupoSobregiro) {
+            // Regla propia de la cuenta corriente: puede quedar en saldo
+            // negativo hasta el limite del cupo autorizado.
+            throw new IllegalStateException("Saldo insuficiente: supera el cupo de sobregiro autorizado");
+        }
+        debitar(monto);
+    }
+
+    public double getCupoSobregiro() {
+        return cupoSobregiro;
+    }
+}
+```
+
+`retirar()` tiene la misma firma en las dos clases, pero el cuerpo es
+distinto — esto es polimorfismo real, no una coincidencia de nombre. Más
+adelante, cualquier código que reciba una `Cuenta` va a poder llamar
+`cuenta.retirar(monto)` sin saber ni importarle cuál de las dos es.
+
+## Paso 6 — `Cliente`: la composición con `Cuenta`
+
+```java
+package model.domain;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Cliente {
+    private final String identificacion;
+    private String nombre;
+    private String telefono;
+    private String direccion;
+    private final List<Cuenta> cuentas;
+
+    public Cliente(String identificacion, String nombre, String telefono, String direccion) {
+        if (identificacion == null || identificacion.isBlank()) {
+            throw new IllegalArgumentException("La identificacion no puede estar vacia");
+        }
+        this.identificacion = identificacion;
+        this.nombre = nombre;
+        this.telefono = telefono;
+        this.direccion = direccion;
+        this.cuentas = new ArrayList<>();
+    }
+
+    public void agregarCuenta(Cuenta cuenta) {
+        // Composicion en codigo: la unica forma de que una Cuenta exista
+        // en el sistema es colgada de un Cliente ya construido.
+        this.cuentas.add(cuenta);
+    }
+
+    public List<Cuenta> getCuentas() {
+        return cuentas;
+    }
+
+    public String getIdentificacion() {
+        return identificacion;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        if (nombre == null || nombre.isBlank()) {
+            throw new IllegalArgumentException("El nombre no puede estar vacio");
+        }
+        this.nombre = nombre;
+    }
+
+    public String getTelefono() {
+        return telefono;
+    }
+
+    public void setTelefono(String telefono) {
+        if (telefono == null || telefono.isBlank()) {
+            throw new IllegalArgumentException("El telefono no puede estar vacio");
+        }
+        this.telefono = telefono;
+    }
+}
+```
+
+`cuentas` se expone como `List<Cuenta>`, no como `List<Object>` ni con un
+tipo de cada subtipo por separado: `Cliente` no necesita saber si una
+cuenta es de ahorros o corriente para guardarla — le basta con saber que es
+una `Cuenta`.
+
+> **Composición cuando el `new` ocurre afuera.** En Asociación, agregación y
+> composición viste el caso más nítido: `Cuenta` creaba sus propios
+> `Movimiento`s con `new` dentro de su método. Aquí la `Cuenta` se
+> construye afuera y se le entrega al `Cliente`, y la relación sigue siendo
+> composición. Lo que la define no es quién ejecuta el `new`, sino la
+> **propiedad exclusiva y el ciclo de vida**: ninguna otra clase conserva
+> una referencia a esa `Cuenta`, no puede reasignarse a otro `Cliente`, y si
+> el `Cliente` desaparece del sistema sus cuentas desaparecen con él.
+> Compáralo con `Sucursal` y `Cliente`, que sí era agregación: allí el
+> `Cliente` podía trasladarse a otra sucursal y seguir existiendo por su
+> cuenta.
+
+## Paso 7 — `PruebaCreacionObjetos`: la clase que demuestra el polimorfismo
+
+Esto es lo que tu laboratorio evalúa como "Pruebas en el App": una clase
+con `main`, ubicada fuera de `model/domain/`, que instancia cada subtipo
+concreto, los agrega a la composición y ejercita el método polimórfico
+sobre cada uno **sin `instanceof`**, imprimiendo un resultado distinto para
+cada uno.
+
+```java
+import model.domain.Cliente;
+import model.domain.Cuenta;
+import model.domain.CuentaAhorros;
+import model.domain.CuentaCorriente;
+
+import java.util.List;
+
+public class PruebaCreacionObjetos {
+    public static void main(String[] args) {
+        // Se crea un Cliente y se le agregan una cuenta de cada subtipo
+        // concreto.
+        Cliente cliente = new Cliente("CC-123", "Ana Torres", "3001234567", "Calle 10 #5-20");
+
+        CuentaAhorros ahorros = new CuentaAhorros("AH-001", 100000, 0.02);
+        CuentaCorriente corriente = new CuentaCorriente("CC-001", 50000, 200000);
+
+        cliente.agregarCuenta(ahorros);
+        cliente.agregarCuenta(corriente);
+
+        // Se recorren las cuentas como referencias del tipo abstracto
+        // Cuenta -- ni una sola vez se pregunta de que subtipo es cada una.
+        // Se pide un retiro de 120000: mas que el saldo de ambas cuentas.
+        // La de ahorros lo rechaza; la corriente lo acepta contra su cupo
+        // de sobregiro. Misma llamada, dos comportamientos distintos.
+        List<Cuenta> cuentas = cliente.getCuentas();
+        for (Cuenta cuenta : cuentas) {
+            probarRetiro(cuenta, 120000);
+        }
+    }
+
+    private static void probarRetiro(Cuenta cuenta, double monto) {
+        // Este metodo no sabe (ni le importa) si 'cuenta' es CuentaAhorros
+        // o CuentaCorriente: retirar() resuelve la regla de cada subtipo
+        // por si sola gracias al polimorfismo. Sin instanceof en ningun lado.
+        String etiqueta = cuenta.getClass().getSimpleName() + " " + cuenta.getNumeroCuenta();
+        try {
+            cuenta.retirar(monto);
+            System.out.println(etiqueta
+                + " -> retiro de " + monto + " aceptado; saldo: " + cuenta.consultarSaldo());
+        } catch (IllegalStateException e) {
+            System.out.println(etiqueta
+                + " -> retiro de " + monto + " rechazado: " + e.getMessage());
+        }
+    }
+}
+```
+
+`cuenta.getClass().getSimpleName()` se usa solo para el mensaje impreso, no
+para decidir comportamiento — eso es distinto de un `instanceof` que
+ramifica la lógica. La regla de retiro sigue viviendo exclusivamente dentro
+de cada subtipo, y al correr este `main` la misma llamada
+(`cuenta.retirar(120000)`) produce dos salidas visiblemente distintas:
+
+```
+CuentaAhorros AH-001 -> retiro de 120000.0 rechazado: Saldo insuficiente: las cuentas de ahorro no permiten sobregiro
+CuentaCorriente CC-001 -> retiro de 120000.0 aceptado; saldo: -70000.0
+```
+
+Eso es exactamente lo que tu laboratorio pide demostrar por consola: que las
+dos implementaciones **se comportan distinto** ante la misma llamada.
+
+## Dónde encajan `service` y `view`
+
+Con el dominio completo y probado, el resto de las capas se apoyan encima
+sin tocar lo que ya escribiste. El `service` es quien decide **cuál**
+subtipo concreto construir según lo que pide el usuario — es el único
+lugar del proyecto donde se nombra `CuentaAhorros` o `CuentaCorriente`
+fuera de `model.domain` — y de ahí en adelante maneja todo como `Cuenta`.
+La `view` solo recolecta datos por consola y se los entrega al `service`;
+nunca instancia `Cuenta` ni llama `Cliente.agregarCuenta()` directamente.
+
+```mermaid
+sequenceDiagram
+  participant View as MenuPrincipal
+  participant Service as CuentaService
+  participant Model as Cuenta
+  View->>Service: abrirCuentaAhorros(datos)
+  Service->>Model: new CuentaAhorros(...)
+  Service->>Model: cliente.agregarCuenta(cuenta)
+  View->>Service: retirar(cuenta, monto)
+  Service->>Model: cuenta.retirar(monto)
+  Model-->>Service: saldo actualizado
+  Service-->>View: confirmacion
+```
+
+Esto cierra la historia de los paquetes del Paso 1: `model.domain` ya no
+cambia por esto, `service` es quien coordina la regla de negocio de abrir
+cuentas y mover saldo, y `view` solo pide datos y muestra resultados.
+
+## Correspondencia con tu propio laboratorio
+
+Cada paso de hoy sobre el Sistema Bancario es exactamente un paso de tu
+laboratorio sobre tu propio proyecto — solo cambian los nombres de las
+clases por los de tu dominio.
+
+| Paso de hoy (Sistema Bancario) | Qué te pide tu laboratorio |
+|---|---|
+| Paso 1 — Diagrama de paquetes | Tu proyecto ya tiene la misma estructura de tres capas; hoy no la modificas, solo ubicas dónde van tus clases nuevas |
+| Paso 2 — Leer el diagrama UML antes de codificar | Ubica la sección de tu proyecto en la guía y lee su diagrama completo antes de escribir una línea |
+| Paso 3 — TAD `OperacionesCuenta` | Crea la interfaz de tu proyecto con las operaciones que el diagrama declara |
+| Paso 4 — `Cuenta` abstracta | Convierte tu clase equivalente en abstracta, implementa la interfaz y deja pendiente el método que cada subtipo resuelve distinto |
+| Paso 5 — `CuentaAhorros` / `CuentaCorriente` | Crea o evoluciona los dos subtipos concretos de tu proyecto, cada uno con su propia regla |
+| Paso 6 — `Cliente` (composición) | Encapsula tu clase de composición y agrega el método que integra la parte al todo |
+| Paso 7 — `PruebaCreacionObjetos` | Escribe tu propia clase de prueba, con `main`, fuera de `model/domain/`, sin `instanceof` |
+
+## Síntesis
+
+- El diagrama UML se lee completo antes de escribir código: dice qué es
+  interfaz, qué es clase abstracta, qué queda pendiente por subtipo y cómo
+  se relacionan las clases entre sí.
+- El TAD en diseño OO es la interfaz (`OperacionesCuenta`): declara qué
+  operaciones existen sin decir cómo se implementan.
+- La clase abstracta (`Cuenta`) implementa lo que es común a todos los
+  subtipos y deja pendiente lo que cada uno resuelve distinto —
+  `retirar()`, en este caso.
+- Los subtipos concretos (`CuentaAhorros`, `CuentaCorriente`) comparten
+  firma pero difieren en comportamiento: eso es polimorfismo, no
+  coincidencia de nombres.
+- La composición (`Cliente` con `Cuenta`) se sostiene en la propiedad
+  exclusiva y el ciclo de vida, no en quién ejecuta el `new`: se escribe
+  como una colección más un método que agrega la instancia al todo que la
+  posee.
+- La clase de prueba demuestra el polimorfismo sin `instanceof`: recorre las
+  instancias por su tipo abstracto y deja que cada una resuelva su propia
+  versión.
+- `service` y `view` se apoyan sobre ese dominio ya probado sin tocarlo:
+  `service` decide qué subtipo construir, `view` solo pide datos y muestra
+  resultados.

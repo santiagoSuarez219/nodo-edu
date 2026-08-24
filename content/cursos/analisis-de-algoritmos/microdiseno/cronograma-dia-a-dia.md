@@ -49,7 +49,10 @@
 *Coincide con la Primera evaluación de estudiantes a docentes (31 ago - 5 sep) — no afecta la clase.*
 **Módulo 4: Crecimiento de funciones (Cormen Cap. 3)**
 - **Sesión 1 (T):** Notación asintótica O, Θ, Ω; notaciones estándar y funciones comunes
-- **Sesión 2 (P):** Laboratorio — Clasificación asintótica y verificación empírica con gráficas
+- **Sesión 2:** Sin sesión de laboratorio esta semana. El laboratorio de
+  clasificación asintótica y verificación empírica con gráficas que
+  ocupaba este espacio se eliminó del curso (decisión del docente,
+  2026-08-22) — no se dicta en ninguna otra semana.
 
 ### Semana 6 — 7 al 13 de septiembre
 **Módulo 5: Recurrencias y divide y vencer (Cormen Cap. 4)**
