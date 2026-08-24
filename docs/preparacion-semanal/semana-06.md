@@ -1,7 +1,7 @@
 # Semana 06 — 7 al 13 de septiembre
 
-**Rama:** `feat/semana-06-analisis-de-algoritmos`
-**Estado:** ✅ Contenido listo · pendiente pasada de `@reviewer` y merge
+**Rama:** `feat/semana-06-analisis-de-algoritmos` (borrada tras el merge)
+**Estado:** ✅ Contenido listo · ✅ `@reviewer` (1.ª pasada CAMBIOS REQUERIDOS, corregidos) · ✅ Mergeada a `development`
 
 > Esta rama también absorbió dos correcciones de contenido retroactivas a
 > lecciones ya publicadas (semanas 4 y 5), pedidas por el usuario al revisar
@@ -126,7 +126,17 @@ laboratorio en GitHub de la Sesión P, no un assignment A/B/C.
   Mermaid del archivo (el script no distinguía cercas de triple backtick de
   spans en línea); se revirtió y se rehizo con un script que respeta las
   cercas de código, verificado con el mismo conteo (46) que reportó
-  `@reviewer`.
+  `@reviewer`. Adicionalmente, hallazgo propio (no del reviewer): el
+  `xychart-beta` final usaba `line "nombre" [...]`, sintaxis sin precedente
+  en el repo ni documentada en `mermaid_guia_completa.md` — cambiado al
+  formato `line [...]` sin etiqueta, con la aclaración de qué curva es cuál
+  movida a la prosa. Commits de corrección: `a2299e8`, `9d2e243`.
+
+**Merge a `development`:** ✅ completo, sin conflictos (commit
+`merge: week 6 lesson on solving recurrences, plus reviewer fixes`).
+`npm run build` verificado en verde sobre `development` ya mergeada. Rama
+`feat/semana-06-analisis-de-algoritmos` borrada (solo local, nunca se
+pusheó a remoto).
 
 ## Pendientes
 
