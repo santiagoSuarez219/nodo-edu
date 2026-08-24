@@ -78,9 +78,10 @@ encontrar una constante `c` tal que `f(n)` nunca supera `c · g(n)`. `g(n)` es
 una **cota superior** del crecimiento de `f(n)` — puede que `f(n)` crezca más
 lento, pero nunca más rápido que `g(n)` a largo plazo.
 
-El peor caso de insertion sort, que en semanas anteriores contaste
-término a término (`i` comparaciones y `i` desplazamientos por cada
-elemento `i`), es una función que pertenece a `O(n²)`: existe una constante
+El peor caso de insertion sort, cuyo costo por elemento ya describiste en
+semanas anteriores (`i` comparaciones y `i` desplazamientos por cada
+elemento `i`) y que vas a contar formalmente término a término a
+continuación, es una función que pertenece a `O(n²)`: existe una constante
 `c` y un `n₀` a partir del cual el trabajo total nunca supera `c · n²`. `O`
 es la afirmación correcta cuando quieres una garantía de "nunca peor que",
 sin comprometerte a que el algoritmo realmente alcance ese crecimiento en
@@ -99,6 +100,17 @@ costo y el número de ejecuciones anotados en cada línea:
 
 ```python
 def insertion_sort(arreglo: list) -> list:
+    """Ordena una lista de menor a mayor usando el metodo de insercion.
+
+    Cada linea del cuerpo tiene anotada su constante de costo (c1..c7)
+    y el numero de veces que se ejecuta, en funcion de n y de t_i.
+
+    Args:
+        arreglo: lista de elementos comparables entre si.
+
+    Returns:
+        La misma lista, modificada in place y ordenada de menor a mayor.
+    """
     for i in range(1, len(arreglo)):        # c1, se ejecuta n veces
         clave = arreglo[i]                   # c2, se ejecuta n - 1 veces
         j = i - 1                             # c3, se ejecuta n - 1 veces
@@ -115,7 +127,7 @@ $t_i$ es el mismo valor que ya describiste en palabras en semanas
 anteriores: cuántas veces itera el cuerpo del `while` al insertar el
 elemento `i`, para `i` de 1 a `n - 1`. La línea de la condición del `while`
 merece cuidado aparte: se evalúa una vez por cada iteración donde da
-verdadero (`tᵢ` veces) y una vez más, la que finalmente da falso y saca al
+verdadero ($t_i$ veces) y una vez más, la que finalmente da falso y saca al
 ciclo — por eso su conteo es $t_i + 1$, no $t_i$.
 
 | Línea                          | Costo | Veces que se ejecuta         |
