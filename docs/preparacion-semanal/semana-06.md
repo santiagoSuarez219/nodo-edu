@@ -163,10 +163,13 @@ pusheó a remoto).
 - **D2 — Merge y push a `main`:** ✅ `deploy: release 2026-08-24` (`0d4cb72`),
   sin conflictos (el fix del diagrama UML se auto-mergeó limpio gracias al
   paso anterior). `npm run build` verificado en verde sobre `main`.
-- **D1 (cierre post-deploy):** ⬜ pendiente — en cuanto el deploy quede en
-  vivo en Vercel, cerrar `estructuras-de-datos/asociacion-agregacion-y-composicion`
-  vía `courses-mcp-prod` (mismo motivo que el slug viejo). Sesión monitoreando
-  el deploy en segundo plano para hacerlo apenas esté disponible.
+- **D1 (cierre post-deploy):** ✅ `estructuras-de-datos/asociacion-agregacion-y-composicion`
+  cerrada vía `courses-mcp-prod` (2026-08-24T13:50:28Z), mismo motivo que el
+  slug viejo. El monitor en segundo plano que vigilaba el deploy se detuvo
+  por timeout antes de detectarlo (el HTTP 307 de la ruta pública no era una
+  señal útil — es el redirect de autenticación, no un indicador de
+  disponibilidad); se verificó y cerró manualmente. Confirmado con
+  `list_course_lessons`: catálogo de 41 lecciones, `orphan_disabled_slugs: []`.
 - **D3 — Banco de preguntas replicado:**
   - Semana 5 de AA (`notacion-o-theta-y-omega`, 6 preguntas) + 5 keywords de
     soporte — ver detalle en `semana-05.md`.
