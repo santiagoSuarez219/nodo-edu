@@ -249,11 +249,12 @@ xychart-beta
   title "Crecimiento de n^2 frente a n*log2(n), n pequeno"
   x-axis [5, 10, 20, 30, 40, 50]
   y-axis "Operaciones" 0 --> 2500
-  line "n^2" [25, 100, 400, 900, 1600, 2500]
-  line "n*log2(n)" [12, 33, 86, 147, 213, 282]
+  line [25, 100, 400, 900, 1600, 2500]
+  line [12, 33, 86, 147, 213, 282]
 ```
 
-Para `n` grande la brecha es todavía mayor —a `n = 5.000`, `n²` vale
+La primera línea es `n²` (la que se dispara más rápido); la segunda,
+`n · log₂ n`. Para `n` grande la brecha es todavía mayor —a `n = 5.000`, `n²` vale
 25.000.000 frente a apenas 61.439 de $n \log_2 n$, una diferencia de más de
 400 veces—, pero graficar ese rango completo aplastaría las curvas de la
 parte pequeña contra el eje. El gráfico de arriba usa un rango chico
