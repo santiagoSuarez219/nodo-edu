@@ -212,7 +212,7 @@ classDiagram
     -telefono : String
     +datosResumen() String
   }
-  class Dueño {
+  class Dueno["Dueño"] {
     -direccion : String
     +rolEnClinica() String
   }
@@ -239,9 +239,9 @@ classDiagram
     -proximaFecha : LocalDate
   }
   RolEnClinica <|.. Persona
-  Persona <|-- Dueño
+  Persona <|-- Dueno
   Persona <|-- Veterinario
-  Dueño "1" *-- "1..*" Animal
+  Dueno "1" *-- "1..*" Animal
   Consulta --> Animal
   Consulta --> Veterinario
   Vacuna --> Animal
