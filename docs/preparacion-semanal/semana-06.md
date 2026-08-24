@@ -138,6 +138,47 @@ laboratorio en GitHub de la Sesión P, no un assignment A/B/C.
 `feat/semana-06-analisis-de-algoritmos` borrada (solo local, nunca se
 pusheó a remoto).
 
+## Despliegue a producción (2026-08-24)
+
+> Este despliegue combinó en un solo release el trabajo de `development`
+> acumulado desde el 18 de agosto: las Semanas 3-6 de `analisis-de-algoritmos`
+> (esta rama y las de `semana-05.md`) **y** trabajo de `estructuras-de-datos`
+> ajeno a esta sesión (T1/T2 de su Semana 4, refactor de 3 capas) — alcance
+> confirmado explícitamente por el usuario antes de tocar `main`.
+
+- **D0/D1 — hallazgos antes del merge:**
+  - Slug renombrado en `estructuras-de-datos` (`composicion-agregacion-y-diagramas-de-paquetes`
+    → `asociacion-agregacion-y-composicion`) dejaba huérfana su fila de
+    cierre en producción — anotado como riesgo en `semana-04.md` y nunca
+    resuelto. Como el nuevo slug no existe en producción hasta que el
+    deploy termina, no se pudo pre-cerrar por adelantado (limitación de la
+    API): se cerró apenas el deploy quedó en vivo (ver abajo), con una
+    ventana de exposición breve pero real. Fila huérfana del slug viejo
+    limpiada antes del merge.
+  - `main` tenía **2 commits locales sin pushear** (`36e2501`, hotfix del
+    diagrama UML "Dueño"/Mermaid en `estructuras-de-datos`) que nunca
+    llegaron a `development` — reaplicado manualmente en `development`
+    (commit `bf63c2b`) antes de mergear, en vez de confiar en que el merge
+    lo preservara.
+- **D2 — Merge y push a `main`:** ✅ `deploy: release 2026-08-24` (`0d4cb72`),
+  sin conflictos (el fix del diagrama UML se auto-mergeó limpio gracias al
+  paso anterior). `npm run build` verificado en verde sobre `main`.
+- **D1 (cierre post-deploy):** ⬜ pendiente — en cuanto el deploy quede en
+  vivo en Vercel, cerrar `estructuras-de-datos/asociacion-agregacion-y-composicion`
+  vía `courses-mcp-prod` (mismo motivo que el slug viejo). Sesión monitoreando
+  el deploy en segundo plano para hacerlo apenas esté disponible.
+- **D3 — Banco de preguntas replicado:** cuestionario de cierre de la
+  Semana 5 de AA (`notacion-o-theta-y-omega`, 6 preguntas) + 5 keywords de
+  soporte — ver detalle en `semana-05.md`. La Semana 6 no tiene cuestionario
+  todavía (pendiente, ver abajo).
+- **D4 — Lecciones abiertas (`courses-mcp-prod`), alcance confirmado por el
+  usuario — solo `analisis-de-algoritmos`, Semanas 4-6:**
+  `analisis-de-algoritmos-y-divide-y-venceras`, `notacion-o-theta-y-omega`,
+  `como-resolver-recurrencias`. Verificado con `list_course_lessons` que la
+  Semana 7 en adelante (`subarreglo-maximo-y-strassen` y siguientes) sigue
+  cerrada, sin filas huérfanas. No se tocó ninguna lección de
+  `estructuras-de-datos` en este paso (fuera del alcance confirmado).
+
 ## Pendientes
 
 - Proponer el cuestionario de cierre de la Semana 6 (E5).
