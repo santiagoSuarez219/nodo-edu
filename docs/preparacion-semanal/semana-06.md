@@ -167,10 +167,26 @@ pusheó a remoto).
   vivo en Vercel, cerrar `estructuras-de-datos/asociacion-agregacion-y-composicion`
   vía `courses-mcp-prod` (mismo motivo que el slug viejo). Sesión monitoreando
   el deploy en segundo plano para hacerlo apenas esté disponible.
-- **D3 — Banco de preguntas replicado:** cuestionario de cierre de la
-  Semana 5 de AA (`notacion-o-theta-y-omega`, 6 preguntas) + 5 keywords de
-  soporte — ver detalle en `semana-05.md`. La Semana 6 no tiene cuestionario
-  todavía (pendiente, ver abajo).
+- **D3 — Banco de preguntas replicado:**
+  - Semana 5 de AA (`notacion-o-theta-y-omega`, 6 preguntas) + 5 keywords de
+    soporte — ver detalle en `semana-05.md`.
+  - **Semana 4 de AA (`analisis-de-algoritmos-y-divide-y-venceras`, 6
+    preguntas)** — hallazgo del usuario: nunca se había replicado, pese a
+    llevar creada en desarrollo desde antes del inicio de esta ronda (nunca
+    quedó registrado en una bitácora porque se creó antes de que existiera
+    `semana-05.md`). El servidor de desarrollo estaba caído en el momento
+    (túnel a `mirp-lab` desconectado) — se recreó en producción a partir del
+    contenido exacto ya verificado en la conversación, sin depender del
+    servidor local. Keyword `recursividad` ya existía en producción (con
+    otra etiqueta/sin clasificar, mismo slug — reutilizada tal cual). IDs
+    en producción: `cad2e1f9-86aa-45a5-a8c9-0b40c5007234`,
+    `4c866ca3-0dc6-4ddb-a314-b672b88abc60`,
+    `b39c42ed-86f2-4ab0-811f-531ce8160250`,
+    `c3553a08-5d5e-4bee-b62b-e4ef6bb80cb4`,
+    `f2d8548c-0dd4-4147-b9ca-a550b303b29b`,
+    `7c960b51-d636-40ab-8d1f-9efe155dc81a` — publicadas y montadas, orden
+    0-5, verificado.
+  - La Semana 6 no tiene cuestionario todavía (pendiente, ver abajo).
 - **D4 — Lecciones abiertas (`courses-mcp-prod`), alcance confirmado por el
   usuario — solo `analisis-de-algoritmos`, Semanas 4-6:**
   `analisis-de-algoritmos-y-divide-y-venceras`, `notacion-o-theta-y-omega`,
