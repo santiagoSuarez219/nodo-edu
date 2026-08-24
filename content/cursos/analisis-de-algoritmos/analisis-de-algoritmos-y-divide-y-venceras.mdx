@@ -12,7 +12,7 @@ slides_hint: "Cada sección ## es una diapositiva. Presentación sincrona."
 date: "2026-08-21"
 author: "Asistente de Docencia"
 summary: "Por qué insertion sort no tiene un solo tiempo de ejecución, cómo se formalizan el peor caso, el mejor caso y el caso promedio, y cómo divide y vencerás —con merge sort como primer ejemplo— ataca el problema de raíz en vez de acelerar el recorrido."
-updatedAt: "2026-08-21"
+updatedAt: "2026-08-24"
 ---
 
 ## El problema: la misma cola, la misma noche
@@ -39,6 +39,38 @@ termina ordenado. La pregunta que la empresa nunca se hizo es otra: **¿tarda
 lo mismo** ordenar un archivo que llega casi ordenado —porque ayer ya estaba
 ordenado y hoy solo se agregaron unos pocos registros nuevos— que uno que
 llega en desorden total, o en el peor desorden posible?
+
+## Dos preguntas distintas: cuánto tarda y cuánta memoria usa
+
+Cuando la empresa de energía pregunta "¿qué tan eficiente es este proceso de
+ordenamiento?", en realidad está mezclando dos preguntas separadas. Una es la
+que ya la urge: ¿cuánto **tiempo** tarda en ordenar 1.850.000 lecturas, y
+alcanza a caber en la ventana de 4 horas? La otra rara vez se hace en voz
+alta, pero también tiene costo real: ¿cuánta **memoria** adicional necesita el
+servidor mientras ordena, más allá del espacio que ya ocupan las lecturas?
+Un servidor tiene RAM limitada igual que tiene horas limitadas — un algoritmo
+que resuelve el problema a tiempo pero agota la memoria disponible también
+falla.
+
+- **Complejidad temporal:** cuánto tiempo —o, de forma equivalente, cuántas
+  operaciones básicas— tarda un algoritmo en función del tamaño de la entrada
+  `n`. Es lo que ya vienes midiendo desde insertion sort: cada comparación y
+  cada desplazamiento del `while` interno es una operación que cuentas para
+  saber cómo escala el algoritmo con `n`.
+- **Complejidad espacial:** cuánta memoria adicional —más allá de la entrada
+  misma— necesita el algoritmo en función de `n`. Cuenta variables auxiliares,
+  estructuras temporales y, en un algoritmo recursivo, la memoria que ocupa la
+  pila de llamadas mientras espera el resultado de cada llamada más pequeña.
+  Insertion sort, por ejemplo, ordena **in place**: no reserva estructuras
+  auxiliares que crezcan con `n`.
+
+Ambas se miden y se comparan con las mismas herramientas matemáticas: la
+notación asintótica que se formaliza en la próxima lección (O, Θ, Ω) no es
+exclusiva del tiempo — se aplica igual a una función de espacio en función de
+`n`. Este módulo, y la mayor parte del curso, se concentra en complejidad
+**temporal**, porque es la que más urge resolver en el caso de la empresa de
+energía; la complejidad espacial no desaparece, y se nombra cada vez que sea
+relevante para una decisión de diseño.
 
 ## ¿Insertion sort tarda igual con cualquier entrada?
 
@@ -321,6 +353,10 @@ que consume un hogar completo en ese mismo periodo.
 
 ## Síntesis
 
+- La eficiencia de un algoritmo se mide en dos ejes distintos: complejidad
+  **temporal** (tiempo en función de `n`) y complejidad **espacial**
+  (memoria adicional en función de `n`) — este módulo, y la mayor parte del
+  curso, se concentra en la temporal.
 - Insertion sort no tiene un único tiempo de ejecución: su costo depende de
   cómo llega la entrada, y esa dependencia se formaliza en mejor caso, peor
   caso y caso promedio.

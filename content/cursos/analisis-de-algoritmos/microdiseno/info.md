@@ -173,6 +173,7 @@ curso-analisis-algoritmos/
 ### Semana 4 — Analizando y diseñando algoritmos
 
 **T — Análisis de algoritmos y divide y vencer**
+- Complejidad temporal vs. complejidad espacial: qué mide cada una
 - Análisis del peor caso, mejor caso y caso promedio
 - Orden de crecimiento: intuición previa a la notación formal
 - Diseño de algoritmos por divide y vencer: introducción con merge sort (dividir, conquistar, combinar)

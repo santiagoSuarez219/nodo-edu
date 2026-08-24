@@ -12,7 +12,7 @@ slides_hint: "Cada sección ## es una diapositiva. Presentación sincrona."
 date: "2026-08-21"
 author: "Asistente de Docencia"
 summary: "El vocabulario formal para comparar el crecimiento de dos funciones de tiempo sin depender de la máquina ni de la constante: O, Θ y Ω aplicadas a insertion sort y a la recurrencia sin resolver de merge sort."
-updatedAt: "2026-08-21"
+updatedAt: "2026-08-22"
 ---
 
 ## El problema: dos funciones de tiempo y ninguna forma justa de compararlas
@@ -78,13 +78,93 @@ encontrar una constante `c` tal que `f(n)` nunca supera `c · g(n)`. `g(n)` es
 una **cota superior** del crecimiento de `f(n)` — puede que `f(n)` crezca más
 lento, pero nunca más rápido que `g(n)` a largo plazo.
 
-El peor caso de insertion sort, que en la lección anterior contaste
-término a término (`i` comparaciones y `i` desplazamientos por cada
-elemento `i`), es una función que pertenece a `O(n²)`: existe una constante
+El peor caso de insertion sort, cuyo costo por elemento ya describiste en
+semanas anteriores (`i` comparaciones y `i` desplazamientos por cada
+elemento `i`) y que vas a contar formalmente término a término a
+continuación, es una función que pertenece a `O(n²)`: existe una constante
 `c` y un `n₀` a partir del cual el trabajo total nunca supera `c · n²`. `O`
 es la afirmación correcta cuando quieres una garantía de "nunca peor que",
 sin comprometerte a que el algoritmo realmente alcance ese crecimiento en
 todos los casos.
+
+## Ejemplo: de insertion sort a O(n²), sumando el costo línea a línea
+
+Esa afirmación —"insertion sort en el peor caso pertenece a `O(n²)`"— no
+sale de la nada. Hay un método explícito para pasar del código a esa
+clasificación: asignarle una constante de costo a cada línea ejecutable,
+contar cuántas veces se ejecuta esa línea en función de `n`, y sumar todo
+para obtener $T(n)$.
+
+Retoma `insertion_sort` de semanas anteriores, ahora con una constante de
+costo y el número de ejecuciones anotados en cada línea:
+
+```python
+def insertion_sort(arreglo: list) -> list:
+    """Ordena una lista de menor a mayor usando el metodo de insercion.
+
+    Cada linea del cuerpo tiene anotada su constante de costo (c1..c7)
+    y el numero de veces que se ejecuta, en funcion de n y de t_i.
+
+    Args:
+        arreglo: lista de elementos comparables entre si.
+
+    Returns:
+        La misma lista, modificada in place y ordenada de menor a mayor.
+    """
+    for i in range(1, len(arreglo)):        # c1, se ejecuta n veces
+        clave = arreglo[i]                   # c2, se ejecuta n - 1 veces
+        j = i - 1                             # c3, se ejecuta n - 1 veces
+
+        while j >= 0 and arreglo[j] > clave:  # c4, se ejecuta sum(t_i + 1)
+            arreglo[j + 1] = arreglo[j]       # c5, se ejecuta sum(t_i)
+            j -= 1                             # c6, se ejecuta sum(t_i)
+
+        arreglo[j + 1] = clave                 # c7, se ejecuta n - 1 veces
+    return arreglo
+```
+
+$t_i$ es el mismo valor que ya describiste en palabras en semanas
+anteriores: cuántas veces itera el cuerpo del `while` al insertar el
+elemento `i`, para `i` de 1 a `n - 1`. La línea de la condición del `while`
+merece cuidado aparte: se evalúa una vez por cada iteración donde da
+verdadero ($t_i$ veces) y una vez más, la que finalmente da falso y saca al
+ciclo — por eso su conteo es $t_i + 1$, no $t_i$.
+
+| Línea                          | Costo | Veces que se ejecuta         |
+| ------------------------------ | ----- | ----------------------------- |
+| `for i in range(...)`          | $c_1$ | $n$                           |
+| `clave = arreglo[i]`           | $c_2$ | $n - 1$                       |
+| `j = i - 1`                    | $c_3$ | $n - 1$                       |
+| condición del `while`          | $c_4$ | $\sum_{i=1}^{n-1} (t_i + 1)$  |
+| `arreglo[j + 1] = arreglo[j]`  | $c_5$ | $\sum_{i=1}^{n-1} t_i$        |
+| `j -= 1`                       | $c_6$ | $\sum_{i=1}^{n-1} t_i$        |
+| `arreglo[j + 1] = clave`       | $c_7$ | $n - 1$                       |
+
+$T(n)$ es la suma de cada costo por el número de veces que se ejecuta:
+
+$$T(n) = c_1 n + c_2(n-1) + c_3(n-1) + c_4\sum_{i=1}^{n-1}(t_i + 1) + c_5\sum_{i=1}^{n-1} t_i + c_6\sum_{i=1}^{n-1} t_i + c_7(n-1)$$
+
+Agrupando los términos que no dependen de $t_i$ y los que sí:
+
+$$T(n) = c_1 n + (c_2 + c_3 + c_4 + c_7)(n-1) + (c_4 + c_5 + c_6)\sum_{i=1}^{n-1} t_i$$
+
+Para el **peor caso** (arreglo en orden inverso), $t_i = i$ para todo `i`, y
+la suma de los primeros `n - 1` enteros tiene una fórmula cerrada conocida:
+$\sum_{i=1}^{n-1} i = \frac{n(n-1)}{2}$. Sustituyendo y expandiendo:
+
+$$T(n) = c_1 n + (c_2 + c_3 + c_4 + c_7)(n - 1) + (c_4 + c_5 + c_6)\frac{n^2 - n}{2}$$
+
+Esto tiene la forma $an^2 + bn + c$, con
+$a = \frac{c_4 + c_5 + c_6}{2}$. Y aquí es donde conecta con lo que ya viste
+al principio de esta lección: para decir que este `T(n)` pertenece a
+`O(n²)`, no hace falta conocer el valor exacto de ninguna constante de
+costo `c₁, ..., c₇` — exactamente como con `f(n) = 2n²` y
+`g(n) = n² + 100n + 500`, alcanza con saber que el término dominante es
+`n²` y que el resto (los términos en `n` y la constante) se puede absorber
+eligiendo `c` y `n₀` suficientemente grandes en la definición formal de
+arriba. La misma sustitución con $t_i = 0$ (mejor caso) anula la sumatoria y
+da una forma lineal $an + b$ — la razón por la que el mejor caso pertenece a
+una clase asintótica distinta, como vas a ver en la próxima sección.
 
 ## Cota inferior asintótica: notación Ω
 
