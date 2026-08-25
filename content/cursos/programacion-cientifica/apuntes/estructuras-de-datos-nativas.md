@@ -198,9 +198,9 @@ Escribir cada producto con el grupo, uno a la vez:
 
 ```python
 inventario = [
-    {"nombre": "Martillo", "precio": 15990.0, "cantidad": 12},
-    {"nombre": "Destornillador", "precio": 8990.0, "cantidad": 30},
-    {"nombre": "Taladro", "precio": 189900.0, "cantidad": 4},
+    {"nombre": "Martillo", "precio": 15990.0, "cantidad": 5},
+    {"nombre": "Destornillador", "precio": 8990.0, "cantidad": 8},
+    {"nombre": "Taladro", "precio": 189900.0, "cantidad": 0},
 ]
 
 # agregar la herramienta nueva del paso 1, ahora sin riesgo de desalinear nada:
@@ -211,9 +211,9 @@ for herramienta in inventario:
 ```
 
 ```text
-Martillo: 12 unidades a $15990.0
-Destornillador: 30 unidades a $8990.0
-Taladro: 4 unidades a $189900.0
+Martillo: 5 unidades a $15990.0
+Destornillador: 8 unidades a $8990.0
+Taladro: 0 unidades a $189900.0
 Alicate: 15 unidades a $22000.0
 ```
 

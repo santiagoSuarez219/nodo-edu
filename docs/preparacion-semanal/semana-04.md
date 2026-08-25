@@ -366,7 +366,17 @@ No aplica — la Semana 4 ya no está marcada `★` tras el reordenamiento.
     `precios` distintos entre secciones, sugerencias de traceback/tildes/orden
     de `set`) — **no corregidos en esta ronda**, a decisión explícita del
     usuario; quedan como deuda menor documentada aquí.
-  - [ ] `@reviewer` (2.ª pasada): pendiente
+  - [x] `@reviewer` (2.ª pasada): CAMBIOS REQUERIDOS — 2 🟠 nuevos, ambos
+    causados por el propio fix de la 1.ª pasada — corregidos:
+    - El fix del gancho cambió las cantidades de Martillo/Destornillador/Taladro
+      pero el remate del cierre (construcción de la lista de diccionarios en
+      la lección y en los apuntes) seguía con las cantidades viejas
+      (`12/30/4`) — sincronizadas a `5/8/0`, coherentes con el gancho.
+    - Referencia obsoleta fuera del diff original en
+      `microdiseno/labs/variables-tipos-de-datos-y-operadores-docente.md:334`
+      ("Momento evaluativo 1 (Semana 4)") — actualizada a "(Semana 5)" +
+      mención de estructuras de datos nativas, coherente con el reordenamiento.
+  - [ ] `@reviewer` (3.ª pasada): pendiente
 
 **Nota operativa:** el túnel SSH a `mirp-lab` (base de datos de desarrollo)
 estaba caído al llegar a E5; se reconectó siguiendo el procedimiento de
