@@ -256,19 +256,25 @@ Configuración de MCPs"), y este spec activa Sentry únicamente en producción.
 ### Fase 5 — Página de diagnóstico y verificación en producción
 - [ ] Crear `app/(admin)/admin/diagnostico-sentry/page.tsx`: página bajo
       `/admin`, por tanto ya protegida por el gate de rol `teacher`/`admin` del
-      `middleware.ts` (D6). Sin enlace en la navegación admin: se llega por URL.
-- [ ] Botón "Probar error de servidor" → server action en `actions.ts` que lanza
-      una excepción con un mensaje reconocible (`"Sentry server-side check"`).
-- [ ] Botón "Probar error de cliente" → client component que lanza dentro de un
-      handler (`"Sentry client-side check"`), envuelto en el `ErrorBoundary`
-      existente para que el fallo degrade solo su recuadro.
-- [ ] Texto en la página advirtiendo, en español, que estos botones generan
-      errores **reales** que llegarán a Sentry y que no deben usarse durante una
+      `middleware.ts` (D6), más `requireAnyRole` en la propia página (defensa
+      en profundidad, igual que el resto de `app/(admin)/admin/**`). Sin
+      enlace en la navegación admin: se llega por URL. Ruta confirmada en el
+      output de `npm run build` (`ƒ /admin/diagnostico-sentry`).
+- [x] Botón "Probar error de servidor" → `triggerServerError` en `actions.ts`
+      (server action, revalida el rol y lanza `"Sentry server-side check"`).
+- [x] Botón "Probar error de cliente" → `ClientErrorTrigger` en
+      `SentryDiagnostics.tsx`, lanza `"Sentry client-side check"` en render
+      tras un click, envuelto en el `ErrorBoundary` existente para que el
+      fallo degrade solo su recuadro.
+- [x] Texto en la página (recuadro amarillo) advirtiendo, en español, que
+      estos botones generan errores **reales** y no deben usarse durante una
       clase en curso.
 - [ ] Desplegar y ejecutar `docs/testing/test-052-integracion-sentry.md` contra
       producción (es la única forma de verificar: en desarrollo el SDK está
       apagado por diseño). El despliegue lo inicia el usuario, con confirmación
-      explícita, siguiendo la sección "Despliegue" de CLAUDE.md.
+      explícita, siguiendo la sección "Despliegue" de CLAUDE.md. **Pendiente**:
+      requiere acción del usuario, fuera del alcance de esta sesión de
+      implementación.
 
 ### Fase 6 — Documentación y deuda
 - [ ] `CLAUDE.md`: añadir `NEXT_PUBLIC_SENTRY_DSN` a la tabla de "Variables de
