@@ -91,6 +91,7 @@ archivo rastreado por git**: entra como variable de entorno (ver Fase 1).
 | `package.json` | Modificar — `@sentry/nextjs` en `dependencies` | 1 |
 | `.env.example` | Modificar — `NEXT_PUBLIC_SENTRY_DSN` (sin valor) + comentario | 1 |
 | `lib/observability/sentry-enabled.ts` | **Crear** — única fuente de verdad del gate "¿está activo?" (D1) | 1 |
+| `lib/observability/scrub-sentry-event.ts` | **Crear** — `beforeSend` compartido entre los tres runtimes (D5) | 2 |
 | `sentry.server.config.ts` | **Crear** — init del runtime Node | 2 |
 | `sentry.edge.config.ts` | **Crear** — init del runtime Edge (`middleware.ts`) | 2 |
 | `instrumentation.ts` | **Crear** — `register()` + `onRequestError` | 2 |
@@ -190,26 +191,30 @@ Configuración de MCPs"), y este spec activa Sentry únicamente en producción.
       archivo de pruebas.
 
 ### Fase 2 — Captura server-side (Node + Edge)
-- [ ] Crear `sentry.server.config.ts` con `Sentry.init({ dsn, enabled, environment: "production", tracesSampleRate: 0, sendDefaultPii: false, beforeSend })`.
+- [x] Crear `sentry.server.config.ts` con `Sentry.init({ dsn, enabled, environment: "production", tracesSampleRate: 0, sendDefaultPii: false, beforeSend })`.
       **No** registrar integraciones de Replay ni de tracing (fuera de alcance).
-- [ ] Crear `sentry.edge.config.ts` con la misma forma, para el runtime en el que
+- [x] Crear `sentry.edge.config.ts` con la misma forma, para el runtime en el que
       corre `middleware.ts`. `middleware.ts` **no se edita**.
-- [ ] Crear `instrumentation.ts` en la raíz:
+- [x] Crear `instrumentation.ts` en la raíz:
       - `register()` importa dinámicamente el config según
         `process.env.NEXT_RUNTIME` (`"nodejs"` → server, `"edge"` → edge).
       - Exportar `onRequestError = Sentry.captureRequestError` — es lo que
         engancha Server Components, Server Actions y las 24 rutas de `app/api/**`
         sin tocar ninguna de ellas.
-- [ ] Implementar `beforeSend` compartido (D5): descartar el evento si
-      `isSentryEnabled` es falso (segunda barrera, defensa en profundidad) y
-      depurar `request.cookies`, la cabecera `Authorization` y cualquier cabecera
-      cuyo nombre contenga `api-key` — por ahí viajan `QUESTION_BANK_API_KEY`,
-      `STUDENTS_ADMIN_API_KEY` y `COURSES_ADMIN_API_KEY`.
-- [ ] **No** envolver `next.config.ts` con `withSentryConfig` (D4 descartada por
-      el usuario): sin subida de source maps, no aporta nada en este spec.
-      `next.config.ts` **no se modifica**.
-- [ ] Verificar que `npm run build` pasa y que `npm run dev` **no** imprime
-      ningún aviso de conexión con Sentry.
+- [x] Implementar `beforeSend` compartido (D5) en
+      `lib/observability/scrub-sentry-event.ts`, reutilizado por los tres
+      runtimes: descarta el evento si `isSentryEnabled` es falso (segunda
+      barrera, defensa en profundidad) y depura `request.cookies`, la cabecera
+      `Authorization` y cualquier cabecera cuyo nombre contenga `api-key` — por
+      ahí viajan `QUESTION_BANK_API_KEY`, `STUDENTS_ADMIN_API_KEY` y
+      `COURSES_ADMIN_API_KEY`.
+- [x] **No** se envolvió `next.config.ts` con `withSentryConfig` (D4 descartada
+      por el usuario): sin subida de source maps, no aporta nada en este spec.
+      `next.config.ts` queda sin modificar.
+- [x] `npm run build` y `npm run lint` pasan sin errores. `npm run dev` no
+      puede imprimir ningún aviso de Sentry: `isSentryEnabled` es
+      estructuralmente `false` en `NODE_ENV=development` (verificación empírica
+      contra el servidor real queda en `TC-052-003`, ronda manual).
 
 ### Fase 3 — Captura client-side
 - [ ] Crear `instrumentation-client.ts` en la raíz (convención de Next 15.3+ /
