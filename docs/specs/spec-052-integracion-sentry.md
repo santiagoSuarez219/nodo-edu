@@ -1,4 +1,4 @@
-# spec-052 — [IN PROGRESS] Integración de Sentry: reporte remoto de errores en producción
+# spec-052 — [TESTING] Integración de Sentry: reporte remoto de errores en producción
 
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.
@@ -277,29 +277,18 @@ Configuración de MCPs"), y este spec activa Sentry únicamente en producción.
       implementación.
 
 ### Fase 6 — Documentación y deuda
-- [ ] `CLAUDE.md`: añadir `NEXT_PUBLIC_SENTRY_DSN` a la tabla de "Variables de
-      entorno", indicando que **solo** se carga en Vercel/Production. Añadir
-      Sentry al bloque "Infraestructura" del stack y al checklist de "Verificar
-      variables de entorno en Vercel" del proceso de despliegue.
-- [ ] `docs/specs/backlog.md`: registrar dos deudas nuevas (usar los
-      correlativos que correspondan al leer el backlog):
-      - **Errores *manejados* sin telemetría**: los resultados discriminados de
-        spec-037 (`status: "unavailable"` en `lib/attendance`, el estado
-        indeterminado de `getSelfAssessmentStatus`, el
-        `auth.status === "unavailable"` de `middleware.ts` + spec-046) señalan
-        fallos reales de infraestructura que **nunca lanzan** y por tanto Sentry
-        no verá. Hoy solo dejan un `console.error` en los logs de Vercel.
-        Convertirlos en eventos explícitos (`captureMessage` con nivel
-        `warning`) es el siguiente paso natural de observabilidad y merece su
-        propio spec.
-      - **Stack traces de cliente sin source maps (D4 descartada)**: los
-        eventos de Sentry originados en el navegador quedan con código
-        minificado. Retomar `withSentryConfig` + `SENTRY_AUTH_TOKEN` es un
-        cambio acotado si en el futuro la legibilidad se vuelve necesaria.
-- [ ] Actualizar la sección "No incluye" de `spec-037` con una nota que enlace a
-      este spec, para que la próxima lectura no vuelva a diagnosticar el hueco
-      como abierto.
-- [ ] `npm run lint` y `npm run build` sin errores; ningún `any` nuevo.
+- [x] `CLAUDE.md`: `NEXT_PUBLIC_SENTRY_DSN` agregado a la tabla de "Variables
+      de entorno", con nota de que solo se carga en Vercel/Production. Sentry
+      agregado al bloque "Infraestructura" del stack y a la lista de
+      variables del checklist "Verificar variables de entorno en Vercel".
+- [x] `docs/specs/backlog.md`: registradas **DEBT-066** (errores *manejados*
+      de spec-037 sin telemetría) y **DEBT-067** (stack traces de cliente sin
+      source maps, D4 descartada).
+- [x] `spec-037`, sección "No incluye": nota agregada enlazando a spec-052 y a
+      **[[DEBT-066]]**.
+- [x] `npm run lint` y `npm run build` pasan sin errores nuevos; `git diff
+      development --name-only -- '*.ts' '*.tsx' | xargs grep -n ": any"` no
+      devuelve coincidencias.
 
 ## Criterios de aceptación
 
