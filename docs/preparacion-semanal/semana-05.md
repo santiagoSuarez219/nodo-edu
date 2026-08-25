@@ -55,11 +55,15 @@ eliminarla del curso por completo**, no se dicta en ninguna semana (ver
 | Lección | Entorno | IDs de preguntas | Publicadas | Montadas (`list_lesson_questions`) |
 |---|---|---|---|---|
 | `notacion-o-theta-y-omega` | desarrollo | `598eda28-0a60-4e9c-8c29-2ca00138f3ce`, `f5c0a850-cbb3-41c8-a9b7-ec01d7ae468a`, `aa9f7d98-e634-41ce-995b-100fd5c26cde`, `8b47b75f-e259-4ab9-920e-c2bb73737351`, `36cef34b-71f7-4c62-866a-90a14fd1315f`, `64e6be07-2f06-4c7d-8d02-e10ed40312c0` | ✅ (6/6) | ✅ (6/6, orden 0–5) |
-| `notacion-o-theta-y-omega` | **producción** | — | ⬜ | ⬜ |
+| `notacion-o-theta-y-omega` | **producción** | `3059f61d-a677-46fc-b076-df1cbfba7278`, `981120f5-e804-4a63-a0fc-e5a4d072948b`, `50da65f7-e0e6-4cb0-8a0a-cafd27b65705`, `c4a8be06-c5e6-4ec3-8df5-b80da7b325a8`, `f8baabb8-ac7d-4552-8c42-ed5797c832dc`, `0c49982d-9e3b-42d6-a570-4a59ed49252d` | ✅ (6/6) | ✅ (6/6, orden 0–5) |
 
-> Keyword nueva creada en el catálogo compartido (desarrollo):
-> `notacion-asintotica` (kind: `tema`). Falta crearla y replicar las 6
-> preguntas en producción durante D3.
+> **Replicadas a producción (2026-08-24)**, vía `question-bank-mcp-prod`:
+> mismo contenido exacto que en desarrollo, publicadas y montadas en el
+> mismo orden, verificado con `list_lesson_questions` contra producción.
+> Keywords nuevas creadas en producción antes de las preguntas:
+> `analisis-de-casos`, `merge-sort`, `divide-y-venceras`, `recurrencias`,
+> `notacion-asintotica` (todas kind `tema`, mismo label/descripción que en
+> desarrollo).
 
 ### Quiz calificable A/B/C
 
@@ -178,7 +182,5 @@ nunca se pusheó a remoto).
 
 ## Pendientes
 
-- Replicar el cuestionario de cierre y la keyword `notacion-asintotica` a
-  producción durante el despliegue (D3).
 - Decidir en qué apunte futuro se resuelve la discrepancia de alcance con
   `microdiseno/info.md` (Semana 3 P) anotada arriba.

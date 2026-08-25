@@ -254,3 +254,177 @@ de codificación, preparado fuera de esta ronda).
   estén disponibles — el usuario indicó que los levanta él mismo.
 - Invocar `@reviewer` sobre el diff contra `development` (F6) antes de
   solicitar el merge.
+
+---
+
+## Ronda — `programacion-cientifica` (2026-08-25)
+
+**Rama:** `feat/semana-04-programacion-cientifica` (mergeada a `development` y borrada)
+**Estado:** ✅ Mergeada a `development` — pendiente despliegue a producción
+
+> Ronda independiente de la de `estructuras-de-datos` de arriba, en el mismo
+> archivo por compartir semana calendario. No se tocó ninguna sesión de
+> `estructuras-de-datos` ni `analisis-de-algoritmos`.
+
+**Alcance confirmado por el usuario:** Semana 4 del cronograma de
+`programacion-cientifica` (jueves 27 de agosto de 2026) — una sola sesión.
+Durante E0 el usuario cambió la estructura del curso: originalmente la
+Semana 4 era el Momento evaluativo 1 sin tema nuevo y "Estructuras de datos
+nativas" estaba en la Semana 5; se intercambiaron (ver "Reordenamiento del
+cronograma" abajo). El Momento evaluativo 1 (ahora Semana 5) queda **fuera
+de esta ronda** — no se preparó taller ni rúbrica para esa sesión.
+
+### Sesiones cubiertas
+
+| Sesión | Fecha | Tema | ★/◇ |
+|---|---|---|---|
+| Única sesión semanal | jue. 27 ago | Estructuras de datos nativas | — |
+
+### Reordenamiento del cronograma (previo a E1, a pedido del usuario)
+
+- `microdiseno/cronograma-dia-a-dia.md` y `microdiseno/info.md` actualizados:
+  Semana 4 pasa de "Momento evaluativo 1" (sin tema) a **"Estructuras de
+  datos nativas"**; Semana 5 pasa de "Estructuras de datos nativas" a
+  **"Momento evaluativo 1"**, ampliado para incluir variables/tipos,
+  condicionales/bucles **y** estructuras de datos nativas.
+- **Momento evaluativo 2** (Semana 8) redefinido de "Estructuras de datos +
+  POO" a **solo "POO"**, ya que estructuras de datos queda evaluada en el
+  Momento 1 — confirmado explícitamente con el usuario.
+- Excepción documentada a la regla general de no tocar `microdiseno/`: aquí
+  el cambio lo pidió el usuario explícitamente, no fue una decisión de
+  Claude ni un efecto secundario del flujo.
+
+### Etapas y aprobaciones
+
+| Etapa | Resultado | Aprobada por el usuario |
+|---|---|---|
+| E2 · Plan de lección | Aprobado sin ajustes | ✅ |
+| E3 · Lección `.mdx` + registro TS | `estructuras-de-datos-nativas` (`order: 4`) — aprobado sin ajustes | ✅ |
+| E4 · Apuntes del docente | Sí, pedidos — aprobados sin ajustes | ✅ |
+| E5 · Cuestionario de cierre | Propuestas 7 preguntas → aprobadas 7 (con corrección de `&gt;`/`&lt;` a `>`/`<` literales en P5 y P7) | ✅ |
+| E6 · Guía del estudiante | No aplica — sesión confirmada como demo en vivo del docente | ✅ |
+| E6 · Quiz A/B/C | No aplica — semana ya no es evaluativa (el ★ se movió a la Semana 5, fuera de esta ronda) | ✅ |
+
+### Artefactos producidos
+
+| Artefacto | Ruta | Publicado |
+|---|---|---|
+| Lección teórica | `content/cursos/programacion-cientifica/estructuras-de-datos-nativas.mdx` | ✅ |
+| Registro TS | `lib/courses/data/programacion-cientifica.ts` (`order: 4`, stub preexistente completado) | ✅ |
+| Apunte de clase | `content/cursos/programacion-cientifica/apuntes/estructuras-de-datos-nativas.md` | Solo owner/admin |
+| Guía del estudiante | No aplica (sesión en vivo) | — |
+
+### Cuestionario de cierre
+
+| Lección | Entorno | IDs de preguntas | Publicadas | Montadas (`list_lesson_questions`) |
+|---|---|---|---|---|
+| `estructuras-de-datos-nativas` | desarrollo | `6eaa462b-7967-4913-b8db-e8092c37db23`, `2900ee86-8e7b-4df2-9d85-8f8f6d73c4c5`, `9e7fc8f6-f932-408c-990e-1975ed714882`, `c8e00101-3c00-4619-8252-e30e9be2ffc0`, `318f9f3c-6434-4c77-8a1a-d897248a92ef`, `ea4f77e1-a084-4682-b139-0d3df9b50dad`, `898ffeeb-9139-4c96-874b-e131fabafd9d` | ✅ (7/7) | ✅ (7/7, orden 0–6) |
+| `estructuras-de-datos-nativas` | **producción** | — | ⬜ | ⬜ |
+
+Keywords nuevas creadas en el catálogo de desarrollo: `listas`, `tuplas`,
+`diccionarios`, `conjuntos` (faltan replicarse en producción en D3, junto
+con las preguntas).
+
+### Quiz calificable A/B/C
+
+No aplica — la Semana 4 ya no está marcada `★` tras el reordenamiento.
+
+### Decisiones tomadas por Claude en nombre del docente
+
+> Todo lo que se resolvió sin preguntar y el usuario debería poder revertir.
+
+- Ninguna: el reordenamiento del cronograma, el tipo de sesión (demo en
+  vivo), la producción de apuntes y el contenido exacto del cuestionario
+  (incluida la corrección de `&gt;`/`&lt;`) se confirmaron explícitamente
+  con el usuario en esta sesión antes de ejecutarse.
+
+### Verificación (E7)
+
+- [x] `npm run build` en verde
+- [x] `npm run lint` en verde (0 errores, 8 advertencias preexistentes sin relación con esta ronda)
+- [x] Checklist de `lesson-authoring` §8 recorrido: sin `# H1`/`###` sueltos, `updatedAt` de hoy, 5 diagramas Mermaid (etiquetas entre comillas, cierres `end` correctos), `$`/`{`/`<` siempre dentro de código o backticks, sin JSX no autorizado, apuntes sin entrada TS ni guía creada
+- [x] `summary` presente en frontmatter **y** en registro TS
+- [x] Coherencia cruzada: la lección retoma el gancho de `condicionales-y-bucles-lab` (listas paralelas de la ferretería), los apuntes siguen el mismo dominio y orden que la lección, y el cuestionario cubre las 4 estructuras + comprensión de listas con una pregunta de aplicación combinada (P7) alineada con el nuevo Momento evaluativo 1
+- [x] `@reviewer` (1.ª pasada): CAMBIOS REQUERIDOS (2 🟠, varios 🟡/🔵) — corregidos:
+  - 🟠 Afirmación falsa de que el taller de la Semana 3 usó `append` (no aparece
+    en ningún artefacto previo del curso) — reformulada en la lección y en los
+    apuntes para referenciar la sección "La lista a fondo" de esta misma
+    lección, no el taller.
+  - 🟠 `info.md` (Práctica de la Semana 6) seguía diciendo "la estructura de
+    datos de ejemplo de la semana anterior", que tras el intercambio ya no
+    apunta a la lección correcta — corregido a "Semana 4 (estructuras de datos
+    nativas)" explícito.
+  - 🟡 El gancho de apertura no coincidía con los valores reales del
+    Ejercicio 10 de `condicionales-y-bucles-lab.md` y presentaba
+    `"Llave inglesa"` como herramienta nueva cuando ya estaba en el taller —
+    corregido en lección y apuntes: mismos 6 valores del taller
+    (`["Martillo", "Taladro", "Sierra", "Destornillador", "Nivel", "Llave inglesa"]` /
+    `[5, 0, 2, 8, 0, 1]`), con `"Alicate"` como la herramienta genuinamente
+    nueva que llega.
+  - Hallazgos 🟡/🔵 restantes (6 diagramas Mermaid, salida partida en dos
+    bloques, referencia a "el taller" en vez de a la lección, valores de
+    `precios` distintos entre secciones, sugerencias de traceback/tildes/orden
+    de `set`) — **no corregidos en esta ronda**, a decisión explícita del
+    usuario; quedan como deuda menor documentada aquí.
+  - [x] `@reviewer` (2.ª pasada): CAMBIOS REQUERIDOS — 2 🟠 nuevos, ambos
+    causados por el propio fix de la 1.ª pasada — corregidos:
+    - El fix del gancho cambió las cantidades de Martillo/Destornillador/Taladro
+      pero el remate del cierre (construcción de la lista de diccionarios en
+      la lección y en los apuntes) seguía con las cantidades viejas
+      (`12/30/4`) — sincronizadas a `5/8/0`, coherentes con el gancho.
+    - Referencia obsoleta fuera del diff original en
+      `microdiseno/labs/variables-tipos-de-datos-y-operadores-docente.md:334`
+      ("Momento evaluativo 1 (Semana 4)") — actualizada a "(Semana 5)" +
+      mención de estructuras de datos nativas, coherente con el reordenamiento.
+  - [x] `@reviewer` (3.ª pasada): CAMBIOS REQUERIDOS — 2 🟠 nuevos, residuos
+    de la misma reescritura del gancho que las pasadas 1 y 2 no alcanzaron a
+    detectar (el hilo de números del inventario se corrigió tramo por tramo,
+    arrastrando el desajuste al siguiente) — corregidos con un barrido
+    completo de todos los números del hilo en ambos archivos:
+    - Pregunta socrática de cierre de los apuntes citaba `append(8)` (valor
+      anterior al fix del gancho) en vez de `append(15)`.
+    - El ejemplo de diccionario de la sección "Acceder por nombre" (un solo
+      producto "Taladro") seguía con `cantidad: 4`, mientras el gancho y el
+      remate de la misma sección ya decían `0` para Taladro — sincronizado a
+      `0` en lección y apuntes (mutación posterior a `3` sin cambios,
+      sigue siendo una demostración válida de mutabilidad).
+    - De paso, alineado el orden de productos del inventario de cierre entre
+      lección y apuntes (Martillo → Taladro → Destornillador en ambos),
+      hallazgo 🔵 de la misma pasada.
+  - [x] `@reviewer` (4.ª pasada): **✅ APROBADO** — barrido exhaustivo confirmó
+    que el hilo del inventario quedó completamente consistente entre lección
+    y apuntes, sin más residuos. La deuda 🟡 previa de "precios distintos
+    entre secciones" se reevaluó y se cierra: son subconjuntos del mismo
+    catálogo, sin contradicción real.
+  - Nota del reviewer, verificada por Claude tras el veredicto: ninguna de
+    las 7 preguntas del cuestionario reclama ser "el inventario de la
+    lección" (son ejemplos de código autocontenidos, algunos reutilizando
+    nombres de la Sección 2 sin cantidades) — no requieren ajuste.
+
+**Nota operativa:** el túnel SSH a `mirp-lab` (base de datos de desarrollo)
+estaba caído al llegar a E5; se reconectó siguiendo el procedimiento de
+`CLAUDE.md` — el stack de Supabase en `mirp-lab` ya estaba corriendo, solo
+faltaba el túnel.
+
+---
+
+## Despliegue — `programacion-cientifica`
+
+| Paso | Estado | Fecha / detalle |
+|---|---|---|
+| D0 · Alcance y checklist pre-despliegue | ⬜ | |
+| D1 · Lecciones nuevas cerradas por adelantado | ⬜ | |
+| D2 · Merge a `main` y deploy en Vercel | ⬜ | rama `deploy/semana-04` (compartida si coincide con el deploy de ED) |
+| D3 · Banco de preguntas replicado a producción | ⬜ | keywords `listas`/`tuplas`/`diccionarios`/`conjuntos` + 7 preguntas |
+| D4 · Lecciones abiertas a los estudiantes | ⬜ | `programacion-cientifica` → `estructuras-de-datos-nativas` |
+| D5 · Verificación end-to-end en producción | ⬜ | |
+| D6 · Bitácora cerrada y rama `deploy/` borrada | ⬜ | |
+
+- [ ] Verificado que las lecciones de semanas futuras siguen **cerradas**
+
+## Pendientes — `programacion-cientifica`
+
+- Invocar `@reviewer` sobre el diff contra `development` (E9) antes de
+  solicitar el merge.
+- Replicar keywords y preguntas del cuestionario a producción (D3) cuando se
+  autorice el despliegue.

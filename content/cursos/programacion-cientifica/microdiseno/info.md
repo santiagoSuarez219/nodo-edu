@@ -24,8 +24,8 @@ Al no tener prerrequisitos en el pensum, el curso recibe estudiantes de primer s
 
 | Actividad                                                                             | Porcentaje | Fecha                            |
 | ---------------------------------------------------------------------------------------- | ---------- | ---------------------------------- |
-| **Momento evaluativo 1:** Programación con Python — variables, condicionales, bucles     | 15%        | Semana 4 — jueves 27 de agosto de 2026     |
-| **Momento evaluativo 2:** Estructuras de datos + POO                                     | 15%        | Semana 8 — jueves 24 de septiembre de 2026     |
+| **Momento evaluativo 1:** Programación con Python — variables, condicionales, bucles, estructuras de datos nativas | 15%        | Semana 5 — jueves 3 de septiembre de 2026     |
+| **Momento evaluativo 2:** POO                                                            | 15%        | Semana 8 — jueves 24 de septiembre de 2026     |
 | **Momento evaluativo 3:** NumPy                                                          | 15%        | Semana 11 — jueves 15 de octubre de 2026    |
 | **Momento evaluativo 4:** Pandas (aplicado al proyecto integrador)                       | 15%        | Semana 14 — jueves 5 de noviembre de 2026    |
 | **Momento evaluativo 5:** Matplotlib y Seaborn (portafolio + presentación del proyecto)  | 20%        | Semana 16 — jueves 19 de noviembre de 2026    |
@@ -159,17 +159,9 @@ Para bajar la carga de decisión, especialmente a estudiantes de primer semestre
 
 ---
 
-## Semana 4 ★ — Momento evaluativo 1: Programación con Python (15%)
-
-**Sesión evaluativa**
-- Taller individual: ejercicios que combinan variables, condicionales y bucles aplicados a un problema sencillo, sobre un dataset de juguete provisto por el docente
-- Evaluación mediante rúbrica: corrección lógica del código, manejo de estructuras de control, legibilidad y documentación básica
-
----
-
 ## Módulo 3 — Estructuras de datos y funciones en Python
 
-### Semana 5 — Estructuras de datos nativas
+### Semana 4 — Estructuras de datos nativas
 
 **Sesión**
 - Listas, tuplas, diccionarios y conjuntos: creación, acceso, métodos comunes
@@ -181,6 +173,16 @@ Para bajar la carga de decisión, especialmente a estudiantes de primer semestre
 
 **◇ Seguimiento:** ejercicios de clase resueltos en el notebook
 
+---
+
+## Semana 5 ★ — Momento evaluativo 1: Programación con Python + Estructuras de datos (15%)
+
+**Sesión evaluativa**
+- Taller individual: ejercicios que combinan variables, condicionales, bucles y estructuras de datos nativas (listas, tuplas, diccionarios, conjuntos) aplicados a un problema sencillo, sobre un dataset de juguete provisto por el docente
+- Evaluación mediante rúbrica: corrección lógica del código, manejo de estructuras de control, uso adecuado de las estructuras de datos nativas, legibilidad y documentación básica
+
+---
+
 ### Semana 6 — Funciones
 
 **Sesión**
@@ -189,7 +191,7 @@ Para bajar la carga de decisión, especialmente a estudiantes de primer semestre
 - Alcance de variables (scope) y buenas prácticas de modularización
 
 **Práctica**
-- Taller de funciones aplicado al procesamiento de la estructura de datos de ejemplo de la semana anterior
+- Taller de funciones aplicado al procesamiento de la estructura de datos de ejemplo de la Semana 4 (estructuras de datos nativas)
 
 **◇ Seguimiento:** taller de funciones resuelto en el notebook
 
@@ -212,11 +214,11 @@ Para bajar la carga de decisión, especialmente a estudiantes de primer semestre
 
 ---
 
-## Semana 8 ★ — Momento evaluativo 2: Estructuras de datos + POO (15%)
+## Semana 8 ★ — Momento evaluativo 2: POO (15%)
 
 **Sesión evaluativa**
-- Taller aplicado a un caso de análisis: combina estructuras de datos nativas, funciones y al menos una clase, sobre un dataset de juguete provisto por el docente
-- Evaluación mediante rúbrica: uso adecuado de estructuras y clases, lógica del código y documentación
+- Taller aplicado a un caso de análisis: modela al menos una clase con sus atributos y métodos, aplicada sobre un dataset de juguete provisto por el docente
+- Evaluación mediante rúbrica: uso adecuado de clases y encapsulamiento, lógica del código y documentación
 
 ---
 
