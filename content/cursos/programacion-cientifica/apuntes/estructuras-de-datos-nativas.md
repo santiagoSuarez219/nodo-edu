@@ -154,7 +154,7 @@ Primero, un solo producto como diccionario:
 producto = {
     "nombre": "Taladro",
     "precio": 189900.0,
-    "cantidad": 4,
+    "cantidad": 0,
 }
 
 print(producto["precio"])
@@ -199,8 +199,8 @@ Escribir cada producto con el grupo, uno a la vez:
 ```python
 inventario = [
     {"nombre": "Martillo", "precio": 15990.0, "cantidad": 5},
-    {"nombre": "Destornillador", "precio": 8990.0, "cantidad": 8},
     {"nombre": "Taladro", "precio": 189900.0, "cantidad": 0},
+    {"nombre": "Destornillador", "precio": 8990.0, "cantidad": 8},
 ]
 
 # agregar la herramienta nueva del paso 1, ahora sin riesgo de desalinear nada:
@@ -212,8 +212,8 @@ for herramienta in inventario:
 
 ```text
 Martillo: 5 unidades a $15990.0
-Destornillador: 8 unidades a $8990.0
 Taladro: 0 unidades a $189900.0
+Destornillador: 8 unidades a $8990.0
 Alicate: 15 unidades a $22000.0
 ```
 
@@ -364,7 +364,7 @@ final combina las cuatro, cada una en el rol para el que sirve mejor.
   riesgo de memorizar qué posición es cada dato que tenían las listas
   paralelas. Le falta el acceso por nombre que sí da el diccionario.
 
-- **Si `cantidades_herramientas.append(8)` nunca se hubiera olvidado en el
+- **Si `cantidades_herramientas.append(15)` nunca se hubiera olvidado en el
   paso 1, ¿seguiría siendo un mal diseño usar dos listas paralelas?**
   Respuesta esperada: sí — el riesgo de desalineación no depende de si el
   error ya ocurrió, sino de que nada en el lenguaje garantiza que las dos

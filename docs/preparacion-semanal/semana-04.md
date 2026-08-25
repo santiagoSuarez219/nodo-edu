@@ -376,7 +376,22 @@ No aplica — la Semana 4 ya no está marcada `★` tras el reordenamiento.
       `microdiseno/labs/variables-tipos-de-datos-y-operadores-docente.md:334`
       ("Momento evaluativo 1 (Semana 4)") — actualizada a "(Semana 5)" +
       mención de estructuras de datos nativas, coherente con el reordenamiento.
-  - [ ] `@reviewer` (3.ª pasada): pendiente
+  - [x] `@reviewer` (3.ª pasada): CAMBIOS REQUERIDOS — 2 🟠 nuevos, residuos
+    de la misma reescritura del gancho que las pasadas 1 y 2 no alcanzaron a
+    detectar (el hilo de números del inventario se corrigió tramo por tramo,
+    arrastrando el desajuste al siguiente) — corregidos con un barrido
+    completo de todos los números del hilo en ambos archivos:
+    - Pregunta socrática de cierre de los apuntes citaba `append(8)` (valor
+      anterior al fix del gancho) en vez de `append(15)`.
+    - El ejemplo de diccionario de la sección "Acceder por nombre" (un solo
+      producto "Taladro") seguía con `cantidad: 4`, mientras el gancho y el
+      remate de la misma sección ya decían `0` para Taladro — sincronizado a
+      `0` en lección y apuntes (mutación posterior a `3` sin cambios,
+      sigue siendo una demostración válida de mutabilidad).
+    - De paso, alineado el orden de productos del inventario de cierre entre
+      lección y apuntes (Martillo → Taladro → Destornillador en ambos),
+      hallazgo 🔵 de la misma pasada.
+  - [ ] `@reviewer` (4.ª pasada): pendiente
 
 **Nota operativa:** el túnel SSH a `mirp-lab` (base de datos de desarrollo)
 estaba caído al llegar a E5; se reconectó siguiendo el procedimiento de
