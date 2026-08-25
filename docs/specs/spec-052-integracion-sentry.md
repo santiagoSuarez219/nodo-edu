@@ -167,27 +167,27 @@ Configuración de MCPs"), y este spec activa Sentry únicamente en producción.
 ## Fases de implementación
 
 ### Fase 1 — Dependencia, variables de entorno y gate de activación
-- [ ] Instalar `@sentry/nextjs` con `npm install @sentry/nextjs` — queda en
+- [x] Instalar `@sentry/nextjs` con `npm install @sentry/nextjs` — queda en
       `dependencies` (se ejecuta en runtime de producción, no es herramienta de
-      build). Confirmar que `package-lock.json` entra en el commit.
-- [ ] Agregar a `.env.example`, en el bloque "Variables de la APP", la entrada
+      build). `package-lock.json` entra en el commit.
+- [x] Agregar a `.env.example`, en el bloque "Variables de la APP", la entrada
       `NEXT_PUBLIC_SENTRY_DSN=` **sin valor**, con un comentario que indique:
       dónde se obtiene (Sentry → proyecto `nodo-edu` → *Settings → Client Keys
       (DSN)*), que **solo** se carga en Vercel → *Settings → Environment
       Variables* con alcance `Production`, y que **no debe ponerse en
       `.env.local`** — hacerlo activaría el reporte desde la máquina de
       desarrollo (ver D1).
-- [ ] Crear `lib/observability/sentry-enabled.ts`: única fuente de verdad del
+- [x] Crear `lib/observability/sentry-enabled.ts`: única fuente de verdad del
       gate, exportando el DSN y un booleano `isSentryEnabled`. Regla (D1):
       **activo solo si hay DSN y `NODE_ENV === "production"`**. Sin `any`, sin
       non-null assertions sobre `process.env` (a diferencia de
       `lib/auth/server.ts`: aquí la ausencia del DSN es un estado válido, no un
       error de configuración).
-- [ ] Agregar `.sentryclirc` a `.gitignore` (el CLI de Sentry puede generarlo
+- [x] Agregar `.sentryclirc` a `.gitignore` (el CLI de Sentry puede generarlo
       con un token dentro).
-- [ ] Verificar que **no** aparece el DSN literal en ningún archivo rastreado:
-      `git grep -n "ingest.us.sentry.io"` debe devolver vacío salvo, como mucho,
-      este spec y el archivo de pruebas.
+- [x] Verificar que **no** aparece el DSN literal en ningún archivo rastreado:
+      `git grep -n "ingest.us.sentry.io"` devuelve vacío salvo este spec y el
+      archivo de pruebas.
 
 ### Fase 2 — Captura server-side (Node + Edge)
 - [ ] Crear `sentry.server.config.ts` con `Sentry.init({ dsn, enabled, environment: "production", tracesSampleRate: 0, sendDefaultPii: false, beforeSend })`.
