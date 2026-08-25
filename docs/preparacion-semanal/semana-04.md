@@ -259,8 +259,8 @@ de codificación, preparado fuera de esta ronda).
 
 ## Ronda — `programacion-cientifica` (2026-08-25)
 
-**Rama:** `feat/semana-04-programacion-cientifica`
-**Estado:** ⬜ En preparación (E7 completo, pendiente E9 — revisión y merge)
+**Rama:** `feat/semana-04-programacion-cientifica` (mergeada a `development` y borrada)
+**Estado:** ✅ Mergeada a `development` — pendiente despliegue a producción
 
 > Ronda independiente de la de `estructuras-de-datos` de arriba, en el mismo
 > archivo por compartir semana calendario. No se tocó ninguna sesión de
@@ -391,7 +391,15 @@ No aplica — la Semana 4 ya no está marcada `★` tras el reordenamiento.
     - De paso, alineado el orden de productos del inventario de cierre entre
       lección y apuntes (Martillo → Taladro → Destornillador en ambos),
       hallazgo 🔵 de la misma pasada.
-  - [ ] `@reviewer` (4.ª pasada): pendiente
+  - [x] `@reviewer` (4.ª pasada): **✅ APROBADO** — barrido exhaustivo confirmó
+    que el hilo del inventario quedó completamente consistente entre lección
+    y apuntes, sin más residuos. La deuda 🟡 previa de "precios distintos
+    entre secciones" se reevaluó y se cierra: son subconjuntos del mismo
+    catálogo, sin contradicción real.
+  - Nota del reviewer, verificada por Claude tras el veredicto: ninguna de
+    las 7 preguntas del cuestionario reclama ser "el inventario de la
+    lección" (son ejemplos de código autocontenidos, algunos reutilizando
+    nombres de la Sección 2 sin cantidades) — no requieren ajuste.
 
 **Nota operativa:** el túnel SSH a `mirp-lab` (base de datos de desarrollo)
 estaba caído al llegar a E5; se reconectó siguiendo el procedimiento de
