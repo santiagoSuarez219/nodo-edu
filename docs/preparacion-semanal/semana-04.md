@@ -417,14 +417,12 @@ faltaba el túnel.
 | D2 · Merge a `main` y deploy en Vercel | ✅ | rama `deploy/semana-04-programacion-cientifica` → `main` (`202757e`), push confirmado por el usuario con build verde en Vercel |
 | D3 · Banco de preguntas replicado a producción | ✅ | Antes de crear: se encontraron y **eliminaron 13 preguntas `code_write` de otro tema** (búsqueda lineal/binaria, ordenamiento, matrices) montadas por error en esta lección desde el 2026-07-30 — a pedido explícito del usuario. Keyword nueva: `conjuntos` (las otras 3 ya existían en prod desde el 2026-08-07). 7 preguntas creadas, publicadas y montadas (orden 0–6), IDs: `e4e24a38-62fc-41e6-995a-c17768f02be8`, `b9e061ec-c6fc-4bc7-8c34-1a9d87a28706`, `a1669c44-b4f1-4eb3-b7cd-fc1bcec71590`, `1207dcb1-1520-4981-9490-a3c397a4316a`, `6db3e5f6-c83a-414d-bd17-777e9fa3e292`, `8e56e230-709f-4c02-8407-d18292dac840`, `3eb431ae-676e-4d16-9cfc-886cc7b0df0f` |
 | D4 · Lecciones abiertas a los estudiantes | ✅ | `programacion-cientifica` → `estructuras-de-datos-nativas` abierta (2026-08-25). Confirmado que `funciones` y siguientes siguen cerradas |
-| D5 · Verificación end-to-end en producción | ⬜ | El usuario la revisa directamente en `nod0.dev`, fuera de esta sesión |
+| D5 · Verificación end-to-end en producción | ✅ | Confirmado por el usuario en `nod0.dev`: lección, diagramas y autoevaluación cargan correctamente (2026-08-25) |
 | D6 · Bitácora cerrada y rama `deploy/` borrada | ✅ | Rama local `deploy/semana-04-programacion-cientifica` — pendiente borrar (ver Pendientes) |
 
 - [x] Verificado que las lecciones de semanas futuras siguen **cerradas**
 
 ## Pendientes — `programacion-cientifica`
 
-- Borrar la rama local `deploy/semana-04-programacion-cientifica` (ya no
-  hace falta: el merge a `main` está hecho y pusheado).
-- El usuario verificará manualmente en `nod0.dev` que la lección, los
-  diagramas Mermaid y la autoevaluación cargan correctamente (D5).
+Ninguno. Ronda cerrada: mergeada, desplegada, banco de preguntas replicado,
+lección abierta y verificada end-to-end en producción por el usuario.
