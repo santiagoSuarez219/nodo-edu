@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import * as Sentry from "@sentry/nextjs";
 import { ErrorState } from "@/components/ErrorState";
 
 // Captura fallos de render en servidor de la página de lección (las llamadas
@@ -16,6 +17,9 @@ export default function LessonError({
 }) {
   useEffect(() => {
     console.error("Error al cargar la lección:", error);
+    Sentry.captureException(error, {
+      tags: { boundary: "lesson", digest: error.digest },
+    });
   }, [error]);
 
   return (

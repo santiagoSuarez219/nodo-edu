@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import * as Sentry from "@sentry/nextjs";
 import { ErrorState } from "@/components/ErrorState";
 
 // Red de seguridad general: cubre cualquier ruta sin un error.tsx propio
@@ -15,6 +16,9 @@ export default function Error({
 }) {
   useEffect(() => {
     console.error("Error de renderizado:", error);
+    Sentry.captureException(error, {
+      tags: { boundary: "root", digest: error.digest },
+    });
   }, [error]);
 
   return (

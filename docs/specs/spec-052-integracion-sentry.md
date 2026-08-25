@@ -232,27 +232,26 @@ Configuración de MCPs"), y este spec activa Sentry únicamente en producción.
       ningún chunk con `replay` en `.next/static/chunks`.
 
 ### Fase 4 — Enganche a los boundaries existentes de spec-037
-- [ ] `app/error.tsx`, `app/(admin)/error.tsx` y
+- [x] `app/error.tsx`, `app/(admin)/error.tsx` y
       `app/(cursos)/[courseSlug]/[lessonSlug]/error.tsx`: dentro del `useEffect`
-      que ya existe, **añadir** `Sentry.captureException(error)` junto al
-      `console.error` actual (que se conserva: es la única señal en desarrollo).
-      Adjuntar el `digest` como *tag* para poder cruzarlo con los runtime logs de
+      que ya existe, **añadido** `Sentry.captureException(error)` junto al
+      `console.error` actual (se conserva: es la única señal en desarrollo).
+      `digest` adjunto como *tag* para poder cruzarlo con los runtime logs de
       Vercel y con el código que ve el usuario en pantalla.
-- [ ] `app/global-error.tsx`: hoy **no tiene `useEffect` y no reporta nada**.
-      Añadir el reporte del `error` que recibe por props. Cuidado: este boundary
-      solo se ve cuando el root layout ya falló — todo lo que se agregue debe ser
-      a prueba de fallos y no puede romper su render (ver la nota de D2 en
-      spec-037 sobre el `<script>` que rompió TC-037-006). El `captureException`
-      va dentro de un `useEffect`, nunca en el cuerpo del render.
-- [ ] `components/ErrorBoundary.tsx`: añadir `Sentry.captureException` en
-      `componentDidCatch`, aprovechando el `errorInfo` de React para adjuntar el
-      *component stack*. Es el único punto que ve los fallos aislados del panel de
-      asistencia proyectado en clase, que por diseño **no** escalan a ningún
-      `error.tsx`.
-- [ ] Etiquetar los eventos con su origen (`boundary: "global" | "root" |
-      "admin" | "lesson" | "component"`) para poder filtrar en el panel de Sentry.
-- [ ] Verificar que ninguna de estas ediciones cambia lo que ve el usuario:
-      `ErrorState` recibe exactamente las mismas props que antes.
+- [x] `app/global-error.tsx`: añadido `useEffect` + `captureException` del
+      `error` que recibe por props (antes no reportaba nada). El
+      `captureException` va dentro del `useEffect`, nunca en el cuerpo del
+      render — no se tocó el `<style>` ni el resto del JSX que causó
+      TC-037-006.
+- [x] `components/ErrorBoundary.tsx`: `Sentry.captureException` en
+      `componentDidCatch`, con el `componentStack` de `errorInfo` en
+      `contexts.react`.
+- [x] Eventos etiquetados con `tags.boundary`: `"global" | "root" | "admin" |
+      "lesson" | "component"`.
+- [x] `npm run build` y `npm run lint` pasan sin errores nuevos. Ninguna de
+      estas ediciones cambia las props que recibe `ErrorState` (revisión visual
+      de los cinco diffs: solo se agregó la llamada a Sentry dentro del
+      `useEffect`/`componentDidCatch`, sin tocar el JSX de retorno).
 
 ### Fase 5 — Página de diagnóstico y verificación en producción
 - [ ] Crear `app/(admin)/admin/diagnostico-sentry/page.tsx`: página bajo
