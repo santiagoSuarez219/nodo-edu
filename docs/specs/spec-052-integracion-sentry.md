@@ -217,18 +217,19 @@ Configuración de MCPs"), y este spec activa Sentry únicamente en producción.
       contra el servidor real queda en `TC-052-003`, ronda manual).
 
 ### Fase 3 — Captura client-side
-- [ ] Crear `instrumentation-client.ts` en la raíz (convención de Next 15.3+ /
+- [x] Crear `instrumentation-client.ts` en la raíz (convención de Next 15.3+ /
       Next 16; sustituye al antiguo `sentry.client.config.ts`) con el mismo
       `Sentry.init` gateado por `isSentryEnabled`.
-- [ ] Confirmar explícitamente que **no** se importa
-      `Sentry.replayIntegration()` ni `browserTracingIntegration()`: fuera de
-      alcance y ambos engordan el bundle del cliente.
-- [ ] Exportar `onRouterTransitionStart` desde `instrumentation-client.ts`
-      (`Sentry.captureRouterTransitionStart`) solo si el SDK lo requiere para no
-      emitir avisos en build; con tracing apagado no aporta datos.
-- [ ] Comprobar el peso añadido al bundle del cliente (`npm run build`) y
-      registrarlo en el spec al cerrar la fase, para tener el dato si más
-      adelante se evalúa Replay.
+- [x] Confirmado: `git grep -n "replayIntegration\|browserTracingIntegration"`
+      no devuelve coincidencias en código (solo en este spec y en el archivo de
+      pruebas, que las mencionan como texto).
+- [x] Exportado `onRouterTransitionStart` desde `instrumentation-client.ts`
+      (`Sentry.captureRouterTransitionStart`) para no emitir avisos de build.
+- [x] `npm run build` (Turbopack) pasa sin errores ni avisos de Sentry. La
+      salida de Next 16/Turbopack no imprime la tabla clásica de *First Load
+      JS*, así que el peso exacto del SDK queda pendiente de medir con
+      DevTools → Network en la ronda manual (`TC-052-010`); no se detecta
+      ningún chunk con `replay` en `.next/static/chunks`.
 
 ### Fase 4 — Enganche a los boundaries existentes de spec-037
 - [ ] `app/error.tsx`, `app/(admin)/error.tsx` y
