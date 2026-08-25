@@ -20,38 +20,38 @@ updatedAt: "2026-08-25"
 En el taller de la semana pasada, el inventario de la ferretería quedó representado con dos listas paralelas:
 
 ```python
-nombres_herramientas = ["Martillo", "Destornillador", "Taladro"]
-cantidades_herramientas = [12, 30, 4]
+nombres_herramientas = ["Martillo", "Taladro", "Sierra", "Destornillador", "Nivel", "Llave inglesa"]
+cantidades_herramientas = [5, 0, 2, 8, 0, 1]
 ```
 
-Para saber cuántas unidades hay de `"Taladro"`, buscas su posición en la primera lista (índice `2`) y usas ese mismo índice en la segunda. Funciona, hasta que llega una herramienta nueva:
+Para saber cuántas unidades hay de `"Destornillador"`, buscas su posición en la primera lista (índice `3`) y usas ese mismo índice en la segunda. Funciona, hasta que llega una herramienta nueva:
 
 ```python
-nombres_herramientas.append("Llave inglesa")
+nombres_herramientas.append("Alicate")
 # se te olvidó esta línea:
-# cantidades_herramientas.append(8)
+# cantidades_herramientas.append(15)
 ```
 
-Ahora `nombres_herramientas` tiene 4 elementos y `cantidades_herramientas` sigue con 3. El índice `3` de nombres apunta a `"Llave inglesa"`, pero ese mismo índice ya no existe en cantidades — y si existiera, apuntaría a un número que no le corresponde. Nada en Python te avisa de este error: el programa sigue corriendo con datos desalineados.
+Ahora `nombres_herramientas` tiene 7 elementos y `cantidades_herramientas` sigue con 6. El índice `6` de nombres apunta a `"Alicate"`, pero ese mismo índice ya no existe en cantidades — y si existiera, apuntaría a un número que no le corresponde. Nada en Python te avisa de este error: el programa sigue corriendo con datos desalineados.
 
 ```mermaid
 flowchart LR
   subgraph N["nombres_herramientas"]
-    n0["0: Martillo"]
-    n1["1: Destornillador"]
-    n2["2: Taladro"]
-    n3["3: Llave inglesa"]
+    n3["3: Destornillador"]
+    n4["4: Nivel"]
+    n5["5: Llave inglesa"]
+    n6["6: Alicate"]
   end
   subgraph C["cantidades_herramientas"]
-    c0["0: 12"]
-    c1["1: 30"]
-    c2["2: 4"]
-    c3["3: ???"]
+    c3["3: 8"]
+    c4["4: 0"]
+    c5["5: 1"]
+    c6["6: ???"]
   end
-  n0 -.->|"mismo indice"| c0
-  n1 -.->|"mismo indice"| c1
-  n2 -.->|"mismo indice"| c2
-  n3 -.->|"desalineado"| c3
+  n3 -.->|"mismo indice"| c3
+  n4 -.->|"mismo indice"| c4
+  n5 -.->|"mismo indice"| c5
+  n6 -.->|"desalineado"| c6
 ```
 
 El problema de fondo no es el `append` olvidado: es que el nombre y la cantidad de una misma herramienta viven en dos contenedores distintos, unidos solo por una coincidencia de posición que tú tienes que mantener a mano. Lo que necesitas es una forma de agrupar nombre, precio y cantidad de **un mismo producto** en una sola unidad — y, por separado, una forma de garantizar que una lista de clientes no repita a nadie. Python resuelve ambos problemas con cuatro estructuras nativas: lista, tupla, diccionario y conjunto.
@@ -237,7 +237,7 @@ Esto resuelve la segunda mitad del problema de entrada: contar clientes distinto
 
 ## Comprensión de listas: construir una lista a partir de otra, en una línea
 
-En el taller de condicionales y bucles construiste listas nuevas recorriendo una lista existente con `for` y acumulando en `append`:
+Ya viste `append` en la sección de la lista: agrega un elemento al final. Repitiendo esa misma operación dentro de un `for`, puedes construir una lista nueva a partir de otra que ya tienes:
 
 ```python
 precios = [15990.0, 189900.0, 25000.0, 8990.0]

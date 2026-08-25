@@ -13,23 +13,23 @@ Reproducir en vivo, en una celda de Colab, el inventario tal como quedó en
 el taller pasado:
 
 ```python
-nombres_herramientas = ["Martillo", "Destornillador", "Taladro"]
-cantidades_herramientas = [12, 30, 4]
+nombres_herramientas = ["Martillo", "Taladro", "Sierra", "Destornillador", "Nivel", "Llave inglesa"]
+cantidades_herramientas = [5, 0, 2, 8, 0, 1]
 
-# para saber cuantas unidades hay de "Taladro":
-indice = nombres_herramientas.index("Taladro")
+# para saber cuantas unidades hay de "Destornillador":
+indice = nombres_herramientas.index("Destornillador")
 print(cantidades_herramientas[indice])
 ```
 
 ```text
-4
+8
 ```
 
 Ahora, simular que llega una herramienta nueva y **cometer el error a
 propósito**, sin corregirlo todavía:
 
 ```python
-nombres_herramientas.append("Llave inglesa")
+nombres_herramientas.append("Alicate")
 # ejecutar la celda anterior y detenerse aqui: NO agregar el append
 # correspondiente en cantidades_herramientas todavia
 
@@ -39,18 +39,18 @@ print(len(nombres_herramientas), len(cantidades_herramientas))
 ```
 
 ```text
-['Martillo', 'Destornillador', 'Taladro', 'Llave inglesa']
-[12, 30, 4]
-4 3
+['Martillo', 'Taladro', 'Sierra', 'Destornillador', 'Nivel', 'Llave inglesa', 'Alicate']
+[5, 0, 2, 8, 0, 1]
+7 6
 ```
 
 Punto a resaltar: Python **no lanza ningún error**. El programa sigue
 corriendo con dos listas de largo distinto. Preguntar al grupo qué pasaría
-si alguien intenta `cantidades_herramientas[3]` ahora mismo — ejecutarlo en
+si alguien intenta `cantidades_herramientas[6]` ahora mismo — ejecutarlo en
 vivo y mostrar el `IndexError`:
 
 ```python
-print(cantidades_herramientas[3])
+print(cantidades_herramientas[6])
 ```
 
 ```text
@@ -61,7 +61,7 @@ Cerrar el paso agregando el `append` que faltaba, para dejar el estado
 consistente antes de seguir:
 
 ```python
-cantidades_herramientas.append(8)   # ahora si, las dos listas quedan alineadas
+cantidades_herramientas.append(15)   # ahora si, las dos listas quedan alineadas
 ```
 
 Punto a resaltar: el error de fondo no es haberse olvidado una línea — es
@@ -204,7 +204,7 @@ inventario = [
 ]
 
 # agregar la herramienta nueva del paso 1, ahora sin riesgo de desalinear nada:
-inventario.append({"nombre": "Llave inglesa", "precio": 22000.0, "cantidad": 8})
+inventario.append({"nombre": "Alicate", "precio": 22000.0, "cantidad": 15})
 
 for herramienta in inventario:
     print(f"{herramienta['nombre']}: {herramienta['cantidad']} unidades a ${herramienta['precio']}")
@@ -214,7 +214,7 @@ for herramienta in inventario:
 Martillo: 12 unidades a $15990.0
 Destornillador: 30 unidades a $8990.0
 Taladro: 4 unidades a $189900.0
-Llave inglesa: 8 unidades a $22000.0
+Alicate: 15 unidades a $22000.0
 ```
 
 Punto a resaltar: volver explícitamente al paso 1. Ahora agregar una
@@ -268,8 +268,8 @@ print(clientes_lunes & clientes_martes)   # interseccion: en ambos dias
 
 ## Paso 6 — Comprensión de listas
 
-Primero, el patrón conocido `for` + `append`, para tenerlo en pantalla antes
-de comprimirlo:
+Primero, el patrón `for` + `append` del Paso 2 aplicado a construir una lista
+nueva, para tenerlo en pantalla antes de comprimirlo:
 
 ```python
 precios = [15990.0, 189900.0, 25000.0, 8990.0]

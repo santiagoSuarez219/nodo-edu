@@ -345,7 +345,28 @@ No aplica — la Semana 4 ya no está marcada `★` tras el reordenamiento.
 - [x] Checklist de `lesson-authoring` §8 recorrido: sin `# H1`/`###` sueltos, `updatedAt` de hoy, 5 diagramas Mermaid (etiquetas entre comillas, cierres `end` correctos), `$`/`{`/`<` siempre dentro de código o backticks, sin JSX no autorizado, apuntes sin entrada TS ni guía creada
 - [x] `summary` presente en frontmatter **y** en registro TS
 - [x] Coherencia cruzada: la lección retoma el gancho de `condicionales-y-bucles-lab` (listas paralelas de la ferretería), los apuntes siguen el mismo dominio y orden que la lección, y el cuestionario cubre las 4 estructuras + comprensión de listas con una pregunta de aplicación combinada (P7) alineada con el nuevo Momento evaluativo 1
-- [ ] `@reviewer`: pendiente (E9)
+- [x] `@reviewer` (1.ª pasada): CAMBIOS REQUERIDOS (2 🟠, varios 🟡/🔵) — corregidos:
+  - 🟠 Afirmación falsa de que el taller de la Semana 3 usó `append` (no aparece
+    en ningún artefacto previo del curso) — reformulada en la lección y en los
+    apuntes para referenciar la sección "La lista a fondo" de esta misma
+    lección, no el taller.
+  - 🟠 `info.md` (Práctica de la Semana 6) seguía diciendo "la estructura de
+    datos de ejemplo de la semana anterior", que tras el intercambio ya no
+    apunta a la lección correcta — corregido a "Semana 4 (estructuras de datos
+    nativas)" explícito.
+  - 🟡 El gancho de apertura no coincidía con los valores reales del
+    Ejercicio 10 de `condicionales-y-bucles-lab.md` y presentaba
+    `"Llave inglesa"` como herramienta nueva cuando ya estaba en el taller —
+    corregido en lección y apuntes: mismos 6 valores del taller
+    (`["Martillo", "Taladro", "Sierra", "Destornillador", "Nivel", "Llave inglesa"]` /
+    `[5, 0, 2, 8, 0, 1]`), con `"Alicate"` como la herramienta genuinamente
+    nueva que llega.
+  - Hallazgos 🟡/🔵 restantes (6 diagramas Mermaid, salida partida en dos
+    bloques, referencia a "el taller" en vez de a la lección, valores de
+    `precios` distintos entre secciones, sugerencias de traceback/tildes/orden
+    de `set`) — **no corregidos en esta ronda**, a decisión explícita del
+    usuario; quedan como deuda menor documentada aquí.
+  - [ ] `@reviewer` (2.ª pasada): pendiente
 
 **Nota operativa:** el túnel SSH a `mirp-lab` (base de datos de desarrollo)
 estaba caído al llegar a E5; se reconectó siguiendo el procedimiento de

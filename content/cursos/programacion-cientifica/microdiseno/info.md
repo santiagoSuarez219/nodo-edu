@@ -191,7 +191,7 @@ Para bajar la carga de decisión, especialmente a estudiantes de primer semestre
 - Alcance de variables (scope) y buenas prácticas de modularización
 
 **Práctica**
-- Taller de funciones aplicado al procesamiento de la estructura de datos de ejemplo de la semana anterior
+- Taller de funciones aplicado al procesamiento de la estructura de datos de ejemplo de la Semana 4 (estructuras de datos nativas)
 
 **◇ Seguimiento:** taller de funciones resuelto en el notebook
 
