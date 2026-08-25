@@ -84,6 +84,8 @@ export const programacionCientifica: Course = {
       articleSlug: "estructuras-de-datos-nativas",
       order: 4,
       title: "Estructuras de datos nativas",
+      summary:
+        "Agrupa nombre, precio y cantidad de un mismo producto en una sola unidad con listas, tuplas, diccionarios y conjuntos, y construye listas en una línea con comprensión de listas.",
       topics: [
         { title: "Listas, tuplas, diccionarios y conjuntos: creación, acceso, métodos comunes" },
         { title: "Comprensión de listas (list comprehensions): introducción" },

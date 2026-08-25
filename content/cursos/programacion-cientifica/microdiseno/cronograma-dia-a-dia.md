@@ -21,11 +21,11 @@
 | 1  | **jue. 6 ago**  | Git, GitHub, Google Colab y diagnóstico inicial |  | — |
 | 2  | **jue. 13 ago** | Variables, tipos de datos y operadores |  | — |
 | 3  | **jue. 20 ago** | Condicionales y bucles |  | — |
-| 4  | **jue. 27 ago** | — | ★ **Momento evaluativo 1** — Programación con Python (15%) | — |
-| 5  | **jue. 3 sep**  | Estructuras de datos nativas | | Coincide con "Primera evaluación de estudiantes a docentes" (31 ago–5 sep) — no afecta la clase |
+| 4  | **jue. 27 ago** | Estructuras de datos nativas |  | — |
+| 5  | **jue. 3 sep**  | — | ★ **Momento evaluativo 1** — Programación con Python + Estructuras de datos (15%) | Coincide con "Primera evaluación de estudiantes a docentes" (31 ago–5 sep) — no afecta la clase |
 | 6  | **jue. 10 sep** | Funciones |  | — |
 | 7  | **jue. 17 sep** | Programación orientada a objetos |  | — |
-| 8  | **jue. 24 sep** | — | ★ **Momento evaluativo 2** — Estructuras de datos + POO (15%) | — |
+| 8  | **jue. 24 sep** | — | ★ **Momento evaluativo 2** — POO (15%) | — |
 | 9  | **jue. 1 oct**  | NumPy: arreglos y dimensiones |  | — |
 | 10 | **jue. 8 oct**  | NumPy: operaciones vectorizadas y álgebra lineal |  | — |
 | 11 | **jue. 15 oct** | — | ★ **Momento evaluativo 3** — NumPy (15%) | Justo antes de "Evaluaciones institucionales" (16–20 oct) |

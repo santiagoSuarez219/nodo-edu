@@ -331,9 +331,10 @@ estudiante lo hace en su propio notebook):
 - Recordar que la Semana 3 introduce condicionales (`if`/`elif`/`else`) y
   bucles (`for`/`while`), que se apoyan directamente en los operadores de
   comparación y lógicos practicados hoy.
-- Anunciar que el Momento evaluativo 1 (Semana 4) combina variables,
-  condicionales y bucles sobre un dataset nuevo — lo visto hoy es parte de
-  esa base, sin ser en sí mismo evaluado con nota.
+- Anunciar que el Momento evaluativo 1 (Semana 5) combina variables,
+  condicionales, bucles y estructuras de datos nativas sobre un dataset
+  nuevo — lo visto hoy es parte de esa base, sin ser en sí mismo evaluado
+  con nota.
 
 ## Materiales y preparación previa
 
