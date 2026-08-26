@@ -220,8 +220,14 @@ DSN inyectado por línea de comandos.
   detrás. Esta es la regresión concreta que este caso vigila — TC-037-006 ya
   falló una vez por añadirle algo a este archivo.
 - En Sentry aparece el issue con etiqueta de origen `boundary: global`.
-**Estado:** ⬜ Pendiente / ✅ Aprobado / ❌ Fallido
-**Hallazgos:** {{observaciones}}
+**Estado:** ⬜ Descopeado — no se ejecuta en esta ronda
+**Hallazgos:** Decisión explícita del usuario (2026-08-26): requiere una
+rama/deployment desechable que no se justificó montar en esta ronda. La
+cobertura de código quedó verificada por revisión (Fase 4 del spec: se agregó
+`useEffect` + `captureException` sin tocar el `<style>` ni el resto del JSX
+que causó TC-037-006), pero **no se confirmó en runtime** que el evento llega
+a Sentry con `boundary: global` ni que el boundary sigue renderizando sin
+flash en modo oscuro. Ver spec-052 → "Excepción: TC-052-007 descopeado".
 
 ---
 
@@ -336,9 +342,10 @@ botones de diagnóstico.
 
 ## Resumen de la ronda
 
-- Aprobados: 11 — Fallidos: 0 — Pendientes: 1 (`TC-052-007`, omitido por
-  decisión del usuario — requiere rama/deployment desechable, se retoma en
-  otra sesión)
+- Aprobados: 11 — Fallidos: 0 — Descopeados: 1 (`TC-052-007`, por decisión
+  explícita del usuario 2026-08-26 — requiere rama/deployment desechable no
+  justificada para esta ronda; cobertura de código verificada por revisión,
+  no en runtime)
 - Hallazgos escalados a `docs/specs/backlog.md`: ninguno nuevo (la demora de
   ingestión de Sentry en `TC-052-001` no ameritó entrada de deuda — quedó
   documentada como hallazgo del propio caso)
