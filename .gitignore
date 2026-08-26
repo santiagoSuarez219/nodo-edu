@@ -37,6 +37,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# sentry (spec-052) — el CLI puede generarlo con un token dentro
+.sentryclirc
+
 # claude code local config
 .claude/
 skills-lock.json

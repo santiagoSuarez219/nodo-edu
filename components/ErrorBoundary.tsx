@@ -1,6 +1,7 @@
 "use client";
 
-import { Component, type ReactNode } from "react";
+import { Component, type ReactNode, type ErrorInfo } from "react";
+import * as Sentry from "@sentry/nextjs";
 import { ErrorState } from "@/components/ErrorState";
 
 interface ErrorBoundaryProps {
@@ -25,8 +26,14 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     return { hasError: true };
   }
 
-  componentDidCatch(error: unknown) {
+  componentDidCatch(error: unknown, errorInfo: ErrorInfo) {
     console.error("Error capturado por ErrorBoundary:", error);
+    // Único punto que ve fallos aislados (panel de asistencia, formulario del
+    // estudiante) que por diseño no escalan a ningún error.tsx (spec-052, D7).
+    Sentry.captureException(error, {
+      tags: { boundary: "component" },
+      contexts: { react: { componentStack: errorInfo.componentStack } },
+    });
   }
 
   handleReset = () => {

@@ -172,6 +172,9 @@ Este proyecto vive en un único repositorio. No hay monorepo ni submódulos.
 - **Vercel** — hosting y deploy continuo desde Git.
 - **GitHub** — repositorio y control de versiones.
 - **npm** — package manager.
+- **Sentry** — reporte remoto de errores server-side y client-side, activo
+  solo en producción (spec-052). Proyecto `nodo-edu`, organización
+  `instituto-tecnologico-metropol`.
 
 ### Tipografía
 - **JetBrains Mono** en todo el proyecto (texto, UI, código) — sin excepciones.
@@ -225,6 +228,7 @@ npm run lint
 | `NEXT_PUBLIC_SITE_URL` | URL base del sitio. Reservada: sin uso actual en el código (no hay OAuth ni recuperación de contraseña implementados); se carga por si un flujo futuro la requiere (ver DEBT-014 en `docs/specs/backlog.md`) |
 | `STUDENTS_ADMIN_API_KEY` | Clave de servicio del dominio de estudiantes (`/api/students/*`, `students-mcp`) — permisos de admin, distinta de `QUESTION_BANK_API_KEY` |
 | `COURSES_ADMIN_API_KEY` | Clave de servicio del dominio de cursos (`/api/courses/*`, `courses-mcp`) — abre y cierra lecciones a los estudiantes. Propia y distinta de `QUESTION_BANK_API_KEY` y `STUDENTS_ADMIN_API_KEY`: debe poder revocarse sin apagar el banco de preguntas (spec-039 M2). Si falta, la ruta responde `500 configuration_error`, nunca `401` |
+| `NEXT_PUBLIC_SENTRY_DSN` | DSN del proyecto Sentry `nodo-edu` (spec-052). Se carga **solo** en Vercel → Production; nunca en `.env.local` — su sola presencia, junto con `NODE_ENV === "production"`, activa el reporte de errores (ver `lib/observability/sentry-enabled.ts`) |
 
 > ⚠️ Nunca escribas valores reales de variables de entorno en este archivo
 > ni en ningún archivo rastreado por git.
@@ -1045,6 +1049,7 @@ development ──merge──▶ deploy/vX.Y.Z ──merge──▶ main ──p
      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
      SUPABASE_SERVICE_ROLE_KEY
      NEXT_PUBLIC_SITE_URL
+     NEXT_PUBLIC_SENTRY_DSN
      ```
 
 4. **Merge a `main`**

@@ -5,6 +5,57 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+## DEBT-067 — Stack traces de cliente sin source maps en Sentry (D4 descartada en spec-052)
+
+**Origen:** spec-052 (integración de Sentry), Fase 6. El usuario descartó
+explícitamente subir source maps al build (`withSentryConfig` +
+`SENTRY_AUTH_TOKEN`) para no gestionar un secreto adicional en Vercel.
+**Prioridad:** Baja — no afecta la captura de eventos, solo su legibilidad.
+
+Los eventos de Sentry originados en el navegador (`instrumentation-client.ts`)
+llegan con el stack **minificado** (`chunk-abc123.js:1:45678` en vez del
+nombre de archivo/función real). El stack de servidor y el `digest` de los
+boundaries no se ven afectados — ambos siguen siendo legibles.
+
+**Acción:** Si la legibilidad se vuelve necesaria (por ejemplo, un bug de
+cliente difícil de reproducir por el `digest` solo), retomar D4: envolver
+`next.config.ts` con `withSentryConfig`, configurar `SENTRY_AUTH_TOKEN` en
+Vercel (alcance `Production`) y confirmar que el build sigue pasando sin el
+token (no debe ser un secreto bloqueante).
+
+---
+
+## DEBT-066 — Errores *manejados* de spec-037 sin telemetría en Sentry
+
+**Origen:** spec-052 (integración de Sentry), Fase 6. spec-052 solo instrumenta
+**excepciones** (lo que llega a un `error.tsx`/`global-error.tsx`/
+`ErrorBoundary` o a `onRequestError`). Los resultados discriminados que
+introdujo spec-037 son valores de retorno, no excepciones, y por diseño
+**nunca lanzan** — Sentry no los ve.
+**Prioridad:** Media — son justo los fallos de infraestructura que spec-037
+identificó como más peligrosos de perder de vista (uno de ellos, ya corregido,
+abría un gate de negocio).
+
+Ejemplos concretos:
+- `lib/attendance/index.ts`: `getOpenSessionForCourse` → `null`,
+  `getSessionAttendanceCount` → `0`, `markAttendanceByCode` → `'not_found'`,
+  `getStudentAttendanceForCourse` → `{sessionOpen:false, alreadyMarked:false}`.
+- `getSelfAssessmentStatus` (`lib/self-assessment/index.ts`): estado
+  indeterminado ante un fallo de lectura.
+- `middleware.ts` + spec-046: `auth.status === "unavailable"` (caída de
+  Supabase Auth) — hoy solo deja un `console.error`.
+
+Todos estos casos ya devuelven valores honestos (no degradan a un caso de
+negocio válido, gracias a spec-037/spec-050), pero **no queda registro fuera
+de los logs de Vercel** ni alerta cuando ocurren.
+
+**Acción:** Spec propio que decida, dominio por dominio, nivel (`warning` vs
+`error`), huella de deduplicación y umbral de ruido antes de convertirlos en
+`Sentry.captureMessage`. No trivial: instrumentar los cuatro dominios a la vez
+sin criterio puede saturar el panel de issues con ruido de red intermitente.
+
+---
+
 ## DEBT-065 — Residuo de la revisión de código de spec-050: hallazgos menores dejados fuera de su alcance
 
 **Origen:** revisión de código (`@reviewer`) de `fix/errores-supabase-envios`

@@ -109,7 +109,10 @@ aplazarse a uno propio.
 ### No incluye
 
 - **Observabilidad / reporte remoto de errores** (Sentry o equivalente). El
-  `digest` de Next queda solo en los logs de Vercel.
+  `digest` de Next queda solo en los logs de Vercel. **Cerrado por spec-052**
+  (2026-08-25): engancha Sentry a los boundaries de esta sección. Los errores
+  *manejados* que este spec introdujo (`status: "unavailable"` y similares)
+  siguen sin telemetría — ver **[[DEBT-066]]**.
 - **Corregir el antipatrón en los demás dominios.** Un barrido de `lib/` muestra
   ~40 sitios con `const { data } = await supabase…` descartando `error` al
   destructurar. Se registran como deuda nueva (ver Fase 7), no se abordan aquí.
