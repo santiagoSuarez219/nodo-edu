@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import * as Sentry from "@sentry/nextjs";
 import { ErrorState } from "@/components/ErrorState";
 
 // Conserva el chrome admin (layout de app/(admin)/layout.tsx) al fallar,
@@ -14,6 +15,9 @@ export default function AdminError({
 }) {
   useEffect(() => {
     console.error("Error en el panel admin:", error);
+    Sentry.captureException(error, {
+      tags: { boundary: "admin", digest: error.digest },
+    });
   }, [error]);
 
   return (

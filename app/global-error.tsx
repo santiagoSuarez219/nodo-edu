@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect } from "react";
+import * as Sentry from "@sentry/nextjs";
 import { ErrorState } from "@/components/ErrorState";
 
 // Único boundary que cubre un fallo del propio root layout (app/layout.tsx es
@@ -20,11 +22,22 @@ import { ErrorState } from "@/components/ErrorState";
 // `next/font` aquí añadiría una vía de fallo dentro del propio manejador de
 // fallos, y este boundary solo se ve cuando el root layout ya falló.
 export default function GlobalError({
+  error,
   reset,
 }: {
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  // Añadido en spec-052: reporte a Sentry. Va dentro de un useEffect, nunca
+  // en el cuerpo del render — este boundary solo se ve cuando el root layout
+  // ya falló y no puede permitirse una segunda vía de fallo (ver TC-037-006
+  // en spec-037, sobre el <script> que rompió esta misma pantalla).
+  useEffect(() => {
+    Sentry.captureException(error, {
+      tags: { boundary: "global", digest: error.digest },
+    });
+  }, [error]);
+
   return (
     <html lang="es">
       <body className="global-error-body min-h-screen flex items-center justify-center px-4">
