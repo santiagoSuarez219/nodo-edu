@@ -12,10 +12,10 @@
 
 | Recurso | Endpoint / origen de creación | Identificador | Eliminado |
 |---|---|---|---|
-| Issue "Sentry server-side check" | Botón de `/admin/diagnostico-sentry` (producción) | `{{issue-id}}` | ⬜ / ✅ |
-| Issue "Sentry client-side check" | Botón de `/admin/diagnostico-sentry` (producción) | `{{issue-id}}` | ⬜ / ✅ |
-| Issue del `ErrorBoundary` (TC-052-006) | Fallo provocado en el panel de asistencia | `{{issue-id}}` | ⬜ / ✅ |
-| Issue de `global-error` (TC-052-007) | Fallo provocado en `app/layout.tsx` | `{{issue-id}}` | ⬜ / ✅ |
+| Issue "Sentry server-side check" | Botón de `/admin/diagnostico-sentry` (producción) | TC-052-001 | ✅ |
+| Issue "Sentry client-side check" | Botón de `/admin/diagnostico-sentry` (producción) | TC-052-002 | ✅ |
+| Issue del `ErrorBoundary` (TC-052-006) | Fallo provocado en el panel de asistencia | TC-052-006 | ✅ |
+| Issue de `global-error` (TC-052-007) | Fallo provocado en `app/layout.tsx` | n/a — caso omitido, no se generó | n/a |
 | Sesión docente de producción | Cuenta real del docente principal | `{{correo}}` | n/a |
 
 > "Eliminado" para un issue de Sentry significa **resuelto o descartado** en el
@@ -38,7 +38,7 @@
 prueba es **posterior** a esa configuración (una variable nueva no se aplica a
 deployments ya construidos: hay que redesplegar).
 
-**Fecha de la ronda:** {{fecha}}
+**Fecha de la ronda:** 2026-08-26
 
 ---
 
@@ -62,8 +62,12 @@ panel de Sentry abierto en el proyecto `nodo-edu` (organización
 - Al abrirlo muestra **stack trace del servidor** (frames de Node, no del
   navegador) y la ruta `/admin/diagnostico-sentry` en el contexto de la request.
 - El evento está etiquetado como entorno `production`.
-**Estado:** ⬜ Pendiente / ✅ Aprobado / ❌ Fallido
-**Hallazgos:** {{observaciones}}
+**Estado:** ✅ Aprobado
+**Hallazgos:** El primer intento no mostró el issue dentro del minuto —
+demora de ingestión de Sentry mayor a la esperada, no un fallo real. Se
+verificó el DSN carácter por carácter contra Vercel (coincide exacto) antes de
+reconfirmar; al refrescar más tarde el issue apareció con título, stack de
+servidor, ruta y entorno `production` correctos.
 
 ---
 
@@ -88,8 +92,10 @@ abiertas en la pestaña **Network** y el filtro escrito en `sentry`.
 - El stack aparece **minificado** (`chunk-abc123.js:1:45678` o similar): D4
   quedó descartada en este spec, no se suben source maps. No es un fallo del
   caso — es el comportamiento esperado.
-**Estado:** ⬜ Pendiente / ✅ Aprobado / ❌ Fallido
-**Hallazgos:** {{observaciones}}
+**Estado:** ✅ Aprobado
+**Hallazgos:** Petición a `*.ingest.us.sentry.io` visible en Network, el
+`ErrorState` degradó solo el recuadro del diagnóstico (resto de la página
+intacto), e issue distinguible del de TC-052-001 apareció en Sentry.
 
 ---
 
@@ -112,8 +118,11 @@ Verificarlo antes de empezar: `grep -c SENTRY .env.local` debe dar `0`.
   y/o terminal): en desarrollo siguen siendo la única señal, tal como decidió
   spec-037.
 - Ningún aviso del SDK de Sentry en el arranque de `npm run dev`.
-**Estado:** ⬜ Pendiente / ✅ Aprobado / ❌ Fallido
-**Hallazgos:** {{observaciones}}
+**Estado:** ✅ Aprobado
+**Hallazgos:** `.env.local` sin `NEXT_PUBLIC_SENTRY_DSN` confirmado antes de
+empezar (`grep -ic SENTRY` → 0). Cero peticiones a `*.ingest.us.sentry.io`,
+ningún issue nuevo, `console.error` de los boundaries sigue funcionando como
+única señal en desarrollo.
 
 ---
 
@@ -132,8 +141,11 @@ Verificarlo antes de empezar: `grep -c SENTRY .env.local` debe dar `0`.
   como referencia a `process.env`, nunca con un valor a la derecha del `=`.
 - En `.env.example`, la línea es `NEXT_PUBLIC_SENTRY_DSN=` **sin valor**, con el
   comentario que explica dónde se obtiene y que solo se carga en Vercel.
-**Estado:** ⬜ Pendiente / ✅ Aprobado / ❌ Fallido
-**Hallazgos:** {{observaciones}}
+**Estado:** ✅ Aprobado
+**Hallazgos:** El literal del host de ingest solo aparece en `docs/specs/` y
+`docs/testing/`. El nombre de la variable solo aparece como referencia a
+`process.env` (`lib/observability/sentry-enabled.ts`) y en `.env.example` sin
+valor a la derecha del `=`, tal como se esperaba.
 
 ---
 
@@ -151,8 +163,11 @@ Verificarlo antes de empezar: `grep -c SENTRY .env.local` debe dar `0`.
 - No existe `SENTRY_AUTH_TOKEN` en ningún entorno de Vercel (D4 descartada).
 - `grep` sobre `.env.local` no devuelve nada: la máquina de desarrollo no tiene
   el DSN.
-**Estado:** ⬜ Pendiente / ✅ Aprobado / ❌ Fallido
-**Hallazgos:** {{observaciones}}
+**Estado:** ✅ Aprobado
+**Hallazgos:** `NEXT_PUBLIC_SENTRY_DSN` en Vercel con alcance `Production`
+únicamente (tipo Config, no Secret — ver nota bajo la Fase 1 sobre por qué no
+usar Secret con prefijo `NEXT_PUBLIC_`). `grep -i sentry` sin coincidencias en
+`.env.local` ni `.env.prod`.
 
 ---
 
@@ -176,8 +191,11 @@ accionar el panel; documentar el método usado.
   origen `boundary: component`.
 - El botón "Reintentar" del `ErrorState` recupera el panel cuando la causa
   desaparece.
-**Estado:** ⬜ Pendiente / ✅ Aprobado / ❌ Fallido
-**Hallazgos:** {{observaciones}}
+**Estado:** ✅ Aprobado
+**Hallazgos:** Fallo provocado con DevTools → Network → Offline. Artículo y
+navegación laterales intactos, solo el recuadro del panel mostró `ErrorState`.
+Issue en Sentry con etiqueta `boundary: component`. "Reintentar" recuperó el
+panel al restaurar la conectividad.
 
 ---
 
@@ -220,8 +238,9 @@ DSN inyectado por línea de comandos.
 - Copy, colores y disposición idénticos a antes del spec.
 - El `digest` se ve como código de referencia discreto; el `message` **nunca**.
 - Contraste correcto en modo claro y oscuro.
-**Estado:** ⬜ Pendiente / ✅ Aprobado / ❌ Fallido
-**Hallazgos:** {{observaciones}}
+**Estado:** ✅ Aprobado
+**Hallazgos:** Copy, colores y disposición idénticos a antes del spec. Sin
+exposición del `message` real en ningún punto de la UI.
 
 ---
 
@@ -243,8 +262,10 @@ que sí acarrea contexto de request).
   (`QUESTION_BANK_API_KEY`, `STUDENTS_ADMIN_API_KEY`, `COURSES_ADMIN_API_KEY`)
   ni `SUPABASE_SERVICE_ROLE_KEY`.
 - No hay direcciones de correo de estudiantes (`sendDefaultPii: false`).
-**Estado:** ⬜ Pendiente / ✅ Aprobado / ❌ Fallido
-**Hallazgos:** {{observaciones}}
+**Estado:** ✅ Aprobado
+**Hallazgos:** Verificado sobre el issue de TC-052-001: sin cookies de sesión,
+sin `Authorization`/`api-key`, sin claves de servicio ni correos en el JSON
+crudo del evento. `beforeSend` (D5) funciona como se diseñó.
 
 ---
 
@@ -262,24 +283,31 @@ que sí acarrea contexto de request).
 - No se carga ningún chunk de Replay.
 - El aumento del *First Load JS* es el del SDK base, no el de Replay
   (Replay añade ~40-50 kB adicionales; si el salto es de ese orden, revisar).
-**Estado:** ⬜ Pendiente / ✅ Aprobado / ❌ Fallido
-**Hallazgos:** {{observaciones}}
+**Estado:** ✅ Aprobado
+**Hallazgos:** `git grep` sin coincidencias de código real (solo el comentario
+que documenta la decisión en `instrumentation-client.ts`). Sin chunks con
+`replay` en el nombre en producción. Turbopack (Next 16) no imprime la tabla
+clásica de *First Load JS*, así que el tamaño exacto del SDK base no quedó
+medido en kB — no se considera bloqueante dado que ambos indicadores directos
+(código y red) dan negativo.
 
 ---
 
-### TC-052-011 — Build y lint pasan, con y sin `SENTRY_AUTH_TOKEN`
+### TC-052-011 — Build y lint pasan
 **Criterio de aceptación:** 11
 **Entorno:** CLI
 **Pasos:**
 1. Ejecutar `npm run build` y `npm run lint`.
-2. Ejecutar `git grep -n ": any" -- "*.ts" "*.tsx"` sobre los archivos creados o
-   modificados por este spec.
+2. Ejecutar `git grep -n ": any"` sobre los archivos creados o modificados por
+   este spec.
 **Resultado esperado:**
 - El build termina **sin errores**.
 - `npm run lint` sin errores.
 - Ningún `any` nuevo introducido por el spec.
-**Estado:** ⬜ Pendiente / ✅ Aprobado / ❌ Fallido
-**Hallazgos:** {{observaciones}}
+**Estado:** ✅ Aprobado
+**Hallazgos:** Verificado sobre `main`: `npm run build` y `npm run lint` sin
+errores (mismos 9 warnings preexistentes, ninguno nuevo). `git grep -n ": any"`
+acotado a los archivos de este spec devuelve vacío.
 
 ---
 
@@ -299,16 +327,23 @@ prueba en producción**: usar una cuenta ya existente y no modificarla.
   **En ningún momento se ven los botones de diagnóstico.**
 - Sin sesión: redirige a `/login?redirectTo=/admin/diagnostico-sentry`.
 - No se genera ningún issue en Sentry por estos intentos.
-**Estado:** ⬜ Pendiente / ✅ Aprobado / ❌ Fallido
-**Hallazgos:** {{observaciones}}
+**Estado:** ✅ Aprobado
+**Hallazgos:** Con sesión de estudiante redirige a `/` (gate de rol del
+middleware); sin sesión redirige a `/login`. En ningún caso llegó a ver los
+botones de diagnóstico.
 
 ---
 
 ## Resumen de la ronda
 
-- Aprobados: {{n}} — Fallidos: {{n}} — Pendientes: 12
-- Hallazgos escalados a `docs/specs/backlog.md`: {{lista o "ninguno"}}
-- Limpieza de datos de prueba: ⬜ Pendiente / ✅ Completada
-  - Issues de diagnóstico resueltos o descartados en Sentry: ⬜ / ✅
-  - Rama/deployment desechable de TC-052-007 eliminado: ⬜ / ✅
+- Aprobados: 11 — Fallidos: 0 — Pendientes: 1 (`TC-052-007`, omitido por
+  decisión del usuario — requiere rama/deployment desechable, se retoma en
+  otra sesión)
+- Hallazgos escalados a `docs/specs/backlog.md`: ninguno nuevo (la demora de
+  ingestión de Sentry en `TC-052-001` no ameritó entrada de deuda — quedó
+  documentada como hallazgo del propio caso)
+- Limpieza de datos de prueba: ✅ Completada
+  - Issues de diagnóstico (TC-052-001, 002, 006) resueltos/descartados en el
+    panel de `nodo-edu`: ✅
+  - Rama/deployment desechable de TC-052-007: n/a (no se creó, caso omitido)
 - Sin datos de dominio creados en producción (no aplica limpieza vía API).

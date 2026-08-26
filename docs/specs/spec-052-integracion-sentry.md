@@ -347,6 +347,10 @@ Configuración de MCPs"), y este spec activa Sentry únicamente en producción.
   confirmación explícita del usuario para ejecutarse contra producción y no
   crean datos de dominio (solo *issues* en Sentry, que se resuelven al cerrar
   la ronda).
+  **Ronda del 2026-08-26: 11/12 aprobados.** `TC-052-007` (forzar un fallo en
+  `app/layout.tsx`) quedó pendiente por decisión del usuario — requiere una
+  rama/deployment desechable y se retoma en otra sesión. El spec permanece en
+  `[TESTING]` hasta que ese caso se ejecute y apruebe.
 - **Automáticas (e2e/unit):**
   `{{ubicación e2e por definir}}/e2e-052-integracion-sentry.spec.ts` — pendiente
   del framework de testing (CLAUDE.md → "Testing"). Los criterios 4, 10 y 11 son
