@@ -1,4 +1,4 @@
-# spec-052 — [TESTING] Integración de Sentry: reporte remoto de errores en producción
+# spec-052 — [DONE] Integración de Sentry: reporte remoto de errores en producción
 
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.
@@ -310,7 +310,8 @@ Configuración de MCPs"), y este spec activa Sentry únicamente en producción.
    No hay regresión de los criterios 1-4 de spec-037.
 7. `app/global-error.tsx` sigue renderizando correctamente (`<html lang="es">`
    propio, sin FOUC de tema) con el reporte a Sentry ya integrado — el criterio 6
-   de spec-037 sigue pasando.
+   de spec-037 sigue pasando. **Verificado solo por revisión de código, no en
+   runtime** — ver "Excepción: TC-052-007 descopeado".
 8. La UI de error no cambia: `ErrorState` muestra el mismo copy y sigue sin
    exponer nunca el `message` de la excepción al usuario.
 9. Ningún evento enviado a Sentry contiene cookies de sesión de Supabase, la
@@ -348,9 +349,8 @@ Configuración de MCPs"), y este spec activa Sentry únicamente en producción.
   crean datos de dominio (solo *issues* en Sentry, que se resuelven al cerrar
   la ronda).
   **Ronda del 2026-08-26: 11/12 aprobados.** `TC-052-007` (forzar un fallo en
-  `app/layout.tsx`) quedó pendiente por decisión del usuario — requiere una
-  rama/deployment desechable y se retoma en otra sesión. El spec permanece en
-  `[TESTING]` hasta que ese caso se ejecute y apruebe.
+  `app/layout.tsx`) quedó descopeado por decisión explícita del usuario — ver
+  "Excepción: TC-052-007 descopeado, spec marcado `[DONE]` con 11/12".
 - **Automáticas (e2e/unit):**
   `{{ubicación e2e por definir}}/e2e-052-integracion-sentry.spec.ts` — pendiente
   del framework de testing (CLAUDE.md → "Testing"). Los criterios 4, 10 y 11 son
@@ -379,3 +379,26 @@ Configuración de MCPs"), y este spec activa Sentry únicamente en producción.
 > contra producción. Hasta entonces, `development` contiene código de
 > observabilidad sin ejecutar en ningún entorno real — no reemplaza ni
 > modifica ningún flujo existente, así que el riesgo de esta excepción es bajo.
+
+### Excepción: `TC-052-007` descopeado, spec marcado `[DONE]` con 11/12
+
+> La ronda manual del 2026-08-26 aprobó 11 de los 12 casos. `TC-052-007`
+> (forzar un fallo en `app/layout.tsx` para confirmar que `global-error.tsx`
+> sigue renderizando bien con Sentry integrado, y que el evento llega
+> etiquetado `boundary: global`) no se ejecutó: es el único caso que requiere
+> una rama y un deployment desechables, y no se justificó montarlos en esta
+> ronda.
+>
+> **Excepción aprobada explícitamente por el usuario (2026-08-26):** descopear
+> `TC-052-007` de esta ronda y marcar el spec `[DONE]` igual. La cobertura del
+> criterio 7 queda solo por **revisión de código** (Fase 4: se agregó
+> `useEffect` + `Sentry.captureException(error, { tags: { boundary: "global",
+> digest: error.digest } })` sin modificar el `<style>` ni el resto del JSX que
+> causó TC-037-006), sin confirmación en runtime de que el evento llega a
+> Sentry ni de que el boundary no se rompe al fallar `app/layout.tsx`. Riesgo
+> aceptado: es la ruta menos transitada (solo se ve si el root layout entero
+> falla) y su implementación es la más simple de las cuatro (un solo
+> `useEffect`, mismo patrón que los otros tres boundaries ya verificados en
+> `TC-052-006`/`TC-052-009`). Si se quiere cerrar esta brecha más adelante, ver
+> `docs/testing/test-052-integracion-sentry.md` → `TC-052-007` para el
+> procedimiento pendiente.
