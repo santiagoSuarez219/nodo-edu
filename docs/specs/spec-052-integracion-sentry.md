@@ -359,3 +359,19 @@ Configuración de MCPs"), y este spec activa Sentry únicamente en producción.
 
 - [x] Paquete (spec + pruebas) aprobado por el usuario, sin D4 (sin source maps / `SENTRY_AUTH_TOKEN`)
 - **Fecha de aprobación:** 2026-08-25
+
+### Excepción a la regla de merge a `development`
+
+> `CLAUDE.md` exige spec en `[DONE]` con `test-NNN` aprobado para mergear a
+> `development`. Este spec no puede cumplirla en el orden habitual: 6 de los
+> 12 casos de `test-052` solo son verificables **en producción** (D1 — el SDK
+> está apagado en desarrollo por diseño), y llegar a producción requiere pasar
+> por `development` → `deploy/` → `main`. Es una dependencia circular
+> inherente a esta funcionalidad, no un atajo para saltarse pruebas.
+>
+> **Excepción aprobada explícitamente por el usuario (2026-08-25):** merge a
+> `development` con el spec en `[TESTING]`, no `[DONE]`. El spec pasa a
+> `[DONE]` recién cuando la ronda manual de `test-052` apruebe los 12 casos
+> contra producción. Hasta entonces, `development` contiene código de
+> observabilidad sin ejecutar en ningún entorno real — no reemplaza ni
+> modifica ningún flujo existente, así que el riesgo de esta excepción es bajo.
