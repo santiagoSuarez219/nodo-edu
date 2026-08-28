@@ -188,26 +188,6 @@ export const estructurasDeDatos: Course = {
       ],
     },
     {
-      id: "lab-poo-jerarquia-de-clases",
-      slug: "lab-poo-jerarquia-de-clases",
-      articleSlug: "lab-poo-jerarquia-de-clases",
-      kind: "guide",
-      order: 9.5,
-      title: "Laboratorio — Jerarquía de Clases de Tres Niveles y Polimorfismo",
-      summary:
-        "Extienda una jerarquía de dos niveles a tres, defina una interfaz simple, y demuestre binding dinámico con un arreglo de referencias, sobre el caso de estudio de su proyecto de aula.",
-      topics: [],
-    },
-    {
-      id: "lab-01-listas-enlazadas",
-      slug: "lab-01-listas-enlazadas",
-      articleSlug: "lab-01-listas-enlazadas",
-      kind: "guide",
-      order: 10,
-      title: "Laboratorio 01 — Listas Enlazadas",
-      topics: [],
-    },
-    {
       id: "asociacion-agregacion-y-composicion",
       slug: "asociacion-agregacion-y-composicion",
       articleSlug: "asociacion-agregacion-y-composicion",
