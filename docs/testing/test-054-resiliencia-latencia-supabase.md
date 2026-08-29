@@ -19,10 +19,12 @@
 | Recurso | Cómo se monta | Identificador | Revertido |
 |---|---|---|---|
 | Docente de desarrollo (ya sembrado, **no** crear ni borrar) | `npm run seed:teacher` | `dev@nodo.local` / `DevLocal2026!` | n/a |
-| Estudiante de prueba matriculado (reutilizado de `test-053`, sigue vivo en `mirp-lab` por decisión del usuario) | ya existente | `test-spec053@nodo.local` / `TestSpec053New!` | n/a |
-| Proxy de latencia local | `node scripts/latency-proxy.mjs --port=54331 …` | proceso local, puerto 54331 | ⬜ |
-| `NEXT_PUBLIC_SUPABASE_URL` de `.env.local` apuntando al proxy | edición manual (valor original: `http://localhost:54321`) | — | ⬜ |
-| `jwt_expiry` en `supabase/config.toml` de `mirp-lab` bajado de `3600` a `60` | edición + reinicio del stack en `mirp-lab` | — | ⬜ |
+| ~~Estudiante de prueba matriculado (reutilizado de `test-053`)~~ | — | ~~`test-spec053@nodo.local`~~ | 🔴 **Ya no existe** — hallazgo de esta ronda: `mirp-lab` no tenía ningún `academic_course` ni estudiante al momento de ejecutar (ver Hallazgos de `TC-054-008`) |
+| Curso académico de prueba (creado vía REST + service role — no existe MCP para esto, ver `DEBT-060`) | `POST /rest/v1/academic_courses` | `TEST054 — Estructuras de Datos`, `37292155-ad61-4517-ba3f-1dc7e8f4adb0` | ⬜ |
+| Estudiante de prueba matriculado en `TEST054` | `create_student` (`students-mcp`) | `d67a80e5-17c4-42a1-bb1c-68e1666fe5c1` (`test-spec054@nodo.local` / `TestSpec054!`), matrícula `f133aa51-48bc-4cfd-a3bb-b48bbed4eb08` | ⬜ |
+| Proxy de latencia local | `node scripts/latency-proxy.mjs --port=54331 …` | proceso local, puerto 54331 | ✅ (apagado al cierre de la ronda) |
+| `NEXT_PUBLIC_SUPABASE_URL` de `.env.local` apuntando al proxy | edición manual (valor original: `http://localhost:54321`) | — | ✅ (restaurado) |
+| `jwt_expiry` en `supabase/config.toml` de `mirp-lab` bajado de `3600` a `60` | edición + reinicio del stack en `mirp-lab` | — | ✅ (revertido tras `TC-054-001`) |
 
 **Entorno de pruebas:** desarrollo — instancia Supabase local en `mirp-lab` vía
 túnel SSH (ver CLAUDE.md → "Base de datos"). **Nunca ejecutar esta ronda contra
@@ -198,8 +200,25 @@ caso superó su presupuesto correspondiente.
 1. Navegar a una lección.
 2. Leer el mensaje mostrado.
 **Resultado esperado:** el copy de infraestructura decidido en D-D ("no pudimos contactar el servidor, tu sesión sigue abierta" o equivalente). **No** "Ocurrió un error inesperado", **no** un 500 crudo, **no** página en blanco.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** —
+**Estado:** ✅ Aprobado *(resultado distinto al anticipado, ver hallazgo)*
+**Hallazgos:** Precondición ajustada respecto al escenario global de
+`--hang` sobre todo `/rest/v1`: con ese patrón, el gate de *acceso*
+(`hasCourseAccess`, también sobre `/rest/v1`) siempre interceptaba primero y
+redirigía a `/servicio-no-disponible` antes de llegar a ninguna consulta de
+datos de la lección — nunca se alcanzaba el escenario que este caso quería
+probar. Se acotó el proxy a `--path='^/rest/v1/lesson_progress' --hang`
+(única tabla identificada como "dato de página, no de autorización" en
+`lib/progress`), dejando pasar `user_roles`/`profiles`/`academic_courses`.
+**Resultado real:** la página renderiza `200` normal, con el `<article>` de
+la lección completo — **no** se activó `error.tsx` ni el copy de
+infraestructura, porque el código de `lib/progress` (lectura y registro de
+progreso) ya degrada en silencio ante un fallo de la consulta, sin propagar
+ninguna excepción. El objetivo del caso ("el usuario no ve un mensaje
+confuso") **sí se cumple**, pero por un mecanismo distinto al anticipado: no
+hay ningún camino de datos de la lección hoy que efectivamente lance una
+excepción capturable por el boundary — el copy de `INFRA_ERROR_COPY` queda
+como cobertura defensiva para el día en que algo sí lance, no como algo
+verificado en ejecución real.
 
 ### TC-054-008 — Un estudiante matriculado no recibe "sin acceso" por un timeout
 **Cubre:** CA 8 (DEBT-070) — evita repetir la mentira que `spec-046` eliminó.
@@ -207,8 +226,16 @@ caso superó su presupuesto correspondiente.
 **Pasos:**
 1. Navegar a una lección de su curso.
 **Resultado esperado:** mensaje de servicio no disponible. **Nunca** el redirect a `/cuenta/cursos?sinAcceso=…`, que afirmaría en falso que no está matriculado.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** —
+**Estado:** ✅ Aprobado
+**Hallazgos:** Precondición bloqueada al inicio: el estudiante de `test-053`
+ya no existía y `mirp-lab` no tenía ningún `academic_course` — hallazgo
+inesperado, ajeno a este spec (no causado por el `stop`/`start` del stack de
+`TC-054-001`, que preserva datos). Creado un curso y un estudiante de prueba
+nuevos (ver "Datos de prueba"), con decisión explícita del usuario de crear
+estos recursos vía REST directo (no existe MCP para crear
+`academic_courses`, `DEBT-060`). Con el estudiante matriculado navegando a
+una lección de su curso bajo `--hang` en `/rest/v1`: redirect a
+`/servicio-no-disponible?from=...`. **Nunca** `sinAcceso=`.
 
 ### TC-054-009 — El root layout no rompe el documento entero
 **Cubre:** Fase 3 y la decisión D-F.
@@ -275,8 +302,10 @@ alcanza esta ruta, tal como se diseñó.
 1. Navegar a `/`, a `/grupo-investigacion` y a una lección, en ventana anónima.
 **Resultado esperado:** **las tres** responden 503. La excepción de E1 **no** aplica a un fallo permanente.
 **Restaurar:** devolver la clave a `.env.local` y reiniciar.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** —
+**Estado:** ✅ Aprobado
+**Hallazgos:** `/`, `/grupo-investigacion` y
+`/estructuras-de-datos/polimorfismo` respondieron `503` las tres. Clave
+restaurada en `.env.local` inmediatamente después de la verificación.
 
 ### TC-054-014 — Navegación normal tras restaurar el servicio
 **Cubre:** recuperación — que el degradado no deje estado pegado (la caché `healthyUntil` es por instancia).
@@ -285,8 +314,11 @@ alcanza esta ruta, tal como se diseñó.
 1. Apagar el retardo del proxy.
 2. Recargar la página inmediatamente y volver a navegar.
 **Resultado esperado:** el sitio vuelve a la normalidad sin esperar a que expire ningún TTL, y sin necesidad de reiniciar `npm run dev`.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** —
+**Estado:** ✅ Aprobado
+**Hallazgos:** Con sesión y datos colgados: `200` en `6.34s` (degradado, banner
+visible). Apagado el proxy de latencia (sin tocar `next start`) y repetida la
+misma petición de inmediato: `200` en `0.30s` — normalidad inmediata, sin
+esperar ningún TTL.
 
 ---
 
@@ -296,8 +328,12 @@ alcanza esta ruta, tal como se diseñó.
 **Precondición:** proxy sin retardo; `npm run dev` corriendo.
 **Input de prueba:** `list_course_lessons(course_slug: "estructuras-de-datos")`
 **Output esperado:** el catálogo completo, sin error.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** —
+**Estado:** ✅ Aprobado
+**Hallazgos:** Ejecutado incluso con Auth completamente colgado (proxy
+`--path='^/auth/v1' --hang`, escenario de `TC-054-002`) — prueba más fuerte
+que la especificada. `list_course_lessons(course_slug: "estructuras-de-datos")`
+devolvió las 39 lecciones sin error. Confirma D3 de `spec-046`: la ruta
+`/api/courses/*` nunca llama a `updateSupabaseSession()`.
 
 ### TC-MCP-054-002 — Los MCPs fallan acotado, no colgados
 **Herramienta probada:** la misma de TC-MCP-054-001
@@ -305,8 +341,15 @@ alcanza esta ruta, tal como se diseñó.
 **Precondición:** proxy con `--hang` en `^/rest/v1`.
 **Input de prueba:** `list_course_lessons(course_slug: "estructuras-de-datos")`
 **Output esperado:** error acotado en ≤ presupuesto de `service.ts` (D-C). **No** una espera indefinida ni un cuelgue del cliente MCP.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** —
+**Estado:** ✅ Aprobado
+**Hallazgos:** El MCP reportó `Error: API no disponible` en ~15s. Confirmado
+en los logs del servidor que el corte real ocurrió dentro del presupuesto de
+`service.ts` (10s): `GET /api/courses/[courseSlug]/lessons error: {message:
+'AbortError: This operation was aborted', ...}` — la ruta de API respondió
+con el error en vez de colgarse. Los ~15s percibidos por el MCP son el
+timeout propio de su cliente HTTP (`mcp-servers/courses-mcp`), no el de
+`service.ts` — el servidor cortó primero y correctamente; nunca hubo una
+espera indefinida en ningún punto de la cadena.
 
 ---
 
@@ -327,6 +370,23 @@ alcanza esta ruta, tal como se diseñó.
 
 ## Resumen de la ronda
 
-- Aprobados: 0 — Fallidos: 0 — Pendientes: 16
-- Hallazgos escalados a `docs/specs/backlog.md`: ninguno todavía
-- Limpieza / reversión del entorno (proxy, `.env.local`, `jwt_expiry`): ⬜ Pendiente
+- Aprobados: 18 (16 casos de UI/temporización + 2 de MCP) — Fallidos: 0 — Pendientes: 0
+- **Tres bugs reales encontrados y corregidos durante la ronda**, cada uno con commit propio:
+  1. `AbortSignal.any()` no soportado en el Edge Runtime de Next.js — el
+     mecanismo primario de DEBT-071 fallaba en silencio, solo el
+     `Promise.race` de respaldo salvaba el resultado (`TC-054-001`).
+  2. `AbortSignal.timeout()` produce `name: "TimeoutError"`, y
+     `postgrest-js` solo trata `"AbortError"` como "no reintentable" — el
+     timeout de datos (DEBT-070) prometía 6s y tardaba ~31s reales
+     (`TC-054-005`).
+  3. `app/layout.tsx` encadenaba sus llamadas en serie (12s en vez de 6s) y
+     el banner de D-F no cubría el caso "sesión válida, perfil sin cargar"
+     (`TC-054-005`/`TC-054-009`).
+- Dos hallazgos de entorno ajenos al spec, no corregidos aquí: la base de
+  `mirp-lab` no tenía ningún estudiante ni curso académico al momento de
+  esta ronda (`TC-054-008`); y el código de progreso de lección ya degrada
+  en silencio sin propagar excepciones, por lo que `TC-054-007` no pudo
+  reproducir el escenario tal como estaba redactado (ver sus Hallazgos).
+- Hallazgos escalados a `docs/specs/backlog.md`: pendiente — ver pregunta al
+  usuario sobre si registrar la pérdida de datos de `mirp-lab` como deuda.
+- Limpieza / reversión del entorno (proxy, `.env.local`, `jwt_expiry`): ✅ Completada
