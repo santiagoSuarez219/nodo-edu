@@ -485,41 +485,56 @@ nadie pidió.
 - [x] `npx tsc --noEmit` y `npx eslint` en verde sobre los archivos nuevos y
       modificados.
 
-### Fase 4 — Pestaña y planilla en modo lectura
-- [ ] Cuarta pestaña "Asistencia" en `CourseTabs.tsx`, mismo patrón `isActive` /
+### Fase 4 — Pestaña y planilla en modo lectura ✅ Completada (2026-08-29)
+- [x] Cuarta pestaña "Asistencia" en `CourseTabs.tsx`, mismo patrón `isActive` /
       `aria-current` que las tres existentes.
-- [ ] `.../asistencia/page.tsx` con `requireAnyRole(["teacher","admin"])` y
+- [x] `.../asistencia/page.tsx` con `requireAnyRole(["teacher","admin"])` y
       `metadata.title`, igual que `grades/page.tsx`.
-- [ ] `AttendanceSheet.tsx`: matriz con columna de estudiante sticky a la
+- [x] `AttendanceSheet.tsx`: matriz con columna de estudiante sticky a la
       izquierda, % sticky a la derecha, cabeceras `scope`, `<caption>` y el
       autoscroll al extremo derecho al montar (D10).
-- [ ] Insignia "En curso" en la columna de la sesión abierta, con el texto que
+- [x] Insignia "En curso" en la columna de la sesión abierta, con el texto que
       indica que se cierra desde la lección (D5).
-- [ ] Tres estados vacíos **distintos entre sí y del fallo**: sin sesiones, sin
+- [x] Tres estados vacíos **distintos entre sí y del fallo**: sin sesiones, sin
       estudiantes activos, y `status: 'unavailable'` (D3).
-- [ ] Tokens semánticos y tabla claro/oscuro de `DESIGN.md`; Flowbite primero.
+- [x] Tokens semánticos y tabla claro/oscuro de `DESIGN.md`; sin librería de
+      componentes nueva — el proyecto no tiene `flowbite-react` instalado, así
+      que "Flowbite primero" se sigue con markup Tailwind al estilo Flowbite
+      (mismo criterio que `GradesTable`/`CourseLifecycleActions`).
+- [x] `npm run lint` (0 errores) y `npm run build` en verde, incluida la ruta
+      nueva `/admin/courses/[academicCourseId]/asistencia`.
 
-### Fase 5 — Edición de celda
-- [ ] `AttendanceCell.tsx`: checkbox con `aria-label` de nombre + fecha completa,
+### Fase 5 — Edición de celda ✅ Completada (2026-08-29, junto con la Fase 4)
+> `AttendanceCell` y el guardado optimista se escribieron a la vez que la
+> matriz de la Fase 4, al ser interdependientes; se documentan aquí por
+> separado siguiendo el checklist del spec.
+- [x] `AttendanceCell.tsx`: checkbox con `aria-label` de nombre + fecha completa,
       inversión optimista, `disabled` mientras viaja, **reversión** y borde rojo
-      ante fallo, y `aria-live` con el resultado (D9, D10).
-- [ ] Blindaje de transporte: `isServerActionTransportError()` +
+      ante fallo, y `aria-live` con el resultado (D9, D10). El estado optimista y
+      la reversión viven en `AttendanceSheet` (el padre), no en la celda: es quien
+      necesita el valor actual para recalcular el % en vivo.
+- [x] Blindaje de transporte: `isServerActionTransportError()` +
       `reportTransportError()`, re-lanzando si no lo es (D4, patrón de
-      `GradeInputCell`).
-- [ ] Marca discreta de procedencia manual con `title`/`aria-label` (D8).
-- [ ] La celda de una sesión **en curso** también es editable (corregir en vivo es
+      `GradeInputCell`), en `AttendanceSheet.handleToggle`.
+- [x] Marca discreta de procedencia manual con `title`/`aria-label` (D8): punto
+      azul sobre la casilla marcada a mano.
+- [x] La celda de una sesión **en curso** también es editable (corregir en vivo es
       legítimo); lo que se bloquea de la sesión abierta es borrarla o moverle la
-      fecha, no marcar (D5).
+      fecha, no marcar (D5) — `AttendanceCell` no consulta `is_open`.
 
-### Fase 6 — Gestión de sesiones
-- [ ] `CreateManualSessionForm.tsx` con React Hook Form + Zod: selector de fecha,
-      aviso no bloqueante si ya existe una sesión ese día (D13).
-- [ ] `AttendanceSessionActions.tsx`: editar fecha y eliminar, deshabilitados en la
-      sesión abierta con el motivo visible (D5).
-- [ ] Modal Flowbite de confirmación de borrado con el **conteo real** de registros
-      que se pierden y botón destructivo no-primario (D11).
-- [ ] Tras crear o borrar, la planilla refleja la columna nueva/ausente sin
-      recargar a mano (`revalidatePath`).
+### Fase 6 — Gestión de sesiones ✅ Completada (2026-08-29, junto con la Fase 4)
+- [x] `CreateManualSessionForm.tsx` con React Hook Form + Zod: selector de fecha,
+      aviso no bloqueante si ya existe una sesión ese día (D13) — segundo clic
+      ("Crear de todas formas") en vez de bloquear el envío.
+- [x] `AttendanceSessionActions.tsx`: editar fecha y eliminar, deshabilitados en la
+      sesión abierta con el motivo visible (D5) — mismo patrón de diálogo
+      accesible (`role="dialog"`, Escape, foco inicial) que
+      `CourseLifecycleActions`.
+- [x] Modal de confirmación de borrado con el **conteo real** de registros
+      que se pierden (calculado por el padre a partir de la planilla en pantalla)
+      y botón destructivo no-primario (D11).
+- [x] Tras crear, editar o borrar, la planilla refleja el cambio vía
+      `router.refresh()` en el cliente + `revalidatePath()` en la Server Action.
 
 ### Fase 7 — Verificación y cierre
 - [ ] `npm run lint` y `npm run build` en verde.

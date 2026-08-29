@@ -24,6 +24,12 @@ export const CreateManualSessionSchema = z.object({
   session_date: dateSchema,
 });
 
+// Solo el campo que pide el formulario de sesión manual — `academic_course_id`
+// llega como prop del componente, no del usuario.
+export const CreateManualSessionFormSchema = CreateManualSessionSchema.pick({
+  session_date: true,
+});
+
 export const UpdateSessionDateSchema = z.object({
   session_id: z.string().uuid(),
   session_date: dateSchema,
@@ -39,6 +45,7 @@ export const DeleteSessionSchema = z.object({
 });
 
 export type CreateManualSessionInput = z.infer<typeof CreateManualSessionSchema>;
+export type CreateManualSessionFormInput = z.infer<typeof CreateManualSessionFormSchema>;
 export type UpdateSessionDateInput = z.infer<typeof UpdateSessionDateSchema>;
 export type MarkAttendanceInput = z.infer<typeof MarkAttendanceSchema>;
 export type DeleteSessionInput = z.infer<typeof DeleteSessionSchema>;
