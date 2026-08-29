@@ -464,18 +464,26 @@ nadie pidió.
       entero; `null` (se pinta "—") si el curso no tiene sesiones.
 - [x] `npx tsc --noEmit` en verde tras los cambios.
 
-### Fase 3 — Server Actions
-- [ ] `lib/attendance/schemas.ts`: Zod para uuid de sesión/estudiante/curso y para
-      la fecha (`YYYY-MM-DD`, no futura en `America/Bogota`) (D13).
-- [ ] `lib/attendance/actions.ts` con `"use server"`, `requireUser()` y retorno
+### Fase 3 — Server Actions ✅ Completada (2026-08-29)
+- [x] `lib/attendance/schemas.ts`: Zod para uuid de sesión/estudiante/curso y para
+      la fecha (`YYYY-MM-DD`, no futura en `America/Bogota`) (D13). El cálculo de
+      "hoy" en Bogotá se duplica ahí (no se importa de `index.ts`, que lleva
+      `"use server"` y solo puede exportar funciones async).
+- [x] `lib/attendance/actions.ts` con `"use server"`, `requireUser()` y retorno
       `AuthResult` en las cinco acciones (D4).
-- [ ] `markStudentAttendanceAction`: `insert` con `marked_by: user.id`; tratar
+- [x] `markStudentAttendanceAction`: `insert` con `marked_by: user.id`; tratar
       `23505` como éxito idempotente (ya estaba marcado), no como error (D6, D8).
-- [ ] `unmarkStudentAttendanceAction`: `delete` por `(session_id, student_id)`.
-- [ ] `createManualSessionAction`: `insert` con `is_open:false`,
+- [x] `unmarkStudentAttendanceAction`: `delete` por `(session_id, student_id)`.
+- [x] `createManualSessionAction`: `insert` con `is_open:false`,
       `attendance_code:null`, `code_expires_at:null` (D7, D13).
-- [ ] `updateSessionDateAction` y `deleteSessionAction`.
-- [ ] Todas revalidan `/admin/courses/${academicCourseId}/asistencia`.
+- [x] `updateSessionDateAction` y `deleteSessionAction`: además de `is_open =
+      false` en el `where`, usan `.select().single()` para distinguir "cero filas
+      afectadas" (sesión en curso, ajena, o inexistente) de un fallo real — sin
+      esto, un `update`/`delete` que RLS filtra en silencio devolvía `{ok: true}`
+      sin haber cambiado nada.
+- [x] Todas revalidan `/admin/courses/${academicCourseId}/asistencia`.
+- [x] `npx tsc --noEmit` y `npx eslint` en verde sobre los archivos nuevos y
+      modificados.
 
 ### Fase 4 — Pestaña y planilla en modo lectura
 - [ ] Cuarta pestaña "Asistencia" en `CourseTabs.tsx`, mismo patrón `isActive` /
