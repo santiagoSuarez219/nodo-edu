@@ -21,6 +21,8 @@
 | Estudiante de prueba matriculado en `TEST051` | `create_student` (`students-mcp`) | `39992280-f977-4c47-85e5-7ccd47c2a1a9` (`test-spec053@nodo.local` / `TestSpec053!` → `TestSpec053New!` desde `TC-053-011`) | ⬜ (`delete_student`, `students-mcp`) |
 | Matrícula del estudiante en `TEST051` (creada junto con el estudiante) | `create_student` (`students-mcp`, `academic_course_id`) | `dd9ac053-f5b4-4bd4-afe0-6c4d8e98a85b` | ⬜ (eliminada en cascada por `delete_student`) |
 | Lección con autoevaluación — **contenido real de producción, no creado por esta ronda**: la misma lección de la evidencia de NODO-EDU-4 | `estructuras-de-datos` / `polimorfismo` — 2 preguntas `multiple_choice` ya publicadas y montadas | `2d4857e4-a7dc-421e-8164-4573f91ecd3d`, `4a9dc0c8-dfed-48ff-a999-8a5b0ef0cd74` | n/a |
+| Grupo de evaluación de prueba (para `TC-053-007`) | `create_assignment_group` + `publish_assignment_group` (`assignment-mcp`), reutiliza la pregunta `open_text` publicada `faeb32d0-440a-46f3-9173-e65154a52b0f` en sus 3 variantes | `fb568d2c-07b2-492e-801e-88fcf01350b5` (`TEST053 — Evaluación de prueba (spec-053)`) | ⬜ — **no se pudo eliminar**: `delete_assignment_group` falla con 409 al tener una entrega real (ver "Resumen de la ronda") |
+| Envío del estudiante de prueba a `TEST053` (variante B) | Enviado vía UI por el estudiante de prueba | `3cab20c7-2a3d-479b-a5b8-009b3242dabe`, calificado `4.50/5.00` | ⬜ (se elimina en cascada junto con el grupo, cuando ese quede libre para borrar) |
 
 > ⚠️ La autoevaluación es de **intento único** (`spec-040`) y cuenta para la
 > nota. `TC-053-001` y `TC-053-002` consumen el intento del estudiante de
@@ -229,8 +231,17 @@ revisión de un envío. Cortar el túnel después de cargar.
 2. Pulsar el botón de guardar/calificar.
 **Resultado esperado:** mensaje de error legible en el panel; la pantalla de
 revisión sigue en pie y no se pierde lo escrito en los demás campos.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{pendiente}}
+**Estado:** ✅ Aprobado
+**Hallazgos:** Montado ad hoc para este caso (ver "Datos de prueba adicionales"
+abajo): grupo `TEST053` (`open_text`, 3 variantes) creado y publicado vía
+`assignment-mcp`, el estudiante de prueba respondió y envió, el docente entró
+a `/admin/courses/.../assignments/.../review/...`. Con el túnel cortado a las
+19:04:23Z, se escribió puntaje `4.5` y retroalimentación "Buena respuesta,
+correcta y clara.", y se pulsó "Guardar": apareció "No pudimos comunicarnos
+con el servidor..." dentro del panel; la pantalla de revisión, el puntaje
+escrito y la retroalimentación **permanecieron intactos** (sin recargar).
+Túnel restaurado, se pulsó "Guardar" otra vez: se guardó correctamente
+(`4.50 / 5.00`, "Guardado" en verde). Sin observaciones adicionales.
 
 ---
 
@@ -344,17 +355,26 @@ prueba quedó en `TestSpec053New!` para el resto de la ronda.
 
 ## Resumen de la ronda
 
-- Aprobados: 10 (`TC-053-001` a `006`, `008` a `011`) — Fallidos: 0 —
-  Pendientes: 1 (`TC-053-007`, requiere una entrega real para calificar —
-  montaje de grupo de evaluación + envío de estudiante, deferido a una
-  continuación de esta ronda)
+- Aprobados: **11/11** (`TC-053-001` a `011`) — Fallidos: 0 — Pendientes: 0
 - Hallazgo no bloqueante: `TC-053-003` documenta que `LoginForm` no conserva
   el correo tras un fallo (comportamiento preexistente de React 19 al
   resetear formularios no controlados tras cualquier action, verificado que
   ocurre igual con Auth sano — no es una regresión de este spec, no
   escalado a backlog por no ser deuda introducida aquí).
 - Hallazgos escalados a `docs/specs/backlog.md`: ninguno
-- Limpieza de datos de prueba: ⬜ Pendiente (ronda sigue abierta —
-  `TC-053-007` puede requerir el mismo estudiante de prueba)
-- Túnel SSH: restaurado y activo al momento de este resumen (no se cierra la
-  ronda todavía)
+- **Limpieza de datos de prueba: ⚠️ bloqueada, requiere decisión del usuario.**
+  El grupo de evaluación `TEST053` (`fb568d2c-07b2-492e-801e-88fcf01350b5`) y
+  el estudiante de prueba (`39992280-f977-4c47-85e5-7ccd47c2a1a9`) no se
+  pudieron eliminar vía API:
+  - `delete_assignment_group` → 409 *"No se puede eliminar una evaluación que
+    ya tiene submissions."*
+  - `delete_student` → 409 *"No se puede eliminar: el estudiante tiene
+    entregas registradas... Usa unenroll_student si solo quieres retirarlo del
+    curso."*
+
+  Ambos bloqueos vienen del mismo envío real registrado en `TC-053-007`
+  (`3cab20c7-2a3d-479b-a5b8-009b3242dabe`). No se intentó borrar nada
+  directamente en base de datos — queda pendiente de instrucción explícita del
+  usuario (dejar los datos, usar `unenroll_student` para retirar al estudiante
+  sin perder el envío, o autorizar un `DELETE` manual en `mirp-lab`).
+- Túnel SSH: restaurado y activo al cierre de esta ronda.

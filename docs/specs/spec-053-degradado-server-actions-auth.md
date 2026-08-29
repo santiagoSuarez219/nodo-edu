@@ -1,4 +1,4 @@
-# spec-053 — [TESTING] Degradado honesto de Server Actions cuando el gate de Auth responde 503
+# spec-053 — [DONE] Degradado honesto de Server Actions cuando el gate de Auth responde 503
 
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.
@@ -360,6 +360,17 @@ MCP" de `spec-052`.
   función pura y sería la primera candidata natural a test unitario cuando el
   framework exista.
 - Sin MCP → sin casos `TC-MCP`.
+
+**Ronda del 2026-08-29: 11/11 aprobados.** Ejecutada en desarrollo
+(`mirp-lab`) contra los 4 eventos reales de NODO-EDU-4 (autoevaluación de
+`polimorfismo` y `/login`) y contra un grupo de evaluación de prueba montado
+para `TC-053-007`. Sin hallazgos que requirieran cambio de código — un solo
+hallazgo no bloqueante documentado en `TC-053-003` (comportamiento
+preexistente de React 19, no introducido por este spec). Limpieza de datos de
+prueba **bloqueada**: el envío real de `TC-053-007` impide borrar el grupo de
+evaluación y el estudiante de prueba vía API (ambos devuelven 409) — pendiente
+de decisión del usuario, ver `docs/testing/test-053-degradado-server-actions-auth.md`
+→ "Resumen de la ronda".
 
 ## Aprobación de implementación
 
