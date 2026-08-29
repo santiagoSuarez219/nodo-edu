@@ -1,4 +1,4 @@
-# spec-054 — [NOT STARTED] Resiliencia del camino de request ante latencia de Supabase
+# spec-054 — [IN PROGRESS] Resiliencia del camino de request ante latencia de Supabase
 
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.
@@ -495,6 +495,26 @@ para que el **mensaje** también sea correcto en todos los caminos.
 
 > Claude no escribe código de implementación hasta que esta sección esté marcada.
 
-- [ ] Paquete (spec + pruebas) aprobado por el usuario
-- [ ] Decisiones D-A … D-F resueltas
-- **Fecha de aprobación:** —
+- [x] Paquete (spec + pruebas) aprobado por el usuario
+- [x] Decisiones D-A … D-F resueltas
+- **Fecha de aprobación:** 2026-08-29
+
+### Decisiones tomadas (2026-08-29)
+
+- **D-A** — 8 s de deadline global en el middleware.
+- **D-B** — `AbortController` compartido + `Promise.race` como cinturón,
+  ambos juntos (recomendación aceptada). `reason: "timeout"` nuevo en
+  `AuthUnavailableReason`, distinto de `"network"`.
+- **D-C** — 6 s en `lib/auth/server.ts` y `lib/auth/actions.ts`; 10 s en el
+  singleton `lib/auth/service.ts` (recomendación aceptada, valores
+  diferenciados).
+- **D-D** — dos comportamientos: camino de sesión/autorización degrada a
+  `/servicio-no-disponible`; consultas de datos de página propagan al error
+  boundary de ruta con copy de infraestructura, sin redirigir.
+- **D-E** — **E1**: ante `reason: "network" | "server"`, `/` y
+  `/grupo-investigacion` quedan abiertas a navegación anónima en modo
+  degradado. Las rutas de curso y lección siguen exigiendo sesión y
+  matrícula sin excepción (D4 de spec-046 intacto). `misconfigured` y
+  `unknown` no activan esta excepción en ninguna ruta.
+- **D-F** — banner discreto y persistente en el layout cuando el estado sea
+  degradado, para que un usuario con sesión válida no crea que se cerró.
