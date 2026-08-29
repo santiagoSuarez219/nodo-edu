@@ -17,20 +17,23 @@
 | Recurso | Endpoint de creación | Identificador | Eliminado |
 |---|---|---|---|
 | Docente de desarrollo (ya sembrado, **no** crear ni borrar) | `npm run seed:teacher` | `dev@nodo.local` / `DevLocal2026!` | n/a |
-| Curso académico de prueba | por definir al abrir la ronda (ver **[[DEBT-060]]** — no hay endpoint/MCP para crear `academic_courses`) | `{{id}}` | ⬜ |
-| Estudiante de prueba matriculado | `create_student` (`students-mcp`) | `{{id}}` | ⬜ |
-| Lección con autoevaluación montada y **sin intento previo** para ese estudiante | `mount_question_in_lesson` (`question-bank-mcp`) | `{{lección}}` / `{{ids de preguntas}}` | ⬜ |
+| Curso académico (**reutilizado, no creado por esta ronda — no eliminar**: leftover de la ronda de `spec-051`, sigue vivo en `mirp-lab`) | `list_academic_courses` (`assignment-mcp`) | `TEST051 — Estructuras de Datos`, `53c1a445-cf85-43ec-8167-8eeefa1f7902` | n/a |
+| Estudiante de prueba matriculado en `TEST051` | `create_student` (`students-mcp`) | `39992280-f977-4c47-85e5-7ccd47c2a1a9` (`test-spec053@nodo.local` / `TestSpec053!`) | ⬜ (`delete_student`, `students-mcp`) |
+| Matrícula del estudiante en `TEST051` (creada junto con el estudiante) | `create_student` (`students-mcp`, `academic_course_id`) | `dd9ac053-f5b4-4bd4-afe0-6c4d8e98a85b` | ⬜ (eliminada en cascada por `delete_student`) |
+| Lección con autoevaluación — **contenido real de producción, no creado por esta ronda**: la misma lección de la evidencia de NODO-EDU-4 | `estructuras-de-datos` / `polimorfismo` — 2 preguntas `multiple_choice` ya publicadas y montadas | `2d4857e4-a7dc-421e-8164-4573f91ecd3d`, `4a9dc0c8-dfed-48ff-a999-8a5b0ef0cd74` | n/a |
 
 > ⚠️ La autoevaluación es de **intento único** (`spec-040`) y cuenta para la
 > nota. `TC-053-001` y `TC-053-002` consumen el intento del estudiante de
-> prueba: si hay que repetirlos, se necesita un estudiante nuevo o borrar el
-> intento. Anotarlo antes de empezar.
+> prueba en `polimorfismo`: si hay que repetirlos, se necesita un estudiante
+> nuevo (no hay endpoint para borrar un intento ya registrado).
 
 **Entorno de pruebas:** desarrollo — instancia Supabase local en `mirp-lab` vía
-túnel SSH (ver CLAUDE.md → "Base de datos"). **Nunca ejecutar esta ronda contra
+túnel SSH (ver CLAUDE.md → "Base de datos"). Confirmado activo antes de esta
+ronda: túnel SSH arriba (`pgrep -f "ssh.*-L 54321.*mirp-lab"` → PID 61981) y
+`npm run dev` sirviendo en `localhost:3000`. **Nunca ejecutar esta ronda contra
 producción:** los casos consisten en tumbar el servicio de autenticación.
 
-**Fecha de la ronda:** {{pendiente}}
+**Fecha de la ronda:** 2026-08-29
 
 ### Cómo simular la caída de Auth y cómo restaurarla
 
@@ -187,7 +190,7 @@ revisión sigue en pie y no se pierde lo escrito en los demás campos.
 
 **Precondición:** cortar el túnel SSH. Sin sesión.
 **Pasos:**
-1. Navegar directamente a `https://localhost:{{puerto}}/` escribiendo la URL
+1. Navegar directamente a `http://localhost:3000/` escribiendo la URL
    (navegación completa, **no** una interacción dentro de la app).
 2. Restaurar el túnel al terminar.
 **Resultado esperado:** se muestra la página de servicio no disponible de
