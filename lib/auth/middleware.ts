@@ -160,9 +160,22 @@ export async function updateSupabaseSession(
     // *resuelva* antes del deadline si alguna rama del SDK no propagara la
     // señal como se espera. Este `Promise.race` sí lo garantiza: la función
     // devuelve dentro del presupuesto pase lo que pase con la promesa
-    // perdedora (que en Edge/serverless muere con la invocación).
+    // perdedora (que en Edge/serverless muere con la invocación — en un
+    // servidor de desarrollo persistente puede seguir viva unos instantes
+    // más, ver el `.catch` de abajo).
+    //
+    // TC-054-001 (ronda de pruebas, 2026-08-29): esa promesa perdedora sigue
+    // corriendo en segundo plano después del deadline, y sus fetches en
+    // curso rechazan por el mismo `AbortController` — visto en los logs de
+    // desarrollo como un rechazo no manejado. `checkAuth()` nunca debería
+    // rechazar (siempre atrapa sus errores y devuelve un `AuthCheckResult`),
+    // así que este `.catch` es puramente defensivo: silencia el ruido de la
+    // promesa abandonada sin afectar `auth`, que ya viene del listener del
+    // deadline.
     const auth = await Promise.race([
-      checkAuth(supabase, supabaseUrl, supabaseKey, healthFetch),
+      checkAuth(supabase, supabaseUrl, supabaseKey, healthFetch).catch(
+        () => ({ status: "unavailable", reason: "timeout" }) as const
+      ),
       new Promise<AuthCheckResult>((resolve) => {
         deadline.signal.addEventListener(
           "abort",

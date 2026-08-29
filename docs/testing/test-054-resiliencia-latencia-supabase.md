@@ -28,7 +28,14 @@
 túnel SSH (ver CLAUDE.md → "Base de datos"). **Nunca ejecutar esta ronda contra
 producción:** los casos consisten en degradar deliberadamente el servicio.
 
-**Fecha de la ronda:** ⬜ pendiente (la ronda se ejecuta tras la implementación)
+**Fecha de la ronda:** 2026-08-29
+
+> **Nota de ejecución:** varios casos de esta ronda son de temporización y
+> contenido HTTP, no de apariencia visual — se ejecutan vía `curl` (con una
+> sesión real obtenida a través de la propia librería `@supabase/ssr`, no
+> reconstruida a mano) en vez de a través del navegador, por instrucción
+> explícita del usuario ("Ejecuta esta prueba" en TC-054-001). Los casos que
+> sí exigen observar la UI (copy, navbar, banner) se marcan aparte.
 
 ### Montaje del escenario
 
@@ -67,8 +74,28 @@ reiniciar `npm run dev`.
 2. Cronometrar la respuesta de extremo a extremo.
 **Resultado esperado:** la página de servicio no disponible de `spec-046` (503), en **≤ el presupuesto de D-A**. **Nunca** la pantalla `504: GATEWAY_TIMEOUT / MIDDLEWARE_INVOCATION_TIMEOUT` de Vercel ni un error de invocación.
 **Estado hoy (pre-implementación):** ❌ se espera que el bucle de `_refreshAccessToken` consuma ~26,6 s (ver Hallazgo 1 del spec) y produzca el 504.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** —
+**Estado:** ✅ Aprobado
+**Hallazgos:** Ejecutado 3 veces vía `curl` con sesión real (login directo
+contra el backend, `jwt_expiry=60` en `mirp-lab`). Resultado final: `503` en
+`8.095982s` con el copy de `spec-046` ("No pudimos verificar tu sesión... Tu
+sesión sigue activa"). Log del servidor confirma
+`[auth] servicio no disponible (timeout, 8002ms) — /cuenta/cursos`, dentro
+del presupuesto de D-A. **Bug real encontrado y corregido en el camino:**
+`createBudgetedFetch` (`lib/auth/fetch-timeout.ts`) usaba `AbortSignal.any()`,
+que **no existe** en el Edge Runtime de Next.js (verificado:
+`node_modules/next/dist/compiled/edge-runtime/index.js` no lo implementa,
+aunque el Node.js del resto del proyecto sí) — producía un
+`TypeError: AbortSignal.any is not a function` en cada fetch del gate,
+silenciado solo porque el `Promise.race` de respaldo (D-B) igual devolvía a
+tiempo. El mecanismo *primario* (el `AbortController` compartido cortando el
+bucle de reintentos) no estaba funcionando en absoluto — solo el cinturón de
+seguridad. Corregido con una combinación manual de señales
+(`combineSignals()`, sin `.any()`). De paso, se encontró y corrigió un
+"unhandled rejection" en `lib/auth/middleware.ts`: la promesa perdedora del
+`Promise.race` no tenía `.catch()`, y sus fetches en curso rechazaban tras el
+deadline sin nadie escuchando — inofensivo en producción (la invocación
+serverless muere antes), pero ruidoso en un servidor de desarrollo
+persistente. Repetido dos veces más tras cada corrección para confirmar.
 
 ### TC-054-002 — Auth colgado por completo: el gate responde dentro del presupuesto
 **Cubre:** CA 2 (DEBT-071).

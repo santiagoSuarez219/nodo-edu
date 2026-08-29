@@ -3,6 +3,28 @@
 // implementación en vez de tres copias del mismo `AbortSignal.timeout`
 // (el estado previo a este spec: solo `lib/auth/middleware.ts` tenía uno).
 
+// Combina varias señales en una sola, sin `AbortSignal.any()`: verificado en
+// la ronda de pruebas de TC-054-001 que el Edge Runtime de Next.js (donde
+// corre `lib/auth/middleware.ts` — no es Node.js, es un sandbox V8 propio,
+// `node_modules/next/dist/compiled/edge-runtime/`) NO implementa `.any()`
+// pese a que el Node.js del resto del proyecto (v24) sí — producía un
+// `TypeError: AbortSignal.any is not a function` en cada fetch del gate,
+// silenciado solo porque el `Promise.race` de respaldo (D-B) igual devolvía
+// a tiempo. Esta combinación manual funciona en ambos entornos.
+function combineSignals(signals: AbortSignal[]): AbortSignal {
+  const controller = new AbortController();
+  for (const signal of signals) {
+    if (signal.aborted) {
+      controller.abort(signal.reason);
+      break;
+    }
+    signal.addEventListener("abort", () => controller.abort(signal.reason), {
+      once: true,
+    });
+  }
+  return controller.signal;
+}
+
 // Uso simple: cada llamada obtiene su propio `AbortSignal.timeout(budgetMs)`.
 // Suficiente para los clientes de datos (server.ts, actions.ts, service.ts):
 // no encadenan reintentos internos del SDK que necesiten un presupuesto
@@ -10,7 +32,7 @@
 export function createTimeoutFetch(budgetMs: number): typeof fetch {
   return (input, init) => {
     const ownSignal = AbortSignal.timeout(budgetMs);
-    const signal = init?.signal ? AbortSignal.any([init.signal, ownSignal]) : ownSignal;
+    const signal = init?.signal ? combineSignals([init.signal, ownSignal]) : ownSignal;
     return fetch(input, { ...init, signal });
   };
 }
@@ -28,6 +50,6 @@ export function createBudgetedFetch(perCallMs: number, sharedSignal: AbortSignal
     const signals = init?.signal
       ? [perCallSignal, sharedSignal, init.signal]
       : [perCallSignal, sharedSignal];
-    return fetch(input, { ...init, signal: AbortSignal.any(signals) });
+    return fetch(input, { ...init, signal: combineSignals(signals) });
   };
 }
