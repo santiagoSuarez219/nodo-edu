@@ -41,6 +41,24 @@ export const getCurrentUser = cache(async () => {
   return auth.status === "authenticated" ? auth.user : null;
 });
 
+// spec-054 (D-F): para que el root layout pueda mostrar un aviso discreto en
+// vez de dejar que una sesión válida parezca cerrada. `getCurrentUser()`
+// colapsa `unavailable` en `null` (DEBT-040, gap deliberado y documentado
+// arriba) — sin esta función, el layout no tiene forma de distinguir "eres
+// anónimo" de "no pudimos verificarte" y la navbar simplemente desaparece,
+// que es exactamente la mentira que spec-046 cerró un nivel más arriba
+// (DEBT-042). Devuelve el motivo solo cuando es transitorio: si llegó hasta
+// aquí con `misconfigured`/`unknown`, la ruta ya habría recibido el 503 total
+// del middleware (spec-054, DEBT-069) y este código nunca se ejecutaría.
+export const getAuthDegradedReason = cache(async (): Promise<"network" | "server" | "timeout" | null> => {
+  const auth = await getAuthCheck();
+  if (auth.status !== "unavailable") return null;
+  if (auth.reason === "network" || auth.reason === "server" || auth.reason === "timeout") {
+    return auth.reason;
+  }
+  return null;
+});
+
 export const getCurrentProfile = cache(async (): Promise<Profile | null> => {
   const user = await getCurrentUser();
   if (!user) return null;
