@@ -4,6 +4,8 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { createGradeItemAction, deleteGradeItemAction } from "@/lib/grades/actions";
 import type { GradeItem } from "@/lib/grades/types";
+import { isServerActionTransportError, SERVER_ACTION_TRANSPORT_ERROR_MESSAGE } from "@/lib/errors/server-action";
+import { reportTransportError } from "@/lib/observability/report-transport-error";
 
 interface Props {
   academicCourseId: string;
@@ -25,11 +27,20 @@ export function GradeItemsPanel({ academicCourseId, initialItems }: Props) {
     }
     setFormError(null);
     startTransition(async () => {
-      const result = await createGradeItemAction(
-        academicCourseId,
-        newName.trim(),
-        initialItems.length
-      );
+      let result;
+      try {
+        result = await createGradeItemAction(
+          academicCourseId,
+          newName.trim(),
+          initialItems.length
+        );
+      } catch (err) {
+        // spec-053: ver LoginForm.tsx para el motivo.
+        if (!isServerActionTransportError(err)) throw err;
+        reportTransportError(err, "createGradeItemAction");
+        setFormError(SERVER_ACTION_TRANSPORT_ERROR_MESSAGE);
+        return;
+      }
       if (!result.ok) {
         setFormError(result.error);
         return;
@@ -44,7 +55,17 @@ export function GradeItemsPanel({ academicCourseId, initialItems }: Props) {
     if (!confirm(`¿Eliminar el ítem "${itemName}"? Esta acción no se puede deshacer.`)) return;
     setDeletingId(itemId);
     startTransition(async () => {
-      const result = await deleteGradeItemAction(itemId, academicCourseId);
+      let result;
+      try {
+        result = await deleteGradeItemAction(itemId, academicCourseId);
+      } catch (err) {
+        setDeletingId(null);
+        // spec-053: ver LoginForm.tsx para el motivo.
+        if (!isServerActionTransportError(err)) throw err;
+        reportTransportError(err, "deleteGradeItemAction");
+        alert(SERVER_ACTION_TRANSPORT_ERROR_MESSAGE);
+        return;
+      }
       setDeletingId(null);
       if (!result.ok) {
         alert(result.error);

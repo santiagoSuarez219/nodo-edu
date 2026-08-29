@@ -2,11 +2,20 @@
 
 import { useActionState, useEffect, useRef } from "react";
 import { changePassword, type ChangePasswordResult } from "@/lib/auth/actions";
+import { withTransportFallback } from "@/lib/errors/server-action";
 
 const initial: ChangePasswordResult = { ok: true };
 
+// spec-053: ver LoginForm.tsx para el motivo — mismo patrón en los cuatro
+// formularios que usan useActionState.
+const changePasswordFormAction = withTransportFallback(
+  changePassword,
+  "changePassword",
+  (error) => ({ ok: false, error })
+);
+
 export function ChangePasswordForm() {
-  const [state, formAction, isPending] = useActionState(changePassword, initial);
+  const [state, formAction, isPending] = useActionState(changePasswordFormAction, initial);
   const formRef = useRef<HTMLFormElement>(null);
 
   // El formulario no se desmonta al tener éxito (no hay redirect), así que

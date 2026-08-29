@@ -2,6 +2,8 @@
 
 import { useState, useRef } from "react";
 import { upsertStudentGradeAction } from "@/lib/grades/actions";
+import { isServerActionTransportError } from "@/lib/errors/server-action";
+import { reportTransportError } from "@/lib/observability/report-transport-error";
 
 type SaveStatus = "idle" | "saving" | "saved" | "error";
 
@@ -42,12 +44,21 @@ export function GradeInputCell({
     if (score === initialScore) return;
 
     setStatus("saving");
-    const result = await upsertStudentGradeAction(
-      enrollmentId,
-      gradeItemId,
-      score,
-      academicCourseId
-    );
+    let result;
+    try {
+      result = await upsertStudentGradeAction(
+        enrollmentId,
+        gradeItemId,
+        score,
+        academicCourseId
+      );
+    } catch (err) {
+      // spec-053: ver LoginForm.tsx para el motivo.
+      if (!isServerActionTransportError(err)) throw err;
+      reportTransportError(err, "upsertStudentGradeAction");
+      setStatus("error");
+      return;
+    }
 
     if (!result.ok) {
       setStatus("error");

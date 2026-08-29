@@ -1,9 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import { signOut } from "@/lib/auth/actions";
 import type { Profile } from "@/lib/students/types";
+import { isServerActionTransportError, SERVER_ACTION_TRANSPORT_ERROR_MESSAGE } from "@/lib/errors/server-action";
+import { reportTransportError } from "@/lib/observability/report-transport-error";
 
 function getInitials(name: string): string {
   return name
@@ -20,10 +22,27 @@ export function UserMenu({ profile }: { profile: Profile }) {
   const triggerRef = useRef<HTMLButtonElement>(null);
   const myAccountRef = useRef<HTMLAnchorElement>(null);
   const initials = getInitials(profile.full_name);
+  const [signOutError, setSignOutError] = useState<string | null>(null);
+  const [isSigningOut, startSignOutTransition] = useTransition();
 
   function close() {
     setOpen(false);
     triggerRef.current?.focus();
+  }
+
+  // spec-053: ver Navbar.tsx para el motivo.
+  function handleSignOut(e: React.FormEvent) {
+    e.preventDefault();
+    setSignOutError(null);
+    startSignOutTransition(async () => {
+      try {
+        await signOut();
+      } catch (err) {
+        if (!isServerActionTransportError(err)) throw err;
+        reportTransportError(err, "signOut");
+        setSignOutError(SERVER_ACTION_TRANSPORT_ERROR_MESSAGE);
+      }
+    });
   }
 
   useEffect(() => {
@@ -110,11 +129,12 @@ export function UserMenu({ profile }: { profile: Profile }) {
             Mi cuenta
           </Link>
 
-          <form action={signOut}>
+          <form onSubmit={handleSignOut}>
             <button
               type="submit"
               role="menuitem"
-              className="flex w-full items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors focus-visible:outline-none focus-visible:bg-gray-100 dark:focus-visible:bg-gray-700"
+              disabled={isSigningOut}
+              className="flex w-full items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors focus-visible:outline-none focus-visible:bg-gray-100 dark:focus-visible:bg-gray-700 disabled:opacity-60"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -134,9 +154,14 @@ export function UserMenu({ profile }: { profile: Profile }) {
                   clipRule="evenodd"
                 />
               </svg>
-              Cerrar sesión
+              {isSigningOut ? "Cerrando sesión…" : "Cerrar sesión"}
             </button>
           </form>
+          {signOutError && (
+            <p role="alert" className="px-3 pb-2 text-xs text-red-600 dark:text-red-400">
+              {signOutError}
+            </p>
+          )}
         </div>
       )}
     </div>
