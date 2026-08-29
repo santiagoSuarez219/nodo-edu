@@ -16,6 +16,37 @@ const RETRY_DELAY_MS = 250;
 // del 503.
 const REQUEST_TIMEOUT_MS = 2000;
 
+// Incidente del 2026-08-29: el sitio entero alternó entre 503 y 200 durante
+// ~35 minutos sin que Auth estuviera caído. `/auth/v1/health` sufría
+// episodios de latencia (medido: 5.98s, y >15s en el peor tramo) mientras
+// `/token` y `/user` seguían respondiendo en ~200ms — los usuarios con
+// sesión navegaban con normalidad y solo los visitantes anónimos, que son
+// los únicos que llegan a este ping, recibían el 503. Con los 2s de
+// REQUEST_TIMEOUT_MS, cada uno de esos episodios se traducía en una caída
+// total.
+//
+// Dos cambios, deliberadamente conservadores:
+//
+// 1. Un timeout propio y más holgado SOLO para el ping de salud. El resto
+//    del cliente (getUser, user_roles) conserva los 2s: esas llamadas nunca
+//    han mostrado esta latencia y no hay motivo para relajarlas. Peor caso
+//    del ping: ~2 intentos × 5s + 250ms ≈ 10.25s, muy por debajo del límite
+//    de ejecución del middleware en Vercel.
+const HEALTH_TIMEOUT_MS = 5000;
+// 2. Cachear el resultado **sano** por instancia. Sin esto, cada request sin
+//    cookie de sesión paga un ping completo (nota de DEBT en
+//    docs/specs/backlog.md), así que un episodio de lentitud se amplifica a
+//    todo el tráfico anónimo. Solo se cachea el resultado positivo: un fallo
+//    nunca se cachea, para que la recuperación sea inmediata y no se
+//    prolongue el 503 más allá del incidente real. El precio es que una
+//    caída de Auth puede tardar hasta este TTL en detectarse, que es
+//    exactamente el intercambio que el backlog dejaba pendiente de evaluar.
+const HEALTH_CACHE_TTL_MS = 10_000;
+
+// Estado por instancia del runtime, no compartido entre regiones ni
+// invocaciones frías — es un amortiguador, no una fuente de verdad.
+let healthyUntil = 0;
+
 export async function updateSupabaseSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
 
@@ -127,16 +158,22 @@ async function tryGetUser(
 // en esta ruta, lo que ocultó el bug en la primera versión de este fix (ver
 // hallazgo 🔴-1 de la revisión de código de spec-046, 2026-08-13): sin la
 // key, cualquier visitante anónimo en producción recibía 503 con Auth
-// perfectamente sano. Mismo timeout que el resto del cliente de este
-// middleware; el reintento ante fallo lo aporta gratis checkAuth() de más
+// perfectamente sano. Timeout propio (HEALTH_TIMEOUT_MS) y caché del
+// resultado sano tras el incidente del 2026-08-29 — ver el bloque de
+// constantes; el reintento ante fallo lo aporta gratis checkAuth() de más
 // arriba.
 async function checkAuthHealth(supabaseUrl: string, supabaseKey: string): Promise<AuthCheckResult> {
+  if (Date.now() < healthyUntil) return { status: "anonymous" };
+
   try {
     const res = await fetch(`${supabaseUrl}/auth/v1/health`, {
       headers: { apikey: supabaseKey, Authorization: `Bearer ${supabaseKey}` },
-      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+      signal: AbortSignal.timeout(HEALTH_TIMEOUT_MS),
     });
-    if (res.ok) return { status: "anonymous" };
+    if (res.ok) {
+      healthyUntil = Date.now() + HEALTH_CACHE_TTL_MS;
+      return { status: "anonymous" };
+    }
 
     // El log de arriba (middleware.ts) solo imprime el `reason` agrupado —
     // no alcanza para diagnosticar un 401/403 (apikey rotada/entorno
