@@ -451,7 +451,11 @@ export async function getAttendanceSheet(
           .from('class_sessions')
           .select('id, session_date, attendance_code, is_open')
           .eq('academic_course_id', academicCourseId)
-          .order('session_date', { ascending: true }),
+          // Desempate por `created_at`: D13 admite dos sesiones el mismo día
+          // (dos bloques de clase), y solo `session_date` no da un orden
+          // determinista entre ellas.
+          .order('session_date', { ascending: true })
+          .order('created_at', { ascending: true }),
         supabase
           .from('enrollments')
           .select('student_id')
@@ -466,11 +470,54 @@ export async function getAttendanceSheet(
     if (sessionsError) throw sessionsError;
     if (enrollmentsError) throw enrollmentsError;
 
+    const sessionIds = (sessions ?? []).map((s) => s.id as string);
+
+    // Hallazgo de @reviewer: PostgREST trunca en `max_rows` (1000 en este
+    // proyecto) sin devolver error. Sin paginar, un curso con suficientes
+    // sesiones y estudiantes puede perder registros en silencio y pintar
+    // presentes como ausentes — exactamente el fallo que D3 prohíbe. Se pagina
+    // hasta recibir una página más corta que el tamaño pedido (fin de datos),
+    // sin depender de conocer el `max_rows` exacto del proyecto.
+    const PAGE_SIZE = 1000;
+    const allRecords: Array<{
+      session_id: string;
+      student_id: string;
+      marked_at: string;
+      marked_by: string | null;
+    }> = [];
+
+    if (sessionIds.length > 0) {
+      let from = 0;
+      for (;;) {
+        const { data: page, error: pageError } = await supabase
+          .from('attendance_records')
+          .select('session_id, student_id, marked_at, marked_by')
+          .in('session_id', sessionIds)
+          .order('session_id', { ascending: true })
+          .range(from, from + PAGE_SIZE - 1);
+
+        if (pageError) throw pageError;
+
+        allRecords.push(...((page ?? []) as typeof allRecords));
+        if (!page || page.length < PAGE_SIZE) break;
+        from += PAGE_SIZE;
+      }
+    }
+
+    // Conteo real por sesión, sin restringir a matrículas activas: es el que
+    // usa el modal de borrado (D11) — el `on delete cascade` se lleva también
+    // los registros de estudiantes retirados que D2 excluye de las filas.
+    const attendeeCountBySession = new Map<string, number>();
+    for (const r of allRecords) {
+      attendeeCountBySession.set(r.session_id, (attendeeCountBySession.get(r.session_id) ?? 0) + 1);
+    }
+
     const sheetSessions: AttendanceSheetSession[] = (sessions ?? []).map((s) => ({
       id: s.id as string,
       session_date: s.session_date as string,
       has_code: s.attendance_code !== null,
       is_open: s.is_open as boolean,
+      attendee_count: attendeeCountBySession.get(s.id as string) ?? 0,
     }));
 
     const studentIds = (enrollments ?? []).map((e) => e.student_id as string);
@@ -479,18 +526,12 @@ export async function getAttendanceSheet(
       return { status: 'ok', sessions: sheetSessions, rows: [] };
     }
 
-    const sessionIds = sheetSessions.map((s) => s.id);
-    const { data: records, error: recordsError } =
-      sessionIds.length > 0
-        ? await supabase
-            .from('attendance_records')
-            .select('session_id, student_id, marked_at, marked_by')
-            .in('session_id', sessionIds)
-        : { data: [], error: null };
-
-    if (recordsError) throw recordsError;
-
     const profiles = await fetchStudentProfilesPublic(supabase, studentIds);
+
+    const recordByKey = new Map<string, (typeof allRecords)[number]>();
+    for (const r of allRecords) {
+      recordByKey.set(`${r.session_id}:${r.student_id}`, r);
+    }
 
     // D2: las filas son las matrículas activas; la ausencia es la falta de
     // registro — no se materializa ninguna fila de ausencia.
@@ -499,15 +540,13 @@ export async function getAttendanceSheet(
       let attendedCount = 0;
 
       for (const session of sheetSessions) {
-        const record = (records ?? []).find(
-          (r) => r.session_id === session.id && r.student_id === studentId
-        );
+        const record = recordByKey.get(`${session.id}:${studentId}`);
 
         if (record) {
           attendedCount++;
           cells[session.id] = {
             present: true,
-            marked_at: record.marked_at as string,
+            marked_at: record.marked_at,
             marked_manually: record.marked_by !== null,
           };
         } else {

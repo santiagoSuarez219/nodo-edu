@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useEffect, useId, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { updateSessionDateAction, deleteSessionAction } from "@/lib/attendance/actions";
 import {
@@ -26,6 +26,10 @@ type DialogKind = "edit" | "delete" | null;
 // controles viven en la vista de lección (AdminAttendancePanel), no aquí.
 export function AttendanceSessionActions({ academicCourseId, session, attendeeCount }: Props) {
   const router = useRouter();
+  // Este componente se instancia una vez por columna (hasta ~32 en un
+  // semestre); un id de diálogo fijo colisionaría en el DOM aunque solo haya
+  // un diálogo abierto a la vez (hallazgo @reviewer).
+  const dialogTitleId = useId();
   const [isPending, startTransition] = useTransition();
   const [dialog, setDialog] = useState<DialogKind>(null);
   const [dateValue, setDateValue] = useState(session.session_date);
@@ -112,7 +116,14 @@ export function AttendanceSessionActions({ academicCourseId, session, attendeeCo
           title={disabledReason ?? "Editar fecha"}
           className="rounded p-1 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 disabled:opacity-30 disabled:hover:text-gray-400"
         >
-          ✏️
+          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+            />
+          </svg>
         </button>
         <button
           type="button"
@@ -122,7 +133,14 @@ export function AttendanceSessionActions({ academicCourseId, session, attendeeCo
           title={disabledReason ?? "Eliminar sesión"}
           className="rounded p-1 text-gray-400 hover:text-red-700 dark:hover:text-red-400 disabled:opacity-30 disabled:hover:text-gray-400"
         >
-          🗑️
+          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+            />
+          </svg>
         </button>
       </div>
 
@@ -137,14 +155,14 @@ export function AttendanceSessionActions({ academicCourseId, session, attendeeCo
           <div
             role="dialog"
             aria-modal="true"
-            aria-labelledby="attendance-session-dialog-title"
+            aria-labelledby={dialogTitleId}
             className="fixed inset-0 z-50 flex items-center justify-center p-4"
           >
             <div className="w-full max-w-sm rounded-[var(--radius-base)] border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 shadow-xl flex flex-col gap-4">
               {dialog === "edit" ? (
                 <>
                   <h2
-                    id="attendance-session-dialog-title"
+                    id={dialogTitleId}
                     className="text-base font-bold text-gray-900 dark:text-white"
                   >
                     Editar fecha de la sesión
@@ -178,16 +196,24 @@ export function AttendanceSessionActions({ academicCourseId, session, attendeeCo
               ) : (
                 <>
                   <h2
-                    id="attendance-session-dialog-title"
+                    id={dialogTitleId}
                     className="text-base font-bold text-gray-900 dark:text-white"
                   >
                     Eliminar sesión
                   </h2>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     Eliminar la sesión del{" "}
-                    <strong>{formatSessionDateLong(session.session_date)}</strong> borrará también
-                    sus <strong>{attendeeCount} registro(s) de asistencia</strong>. Esta acción no
-                    se puede deshacer.
+                    <strong>{formatSessionDateLong(session.session_date)}</strong> borrará también{" "}
+                    {attendeeCount === 1 ? (
+                      <>
+                        su <strong>1 registro de asistencia</strong>
+                      </>
+                    ) : (
+                      <>
+                        sus <strong>{attendeeCount} registros de asistencia</strong>
+                      </>
+                    )}
+                    . Esta acción no se puede deshacer.
                   </p>
                   {error && <p className="text-sm text-red-700 dark:text-red-400">{error}</p>}
                   <div className="flex justify-end gap-3">

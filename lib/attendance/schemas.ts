@@ -33,6 +33,7 @@ export const CreateManualSessionFormSchema = CreateManualSessionSchema.pick({
 export const UpdateSessionDateSchema = z.object({
   session_id: z.string().uuid(),
   session_date: dateSchema,
+  academic_course_id: z.string().uuid(),
 });
 
 export const MarkAttendanceSchema = z.object({
@@ -42,6 +43,7 @@ export const MarkAttendanceSchema = z.object({
 
 export const DeleteSessionSchema = z.object({
   session_id: z.string().uuid(),
+  academic_course_id: z.string().uuid(),
 });
 
 export type CreateManualSessionInput = z.infer<typeof CreateManualSessionSchema>;

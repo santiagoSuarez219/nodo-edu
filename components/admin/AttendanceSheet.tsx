@@ -1,14 +1,21 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { markStudentAttendanceAction, unmarkStudentAttendanceAction } from "@/lib/attendance/actions";
-import { isServerActionTransportError } from "@/lib/errors/server-action";
+import {
+  isServerActionTransportError,
+  SERVER_ACTION_TRANSPORT_ERROR_MESSAGE,
+} from "@/lib/errors/server-action";
 import { reportTransportError } from "@/lib/observability/report-transport-error";
 import { formatSessionDateLong, formatSessionDateShort } from "@/lib/attendance/date-format";
 import { AttendanceCell } from "./AttendanceCell";
 import { AttendanceSessionActions } from "./AttendanceSessionActions";
 import { CreateManualSessionForm } from "./CreateManualSessionForm";
-import type { AttendanceSheetCell, AttendanceSheetResult } from "@/lib/attendance/types";
+import type {
+  AttendanceSheetCell,
+  AttendanceSheetResult,
+  AttendanceSheetRow,
+} from "@/lib/attendance/types";
 
 interface Props {
   academicCourseId: string;
@@ -27,18 +34,41 @@ function cellKey(studentId: string, sessionId: string): string {
   return `${studentId}:${sessionId}`;
 }
 
+// Identidad estable: un `[]` inline en cada render (cuando `status:
+// 'unavailable'`) haría que `useMemo` de abajo recalculara siempre.
+const EMPTY_ROWS: AttendanceSheetRow[] = [];
+
 export function AttendanceSheet({ academicCourseId, sheet }: Props) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [overrides, setOverrides] = useState<Record<string, AttendanceSheetCell>>({});
   const [cellStatus, setCellStatus] = useState<Record<string, CellSaveStatus>>({});
+  const [actionError, setActionError] = useState<string | null>(null);
 
-  // D10: al cargar, la sesión más reciente (extremo derecho, orden
-  // ascendente) queda a la vista sin dejar de leer el semestre en su
-  // dirección natural.
+  // D10: al MONTAR (no en cada actualización), la sesión más reciente
+  // (extremo derecho, orden ascendente) queda a la vista sin dejar de leer el
+  // semestre en su dirección natural. Deps vacías a propósito: cada Server
+  // Action llama a `revalidatePath`, lo que trae una `sheet` con identidad
+  // nueva en cada guardado — con `[sheet]` como dependencia, el efecto se
+  // repetía en cada clic y arrastraba la vista al extremo derecho aunque el
+  // docente estuviera corrigiendo una sesión antigua (hallazgo @reviewer).
   useEffect(() => {
     const el = scrollRef.current;
     if (el) el.scrollLeft = el.scrollWidth;
-  }, [sheet]);
+  }, []);
+
+  // Reglas de los Hooks: `rows` (y su Map derivado) se calculan siempre, aun
+  // en `status: 'unavailable'`, para no llamar a `useMemo` condicionalmente
+  // antes del `return` temprano de abajo. `EMPTY_ROWS` mantiene identidad
+  // estable entre renders para que el `useMemo` de abajo no recalcule de más.
+  const rows = sheet.status === "ok" ? sheet.rows : EMPTY_ROWS;
+
+  // Hallazgo @reviewer: `rows.find()` dentro del recorrido de cada celda es
+  // O(estudiantes × sesiones × estudiantes) en un curso grande. Un `Map` lo
+  // deja lineal.
+  const rowsByStudentId = useMemo(
+    () => new Map(rows.map((r) => [r.student_id, r])),
+    [rows]
+  );
 
   if (sheet.status === "unavailable") {
     return (
@@ -53,12 +83,12 @@ export function AttendanceSheet({ academicCourseId, sheet }: Props) {
     );
   }
 
-  const { sessions, rows } = sheet;
+  const { sessions } = sheet;
 
   function getCell(studentId: string, sessionId: string): AttendanceSheetCell {
     const key = cellKey(studentId, sessionId);
     if (key in overrides) return overrides[key];
-    const row = rows.find((r) => r.student_id === studentId);
+    const row = rowsByStudentId.get(studentId);
     return row?.cells[sessionId] ?? EMPTY_CELL;
   }
 
@@ -68,10 +98,6 @@ export function AttendanceSheet({ academicCourseId, sheet }: Props) {
     return Math.round((attended / sessions.length) * 100);
   }
 
-  function attendeeCountForSession(sessionId: string): number {
-    return rows.filter((r) => getCell(r.student_id, sessionId).present).length;
-  }
-
   async function handleToggle(studentId: string, sessionId: string) {
     const key = cellKey(studentId, sessionId);
     const current = getCell(studentId, sessionId);
@@ -79,6 +105,7 @@ export function AttendanceSheet({ academicCourseId, sheet }: Props) {
       ? { present: false, marked_at: null, marked_manually: false }
       : { present: true, marked_at: new Date().toISOString(), marked_manually: true };
 
+    setActionError(null);
     setOverrides((prev) => ({ ...prev, [key]: optimistic }));
     setCellStatus((prev) => ({ ...prev, [key]: "saving" }));
 
@@ -95,12 +122,14 @@ export function AttendanceSheet({ academicCourseId, sheet }: Props) {
       );
       setOverrides((prev) => ({ ...prev, [key]: current }));
       setCellStatus((prev) => ({ ...prev, [key]: "error" }));
+      setActionError(SERVER_ACTION_TRANSPORT_ERROR_MESSAGE);
       return;
     }
 
     if (!result.ok) {
       setOverrides((prev) => ({ ...prev, [key]: current }));
       setCellStatus((prev) => ({ ...prev, [key]: "error" }));
+      setActionError(result.error);
       return;
     }
 
@@ -113,6 +142,23 @@ export function AttendanceSheet({ academicCourseId, sheet }: Props) {
         academicCourseId={academicCourseId}
         existingDates={sessions.map((s) => s.session_date)}
       />
+
+      {actionError && (
+        <div
+          role="alert"
+          className="flex items-center justify-between gap-3 rounded-lg border border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-900/20 px-4 py-2 text-sm text-red-700 dark:text-red-400"
+        >
+          <span>{actionError}</span>
+          <button
+            type="button"
+            onClick={() => setActionError(null)}
+            aria-label="Descartar"
+            className="font-bold leading-none"
+          >
+            ×
+          </button>
+        </div>
+      )}
 
       {sessions.length === 0 ? (
         <div className="rounded-[var(--radius-base)] border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-8 py-12 text-center">
@@ -163,15 +209,24 @@ export function AttendanceSheet({ academicCourseId, sheet }: Props) {
                           <span className="sr-only">
                             {formatSessionDateLong(session.session_date)}
                           </span>
-                          {session.is_open && (
+                          {session.is_open ? (
                             <span className="rounded-full bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-300 px-1.5 py-0.5 text-[0.6rem] font-bold normal-case">
                               En curso
                             </span>
+                          ) : (
+                            !session.has_code && (
+                              <span
+                                title="Registrada manualmente por el docente, sin código"
+                                className="rounded-full bg-gray-100 dark:bg-gray-600 text-gray-600 dark:text-gray-300 px-1.5 py-0.5 text-[0.6rem] font-bold normal-case"
+                              >
+                                Manual
+                              </span>
+                            )
                           )}
                           <AttendanceSessionActions
                             academicCourseId={academicCourseId}
                             session={session}
-                            attendeeCount={attendeeCountForSession(session.id)}
+                            attendeeCount={session.attendee_count}
                           />
                         </div>
                       </th>
@@ -204,6 +259,7 @@ export function AttendanceSheet({ academicCourseId, sheet }: Props) {
                             <AttendanceCell
                               checked={cell.present}
                               markedManually={cell.marked_manually}
+                              markedAt={cell.marked_at}
                               status={cellStatus[key] ?? "idle"}
                               studentName={row.student_name}
                               sessionDateLabel={formatSessionDateLong(session.session_date)}

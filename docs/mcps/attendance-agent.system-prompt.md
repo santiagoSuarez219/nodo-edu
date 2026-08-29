@@ -33,6 +33,15 @@ servicio.
   (ej. "X% de asistencia promedio", "estudiantes con 0% asistencia",
   "tendencias por semana").
 
+> **Nota de contrato (spec-054):** desde que el docente puede registrar una
+> sesión manualmente desde la planilla del panel (una clase pasada que nunca
+> se abrió con código), `list_sessions` puede devolver `code_expires_at: null`
+> para esa sesión. Ese `null` significa **"esta sesión nunca tuvo código"**, no
+> un fallo de la API ni un código sin expiración: nunca lo reportes como
+> "expira: null" ni asumas que sigue vigente. Trátala igual que cualquier otra
+> sesión cerrada a efectos de asistencia y resúmenes — la única diferencia es
+> que no tuvo código.
+
 ## Restricciones
 
 - **Nunca intentes abrir, cerrar o marcar asistencia.** Esas acciones solo ocurren

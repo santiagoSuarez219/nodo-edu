@@ -56,6 +56,16 @@ export async function markStudentAttendanceAction(
 
 // Desmarcar no necesita policy nueva: `attendance_records_delete_teacher_or_admin`
 // ya autorizaba esta corrección desde spec-010 ("correcciones manuales futuras").
+//
+// A diferencia de `updateSessionDateAction`/`deleteSessionAction`, esta acción
+// NO usa `.select().single()` para detectar "cero filas afectadas": aquí cero
+// filas es indistinguible entre "RLS lo bloqueó" y "ya estaba desmarcado"
+// (idempotencia legítima, simétrica al `on conflict do nothing` de `marked`),
+// y forzar un error en el segundo caso rompería un doble clic inofensivo. La
+// UI solo llega aquí con sesiones de la propia planilla del docente (ya
+// filtradas por RLS en `getAttendanceSheet`), así que el caso "bloqueado por
+// RLS" no es alcanzable sin fabricar la llamada a mano, y de lograrlo no
+// desmarca nada (no hay corrupción posible, solo un no-op silencioso).
 export async function unmarkStudentAttendanceAction(
   sessionId: string,
   studentId: string,
@@ -131,7 +141,11 @@ export async function createManualSessionAction(
 // spec-054 (D5, D12): solo opera sobre sesiones cerradas — la UI deshabilita
 // esta acción para la sesión en curso, que se gestiona desde la lección. La
 // policy `class_sessions_mutate_owner_or_admin` ahora valida también la fila
-// resultante (DEBT-046), aunque este `update` no toca `academic_course_id`.
+// resultante (DEBT-046). El filtro por `academic_course_id` (hallazgo
+// @reviewer) cierra el criterio 12 en el servidor, no solo en la UI: sin él,
+// un docente con dos cursos podía, con un `session_id` fabricado, editar una
+// sesión del curso B desde la planilla del curso A — RLS ya lo impedía entre
+// docentes distintos, pero no entre los propios cursos de un mismo docente.
 export async function updateSessionDateAction(
   sessionId: string,
   sessionDate: string,
@@ -142,6 +156,7 @@ export async function updateSessionDateAction(
   const parsed = UpdateSessionDateSchema.safeParse({
     session_id: sessionId,
     session_date: sessionDate,
+    academic_course_id: academicCourseId,
   });
   if (!parsed.success) {
     return { ok: false, error: parsed.error.issues[0]?.message ?? "Datos inválidos." };
@@ -149,13 +164,14 @@ export async function updateSessionDateAction(
 
   const supabase = await createServerSupabaseClient();
   // `.select().single()` para distinguir "sin filas afectadas" (sesión
-  // abierta, ajena por RLS, o inexistente) de un fallo real: sin esto, un
-  // `update` que RLS filtra en silencio a cero filas devolvería `{ok: true}`
-  // sin haber cambiado nada (mismo criterio que `extendSessionCode`).
+  // abierta, ajena por RLS, de otro curso, o inexistente) de un fallo real:
+  // sin esto, un `update` filtrado en silencio a cero filas devolvería
+  // `{ok: true}` sin haber cambiado nada (mismo criterio que `extendSessionCode`).
   const { error } = await supabase
     .from("class_sessions")
     .update({ session_date: parsed.data.session_date })
     .eq("id", parsed.data.session_id)
+    .eq("academic_course_id", parsed.data.academic_course_id)
     .eq("is_open", false)
     .select()
     .single();
@@ -176,17 +192,22 @@ export async function updateSessionDateAction(
 }
 
 // spec-054 (D11): destructivo en cascada — borra también los
-// `attendance_records` de esa sesión (`on delete cascade`). La confirmación
+// `attendance_records` de esa sesión (`on delete cascade`), incluidos los de
+// estudiantes retirados que la planilla ya no muestra (D2). La confirmación
 // con el conteo real vive en la UI (`AttendanceSessionActions`), a partir de
-// los datos que la planilla ya tiene en pantalla; esta acción no vuelve a
-// contar antes de borrar.
+// `AttendanceSheetSession.attendee_count` (que sí cuenta esos registros);
+// esta acción no vuelve a contar antes de borrar. Filtro por
+// `academic_course_id`: ver comentario en `updateSessionDateAction`.
 export async function deleteSessionAction(
   sessionId: string,
   academicCourseId: string
 ): Promise<AuthResult> {
   await requireUser();
 
-  const parsed = DeleteSessionSchema.safeParse({ session_id: sessionId });
+  const parsed = DeleteSessionSchema.safeParse({
+    session_id: sessionId,
+    academic_course_id: academicCourseId,
+  });
   if (!parsed.success) {
     return { ok: false, error: "Datos inválidos." };
   }
@@ -197,6 +218,7 @@ export async function deleteSessionAction(
     .from("class_sessions")
     .delete()
     .eq("id", parsed.data.session_id)
+    .eq("academic_course_id", parsed.data.academic_course_id)
     .eq("is_open", false)
     .select()
     .single();

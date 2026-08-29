@@ -536,11 +536,48 @@ nadie pidió.
 - [x] Tras crear, editar o borrar, la planilla refleja el cambio vía
       `router.refresh()` en el cliente + `revalidatePath()` en la Server Action.
 
-### Fase 7 — Verificación y cierre
-- [ ] `npm run lint` y `npm run build` en verde.
+### Fase 7 — Verificación y cierre (en curso)
+- [x] `npm run lint` y `npm run build` en verde.
+- [x] Invocado `@reviewer` sobre el diff contra `development` (2026-08-29):
+      veredicto inicial **CAMBIOS REQUERIDOS**. Hallazgos resueltos en esta
+      misma fase, antes de pasar a la ronda manual:
+  - 🔴 **Truncamiento silencioso de `attendance_records`** (`max_rows = 1000`
+    en `supabase/config.toml`): `getAttendanceSheet` no paginaba, así que un
+    curso con suficientes sesiones/estudiantes podía perder registros sin
+    error y pintar presentes como ausentes. Corregido con un bucle de
+    `.range()` que pagina hasta recibir una página más corta que el tamaño
+    pedido.
+  - 🟠 **Conteo del modal de borrado excluía a estudiantes retirados**: el
+    `on delete cascade` se lleva también sus registros, que D2 excluye de las
+    filas pero no del conteo real. Se añadió `AttendanceSheetSession.attendee_count`
+    (calculado sobre *todos* los registros de la sesión, sin restringir a
+    matrícula activa) y `AttendanceSessionActions` ahora lo usa en vez de
+    contar solo sobre las filas visibles.
+  - 🟠 **Autoscroll se repetía en cada guardado**: la dependencia `[sheet]` del
+    `useEffect` cambiaba de identidad en cada `revalidatePath`. Corregido a
+    `[]` (una sola vez, al montar), como pide D10.
+  - 🟠 **System prompt del MCP no reflejaba `code_expires_at: null`**: se añadió
+    la nota de contrato en `docs/mcps/attendance-agent.system-prompt.md`.
+  - 🟡 Menores corregidos: `.eq("academic_course_id", …)` explícito en
+    `updateSessionDateAction`/`deleteSessionAction` (cierra el criterio 12 en
+    servidor, no solo en UI); casts `as string` que mentían sobre el nullable
+    en `service.ts`; `id` de diálogo con `useId()` en vez de fijo
+    (`AttendanceSessionActions` se instancia una vez por columna); plural
+    natural en el texto del modal de borrado; iconos SVG en vez de emoji;
+    mensaje de fallo ahora también visible (no solo `sr-only`) vía un banner
+    en `AttendanceSheet`; búsquedas `O(n²)`/`O(n³)` (`records.find`,
+    `rows.find`) reemplazadas por `Map` — esta última introdujo y corrigió en
+    el acto una violación de las Reglas de los Hooks (`useMemo` después de un
+    `return` condicional).
+  - 🔵 Aceptado como deuda documentada, no corregido aquí: `unmarkStudentAttendanceAction`
+    se deja sin `.select().single()` a propósito (razonado en un comentario:
+    desmarcar dos veces es idempotente y legítimo, a diferencia de
+    editar/eliminar una sesión); los `overrides` locales de
+    `AttendanceSheet` no se reconcilian si otra pestaña cambia el mismo dato
+    (mismo límite ya aceptado en `GradesTable`).
+  - Pendiente re-invocar `@reviewer` para el veredicto final antes de `[DONE]`.
 - [ ] Ronda manual completa de `docs/testing/test-054-planilla-asistencia.md`
       contra el entorno de desarrollo (`mirp-lab`), con limpieza de datos.
-- [ ] Invocar `@reviewer` sobre el diff contra `development`.
 - [ ] Actualizar [[DEBT-046]] en `docs/specs/backlog.md`: cerrada la mitad de
       `class_sessions`; **queda abierta** la auditoría del resto de policies
       `for update` del proyecto (D12).
@@ -548,7 +585,8 @@ nadie pidió.
       `EnrollmentTable.tsx` (D14); (b) % penaliza al estudiante matriculado tarde
       (D2); (c) exponer la procedencia `marked_by` en `get_session_attendance` del
       MCP si el docente lo pide (Evaluación MCP punto 3); (d) marcado masivo por
-      columna; (e) exportar la planilla a CSV.
+      columna; (e) exportar la planilla a CSV; (f) reconciliación de `overrides`
+      locales en `AttendanceSheet` ante cambios de otra pestaña/sesión.
 - [ ] Aplicar las migraciones a producción **solo** con confirmación explícita del
       usuario, en el despliegue (CLAUDE.md → "Despliegue").
 

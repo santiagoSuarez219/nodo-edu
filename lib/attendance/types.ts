@@ -29,6 +29,12 @@ export type AttendanceSheetSession = {
   // Una sesión sin código (D7) es una sesión creada manualmente.
   has_code: boolean;
   is_open: boolean;
+  // Conteo real de attendance_records de esta sesión, SIN restringir a
+  // matrículas activas (a diferencia de las filas de la planilla, D2). Es el
+  // número que el `on delete cascade` se llevaría de verdad, incluidos los
+  // registros de estudiantes retirados — el que necesita el modal de borrado
+  // (D11).
+  attendee_count: number;
 };
 
 export type AttendanceSheetCell = {
