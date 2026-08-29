@@ -1,4 +1,4 @@
-# spec-054 — [NOT STARTED] Planilla de asistencia editable en el panel del curso
+# spec-054 — [IN PROGRESS] Planilla de asistencia editable en el panel del curso
 
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.
@@ -571,5 +571,5 @@ nadie pidió.
 
 > Claude no escribe código de implementación hasta que esta sección esté marcada.
 
-- [ ] Paquete (spec + pruebas) aprobado por el usuario
-- **Fecha de aprobación:** {{pendiente}}
+- [x] Paquete (spec + pruebas) aprobado por el usuario
+- **Fecha de aprobación:** 2026-08-29
