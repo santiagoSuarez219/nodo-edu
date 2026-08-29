@@ -262,6 +262,8 @@ export const estructurasDeDatos: Course = {
       articleSlug: "notacion-big-o-y-analisis-de-complejidad",
       order: 15,
       title: "Notación Big O y análisis de complejidad",
+      summary:
+        "Por qué dos formas de buscar un cliente funcionan igual con 10 cuentas y una se vuelve inutilizable con 100.000 — Big O como herramienta para predecir el costo de un algoritmo antes de que el hardware te avise.",
       topics: [
         { title: "Complejidad temporal y espacial" },
         { title: "Notación Big O: definición e interpretación" },
@@ -290,6 +292,8 @@ export const estructurasDeDatos: Course = {
       articleSlug: "nodos-y-memoria-dinamica-en-java",
       order: 17,
       title: "Nodos y memoria dinámica en Java",
+      summary:
+        "Por qué un arreglo no alcanza cuando no sabes cuántos elementos vas a guardar, y cómo Nodo<T> y ListaSimple<T> resuelven ese problema encadenando objetos por referencia en el heap.",
       topics: [
         { title: "Gestión de memoria dinámica y referencias en Java" },
         { title: "Estructura de un nodo: dato y referencia al siguiente" },
