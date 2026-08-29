@@ -41,6 +41,26 @@ export const getCurrentUser = cache(async () => {
   return auth.status === "authenticated" ? auth.user : null;
 });
 
+// spec-054: consulta a `profiles` compartida por `getCurrentProfile()` (firma
+// histórica, `Profile | null`, 16 call sites) y `getAuthDegradedReason()`
+// (necesita saber si la consulta *falló*, no solo si vino vacía). `cache()`
+// de React dedup: aunque ambas la llamen, solo hace una petición de red.
+const getProfileResult = cache(
+  async (): Promise<{ profile: Profile | null; failed: boolean }> => {
+    const user = await getCurrentUser();
+    if (!user) return { profile: null, failed: false };
+
+    const supabase = await createServerSupabaseClient();
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", user.id)
+      .single();
+
+    return { profile: data ?? null, failed: !!error };
+  }
+);
+
 // spec-054 (D-F): para que el root layout pueda mostrar un aviso discreto en
 // vez de dejar que una sesión válida parezca cerrada. `getCurrentUser()`
 // colapsa `unavailable` en `null` (DEBT-040, gap deliberado y documentado
@@ -50,27 +70,33 @@ export const getCurrentUser = cache(async () => {
 // (DEBT-042). Devuelve el motivo solo cuando es transitorio: si llegó hasta
 // aquí con `misconfigured`/`unknown`, la ruta ya habría recibido el 503 total
 // del middleware (spec-054, DEBT-069) y este código nunca se ejecutaría.
-export const getAuthDegradedReason = cache(async (): Promise<"network" | "server" | "timeout" | null> => {
-  const auth = await getAuthCheck();
-  if (auth.status !== "unavailable") return null;
-  if (auth.reason === "network" || auth.reason === "server" || auth.reason === "timeout") {
-    return auth.reason;
+//
+// TC-054-009 (ronda de pruebas, 2026-08-29): el chequeo original solo miraba
+// `auth.status === "unavailable"` — cubre "no pudimos verificar tu sesión",
+// pero no el caso, igual de real, en que Auth respondió bien (sesión válida)
+// y fue la consulta a `profiles` la que abortó por el timeout de datos
+// (DEBT-070). Sin este segundo chequeo, ese caso mostraba la navbar oculta
+// sin ningún aviso — el mismo síntoma que este banner existe para evitar.
+export const getAuthDegradedReason = cache(
+  async (): Promise<"network" | "server" | "timeout" | null> => {
+    const auth = await getAuthCheck();
+    if (auth.status === "unavailable") {
+      if (auth.reason === "network" || auth.reason === "server" || auth.reason === "timeout") {
+        return auth.reason;
+      }
+      return null;
+    }
+    if (auth.status === "authenticated") {
+      const { failed } = await getProfileResult();
+      if (failed) return "timeout";
+    }
+    return null;
   }
-  return null;
-});
+);
 
 export const getCurrentProfile = cache(async (): Promise<Profile | null> => {
-  const user = await getCurrentUser();
-  if (!user) return null;
-
-  const supabase = await createServerSupabaseClient();
-  const { data } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", user.id)
-    .single();
-
-  return data ?? null;
+  const { profile } = await getProfileResult();
+  return profile;
 });
 
 export const getCurrentRoles = cache(async (): Promise<AppRole[]> => {

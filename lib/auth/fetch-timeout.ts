@@ -1,19 +1,38 @@
 // spec-054 — fábrica única del `fetch` con presupuesto de tiempo, para que el
 // middleware y los clientes Supabase de datos compartan una sola
-// implementación en vez de tres copias del mismo `AbortSignal.timeout`
-// (el estado previo a este spec: solo `lib/auth/middleware.ts` tenía uno).
+// implementación en vez de tres copias del mismo timeout manual (el estado
+// previo a este spec: solo `lib/auth/middleware.ts` tenía uno).
 
-// Combina varias señales en una sola, sin `AbortSignal.any()`: verificado en
-// la ronda de pruebas de TC-054-001 que el Edge Runtime de Next.js (donde
-// corre `lib/auth/middleware.ts` — no es Node.js, es un sandbox V8 propio,
-// `node_modules/next/dist/compiled/edge-runtime/`) NO implementa `.any()`
-// pese a que el Node.js del resto del proyecto (v24) sí — producía un
-// `TypeError: AbortSignal.any is not a function` en cada fetch del gate,
-// silenciado solo porque el `Promise.race` de respaldo (D-B) igual devolvía
-// a tiempo. Esta combinación manual funciona en ambos entornos.
-function combineSignals(signals: AbortSignal[]): AbortSignal {
+// Arma un `AbortController` propio en vez de usar `AbortSignal.timeout()`.
+// TC-054-005 (ronda de pruebas, 2026-08-29) encontró que esa diferencia
+// importa de verdad: `AbortSignal.timeout(ms)` produce un `DOMException` con
+// `name: "TimeoutError"`, mientras que `controller.abort()` produce
+// `name: "AbortError"` — y `@supabase/postgrest-js` solo trata como
+// "no reintentable" el segundo (`PostgrestBuilder.ts`:
+// `if (fetchError?.name === 'AbortError' ...) throw fetchError`, comentado
+// "Never retry aborted requests"). Con `AbortSignal.timeout()`, postgrest-js
+// no reconocía el timeout como un abort deliberado y lo trataba como un
+// fallo de red reintentable — activando su propio backoff interno
+// (`DEFAULT_MAX_RETRIES`) hasta ~30s antes de rendirse, muy por encima del
+// presupuesto real que se le pasaba (verificado: 6s prometidos, ~31s reales).
+// `@supabase/auth-js` no distingue por nombre (envuelve cualquier fallo de
+// fetch igual, reintentable o no, según su propia lógica — ver
+// `lib/auth/middleware.ts`), así que el gate del middleware no sufría este
+// bug — pero los clientes de datos (server.ts/actions.ts/service.ts), que sí
+// pasan por postgrest-js, lo sufrían todos.
+function createArmedController(budgetMs: number, externalSignals: AbortSignal[]): AbortController {
   const controller = new AbortController();
-  for (const signal of signals) {
+
+  const timer = setTimeout(() => controller.abort(), budgetMs);
+  // `unref()` no existe en el Edge Runtime (solo en Node.js) — no debe
+  // impedir que el proceso termine esperando este timer en un entorno
+  // Node.js de larga vida (como `next dev`/`next start`), pero es un no-op
+  // seguro donde no exista.
+  if (typeof (timer as unknown as { unref?: () => void }).unref === "function") {
+    (timer as unknown as { unref: () => void }).unref();
+  }
+
+  for (const signal of externalSignals) {
     if (signal.aborted) {
       controller.abort(signal.reason);
       break;
@@ -22,18 +41,18 @@ function combineSignals(signals: AbortSignal[]): AbortSignal {
       once: true,
     });
   }
-  return controller.signal;
+
+  return controller;
 }
 
-// Uso simple: cada llamada obtiene su propio `AbortSignal.timeout(budgetMs)`.
-// Suficiente para los clientes de datos (server.ts, actions.ts, service.ts):
-// no encadenan reintentos internos del SDK que necesiten un presupuesto
-// compartido entre llamadas — ver DEBT-070.
+// Uso simple: cada llamada obtiene su propio presupuesto. Suficiente para
+// los clientes de datos (server.ts, actions.ts, service.ts): no encadenan
+// reintentos internos del SDK que necesiten un presupuesto compartido entre
+// llamadas — ver DEBT-070.
 export function createTimeoutFetch(budgetMs: number): typeof fetch {
   return (input, init) => {
-    const ownSignal = AbortSignal.timeout(budgetMs);
-    const signal = init?.signal ? combineSignals([init.signal, ownSignal]) : ownSignal;
-    return fetch(input, { ...init, signal });
+    const controller = createArmedController(budgetMs, init?.signal ? [init.signal] : []);
+    return fetch(input, { ...init, signal: controller.signal });
   };
 }
 
@@ -46,10 +65,8 @@ export function createTimeoutFetch(budgetMs: number): typeof fetch {
 // inmediato, en vez de esperar los `perCallMs` completos una vez más.
 export function createBudgetedFetch(perCallMs: number, sharedSignal: AbortSignal): typeof fetch {
   return (input, init) => {
-    const perCallSignal = AbortSignal.timeout(perCallMs);
-    const signals = init?.signal
-      ? [perCallSignal, sharedSignal, init.signal]
-      : [perCallSignal, sharedSignal];
-    return fetch(input, { ...init, signal: combineSignals(signals) });
+    const externalSignals = init?.signal ? [sharedSignal, init.signal] : [sharedSignal];
+    const controller = createArmedController(perCallMs, externalSignals);
+    return fetch(input, { ...init, signal: controller.signal });
   };
 }

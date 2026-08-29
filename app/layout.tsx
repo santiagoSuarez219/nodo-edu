@@ -34,13 +34,22 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const profile = await getCurrentProfile();
-  const roles = await getCurrentRoles();
-  // spec-054 (D-F): `!profile` es ambiguo — puede ser un visitante realmente
-  // anónimo o una sesión válida que no se pudo verificar a tiempo. Sin este
-  // aviso, el segundo caso es indistinguible del primero para el usuario: la
-  // navbar desaparece y parece que se cerró la sesión.
-  const degradedReason = await getAuthDegradedReason();
+  // spec-054 (D-F, y hallazgo de TC-054-005): las tres llamadas comparten
+  // `getAuthCheck()` (cache()-ada, se resuelve una sola vez), pero cada una
+  // hace su propia consulta adicional a Postgres (`profiles`, `user_roles`)
+  // — independientes entre sí. Antes iban en serie: con el timeout de datos
+  // de la Fase 2 (6s, DEBT-070) aplicado a cada una, una consulta colgada
+  // hacía que el layout completo tardara 12s (2 × 6s) en vez de 6s, porque
+  // `await` secuencial paga cada timeout por separado. `!profile` es
+  // ambiguo — puede ser un visitante realmente anónimo o una sesión válida
+  // que no se pudo verificar a tiempo. Sin `degradedReason`, el segundo caso
+  // es indistinguible del primero para el usuario: la navbar desaparece y
+  // parece que se cerró la sesión.
+  const [profile, roles, degradedReason] = await Promise.all([
+    getCurrentProfile(),
+    getCurrentRoles(),
+    getAuthDegradedReason(),
+  ]);
 
   return (
     <html

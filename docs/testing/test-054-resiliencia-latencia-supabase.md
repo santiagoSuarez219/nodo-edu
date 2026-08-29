@@ -101,11 +101,22 @@ persistente. Repetido dos veces más tras cada corrección para confirmar.
 **Cubre:** CA 2 (DEBT-071).
 **Precondición:** proxy con `--path='^/auth/v1' --hang`.
 **Pasos:**
-1. En una ventana anónima, navegar a `/`.
+1. En una ventana anónima, navegar a `/login` (**no** `/`: tras la decisión
+   E1 de la Fase 4, `/` es una ruta degradable — ese comportamiento tiene su
+   propio caso, `TC-054-011`. `/login` nunca es degradable, así que aísla el
+   mecanismo del deadline global sin la excepción de E1 de por medio).
 2. Cronometrar.
 **Resultado esperado:** 503 con la página de `spec-046` en ≤ presupuesto de D-A.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** —
+**Estado:** ✅ Aprobado
+**Hallazgos:** Ajustado de `/` a `/login` (decisión del usuario, 2026-08-29):
+el caso original escrito antes de la decisión E1 esperaba 503 en `/`, pero
+tras E1 `/` responde `200` en modo degradado — comportamiento correcto, no un
+fallo (ver `TC-054-011`). Verificado primero el síntoma en `/` vía `curl`
+(`200`, `8.555121s`, log confirma `reason: timeout` pero la excepción de ruta
+abierta aplicó), luego contra `/login`: `503` en `8.009460s`, copy correcto
+de `spec-046`. El deadline global funciona correctamente; solo la ruta de
+prueba original quedó desactualizada por un cambio de scope posterior a la
+redacción del test.
 
 ### TC-054-003 — Sin regresión con Supabase sano
 **Cubre:** CA 4 — que el fix no cueste rendimiento en el caso normal.
@@ -115,8 +126,15 @@ persistente. Repetido dos veces más tras cada corrección para confirmar.
 2. Iniciar sesión como `dev@nodo.local` y navegar a `/cuenta/cursos`, a una lección y a `/admin`.
 3. Comparar tiempos con los de la misma navegación antes de la implementación.
 **Resultado esperado:** sin diferencia perceptible; ninguna ruta se vuelve más lenta.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** —
+**Estado:** ✅ Aprobado
+**Hallazgos:** Medido contra build de producción (`next start`), Supabase
+sano, sin proxy de por medio. `/login` anónimo: 220ms. `/` anónimo: 307
+(redirect a `/login`, comportamiento preexistente no relacionado con este
+spec) en 2.6ms. Login: 185ms. `/cuenta/cursos` autenticado: 784ms.
+`/estructuras-de-datos/polimorfismo` autenticado: 1,76s. `/admin/courses`
+autenticado: 1,07s. Todos los tiempos consistentes con navegación normal, sin
+indicio de regresión atribuible al timeout (muy por debajo de los
+presupuestos de 6-10s).
 
 ### TC-054-004 — El ping de salud no puede exceder el deadline global
 **Cubre:** CA 2 y el paso de la Fase 1 sobre `HEALTH_TIMEOUT_MS`.
@@ -125,8 +143,12 @@ persistente. Repetido dos veces más tras cada corrección para confirmar.
 1. En ventana anónima (sin cookie de sesión, que es el único camino que llega al ping), navegar a `/`.
 2. Cronometrar.
 **Resultado esperado:** respuesta dentro del presupuesto de D-A. El peor caso viejo (`2 × 5 s + 250 ms`) ya no aplica: el ping está subordinado al deadline global.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** —
+**Estado:** ✅ Aprobado
+**Hallazgos:** Probado contra `/login` (no `/`, mismo criterio que
+`TC-054-002`, para aislar el mecanismo de la excepción de E1). `503` en
+`8.007033s` — dentro del presupuesto de D-A, muy por debajo de los ~10,25s+
+del peor caso que tenía el ping de salud antes de subordinarlo al deadline
+global.
 
 ### TC-054-005 — Página de curso con Supabase colgado: acotada, no 300 s
 **Cubre:** CA 5 (DEBT-070) — los 10 cuelgues de 300 s en `/[courseSlug]`.
@@ -135,16 +157,39 @@ persistente. Repetido dos veces más tras cada corrección para confirmar.
 1. Navegar a `/estructuras-de-datos`.
 2. Cronometrar hasta que la página resuelva (de una forma u otra).
 **Resultado esperado:** resuelve en ≤ presupuesto de D-C. **No** queda colgada minutos.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** —
+**Estado:** ✅ Aprobado
+**Hallazgos:** Requirió corregir **dos bugs reales** encontrados en el
+camino, ambos con commit propio:
+1. **`createTimeoutFetch`/`createBudgetedFetch` usaban `AbortSignal.timeout()`**,
+   que produce un error con `name: "TimeoutError"`. `@supabase/postgrest-js`
+   solo reconoce `name === "AbortError"` como "no reintentable"
+   (`PostgrestBuilder.ts`, comentario "Never retry aborted requests") — con
+   `TimeoutError` lo trataba como fallo de red reintentable y activaba su
+   propio backoff interno durante **~31s** antes de rendirse (verificado en
+   Node puro, sin Next.js de por medio: 6s prometidos, 30978ms reales).
+   Corregido usando un `AbortController` armado manualmente
+   (`controller.abort()`, que sí produce `AbortError`) en vez de
+   `AbortSignal.timeout()`. Re-verificado en aislamiento: 6013ms.
+2. **`app/layout.tsx` llamaba `getCurrentProfile()`/`getCurrentRoles()` en
+   serie**, no en paralelo — con el timeout de 6s aplicado a cada una, un
+   dato colgado costaba 6s × 2 = 12s en vez de 6s. Corregido con
+   `Promise.all`.
+Con ambos fixes: `/estructuras-de-datos/fundamentos-control-de-versiones`
+resuelve en `6.45s` (antes: 40s+ sin resolver, con la misma consulta
+repitiéndose indefinidamente en el log del proxy).
 
 ### TC-054-006 — Ninguna ruta con Server Components supera el presupuesto
 **Cubre:** CA 6 (DEBT-070).
 **Precondición:** igual que TC-054-005.
 **Pasos:** repetir la medición en `/`, `/[courseSlug]`, `/[courseSlug]/[lessonSlug]`, `/cuenta/cursos` y `/admin`.
 **Resultado esperado:** las cinco resuelven en ≤ presupuesto de D-C.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** —
+**Estado:** ✅ Aprobado
+**Hallazgos:** Con los dos fixes de `TC-054-005` ya aplicados: `/` → `200` en
+`6.23s` (degradado, ver `TC-054-009`); `/cuenta/cursos` → `200` en `6.23s`;
+`/admin/courses` → `307` en `2.13s` (más rápido: pasa por el cliente del
+*middleware*, no por `server.ts` — su cap por intento es 2s, no 6s, tal como
+se diseñó). `/[courseSlug]/[lessonSlug]` cubierta por `TC-054-005`. Ningún
+caso superó su presupuesto correspondiente.
 
 ### TC-054-007 — Mensaje honesto al abortar una consulta de datos
 **Cubre:** CA 7 (DEBT-070) y la decisión D-D.
@@ -172,8 +217,18 @@ persistente. Repetido dos veces más tras cada corrección para confirmar.
 1. Navegar a cualquier ruta.
 2. Observar si aparece el `global-error` (documento reemplazado, sin estilos ni navbar) o un degradado dentro del layout normal.
 **Resultado esperado:** el layout **nunca** lanza; se ve navbar degradada + aviso (D-F), no la pantalla de `global-error.tsx`.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** —
+**Estado:** ✅ Aprobado
+**Hallazgos:** El layout nunca lanza (documento normal, sin `global-error`),
+confirmado. Pero **encontró un tercer bug real**: el aviso de D-F NO
+aparecía en este escenario específico — `getAuthDegradedReason()` solo
+comprobaba `auth.status === "unavailable"` (sesión no verificable), y aquí
+Auth respondía bien (`/auth/v1/user` no está bajo el patrón `^/rest/v1` del
+proxy) — el problema era que la consulta a `profiles` abortaba por el
+timeout de datos, un caso distinto que la función no contemplaba. Corregido
+en `lib/auth/session.ts`: `getAuthDegradedReason()` ahora también revisa si
+la consulta a `profiles` falló con sesión válida. Reconstruido y
+reverificado: el banner ("Estamos con problemas de conexión...") aparece
+correctamente, en `6.39s`.
 
 ### TC-054-010 — Un usuario con sesión no cree que lo desconectaron
 **Cubre:** D-F — la deuda DEBT-042 que `spec-046` cerró y que E1 podría reabrir.
@@ -192,8 +247,14 @@ persistente. Repetido dos veces más tras cada corrección para confirmar.
 1. Navegar a `/`.
 2. Navegar a `/grupo-investigacion`.
 **Resultado esperado:** ambas cargan en modo degradado, con `Cache-Control: no-store`. **Si D-E se resolvió por E2, este caso se marca N/A y no se ejecuta.**
-**Estado:** ⬜ Pendiente
-**Hallazgos:** —
+**Estado:** ✅ Aprobado
+**Hallazgos:** Ambas rutas responden `200` con `x-auth-degraded: timeout`.
+Contra `next dev` el `Cache-Control` aparecía como `no-cache, must-revalidate`
+(el propio dev server de Next/Turbopack lo reescribe para su HMR — no es el
+valor que fija `middleware.ts`); contra un build de producción real
+(`next start`, más representativo de Vercel) el header es exactamente
+`no-store, must-revalidate` como se diseñó. Descubrimiento que motivó cambiar
+a `next start` para el resto de la ronda.
 
 ### TC-054-012 — El contenido restringido sigue cerrado *(el caso de seguridad)*
 **Cubre:** CA 11 (DEBT-069) — que la excepción sea de navegación y no de autorización.
@@ -201,8 +262,11 @@ persistente. Repetido dos veces más tras cada corrección para confirmar.
 **Pasos:**
 1. Intentar cargar `/estructuras-de-datos/polimorfismo` directamente por URL.
 **Resultado esperado:** 503 o el redirect de acceso. **Bajo ninguna circunstancia** se muestra contenido de la lección.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** —
+**Estado:** ✅ Aprobado
+**Hallazgos:** `503`, página de `spec-046` (68 líneas, sin ningún encabezado
+de la lección — el único lugar donde aparece el string "polimorfismo" en la
+respuesta es el `href` del botón de reintentar). La excepción de E1 no
+alcanza esta ruta, tal como se diseñó.
 
 ### TC-054-013 — D4 de spec-046 intacto ante `misconfigured`
 **Cubre:** CA 12 (DEBT-069).
