@@ -1,4 +1,4 @@
-# spec-054 — [IN PROGRESS] Planilla de asistencia editable en el panel del curso
+# spec-054 — [TESTING] Planilla de asistencia editable en el panel del curso
 
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.
@@ -536,11 +536,11 @@ nadie pidió.
 - [x] Tras crear, editar o borrar, la planilla refleja el cambio vía
       `router.refresh()` en el cliente + `revalidatePath()` en la Server Action.
 
-### Fase 7 — Verificación y cierre (en curso)
+### Fase 7 — Verificación y cierre (pendiente la ronda manual del usuario)
 - [x] `npm run lint` y `npm run build` en verde.
-- [x] Invocado `@reviewer` sobre el diff contra `development` (2026-08-29):
-      veredicto inicial **CAMBIOS REQUERIDOS**. Hallazgos resueltos en esta
-      misma fase, antes de pasar a la ronda manual:
+- [x] Invocado `@reviewer` sobre el diff contra `development` (2026-08-29),
+      **dos rondas**. 1ª ronda: **CAMBIOS REQUERIDOS**. Hallazgos resueltos en
+      esta misma fase:
   - 🔴 **Truncamiento silencioso de `attendance_records`** (`max_rows = 1000`
     en `supabase/config.toml`): `getAttendanceSheet` no paginaba, así que un
     curso con suficientes sesiones/estudiantes podía perder registros sin
@@ -569,24 +569,49 @@ nadie pidió.
     `rows.find`) reemplazadas por `Map` — esta última introdujo y corrigió en
     el acto una violación de las Reglas de los Hooks (`useMemo` después de un
     `return` condicional).
-  - 🔵 Aceptado como deuda documentada, no corregido aquí: `unmarkStudentAttendanceAction`
+  - 🔵 Aceptado como deuda documentada, no corregido: `unmarkStudentAttendanceAction`
     se deja sin `.select().single()` a propósito (razonado en un comentario:
     desmarcar dos veces es idempotente y legítimo, a diferencia de
-    editar/eliminar una sesión); los `overrides` locales de
-    `AttendanceSheet` no se reconcilian si otra pestaña cambia el mismo dato
-    (mismo límite ya aceptado en `GradesTable`).
-  - Pendiente re-invocar `@reviewer` para el veredicto final antes de `[DONE]`.
+    editar/eliminar una sesión); `markStudentAttendanceAction`/
+    `unmarkStudentAttendanceAction` no validan `academicCourseId` contra el
+    curso real de la sesión (a diferencia de editar/eliminar sesión) — razonado
+    en un comentario: RLS ya exige que el docente sea dueño del curso *real* de
+    la sesión y que el estudiante esté matriculado activo ahí, así que el peor
+    caso es un desajuste de caché (`revalidatePath` a la ruta equivocada), no
+    una escritura no autorizada.
+
+  2ª ronda (tras las correcciones anteriores): **APROBADO** para pasar a
+  pruebas manuales, con un 🟠 real que se corrigió antes de cerrar esta fase:
+  - 🟠 **La paginación no tenía un orden total**: solo se ordenaba por
+    `session_id` (no único por sí solo), lo que con `OFFSET` y una inserción
+    concurrente (un estudiante marcando mientras el docente mira la planilla)
+    podía saltarse una fila entre dos páginas — el mismo síntoma del hallazgo
+    original. Corregido con un segundo `.order('student_id')`, que junto con
+    `session_id` sí es la clave única de la tabla. También se corrigió el
+    comentario, que afirmaba (incorrectamente) que la paginación no dependía
+    de `max_rows` del servidor, y se bajó `PAGE_SIZE` de 1000 a 500 como
+    margen de seguridad.
+  - 🟡 Menores de la 2ª ronda, corregidos: `AttendanceSheetRow.attendancePct`
+    era código muerto (la UI siempre recalcula el % para incorporar el estado
+    optimista) — eliminado del tipo y de `getAttendanceSheet`; la nota del
+    system prompt del MCP solo mencionaba `list_sessions`, ahora también cubre
+    `get_session_attendance`; comentario `// DEBT:` añadido en
+    `AttendanceSheet.tsx` apuntando a [[DEBT-075]] (antes solo estaba en el
+    checklist de este spec, sin registrar en el backlog — CLAUDE.md lo exige).
 - [ ] Ronda manual completa de `docs/testing/test-054-planilla-asistencia.md`
-      contra el entorno de desarrollo (`mirp-lab`), con limpieza de datos.
-- [ ] Actualizar [[DEBT-046]] en `docs/specs/backlog.md`: cerrada la mitad de
-      `class_sessions`; **queda abierta** la auditoría del resto de policies
-      `for update` del proyecto (D12).
-- [ ] Registrar en `docs/specs/backlog.md`: (a) quitar "Fecha matrícula" de
-      `EnrollmentTable.tsx` (D14); (b) % penaliza al estudiante matriculado tarde
-      (D2); (c) exponer la procedencia `marked_by` en `get_session_attendance` del
-      MCP si el docente lo pide (Evaluación MCP punto 3); (d) marcado masivo por
-      columna; (e) exportar la planilla a CSV; (f) reconciliación de `overrides`
-      locales en `AttendanceSheet` ante cambios de otra pestaña/sesión.
+      contra el entorno de desarrollo (`mirp-lab`) — **pendiente, la ejecuta el
+      usuario**; Claude prepara los datos y acompaña si se pide (ver CLAUDE.md
+      → "Pruebas manuales asistidas por Claude").
+- [x] Actualizado [[DEBT-046]] en `docs/specs/backlog.md`: cerrada la mitad de
+      `class_sessions` (2026-08-29); **sigue abierta** la auditoría del resto
+      de policies `for update` del proyecto (D12).
+- [x] Registrado en `docs/specs/backlog.md`: [[DEBT-070]] (quitar "Fecha
+      matrícula" de `EnrollmentTable.tsx`, D14), [[DEBT-071]] (% penaliza al
+      estudiante matriculado tarde, D2), [[DEBT-072]] (exponer `marked_by` en
+      `get_session_attendance` del MCP), [[DEBT-073]] (exportar la planilla a
+      CSV), [[DEBT-074]] (marcado masivo por columna), [[DEBT-075]]
+      (reconciliación de `overrides` locales en `AttendanceSheet` ante cambios
+      de otra pestaña/sesión, con su `// DEBT:` en el código).
 - [ ] Aplicar las migraciones a producción **solo** con confirmación explícita del
       usuario, en el despliegue (CLAUDE.md → "Despliegue").
 

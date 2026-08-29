@@ -40,6 +40,11 @@ const EMPTY_ROWS: AttendanceSheetRow[] = [];
 
 export function AttendanceSheet({ academicCourseId, sheet }: Props) {
   const scrollRef = useRef<HTMLDivElement>(null);
+  // DEBT-075: `overrides` nunca se limpia. Converge con el servidor tras un
+  // guardado propio (la siguiente `sheet` revalidada coincide), pero si OTRA
+  // pestaña/sesión cambia la misma celda mientras esta sigue abierta, el
+  // override local la enmascara indefinidamente. Mismo límite que ya acepta
+  // `gradesState` en GradesTable.tsx; ver docs/specs/backlog.md.
   const [overrides, setOverrides] = useState<Record<string, AttendanceSheetCell>>({});
   const [cellStatus, setCellStatus] = useState<Record<string, CellSaveStatus>>({});
   const [actionError, setActionError] = useState<string | null>(null);

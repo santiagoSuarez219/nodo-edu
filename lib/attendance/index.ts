@@ -472,13 +472,17 @@ export async function getAttendanceSheet(
 
     const sessionIds = (sessions ?? []).map((s) => s.id as string);
 
-    // Hallazgo de @reviewer: PostgREST trunca en `max_rows` (1000 en este
-    // proyecto) sin devolver error. Sin paginar, un curso con suficientes
-    // sesiones y estudiantes puede perder registros en silencio y pintar
-    // presentes como ausentes — exactamente el fallo que D3 prohíbe. Se pagina
-    // hasta recibir una página más corta que el tamaño pedido (fin de datos),
-    // sin depender de conocer el `max_rows` exacto del proyecto.
-    const PAGE_SIZE = 1000;
+    // Hallazgo de @reviewer: PostgREST trunca en `max_rows` (1000 en el
+    // proyecto local — `supabase/config.toml`, no verificado contra el
+    // proyecto hosted de producción) sin devolver error. Sin paginar, un
+    // curso con suficientes sesiones y estudiantes puede perder registros en
+    // silencio y pintar presentes como ausentes — exactamente el fallo que D3
+    // prohíbe. Se pagina hasta recibir una página más corta que `PAGE_SIZE`
+    // (fin de datos). Esto SÍ depende de que `PAGE_SIZE <= max_rows` del
+    // servidor (si el servidor recortara por debajo de `PAGE_SIZE`, la
+    // primera página ya volvería corta y el bucle cortaría de más); se deja
+    // margen bajo el límite local conocido en vez de pedir exactamente 1000.
+    const PAGE_SIZE = 500;
     const allRecords: Array<{
       session_id: string;
       student_id: string;
@@ -493,7 +497,15 @@ export async function getAttendanceSheet(
           .from('attendance_records')
           .select('session_id, student_id, marked_at, marked_by')
           .in('session_id', sessionIds)
+          // Segundo hallazgo de @reviewer: `session_id` solo no es un orden
+          // total (hay N registros por sesión) — entre dos páginas con
+          // `OFFSET` distinto, un empate reordenado o una fila insertada
+          // concurrentemente (un estudiante marcando justo mientras el
+          // docente mira la planilla) puede saltarse una fila. Se desempata
+          // por `student_id`, que junto con `session_id` sí es la clave única
+          // de la tabla (`attendance_records_unique`) y da un orden total.
           .order('session_id', { ascending: true })
+          .order('student_id', { ascending: true })
           .range(from, from + PAGE_SIZE - 1);
 
         if (pageError) throw pageError;
@@ -535,33 +547,28 @@ export async function getAttendanceSheet(
 
     // D2: las filas son las matrículas activas; la ausencia es la falta de
     // registro — no se materializa ninguna fila de ausencia.
+    //
+    // Nota (hallazgo @reviewer): el % de asistencia NO se calcula aquí — vivía
+    // como `attendancePct` en un commit anterior, pero era código muerto: la
+    // UI (`AttendanceSheet.computePct`) tiene que recalcularlo de todas formas
+    // para incorporar el estado optimista de una celda recién marcada/desmarcada
+    // que aún no pasó por `revalidatePath`, así que un valor "de servidor" que
+    // nadie lee solo era ruido.
     const rows: AttendanceSheetRow[] = studentIds.map((studentId) => {
       const cells: Record<string, AttendanceSheetCell> = {};
-      let attendedCount = 0;
 
       for (const session of sheetSessions) {
         const record = recordByKey.get(`${session.id}:${studentId}`);
 
-        if (record) {
-          attendedCount++;
-          cells[session.id] = {
-            present: true,
-            marked_at: record.marked_at,
-            marked_manually: record.marked_by !== null,
-          };
-        } else {
-          cells[session.id] = { present: false, marked_at: null, marked_manually: false };
-        }
+        cells[session.id] = record
+          ? { present: true, marked_at: record.marked_at, marked_manually: record.marked_by !== null }
+          : { present: false, marked_at: null, marked_manually: false };
       }
 
       return {
         student_id: studentId,
         student_name: profiles.get(studentId)?.full_name ?? 'Estudiante',
         cells,
-        attendancePct:
-          sheetSessions.length > 0
-            ? Math.round((attendedCount / sheetSessions.length) * 100)
-            : null,
       };
     });
 

@@ -21,6 +21,20 @@ function attendanceSheetPath(academicCourseId: string): string {
 // estudiante tenga matrícula activa en el curso de la sesión, y que
 // `marked_by = auth.uid()`. RLS rechaza cualquier intento fuera de esas
 // condiciones; esta acción no repite esa comprobación en código (D1).
+//
+// A diferencia de `updateSessionDateAction`/`deleteSessionAction`, esta
+// acción (y `unmarkStudentAttendanceAction`) NO valida `academicCourseId`
+// contra el curso real de `sessionId` — es un desvío deliberado, no una
+// omisión (hallazgo @reviewer): un `sessionId` fabricado que apunte a OTRO
+// curso del MISMO docente sigue exigiendo, vía RLS, que ese curso también sea
+// suyo y que el estudiante esté matriculado activo ahí. No hay estudiante
+// marcado en un curso ajeno ni docente ajeno pudiendo marcar — solo el
+// registro quedaría atribuido al curso real de la sesión, no al que dice
+// `academicCourseId` (que aquí solo determina qué ruta revalidar). Es un
+// desajuste de caché en el peor caso, no una vía de escritura no autorizada
+// — por eso no justifica una lectura extra en cada marcado, a diferencia de
+// reasignar la fecha o borrar una sesión completa (criterio 12), que si movía
+// el recurso de un curso a otro sin verificarlo.
 export async function markStudentAttendanceAction(
   sessionId: string,
   studentId: string,

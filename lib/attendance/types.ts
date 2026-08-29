@@ -48,10 +48,11 @@ export type AttendanceSheetCell = {
 export type AttendanceSheetRow = {
   student_id: string;
   student_name: string;
-  // Una entrada por sesión del curso, en el mismo orden que `sessions`.
+  // Una entrada por sesión del curso, en el mismo orden que `sessions`. El %
+  // de asistencia no vive aquí: `AttendanceSheet.computePct()` lo calcula en
+  // cliente a partir de estas celdas, porque necesita incorporar el estado
+  // optimista de una celda recién marcada/desmarcada (D2, D9).
   cells: Record<string, AttendanceSheetCell>;
-  // D2: null si el curso no tiene sesiones (no hay denominador).
-  attendancePct: number | null;
 };
 
 // Resultado discriminado de getAttendanceSheet (D3): un curso sin sesiones o

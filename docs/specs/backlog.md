@@ -5,6 +5,97 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+## DEBT-075 — Reconciliar `overrides` locales de `AttendanceSheet` ante cambios de otra pestaña/sesión
+
+**Origen:** spec-054 (planilla de asistencia editable), revisión de `@reviewer`,
+2026-08-29
+**Prioridad:** Baja — solo se manifiesta con dos pestañas del mismo docente
+abiertas a la vez, o dos docentes con acceso admin al mismo curso
+
+`AttendanceSheet.tsx` guarda el estado optimista de cada celda tocada en un
+`overrides` local (`useState`) que nunca se limpia. Tras un guardado exitoso
+converge con el valor del servidor (la próxima `sheet` que llegue por
+`revalidatePath` coincide), pero si **otra pestaña o sesión** cambia la misma
+celda mientras la primera sigue abierta, el override local queda enmascarando
+el dato nuevo del servidor indefinidamente, hasta que esa celda se vuelva a
+tocar. Mismo límite que ya tiene `gradesState` en `GradesTable.tsx` (spec de
+calificaciones) — no es un problema nuevo de este spec, es el mismo patrón.
+
+**Fix:** limpiar la clave de `overrides` (y de `cellStatus`) cuando la celda
+del servidor coincide con el override tras un refresco, o migrar a una
+librería de estado de servidor (SWR/React Query) que ya resuelve esto. No se
+aborda aquí por ser el mismo alcance que `GradesTable` dejó pendiente.
+
+---
+
+## DEBT-074 — Planilla de asistencia: marcado masivo por columna
+
+**Origen:** spec-054, "No incluye" — descartado explícitamente por alcance
+**Prioridad:** Baja
+
+Marcar una columna entera ("todos presentes") de un golpe. El caso de uso
+principal (captura masiva) ya lo cubre el código de asistencia en el aula; la
+planilla es para corregir casos sueltos. Si un docente lo pide para una
+sesión con exportación externa de asistencia, evaluar entonces.
+
+---
+
+## DEBT-073 — Planilla de asistencia: exportar a CSV
+
+**Origen:** spec-054, "No incluye" — descartado explícitamente por alcance
+**Prioridad:** Baja
+
+---
+
+## DEBT-072 — Exponer `marked_by` (procedencia del marcado) en `get_session_attendance` del MCP
+
+**Origen:** spec-054, Evaluación MCP, punto 3
+**Prioridad:** Baja — nadie lo ha pedido; el dato recién nace, no hay
+histórico previo que consultar
+
+`attendance_records.marked_by` (D8) distingue un marcado con código de uno
+manual del docente. Un agente podría querer preguntar "¿cuánta asistencia del
+semestre se registró a mano?", pero no se expuso en `get_session_attendance`
+en spec-054 por no ampliar el alcance especulativamente. Si un docente lo pide,
+es una extensión barata del MCP existente (no requiere spec nuevo, ver
+CLAUDE.md → criterios de MCP).
+
+---
+
+## DEBT-071 — El % de asistencia penaliza al estudiante matriculado tarde
+
+**Origen:** spec-054 (D2)
+**Prioridad:** Baja — imprecisión conocida, mismo criterio que ya usa
+`get_course_attendance_summary` del MCP
+
+La planilla (`getAttendanceSheet`) calcula el % de un estudiante como
+`sesiones_asistidas / total_sesiones_del_curso`, sin comparar `enrolled_at`
+contra `session_date`. Un estudiante matriculado en la sesión 10 de 30
+aparece con 9 ausencias que no pudo evitar, y su % sale penalizado. Corregirlo
+exige decidir una semántica (¿el denominador es "sesiones desde que se
+matriculó"?) que nadie ha pedido todavía.
+
+---
+
+## DEBT-070 — Quitar la columna "Fecha matrícula" de `EnrollmentTable.tsx`
+
+**Origen:** Spec antiguo `spec-052-panel-asistencia-curso` (descartado, nunca
+implementado, commit `446dd2d` en la rama `feat/panel-asistencia-curso`);
+recogido como D14 al rediseñar spec-054
+**Prioridad:** Baja — cosmético, sin relación funcional con la planilla de
+asistencia
+
+`components/admin/EnrollmentTable.tsx` (líneas ~62 y ~127) muestra "Fecha
+matrícula" en las tablas de estudiantes activos y retirados. Es una columna de
+poco valor operativo que compite por ancho en una tabla ya apretada. No se
+tocó en spec-054 por no tener relación con la planilla y no haber sido pedido
+en esa sesión (CLAUDE.md prohíbe ampliar el alcance de un spec sin
+aprobación). El dato no se borraría: sigue en `enrollments.enrolled_at` y en
+el tipo `EnrollmentWithStudent`, solo dejaría de pintarse. En la tabla de
+retirados quedaría "Fecha retiro", que sí es relevante ahí.
+
+---
+
 ## DEBT-068 — Sin contexto de usuario en Sentry (`Sentry.setUser`)
 
 **Origen:** spec-053 (degradado honesto de Server Actions ante Auth caído),
@@ -770,13 +861,23 @@ componente, sin migración.
 
 ---
 
-## DEBT-046 — La policy de `update` de `class_sessions` no tiene `with check`: un `update` puede reasignar la sesión a otro curso
+## DEBT-046 — La policy de `update` de `class_sessions` no tiene `with check`: un `update` puede reasignar la sesión a otro curso — 🟡 Parcialmente resuelto (spec-054, 2026-08-29)
 
 **Origen:** Análisis de impacto de `spec-041` (refrescar el código de asistencia),
 2026-08-05 — detectado al confirmar que refrescar el código no necesitaba policy
 nueva
 **Prioridad:** Media — no hay explotación conocida hoy; requiere migración y su
 propia ronda de pruebas
+
+> **Actualización (spec-054, 2026-08-29):** `class_sessions_mutate_owner_or_admin`
+> ya tiene `with check` — `supabase/migrations/20260829000001_rls_attendance_teacher_marking.sql`
+> le agregó el mismo predicado que su `using`, verificado a mano contra la base
+> local (un docente dueño ya no puede reasignar una sesión al curso de otro).
+> Fue necesario porque este spec introdujo la primera escritura de UI que hace
+> `update` sobre `class_sessions` por algo distinto del código (editar la
+> fecha de una sesión, `updateSessionDateAction`). **Sigue abierta la segunda
+> mitad**, sin tocar: auditar el resto de policies `for update` del proyecto
+> con el mismo criterio, como pedía el "Fix" original más abajo.
 
 `class_sessions_mutate_owner_or_admin`
 (`supabase/migrations/20260716000001_rls_attendance.sql:22`) define la policy
