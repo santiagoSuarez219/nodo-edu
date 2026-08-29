@@ -5,37 +5,125 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
-## DEBT-072 — `mirp-lab` se quedó sin ningún estudiante ni curso académico
+## DEBT-072 — El procedimiento documentado para probar migraciones (`db reset`) destruye todos los datos de desarrollo, sin advertirlo
 
-**Origen:** ronda de pruebas manuales de spec-054 (2026-08-29). **Prioridad:**
-Media — no bloquea desarrollo del día a día, pero deja el entorno de
-desarrollo sin datos de dominio para probar flujos que los necesiten, y la
-causa está sin diagnosticar.
+**Origen:** ronda de pruebas manuales de spec-054 (2026-08-29), investigación
+posterior a petición del usuario. **Prioridad:** Media-alta — el
+procedimiento se seguirá ejecutando cada vez que alguien agregue una
+migración, y cada ejecución vuelve a vaciar el entorno de desarrollo.
 
-Al preparar `TC-054-008` se encontró que la instancia Supabase local de
-`mirp-lab` no tenía **ningún** `academic_course` (`list_academic_courses`
-del `assignment-mcp` devolvió `[]`) ni el estudiante de prueba de la ronda de
-`test-053` (`test-spec053@nodo.local`, matriculado el 2026-08-29 en la misma
-sesión de trabajo, según `docs/testing/test-053-degradado-server-actions-auth.md`
-— el admin API de Auth ya no lo lista). Solo sobrevivía el docente
-`dev@nodo.local` (probablemente re-sembrado por `npm run seed:teacher` en
-algún punto).
+### Síntoma
 
-No fue causado por esta ronda: el único comando ejecutado sobre `mirp-lab`
-antes del hallazgo fue `supabase stop && supabase start` (para aplicar
-`jwt_expiry=60` de `TC-054-001`), que preserva datos — no equivale a
-`supabase db reset`. La pérdida ocurrió en algún momento **anterior** a esta
-sesión, de causa desconocida (¿un `db reset` en otra sesión sin documentar?,
-¿el volumen de Docker de `mirp-lab` se recreó?, ¿un problema de la propia
-workstation del laboratorio?).
+Al preparar `TC-054-008` se encontró que la instancia Supabase de `mirp-lab`
+no tenía **ningún** `academic_course` (`list_academic_courses` devolvió `[]`),
+ni el estudiante de la ronda de `test-053` (`test-spec053@nodo.local`,
+matriculado ese mismo día), ni una sola fila en `questions` (banco de
+preguntas vacío). Solo sobrevivía el docente `dev@nodo.local`.
 
-**Acción:** Investigar en una sesión con acceso más directo a `mirp-lab`
-(revisar historial de comandos, logs de Docker, o si hubo un reinicio de la
-workstation). Mientras tanto, el entorno tiene un curso de prueba nuevo
+### Causa raíz — **confirmada**, no inferida
+
+| Momento (UTC) | Evento | Fuente |
+|---|---|---|
+| `20:46:17.749Z` | Una sesión previa de Claude Code (rama `feat/planilla-asistencia`) ejecuta `ssh mirp-lab "… npx supabase db reset"` | transcript de esa sesión |
+| `20:46:20` | El volumen `supabase_db_02-Educational-Page` se recrea (3 s después) | `docker volume inspect --format {{.CreatedAt}}` |
+| `20:47:31` | Se re-siembra `dev@nodo.local` | `min(created_at)` de `auth.users` |
+
+Los otros volúmenes del stack (`storage`, `edge_runtime`) siguen siendo del
+`2026-07-31`, lo que descarta que se recreara el stack entero: se recreó
+**solo el volumen de datos**, que es exactamente lo que hace `db reset`.
+
+Ese `db reset` **no fue un error**: es el procedimiento que este mismo
+`CLAUDE.md` documenta (sección "Base de datos"): *"si agregás una migración
+nueva acá, hay que `rsync`earla a `mirp-lab` y correr `supabase db reset`
+allá para probarla antes de aplicarla a prod"*. La sesión estaba probando
+las dos migraciones de `feat/planilla-asistencia`
+(`20260829000000_attendance_manual_sessions.sql`,
+`20260829000001_rls_attendance_teacher_marking.sql`), que efectivamente
+siguen en `mirp-lab` y no en `development`/`main`.
+
+**El problema no es quién lo ejecutó, sino que el procedimiento documentado
+destruye todos los datos de desarrollo y no lo advierte en ninguna parte.**
+
+Descartado explícitamente: los dos `supabase stop && supabase start` de la
+ronda de spec-054 **no** causaron la pérdida — recrean los contenedores pero
+preservan el volumen (el `CreatedAt` del volumen es anterior a ambos, y los
+datos sembrados a las 20:47 sobrevivieron a los dos ciclos).
+
+### Acción propuesta
+
+1. Advertir en `CLAUDE.md` que `supabase db reset` en `mirp-lab` **borra todos
+   los datos de desarrollo**, y que conviene avisar antes de correrlo.
+2. Crear un seed reproducible de datos de desarrollo (curso + estudiantes +
+   algunas preguntas), de modo que un `db reset` cueste un comando de
+   recuperación y no una ronda de pruebas perdida. Hoy `npm run seed:teacher`
+   solo restaura el docente.
+
+Mientras tanto, el entorno quedó con un curso de prueba
 (`TEST054 — Estructuras de Datos`, `37292155-ad61-4517-ba3f-1dc7e8f4adb0`) y
 un estudiante matriculado (`test-spec054@nodo.local`, ver
 `docs/testing/test-054-resiliencia-latencia-supabase.md` → "Datos de
 prueba"), dejados en desarrollo por decisión del usuario.
+
+---
+
+## DEBT-073 — El procedimiento de despliegue apunta a producción con un flag que el CLI ya no acepta, y ambas máquinas están `linked` a producción
+
+**Origen:** investigación de [[DEBT-072]] (2026-08-29), a petición del usuario
+("que no vaya a suceder en producción a la hora de realizar el despliegue").
+**Prioridad:** **Alta** — no hay daño hoy, pero la salvaguarda que el
+procedimiento creía tener no existe.
+
+### Lo que dice `CLAUDE.md` vs. lo que hace el CLI instalado
+
+`CLAUDE.md` (secciones "Base de datos" y "Despliegue") indica usar
+`--project-ref` explícito *"para apuntar a producción sin ambigüedad"*:
+
+```bash
+supabase db push --project-ref bgiimadnmqnoqmdbudpo
+supabase migration list --project-ref bgiimadnmqnoqmdbudpo
+```
+
+**El CLI instalado (2.107.0) ya no acepta `--project-ref` en esos comandos**
+— verificado: `Unrecognized flag: --project-ref in command supabase migration
+list`. Los únicos selectores de destino disponibles hoy son `--linked`,
+`--local` y `--db-url`.
+
+Consecuencia: quien siga el procedimiento documentado obtiene un error, y la
+corrección natural es `--linked` — que **no nombra el proyecto al que
+apunta**. Justo la ambigüedad que el `--project-ref` explícito buscaba evitar.
+
+### Y ambos entornos están enlazados a producción
+
+- Mac de desarrollo: `supabase/.temp/project-ref` → `bgiimadnmqnoqmdbudpo`
+- `mirp-lab`: `supabase/.temp/project-ref` → `bgiimadnmqnoqmdbudpo`
+
+`mirp-lab` es una **workstation compartida** del laboratorio (otro usuario con
+sesión gráfica activa, ~20 proyectos Docker ajenos). Que el directorio de la
+base de *desarrollo* esté enlazado a *producción* significa que un
+`db push --linked` desde ahí aplicaría a producción las 2 migraciones de
+`feat/planilla-asistencia` que hoy solo existen en esa máquina — sin pasar
+por revisión ni por `main`.
+
+**Mitigación que existe hoy (parcial y frágil):** ninguna de las dos máquinas
+tiene token del CLI (`~/.supabase/access-token` no existe en ninguna), así que
+un comando contra el proyecto enlazado pediría `supabase login` primero. Es
+una barrera real, pero accidental — no una decisión de diseño.
+
+### Acción propuesta
+
+1. **Actualizar `CLAUDE.md`** con los comandos que el CLI acepta hoy, y hacer
+   de `--dry-run` (que sí existe en `db push`) un paso obligatorio del
+   checklist antes de cualquier push a producción.
+2. **Desenlazar `mirp-lab` de producción** (borrar su `supabase/.temp/`): esa
+   máquina no necesita alcanzar producción para nada.
+3. Evaluar si la Mac debe permanecer enlazada, o si conviene exigir
+   `--db-url` explícito para cada operación contra producción.
+
+### Estado verificado de producción (2026-08-29, solo lectura)
+
+Producción **no** tiene las migraciones de asistencia: la columna
+`attendance_records.marked_by` no existe (`42703`), confirmando que sigue
+sincronizada con `main` y que nada no revisado se ha filtrado.
 
 ---
 
