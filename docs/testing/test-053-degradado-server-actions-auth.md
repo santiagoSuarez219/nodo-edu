@@ -18,11 +18,11 @@
 |---|---|---|---|
 | Docente de desarrollo (ya sembrado, **no** crear ni borrar) | `npm run seed:teacher` | `dev@nodo.local` / `DevLocal2026!` | n/a |
 | Curso académico (**reutilizado, no creado por esta ronda — no eliminar**: leftover de la ronda de `spec-051`, sigue vivo en `mirp-lab`) | `list_academic_courses` (`assignment-mcp`) | `TEST051 — Estructuras de Datos`, `53c1a445-cf85-43ec-8167-8eeefa1f7902` | n/a |
-| Estudiante de prueba matriculado en `TEST051` | `create_student` (`students-mcp`) | `39992280-f977-4c47-85e5-7ccd47c2a1a9` (`test-spec053@nodo.local` / `TestSpec053!` → `TestSpec053New!` desde `TC-053-011`) | ⬜ (`delete_student`, `students-mcp`) |
-| Matrícula del estudiante en `TEST051` (creada junto con el estudiante) | `create_student` (`students-mcp`, `academic_course_id`) | `dd9ac053-f5b4-4bd4-afe0-6c4d8e98a85b` | ⬜ (eliminada en cascada por `delete_student`) |
+| Estudiante de prueba matriculado en `TEST051` | `create_student` (`students-mcp`) | `39992280-f977-4c47-85e5-7ccd47c2a1a9` (`test-spec053@nodo.local` / `TestSpec053!` → `TestSpec053New!` desde `TC-053-011`) | 🟡 No eliminado — decisión del usuario (2026-08-29): queda en desarrollo |
+| Matrícula del estudiante en `TEST051` (creada junto con el estudiante) | `create_student` (`students-mcp`, `academic_course_id`) | `dd9ac053-f5b4-4bd4-afe0-6c4d8e98a85b` | 🟡 No eliminada — misma decisión |
 | Lección con autoevaluación — **contenido real de producción, no creado por esta ronda**: la misma lección de la evidencia de NODO-EDU-4 | `estructuras-de-datos` / `polimorfismo` — 2 preguntas `multiple_choice` ya publicadas y montadas | `2d4857e4-a7dc-421e-8164-4573f91ecd3d`, `4a9dc0c8-dfed-48ff-a999-8a5b0ef0cd74` | n/a |
-| Grupo de evaluación de prueba (para `TC-053-007`) | `create_assignment_group` + `publish_assignment_group` (`assignment-mcp`), reutiliza la pregunta `open_text` publicada `faeb32d0-440a-46f3-9173-e65154a52b0f` en sus 3 variantes | `fb568d2c-07b2-492e-801e-88fcf01350b5` (`TEST053 — Evaluación de prueba (spec-053)`) | ⬜ — **no se pudo eliminar**: `delete_assignment_group` falla con 409 al tener una entrega real (ver "Resumen de la ronda") |
-| Envío del estudiante de prueba a `TEST053` (variante B) | Enviado vía UI por el estudiante de prueba | `3cab20c7-2a3d-479b-a5b8-009b3242dabe`, calificado `4.50/5.00` | ⬜ (se elimina en cascada junto con el grupo, cuando ese quede libre para borrar) |
+| Grupo de evaluación de prueba (para `TC-053-007`) | `create_assignment_group` + `publish_assignment_group` (`assignment-mcp`), reutiliza la pregunta `open_text` publicada `faeb32d0-440a-46f3-9173-e65154a52b0f` en sus 3 variantes | `fb568d2c-07b2-492e-801e-88fcf01350b5` (`TEST053 — Evaluación de prueba (spec-053)`) | 🟡 No eliminado (409, tiene una entrega real); decisión del usuario (2026-08-29): queda en desarrollo |
+| Envío del estudiante de prueba a `TEST053` (variante B) | Enviado vía UI por el estudiante de prueba | `3cab20c7-2a3d-479b-a5b8-009b3242dabe`, calificado `4.50/5.00` | 🟡 No eliminado — misma decisión |
 
 > ⚠️ La autoevaluación es de **intento único** (`spec-040`) y cuenta para la
 > nota. `TC-053-001` y `TC-053-002` consumen el intento del estudiante de
@@ -374,7 +374,10 @@ prueba quedó en `TestSpec053New!` para el resto de la ronda.
 
   Ambos bloqueos vienen del mismo envío real registrado en `TC-053-007`
   (`3cab20c7-2a3d-479b-a5b8-009b3242dabe`). No se intentó borrar nada
-  directamente en base de datos — queda pendiente de instrucción explícita del
-  usuario (dejar los datos, usar `unenroll_student` para retirar al estudiante
-  sin perder el envío, o autorizar un `DELETE` manual en `mirp-lab`).
+  directamente en base de datos.
+
+  **Decisión del usuario (2026-08-29): dejar los datos en desarrollo.** El
+  grupo `TEST053` y el estudiante de prueba quedan en `mirp-lab`, claramente
+  identificados como datos de prueba (título "Evaluación de prueba (spec-053)",
+  correo `test-spec053@nodo.local`), sin acción de limpieza adicional.
 - Túnel SSH: restaurado y activo al cierre de esta ronda.
