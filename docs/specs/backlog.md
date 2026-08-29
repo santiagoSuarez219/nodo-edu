@@ -5,6 +5,67 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+## DEBT-070 — Clientes Supabase server-side sin timeout: una conexión colgada retiene la función hasta los 300s de Vercel
+
+**Origen:** incidente de plataforma de Supabase del 2026-08-27→29
+("Increased response times for requests", deploy defectuoso de PostgREST 14.5
+con rollback completado el 28 a las 21:06 UTC), diagnosticado con los runtime
+logs de Vercel el 2026-08-29. **Prioridad:** Media-alta — durante el incidente
+hubo 10 ejecuciones de `/[courseSlug]` muertas por `Vercel Runtime Timeout
+Error: Task timed out after 300 seconds` (27–29 de agosto, 4 usuarios
+afectados): 5 minutos de espera para el estudiante y 5 minutos de cómputo
+facturado por request, por página.
+
+El único cliente Supabase con timeout propio es el del middleware
+(`lib/auth/middleware.ts`, `AbortSignal.timeout` inyectado vía `global.fetch`
+en spec-046). Los demás — `lib/auth/server.ts` (Server Components/RSC),
+`lib/auth/actions.ts` y `lib/auth/service.ts` (service role) — usan el fetch
+por defecto, sin límite: cuando la conexión hacia Supabase se cuelga (como
+pasó de forma intermitente durante el incidente), la función serverless espera
+hasta el límite duro de la plataforma.
+
+**Acción:** Spec propio. Inyectar un `global.fetch` con `AbortSignal.timeout`
+en los tres clientes restantes, con un presupuesto pensado para consultas de
+datos (más holgado que los 2s del middleware — una página puede tolerar
+algunos segundos, nunca 300). Decidir además qué renderiza la página cuando la
+consulta aborta: hoy no existe esa rama de error, y un timeout sin manejo
+seguiría siendo un 500 — más honesto que 300s de cuelgue, pero mejorable
+(¿error boundary con reintento?, ¿degradado tipo spec-053?).
+
+---
+
+## DEBT-071 — El middleware puede agotar los 25s de Vercel pese a sus presupuestos de timeout (sospecha: retries internos de `@supabase/auth-js`)
+
+**Origen:** mismo incidente del 2026-08-27→29. Los runtime logs de Vercel
+registran 35 × `Your function was stopped as it did not return an initial
+response within 25s` en `/middleware` (primera vez 2026-08-13, concentrados en
+el incidente) y 34 respuestas 504 (`MIDDLEWARE_INVOCATION_TIMEOUT`) solo en
+las últimas 24h del 29 de agosto. **Prioridad:** Media-alta — este es el modo
+de fallo que el usuario vio como "el sitio no carga": un 504 de Vercel sin
+página de degradado, peor que el 503 diseñado por spec-046.
+
+El presupuesto teórico del peor caso en `lib/auth/middleware.ts` es ~10.25s
+(2 intentos × HEALTH_TIMEOUT_MS 5s + 250ms de backoff), más ~4.25s del camino
+getUser y ~2s de `user_roles` — lejos de 25s. Que aun así se alcance el límite
+apunta a los reintentos **internos** de `@supabase/auth-js` al refrescar un
+token (`_refreshAccessToken` reintenta con backoff propio ante
+`AuthRetryableFetchError`): cada intento individual respeta los 2s del
+`AbortSignal`, pero el bucle interno del SDK los acumula por fuera de los
+presupuestos del middleware. Consistente con los 30 × `AuthRetryableFetchError:
+The operation was aborted due to timeout` registrados el mismo día — ese error
+es exactamente el que el SDK considera reintentable.
+
+**Acción:** Spec propio. Primero confirmar el mecanismo (reproducir con
+latencia inyectada, o leer la versión vendorizada de auth-js); luego acotar el
+tiempo total de `updateSupabaseSession` con un deadline global (p. ej.
+`Promise.race` a ~10s que devuelva `unavailable/network`), de modo que el gate
+de spec-046 responda su 503 diseñado antes de que Vercel mate la invocación
+con un 504 sin explicación. Relacionado: [[DEBT-069]] (alcance del 503) —
+resolver ambos dejaría el peor caso en "rutas públicas siguen vivas, rutas con
+sesión ven el degradado honesto".
+
+---
+
 ## DEBT-068 — Sin contexto de usuario en Sentry (`Sentry.setUser`)
 
 **Origen:** spec-053 (degradado honesto de Server Actions ante Auth caído),
