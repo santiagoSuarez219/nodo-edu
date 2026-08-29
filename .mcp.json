@@ -39,6 +39,10 @@
     "courses-mcp-prod": {
       "command": "./mcp-servers/run-prod-mcp.sh",
       "args": ["courses-mcp"]
+    },
+    "supabase": {
+      "type": "http",
+      "url": "https://mcp.supabase.com/mcp?features=docs%2Caccount%2Cdatabase%2Cdebugging%2Cdevelopment%2Cfunctions%2Cbranching"
     }
   }
 }
