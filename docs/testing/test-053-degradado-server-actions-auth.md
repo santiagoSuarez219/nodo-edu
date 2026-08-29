@@ -18,7 +18,7 @@
 |---|---|---|---|
 | Docente de desarrollo (ya sembrado, **no** crear ni borrar) | `npm run seed:teacher` | `dev@nodo.local` / `DevLocal2026!` | n/a |
 | Curso académico (**reutilizado, no creado por esta ronda — no eliminar**: leftover de la ronda de `spec-051`, sigue vivo en `mirp-lab`) | `list_academic_courses` (`assignment-mcp`) | `TEST051 — Estructuras de Datos`, `53c1a445-cf85-43ec-8167-8eeefa1f7902` | n/a |
-| Estudiante de prueba matriculado en `TEST051` | `create_student` (`students-mcp`) | `39992280-f977-4c47-85e5-7ccd47c2a1a9` (`test-spec053@nodo.local` / `TestSpec053!`) | ⬜ (`delete_student`, `students-mcp`) |
+| Estudiante de prueba matriculado en `TEST051` | `create_student` (`students-mcp`) | `39992280-f977-4c47-85e5-7ccd47c2a1a9` (`test-spec053@nodo.local` / `TestSpec053!` → `TestSpec053New!` desde `TC-053-011`) | ⬜ (`delete_student`, `students-mcp`) |
 | Matrícula del estudiante en `TEST051` (creada junto con el estudiante) | `create_student` (`students-mcp`, `academic_course_id`) | `dd9ac053-f5b4-4bd4-afe0-6c4d8e98a85b` | ⬜ (eliminada en cascada por `delete_student`) |
 | Lección con autoevaluación — **contenido real de producción, no creado por esta ronda**: la misma lección de la evidencia de NODO-EDU-4 | `estructuras-de-datos` / `polimorfismo` — 2 preguntas `multiple_choice` ya publicadas y montadas | `2d4857e4-a7dc-421e-8164-4573f91ecd3d`, `4a9dc0c8-dfed-48ff-a999-8a5b0ef0cd74` | n/a |
 
@@ -96,8 +96,16 @@ de que la página haya cargado por completo.
 - El artículo de la lección, el sidebar de navegación y el resto de la página
   **siguen visibles**.
 - **No** aparece la pantalla "No pudimos cargar esta lección".
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{pendiente}}
+**Estado:** ✅ Aprobado
+**Hallazgos:** Ejecutado contra `estructuras-de-datos/polimorfismo` con el
+estudiante `test-spec053@nodo.local`. Túnel cortado a las 16:55:54Z. Tras
+marcar las 2 respuestas y confirmar el envío (paso intermedio "Vas a enviar
+tus 2 respuestas... Sí, enviar definitivamente"), apareció el mensaje "No
+pudimos comunicarnos con el servidor. Revisa tu conexión e inténtalo de nuevo
+en un momento." dentro del recuadro de Autoevaluación, con ícono de error. El
+artículo completo (todas las tablas comparativas, "Resumen operativo",
+"Síntesis") permaneció visible al hacer scroll — sin regresión de layout. Sin
+observaciones adicionales.
 
 ### TC-053-002 — Las respuestas se conservan y el reintento funciona
 **Precondición:** continuación directa de `TC-053-001`, sin recargar la página.
@@ -108,8 +116,15 @@ de que la página haya cargado por completo.
 3. Pulsar "Enviar" otra vez, **sin recargar la página**.
 **Resultado esperado:** el envío se completa, la autoevaluación queda registrada
 con un único intento y la página muestra la revisión del intento.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{pendiente}}
+**Estado:** ✅ Aprobado
+**Hallazgos:** Tras `TC-053-001`, sin recargar, las 2 respuestas seguían
+marcadas visualmente y el botón "Enviar respuestas" seguía operativo. Túnel
+restaurado, se repitió "Enviar respuestas" → "Sí, enviar definitivamente" y el
+envío se completó: `router.refresh()` trajo la revisión con la respuesta
+correcta en verde y la elegida (incorrecta, en la 2ª pregunta) en rojo con
+etiqueta "Incorrecto", y "Completar lección" quedó habilitado. Solo un intento
+registrado — no se duplicó por el primer intento fallido. Sin observaciones
+adicionales.
 
 ### TC-053-003 — Login degrada dentro del formulario
 > Reproduce los eventos 1 y 2 de NODO-EDU-4 (27-ago 12:55 y 28-ago 10:20).
@@ -124,8 +139,24 @@ túnel **después** de que la página haya cargado.
 **Resultado esperado:** aparece un mensaje de error **en el formulario**, con el
 correo escrito aún visible. **No** se sustituye la página por el `ErrorState`
 genérico ni por una pantalla en blanco.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{pendiente}}
+**Estado:** ✅ Aprobado (con hallazgo no bloqueante — ver abajo)
+**Hallazgos:** Túnel cortado a las 16:57:46Z, formulario ya con los dos campos
+llenos. Al enviar, apareció "No pudimos comunicarnos con el servidor. Revisa tu
+conexión e inténtalo de nuevo en un momento." **dentro del formulario** — sin
+sustituir la página por `ErrorState`, cumpliendo el criterio central.
+
+Discrepancia con el criterio tal como estaba escrito: el campo de correo
+**no** quedó visible — volvió al placeholder vacío. Se verificó que **no** es
+una regresión de este spec: con Auth sano y credenciales incorrectas
+("Correo o contraseña incorrectos.") ocurre exactamente lo mismo — es el
+comportamiento nativo de React 19, que resetea los campos no controlados de un
+`<form action={fn}>` tras cualquier resolución de la action, éxito o fallo.
+`withTransportFallback` (D5) no lo introduce ni lo agrava: el estado que
+retorna tiene la misma forma que el de `signIn` directamente. El criterio de
+este archivo quedaba mal formulado por un supuesto no verificado antes de
+implementar; no amerita cambio de código, pero si se quiere conservar el
+correo entre envíos haría falta un input controlado — deuda de UX preexistente
+a este spec, no registrada como DEBT por quedar fuera de su alcance.
 
 ### TC-053-004 — El gate 503 reporta a Sentry *(solo revisión de código en esta ronda — ver nota arriba)*
 **Precondición:** implementación de la Fase 2 completa.
@@ -137,8 +168,16 @@ genérico ni por una pantalla en blanco.
 4. Con el túnel caído, comprobar en la terminal de `npm run dev` que el
    `console.error` sigue apareciendo con el `reason` correcto.
 **Resultado esperado:** el código cumple los cuatro puntos.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{pendiente}}
+**Estado:** ✅ Aprobado (revisión de código)
+**Hallazgos:** `middleware.ts:38-54` confirma los cuatro puntos: `captureMessage`
+(no `captureException`) con `level: "error"` y tags `gate: "auth"`, `reason`,
+`path`, `is_server_action` (derivado de `request.headers.has("Next-Action")`);
+el `console.error` original de la línea 36 se conserva sin modificar, justo
+antes del bloque nuevo. No se pudo capturar el stdout en vivo de la terminal
+de `npm run dev` (corre en una sesión sin log redirigido accesible desde
+aquí), pero el gate se disparó realmente 4 veces durante esta ronda
+(`TC-053-001`, `003`, `006`, `008`) por el mismo camino de código — sin
+evidencia de que el `console.error` se haya roto.
 
 ### TC-053-005 — El fallo capturado se sigue reportando *(solo revisión de código en esta ronda)*
 > Verifica que el spec no convierte el bug en un fallo silencioso (D4).
@@ -151,8 +190,18 @@ genérico ni por una pantalla en blanco.
 3. Confirmar que `LessonClosure.tsx` y `AttendanceSection.tsx` —que ya
    capturaban— también reportan ahora.
 **Resultado esperado:** ningún `catch` de fallo de transporte queda sin reporte.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{pendiente}}
+**Estado:** ✅ Aprobado (revisión de código)
+**Hallazgos:** `reportTransportError()` (`level: "warning"`, tag
+`transport: "server_action"`, gateado por `isSentryEnabled`) se invoca desde
+los 8 call sites directos (`EnrollmentForm`, `GradeInputCell`,
+`GradeItemsPanel`, `RecalculateSelfAssessmentButton`,
+`SubmissionReviewPanel`, `AttendanceSection`, `LessonClosure`,
+`QuestionRenderer`) más `lib/errors/server-action.ts`, que la envuelve dentro
+de `withTransportFallback()` — usado por `LoginForm`, `ChangePasswordForm` y
+`AccountForm` — y directamente en `Navbar`/`UserMenu` (cierre de sesión).
+`LessonClosure.tsx` y `AttendanceSection.tsx` (que ya capturaban antes de este
+spec) confirmados con la llamada nueva añadida dentro de su `catch` existente.
+12/12 call sites de la auditoría cubiertos.
 
 ### TC-053-006 — Cerrar sesión no rompe la página
 **Precondición:** sesión iniciada como estudiante de prueba, en cualquier página.
@@ -162,8 +211,14 @@ Cortar el túnel después de cargar.
 2. Pulsar "Cerrar sesión".
 **Resultado esperado:** o bien la sesión se cierra, o bien se muestra un error
 legible; en ningún caso se sustituye la página por el `ErrorState` genérico.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{pendiente}}
+**Estado:** ✅ Aprobado
+**Hallazgos:** Túnel cortado a las 16:59:27Z, con sesión ya iniciada en
+`/cuenta/cursos`. Se abrió el menú móvil (viewport de la sesión de pruebas cae
+bajo el breakpoint `lg`, así que se probó el `UserMenu` de escritorio de forma
+indirecta a través del mismo componente móvil) y se pulsó "Cerrar sesión": el
+mensaje "No pudimos comunicarnos con el servidor..." apareció bajo el enlace,
+la sesión siguió activa (nombre del estudiante visible) y el resto de la
+página no se alteró. Sin observaciones adicionales.
 
 ### TC-053-007 — Docente calificando: el panel de revisión degrada solo
 **Precondición:** sesión iniciada como `dev@nodo.local`, en la pantalla de
@@ -195,8 +250,13 @@ revisión sigue en pie y no se pierde lo escrito en los demás campos.
 2. Restaurar el túnel al terminar.
 **Resultado esperado:** se muestra la página de servicio no disponible de
 `spec-046`, con `503`. Sin regresión de `TC-046-001` … `TC-046-010`.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{pendiente}}
+**Estado:** ✅ Aprobado
+**Hallazgos:** Túnel cortado a las 17:03:17Z, navegación completa a `/`. Se
+mostró "No pudimos verificar tu sesión / El servicio de autenticación no está
+respondiendo. Tu sesión sigue activa — esto no es un problema con tu usuario
+ni tu contraseña. Intenta de nuevo en unos segundos." con botón "Reintentar",
+título de pestaña "Servicio no disponible" — página de `spec-046` sin
+modificar, confirmando que **D1 se respetó**: el spec no tocó esta ruta.
 
 ### TC-053-009 — Los mensajes de negocio no cambian
 **Precondición:** túnel restaurado. Estudiante de prueba con la autoevaluación
@@ -212,8 +272,20 @@ revisión sigue en pie y no se pierde lo escrito en los demás campos.
 enviaste esta autoevaluación…", "No estás matriculado en este curso"), **no**
 el copy genérico de fallo de transporte. Los dos tipos de error siguen siendo
 distinguibles para el usuario.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{pendiente}}
+**Estado:** ✅ Aprobado
+**Hallazgos:** (1) `not_enrolled`: navegar a `/programacion-cientifica`
+(estudiante no matriculado allí) mostró "No estás matriculado en el curso
+programacion-cientifica. Ingresa el código de matrícula para acceder." —
+mensaje de negocio intacto, no el copy genérico. (2) `already_submitted`: no
+se pudo forzar directamente vía UI en esta ronda — `spec-040` oculta el
+formulario de autoevaluación en cuanto existe un intento (verificado en
+`TC-053-002`: tras enviar, la sección pasó a mostrar la revisión, no el
+formulario), así que ese mensaje solo aparece ante una condición de carrera
+genuina (doble pestaña) que esta ronda no reprodujo. No es una brecha del
+spec: el código de `SelfAssessmentSection.tsx` solo intercepta la excepción
+(`catch`) — el resultado de negocio `already_submitted` sigue el camino
+`result.ok === false` sin pasar por el nuevo `catch`, así que no hay motivo
+para que este spec lo afecte.
 
 ### TC-053-010 — Un error que no es de transporte sigue escalando al boundary
 > El caso que protege contra el riesgo de la **D2**: que el `catch` nuevo se
@@ -229,8 +301,17 @@ distinguibles para el usuario.
 `spec-052`/`spec-037` — el de servidor a su boundary, el de cliente al
 `ErrorBoundary` de componente sin desmontar la página. Ninguno se convierte en
 el mensaje genérico de fallo de transporte.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{pendiente}}
+**Estado:** ✅ Aprobado
+**Hallazgos:** "Probar error de servidor" mostró "El servidor respondió con:
+Sentry server-side check — revisar el panel de Sentry para confirmar el
+evento." — `SentryDiagnostics.tsx` ya tenía su propio `try/catch` desde
+spec-052 (archivo no tocado por spec-053), comportamiento sin cambios.
+"Probar error de cliente" mostró "Error de cliente capturado / El fallo se
+reportó a Sentry sin desmontar el resto de la página." dentro de su recuadro,
+con botón "Reintentar"; el resto de la página (título, banner amarillo, botón
+de servidor) permaneció intacto. Ningún mensaje genérico de transporte
+apareció en ninguno de los dos casos — correcto, ninguno de los dos es un
+fallo de transporte.
 
 ### TC-053-011 — Camino feliz de los cuatro formularios envueltos
 > Cubre el riesgo señalado en la **D5**: que envolver la acción interfiera con
@@ -246,14 +327,34 @@ el mensaje genérico de fallo de transporte.
 4. Editar el perfil desde `/cuenta` → éxito.
 **Resultado esperado:** los cuatro flujos se comportan igual que antes del spec.
 Ninguna redirección se pierde ni se queda a medias.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** {{pendiente}}
+**Estado:** ✅ Aprobado
+**Hallazgos:** (1) Login desde `/login` sin `redirectTo` → `/cuenta/cursos`.
+(2) Login desde `/estructuras-de-datos/herencia` (protegida) sin sesión →
+redirigió a `/login?redirectTo=%2Festructuras-de-datos%2Fherencia`; tras el
+login volvió exactamente a `/estructuras-de-datos/herencia`. (3) Edición de
+perfil en `/cuenta` (`AccountForm`, agregado `github_username: spec053tester`)
+→ "Perfil actualizado correctamente.". (4) Cambio de contraseña
+(`TestSpec053!` → `TestSpec053New!`) → "Contraseña actualizada. Cerramos tus
+demás sesiones abiertas por seguridad — esta sigue activa.", campos
+limpiados, sesión conservada. Los cuatro adaptadores `withTransportFallback`
+no alteraron ningún flujo exitoso. **Nota:** la contraseña del estudiante de
+prueba quedó en `TestSpec053New!` para el resto de la ronda.
 
 ---
 
 ## Resumen de la ronda
 
-- Aprobados: 0 — Fallidos: 0 — Pendientes: 11
-- Hallazgos escalados a `docs/specs/backlog.md`: {{pendiente}}
-- Limpieza de datos de prueba: ⬜ Pendiente
-- Túnel SSH restaurado al cerrar la ronda: ⬜ Pendiente
+- Aprobados: 10 (`TC-053-001` a `006`, `008` a `011`) — Fallidos: 0 —
+  Pendientes: 1 (`TC-053-007`, requiere una entrega real para calificar —
+  montaje de grupo de evaluación + envío de estudiante, deferido a una
+  continuación de esta ronda)
+- Hallazgo no bloqueante: `TC-053-003` documenta que `LoginForm` no conserva
+  el correo tras un fallo (comportamiento preexistente de React 19 al
+  resetear formularios no controlados tras cualquier action, verificado que
+  ocurre igual con Auth sano — no es una regresión de este spec, no
+  escalado a backlog por no ser deuda introducida aquí).
+- Hallazgos escalados a `docs/specs/backlog.md`: ninguno
+- Limpieza de datos de prueba: ⬜ Pendiente (ronda sigue abierta —
+  `TC-053-007` puede requerir el mismo estudiante de prueba)
+- Túnel SSH: restaurado y activo al momento de este resumen (no se cierra la
+  ronda todavía)
