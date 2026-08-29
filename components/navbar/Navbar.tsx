@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import type { Profile } from "@/lib/students/types";
 import type { AppRole } from "@/lib/auth/session";
 import { signOut } from "@/lib/auth/actions";
@@ -9,6 +9,8 @@ import { UserMenu } from "./UserMenu";
 import { NavLinkList } from "./NavLinkList";
 import { getStudentNavLinks, getTeacherNavLinks } from "./navLinks";
 import Image from "next/image";
+import { isServerActionTransportError, SERVER_ACTION_TRANSPORT_ERROR_MESSAGE } from "@/lib/errors/server-action";
+import { reportTransportError } from "@/lib/observability/report-transport-error";
 
 export const Navbar = ({
   profile,
@@ -18,6 +20,25 @@ export const Navbar = ({
   roles?: AppRole[];
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [signOutError, setSignOutError] = useState<string | null>(null);
+  const [isSigningOut, startSignOutTransition] = useTransition();
+
+  // spec-053: <form action={signOut}> no admite try/catch en el call site —
+  // sin este manejador, un 503 del gate de Auth (middleware.ts) durante el
+  // cierre de sesión escalaba al boundary de app/error.tsx.
+  function handleSignOut(e: React.FormEvent) {
+    e.preventDefault();
+    setSignOutError(null);
+    startSignOutTransition(async () => {
+      try {
+        await signOut();
+      } catch (err) {
+        if (!isServerActionTransportError(err)) throw err;
+        reportTransportError(err, "signOut");
+        setSignOutError(SERVER_ACTION_TRANSPORT_ERROR_MESSAGE);
+      }
+    });
+  }
 
   const isTeacher = roles.includes("teacher") || roles.includes("admin");
 
@@ -125,14 +146,20 @@ export const Navbar = ({
             </Link>
           </li>
           <li>
-            <form action={signOut}>
+            <form onSubmit={handleSignOut}>
               <button
                 type="submit"
-                className="block w-full text-left py-3 text-gray-700 dark:text-gray-300 hover:text-blue-700 dark:hover:text-blue-400 transition-colors"
+                disabled={isSigningOut}
+                className="block w-full text-left py-3 text-gray-700 dark:text-gray-300 hover:text-blue-700 dark:hover:text-blue-400 transition-colors disabled:opacity-60"
               >
-                Cerrar sesión
+                {isSigningOut ? "Cerrando sesión…" : "Cerrar sesión"}
               </button>
             </form>
+            {signOutError && (
+              <p role="alert" className="px-1 pb-2 text-xs text-red-600 dark:text-red-400">
+                {signOutError}
+              </p>
+            )}
           </li>
         </ul>
       </div>

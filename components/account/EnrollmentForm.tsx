@@ -3,6 +3,8 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { enrollByCourseCodeAction } from "@/lib/enrollments/actions";
+import { isServerActionTransportError, SERVER_ACTION_TRANSPORT_ERROR_MESSAGE } from "@/lib/errors/server-action";
+import { reportTransportError } from "@/lib/observability/report-transport-error";
 
 export function EnrollmentForm() {
   const router = useRouter();
@@ -26,7 +28,16 @@ export function EnrollmentForm() {
     formData.set("enrollment_code", trimmed);
 
     startTransition(async () => {
-      const result = await enrollByCourseCodeAction({ ok: true }, formData);
+      let result;
+      try {
+        result = await enrollByCourseCodeAction({ ok: true }, formData);
+      } catch (err) {
+        // spec-053: ver LoginForm.tsx para el motivo.
+        if (!isServerActionTransportError(err)) throw err;
+        reportTransportError(err, "enrollByCourseCodeAction");
+        setError(SERVER_ACTION_TRANSPORT_ERROR_MESSAGE);
+        return;
+      }
       if (!result.ok) {
         setError(result.error);
         return;

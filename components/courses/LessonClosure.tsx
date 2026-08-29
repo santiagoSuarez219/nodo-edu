@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { markLessonCompleted, markLessonUncompleted } from "@/lib/progress";
+import { reportTransportError } from "@/lib/observability/report-transport-error";
 
 interface LessonClosureProps {
   courseSlug: string;
@@ -66,6 +67,10 @@ export function LessonClosure({
         }
       } catch (err) {
         console.error("Error toggling lesson completion:", err);
+        // spec-053: sin esto, el fallo capturado no dejaba ningún rastro en
+        // Sentry (D4) — se veía bien para el estudiante pero era invisible
+        // en el panel.
+        reportTransportError(err, "markLessonCompleted/markLessonUncompleted");
         setError("No se pudo conectar con el servidor. Intenta de nuevo.");
       }
     });

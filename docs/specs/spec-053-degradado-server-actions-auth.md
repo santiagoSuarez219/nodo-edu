@@ -1,4 +1,4 @@
-# spec-053 — [NOT STARTED] Degradado honesto de Server Actions cuando el gate de Auth responde 503
+# spec-053 — [TESTING] Degradado honesto de Server Actions cuando el gate de Auth responde 503
 
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.
@@ -223,32 +223,32 @@ MCP" de `spec-052`.
 ## Fases de implementación
 
 ### Fase 1 — Clasificación del error y reporte compartido
-- [ ] Crear `lib/errors/server-action.ts` con `isServerActionTransportError(error: unknown): boolean`.
+- [x] Crear `lib/errors/server-action.ts` con `isServerActionTransportError(error: unknown): boolean`.
       Reconoce las dos familias observadas en Sentry esta semana:
       `"An unexpected response was received from the server"` (NODO-EDU-4 — llegó
       respuesta no-RSC) y `TypeError: Failed to fetch` / `"Load failed"`
       (NODO-EDU-3 y NODO-EDU-5 — no llegó respuesta). Ver **D2** sobre por qué
       la detección va por mensaje y qué la hace aceptable aquí.
-- [ ] Exportar desde el mismo módulo el copy compartido en español, para que los
+- [x] Exportar desde el mismo módulo el copy compartido en español, para que los
       12 componentes no inventen 12 mensajes distintos. Propuesta:
       *"No pudimos comunicarnos con el servidor. Revisa tu conexión e inténtalo
       de nuevo en un momento."*
-- [ ] Crear `lib/observability/report-transport-error.ts`: envía el error a
+- [x] Crear `lib/observability/report-transport-error.ts`: envía el error a
       Sentry con `level: "warning"` y tags `{ transport: "server_action", action: "<nombre>" }`
       (**D4**). Debe respetar el gate `isSentryEnabled` de `spec-052` — en
       desarrollo no envía nada y solo queda el `console.error`.
-- [ ] Sin `any`. `npm run lint` y `npm run build` pasan.
+- [x] Sin `any`. `npm run lint` y `npm run build` pasan.
 
 ### Fase 2 — Telemetría del gate 503 en el middleware
-- [ ] En `middleware.ts:44-55`, junto al `console.error` que ya existe (que **se
+- [x] En `middleware.ts:44-55`, junto al `console.error` que ya existe (que **se
       conserva**: es la única señal en desarrollo), reportar a Sentry el 503 con
       el `reason` (`network` / `server` / `misconfigured` / `unknown`), el
       `pathname` y si la request era un Server Action (**D3**).
-- [ ] Verificar que el runtime Edge de `spec-052` (`sentry.edge.config.ts`)
+- [x] Verificar que el runtime Edge de `spec-052` (`sentry.edge.config.ts`)
       efectivamente inicializa para `middleware.ts` — si no, el evento no sale y
       la fase no está hecha. Es la única parte de la instrumentación de
       `spec-052` que nunca se ejercitó en producción.
-- [ ] Confirmar que el evento **no** lleva cookies ni cabeceras de
+- [x] Confirmar que el evento **no** lleva cookies ni cabeceras de
       autenticación: el `beforeSend` de `lib/observability/scrub-sentry-event.ts`
       (spec-052, D5) debe seguir aplicando.
 
@@ -257,49 +257,49 @@ MCP" de `spec-052`.
 > Cada componente aplica el mismo patrón — capturar, reportar (Fase 1), mostrar
 > el copy compartido, **no** escalar al boundary.
 
-- [ ] `components/courses/SelfAssessmentSection.tsx`: `try/catch` alrededor de
+- [x] `components/courses/SelfAssessmentSection.tsx`: `try/catch` alrededor de
       `submitSelfAssessment` (línea 68). El mensaje va al `submitError` que ya
       existe (línea 35), y **no** se llama a `router.refresh()` ni se limpia el
       formulario: el estudiante conserva sus respuestas y el botón vuelve a
       quedar operativo. Es el caso con peor consecuencia hoy (autoevaluación de
       intento único que cuenta para la nota, `spec-040`).
-- [ ] `components/auth/LoginForm.tsx`: aplicar **D5** para que `useActionState`
+- [x] `components/auth/LoginForm.tsx`: aplicar **D5** para que `useActionState`
       reciba un `AuthResult` con `ok: false` en vez de una excepción. Mismo
       patrón en `account/ChangePasswordForm.tsx`, `account/AccountForm.tsx` y
       `account/EnrollmentForm.tsx`.
-- [ ] `components/student/QuestionRenderer.tsx`: `try/catch` en `runCodeAction`.
-- [ ] `components/navbar/Navbar.tsx` y `components/navbar/UserMenu.tsx`: el
+- [x] `components/student/QuestionRenderer.tsx`: `try/catch` en `runCodeAction`.
+- [x] `components/navbar/Navbar.tsx` y `components/navbar/UserMenu.tsx`: el
       `<form action={signOut}>` no admite `try/catch` en el call site — evaluar
       envolver `signOut` con el mismo patrón de **D5**.
-- [ ] Barrido de los 4 componentes de `admin/` sin `catch` (ver tabla de
+- [x] Barrido de los 4 componentes de `admin/` sin `catch` (ver tabla de
       auditoría). Prioridad menor: solo los sufre el docente, y con la sesión
       abierta ya sabe interpretar el fallo — pero el patrón debe quedar
       uniforme.
-- [ ] `components/courses/LessonClosure.tsx` (línea 67) y
+- [x] `components/courses/LessonClosure.tsx` (línea 67) y
       `components/courses/AttendanceSection.tsx` (línea 96): **no** cambiar la
       estructura; añadir únicamente la llamada de reporte de la Fase 1 dentro
       del `catch` que ya tienen. Hoy capturan bien pero el evento se pierde.
-- [ ] Verificar que ningún componente traga un error que **no** sea de
+- [x] Verificar que ningún componente traga un error que **no** sea de
       transporte: el `catch` reporta y muestra el copy solo si
       `isServerActionTransportError()` da verdadero; en cualquier otro caso
       **re-lanza**, para que el boundary siga cumpliendo su función de
       `spec-037`.
 
 ### Fase 4 — Documentación y deuda
-- [ ] `docs/specs/backlog.md`: registrar **DEBT-068** — *sin contexto de usuario
+- [x] `docs/specs/backlog.md`: registrar **DEBT-068** — *sin contexto de usuario
       en Sentry (`Sentry.setUser`)*: los 4 eventos de NODO-EDU-4 reportan
       `Users: 0`, así que no se sabe si el afectado fue un estudiante, cuál, ni
       cuántos lo sufrieron. Sin ese dato no se puede priorizar por impacto real.
-- [ ] `docs/specs/backlog.md`: anotar en **[[DEBT-059]]** que el 504 produce el
+- [x] `docs/specs/backlog.md`: anotar en **[[DEBT-059]]** que el 504 produce el
       mismo error cliente que este spec degrada, y que el presupuesto de ~4.25 s
       del gate de Auth es un contribuyente directo a la latencia p95 del
       middleware.
-- [ ] `docs/specs/backlog.md`: anotar en **[[DEBT-066]]** que la Fase 2 cubre
+- [x] `docs/specs/backlog.md`: anotar en **[[DEBT-066]]** que la Fase 2 cubre
       **un** caso concreto (el 503 del gate), no la deuda completa.
-- [ ] `docs/specs/spec-046-gate-auth-degradado.md`, sección "No incluye": nota
+- [x] `docs/specs/spec-046-gate-auth-degradado.md`, sección "No incluye": nota
       enlazando a este spec — el gate fallaba cerrado correctamente, pero nunca
       se consideró el caso "el cliente que recibe el 503 esperaba RSC".
-- [ ] `npm run lint` y `npm run build` pasan sin errores nuevos.
+- [x] `npm run lint` y `npm run build` pasan sin errores nuevos.
 
 ## Criterios de aceptación
 
@@ -365,8 +365,10 @@ MCP" de `spec-052`.
 
 > Claude no escribe código de implementación hasta que esta sección esté marcada.
 
-- [ ] Paquete (spec + pruebas) aprobado por el usuario
-- [ ] **D1 resuelta explícitamente** por el usuario (mantener la política de
-      `spec-046` o reabrirla) — es la única decisión del spec que no se puede
-      dejar en la propuesta por defecto sin su confirmación.
-- **Fecha de aprobación:** {{pendiente}}
+- [x] Paquete (spec + pruebas) aprobado por el usuario
+- [x] **D1 resuelta explícitamente** por el usuario: se **mantiene** la
+      política de `spec-046` sin cambios — el gate sigue devolviendo 503 en
+      `/login` (y cualquier otra ruta) cuando Auth está caído. Este spec
+      resuelve el síntoma solo del lado del cliente, sin tocar `middleware.ts`
+      más allá de la telemetría de la Fase 2.
+- **Fecha de aprobación:** 2026-08-29

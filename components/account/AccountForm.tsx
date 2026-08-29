@@ -4,6 +4,7 @@ import { useActionState } from "react";
 import { updateAccountAction } from "@/lib/students/actions";
 import type { AuthResult } from "@/lib/auth/types";
 import type { Profile, Student } from "@/lib/students/types";
+import { withTransportFallback } from "@/lib/errors/server-action";
 
 interface Props {
   profile: Profile;
@@ -14,9 +15,17 @@ const GITHUB_USERNAME_HELP_ID = "github-username-help";
 
 const initial: AuthResult = { ok: true };
 
+// spec-053: ver LoginForm.tsx para el motivo — mismo patrón en los cuatro
+// formularios que usan useActionState.
+const updateAccountFormAction = withTransportFallback(
+  updateAccountAction,
+  "updateAccountAction",
+  (error) => ({ ok: false, error })
+);
+
 export function AccountForm({ profile, student }: Props) {
   const [state, formAction, isPending] = useActionState(
-    updateAccountAction,
+    updateAccountFormAction,
     initial
   );
 

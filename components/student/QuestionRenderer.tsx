@@ -4,6 +4,8 @@ import { useState } from "react";
 import { runCodeAction } from "@/lib/submissions/actions";
 import type { QuestionDetail } from "@/lib/submissions/types";
 import { QuestionText } from "@/components/questions/QuestionText";
+import { isServerActionTransportError, SERVER_ACTION_TRANSPORT_ERROR_MESSAGE } from "@/lib/errors/server-action";
+import { reportTransportError } from "@/lib/observability/report-transport-error";
 
 export interface QuestionAnswer {
   selected_choice_ids: string[];
@@ -189,12 +191,19 @@ export function QuestionRenderer({ question, answer, onChange, disabled = false 
             <button
               type="button"
               onClick={async () => {
-                const result = await runCodeAction(code_language ?? "text", answer.text_response);
-                setRunResult(
-                  result.status === "disabled"
-                    ? "La ejecución de código no está disponible en esta versión."
-                    : (result.output ?? result.error ?? "Sin salida.")
-                );
+                try {
+                  const result = await runCodeAction(code_language ?? "text", answer.text_response);
+                  setRunResult(
+                    result.status === "disabled"
+                      ? "La ejecución de código no está disponible en esta versión."
+                      : (result.output ?? result.error ?? "Sin salida.")
+                  );
+                } catch (err) {
+                  // spec-053: ver LoginForm.tsx para el motivo.
+                  if (!isServerActionTransportError(err)) throw err;
+                  reportTransportError(err, "runCodeAction");
+                  setRunResult(SERVER_ACTION_TRANSPORT_ERROR_MESSAGE);
+                }
               }}
               className="rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-xs font-semibold px-3 py-1.5 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
             >

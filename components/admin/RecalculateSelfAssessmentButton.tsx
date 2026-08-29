@@ -3,6 +3,8 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { recalculateCourseSelfAssessmentGrades } from "@/lib/grades/actions";
+import { isServerActionTransportError, SERVER_ACTION_TRANSPORT_ERROR_MESSAGE } from "@/lib/errors/server-action";
+import { reportTransportError } from "@/lib/observability/report-transport-error";
 
 interface Props {
   academicCourseId: string;
@@ -29,7 +31,16 @@ export function RecalculateSelfAssessmentButton({ academicCourseId }: Props) {
     setResult(null);
     setError(null);
     startTransition(async () => {
-      const res = await recalculateCourseSelfAssessmentGrades(academicCourseId);
+      let res;
+      try {
+        res = await recalculateCourseSelfAssessmentGrades(academicCourseId);
+      } catch (err) {
+        // spec-053: ver LoginForm.tsx para el motivo.
+        if (!isServerActionTransportError(err)) throw err;
+        reportTransportError(err, "recalculateCourseSelfAssessmentGrades");
+        setError(SERVER_ACTION_TRANSPORT_ERROR_MESSAGE);
+        return;
+      }
       if (!res.ok) {
         setError(res.error);
         return;

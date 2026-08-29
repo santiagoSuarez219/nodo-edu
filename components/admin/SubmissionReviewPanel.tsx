@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { finalizeGradingAction, gradeAnswerAction } from "@/lib/submissions/actions";
 import type { AnswerForReview, SubmissionForReview } from "@/lib/submissions/types";
 import { QuestionText } from "@/components/questions/QuestionText";
+import { isServerActionTransportError, SERVER_ACTION_TRANSPORT_ERROR_MESSAGE } from "@/lib/errors/server-action";
+import { reportTransportError } from "@/lib/observability/report-transport-error";
 
 interface SubmissionReviewPanelProps {
   submission: SubmissionForReview;
@@ -63,14 +65,23 @@ function AnswerCard({
     }
 
     startSaving(async () => {
-      const result = await gradeAnswerAction(
-        answer.id,
-        score,
-        draft.notes.trim() === "" ? null : draft.notes,
-        submissionId,
-        academicCourseId,
-        groupId
-      );
+      let result;
+      try {
+        result = await gradeAnswerAction(
+          answer.id,
+          score,
+          draft.notes.trim() === "" ? null : draft.notes,
+          submissionId,
+          academicCourseId,
+          groupId
+        );
+      } catch (err) {
+        // spec-053: ver LoginForm.tsx para el motivo.
+        if (!isServerActionTransportError(err)) throw err;
+        reportTransportError(err, "gradeAnswerAction");
+        setError(SERVER_ACTION_TRANSPORT_ERROR_MESSAGE);
+        return;
+      }
 
       if (!result.ok) {
         setError(result.error);
@@ -250,7 +261,16 @@ export default function SubmissionReviewPanel({
   function handleFinalize() {
     setFinalizeError(null);
     startFinalizing(async () => {
-      const result = await finalizeGradingAction(submission.id, academicCourseId, groupId);
+      let result;
+      try {
+        result = await finalizeGradingAction(submission.id, academicCourseId, groupId);
+      } catch (err) {
+        // spec-053: ver LoginForm.tsx para el motivo.
+        if (!isServerActionTransportError(err)) throw err;
+        reportTransportError(err, "finalizeGradingAction");
+        setFinalizeError(SERVER_ACTION_TRANSPORT_ERROR_MESSAGE);
+        return;
+      }
       if (!result.ok) {
         setFinalizeError(result.error);
         return;
