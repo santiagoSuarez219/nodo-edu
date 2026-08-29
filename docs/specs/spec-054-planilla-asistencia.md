@@ -415,24 +415,32 @@ nadie pidió.
 
 ## Fases de implementación
 
-### Fase 1 — Migraciones de esquema y RLS
-- [ ] `supabase/migrations/20260829000000_attendance_manual_sessions.sql`:
+### Fase 1 — Migraciones de esquema y RLS ✅ Completada (2026-08-29)
+- [x] `supabase/migrations/20260829000000_attendance_manual_sessions.sql`:
       `alter table class_sessions alter column attendance_code drop not null` e
       ídem para `code_expires_at`, con comentario de la semántica `NULL` (D7).
-- [ ] En la misma migración: `alter table attendance_records add column marked_by
+- [x] En la misma migración: `alter table attendance_records add column marked_by
       uuid references auth.users(id) on delete set null`, comentada como
       "NULL = marcado por el estudiante con el código" (D8).
-- [ ] `supabase/migrations/20260829000001_rls_attendance_teacher_marking.sql`:
+- [x] `supabase/migrations/20260829000001_rls_attendance_teacher_marking.sql`:
       policy `attendance_records_insert_teacher_or_admin` con el `with check` de
       tres condiciones de D6, y **reescribir el comentario** del bloque
       "INTENCIONALMENTE: sin insert policy" para que refleje el estado nuevo.
-- [ ] En la misma migración: `alter policy class_sessions_mutate_owner_or_admin
+- [x] En la misma migración: `alter policy class_sessions_mutate_owner_or_admin
       ... with check (<mismo predicado que using>)` — cierra [[DEBT-046]] (D12).
-- [ ] Sincronizar ambas migraciones a `mirp-lab` (`rsync`) y aplicar con
+- [x] Sincronizar ambas migraciones a `mirp-lab` (`rsync`) y aplicar con
       `supabase db reset` allá; **no** tocar producción (CLAUDE.md → "Base de datos").
-- [ ] Verificar a mano contra la base local que: un JWT de estudiante **sigue sin
-      poder** insertar en `attendance_records`; un docente no dueño tampoco; y el
-      `update` que reasigna `academic_course_id` ahora es rechazado.
+      Reaplicados los `GRANT`s estándar tras el reset (nota de mantenimiento del
+      CLI en CLAUDE.md) y re-sembrado `dev@nodo.local` con `npm run seed:teacher`.
+- [x] Verificado a mano contra la base local, con un escenario de dos docentes /
+      un estudiante / dos cursos simulando JWTs (`set local role authenticated` +
+      `request.jwt.claims` dentro de una transacción explícita, con `rollback`):
+      un JWT de estudiante **no puede** autoinsertarse asistencia (rechazado); un
+      docente **no dueño** de la sesión tampoco puede marcarla (rechazado); el
+      docente **dueño** sí puede marcar manualmente a su estudiante activo, con
+      `marked_by` poblado correctamente; y el docente dueño **no puede** reasignar
+      la sesión al curso de otro docente (rechazado — DEBT-046 cerrado en
+      `class_sessions`). Datos de la verificación limpiados al terminar.
 
 ### Fase 2 — Tipos y capa de lectura
 - [ ] `lib/attendance/types.ts`: `attendance_code` y `code_expires_at` a
