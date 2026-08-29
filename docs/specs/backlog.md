@@ -5,7 +5,7 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
-## DEBT-072 — El procedimiento documentado para probar migraciones (`db reset`) destruye todos los datos de desarrollo, sin advertirlo
+## DEBT-072 — El procedimiento documentado para probar migraciones (`db reset`) destruye todos los datos de desarrollo, sin advertirlo — ✅ Mitigado (2026-08-29)
 
 **Origen:** ronda de pruebas manuales de spec-054 (2026-08-29), investigación
 posterior a petición del usuario. **Prioridad:** Media-alta — el
@@ -49,14 +49,21 @@ ronda de spec-054 **no** causaron la pérdida — recrean los contenedores pero
 preservan el volumen (el `CreatedAt` del volumen es anterior a ambos, y los
 datos sembrados a las 20:47 sobrevivieron a los dos ciclos).
 
-### Acción propuesta
+### Acción aplicada (2026-08-29)
 
-1. Advertir en `CLAUDE.md` que `supabase db reset` en `mirp-lab` **borra todos
-   los datos de desarrollo**, y que conviene avisar antes de correrlo.
-2. Crear un seed reproducible de datos de desarrollo (curso + estudiantes +
-   algunas preguntas), de modo que un `db reset` cueste un comando de
-   recuperación y no una ronda de pruebas perdida. Hoy `npm run seed:teacher`
-   solo restaura el docente.
+1. ✅ `CLAUDE.md` advierte en "Base de datos" que `supabase db reset` **borra
+   todos los datos de desarrollo**, y "Acciones prohibidas" exige avisar
+   antes de ejecutarlo.
+2. ✅ `scripts/seed-dev-data.mjs` + `npm run seed:dev`: siembra un
+   `academic_course` por cada curso de `content/cursos/` y tres estudiantes
+   matriculados. Idempotente (verificado: segunda corrida reutiliza todo, no
+   duplica) y con guarda que **aborta si la URL no es localhost**, para no
+   sembrar datos ficticios en producción (verificado: aborta con exit 1).
+   Recuperarse de un reset es ahora
+   `npm run seed:teacher && npm run seed:dev`.
+
+Queda fuera, por ahora: sembrar preguntas del banco. Requiere decidir un
+conjunto representativo y no bloquea ninguna ronda de pruebas conocida.
 
 Mientras tanto, el entorno quedó con un curso de prueba
 (`TEST054 — Estructuras de Datos`, `37292155-ad61-4517-ba3f-1dc7e8f4adb0`) y
@@ -66,7 +73,7 @@ prueba"), dejados en desarrollo por decisión del usuario.
 
 ---
 
-## DEBT-073 — El procedimiento de despliegue apunta a producción con un flag que el CLI ya no acepta, y ambas máquinas están `linked` a producción
+## DEBT-073 — El procedimiento de despliegue apunta a producción con un flag que el CLI ya no acepta, y ambas máquinas están `linked` a producción — ✅ Resuelto (2026-08-29)
 
 **Origen:** investigación de [[DEBT-072]] (2026-08-29), a petición del usuario
 ("que no vaya a suceder en producción a la hora de realizar el despliegue").
@@ -109,15 +116,31 @@ tiene token del CLI (`~/.supabase/access-token` no existe en ninguna), así que
 un comando contra el proyecto enlazado pediría `supabase login` primero. Es
 una barrera real, pero accidental — no una decisión de diseño.
 
-### Acción propuesta
+### Acción aplicada (2026-08-29)
 
-1. **Actualizar `CLAUDE.md`** con los comandos que el CLI acepta hoy, y hacer
-   de `--dry-run` (que sí existe en `db push`) un paso obligatorio del
-   checklist antes de cualquier push a producción.
-2. **Desenlazar `mirp-lab` de producción** (borrar su `supabase/.temp/`): esa
-   máquina no necesita alcanzar producción para nada.
-3. Evaluar si la Mac debe permanecer enlazada, o si conviene exigir
-   `--db-url` explícito para cada operación contra producción.
+1. ✅ **`mirp-lab` desenlazada de producción**: se borraron
+   `supabase/.temp/{project-ref,linked-project.json,pooler-url}` de esa
+   máquina (respaldo con permisos `700` en
+   `~/nodo-dev-db-unlink-backup-20260829/`, por si hiciera falta revertir).
+   Se conservó el resto de `.temp` (caché de versiones del stack local);
+   verificado después: `supabase status` sigue sano y el túnel sirve datos.
+   Nota de gravedad: el `pooler-url` que tenía era una connection string
+   **directa a producción con credenciales embebidas**, no solo el ref.
+2. ✅ **`CLAUDE.md` actualizado**: comandos con `--linked` en vez del
+   inexistente `--project-ref`; `--dry-run` obligatorio antes de cualquier
+   `db push`, tanto en el checklist pre-despliegue como en el paso 2 del
+   proceso; un paso nuevo de checklist para confirmar con
+   `git diff --stat origin/main..HEAD -- supabase/` si el despliegue toca el
+   esquema (si no, no se ejecuta ningún comando de base de datos); y tres
+   entradas nuevas en "Acciones prohibidas" (no correr `db reset` sin avisar,
+   no hacer `db push --linked` sin `--dry-run` previo, no volver a enlazar
+   `mirp-lab`).
+
+**Pendiente, a criterio del usuario:** si la Mac debe permanecer enlazada a
+producción o si conviene exigir `--db-url` explícito para cada operación. Se
+dejó enlazada por ahora: es la máquina desde la que se despliega, y el
+`--dry-run` obligatorio más la ausencia de token del CLI cubren el riesgo
+principal.
 
 ### Estado verificado de producción (2026-08-29, solo lectura)
 
