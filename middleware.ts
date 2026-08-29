@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/nextjs";
 import { type NextRequest, NextResponse } from "next/server";
 import { updateSupabaseSession } from "@/lib/auth/middleware";
 import { renderServiceUnavailablePage } from "@/lib/auth/service-unavailable-page";
@@ -33,6 +34,25 @@ export async function middleware(request: NextRequest) {
   // (DEBT-042).
   if (auth.status === "unavailable") {
     console.error(`[auth] servicio no disponible (${auth.reason}) — ${pathname}`);
+
+    // spec-053: sin esto, este 503 no dejaba ningún rastro en Sentry — solo
+    // el console.error de arriba, invisible fuera de los runtime logs de
+    // Vercel. `captureMessage`, no `captureException`: no hay una excepción
+    // real, es una decisión deliberada del gate de spec-046 (D3). El tag
+    // `is_server_action` distingue el caso benigno (una navegación normal
+    // que ve la página de servicio no disponible, como se diseñó) del caso
+    // que motivó este spec (un Server Action que esperaba RSC y recibió este
+    // mismo 503 — issue NODO-EDU-4 de Sentry).
+    Sentry.captureMessage("Gate de Auth: servicio no disponible", {
+      level: "error",
+      tags: {
+        gate: "auth",
+        reason: auth.reason,
+        path: pathname,
+        is_server_action: request.headers.has("Next-Action"),
+      },
+    });
+
     return new NextResponse(renderServiceUnavailablePage(pathname), {
       status: 503,
       headers: {

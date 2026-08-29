@@ -120,8 +120,19 @@ o el spec no produce ningún cambio observable.
   de infraestructura. Descartadas por decisión del usuario (2026-08-09); ver
   "Decisiones".
 - **Observabilidad / reporte remoto** (Sentry o equivalente), coherente con el
-  "No incluye" de spec-037.
+  "No incluye" de spec-037. Cerrado por **[[spec-052]]** y, para el 503 de este
+  mismo gate en particular, por la Fase 2 de **[[spec-053]]**.
 - **Cambios de esquema.** Este spec no toca migraciones.
+- **Qué recibe un Server Action cuando este gate responde 503.** El `matcher`
+  (`middleware.ts:126-130`) corre también sobre los POST de Server Actions, no
+  solo sobre navegaciones. Un cliente que esperaba un payload RSC y recibe este
+  503 `text/html` lanza `"An unexpected response was received from the
+  server"`, que escalaba sin control al error boundary de ruta más cercano —
+  evidencia en producción: issue **NODO-EDU-4** de Sentry, 2026-08-27/28. No se
+  consideró en su momento porque este spec se centró en navegaciones
+  completas. Resuelto del lado del **cliente** por **[[spec-053]]**, sin tocar
+  la política de este spec (su D4 sigue vigente sin cambios: un visitante sin
+  sesión también falla cerrado).
 
 ## Decisiones
 

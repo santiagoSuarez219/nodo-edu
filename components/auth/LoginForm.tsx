@@ -4,11 +4,20 @@ import { useActionState } from "react";
 import Link from "next/link";
 import { signIn } from "@/lib/auth/actions";
 import type { AuthResult } from "@/lib/auth/types";
+import { withTransportFallback } from "@/lib/errors/server-action";
 
 const initial: AuthResult = { ok: true };
 
+// spec-053: sin esto, un 503 del gate de Auth (middleware.ts) durante el
+// envío de este formulario escalaba al boundary de app/error.tsx y
+// sustituía toda la página (evidencia: issue NODO-EDU-4 de Sentry).
+const signInAction = withTransportFallback(signIn, "signIn", (error) => ({
+  ok: false,
+  error,
+}));
+
 export function LoginForm({ redirectTo }: { redirectTo?: string }) {
-  const [state, formAction, isPending] = useActionState(signIn, initial);
+  const [state, formAction, isPending] = useActionState(signInAction, initial);
 
   return (
     <form action={formAction} className="flex flex-col gap-5">

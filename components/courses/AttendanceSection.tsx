@@ -11,6 +11,7 @@ import type {
   StudentAttendanceState,
   MarkAttendanceResult,
 } from '@/lib/attendance/types';
+import { reportTransportError } from '@/lib/observability/report-transport-error';
 
 interface AttendanceSectionProps {
   courseSlug: string;
@@ -105,6 +106,8 @@ export function AttendanceSection({
         // Fallo de transporte del server action (Frente 3, DEBT-037): un
         // código correcto no debe leerse como "código no válido".
         console.error('Error marking attendance:', err);
+        // spec-053 (D4): sin esto, el fallo capturado no dejaba rastro en Sentry.
+        reportTransportError(err, 'markAttendanceByCode');
         setLastResult('unavailable');
         reset();
       }

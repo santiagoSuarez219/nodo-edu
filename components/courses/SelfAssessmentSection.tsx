@@ -10,6 +10,8 @@ import { submitSelfAssessment } from '@/lib/self-assessment';
 import type { SelfAssessmentQuestion, AttemptReview } from '@/lib/self-assessment/types';
 import { QuestionStem } from '@/components/courses/QuestionStem';
 import { QuestionText } from '@/components/questions/QuestionText';
+import { isServerActionTransportError, SERVER_ACTION_TRANSPORT_ERROR_MESSAGE } from '@/lib/errors/server-action';
+import { reportTransportError } from '@/lib/observability/report-transport-error';
 
 interface SelfAssessmentSectionProps {
   courseSlug: string;
@@ -65,7 +67,23 @@ export function SelfAssessmentSection({
         }
       }
 
-      const result = await submitSelfAssessment(courseSlug, lessonSlug, answers);
+      let result;
+      try {
+        result = await submitSelfAssessment(courseSlug, lessonSlug, answers);
+      } catch (err) {
+        // spec-053: la autoevaluación es de intento único y cuenta para la
+        // nota (spec-040) — sin este catch, un 503 del gate de Auth
+        // (middleware.ts, spec-046) durante el envío escalaba al boundary de
+        // la lección (app/(cursos)/[courseSlug]/[lessonSlug]/error.tsx) y
+        // reemplazaba toda la página, perdiendo las respuestas ya marcadas
+        // (evidencia: issue NODO-EDU-4 de Sentry). Solo se atrapa el fallo de
+        // *transporte*; cualquier otra excepción real sigue escalando.
+        if (!isServerActionTransportError(err)) throw err;
+        reportTransportError(err, 'submitSelfAssessment');
+        setAwaitingConfirmation(false);
+        setSubmitError(SERVER_ACTION_TRANSPORT_ERROR_MESSAGE);
+        return;
+      }
 
       if (result.ok) {
         // El servidor ya tiene el intento persistido; refrescar trae

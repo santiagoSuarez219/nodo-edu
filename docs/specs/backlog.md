@@ -5,6 +5,27 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+## DEBT-068 — Sin contexto de usuario en Sentry (`Sentry.setUser`)
+
+**Origen:** spec-053 (degradado honesto de Server Actions ante Auth caído),
+diagnóstico del issue **NODO-EDU-4**. **Prioridad:** Media — sin este dato no
+se puede priorizar un issue por impacto real (¿un estudiante o cincuenta?).
+
+Los cuatro eventos de NODO-EDU-4 reportan `Users: 0` — ninguno de los tres
+runtimes de Sentry (`sentry.server.config.ts`, `sentry.edge.config.ts`,
+`instrumentation-client.ts`, spec-052) llama a `Sentry.setUser()`. El panel no
+puede distinguir "un estudiante reintentó tres veces" de "tres estudiantes
+distintos lo sufrieron una vez cada uno", ni ofrecer un correo con el que
+identificar y contactar al afectado en un caso grave.
+
+**Acción:** Spec propio. Requiere decidir dónde enganchar `setUser()` (el
+candidato natural es dentro de `getCurrentUser()`/`updateSupabaseSession`, ver
+`lib/auth/session.ts` y `lib/auth/middleware.ts`) y qué campos enviar sin violar
+la higiene de datos de spec-052 (D5) — probablemente `id`, no correo ni nombre,
+dado que los usuarios son estudiantes reales identificables.
+
+---
+
 ## DEBT-067 — Stack traces de cliente sin source maps en Sentry (D4 descartada en spec-052)
 
 **Origen:** spec-052 (integración de Sentry), Fase 6. El usuario descartó
@@ -43,7 +64,12 @@ Ejemplos concretos:
 - `getSelfAssessmentStatus` (`lib/self-assessment/index.ts`): estado
   indeterminado ante un fallo de lectura.
 - `middleware.ts` + spec-046: `auth.status === "unavailable"` (caída de
-  Supabase Auth) — hoy solo deja un `console.error`.
+  Supabase Auth) — hoy solo deja un `console.error`. **Resuelto para este caso
+  concreto por spec-053** (Fase 2): el 503 del gate ahora también reporta a
+  Sentry con `captureMessage`, `level: "error"` y tags `reason`/`path`/
+  `is_server_action`. Los otros tres dominios (`attendance`, `self-assessment`)
+  siguen sin instrumentar — esta deuda **no** se cierra, solo se reduce en uno
+  de sus cuatro ejemplos.
 
 Todos estos casos ya devuelven valores honestos (no degradan a un caso de
 negocio válido, gracias a spec-037/spec-050), pero **no queda registro fuera
@@ -334,6 +360,16 @@ como los 5xx volvieron a baseline hacia el final de la ventana observada.
 No se investigó a fondo el origen del tráfico (¿publicación viral, refresh en
 loop, prueba de carga no anunciada?) — si vuelve a ocurrir, vale la pena
 revisar Web Analytics/Runtime Logs de Vercel para esa ventana específica.
+
+**Relación con spec-053 (2026-08-29):** un 504 de Vercel produce el mismo
+síntoma que el 503 del gate de Auth — HTML de error donde un Server Action
+esperaba RSC, lanzando `"An unexpected response was received from the
+server"` en el cliente (issue **NODO-EDU-4** de Sentry). spec-053 hace que los
+call sites cliente degraden bien ante **ese síntoma**, cualquiera sea su causa,
+pero no ataca esta causa: el presupuesto de reintentos del gate de Auth
+(`lib/auth/middleware.ts` — hasta ~4.25s: 2 intentos × 2s + 250ms de backoff)
+sigue siendo un contribuyente directo a la p95 del middleware que este DEBT ya
+señalaba como el síntoma que escaló con el tráfico.
 
 ---
 
