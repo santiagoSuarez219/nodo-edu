@@ -14,7 +14,8 @@ interface SessionWithAttendance {
   id: string;
   session_date: string;
   is_open: boolean;
-  code_expires_at: string;
+  // spec-054 (D7): null en una sesión registrada manualmente, sin código.
+  code_expires_at: string | null;
   attendee_count: number;
   created_at: string;
 }

@@ -442,22 +442,27 @@ nadie pidió.
       la sesión al curso de otro docente (rechazado — DEBT-046 cerrado en
       `class_sessions`). Datos de la verificación limpiados al terminar.
 
-### Fase 2 — Tipos y capa de lectura
-- [ ] `lib/attendance/types.ts`: `attendance_code` y `code_expires_at` a
+### Fase 2 — Tipos y capa de lectura ✅ Completada (2026-08-29)
+- [x] `lib/attendance/types.ts`: `attendance_code` y `code_expires_at` a
       `string | null`; `marked_by: string | null` en `AttendanceRecord`; tipos
       `AttendanceSheetSession`, `AttendanceSheetRow` y el discriminado
       `AttendanceSheetResult = {status:'ok'; …} | {status:'unavailable'}`.
-- [ ] Propagar el nullable a `lib/attendance/service.ts` (interfaces internas) y a
-      `components/admin/AdminAttendancePanel.tsx` (líneas 143, 172, 394) con
-      fallback explícito, sin cambiar comportamiento (D7, Evaluación MCP punto 2).
-- [ ] `getAttendanceSheet(academicCourseId)` en `lib/attendance/index.ts`:
+- [x] Propagado el nullable a `lib/attendance/service.ts` (interfaz
+      `SessionWithAttendance.code_expires_at`) y a
+      `components/admin/AdminAttendancePanel.tsx` (`computeTimeRemaining` acepta
+      `string | null` y trata `null` como "expirado" — inalcanzable en la
+      práctica porque este panel solo opera sobre sesiones que
+      openSession/extendSessionCode/rotateSessionCode acaban de escribir, y esas
+      tres siempre generan código) (D7, Evaluación MCP punto 2).
+- [x] `getAttendanceSheet(academicCourseId)` en `lib/attendance/index.ts`:
       sesiones del curso ascendentes por `session_date`; matrículas `active`;
       registros de esas sesiones; nombres vía `fetchStudentProfilesPublic()`
       (el docente **no** lee `profiles` por RLS).
-- [ ] Con `createServerSupabaseClient()` y verificando el `error` de **cada**
+- [x] Con `createServerSupabaseClient()` y verificando el `error` de **cada**
       consulta antes de confiar en `data` (D1, D3).
-- [ ] Cálculo del % por estudiante: `asistidas / total_sesiones`, redondeado a
+- [x] Cálculo del % por estudiante: `asistidas / total_sesiones`, redondeado a
       entero; `null` (se pinta "—") si el curso no tiene sesiones.
+- [x] `npx tsc --noEmit` en verde tras los cambios.
 
 ### Fase 3 — Server Actions
 - [ ] `lib/attendance/schemas.ts`: Zod para uuid de sesión/estudiante/curso y para

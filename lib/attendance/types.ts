@@ -2,8 +2,10 @@ export type ClassSession = {
   id: string;
   academic_course_id: string;
   session_date: string;
-  attendance_code: string;
-  code_expires_at: string;
+  // spec-054 (D7): NULL = sesión registrada manualmente por el docente, sin
+  // código. Una sesión abierta con código real siempre tiene ambos poblados.
+  attendance_code: string | null;
+  code_expires_at: string | null;
   is_open: boolean;
   created_at: string;
   updated_at: string;
@@ -14,7 +16,44 @@ export type AttendanceRecord = {
   session_id: string;
   student_id: string;
   marked_at: string;
+  // spec-054 (D8): NULL = el propio estudiante marcó con el código de
+  // asistencia. uuid = el docente que marcó manualmente desde la planilla.
+  marked_by: string | null;
 };
+
+// spec-054: la planilla matriz estudiantes × sesiones del panel del curso.
+
+export type AttendanceSheetSession = {
+  id: string;
+  session_date: string;
+  // Una sesión sin código (D7) es una sesión creada manualmente.
+  has_code: boolean;
+  is_open: boolean;
+};
+
+export type AttendanceSheetCell = {
+  present: boolean;
+  marked_at: string | null;
+  // D8: distingue el marcado del docente del marcado con código del propio
+  // estudiante. `false` cuando la celda está ausente.
+  marked_manually: boolean;
+};
+
+export type AttendanceSheetRow = {
+  student_id: string;
+  student_name: string;
+  // Una entrada por sesión del curso, en el mismo orden que `sessions`.
+  cells: Record<string, AttendanceSheetCell>;
+  // D2: null si el curso no tiene sesiones (no hay denominador).
+  attendancePct: number | null;
+};
+
+// Resultado discriminado de getAttendanceSheet (D3): un curso sin sesiones o
+// sin estudiantes activos es un dato de negocio legítimo (arrays vacíos), no
+// un fallo — `status: 'unavailable'` está reservado a fallos de lectura.
+export type AttendanceSheetResult =
+  | { status: 'ok'; sessions: AttendanceSheetSession[]; rows: AttendanceSheetRow[] }
+  | { status: 'unavailable' };
 
 export type OpenSessionSummary = {
   session: ClassSession;

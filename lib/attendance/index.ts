@@ -4,8 +4,13 @@ import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
 import { createServerSupabaseClient } from '@/lib/auth/server';
+import { fetchStudentProfilesPublic } from '@/lib/enrollments/index';
 import type {
   AttendanceCountResult,
+  AttendanceSheetCell,
+  AttendanceSheetResult,
+  AttendanceSheetRow,
+  AttendanceSheetSession,
   ClassSession,
   MarkAttendanceResult,
   OpenSessionResult,
@@ -421,6 +426,110 @@ export async function markAttendanceByCode(
   } catch (err) {
     console.error('Error marking attendance:', err);
     return 'unavailable';
+  }
+}
+
+// spec-054: lectura de la planilla matriz estudiantes × sesiones del panel
+// del curso. Con `createServerSupabaseClient()` (sesión del docente) y no con
+// `createServiceSupabaseClient()` (D1): RLS —no una comprobación en código—
+// autoriza que solo el docente dueño o un admin vean estas filas.
+export async function getAttendanceSheet(
+  academicCourseId: string
+): Promise<AttendanceSheetResult> {
+  let supabase;
+  try {
+    supabase = await createServerSupabaseClient();
+  } catch (err) {
+    console.error('Error getting attendance sheet:', err);
+    return { status: 'unavailable' };
+  }
+
+  try {
+    const [{ data: sessions, error: sessionsError }, { data: enrollments, error: enrollmentsError }] =
+      await Promise.all([
+        supabase
+          .from('class_sessions')
+          .select('id, session_date, attendance_code, is_open')
+          .eq('academic_course_id', academicCourseId)
+          .order('session_date', { ascending: true }),
+        supabase
+          .from('enrollments')
+          .select('student_id')
+          .eq('academic_course_id', academicCourseId)
+          .eq('status', 'active')
+          .order('enrolled_at', { ascending: true }),
+      ]);
+
+    // D3: verificar el `error` de cada consulta antes de confiar en `data` —
+    // un curso sin sesiones o sin estudiantes activos es un array vacío
+    // legítimo, no un error.
+    if (sessionsError) throw sessionsError;
+    if (enrollmentsError) throw enrollmentsError;
+
+    const sheetSessions: AttendanceSheetSession[] = (sessions ?? []).map((s) => ({
+      id: s.id as string,
+      session_date: s.session_date as string,
+      has_code: s.attendance_code !== null,
+      is_open: s.is_open as boolean,
+    }));
+
+    const studentIds = (enrollments ?? []).map((e) => e.student_id as string);
+
+    if (studentIds.length === 0) {
+      return { status: 'ok', sessions: sheetSessions, rows: [] };
+    }
+
+    const sessionIds = sheetSessions.map((s) => s.id);
+    const { data: records, error: recordsError } =
+      sessionIds.length > 0
+        ? await supabase
+            .from('attendance_records')
+            .select('session_id, student_id, marked_at, marked_by')
+            .in('session_id', sessionIds)
+        : { data: [], error: null };
+
+    if (recordsError) throw recordsError;
+
+    const profiles = await fetchStudentProfilesPublic(supabase, studentIds);
+
+    // D2: las filas son las matrículas activas; la ausencia es la falta de
+    // registro — no se materializa ninguna fila de ausencia.
+    const rows: AttendanceSheetRow[] = studentIds.map((studentId) => {
+      const cells: Record<string, AttendanceSheetCell> = {};
+      let attendedCount = 0;
+
+      for (const session of sheetSessions) {
+        const record = (records ?? []).find(
+          (r) => r.session_id === session.id && r.student_id === studentId
+        );
+
+        if (record) {
+          attendedCount++;
+          cells[session.id] = {
+            present: true,
+            marked_at: record.marked_at as string,
+            marked_manually: record.marked_by !== null,
+          };
+        } else {
+          cells[session.id] = { present: false, marked_at: null, marked_manually: false };
+        }
+      }
+
+      return {
+        student_id: studentId,
+        student_name: profiles.get(studentId)?.full_name ?? 'Estudiante',
+        cells,
+        attendancePct:
+          sheetSessions.length > 0
+            ? Math.round((attendedCount / sheetSessions.length) * 100)
+            : null,
+      };
+    });
+
+    return { status: 'ok', sessions: sheetSessions, rows };
+  } catch (err) {
+    console.error('Error getting attendance sheet:', err);
+    return { status: 'unavailable' };
   }
 }
 
