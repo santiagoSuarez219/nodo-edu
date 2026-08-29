@@ -20,8 +20,8 @@
 |---|---|---|---|
 | Docente de desarrollo (ya sembrado, **no** crear ni borrar) | `npm run seed:teacher` | `dev@nodo.local` / `DevLocal2026!` | n/a |
 | ~~Estudiante de prueba matriculado (reutilizado de `test-053`)~~ | — | ~~`test-spec053@nodo.local`~~ | 🔴 **Ya no existe** — hallazgo de esta ronda: `mirp-lab` no tenía ningún `academic_course` ni estudiante al momento de ejecutar (ver Hallazgos de `TC-054-008`) |
-| Curso académico de prueba (creado vía REST + service role — no existe MCP para esto, ver `DEBT-060`) | `POST /rest/v1/academic_courses` | `TEST054 — Estructuras de Datos`, `37292155-ad61-4517-ba3f-1dc7e8f4adb0` | ⬜ |
-| Estudiante de prueba matriculado en `TEST054` | `create_student` (`students-mcp`) | `d67a80e5-17c4-42a1-bb1c-68e1666fe5c1` (`test-spec054@nodo.local` / `TestSpec054!`), matrícula `f133aa51-48bc-4cfd-a3bb-b48bbed4eb08` | ⬜ |
+| Curso académico de prueba (creado vía REST + service role — no existe MCP para esto, ver `DEBT-060`) | `POST /rest/v1/academic_courses` | `TEST054 — Estructuras de Datos`, `37292155-ad61-4517-ba3f-1dc7e8f4adb0` | 🟡 No eliminado — decisión del usuario (2026-08-29): queda en desarrollo |
+| Estudiante de prueba matriculado en `TEST054` | `create_student` (`students-mcp`) | `d67a80e5-17c4-42a1-bb1c-68e1666fe5c1` (`test-spec054@nodo.local` / `TestSpec054!`), matrícula `f133aa51-48bc-4cfd-a3bb-b48bbed4eb08` | 🟡 No eliminado — misma decisión |
 | Proxy de latencia local | `node scripts/latency-proxy.mjs --port=54331 …` | proceso local, puerto 54331 | ✅ (apagado al cierre de la ronda) |
 | `NEXT_PUBLIC_SUPABASE_URL` de `.env.local` apuntando al proxy | edición manual (valor original: `http://localhost:54321`) | — | ✅ (restaurado) |
 | `jwt_expiry` en `supabase/config.toml` de `mirp-lab` bajado de `3600` a `60` | edición + reinicio del stack en `mirp-lab` | — | ✅ (revertido tras `TC-054-001`) |

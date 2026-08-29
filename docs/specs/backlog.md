@@ -5,6 +5,40 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+## DEBT-072 — `mirp-lab` se quedó sin ningún estudiante ni curso académico
+
+**Origen:** ronda de pruebas manuales de spec-054 (2026-08-29). **Prioridad:**
+Media — no bloquea desarrollo del día a día, pero deja el entorno de
+desarrollo sin datos de dominio para probar flujos que los necesiten, y la
+causa está sin diagnosticar.
+
+Al preparar `TC-054-008` se encontró que la instancia Supabase local de
+`mirp-lab` no tenía **ningún** `academic_course` (`list_academic_courses`
+del `assignment-mcp` devolvió `[]`) ni el estudiante de prueba de la ronda de
+`test-053` (`test-spec053@nodo.local`, matriculado el 2026-08-29 en la misma
+sesión de trabajo, según `docs/testing/test-053-degradado-server-actions-auth.md`
+— el admin API de Auth ya no lo lista). Solo sobrevivía el docente
+`dev@nodo.local` (probablemente re-sembrado por `npm run seed:teacher` en
+algún punto).
+
+No fue causado por esta ronda: el único comando ejecutado sobre `mirp-lab`
+antes del hallazgo fue `supabase stop && supabase start` (para aplicar
+`jwt_expiry=60` de `TC-054-001`), que preserva datos — no equivale a
+`supabase db reset`. La pérdida ocurrió en algún momento **anterior** a esta
+sesión, de causa desconocida (¿un `db reset` en otra sesión sin documentar?,
+¿el volumen de Docker de `mirp-lab` se recreó?, ¿un problema de la propia
+workstation del laboratorio?).
+
+**Acción:** Investigar en una sesión con acceso más directo a `mirp-lab`
+(revisar historial de comandos, logs de Docker, o si hubo un reinicio de la
+workstation). Mientras tanto, el entorno tiene un curso de prueba nuevo
+(`TEST054 — Estructuras de Datos`, `37292155-ad61-4517-ba3f-1dc7e8f4adb0`) y
+un estudiante matriculado (`test-spec054@nodo.local`, ver
+`docs/testing/test-054-resiliencia-latencia-supabase.md` → "Datos de
+prueba"), dejados en desarrollo por decisión del usuario.
+
+---
+
 ## DEBT-070 — Clientes Supabase server-side sin timeout: una conexión colgada retiene la función hasta los 300s de Vercel — ✅ Resuelto (spec-054, 2026-08-29)
 
 **Origen:** incidente de plataforma de Supabase del 2026-08-27→29

@@ -1,4 +1,4 @@
-# spec-054 — [TESTING] Resiliencia del camino de request ante latencia de Supabase
+# spec-054 — [DONE] Resiliencia del camino de request ante latencia de Supabase
 
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.
@@ -547,7 +547,32 @@ código:
   (`hasCourseAccess`) igual: ya clasificaba el error de una consulta abortada
   como `unavailable`, verificado sin necesidad de cambio.
 
-Pendiente para cerrar a `[DONE]`: la ronda de pruebas manuales de
-`docs/testing/test-054-resiliencia-latencia-supabase.md` (16 casos,
-ejecutados por el usuario sobre la UI) y la ventana de observación de 7 días
-en producción descrita en ese mismo archivo.
+### Ronda de pruebas manuales completada (2026-08-29)
+
+18/18 aprobados (16 casos de UI/temporización + 2 de MCP), ver
+`docs/testing/test-054-resiliencia-latencia-supabase.md`. La ronda encontró y
+corrigió **tres bugs reales** en la implementación, cada uno con commit
+propio:
+
+1. `AbortSignal.any()` no soportado en el Edge Runtime de Next.js — el
+   mecanismo primario de la Fase 1 fallaba en silencio, solo el
+   `Promise.race` de respaldo (D-B) salvaba el resultado.
+2. `AbortSignal.timeout()` produce `name: "TimeoutError"`, que
+   `@supabase/postgrest-js` no reconoce como "no reintentable" (solo
+   `"AbortError"`) — el timeout de datos de la Fase 2 prometía 6s y tardaba
+   ~31s reales.
+3. `app/layout.tsx` encadenaba sus llamadas en serie (pagando el timeout dos
+   veces) y el banner de D-F no cubría el caso "sesión válida, perfil sin
+   cargar".
+
+Dos observaciones que no requirieron cambio de código: `TC-054-007` reveló
+que el código de progreso de lección ya degrada en silencio ante un fallo de
+consulta, sin propagar ninguna excepción — el copy de `INFRA_ERROR_COPY`
+queda como cobertura defensiva, no verificada en ejecución real con el
+código actual. Y `mirp-lab` apareció sin ningún dato de dominio
+(estudiantes/cursos) al iniciar la ronda, ajeno a este spec — registrado como
+[[DEBT-072]].
+
+Pendiente, no bloqueante para `[DONE]` (según lo definido en la sección "Qué
+es verificable dónde"): la ventana de observación de 7 días en producción
+tras el despliegue, descrita en `docs/testing/test-054-*.md`.
