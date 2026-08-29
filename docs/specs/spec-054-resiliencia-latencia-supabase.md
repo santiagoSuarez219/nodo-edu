@@ -1,4 +1,4 @@
-# spec-054 — [IN PROGRESS] Resiliencia del camino de request ante latencia de Supabase
+# spec-054 — [TESTING] Resiliencia del camino de request ante latencia de Supabase
 
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.
@@ -215,17 +215,17 @@ su capa de datos, y se cubre con la decisión **D-C** y con los casos
 > se puede convocar a voluntad**. Sin este instrumento, ningún criterio de
 > aceptación es verificable y la implementación sería un acto de fe.
 
-- [ ] Crear `scripts/latency-proxy.mjs`: proxy HTTP de reenvío **sin
+- [x] Crear `scripts/latency-proxy.mjs`: proxy HTTP de reenvío **sin
       dependencias nuevas** (`node:http` + `fetch`), que escucha en un puerto
       local (p. ej. 54331) y reenvía a `http://localhost:54321` (el túnel SSH a
       `mirp-lab`, ver CLAUDE.md → "Base de datos").
-- [ ] Modos de inyección, seleccionables por flag:
+- [x] Modos de inyección, seleccionables por flag:
       `--delay=<ms>` (retardo fijo); `--hang` (no responde nunca, reproduce el
       cuelgue de 300 s); `--path=<regex>` (retardo solo en rutas que casen —
       **crítico**: el incidente real tenía `/auth/v1/token` lento con
       `/auth/v1/health` sano, y hay que poder reproducir esa asimetría);
       `--fail-rate=<0..1>` (intermitencia, para el patrón 503/200 alternado).
-- [ ] Documentar en el propio script el procedimiento: levantar túnel, levantar
+- [x] Documentar en el propio script el procedimiento: levantar túnel, levantar
       proxy, apuntar `NEXT_PUBLIC_SUPABASE_URL` de `.env.local` al puerto del
       proxy, reiniciar `npm run dev`.
 - [ ] Para los escenarios de refresh de token (DEBT-071), bajar `jwt_expiry` en
@@ -235,75 +235,75 @@ su capa de datos, y se cubre con la decisión **D-C** y con los casos
 
 ### Fase 1 — DEBT-071: deadline global del middleware
 
-- [ ] `lib/auth/fetch-timeout.ts` *(nuevo)*: fábrica del `fetch` con
+- [x] `lib/auth/fetch-timeout.ts` *(nuevo)*: fábrica del `fetch` con
       presupuesto, capaz de recibir un `AbortSignal` **externo y compartido** en
       vez de crear uno nuevo por llamada. Es la pieza que permite cortar también
       los reintentos internos del SDK.
-- [ ] `lib/auth/middleware.ts`: crear un `AbortController` por request en
+- [x] `lib/auth/middleware.ts`: crear un `AbortController` por request en
       `updateSupabaseSession`, armado con el presupuesto global (**D-A**), y
       pasarlo al `global.fetch` del `createServerClient` (sustituye el
       `AbortSignal.timeout(REQUEST_TIMEOUT_MS)` de la línea 77). Efecto buscado:
       cuando el bucle de `_refreshAccessToken` haga su intento nº 4, la señal ya
       está abortada y el intento falla **de inmediato**, no a los 2 s — el bucle
       se agota en milisegundos en vez de en 26,6 s.
-- [ ] Conservar un timeout **por intento** además del global (`AbortSignal.any`
+- [x] Conservar un timeout **por intento** además del global (`AbortSignal.any`
       o señales combinadas): el global evita el 504; el por-intento sigue
       evitando que un solo request colgado consuma todo el presupuesto.
-- [ ] Subordinar `HEALTH_TIMEOUT_MS` (5 s) y `RETRY_DELAY_MS` al deadline
+- [x] Subordinar `HEALTH_TIMEOUT_MS` (5 s) y `RETRY_DELAY_MS` al deadline
       global: el peor caso del ping de salud (`2 × 5 s + 250 ms ≈ 10,25 s`)
       **excede** el presupuesto recomendado y no puede seguir siendo un
       presupuesto paralelo. Este es exactamente el error de diseño que produjo
       DEBT-071.
-- [ ] Añadir el cinturón de seguridad: `Promise.race` de `checkAuth()` completo
+- [x] Añadir el cinturón de seguridad: `Promise.race` de `checkAuth()` completo
       contra un temporizador al presupuesto global. El `AbortController` corta
       de raíz; el `race` protege ante cualquier ruta del SDK que no propague la
       señal.
-- [ ] Corregir el comentario de las líneas 14-17 y documentar el bucle de
+- [x] Corregir el comentario de las líneas 14-17 y documentar el bucle de
       auth-js 2.108.2 (tabla del Hallazgo 1) con la advertencia de que **bajar
       el timeout por intento empeora el problema**. Es de los comentarios que
       justifican existir: el *por qué* no es obvio y ya engañó una vez.
-- [ ] `lib/auth/errors.ts`: mapear `DOMException` `TimeoutError`/`AbortError`
+- [x] `lib/auth/errors.ts`: mapear `DOMException` `TimeoutError`/`AbortError`
       explícitamente, para que un abort no caiga en el default `unknown`.
-- [ ] `middleware.ts`: añadir duración del gate y motivo (`deadline` vs.
+- [x] `middleware.ts`: añadir duración del gate y motivo (`deadline` vs.
       clasificación) como tags del `Sentry.captureMessage` existente.
 
 ### Fase 2 — DEBT-070: presupuesto de red en los clientes de datos
 
-- [ ] `lib/auth/server.ts`: inyectar `global.fetch` con el presupuesto de datos
+- [x] `lib/auth/server.ts`: inyectar `global.fetch` con el presupuesto de datos
       (**D-C**) usando la fábrica de la Fase 1. Sustituir los non-null
       assertions `!` de las líneas 8-9 por guardas explícitas — hoy una env var
       ausente lanza una excepción cruda dentro de `createServerClient`,
       exactamente el fallo que `spec-046` corrigió en el middleware y que aquí
       quedó vivo.
-- [ ] `lib/auth/actions.ts`: presupuesto en el cliente *throwaway* de la línea
+- [x] `lib/auth/actions.ts`: presupuesto en el cliente *throwaway* de la línea
       216. Los otros cuatro call sites (37, 122, 186, 309) lo heredan.
-- [ ] `lib/auth/service.ts`: presupuesto en el singleton, con el valor de
+- [x] `lib/auth/service.ts`: presupuesto en el singleton, con el valor de
       **D-C**. Verificar que el `fetch` inyectado no rompe
       `supabase.auth.admin.updateUserById` ni las operaciones por lotes de los
       servicios de `/api`.
-- [ ] Barrer el repo por clientes sin presupuesto
+- [x] Barrer el repo por clientes sin presupuesto
       (`grep -rn "createServerClient\|createClient(" lib app`) y cerrar el
       conjunto.
 
 ### Fase 3 — DEBT-070 (segunda mitad): qué se renderiza cuando la consulta aborta
 
-- [ ] `lib/auth/session.ts`: que `getAuthCheck()` clasifique el abort como
+- [x] `lib/auth/session.ts`: que `getAuthCheck()` clasifique el abort como
       `unavailable`, no como `unknown`. Comportamiento de
       `getCurrentProfile`/`getCurrentRoles` según **D-D**.
-- [ ] `app/layout.tsx`: camino degradado del root layout. **Punto delicado:** un
+- [x] `app/layout.tsx`: camino degradado del root layout. **Punto delicado:** un
       throw aquí no lo captura `app/error.tsx`, solo `global-error.tsx`, que
       reemplaza el documento entero. El root layout **nunca debe lanzar**:
       degrada a navbar anónima + aviso (**D-F**).
-- [ ] `lib/enrollments/access.ts`: verificar que `hasCourseAccess()` devuelve
+- [x] `lib/enrollments/access.ts`: verificar que `hasCourseAccess()` devuelve
       `unavailable` y no `not-enrolled` cuando la consulta aborta. Si devolviera
       `not-enrolled`, un timeout mandaría a un estudiante **matriculado** a
       `/cuenta/cursos?sinAcceso=…`: el mismo tipo de mentira que `spec-046`
       eliminó, un nivel más abajo.
-- [ ] `app/(cursos)/[courseSlug]/[lessonSlug]/error.tsx` y
+- [x] `app/(cursos)/[courseSlug]/[lessonSlug]/error.tsx` y
       `components/ErrorState.tsx`: copy diferenciado ("no pudimos contactar el
       servidor, tu sesión sigue abierta"), coherente con
       `/servicio-no-disponible`.
-- [ ] Revisar `app/(admin)/error.tsx` y `app/error.tsx` para que el copy
+- [x] Revisar `app/(admin)/error.tsx` y `app/error.tsx` para que el copy
       genérico siga siendo correcto en lo que no cubre la rama nueva.
 
 ### Fase 4 — DEBT-069: alcance del 503 ante fallo transitorio
@@ -311,20 +311,20 @@ su capa de datos, y se cubre con la decisión **D-C** y con los casos
 > **Bloqueada hasta que se resuelva D-E**, porque su premisa de partida es falsa
 > (Hallazgo 3). No debe implementarse "según el backlog".
 
-- [ ] `middleware.ts`: introducir el conjunto de rutas abiertas que decida D-E,
+- [x] `middleware.ts`: introducir el conjunto de rutas abiertas que decida D-E,
       **separado y explícito** frente a `PUBLIC_PREFIXES` (que hoy significa
       otra cosa: "rutas de auth exentas del gate de sesión").
-- [ ] Aplicar la excepción **solo** cuando `auth.reason` sea `"network"` o
+- [x] Aplicar la excepción **solo** cuando `auth.reason` sea `"network"` o
       `"server"`. `misconfigured` y `unknown` siguen produciendo 503 en todas las
       rutas: **D4 de `spec-046` queda intacto**.
-- [ ] Dejar escrito el argumento de seguridad: dejar pasar una navegación
+- [x] Dejar escrito el argumento de seguridad: dejar pasar una navegación
       anónima a `/` **no expone contenido**, porque las páginas de curso y
       lección tienen su propia capa (`requireCourseAccess`) que sigue fallando
       cerrado ante `unavailable`. La excepción es de **navegación**, no de
       **autorización**.
-- [ ] Responder `Cache-Control: no-store` en las rutas que pasen en modo
+- [x] Responder `Cache-Control: no-store` en las rutas que pasen en modo
       degradado, para que ningún CDN fije la versión anónima.
-- [ ] Ampliar los tags de Sentry con la ruta y si se aplicó la excepción, para
+- [x] Ampliar los tags de Sentry con la ruta y si se aplicó la excepción, para
       medir cuánto tráfico salva realmente.
 
 ### Fase 5 — Observabilidad y cierre
@@ -332,7 +332,7 @@ su capa de datos, y se cubre con la decisión **D-C** y con los casos
 - [ ] Verificar que los tags nuevos aparecen en el proyecto `nodo-edu` de Sentry
       y permiten responder: ¿cuál fue la duración máxima real del gate esta
       semana?, ¿cuántos 503 se evitaron?
-- [ ] Actualizar `docs/specs/backlog.md`: DEBT-069/070/071 → resueltas, con nota
+- [x] Actualizar `docs/specs/backlog.md`: DEBT-069/070/071 → resueltas, con nota
       de qué queda vivo (DEBT-040, DEBT-067, DEBT-061).
 - [ ] Revertir `jwt_expiry` en `mirp-lab` y apagar el proxy; dejar el script
       versionado y documentado para el próximo incidente.
@@ -518,3 +518,36 @@ para que el **mensaje** también sea correcto en todos los caminos.
   `unknown` no activan esta excepción en ninguna ruta.
 - **D-F** — banner discreto y persistente en el layout cuando el estado sea
   degradado, para que un usuario con sesión válida no crea que se cerró.
+
+### Implementación completada (2026-08-29)
+
+Fases 0-5 implementadas. `npm run build` y `npm run lint` pasan sin errores.
+Verificación empírica del mecanismo de DEBT-071 (Fase 1) contra `mirp-lab` con
+el proxy de la Fase 0: una réplica exacta del bucle de reintentos de
+`@supabase/auth-js@2.108.2` (mismo backoff, mismo predicado de corte a 30s)
+tardaba **8002ms** en resolver con el deadline global implementado, contra los
+~26.600ms que el mismo bucle tarda sin él (tabla del Hallazgo 1) — confirma
+que el `AbortController` compartido + `Promise.race` cortan el bucle dentro
+del presupuesto de D-A.
+
+Dos desviaciones menores respecto al plan original, ambas documentadas en el
+código:
+
+- `lib/auth/errors.ts` gana el mapeo de `DOMException` que pedía la Fase 1,
+  pero se verificó en `node_modules/@supabase/auth-js` que en la práctica es
+  inalcanzable desde `supabase.auth.getUser()`: el SDK ya envuelve cualquier
+  abort en `AuthRetryableFetchError` antes de que llegue a `classifyAuthError`.
+  Queda como cinturón de seguridad, no como corrección de un bug real.
+- La Fase 3 (D-D, "root layout nunca lanza") resultó ya satisfecha por
+  construcción: `getCurrentProfile`/`getCurrentRoles` ya degradaban a
+  `null`/`[]` sin lanzar antes de este spec (gap de DEBT-040, fuera de
+  alcance) — aplicar el timeout de la Fase 2 convirtió esa degradación de
+  "eventual, tras 300s" a "acotada, en 6s", sin necesitar tocar
+  `app/layout.tsx` más allá del banner de D-F. `lib/enrollments/access.ts`
+  (`hasCourseAccess`) igual: ya clasificaba el error de una consulta abortada
+  como `unavailable`, verificado sin necesidad de cambio.
+
+Pendiente para cerrar a `[DONE]`: la ronda de pruebas manuales de
+`docs/testing/test-054-resiliencia-latencia-supabase.md` (16 casos,
+ejecutados por el usuario sobre la UI) y la ventana de observación de 7 días
+en producción descrita en ese mismo archivo.

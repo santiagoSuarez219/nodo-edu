@@ -5,7 +5,7 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
-## DEBT-070 — Clientes Supabase server-side sin timeout: una conexión colgada retiene la función hasta los 300s de Vercel
+## DEBT-070 — Clientes Supabase server-side sin timeout: una conexión colgada retiene la función hasta los 300s de Vercel — ✅ Resuelto (spec-054, 2026-08-29)
 
 **Origen:** incidente de plataforma de Supabase del 2026-08-27→29
 ("Increased response times for requests", deploy defectuoso de PostgREST 14.5
@@ -32,9 +32,19 @@ consulta aborta: hoy no existe esa rama de error, y un timeout sin manejo
 seguiría siendo un 500 — más honesto que 300s de cuelgue, pero mejorable
 (¿error boundary con reintento?, ¿degradado tipo spec-053?).
 
+**Resolución:** `lib/auth/fetch-timeout.ts` (nuevo) da timeout a `server.ts`
+(6s), al cliente *throwaway* de `actions.ts` (6s) y al singleton de
+`service.ts` (10s, mayor radio de acción — alimenta los 5 MCPs). `hasCourseAccess`
+ya clasificaba correctamente el error de una consulta abortada como
+`unavailable` (verificado, sin cambios); `app/layout.tsx` ya degradaba a
+`null`/`[]` sin lanzar (sin cambios) — con el timeout aplicado, esa
+degradación pasó de ser "eventual, tras 300s" a "acotada, en 6s". Único
+residuo declarado: `getCurrentUser()` sigue colapsando `unavailable` en
+`null` (DEBT-040, explícitamente fuera de alcance).
+
 ---
 
-## DEBT-071 — El middleware puede agotar los 25s de Vercel pese a sus presupuestos de timeout (sospecha: retries internos de `@supabase/auth-js`)
+## DEBT-071 — El middleware puede agotar los 25s de Vercel pese a sus presupuestos de timeout — ✅ Resuelto (spec-054, 2026-08-29)
 
 **Origen:** mismo incidente del 2026-08-27→29. Los runtime logs de Vercel
 registran 35 × `Your function was stopped as it did not return an initial
@@ -63,6 +73,22 @@ de spec-046 responda su 503 diseñado antes de que Vercel mate la invocación
 con un 504 sin explicación. Relacionado: [[DEBT-069]] (alcance del 503) —
 resolver ambos dejaría el peor caso en "rutas públicas siguen vivas, rutas con
 sesión ven el degradado honesto".
+
+**Resolución:** el mecanismo quedó **confirmado**, no solo sospechado —
+verificado en `node_modules/@supabase/auth-js/dist/module/GoTrueClient.js:3902-3918`:
+`_refreshAccessToken` reintenta bajo un predicado que mide reloj de pared
+contra `AUTO_REFRESH_TICK_DURATION_MS` (30s), no un número de intentos; con
+el `AbortSignal.timeout(2000)` de entonces, el bucle cabía 7 veces (~26,6s),
+por encima de los 25s de Vercel. `lib/auth/middleware.ts` ahora arma un
+`AbortController` por request (presupuesto global de 8s, D-A) compartido por
+todas las llamadas del gate — cuando el bucle interno del SDK intenta un
+nuevo fetch pasado el presupuesto, la señal ya está abortada y rechaza de
+inmediato — más un `Promise.race` como cinturón de seguridad que garantiza
+que la función devuelve dentro del presupuesto pase lo que pase con la
+promesa perdedora. Verificado empíricamente contra `mirp-lab` con una réplica
+exacta del bucle de auth-js: sin el fix, ~26,6s; con el fix, 8002ms. Nuevo
+`reason: "timeout"` en `AuthUnavailableReason` para distinguir en Sentry esta
+causa de un `network`/`server` clásico.
 
 ---
 
@@ -363,7 +389,7 @@ resuelto — y pidió backlog para el resto).
 
 ---
 
-## DEBT-069 — El gate de Auth tumba también las rutas públicas ante un fallo transitorio
+## DEBT-069 — El gate de Auth tumba también las rutas públicas ante un fallo transitorio — ✅ Resuelto (spec-054, 2026-08-29)
 
 **Origen:** incidente de producción del 2026-08-29 (issues NODO-EDU-3/4/5 y la
 investigación posterior con los logs de Supabase)
@@ -390,6 +416,19 @@ navegación anónima a rutas públicas y reservar el 503 para lo que realmente
 exige sesión. Requiere decidir qué es "ruta pública" de forma explícita y no
 debilitar el criterio de fallo cerrado de spec-046 (D4) para el contenido
 restringido.
+
+**Resolución:** la premisa original no se sostenía — al diseñar spec-054 se
+verificó que **hoy no existe contenido público**: el middleware exige sesión
+para todo salvo `/login`/`/registro`/`/servicio-no-disponible`, y las
+lecciones exigen además matrícula vía `requireCourseAccess`. Decisión del
+usuario (E1, 2026-08-29): `middleware.ts` deja pasar `/` y
+`/grupo-investigacion` —las dos únicas rutas que no consultan Supabase para
+renderizar— en modo degradado, y **solo** ante `reason` transitorio
+(`network`/`server`/`timeout`); `misconfigured`/`unknown` siguen produciendo
+503 en todo el sitio. Las rutas de curso y lección no obtienen ninguna
+excepción: `requireCourseAccess` sigue fallando cerrado, D4 de spec-046
+intacto. Banner en `app/layout.tsx` (D-F) para que un usuario con sesión
+válida en modo degradado no crea que se cerró.
 
 ---
 
