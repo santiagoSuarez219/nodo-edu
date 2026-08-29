@@ -293,11 +293,42 @@ resuelto — y pidió backlog para el resto).
   Fuera de alcance por D3 del spec (que exime a `/api` del gate HTML), pero
   sus consumidores JSON merecerían un `503 service_unavailable` explícito
   ante esta misma causa.
-- **`checkAuthHealth()` sin cachear** (`lib/auth/middleware.ts`) — el ping a
-  `/auth/v1/health` se dispara en cada request sin cookie de sesión
-  (`/login`, `/registro`, crawlers…), sin ningún cacheo por instancia.
-  Consecuencia deliberada de D4, pero dado `DEBT-059` (pico de tráfico que ya
-  disparó la p95 del middleware), vale evaluar un cacheo corto del resultado.
+- **`checkAuthHealth()` sin cachear** (`lib/auth/middleware.ts`) —
+  ✅ **Resuelto el 2026-08-29** por el fix del incidente de ese día (rama
+  `fix/auth-health-timeout-cache`): el resultado **sano** del ping se cachea
+  10s por instancia (`HEALTH_CACHE_TTL_MS`) y el ping tiene ahora su propio
+  timeout de 5s (`HEALTH_TIMEOUT_MS`), separado de los 2s del resto del
+  cliente. Los fallos no se cachean, para que la recuperación sea inmediata.
+
+---
+
+## DEBT-069 — El gate de Auth tumba también las rutas públicas ante un fallo transitorio
+
+**Origen:** incidente de producción del 2026-08-29 (issues NODO-EDU-3/4/5 y la
+investigación posterior con los logs de Supabase)
+**Prioridad:** Media-alta — el fix del mismo día reduce la frecuencia, no el
+alcance: cuando el gate decide 503, sigue cayendo el sitio entero
+
+Ese día `www.nod0.dev` alternó entre 503 y 200 durante ~35 minutos. Auth
+**nunca estuvo caído**: los logs de `edge_logs` muestran 0 respuestas distintas
+de 200 en `/auth/v1/*`, con logins reales de usuarios completándose mientras el
+sitio devolvía 503 a los visitantes anónimos. La causa fue latencia
+intermitente de `/auth/v1/health` (medido 5.98s, y >15s en el peor tramo)
+contra un timeout de 2s en el middleware.
+
+El fix del 2026-08-29 ataca la frecuencia (timeout más holgado + caché del
+resultado sano). Queda pendiente el problema de **alcance**: `reason: "network"`
+—transitorio por definición— recibe el mismo trato que `misconfigured`
+—permanente—, y ambos tumban todas las rutas, incluido el contenido público
+que se renderiza sin consultar Auth. Durante el incidente, un visitante que
+solo quería leer una lección abierta recibía un 503 por un servicio que esa
+página no necesita.
+
+Propuesta a evaluar en un spec propio: ante `network`/`server`, dejar pasar la
+navegación anónima a rutas públicas y reservar el 503 para lo que realmente
+exige sesión. Requiere decidir qué es "ruta pública" de forma explícita y no
+debilitar el criterio de fallo cerrado de spec-046 (D4) para el contenido
+restringido.
 
 ---
 
