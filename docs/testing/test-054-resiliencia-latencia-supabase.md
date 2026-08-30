@@ -264,8 +264,18 @@ correctamente, en `6.39s`.
 1. Navegar por el sitio en modo degradado.
 2. Observar la navbar y cualquier aviso.
 **Resultado esperado:** si la navbar muestra estado anónimo, hay un banner explícito indicando que la sesión **no** se ha cerrado.
-**Estado:** ⬜ Pendiente
-**Hallazgos:** —
+**Estado:** ✅ Aprobado
+**Hallazgos:** Con sesión válida del docente y `--path='^/auth/v1' --hang`,
+navegando a `/`: `200` con el banner presente ("Estamos con problemas de
+conexión... **Tu sesión no se ha cerrado**") y la navbar efectivamente en
+estado anónimo — exactamente el escenario que D-F cubre. **Observación de
+experiencia de usuario, no un fallo:** la respuesta tardó `11.48s`, que es la
+suma del deadline del gate (8s, D-A) más el presupuesto del render degradado
+del layout (hasta 6s, D-C), porque son dos etapas secuenciales de la misma
+navegación. No incumple ningún criterio: el middleware por sí solo respeta
+sus 8s (muy por debajo de los 25s de Vercel) y el render respeta los suyos.
+Pero conviene tenerlo presente: en modo degradado el peor caso percibido por
+el usuario ronda los 14s, no los 8s del gate.
 
 ### TC-054-011 — Rutas abiertas siguen en pie ante fallo transitorio *(solo si D-E = E1)*
 **Cubre:** CA 10 (DEBT-069).
@@ -382,11 +392,16 @@ espera indefinida en ningún punto de la cadena.
   3. `app/layout.tsx` encadenaba sus llamadas en serie (12s en vez de 6s) y
      el banner de D-F no cubría el caso "sesión válida, perfil sin cargar"
      (`TC-054-005`/`TC-054-009`).
-- Dos hallazgos de entorno ajenos al spec, no corregidos aquí: la base de
-  `mirp-lab` no tenía ningún estudiante ni curso académico al momento de
-  esta ronda (`TC-054-008`); y el código de progreso de lección ya degrada
+- Dos hallazgos de entorno ajenos al spec: la base de `mirp-lab` no tenía
+  ningún estudiante ni curso académico al momento de esta ronda
+  (`TC-054-008`) — causa investigada y resuelta después en
+  [[DEBT-072]]/[[DEBT-073]]; y el código de progreso de lección ya degrada
   en silencio sin propagar excepciones, por lo que `TC-054-007` no pudo
   reproducir el escenario tal como estaba redactado (ver sus Hallazgos).
+- Observación de experiencia de usuario (`TC-054-010`, no bloqueante): en
+  modo degradado el tiempo percibido es la suma del deadline del gate (8s) y
+  el del render (6s) — hasta ~14s en el peor caso, no los 8s del gate.
+  Candidato a afinar si alguna vez molesta en producción.
 - Hallazgos escalados a `docs/specs/backlog.md`: pendiente — ver pregunta al
   usuario sobre si registrar la pérdida de datos de `mirp-lab` como deuda.
 - Limpieza / reversión del entorno (proxy, `.env.local`, `jwt_expiry`): ✅ Completada
