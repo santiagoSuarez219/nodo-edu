@@ -5,6 +5,43 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+## DEBT-074 — El copy de error de infraestructura nunca se muestra en producción: Next redacta el mensaje del error
+
+**Origen:** revisión de código de spec-054 (hallazgo 🟠-1, 2026-08-30).
+**Prioridad:** Media — no rompe nada, pero el criterio de aceptación 7 de
+spec-054 y su decisión D-D quedan cumplidos solo a medias, y el spec los daba
+por completos.
+
+`components/ErrorState.tsx` exporta `isInfraError()`, que decide entre el copy
+genérico ("Algo salió mal") y el honesto de spec-054 ("No pudimos contactar el
+servidor, tu sesión sigue activa") inspeccionando `error.message` en busca de
+`abort`/`timeout`. Lo consumen los tres error boundaries del proyecto
+(lección, admin, raíz).
+
+**El problema:** Next.js **redacta** el mensaje de cualquier error lanzado en
+el servidor antes de entregárselo a un `error.tsx` de cliente. Lo que llega en
+producción es `"An error occurred in the Server Components render. The
+specific message is omitted in production builds…"` más un `digest`. Esa
+cadena no contiene `abort` ni `timeout`, así que `infra` es **siempre `false`
+en producción** — justo para los errores que este mecanismo existía para
+distinguir, porque todos nacen server-side en `lib/auth/fetch-timeout.ts`.
+
+Consecuencias: el copy honesto solo se ve en `next dev`; el tag `infra` de
+Sentry siempre será `false` en producción; y el usuario real sigue viendo
+"Algo salió mal" ante un fallo de infraestructura.
+
+Atenuante: en la práctica, hoy **ningún** camino de datos de lección propaga
+la excepción hasta el boundary (verificado en `TC-054-007`: `lib/progress`
+degrada en silencio), así que el boundary rara vez se alcanza por esta vía.
+Eso hace que el defecto sea de baja frecuencia, no que deje de existir.
+
+**Acción:** propagar la señal desde el servidor en vez de adivinarla por el
+mensaje. Opciones a evaluar: un error tipado con `digest` propio que el
+boundary pueda reconocer, o decidir el copy en un componente de servidor que
+sí ve el error real. Registrar también qué hacer con el tag de Sentry.
+
+---
+
 ## DEBT-072 — El procedimiento documentado para probar migraciones (`db reset`) destruye todos los datos de desarrollo, sin advertirlo — ✅ Mitigado (2026-08-29)
 
 **Origen:** ronda de pruebas manuales de spec-054 (2026-08-29), investigación

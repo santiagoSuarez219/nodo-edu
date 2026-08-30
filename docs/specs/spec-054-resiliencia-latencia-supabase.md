@@ -334,7 +334,7 @@ su capa de datos, y se cubre con la decisión **D-C** y con los casos
       semana?, ¿cuántos 503 se evitaron?
 - [x] Actualizar `docs/specs/backlog.md`: DEBT-069/070/071 → resueltas, con nota
       de qué queda vivo (DEBT-040, DEBT-067, DEBT-061).
-- [ ] Revertir `jwt_expiry` en `mirp-lab` y apagar el proxy; dejar el script
+- [x] Revertir `jwt_expiry` en `mirp-lab` y apagar el proxy; dejar el script
       versionado y documentado para el próximo incidente.
 
 ## Decisiones pendientes del usuario
@@ -472,6 +472,30 @@ a fallar.
 
 ## Residuo declarado
 
+**El criterio de aceptación 7 se cumple solo a medias, y conviene decirlo.**
+La revisión de código (2026-08-30) encontró que `isInfraError()`
+(`components/ErrorState.tsx`) decide el copy inspeccionando `error.message`,
+pero Next.js **redacta** el mensaje de todo error lanzado en el servidor antes
+de pasarlo a un `error.tsx` de cliente. En producción llega `"An error
+occurred in the Server Components render…"`, que no contiene `abort` ni
+`timeout`: el copy honesto de D-D **nunca se muestra en producción** y el tag
+`infra` de Sentry siempre será `false`. La mitad negativa del CA 7 sí se
+cumple (no hay 500 crudo, ni página en blanco, ni cuelgue), pero la positiva
+—que el usuario lea un mensaje honesto de infraestructura— no. Registrado como
+[[DEBT-074]]; requiere propagar la señal desde el servidor, no adivinarla por
+el mensaje. Atenuante: hoy ningún camino de datos de lección propaga la
+excepción hasta el boundary (ver `TC-054-007`), así que la ruta rara vez se
+alcanza.
+
+**Delta de exposición de E1, no explicitado antes.** `/` no era pública antes
+de este spec: exigía sesión. En modo degradado, un visitante anónimo ve el
+catálogo de cursos que `getAllCourses()` lee de disco. No es contenido de
+lección —las rutas de curso y lección siguen cerradas por `requireCourseAccess`,
+D4 intacto— pero decir "no expone contenido" no es del todo exacto: expone
+**metadatos de catálogo** que antes requerían sesión. Se acepta
+conscientemente: son los títulos y resúmenes de los cursos, el mismo material
+que el sitio anuncia públicamente.
+
 Aunque este spec cierre las tres deudas, **[[DEBT-067]] sigue abierta y es
 visible**: durante una caída, cualquier Server Action (`signIn`, `signOut`,
 `changePassword`, `withdrawStudentAction`…) que reciba el 503 en HTML plano
@@ -530,9 +554,20 @@ tardaba **8002ms** en resolver con el deadline global implementado, contra los
 que el `AbortController` compartido + `Promise.race` cortan el bucle dentro
 del presupuesto de D-A.
 
-Dos desviaciones menores respecto al plan original, ambas documentadas en el
-código:
+Tres desviaciones respecto al plan original, todas documentadas en el código:
 
+- **`TRANSIENT_REASONS` incluye `"timeout"`, que D-E no menciona.** La
+  decisión aprobada dice, dos veces, *"solo cuando `auth.reason` sea `network`
+  o `server`"*. La implementación añade el tercer motivo — pero es un motivo
+  que **este mismo spec crea** (D-B introduce `reason: "timeout"` en
+  `AuthUnavailableReason`; no existía cuando se redactó D-E) y que es
+  transitorio por definición: significa que el gate agotó su presupuesto
+  esperando, exactamente el escenario del incidente. Sin él, E1 casi no
+  salvaría tráfico, porque `timeout` fue el motivo dominante de la ronda de
+  pruebas. Es una ampliación de una excepción de seguridad, así que queda
+  declarada aquí en vez de pasar inadvertida: `misconfigured` y `unknown`
+  —los motivos permanentes— siguen fuera, y ninguna ruta de curso o lección
+  obtiene excepción por ningún motivo.
 - `lib/auth/errors.ts` gana el mapeo de `DOMException` que pedía la Fase 1,
   pero se verificó en `node_modules/@supabase/auth-js` que en la práctica es
   inalcanzable desde `supabase.auth.getUser()`: el SDK ya envuelve cualquier
@@ -549,7 +584,7 @@ código:
 
 ### Ronda de pruebas manuales completada (2026-08-29)
 
-18/18 aprobados (16 casos de UI/temporización + 2 de MCP), ver
+19/19 aprobados (17 casos de UI/temporización + 2 de MCP), ver
 `docs/testing/test-054-resiliencia-latencia-supabase.md`. La ronda encontró y
 corrigió **tres bugs reales** en la implementación, cada uno con commit
 propio:

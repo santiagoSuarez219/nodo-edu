@@ -20,7 +20,10 @@
 // `lib/auth/middleware.ts`), así que el gate del middleware no sufría este
 // bug — pero los clientes de datos (server.ts/actions.ts/service.ts), que sí
 // pasan por postgrest-js, lo sufrían todos.
-function createArmedController(budgetMs: number, externalSignals: AbortSignal[]): AbortController {
+function createArmedController(
+  budgetMs: number,
+  externalSignals: AbortSignal[]
+): { controller: AbortController; disarm: () => void } {
   const controller = new AbortController();
 
   const timer = setTimeout(() => controller.abort(), budgetMs);
@@ -42,7 +45,32 @@ function createArmedController(budgetMs: number, externalSignals: AbortSignal[])
     });
   }
 
-  return controller;
+  return { controller, disarm: () => clearTimeout(timer) };
+}
+
+// Desarma el temporizador en cuanto la petición se asienta (hallazgo 🟡-2 de
+// la revisión de código, 2026-08-29: antes ningún camino lo limpiaba).
+//
+// El presupuesto cubre así hasta las **cabeceras** de la respuesta, no la
+// lectura completa del body. Es deliberado: dejar el temporizador vivo
+// protegería también el body, pero a cambio podría abortar el stream de una
+// respuesta que ya empezó a llegar bien — y todas las respuestas de este
+// proyecto son JSON pequeño que `postgrest-js`/`auth-js` consumen de
+// inmediato, así que el riesgo de cortar una lectura legítima es mayor que
+// el de un body lento. El modo de fallo del incidente que motivó spec-054
+// (gateway que no responde en absoluto) queda cubierto igual: ahí no llegan
+// ni las cabeceras.
+function withDisarm(promise: Promise<Response>, disarm: () => void): Promise<Response> {
+  return promise.then(
+    (response) => {
+      disarm();
+      return response;
+    },
+    (error) => {
+      disarm();
+      throw error;
+    }
+  );
 }
 
 // Uso simple: cada llamada obtiene su propio presupuesto. Suficiente para
@@ -51,8 +79,11 @@ function createArmedController(budgetMs: number, externalSignals: AbortSignal[])
 // llamadas — ver DEBT-070.
 export function createTimeoutFetch(budgetMs: number): typeof fetch {
   return (input, init) => {
-    const controller = createArmedController(budgetMs, init?.signal ? [init.signal] : []);
-    return fetch(input, { ...init, signal: controller.signal });
+    const { controller, disarm } = createArmedController(
+      budgetMs,
+      init?.signal ? [init.signal] : []
+    );
+    return withDisarm(fetch(input, { ...init, signal: controller.signal }), disarm);
   };
 }
 
@@ -66,7 +97,7 @@ export function createTimeoutFetch(budgetMs: number): typeof fetch {
 export function createBudgetedFetch(perCallMs: number, sharedSignal: AbortSignal): typeof fetch {
   return (input, init) => {
     const externalSignals = init?.signal ? [sharedSignal, init.signal] : [sharedSignal];
-    const controller = createArmedController(perCallMs, externalSignals);
-    return fetch(input, { ...init, signal: controller.signal });
+    const { controller, disarm } = createArmedController(perCallMs, externalSignals);
+    return withDisarm(fetch(input, { ...init, signal: controller.signal }), disarm);
   };
 }

@@ -380,7 +380,7 @@ espera indefinida en ningún punto de la cadena.
 
 ## Resumen de la ronda
 
-- Aprobados: 18 (16 casos de UI/temporización + 2 de MCP) — Fallidos: 0 — Pendientes: 0
+- Aprobados: 19 (17 casos de UI/temporización + 2 de MCP) — Fallidos: 0 — Pendientes: 0
 - **Tres bugs reales encontrados y corregidos durante la ronda**, cada uno con commit propio:
   1. `AbortSignal.any()` no soportado en el Edge Runtime de Next.js — el
      mecanismo primario de DEBT-071 fallaba en silencio, solo el

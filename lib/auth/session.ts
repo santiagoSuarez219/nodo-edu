@@ -57,7 +57,16 @@ const getProfileResult = cache(
       .eq("id", user.id)
       .single();
 
-    return { profile: data ?? null, failed: !!error };
+    // `.single()` devuelve error con código PGRST116 cuando la consulta trae
+    // **cero filas** — un caso perfectamente sano (una sesión válida cuyo
+    // `profiles` no existe todavía, o que RLS oculta), no un fallo de
+    // infraestructura. Sin esta distinción, `getAuthDegradedReason()` mostraba
+    // el banner de "problemas de conexión" con la red y Supabase impecables
+    // (hallazgo 🟠-2 de la revisión de código, 2026-08-29). `failed` significa
+    // exclusivamente "la consulta no se pudo completar".
+    const isEmptyResult = error?.code === "PGRST116";
+
+    return { profile: data ?? null, failed: !!error && !isEmptyResult };
   }
 );
 

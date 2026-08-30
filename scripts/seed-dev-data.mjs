@@ -13,6 +13,7 @@
 // exista (por correo del estudiante y por `enrollment_code` del curso) en vez
 // de duplicarlo.
 
+import { createHash } from 'node:crypto';
 import { createClient } from '@supabase/supabase-js';
 
 const requiredVars = ['NEXT_PUBLIC_SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY'];
@@ -33,16 +34,47 @@ const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 // Este script escribe datos ficticios con `service_role` (bypasea RLS). Correrlo
 // contra producción metería estudiantes y cursos falsos en la base real, entre
 // datos de estudiantes reales, sin ninguna marca que los distinga a simple
-// vista. Se exige que la URL sea local: el entorno de desarrollo llega vía
-// túnel SSH a `mirp-lab` (localhost:54321), así que una URL `*.supabase.co`
-// solo puede significar producción — o el proxy de latencia de spec-054
-// apuntando a ella.
+// vista.
+//
+// Son DOS comprobaciones, porque una sola no alcanza (hallazgo 🟠-3 de la
+// revisión de código, 2026-08-29):
+//
+//   1. La URL debe ser local. Necesario pero **no suficiente**: un
+//      `localhost:54331` puede ser el proxy de latencia de spec-054
+//      (`scripts/latency-proxy.mjs`) reenviando a producción, o un túnel SSH
+//      mal apuntado. Es decir, el propio procedimiento de prueba de este spec
+//      basta para burlar una guarda que solo mire la URL.
+//   2. La clave debe ser la del stack local de desarrollo. Se compara por
+//      **hash SHA-256**, no en claro: una clave de servicio en un archivo
+//      versionado es exactamente lo que CLAUDE.md prohíbe (y lo que el escaneo
+//      de secretos de GitHub bloquea, con razón). El hash cumple la misma
+//      función de guarda sin exponer nada: no es reversible, y para pasar la
+//      comprobación hay que tener ya la clave.
 // ─────────────────────────────────────────────────────────────
 const isLocalUrl = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?/i.test(supabaseUrl);
 if (!isLocalUrl) {
   console.error('❌ ABORTADO: este script solo puede correr contra la base de DESARROLLO.');
   console.error(`   NEXT_PUBLIC_SUPABASE_URL apunta a: ${supabaseUrl}`);
   console.error('   Se esperaba localhost/127.0.0.1 (túnel SSH a mirp-lab, ver CLAUDE.md → "Base de datos").');
+  process.exit(1);
+}
+
+// Huellas SHA-256 de las claves `service_role` aceptadas: la del stack local
+// de `mirp-lab` y la clave demo del CLI de Supabase (formato JWT heredado,
+// que aún aparece según la versión). Si alguna vez se regenera el stack local
+// con claves nuevas, recalcular con:
+//   node -e 'console.log(require("crypto").createHash("sha256").update(process.env.SUPABASE_SERVICE_ROLE_KEY).digest("hex"))'
+const LOCAL_SERVICE_KEY_HASHES = new Set([
+  'c85debb55f2f204d868cc1552c42faa143b4c675f61363ab040dd50b5b5304cd',
+  '70541e07fd4f900b66e289f5be55c85f9bef1def4924a5b0c518c45ea1688c12',
+]);
+const keyHash = createHash('sha256').update(serviceRoleKey).digest('hex');
+if (!LOCAL_SERVICE_KEY_HASHES.has(keyHash)) {
+  console.error('❌ ABORTADO: la SUPABASE_SERVICE_ROLE_KEY no es la del stack local.');
+  console.error(`   La URL dice "${supabaseUrl}", pero la clave no coincide con ninguna clave local conocida.`);
+  console.error('   Eso significa que el destino real puede ser producción — por ejemplo, un');
+  console.error('   túnel SSH o el proxy de scripts/latency-proxy.mjs reenviando a la base real.');
+  console.error('   Este script NUNCA debe sembrar datos ficticios en producción.');
   process.exit(1);
 }
 
