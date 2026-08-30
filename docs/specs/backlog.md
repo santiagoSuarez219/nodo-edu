@@ -5,6 +5,275 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+## DEBT-074 — El copy de error de infraestructura nunca se muestra en producción: Next redacta el mensaje del error
+
+**Origen:** revisión de código de spec-054 (hallazgo 🟠-1, 2026-08-30).
+**Prioridad:** Media — no rompe nada, pero el criterio de aceptación 7 de
+spec-054 y su decisión D-D quedan cumplidos solo a medias, y el spec los daba
+por completos.
+
+`components/ErrorState.tsx` exporta `isInfraError()`, que decide entre el copy
+genérico ("Algo salió mal") y el honesto de spec-054 ("No pudimos contactar el
+servidor, tu sesión sigue activa") inspeccionando `error.message` en busca de
+`abort`/`timeout`. Lo consumen los tres error boundaries del proyecto
+(lección, admin, raíz).
+
+**El problema:** Next.js **redacta** el mensaje de cualquier error lanzado en
+el servidor antes de entregárselo a un `error.tsx` de cliente. Lo que llega en
+producción es `"An error occurred in the Server Components render. The
+specific message is omitted in production builds…"` más un `digest`. Esa
+cadena no contiene `abort` ni `timeout`, así que `infra` es **siempre `false`
+en producción** — justo para los errores que este mecanismo existía para
+distinguir, porque todos nacen server-side en `lib/auth/fetch-timeout.ts`.
+
+Consecuencias: el copy honesto solo se ve en `next dev`; el tag `infra` de
+Sentry siempre será `false` en producción; y el usuario real sigue viendo
+"Algo salió mal" ante un fallo de infraestructura.
+
+Atenuante: en la práctica, hoy **ningún** camino de datos de lección propaga
+la excepción hasta el boundary (verificado en `TC-054-007`: `lib/progress`
+degrada en silencio), así que el boundary rara vez se alcanza por esta vía.
+Eso hace que el defecto sea de baja frecuencia, no que deje de existir.
+
+**Acción:** propagar la señal desde el servidor en vez de adivinarla por el
+mensaje. Opciones a evaluar: un error tipado con `digest` propio que el
+boundary pueda reconocer, o decidir el copy en un componente de servidor que
+sí ve el error real. Registrar también qué hacer con el tag de Sentry.
+
+---
+
+## DEBT-072 — El procedimiento documentado para probar migraciones (`db reset`) destruye todos los datos de desarrollo, sin advertirlo — ✅ Mitigado (2026-08-29)
+
+**Origen:** ronda de pruebas manuales de spec-054 (2026-08-29), investigación
+posterior a petición del usuario. **Prioridad:** Media-alta — el
+procedimiento se seguirá ejecutando cada vez que alguien agregue una
+migración, y cada ejecución vuelve a vaciar el entorno de desarrollo.
+
+### Síntoma
+
+Al preparar `TC-054-008` se encontró que la instancia Supabase de `mirp-lab`
+no tenía **ningún** `academic_course` (`list_academic_courses` devolvió `[]`),
+ni el estudiante de la ronda de `test-053` (`test-spec053@nodo.local`,
+matriculado ese mismo día), ni una sola fila en `questions` (banco de
+preguntas vacío). Solo sobrevivía el docente `dev@nodo.local`.
+
+### Causa raíz — **confirmada**, no inferida
+
+| Momento (UTC) | Evento | Fuente |
+|---|---|---|
+| `20:46:17.749Z` | Una sesión previa de Claude Code (rama `feat/planilla-asistencia`) ejecuta `ssh mirp-lab "… npx supabase db reset"` | transcript de esa sesión |
+| `20:46:20` | El volumen `supabase_db_02-Educational-Page` se recrea (3 s después) | `docker volume inspect --format {{.CreatedAt}}` |
+| `20:47:31` | Se re-siembra `dev@nodo.local` | `min(created_at)` de `auth.users` |
+
+Los otros volúmenes del stack (`storage`, `edge_runtime`) siguen siendo del
+`2026-07-31`, lo que descarta que se recreara el stack entero: se recreó
+**solo el volumen de datos**, que es exactamente lo que hace `db reset`.
+
+Ese `db reset` **no fue un error**: es el procedimiento que este mismo
+`CLAUDE.md` documenta (sección "Base de datos"): *"si agregás una migración
+nueva acá, hay que `rsync`earla a `mirp-lab` y correr `supabase db reset`
+allá para probarla antes de aplicarla a prod"*. La sesión estaba probando
+las dos migraciones de `feat/planilla-asistencia`
+(`20260829000000_attendance_manual_sessions.sql`,
+`20260829000001_rls_attendance_teacher_marking.sql`), que efectivamente
+siguen en `mirp-lab` y no en `development`/`main`.
+
+**El problema no es quién lo ejecutó, sino que el procedimiento documentado
+destruye todos los datos de desarrollo y no lo advierte en ninguna parte.**
+
+Descartado explícitamente: los dos `supabase stop && supabase start` de la
+ronda de spec-054 **no** causaron la pérdida — recrean los contenedores pero
+preservan el volumen (el `CreatedAt` del volumen es anterior a ambos, y los
+datos sembrados a las 20:47 sobrevivieron a los dos ciclos).
+
+### Acción aplicada (2026-08-29)
+
+1. ✅ `CLAUDE.md` advierte en "Base de datos" que `supabase db reset` **borra
+   todos los datos de desarrollo**, y "Acciones prohibidas" exige avisar
+   antes de ejecutarlo.
+2. ✅ `scripts/seed-dev-data.mjs` + `npm run seed:dev`: siembra un
+   `academic_course` por cada curso de `content/cursos/` y tres estudiantes
+   matriculados. Idempotente (verificado: segunda corrida reutiliza todo, no
+   duplica) y con guarda que **aborta si la URL no es localhost**, para no
+   sembrar datos ficticios en producción (verificado: aborta con exit 1).
+   Recuperarse de un reset es ahora
+   `npm run seed:teacher && npm run seed:dev`.
+
+Queda fuera, por ahora: sembrar preguntas del banco. Requiere decidir un
+conjunto representativo y no bloquea ninguna ronda de pruebas conocida.
+
+Mientras tanto, el entorno quedó con un curso de prueba
+(`TEST054 — Estructuras de Datos`, `37292155-ad61-4517-ba3f-1dc7e8f4adb0`) y
+un estudiante matriculado (`test-spec054@nodo.local`, ver
+`docs/testing/test-054-resiliencia-latencia-supabase.md` → "Datos de
+prueba"), dejados en desarrollo por decisión del usuario.
+
+---
+
+## DEBT-073 — El procedimiento de despliegue apunta a producción con un flag que el CLI ya no acepta, y ambas máquinas están `linked` a producción — ✅ Resuelto (2026-08-29)
+
+**Origen:** investigación de [[DEBT-072]] (2026-08-29), a petición del usuario
+("que no vaya a suceder en producción a la hora de realizar el despliegue").
+**Prioridad:** **Alta** — no hay daño hoy, pero la salvaguarda que el
+procedimiento creía tener no existe.
+
+### Lo que dice `CLAUDE.md` vs. lo que hace el CLI instalado
+
+`CLAUDE.md` (secciones "Base de datos" y "Despliegue") indica usar
+`--project-ref` explícito *"para apuntar a producción sin ambigüedad"*:
+
+```bash
+supabase db push --project-ref bgiimadnmqnoqmdbudpo
+supabase migration list --project-ref bgiimadnmqnoqmdbudpo
+```
+
+**El CLI instalado (2.107.0) ya no acepta `--project-ref` en esos comandos**
+— verificado: `Unrecognized flag: --project-ref in command supabase migration
+list`. Los únicos selectores de destino disponibles hoy son `--linked`,
+`--local` y `--db-url`.
+
+Consecuencia: quien siga el procedimiento documentado obtiene un error, y la
+corrección natural es `--linked` — que **no nombra el proyecto al que
+apunta**. Justo la ambigüedad que el `--project-ref` explícito buscaba evitar.
+
+### Y ambos entornos están enlazados a producción
+
+- Mac de desarrollo: `supabase/.temp/project-ref` → `bgiimadnmqnoqmdbudpo`
+- `mirp-lab`: `supabase/.temp/project-ref` → `bgiimadnmqnoqmdbudpo`
+
+`mirp-lab` es una **workstation compartida** del laboratorio (otro usuario con
+sesión gráfica activa, ~20 proyectos Docker ajenos). Que el directorio de la
+base de *desarrollo* esté enlazado a *producción* significa que un
+`db push --linked` desde ahí aplicaría a producción las 2 migraciones de
+`feat/planilla-asistencia` que hoy solo existen en esa máquina — sin pasar
+por revisión ni por `main`.
+
+**Mitigación que existe hoy (parcial y frágil):** ninguna de las dos máquinas
+tiene token del CLI (`~/.supabase/access-token` no existe en ninguna), así que
+un comando contra el proyecto enlazado pediría `supabase login` primero. Es
+una barrera real, pero accidental — no una decisión de diseño.
+
+### Acción aplicada (2026-08-29)
+
+1. ✅ **`mirp-lab` desenlazada de producción**: se borraron
+   `supabase/.temp/{project-ref,linked-project.json,pooler-url}` de esa
+   máquina (respaldo con permisos `700` en
+   `~/nodo-dev-db-unlink-backup-20260829/`, por si hiciera falta revertir).
+   Se conservó el resto de `.temp` (caché de versiones del stack local);
+   verificado después: `supabase status` sigue sano y el túnel sirve datos.
+   Nota de gravedad: el `pooler-url` que tenía era una connection string
+   **directa a producción con credenciales embebidas**, no solo el ref.
+2. ✅ **`CLAUDE.md` actualizado**: comandos con `--linked` en vez del
+   inexistente `--project-ref`; `--dry-run` obligatorio antes de cualquier
+   `db push`, tanto en el checklist pre-despliegue como en el paso 2 del
+   proceso; un paso nuevo de checklist para confirmar con
+   `git diff --stat origin/main..HEAD -- supabase/` si el despliegue toca el
+   esquema (si no, no se ejecuta ningún comando de base de datos); y tres
+   entradas nuevas en "Acciones prohibidas" (no correr `db reset` sin avisar,
+   no hacer `db push --linked` sin `--dry-run` previo, no volver a enlazar
+   `mirp-lab`).
+
+**Pendiente, a criterio del usuario:** si la Mac debe permanecer enlazada a
+producción o si conviene exigir `--db-url` explícito para cada operación. Se
+dejó enlazada por ahora: es la máquina desde la que se despliega, y el
+`--dry-run` obligatorio más la ausencia de token del CLI cubren el riesgo
+principal.
+
+### Estado verificado de producción (2026-08-29, solo lectura)
+
+Producción **no** tiene las migraciones de asistencia: la columna
+`attendance_records.marked_by` no existe (`42703`), confirmando que sigue
+sincronizada con `main` y que nada no revisado se ha filtrado.
+
+---
+
+## DEBT-070 — Clientes Supabase server-side sin timeout: una conexión colgada retiene la función hasta los 300s de Vercel — ✅ Resuelto (spec-054, 2026-08-29)
+
+**Origen:** incidente de plataforma de Supabase del 2026-08-27→29
+("Increased response times for requests", deploy defectuoso de PostgREST 14.5
+con rollback completado el 28 a las 21:06 UTC), diagnosticado con los runtime
+logs de Vercel el 2026-08-29. **Prioridad:** Media-alta — durante el incidente
+hubo 10 ejecuciones de `/[courseSlug]` muertas por `Vercel Runtime Timeout
+Error: Task timed out after 300 seconds` (27–29 de agosto, 4 usuarios
+afectados): 5 minutos de espera para el estudiante y 5 minutos de cómputo
+facturado por request, por página.
+
+El único cliente Supabase con timeout propio es el del middleware
+(`lib/auth/middleware.ts`, `AbortSignal.timeout` inyectado vía `global.fetch`
+en spec-046). Los demás — `lib/auth/server.ts` (Server Components/RSC),
+`lib/auth/actions.ts` y `lib/auth/service.ts` (service role) — usan el fetch
+por defecto, sin límite: cuando la conexión hacia Supabase se cuelga (como
+pasó de forma intermitente durante el incidente), la función serverless espera
+hasta el límite duro de la plataforma.
+
+**Acción:** Spec propio. Inyectar un `global.fetch` con `AbortSignal.timeout`
+en los tres clientes restantes, con un presupuesto pensado para consultas de
+datos (más holgado que los 2s del middleware — una página puede tolerar
+algunos segundos, nunca 300). Decidir además qué renderiza la página cuando la
+consulta aborta: hoy no existe esa rama de error, y un timeout sin manejo
+seguiría siendo un 500 — más honesto que 300s de cuelgue, pero mejorable
+(¿error boundary con reintento?, ¿degradado tipo spec-053?).
+
+**Resolución:** `lib/auth/fetch-timeout.ts` (nuevo) da timeout a `server.ts`
+(6s), al cliente *throwaway* de `actions.ts` (6s) y al singleton de
+`service.ts` (10s, mayor radio de acción — alimenta los 5 MCPs). `hasCourseAccess`
+ya clasificaba correctamente el error de una consulta abortada como
+`unavailable` (verificado, sin cambios); `app/layout.tsx` ya degradaba a
+`null`/`[]` sin lanzar (sin cambios) — con el timeout aplicado, esa
+degradación pasó de ser "eventual, tras 300s" a "acotada, en 6s". Único
+residuo declarado: `getCurrentUser()` sigue colapsando `unavailable` en
+`null` (DEBT-040, explícitamente fuera de alcance).
+
+---
+
+## DEBT-071 — El middleware puede agotar los 25s de Vercel pese a sus presupuestos de timeout — ✅ Resuelto (spec-054, 2026-08-29)
+
+**Origen:** mismo incidente del 2026-08-27→29. Los runtime logs de Vercel
+registran 35 × `Your function was stopped as it did not return an initial
+response within 25s` en `/middleware` (primera vez 2026-08-13, concentrados en
+el incidente) y 34 respuestas 504 (`MIDDLEWARE_INVOCATION_TIMEOUT`) solo en
+las últimas 24h del 29 de agosto. **Prioridad:** Media-alta — este es el modo
+de fallo que el usuario vio como "el sitio no carga": un 504 de Vercel sin
+página de degradado, peor que el 503 diseñado por spec-046.
+
+El presupuesto teórico del peor caso en `lib/auth/middleware.ts` es ~10.25s
+(2 intentos × HEALTH_TIMEOUT_MS 5s + 250ms de backoff), más ~4.25s del camino
+getUser y ~2s de `user_roles` — lejos de 25s. Que aun así se alcance el límite
+apunta a los reintentos **internos** de `@supabase/auth-js` al refrescar un
+token (`_refreshAccessToken` reintenta con backoff propio ante
+`AuthRetryableFetchError`): cada intento individual respeta los 2s del
+`AbortSignal`, pero el bucle interno del SDK los acumula por fuera de los
+presupuestos del middleware. Consistente con los 30 × `AuthRetryableFetchError:
+The operation was aborted due to timeout` registrados el mismo día — ese error
+es exactamente el que el SDK considera reintentable.
+
+**Acción:** Spec propio. Primero confirmar el mecanismo (reproducir con
+latencia inyectada, o leer la versión vendorizada de auth-js); luego acotar el
+tiempo total de `updateSupabaseSession` con un deadline global (p. ej.
+`Promise.race` a ~10s que devuelva `unavailable/network`), de modo que el gate
+de spec-046 responda su 503 diseñado antes de que Vercel mate la invocación
+con un 504 sin explicación. Relacionado: [[DEBT-069]] (alcance del 503) —
+resolver ambos dejaría el peor caso en "rutas públicas siguen vivas, rutas con
+sesión ven el degradado honesto".
+
+**Resolución:** el mecanismo quedó **confirmado**, no solo sospechado —
+verificado en `node_modules/@supabase/auth-js/dist/module/GoTrueClient.js:3902-3918`:
+`_refreshAccessToken` reintenta bajo un predicado que mide reloj de pared
+contra `AUTO_REFRESH_TICK_DURATION_MS` (30s), no un número de intentos; con
+el `AbortSignal.timeout(2000)` de entonces, el bucle cabía 7 veces (~26,6s),
+por encima de los 25s de Vercel. `lib/auth/middleware.ts` ahora arma un
+`AbortController` por request (presupuesto global de 8s, D-A) compartido por
+todas las llamadas del gate — cuando el bucle interno del SDK intenta un
+nuevo fetch pasado el presupuesto, la señal ya está abortada y rechaza de
+inmediato — más un `Promise.race` como cinturón de seguridad que garantiza
+que la función devuelve dentro del presupuesto pase lo que pase con la
+promesa perdedora. Verificado empíricamente contra `mirp-lab` con una réplica
+exacta del bucle de auth-js: sin el fix, ~26,6s; con el fix, 8002ms. Nuevo
+`reason: "timeout"` en `AuthUnavailableReason` para distinguir en Sentry esta
+causa de un `network`/`server` clásico.
+
+---
+
 ## DEBT-068 — Sin contexto de usuario en Sentry (`Sentry.setUser`)
 
 **Origen:** spec-053 (degradado honesto de Server Actions ante Auth caído),
@@ -302,7 +571,7 @@ resuelto — y pidió backlog para el resto).
 
 ---
 
-## DEBT-069 — El gate de Auth tumba también las rutas públicas ante un fallo transitorio
+## DEBT-069 — El gate de Auth tumba también las rutas públicas ante un fallo transitorio — ✅ Resuelto (spec-054, 2026-08-29)
 
 **Origen:** incidente de producción del 2026-08-29 (issues NODO-EDU-3/4/5 y la
 investigación posterior con los logs de Supabase)
@@ -329,6 +598,19 @@ navegación anónima a rutas públicas y reservar el 503 para lo que realmente
 exige sesión. Requiere decidir qué es "ruta pública" de forma explícita y no
 debilitar el criterio de fallo cerrado de spec-046 (D4) para el contenido
 restringido.
+
+**Resolución:** la premisa original no se sostenía — al diseñar spec-054 se
+verificó que **hoy no existe contenido público**: el middleware exige sesión
+para todo salvo `/login`/`/registro`/`/servicio-no-disponible`, y las
+lecciones exigen además matrícula vía `requireCourseAccess`. Decisión del
+usuario (E1, 2026-08-29): `middleware.ts` deja pasar `/` y
+`/grupo-investigacion` —las dos únicas rutas que no consultan Supabase para
+renderizar— en modo degradado, y **solo** ante `reason` transitorio
+(`network`/`server`/`timeout`); `misconfigured`/`unknown` siguen produciendo
+503 en todo el sitio. Las rutas de curso y lección no obtienen ninguna
+excepción: `requireCourseAccess` sigue fallando cerrado, D4 de spec-046
+intacto. Banner en `app/layout.tsx` (D-F) para que un usuario con sesión
+válida en modo degradado no crea que se cerró.
 
 ---
 

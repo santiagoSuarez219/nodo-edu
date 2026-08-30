@@ -41,18 +41,71 @@ export const getCurrentUser = cache(async () => {
   return auth.status === "authenticated" ? auth.user : null;
 });
 
+// spec-054: consulta a `profiles` compartida por `getCurrentProfile()` (firma
+// histórica, `Profile | null`, 16 call sites) y `getAuthDegradedReason()`
+// (necesita saber si la consulta *falló*, no solo si vino vacía). `cache()`
+// de React dedup: aunque ambas la llamen, solo hace una petición de red.
+const getProfileResult = cache(
+  async (): Promise<{ profile: Profile | null; failed: boolean }> => {
+    const user = await getCurrentUser();
+    if (!user) return { profile: null, failed: false };
+
+    const supabase = await createServerSupabaseClient();
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", user.id)
+      .single();
+
+    // `.single()` devuelve error con código PGRST116 cuando la consulta trae
+    // **cero filas** — un caso perfectamente sano (una sesión válida cuyo
+    // `profiles` no existe todavía, o que RLS oculta), no un fallo de
+    // infraestructura. Sin esta distinción, `getAuthDegradedReason()` mostraba
+    // el banner de "problemas de conexión" con la red y Supabase impecables
+    // (hallazgo 🟠-2 de la revisión de código, 2026-08-29). `failed` significa
+    // exclusivamente "la consulta no se pudo completar".
+    const isEmptyResult = error?.code === "PGRST116";
+
+    return { profile: data ?? null, failed: !!error && !isEmptyResult };
+  }
+);
+
+// spec-054 (D-F): para que el root layout pueda mostrar un aviso discreto en
+// vez de dejar que una sesión válida parezca cerrada. `getCurrentUser()`
+// colapsa `unavailable` en `null` (DEBT-040, gap deliberado y documentado
+// arriba) — sin esta función, el layout no tiene forma de distinguir "eres
+// anónimo" de "no pudimos verificarte" y la navbar simplemente desaparece,
+// que es exactamente la mentira que spec-046 cerró un nivel más arriba
+// (DEBT-042). Devuelve el motivo solo cuando es transitorio: si llegó hasta
+// aquí con `misconfigured`/`unknown`, la ruta ya habría recibido el 503 total
+// del middleware (spec-054, DEBT-069) y este código nunca se ejecutaría.
+//
+// TC-054-009 (ronda de pruebas, 2026-08-29): el chequeo original solo miraba
+// `auth.status === "unavailable"` — cubre "no pudimos verificar tu sesión",
+// pero no el caso, igual de real, en que Auth respondió bien (sesión válida)
+// y fue la consulta a `profiles` la que abortó por el timeout de datos
+// (DEBT-070). Sin este segundo chequeo, ese caso mostraba la navbar oculta
+// sin ningún aviso — el mismo síntoma que este banner existe para evitar.
+export const getAuthDegradedReason = cache(
+  async (): Promise<"network" | "server" | "timeout" | null> => {
+    const auth = await getAuthCheck();
+    if (auth.status === "unavailable") {
+      if (auth.reason === "network" || auth.reason === "server" || auth.reason === "timeout") {
+        return auth.reason;
+      }
+      return null;
+    }
+    if (auth.status === "authenticated") {
+      const { failed } = await getProfileResult();
+      if (failed) return "timeout";
+    }
+    return null;
+  }
+);
+
 export const getCurrentProfile = cache(async (): Promise<Profile | null> => {
-  const user = await getCurrentUser();
-  if (!user) return null;
-
-  const supabase = await createServerSupabaseClient();
-  const { data } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", user.id)
-    .single();
-
-  return data ?? null;
+  const { profile } = await getProfileResult();
+  return profile;
 });
 
 export const getCurrentRoles = cache(async (): Promise<AppRole[]> => {

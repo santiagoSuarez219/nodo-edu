@@ -197,6 +197,14 @@ npm run start
 # Linter
 npm run lint
 
+# Sembrar la cuenta docente de desarrollo (dev@nodo.local)
+npm run seed:teacher
+
+# Sembrar datos de dominio de desarrollo: cursos académicos + estudiantes
+# matriculados. Idempotente; aborta si la URL no es localhost.
+# Correr después de un `supabase db reset` en mirp-lab (ver "Base de datos").
+npm run seed:dev
+
 # Tests
 # (framework por definir — ver sección Testing)
 ```
@@ -253,10 +261,12 @@ npm run lint
   - **Producción:** proyecto Supabase remoto `academy-page`
     (ref `bgiimadnmqnoqmdbudpo`). Variables reales respaldadas en
     `.env.prod` / `.env.prod-mcp` (gitignorados, nunca commitear).
-    `supabase db push`/`supabase migration list` **sin** `--project-ref`
-    (o con `bgiimadnmqnoqmdbudpo` explícito) operan contra este proyecto —
+    Este repo (la Mac) está **enlazado** a ese proyecto
+    (`supabase/.temp/project-ref`), así que `supabase db push` /
+    `supabase migration list` con `--linked` operan contra **producción** —
     requiere confirmación explícita del usuario antes de aplicar
-    migraciones (ver "Acciones prohibidas").
+    migraciones (ver "Acciones prohibidas"). Ver el recuadro de abajo sobre
+    los flags del CLI.
   - **Desarrollo:** instancia local (`supabase start`) en `mirp-lab`
     (`/home/sosagro4c/proyectos/nodo-dev-db/`), con su propia copia de
     `supabase/migrations/` sincronizada manualmente desde este repo (no
@@ -264,6 +274,28 @@ npm run lint
     migración nueva acá, hay que `rsync`earla a `mirp-lab` y correr
     `supabase db reset` allá para probarla antes de aplicarla a prod).
     `.env.local` apunta acá por defecto.
+    **`mirp-lab` ya NO está enlazado a producción** (desenlazado el
+    2026-08-29, [[DEBT-073]]: es una workstation compartida del laboratorio
+    y no tiene por qué poder alcanzar la base real; su
+    `supabase/.temp/{project-ref,linked-project.json,pooler-url}` quedó
+    respaldado en `~/nodo-dev-db-unlink-backup-20260829/` de esa máquina).
+    No volver a enlazarla.
+
+  > 🔴 **`supabase db reset` BORRA TODOS LOS DATOS de desarrollo.** Recrea el
+  > volumen de Postgres desde cero: se pierden cursos, estudiantes,
+  > matrículas, preguntas y progreso. Es el procedimiento correcto para
+  > probar una migración nueva, pero **avisá al usuario antes de correrlo**
+  > si hay una ronda de pruebas en curso — ya costó una vez los datos de una
+  > ronda entera ([[DEBT-072]], 2026-08-29). Para recuperarse después:
+  > `npm run seed:teacher && npm run seed:dev`.
+
+  > ⚠️ **Flags del CLI (verificado con `supabase` 2.107.0, 2026-08-29):**
+  > `--project-ref` **ya no existe** en `db push` ni en `migration list`
+  > (`Unrecognized flag`). Los selectores de destino disponibles son
+  > `--linked` (el proyecto enlazado = **producción**), `--local` y
+  > `--db-url`. Como `--linked` no nombra el proyecto al que apunta,
+  > **`--dry-run` es obligatorio** antes de cualquier `db push` a producción
+  > (ver "Despliegue → Checklist pre-despliegue").
 
   **Para reconectar el entorno de desarrollo en una sesión nueva:**
   1. Túnel SSH (si no está activo —
@@ -286,6 +318,13 @@ npm run lint
      antes de este cambio, para que recargue el `.env.local` nuevo).
   4. Docente de desarrollo ya sembrado: `dev@nodo.local` / `DevLocal2026!`
      (`npm run seed:teacher` para recrearlo si se resetea la base).
+  5. Datos de dominio de desarrollo (cursos académicos + estudiantes
+     matriculados): `npm run seed:dev` — idempotente, se puede correr las
+     veces que haga falta. Siembra un `academic_course` por cada curso de
+     `content/cursos/` (códigos `DEVEDD2026`, `DEVADA2026`, `DEVPC2026`) y
+     tres estudiantes (`dev-estudiante{1,2,3}@nodo.local` /
+     `DevStudent2026!`). Aborta si `NEXT_PUBLIC_SUPABASE_URL` no es
+     localhost, para no sembrar datos ficticios en producción.
   > ⚠️ **Nota de mantenimiento del CLI:** esta instancia local (CLI
   > `2.111.0`) no otorgó automáticamente los `GRANT`s estándar de
   > `anon`/`authenticated`/`service_role` sobre `public` al aplicar las
@@ -295,10 +334,14 @@ npm run lint
   > equivalente). Si se vuelve a resetear esta base desde cero
   > (`supabase db reset`) y algo empieza a fallar con
   > `permission denied for table ...`, repetir esos `GRANT`s.
-- Para verificar que una migración se aplicó en **producción**:
-  `supabase migration list --project-ref bgiimadnmqnoqmdbudpo` (columnas
-  Local y Remote deben coincidir) o una consulta REST contra
-  `NEXT_PUBLIC_SUPABASE_URL` de `.env.prod`.
+- Para verificar que una migración se aplicó en **producción**, en orden de
+  preferencia:
+  1. **Consulta REST** contra `NEXT_PUBLIC_SUPABASE_URL` de `.env.prod`
+     pidiendo una columna que la migración cree — es solo lectura, no
+     necesita el CLI ni login, y responde sin ambigüedad. Un `42703`
+     (`column ... does not exist`) significa que **no** se aplicó.
+  2. `supabase migration list --linked` (requiere `supabase login`; recordá
+     que `--linked` es **producción**).
 - Row Level Security habilitado; verificar políticas antes de añadir nuevas tablas.
 - **[[DEBT-031]] resuelta (2026-07-31)**: el historial de migraciones ahora
   **sí** reconstruye producción desde cero. Las tablas `assignments` y
@@ -1002,7 +1045,13 @@ Ejecutar este checklist **antes de iniciar cualquier despliegue**:
 - [ ] La rama `development` tiene todos los merges requeridos.
 - [ ] Las variables de entorno de producción están actualizadas en Vercel y
       Supabase — **no en archivos locales**.
-- [ ] Si hay cambios de esquema, el script de migración está preparado y revisado.
+- [ ] **Confirmar si el despliegue toca el esquema o no:**
+      `git diff --stat origin/main..HEAD -- supabase/` — si la salida está
+      vacía, el despliegue es **solo código** y no debe ejecutarse **ningún**
+      comando de base de datos (se salta el paso 2 del proceso).
+- [ ] Si hay cambios de esquema: el script de migración está preparado y
+      revisado, y se corrió `supabase db push --linked --dry-run` para ver
+      exactamente qué se aplicaría **antes** de aplicarlo de verdad.
 - [ ] El build local pasa sin errores (`npm run build`).
 - [ ] El linter pasa sin errores (`npm run lint`).
 - [ ] (Cuando exista framework de tests) los tests pasan en su totalidad.
@@ -1027,15 +1076,26 @@ development ──merge──▶ deploy/vX.Y.Z ──merge──▶ main ──p
    git checkout -b deploy/{{versión}}
    ```
 
-2. **Aplicar migraciones en Supabase** *(solo si hay cambios de esquema)*
+2. **Aplicar migraciones en Supabase** *(solo si hay cambios de esquema —
+   confirmalo con el `git diff` del checklist; si no los hay, **saltate este
+   paso entero**)*
    > ⚠️ Requiere confirmación explícita del usuario antes de ejecutar.
+   > `--linked` apunta a **producción** y no lo dice en el comando: por eso
+   > el `--dry-run` va primero, siempre.
    ```bash
-   # Aplicar migraciones pendientes en producción:
-   supabase db push --project-ref bgiimadnmqnoqmdbudpo
+   # 1. Ver QUÉ se aplicaría, sin aplicar nada (obligatorio):
+   supabase db push --linked --dry-run
+
+   # 2. Solo si el dry-run muestra exactamente lo esperado:
+   supabase db push --linked
 
    # Ver estado de migraciones:
-   supabase migration list --project-ref bgiimadnmqnoqmdbudpo
+   supabase migration list --linked
    ```
+   - Revisar la salida del `--dry-run` migración por migración: debe listar
+     **solo** las de esta entrega. Si aparece alguna que no reconocés, parar
+     y reportar al usuario — puede venir de otra rama sin mergear (fue el
+     riesgo detectado en [[DEBT-073]]).
    - Verificar los cambios en `Table Editor` del panel de Supabase antes de continuar.
    - Si el proyecto usa Row Level Security (RLS), validar que las nuevas tablas
      o columnas tienen las políticas correctas aplicadas.
@@ -1090,20 +1150,27 @@ development ──merge──▶ deploy/vX.Y.Z ──merge──▶ main ──p
 ### Migraciones de base de datos — Supabase
 
 > Nota: desde el 2026-07-31 desarrollo y producción son proyectos Supabase
-> **separados** (ver "Base de datos") — `supabase db push`/`migration list`
-> sin `--project-ref` aplican sobre el proyecto que esté enlazado
-> (`supabase link`) en la máquina donde se ejecuten; usar
-> `--project-ref bgiimadnmqnoqmdbudpo` explícito para apuntar a producción
-> sin ambigüedad, como en los comandos de abajo.
+> **separados** (ver "Base de datos"). `supabase db push`/`migration list`
+> aplican sobre el proyecto **enlazado** en la máquina donde se ejecuten.
+> Desde el 2026-08-29 solo la Mac está enlazada (a producción); `mirp-lab`
+> fue desenlazada a propósito ([[DEBT-073]]).
+>
+> 🔴 **`--project-ref` ya no existe** en estos comandos (verificado con el
+> CLI 2.107.0): devuelve `Unrecognized flag`. El único selector de destino
+> remoto es `--linked`, que **no nombra el proyecto al que apunta** — por eso
+> `--dry-run` es obligatorio antes de cualquier `push`.
 
 - Proveedor PostgreSQL gestionado con Storage, Auth y Realtime integrados.
 - Las migraciones se gestionan con la CLI de Supabase:
   ```bash
-  # Aplicar migraciones pendientes en producción:
-  supabase db push --project-ref bgiimadnmqnoqmdbudpo
+  # 1. Ver qué se aplicaría, sin aplicar nada (SIEMPRE primero):
+  supabase db push --linked --dry-run
+
+  # 2. Aplicar migraciones pendientes en producción:
+  supabase db push --linked
 
   # Ver estado de migraciones:
-  supabase migration list --project-ref bgiimadnmqnoqmdbudpo
+  supabase migration list --linked
   ```
 - Verificar cambios en `Table Editor` del panel antes de confirmar.
 - Si el proyecto usa Row Level Security (RLS), validar que las nuevas
@@ -1160,6 +1227,16 @@ Claude **nunca** debe:
   dejando datos de prueba sin eliminar.
 - Borrar archivos o carpetas (salvo temporales generados por la propia tarea).
 - Ejecutar migraciones de base de datos en entornos distintos al local.
+- **Ejecutar `supabase db reset` (en `mirp-lab` o donde sea) sin avisar
+  antes**: borra todos los datos de desarrollo — cursos, estudiantes,
+  matrículas, preguntas y progreso ([[DEBT-072]]). Si hay una ronda de
+  pruebas manuales en curso, la deja sin sus precondiciones a mitad de
+  camino. Tras un reset: `npm run seed:teacher && npm run seed:dev`.
+- **Ejecutar `supabase db push --linked` sin haber corrido antes
+  `--dry-run` y mostrado su salida al usuario**: `--linked` es
+  **producción** y el comando no lo dice ([[DEBT-073]]).
+- **Volver a enlazar `mirp-lab` a producción** (`supabase link` en esa
+  máquina): se desenlazó a propósito por ser una workstation compartida.
 - Hacer push a `main` o `development` directamente.
 - Modificar variables de entorno de producción.
 - Instalar dependencias nuevas sin mencionarlo y esperar confirmación.

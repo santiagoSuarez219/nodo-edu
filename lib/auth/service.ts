@@ -1,10 +1,20 @@
 import { createClient, type SupabaseClient, type User } from "@supabase/supabase-js";
+import { createTimeoutFetch } from "./fetch-timeout";
 
 // SupabaseClient explícito, NO ReturnType<typeof createClient>: para una
 // función genérica, ReturnType<T> no resuelve los parámetros de tipo por
 // defecto igual que una invocación real, y termina tipando las filas de
 // .insert()/.update() como `never` en vez de `any`.
 let serviceClient: SupabaseClient | null = null;
+
+// spec-054 (D-C) — 10s, más holgado que los 6s de server.ts/actions.ts: este
+// singleton alimenta los 10 módulos de servicio que sirven /api/* y, por
+// tanto, los 5 MCPs del proyecto (docs/mcps/README.md), donde hay
+// operaciones legítimamente más largas que una consulta de página (altas
+// por lotes, publicación de variantes de evaluación). Antes de este spec no
+// tenía ningún timeout: una conexión colgada retenía la función hasta el
+// límite de 300s de Vercel.
+const SERVICE_TIMEOUT_MS = 10_000;
 
 export function createServiceSupabaseClient() {
   if (!serviceClient) {
@@ -17,7 +27,9 @@ export function createServiceSupabaseClient() {
       );
     }
 
-    serviceClient = createClient(url, key);
+    serviceClient = createClient(url, key, {
+      global: { fetch: createTimeoutFetch(SERVICE_TIMEOUT_MS) },
+    });
   }
 
   return serviceClient;

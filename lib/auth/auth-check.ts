@@ -10,7 +10,18 @@ import type { User } from "@supabase/supabase-js";
 // ya existía con `AuthResult` (resultado de server actions), un tipo
 // homónimo pero no relacionado — mezclar ambos en el mismo módulo habría
 // confundido dos dominios distintos.
-export type AuthUnavailableReason = "network" | "server" | "misconfigured" | "unknown";
+// spec-054 (D-B): "timeout" es un motivo aparte de "network" — no es que la
+// petición fallara, es que el presupuesto de tiempo del *gate* se agotó
+// mientras Supabase seguía intentando responder (posiblemente atrapado en el
+// bucle de reintentos interno de @supabase/auth-js, ver
+// lib/auth/middleware.ts). Distinguirlo en Sentry es lo que permitió
+// diagnosticar el incidente del 2026-08-29 en primer lugar.
+export type AuthUnavailableReason =
+  | "network"
+  | "server"
+  | "misconfigured"
+  | "timeout"
+  | "unknown";
 
 export type AuthCheckResult =
   | { status: "authenticated"; user: User }

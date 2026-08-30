@@ -36,6 +36,23 @@ type AuthErrorClassification =
 // trata como `unavailable`, no como `anonymous`, para no abrir el gate ante
 // un fallo de infraestructura que no anticipamos.
 export function classifyAuthError(error: unknown): AuthErrorClassification {
+  // spec-054: en la práctica esta rama no se alcanza desde
+  // `supabase.auth.getUser()` — verificado en
+  // node_modules/@supabase/auth-js/dist/module/lib/fetch.js
+  // (`_handleRequest`): el SDK ya envuelve cualquier rechazo de `fetch`
+  // (incluido un abort por timeout) en `AuthRetryableFetchError` antes de que
+  // llegue aquí, y esa rama ya clasifica correctamente como `network`/
+  // `server` más abajo. Se deja como cinturón de seguridad para cualquier
+  // llamador que pase un `DOMException` crudo sin pasar por el SDK — sin
+  // esto caía en el `unknown` genérico de abajo, que también falla cerrado
+  // (D4) pero sin la granularidad de telemetría que sí aporta `timeout`.
+  if (
+    error instanceof DOMException &&
+    (error.name === "TimeoutError" || error.name === "AbortError")
+  ) {
+    return { status: "unavailable", reason: "timeout" };
+  }
+
   if (!isAuthErrorLike(error)) {
     return { status: "unavailable", reason: "unknown" };
   }

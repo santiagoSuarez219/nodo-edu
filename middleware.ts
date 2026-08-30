@@ -11,6 +11,27 @@ const PUBLIC_PREFIXES = [
 ];
 const CHANGE_PASSWORD_PATH = "/cambiar-contrasena"; // spec-051 — mismo motivo: debe quedar exento o entra en bucle
 
+// spec-054 (DEBT-069, decisión D-E = E1): rutas que no necesitan Auth para
+// renderizar (ambas leen MDX/son estáticas) y que por tanto pueden dejarse
+// pasar en modo degradado — SOLO cuando el fallo es transitorio. Coincidencia
+// EXACTA a propósito, no prefijo: un prefijo "/"' matchearía todo el sitio, y
+// un curso futuro con slug "grupo-investigacion-2" no debe heredar la
+// excepción por accidente.
+//
+// La excepción es de NAVEGACIÓN, no de AUTORIZACIÓN: las rutas de curso y
+// lección siguen exigiendo sesión y matrícula (requireCourseAccess,
+// lib/enrollments/access.ts) sin ninguna excepción — D4 de spec-046 queda
+// intacto. Ver "Hallazgo 3" de docs/specs/spec-054-resiliencia-latencia-supabase.md:
+// hoy no existe contenido público más allá de estas dos rutas.
+const DEGRADABLE_OPEN_ROUTES = new Set(["/", "/grupo-investigacion"]);
+
+// reason que spec-054 considera transitorio — un episodio de latencia o de
+// caída puntual del proveedor, del tipo que la excepción de arriba busca no
+// amplificar. `misconfigured` y `unknown` NUNCA activan la excepción: son
+// fallos permanentes (env var ausente, algo no anticipado) donde fallar
+// cerrado en todo el sitio sigue siendo lo correcto.
+const TRANSIENT_REASONS = new Set(["network", "server", "timeout"]);
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -25,7 +46,8 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const { supabaseResponse, auth, supabase } = await updateSupabaseSession(request);
+  const { supabaseResponse, auth, supabase, authDurationMs, deadlineExceeded } =
+    await updateSupabaseSession(request);
 
   // spec-046: Supabase Auth no se pudo verificar (caído, inalcanzable, mal
   // configurado). Antes de este spec, `user: null` era indistinguible de
@@ -33,7 +55,19 @@ export async function middleware(request: NextRequest) {
   // /login necesitando el mismo servicio caído, nadie podía volver a entrar
   // (DEBT-042).
   if (auth.status === "unavailable") {
-    console.error(`[auth] servicio no disponible (${auth.reason}) — ${pathname}`);
+    console.error(
+      `[auth] servicio no disponible (${auth.reason}, ${authDurationMs}ms) — ${pathname}`
+    );
+
+    // spec-054 (DEBT-069, D-E = E1): un fallo TRANSITORIO no tumba las dos
+    // rutas que no dependen de Auth para renderizar. La excepción nunca
+    // aplica a `misconfigured`/`unknown` (fallos permanentes) ni a ninguna
+    // ruta fuera de DEGRADABLE_OPEN_ROUTES — en particular, nunca a una
+    // lección: esas siguen su propio gate de matrícula
+    // (requireCourseAccess) más abajo en el render, que sigue fallando
+    // cerrado ante `unavailable` sin ninguna excepción.
+    const degradedRouteException =
+      TRANSIENT_REASONS.has(auth.reason) && DEGRADABLE_OPEN_ROUTES.has(pathname);
 
     // spec-053: sin esto, este 503 no dejaba ningún rastro en Sentry — solo
     // el console.error de arriba, invisible fuera de los runtime logs de
@@ -41,8 +75,11 @@ export async function middleware(request: NextRequest) {
     // real, es una decisión deliberada del gate de spec-046 (D3). El tag
     // `is_server_action` distingue el caso benigno (una navegación normal
     // que ve la página de servicio no disponible, como se diseñó) del caso
-    // que motivó este spec (un Server Action que esperaba RSC y recibió este
-    // mismo 503 — issue NODO-EDU-4 de Sentry).
+    // que motivó spec-053 (un Server Action que esperaba RSC y recibió este
+    // mismo 503 — issue NODO-EDU-4 de Sentry). spec-054 añade `duration_ms`
+    // y `deadline_exceeded` (para medir en producción si GLOBAL_DEADLINE_MS
+    // sigue siendo suficiente) y `degraded_route_exception` (para medir
+    // cuánto tráfico salva realmente la excepción de E1).
     Sentry.captureMessage("Gate de Auth: servicio no disponible", {
       level: "error",
       tags: {
@@ -50,8 +87,21 @@ export async function middleware(request: NextRequest) {
         reason: auth.reason,
         path: pathname,
         is_server_action: request.headers.has("Next-Action"),
+        duration_ms: authDurationMs,
+        deadline_exceeded: deadlineExceeded,
+        degraded_route_exception: degradedRouteException,
       },
     });
+
+    if (degradedRouteException) {
+      // Navegación anónima en modo degradado — nunca autorización: el
+      // contenido de "/" y "/grupo-investigacion" no consulta Supabase, así
+      // que no hay nada que este bypass exponga. `no-store` para que ningún
+      // CDN fije la versión anónima de estas rutas como si fuera la normal.
+      supabaseResponse.headers.set("Cache-Control", "no-store, must-revalidate");
+      supabaseResponse.headers.set("X-Auth-Degraded", auth.reason);
+      return supabaseResponse;
+    }
 
     return new NextResponse(renderServiceUnavailablePage(pathname), {
       status: 503,
