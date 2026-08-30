@@ -12,6 +12,7 @@
     "start": "next start",
     "lint": "eslint",
     "seed:teacher": "node --env-file-if-exists=.env.local scripts/seed-teacher.mjs",
+    "seed:dev": "node --env-file-if-exists=.env.local scripts/seed-dev-data.mjs",
     "reset:password:prod": "node --env-file-if-exists=.env.prod scripts/reset-account-password.mjs"
   },
   "dependencies": {
