@@ -378,6 +378,29 @@ espera indefinida en ningún punto de la cadena.
 | Duración máxima del gate y motivo | tags de Sentry (`nodo-edu`) | El máximo observado ≤ presupuesto de D-A |
 | Proporción de 503 evitados *(solo si D-E = E1)* | tags de Sentry de la Fase 4 | Dato informativo, sin umbral |
 
+### Línea base ANTES del despliegue (2026-08-30 12:18 UTC)
+
+> Tomada de los runtime errors de Vercel con ventana de 24 h, para que la
+> comparación posterior sea contra números y no contra impresiones. Todas
+> estas ocurrencias son del código **anterior** a spec-054.
+
+| Señal | Ocurrencias (24 h) | Última vez |
+|---|---|---|
+| `DOMException [TimeoutError]: The operation was aborted due to timeout` | 356 | 2026-08-29 21:31 UTC |
+| `Your function was stopped as it did not return an initial response within 25s` | 35 | 2026-08-29 21:24 UTC |
+| `AuthRetryableFetchError: The operation was aborted due to timeout` | 30 + 24 | 2026-08-29 21:31 UTC |
+| `Vercel Runtime Timeout Error: Task timed out after 300 seconds` (`/[courseSlug]`) | 10 | 2026-08-29 19:32 UTC |
+| `[auth] servicio no disponible (network)` — todas las rutas | ~150 | 2026-08-29 21:24 UTC |
+
+**Estado del incidente al momento de desplegar:** el último error de cualquier
+tipo es de las 21:31 UTC del 2026-08-29, es decir **~15 h sin ocurrencias
+nuevas**. El episodio de latencia del proveedor está calmado, así que el
+despliegue no ocurre en medio del incidente — bueno para no confundir
+"mejoró por el fix" con "mejoró porque el proveedor se recuperó". Justamente
+por eso la ventana de observación se define por **ausencia de regresión** y no
+por una mejora medible: puede que el proveedor no vuelva a fallar en 7 días,
+y eso no invalida el fix.
+
 ## Resumen de la ronda
 
 - Aprobados: 19 (17 casos de UI/temporización + 2 de MCP) — Fallidos: 0 — Pendientes: 0
