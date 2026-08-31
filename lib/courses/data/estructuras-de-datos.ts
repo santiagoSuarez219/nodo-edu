@@ -227,21 +227,6 @@ export const estructurasDeDatos: Course = {
       topics: [],
     },
     {
-      id: "criterios-de-seleccion-de-estructuras",
-      slug: "criterios-de-seleccion-de-estructuras",
-      articleSlug: "criterios-de-seleccion-de-estructuras",
-      order: 14,
-      title: "Criterios de selección de estructuras",
-      topics: [
-        { title: "Ventajas y desventajas de cada estructura de datos" },
-        {
-          title:
-            "Preguntas clave: ¿cómo se accede?, ¿con qué frecuencia se inserta o elimina?, ¿importa el orden?",
-        },
-        { title: "Relación entre el tipo de problema, los datos y la estructura adecuada" },
-      ],
-    },
-    {
       id: "notacion-big-o-y-analisis-de-complejidad",
       slug: "notacion-big-o-y-analisis-de-complejidad",
       articleSlug: "notacion-big-o-y-analisis-de-complejidad",
