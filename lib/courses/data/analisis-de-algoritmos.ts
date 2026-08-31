@@ -137,6 +137,16 @@ export const analisisDeAlgoritmos: Course = {
       ],
     },
     {
+      id: "lab-evaluativo-01-fundamentos-complejidad-recurrencias",
+      slug: "lab-evaluativo-01-fundamentos-complejidad-recurrencias",
+      articleSlug: "lab-evaluativo-01-fundamentos-complejidad-recurrencias",
+      kind: "guide",
+      order: 6.5,
+      title:
+        "Laboratorio evaluativo 01 — Fundamentos, complejidad y recurrencias",
+      topics: [],
+    },
+    {
       id: "subarreglo-maximo-y-strassen",
       slug: "subarreglo-maximo-y-strassen",
       articleSlug: "subarreglo-maximo-y-strassen",
