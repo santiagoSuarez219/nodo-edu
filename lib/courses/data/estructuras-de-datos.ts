@@ -227,21 +227,6 @@ export const estructurasDeDatos: Course = {
       topics: [],
     },
     {
-      id: "tipos-abstractos-de-datos-tad",
-      slug: "tipos-abstractos-de-datos-tad",
-      articleSlug: "tipos-abstractos-de-datos-tad",
-      order: 13,
-      title: "Tipos abstractos de datos (TAD)",
-      topics: [
-        { title: "Qué es un tipo abstracto de datos" },
-        { title: "Separación entre interfaz y representación interna" },
-        {
-          title:
-            "Panorama general de estructuras: arreglos, listas, pilas, colas, árboles, grafos, tablas hash",
-        },
-      ],
-    },
-    {
       id: "criterios-de-seleccion-de-estructuras",
       slug: "criterios-de-seleccion-de-estructuras",
       articleSlug: "criterios-de-seleccion-de-estructuras",
