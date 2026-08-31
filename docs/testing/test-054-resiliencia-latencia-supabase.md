@@ -378,6 +378,18 @@ espera indefinida en ningún punto de la cadena.
 | Duración máxima del gate y motivo | tags de Sentry (`nodo-edu`) | El máximo observado ≤ presupuesto de D-A |
 | Proporción de 503 evitados *(solo si D-E = E1)* | tags de Sentry de la Fase 4 | Dato informativo, sin umbral |
 
+### Despliegue a producción — 2026-08-30 12:25 UTC
+
+Commit `63e6fb4`, deployment `dpl_JKSwyDaHK52xgoHiSH5Dn6zwgDJT` (`READY` en
+45 s, región `iad1`). Sin comandos de base de datos: el diff de `supabase/`
+contra `main` estaba vacío. Verificado tras publicar: `/login` responde `200`
+con su formulario (la conexión con Supabase funciona), y `/` y
+`/grupo-investigacion` redirigen a `/login` **sin** cabecera
+`X-Auth-Degraded` — es decir, el gate opera en modo normal y la excepción de
+E1 no se está aplicando, que es lo correcto con Auth sano.
+
+**La ventana de observación de 7 días arranca aquí: hasta el 2026-09-06.**
+
 ### Línea base ANTES del despliegue (2026-08-30 12:18 UTC)
 
 > Tomada de los runtime errors de Vercel con ventana de 24 h, para que la
