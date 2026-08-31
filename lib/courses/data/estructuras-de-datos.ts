@@ -227,36 +227,6 @@ export const estructurasDeDatos: Course = {
       topics: [],
     },
     {
-      id: "tipos-abstractos-de-datos-tad",
-      slug: "tipos-abstractos-de-datos-tad",
-      articleSlug: "tipos-abstractos-de-datos-tad",
-      order: 13,
-      title: "Tipos abstractos de datos (TAD)",
-      topics: [
-        { title: "Qué es un tipo abstracto de datos" },
-        { title: "Separación entre interfaz y representación interna" },
-        {
-          title:
-            "Panorama general de estructuras: arreglos, listas, pilas, colas, árboles, grafos, tablas hash",
-        },
-      ],
-    },
-    {
-      id: "criterios-de-seleccion-de-estructuras",
-      slug: "criterios-de-seleccion-de-estructuras",
-      articleSlug: "criterios-de-seleccion-de-estructuras",
-      order: 14,
-      title: "Criterios de selección de estructuras",
-      topics: [
-        { title: "Ventajas y desventajas de cada estructura de datos" },
-        {
-          title:
-            "Preguntas clave: ¿cómo se accede?, ¿con qué frecuencia se inserta o elimina?, ¿importa el orden?",
-        },
-        { title: "Relación entre el tipo de problema, los datos y la estructura adecuada" },
-      ],
-    },
-    {
       id: "notacion-big-o-y-analisis-de-complejidad",
       slug: "notacion-big-o-y-analisis-de-complejidad",
       articleSlug: "notacion-big-o-y-analisis-de-complejidad",
