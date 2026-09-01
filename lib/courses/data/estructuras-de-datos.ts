@@ -227,41 +227,13 @@ export const estructurasDeDatos: Course = {
       topics: [],
     },
     {
-      id: "tipos-abstractos-de-datos-tad",
-      slug: "tipos-abstractos-de-datos-tad",
-      articleSlug: "tipos-abstractos-de-datos-tad",
-      order: 13,
-      title: "Tipos abstractos de datos (TAD)",
-      topics: [
-        { title: "Qué es un tipo abstracto de datos" },
-        { title: "Separación entre interfaz y representación interna" },
-        {
-          title:
-            "Panorama general de estructuras: arreglos, listas, pilas, colas, árboles, grafos, tablas hash",
-        },
-      ],
-    },
-    {
-      id: "criterios-de-seleccion-de-estructuras",
-      slug: "criterios-de-seleccion-de-estructuras",
-      articleSlug: "criterios-de-seleccion-de-estructuras",
-      order: 14,
-      title: "Criterios de selección de estructuras",
-      topics: [
-        { title: "Ventajas y desventajas de cada estructura de datos" },
-        {
-          title:
-            "Preguntas clave: ¿cómo se accede?, ¿con qué frecuencia se inserta o elimina?, ¿importa el orden?",
-        },
-        { title: "Relación entre el tipo de problema, los datos y la estructura adecuada" },
-      ],
-    },
-    {
       id: "notacion-big-o-y-analisis-de-complejidad",
       slug: "notacion-big-o-y-analisis-de-complejidad",
       articleSlug: "notacion-big-o-y-analisis-de-complejidad",
       order: 15,
       title: "Notación Big O y análisis de complejidad",
+      summary:
+        "Por qué dos formas de buscar un cliente funcionan igual con 10 cuentas y una se vuelve inutilizable con 100.000 — Big O como herramienta para predecir el costo de un algoritmo antes de que el hardware te avise.",
       topics: [
         { title: "Complejidad temporal y espacial" },
         { title: "Notación Big O: definición e interpretación" },
@@ -290,6 +262,8 @@ export const estructurasDeDatos: Course = {
       articleSlug: "nodos-y-memoria-dinamica-en-java",
       order: 17,
       title: "Nodos y memoria dinámica en Java",
+      summary:
+        "Por qué un arreglo no alcanza cuando no sabes cuántos elementos vas a guardar, y cómo Nodo<T> y ListaSimple<T> resuelven ese problema encadenando objetos por referencia en el heap.",
       topics: [
         { title: "Gestión de memoria dinámica y referencias en Java" },
         { title: "Estructura de un nodo: dato y referencia al siguiente" },
