@@ -93,17 +93,6 @@ tiene en un punto concreto. Un algoritmo O(n) siempre termina ganándole a
 uno O(n²) a medida que `n` crece, sin importar qué tan rápido sea el
 procesador de cada uno.
 
-```mermaid
-xychart-beta
-    title "Operaciones ejecutadas segun el tamano de la entrada n"
-    x-axis [10, 100, 1000, 10000]
-    y-axis "Operaciones" 0 --> 10000
-    line [1, 1, 1, 1]
-    line [3, 7, 10, 13]
-    line [10, 100, 1000, 10000]
-    line [100, 10000, 1000000, 10000000]
-```
-
 La curva de abajo (constante) apenas se mueve; la de arriba (cuadrática) se
 dispara. Esa forma de la curva — no el valor exacto en `n = 10` — es lo que
 Big O compara.
@@ -131,10 +120,6 @@ notación Big O:
 > **Complejidad temporal y espacial:** el tiempo y la memoria que un
 > algoritmo consume, expresados como funciones del tamaño `n` de su
 > entrada, no como cantidades absolutas de segundos o bytes.
-
-Del arreglo de clientes: guardar `n` clientes siempre cuesta memoria O(n)
-—eso no cambia—, pero cuánto tiempo toma *encontrar* uno depende del
-algoritmo de búsqueda que elijas sobre ese mismo arreglo.
 
 ## Notación Big O: qué significa "cota superior"
 
@@ -241,49 +226,20 @@ el peor caso significa que el sistema del banco responde dentro de un
 límite conocido incluso el día en que la cuenta que se busca es,
 precisamente, la que no existe.
 
-## Reglas para simplificar: constantes y término dominante
-
-Contar operación por operación es tedioso y, además, innecesario: Big O
-solo le importa cómo crece el costo cuando `n` es grande, así que existen
-tres reglas para simplificar cualquier análisis:
-
-1. **Pasos secuenciales se suman.** Dos bucles uno detrás del otro, cada
-   uno O(n), dan O(n) + O(n) — no se multiplican.
-2. **Bucles anidados se multiplican.** Un bucle O(n) dentro de otro bucle
-   O(n) da O(n) × O(n) = O(n²).
-3. **Se descartan constantes y términos de menor orden.** O(2n + 5) se
-   simplifica a O(n); O(n² + n) se simplifica a O(n²) — el término que
-   domina cuando `n` crece es el único que importa.
-
-```mermaid
-flowchart LR
-  A["for cliente en clientes:\n  for tx en cliente.transacciones():\n    procesar(tx)"] --> B["Costo parcial:\nbucle externo n clientes\nbucle interno k transacciones c/u"]
-  B --> C["n * k operaciones\n(bucles anidados: se multiplican)"]
-  C --> D["Se descartan constantes\ny terminos menores"]
-  D --> E["O(n * k)\nsi k ~ n, queda O(n^2)"]
-```
-
-Recorrer la lista de clientes y, dentro de cada uno, su lista de
-transacciones, es exactamente ese patrón: un bucle anidado dentro de otro.
-Si el número de transacciones por cliente crece al mismo ritmo que el
-número de clientes, el costo total queda en O(n²) — el mismo orden que
-`hayTransaccionesDuplicadas` de la sección anterior, aunque el código se
-vea distinto.
-
 ## Tabla comparativa: el mapa de referencia del semestre
 
 Esta tabla se va a completar a lo largo del curso, a medida que cada
 estructura se estudie en detalle. Por ahora solo el arreglo está resuelto —
 es la única estructura que ya conoces en profundidad:
 
-| Estructura           | Acceso | Búsqueda | Inserción | Eliminación |
-|-----------------------|--------|----------|-----------|-------------|
-| Arreglo                | O(1)   | O(n)     | O(n)      | O(n)        |
-| Arreglo ordenado + búsqueda binaria | O(1) | O(log n) | O(n) | O(n) |
-| Lista enlazada         | *pendiente — semanas 5–6* | *pendiente* | *pendiente* | *pendiente* |
-| Pila                   | *pendiente — semana 8* | *pendiente* | *pendiente* | *pendiente* |
-| Cola                   | *pendiente — semana 9* | *pendiente* | *pendiente* | *pendiente* |
-| Árbol binario de búsqueda (BST) | *pendiente — semana 15* | *pendiente* | *pendiente* | *pendiente* |
+| Estructura                          | Acceso                    | Búsqueda    | Inserción   | Eliminación |
+| ----------------------------------- | ------------------------- | ----------- | ----------- | ----------- |
+| Arreglo                             | O(1)                      | O(n)        | O(n)        | O(n)        |
+| Arreglo ordenado + búsqueda binaria | O(1)                      | O(log n)    | O(n)        | O(n)        |
+| Lista enlazada                      | _pendiente — semanas 5–6_ | _pendiente_ | _pendiente_ | _pendiente_ |
+| Pila                                | _pendiente — semana 8_    | _pendiente_ | _pendiente_ | _pendiente_ |
+| Cola                                | _pendiente — semana 9_    | _pendiente_ | _pendiente_ | _pendiente_ |
+| Árbol binario de búsqueda (BST)     | _pendiente — semana 15_   | _pendiente_ | _pendiente_ | _pendiente_ |
 
 El arreglo tiene acceso O(1) por índice, pero cualquier búsqueda por valor
 —como buscar un cliente por número de cuenta sin conocer su posición— cuesta
