@@ -5,6 +5,53 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+## DEBT-077 — TC-054-012 no ejercitó directamente el rechazo por RLS
+
+**Origen:** test-054 (ronda de pruebas de la planilla de asistencia editable),
+ejecución de TC-054-012, 2026-09-06
+**Prioridad:** Baja — el aislamiento entre cursos se verificó por vía
+indirecta (S3 no aparece en la planilla de A, y su asistencia permaneció
+intacta tras el intento de acceso cruzado), no forzando directamente un
+intento de escritura con un `session_id` de otro curso
+
+El paso 2 de TC-054-012 (usar DevTools para sustituir el id de sesión al
+disparar la acción de marcar asistencia desde la planilla de A, apuntando a
+`sessionId_S3` del curso B) no se ejecutó por no ser viable de forma confiable
+vía automatización de navegador en esta ronda. Se verificó en su lugar la vía
+alternativa que el propio caso prevé (paso 3), confirmando el resultado
+observable pero no el mecanismo de rechazo (política RLS) en sí.
+
+**Acción:** En una ronda de pruebas futura (o como test automatizado cuando
+exista framework), ejercitar directamente el intento de escritura cross-curso
+—vía `fetch`/Server Action con `session_id` ajeno— y confirmar que Supabase
+rechaza la operación por RLS, no solo que el estado final es consistente.
+
+---
+
+## DEBT-076 — No existe endpoint/MCP para crear cursos académicos ni dar de alta docentes
+
+**Origen:** test-054 (ronda de pruebas de la planilla de asistencia editable),
+preparación de datos, 2026-09-06
+**Prioridad:** Media — bloquea la preparación de datos de prueba por API/MCP
+para cualquier spec que necesite un segundo curso o docente
+
+No existe ningún endpoint ni herramienta MCP para crear `academic_courses` ni
+para dar de alta un docente nuevo (rol `teacher`) — ambos requieren la UI
+(`/admin/courses/new`, y el rol se asigna a mano en `user_roles`). Al preparar
+`test-054-planilla-asistencia.md` esto obligó a crear ambos recursos vía
+SQL/Admin API directo contra el Supabase de desarrollo, con autorización
+explícita del usuario, en lugar de por API — desviación del protocolo estándar
+de "Pruebas manuales asistidas por Claude" (que solo contempla crear datos vía
+API/MCP).
+
+**Acción:** Evaluar si conviene un endpoint (`POST /api/courses` o similar) y/o
+una herramienta de escritura en `courses-mcp` para crear cursos académicos, y
+un mecanismo — endpoint o herramienta en `students-mcp`/nuevo MCP — para dar de
+alta un docente colaborador con su rol. Definir alcance junto con `@architect`
+antes de implementar (afecta autorización y RLS de `academic_courses`).
+
+---
+
 ## DEBT-075 — Reconciliar `overrides` locales de `AttendanceSheet` ante cambios de otra pestaña/sesión
 
 **Origen:** spec-054 (planilla de asistencia editable), revisión de `@reviewer`,

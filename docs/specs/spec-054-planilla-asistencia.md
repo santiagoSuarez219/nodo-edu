@@ -1,4 +1,4 @@
-# spec-054 — [TESTING] Planilla de asistencia editable en el panel del curso
+# spec-054 — [DONE] Planilla de asistencia editable en el panel del curso
 
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.
@@ -672,3 +672,17 @@ nadie pidió.
 
 - [x] Paquete (spec + pruebas) aprobado por el usuario
 - **Fecha de aprobación:** 2026-08-29
+
+## Cierre
+
+- **Ronda de pruebas manuales:** 2026-09-06, 17/17 casos aprobados (2 con
+  observaciones no bloqueantes: TC-054-010 y TC-054-015). Detalle en
+  `docs/testing/test-054-planilla-asistencia.md`.
+- **Pruebas automáticas:** no ejecutadas — framework de testing aún por
+  definir (ver CLAUDE.md → "Testing").
+- **Hallazgos fuera de alcance escalados:** DEBT-076 (sin endpoint/MCP para
+  crear cursos académicos ni dar de alta docentes) y DEBT-077 (TC-054-012 no
+  ejercitó directamente el rechazo por RLS) en `docs/specs/backlog.md`.
+- **Datos de prueba:** conservados a propósito como fixtures reutilizables
+  (decisión del usuario), documentados en CLAUDE.md → "Datos de prueba
+  reutilizables en desarrollo".
