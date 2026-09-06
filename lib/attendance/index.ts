@@ -4,8 +4,13 @@ import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
 import { createServerSupabaseClient } from '@/lib/auth/server';
+import { fetchStudentProfilesPublic } from '@/lib/enrollments/index';
 import type {
   AttendanceCountResult,
+  AttendanceSheetCell,
+  AttendanceSheetResult,
+  AttendanceSheetRow,
+  AttendanceSheetSession,
   ClassSession,
   MarkAttendanceResult,
   OpenSessionResult,
@@ -421,6 +426,156 @@ export async function markAttendanceByCode(
   } catch (err) {
     console.error('Error marking attendance:', err);
     return 'unavailable';
+  }
+}
+
+// spec-054: lectura de la planilla matriz estudiantes × sesiones del panel
+// del curso. Con `createServerSupabaseClient()` (sesión del docente) y no con
+// `createServiceSupabaseClient()` (D1): RLS —no una comprobación en código—
+// autoriza que solo el docente dueño o un admin vean estas filas.
+export async function getAttendanceSheet(
+  academicCourseId: string
+): Promise<AttendanceSheetResult> {
+  let supabase;
+  try {
+    supabase = await createServerSupabaseClient();
+  } catch (err) {
+    console.error('Error getting attendance sheet:', err);
+    return { status: 'unavailable' };
+  }
+
+  try {
+    const [{ data: sessions, error: sessionsError }, { data: enrollments, error: enrollmentsError }] =
+      await Promise.all([
+        supabase
+          .from('class_sessions')
+          .select('id, session_date, attendance_code, is_open')
+          .eq('academic_course_id', academicCourseId)
+          // Desempate por `created_at`: D13 admite dos sesiones el mismo día
+          // (dos bloques de clase), y solo `session_date` no da un orden
+          // determinista entre ellas.
+          .order('session_date', { ascending: true })
+          .order('created_at', { ascending: true }),
+        supabase
+          .from('enrollments')
+          .select('student_id')
+          .eq('academic_course_id', academicCourseId)
+          .eq('status', 'active')
+          .order('enrolled_at', { ascending: true }),
+      ]);
+
+    // D3: verificar el `error` de cada consulta antes de confiar en `data` —
+    // un curso sin sesiones o sin estudiantes activos es un array vacío
+    // legítimo, no un error.
+    if (sessionsError) throw sessionsError;
+    if (enrollmentsError) throw enrollmentsError;
+
+    const sessionIds = (sessions ?? []).map((s) => s.id as string);
+
+    // Hallazgo de @reviewer: PostgREST trunca en `max_rows` (1000 en el
+    // proyecto local — `supabase/config.toml`, no verificado contra el
+    // proyecto hosted de producción) sin devolver error. Sin paginar, un
+    // curso con suficientes sesiones y estudiantes puede perder registros en
+    // silencio y pintar presentes como ausentes — exactamente el fallo que D3
+    // prohíbe. Se pagina hasta recibir una página más corta que `PAGE_SIZE`
+    // (fin de datos). Esto SÍ depende de que `PAGE_SIZE <= max_rows` del
+    // servidor (si el servidor recortara por debajo de `PAGE_SIZE`, la
+    // primera página ya volvería corta y el bucle cortaría de más); se deja
+    // margen bajo el límite local conocido en vez de pedir exactamente 1000.
+    const PAGE_SIZE = 500;
+    const allRecords: Array<{
+      session_id: string;
+      student_id: string;
+      marked_at: string;
+      marked_by: string | null;
+    }> = [];
+
+    if (sessionIds.length > 0) {
+      let from = 0;
+      for (;;) {
+        const { data: page, error: pageError } = await supabase
+          .from('attendance_records')
+          .select('session_id, student_id, marked_at, marked_by')
+          .in('session_id', sessionIds)
+          // Segundo hallazgo de @reviewer: `session_id` solo no es un orden
+          // total (hay N registros por sesión) — entre dos páginas con
+          // `OFFSET` distinto, un empate reordenado o una fila insertada
+          // concurrentemente (un estudiante marcando justo mientras el
+          // docente mira la planilla) puede saltarse una fila. Se desempata
+          // por `student_id`, que junto con `session_id` sí es la clave única
+          // de la tabla (`attendance_records_unique`) y da un orden total.
+          .order('session_id', { ascending: true })
+          .order('student_id', { ascending: true })
+          .range(from, from + PAGE_SIZE - 1);
+
+        if (pageError) throw pageError;
+
+        allRecords.push(...((page ?? []) as typeof allRecords));
+        if (!page || page.length < PAGE_SIZE) break;
+        from += PAGE_SIZE;
+      }
+    }
+
+    // Conteo real por sesión, sin restringir a matrículas activas: es el que
+    // usa el modal de borrado (D11) — el `on delete cascade` se lleva también
+    // los registros de estudiantes retirados que D2 excluye de las filas.
+    const attendeeCountBySession = new Map<string, number>();
+    for (const r of allRecords) {
+      attendeeCountBySession.set(r.session_id, (attendeeCountBySession.get(r.session_id) ?? 0) + 1);
+    }
+
+    const sheetSessions: AttendanceSheetSession[] = (sessions ?? []).map((s) => ({
+      id: s.id as string,
+      session_date: s.session_date as string,
+      has_code: s.attendance_code !== null,
+      is_open: s.is_open as boolean,
+      attendee_count: attendeeCountBySession.get(s.id as string) ?? 0,
+    }));
+
+    const studentIds = (enrollments ?? []).map((e) => e.student_id as string);
+
+    if (studentIds.length === 0) {
+      return { status: 'ok', sessions: sheetSessions, rows: [] };
+    }
+
+    const profiles = await fetchStudentProfilesPublic(supabase, studentIds);
+
+    const recordByKey = new Map<string, (typeof allRecords)[number]>();
+    for (const r of allRecords) {
+      recordByKey.set(`${r.session_id}:${r.student_id}`, r);
+    }
+
+    // D2: las filas son las matrículas activas; la ausencia es la falta de
+    // registro — no se materializa ninguna fila de ausencia.
+    //
+    // Nota (hallazgo @reviewer): el % de asistencia NO se calcula aquí — vivía
+    // como `attendancePct` en un commit anterior, pero era código muerto: la
+    // UI (`AttendanceSheet.computePct`) tiene que recalcularlo de todas formas
+    // para incorporar el estado optimista de una celda recién marcada/desmarcada
+    // que aún no pasó por `revalidatePath`, así que un valor "de servidor" que
+    // nadie lee solo era ruido.
+    const rows: AttendanceSheetRow[] = studentIds.map((studentId) => {
+      const cells: Record<string, AttendanceSheetCell> = {};
+
+      for (const session of sheetSessions) {
+        const record = recordByKey.get(`${session.id}:${studentId}`);
+
+        cells[session.id] = record
+          ? { present: true, marked_at: record.marked_at, marked_manually: record.marked_by !== null }
+          : { present: false, marked_at: null, marked_manually: false };
+      }
+
+      return {
+        student_id: studentId,
+        student_name: profiles.get(studentId)?.full_name ?? 'Estudiante',
+        cells,
+      };
+    });
+
+    return { status: 'ok', sessions: sheetSessions, rows };
+  } catch (err) {
+    console.error('Error getting attendance sheet:', err);
+    return { status: 'unavailable' };
   }
 }
 

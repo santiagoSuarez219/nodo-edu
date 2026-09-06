@@ -34,7 +34,14 @@ type PanelAction = 'open' | 'close' | 'extend' | 'rotate';
 // (abrir sesión no tiene nada que confirmar).
 type ConfirmAction = 'close' | 'extend' | 'rotate' | null;
 
-function computeTimeRemaining(codeExpiresAt: string): string {
+function computeTimeRemaining(codeExpiresAt: string | null): string {
+  // spec-054 (D7): code_expires_at es null en una sesión registrada
+  // manualmente (sin código). Este panel solo opera sobre sesiones que
+  // openSession/extendSessionCode/rotateSessionCode acaban de escribir —
+  // esas tres siempre generan un código—, así que este caso es inalcanzable
+  // en la práctica; se trata como "expirado" por si acaso, nunca como vigente.
+  if (codeExpiresAt === null) return 'expirado';
+
   const diff = new Date(codeExpiresAt).getTime() - Date.now();
 
   if (diff <= 0) return 'expirado';

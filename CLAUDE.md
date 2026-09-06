@@ -202,7 +202,7 @@ npm run seed:teacher
 
 # Sembrar datos de dominio de desarrollo: cursos académicos + estudiantes
 # matriculados. Idempotente; aborta si la URL no es localhost.
-# Correr después de un `supabase db reset` en mirp-lab (ver "Base de datos").
+# Correr después de un `supabase db reset` en asus (ver "Base de datos").
 npm run seed:dev
 
 # Tests
@@ -245,11 +245,15 @@ npm run seed:dev
 > producción** (spec-026 quedó `[DONE]` con la app ya en producción real, lo
 > que hizo necesario dejar de probar directo ahí). `.env.local` apunta a una
 > instancia de Supabase local (`supabase start`) corriendo en la workstation
-> de laboratorio `mirp-lab` (host SSH configurado en `~/.ssh/config`,
-> `/home/sosagro4c/proyectos/nodo-dev-db/`), accesible desde esta Mac vía
-> túnel SSH. Los valores reales de producción quedaron respaldados en
-> `.env.local.prod-backup` (gitignorado). Ver "Base de datos" para el
-> procedimiento completo de arranque/reconexión.
+> `asus` (host SSH configurado en `~/.ssh/config`, vía túnel Cloudflare Access
+> — `~/services/nodo-dev-db/` en esa máquina), accesible desde esta Mac vía
+> túnel SSH sobre ese Access. Los valores reales de producción quedaron
+> respaldados en `.env.local.prod-backup` (gitignorado). Ver "Base de datos"
+> para el procedimiento completo de arranque/reconexión.
+> **Migración 2026-09-06:** el entorno de desarrollo vivía antes en
+> `mirp-lab`, dado de baja por caída persistente del túnel Cloudflare
+> (hostname dejó de resolver). Se migró a `asus`, que aloja además otros
+> servicios del usuario bajo `~/services/`.
 
 ---
 
@@ -267,19 +271,18 @@ npm run seed:dev
     requiere confirmación explícita del usuario antes de aplicar
     migraciones (ver "Acciones prohibidas"). Ver el recuadro de abajo sobre
     los flags del CLI.
-  - **Desarrollo:** instancia local (`supabase start`) en `mirp-lab`
-    (`/home/sosagro4c/proyectos/nodo-dev-db/`), con su propia copia de
-    `supabase/migrations/` sincronizada manualmente desde este repo (no
-    hay symlink ni CI que las mantenga alineadas — si agregás una
-    migración nueva acá, hay que `rsync`earla a `mirp-lab` y correr
-    `supabase db reset` allá para probarla antes de aplicarla a prod).
-    `.env.local` apunta acá por defecto.
-    **`mirp-lab` ya NO está enlazado a producción** (desenlazado el
-    2026-08-29, [[DEBT-073]]: es una workstation compartida del laboratorio
-    y no tiene por qué poder alcanzar la base real; su
-    `supabase/.temp/{project-ref,linked-project.json,pooler-url}` quedó
-    respaldado en `~/nodo-dev-db-unlink-backup-20260829/` de esa máquina).
-    No volver a enlazarla.
+  - **Desarrollo:** instancia local (`supabase start`) en `asus`
+    (`~/services/nodo-dev-db/`, junto a otros servicios del usuario en esa
+    misma workstation), con su propia copia de `supabase/migrations/`
+    sincronizada manualmente desde este repo (no hay symlink ni CI que las
+    mantenga alineadas — si agregás una migración nueva acá, hay que
+    `rsync`earla a `asus` y correr `supabase db reset` allá para probarla
+    antes de aplicarla a prod). `.env.local` apunta acá por defecto.
+    **Migración 2026-09-06:** el entorno de desarrollo vivía antes en
+    `mirp-lab`, dado de baja por caída persistente del túnel Cloudflare
+    (el hostname dejó de resolver). `mirp-lab` ya no estaba enlazado a
+    producción desde el 2026-08-29 ([[DEBT-073]]); esa preocupación no
+    aplica a `asus`, que nunca se enlazó a producción.
 
   > 🔴 **`supabase db reset` BORRA TODOS LOS DATOS de desarrollo.** Recrea el
   > volumen de Postgres desde cero: se pierden cursos, estudiantes,
@@ -299,25 +302,29 @@ npm run seed:dev
 
   **Para reconectar el entorno de desarrollo en una sesión nueva:**
   1. Túnel SSH (si no está activo —
-     `pgrep -f "ssh.*-L 54321.*mirp-lab"` para chequear):
+     `pgrep -f "ssh.*-L 54321.*asus"` para chequear). El host `asus` en
+     `~/.ssh/config` ya resuelve vía Cloudflare Access (`cloudflared access
+     ssh --hostname ...` como `ProxyCommand`), así que basta:
      ```bash
      ssh -f -N -L 54321:localhost:54321 -L 54322:localhost:54322 \
-       -L 54323:localhost:54323 -L 54324:localhost:54324 mirp-lab
+       -L 54323:localhost:54323 -L 54324:localhost:54324 asus
      ```
-  2. Confirmar que el stack sigue corriendo en `mirp-lab` (si se reinició la
+  2. Confirmar que el stack sigue corriendo en `asus` (si se reinició la
      máquina, hay que levantarlo de nuevo):
      ```bash
-     ssh mirp-lab "cd /home/sosagro4c/proyectos/nodo-dev-db && \
-       NODE_OPTIONS='--dns-result-order=ipv4first' npx supabase status"
+     ssh asus "cd ~/services/nodo-dev-db && \
+       export NVM_DIR=\$HOME/.nvm && . \$NVM_DIR/nvm.sh && npx supabase status"
      # si no está corriendo:
-     ssh mirp-lab "cd /home/sosagro4c/proyectos/nodo-dev-db && \
-       NODE_OPTIONS='--dns-result-order=ipv4first' npx supabase start"
+     ssh asus "cd ~/services/nodo-dev-db && \
+       export NVM_DIR=\$HOME/.nvm && . \$NVM_DIR/nvm.sh && npx supabase start"
      ```
   3. `.env.local` ya apunta a `http://localhost:54321` vía el túnel — solo
      hace falta que `npm run dev` esté corriendo (reiniciarlo si venía de
      antes de este cambio, para que recargue el `.env.local` nuevo).
   4. Docente de desarrollo ya sembrado: `dev@nodo.local` / `DevLocal2026!`
-     (`npm run seed:teacher` para recrearlo si se resetea la base).
+     (`npm run seed:teacher` para recrearlo si se resetea la base; su UUID
+     actual vive en `QUESTION_BANK_AGENT_TEACHER_ID` de `.env.local` y
+     cambia cada vez que se resiembra desde cero).
   5. Datos de dominio de desarrollo (cursos académicos + estudiantes
      matriculados): `npm run seed:dev` — idempotente, se puede correr las
      veces que haga falta. Siembra un `academic_course` por cada curso de
@@ -326,7 +333,7 @@ npm run seed:dev
      `DevStudent2026!`). Aborta si `NEXT_PUBLIC_SUPABASE_URL` no es
      localhost, para no sembrar datos ficticios en producción.
   > ⚠️ **Nota de mantenimiento del CLI:** esta instancia local (CLI
-  > `2.111.0`) no otorgó automáticamente los `GRANT`s estándar de
+  > `2.116.0`) tampoco otorgó automáticamente los `GRANT`s estándar de
   > `anon`/`authenticated`/`service_role` sobre `public` al aplicar las
   > migraciones desde cero — tuvieron que ejecutarse a mano
   > (`GRANT ALL ON ALL TABLES/SEQUENCES/FUNCTIONS IN SCHEMA public TO
@@ -350,8 +357,33 @@ npm run seed:dev
   `20260717000001_init_assignment_questions_legacy_table.sql` con el DDL real
   extraído de producción, y se marcaron como aplicadas allá con
   `supabase migration repair` (no ejecutan DDL en producción). Verificado:
-  `db reset` en `mirp-lab` produce un esquema idéntico al de producción.
+  `db reset` en el entorno de desarrollo produce un esquema idéntico al de
+  producción.
   Ver `docs/specs/backlog.md`.
+
+---
+
+## Datos de prueba reutilizables en desarrollo
+
+> Fixtures creados durante la ronda de pruebas de spec-054, conservados a
+> propósito (decisión del usuario, 2026-09-06) para que futuros specs los
+> reutilicen sin tener que volver a montarlos. Viven **solo** en el Supabase
+> de desarrollo (`asus`, ver "Base de datos") — nunca en producción.
+
+| Recurso | Identificador | Notas |
+|---------|---------------|-------|
+| Curso "Test-054 Curso A" | `65a0bad9-16a8-4c27-bec6-3e097f6055fc` | Docente: `dev@nodo.local`. `course_slug: analisis-de-algoritmos`. 2 estudiantes activos (Ana, Bruno), Carla retirada. Varias sesiones de asistencia históricas. |
+| Curso "Test-054 Curso B" | `98e1d74e-8bc9-426d-9a3c-ce8b8d846c2c` | Docente: el docente secundario de abajo. `course_slug: analisis-de-algoritmos`. Ana también matriculada aquí. |
+| Curso "Test-054 Curso Vacío" | `bdf3ca64-adbe-4c6b-915e-91e7e9c575d0` | Docente: `dev@nodo.local`. Sin `course_slug`. Sin estudiantes activos; usado para probar estados vacíos. |
+| Docente secundario | `docente2.test054@nodo.local` / `Test054Docente2!` (id `491cce48-1e07-4eb8-a871-46f3be29f58b`) | Rol `teacher`. Dueño del Curso B. Creado vía Admin API directo (no hay endpoint de alta de docentes, ver DEBT-076). |
+| Estudiante "Ana Gómez" | `ana.gomez.test054@nodo.local` / `Test054Ana!` (id `4af748bf-01d7-469e-bfe1-cacb91249de5`) | Activa en Curso A y Curso B. |
+| Estudiante "Bruno Díaz" | `bruno.diaz.test054@nodo.local` / `Test054Bruno!` (id `02021ec2-2116-4c16-830b-2c31b22ef257`) | Activo en Curso A. |
+| Estudiante "Carla Ruiz" | `carla.ruiz.test054@nodo.local` / `Test054Carla!` (id `8363e1c1-2c61-4fab-95bb-bf25aa780f38`) | **Retirada** del Curso A (útil para probar flujos de estudiante retirado). |
+
+Detalle completo de qué se creó y con qué precondición en
+`docs/testing/test-054-planilla-asistencia.md` → "Datos de prueba". Si un
+spec futuro necesita limpiarlos, pedir confirmación explícita antes de
+borrarlos — no son datos huérfanos, son fixtures a propósito.
 
 ---
 
@@ -912,7 +944,7 @@ inesperado, lentitud, detalle visual… o "sin observaciones"}}
 - Leer el archivo `test-NNN-slug.md` completo e identificar las precondiciones
   de cada caso antes de crear nada.
 - Confirmar con el usuario el **entorno** contra el que se trabajará. Por
-  defecto, desarrollo (`.env.local` → instancia local en `mirp-lab`, ver
+  defecto, desarrollo (`.env.local` → instancia local en `asus`, ver
   "Base de datos"). **Nunca crear datos de prueba en producción** sin
   confirmación explícita en esa misma sesión — desde el 2026-07-31 sí existen
   entornos separados, pero la confirmación de alcance sigue aplicando igual:
@@ -1227,7 +1259,7 @@ Claude **nunca** debe:
   dejando datos de prueba sin eliminar.
 - Borrar archivos o carpetas (salvo temporales generados por la propia tarea).
 - Ejecutar migraciones de base de datos en entornos distintos al local.
-- **Ejecutar `supabase db reset` (en `mirp-lab` o donde sea) sin avisar
+- **Ejecutar `supabase db reset` (en `asus` o donde sea) sin avisar
   antes**: borra todos los datos de desarrollo — cursos, estudiantes,
   matrículas, preguntas y progreso ([[DEBT-072]]). Si hay una ronda de
   pruebas manuales en curso, la deja sin sus precondiciones a mitad de
@@ -1235,8 +1267,9 @@ Claude **nunca** debe:
 - **Ejecutar `supabase db push --linked` sin haber corrido antes
   `--dry-run` y mostrado su salida al usuario**: `--linked` es
   **producción** y el comando no lo dice ([[DEBT-073]]).
-- **Volver a enlazar `mirp-lab` a producción** (`supabase link` en esa
-  máquina): se desenlazó a propósito por ser una workstation compartida.
+- **Enlazar `asus` (o cualquier workstation de desarrollo compartida) a
+  producción** (`supabase link` en esa máquina): solo la Mac debe estar
+  enlazada; ver la nota histórica sobre `mirp-lab` en "Base de datos".
 - Hacer push a `main` o `development` directamente.
 - Modificar variables de entorno de producción.
 - Instalar dependencias nuevas sin mencionarlo y esperar confirmación.

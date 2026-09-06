@@ -14,7 +14,8 @@ interface SessionWithAttendance {
   id: string;
   session_date: string;
   is_open: boolean;
-  code_expires_at: string;
+  // spec-054 (D7): null en una sesión registrada manualmente, sin código.
+  code_expires_at: string | null;
   attendee_count: number;
   created_at: string;
 }
@@ -91,7 +92,7 @@ export async function getServiceSessions(
       id: row.id as string,
       session_date: row.session_date as string,
       is_open: row.is_open as boolean,
-      code_expires_at: row.code_expires_at as string,
+      code_expires_at: row.code_expires_at as string | null,
       attendee_count: attendanceRecords?.[0]?.count ?? 0,
       created_at: row.created_at as string,
     };
@@ -161,7 +162,7 @@ export async function getServiceSessionAttendance(
       id: session.id as string,
       academic_course_id: session.academic_course_id as string,
       session_date: session.session_date as string,
-      code_expires_at: session.code_expires_at as string,
+      code_expires_at: session.code_expires_at as string | null,
       is_open: session.is_open as boolean,
       created_at: session.created_at as string,
       updated_at: session.updated_at as string,
