@@ -38,7 +38,7 @@ método para pasar de la recurrencia a una fórmula cerrada, algo que puedas
 evaluar directamente y comparar contra otras funciones de tiempo. Esta
 lección es ese método — en realidad, tres métodos distintos, que conducen al
 mismo resultado por caminos independientes. Es el contenido del capítulo 4
-de Cormen, *Introduction to Algorithms*, dedicado enteramente a recurrencias
+de Cormen, _Introduction to Algorithms_, dedicado enteramente a recurrencias
 y divide y vencerás.
 
 ## Planteamiento de una recurrencia
@@ -113,11 +113,6 @@ concreta:
 4. **Verificar que la desigualdad se sostiene**: el resultado es exactamente
    $T(n) \le c\,n\log n$, la misma forma de la hipótesis. La inducción se
    cierra.
-5. **Caso base:** elegir `n_0` lo bastante grande para que la desigualdad
-   valga también ahí (para `n = 1`, $\log n = 0$ y la hipótesis exigiría
-   $T(1) \le 0$, que es falso salvo que `T(1) = 0`; por eso se elige un
-   $n_0 \ge 2$ donde el caso base sí se cumple con una constante `c`
-   suficientemente grande).
 
 Con la hipótesis demostrada por inducción, $T(n) = O(n\log n)$. El mismo
 procedimiento, invirtiendo la desigualdad, demuestra $T(n) = \Omega(n\log n)$
@@ -263,11 +258,11 @@ mide al final.
 
 ## Resumen operativo
 
-| Método | Cuándo usarlo | Qué necesita | Limitación principal |
-| --- | --- | --- | --- |
-| Sustitución | Cuando ya tienes una sospecha fundamentada de la solución | Adivinar la forma correcta antes de empezar | Si la conjetura inicial es incorrecta, la inducción no cierra y hay que reintentar |
-| Árbol de recursión | Cuando no sabes qué conjeturar y necesitas generarla | Dibujar y sumar el costo de cada nivel | Es intuitivo pero informal — conviene verificar el resultado con sustitución después |
-| Método maestro | Cuando la recurrencia tiene la forma exacta `aT(n/b) + f(n)` y quieres una respuesta rápida | Comparar `f(n)` contra $n^{\log_b a}$ | No cubre todas las formas de `f(n)`, en particular cuando no es polinomialmente comparable con $n^{\log_b a}$ |
+| Método             | Cuándo usarlo                                                                               | Qué necesita                                | Limitación principal                                                                                          |
+| ------------------ | ------------------------------------------------------------------------------------------- | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| Sustitución        | Cuando ya tienes una sospecha fundamentada de la solución                                   | Adivinar la forma correcta antes de empezar | Si la conjetura inicial es incorrecta, la inducción no cierra y hay que reintentar                            |
+| Árbol de recursión | Cuando no sabes qué conjeturar y necesitas generarla                                        | Dibujar y sumar el costo de cada nivel      | Es intuitivo pero informal — conviene verificar el resultado con sustitución después                          |
+| Método maestro     | Cuando la recurrencia tiene la forma exacta `aT(n/b) + f(n)` y quieres una respuesta rápida | Comparar `f(n)` contra $n^{\log_b a}$       | No cubre todas las formas de `f(n)`, en particular cuando no es polinomialmente comparable con $n^{\log_b a}$ |
 
 ## Síntesis
 
