@@ -1,12 +1,22 @@
 > Sesión T1, Semana 6 — desarrollo en vivo del docente sobre el caso de
 > referencia del Sistema Bancario. Continúa directo sobre `ListaSimple<T>`
 > tal como quedó al cierre de la Semana 5 (constructor, `estaVacia()`,
-> `getTamano()`): hoy se agregan las cinco operaciones de la lección teórica
-> — `insertarInicio`, `insertarFinal`, `insertarEnPosicion`, `buscarPorIndice`
-> y `buscarPorValor` — y se instancia con `Transaccion` en vez de `String`,
-> para que el ejemplo se vea con el tipo real del proyecto. Esta sesión no
-> tiene laboratorio propio — la `P` de esta semana (`ListaDoble<T>` y
-> `ListaCircular<T>`) es una práctica distinta, fuera de esta ronda.
+> `getTamano()`, `recorrerEImprimir()`): hoy se agregan las cinco operaciones
+> de la lección teórica — `insertarInicio`, `insertarFinal`,
+> `insertarEnPosicion`, `buscarPorIndice` y `buscarPorValor` — y se instancia
+> con `Transaccion` en vez de `String`, para que el ejemplo se vea con el
+> tipo real del proyecto. Esta sesión no tiene laboratorio propio — la `P`
+> de esta semana (`ListaDoble<T>` y `ListaCircular<T>`) es una práctica
+> distinta, fuera de esta ronda.
+>
+> ⚠️ **Antes de empezar, renombra en el proyecto del estudiante**: la sesión
+> práctica de la Semana 5 dejó un método `insertarAlFinal(T dato)` en
+> `ListaSimple<T>` con el mismo cuerpo que el `insertarFinal(T dato)` de hoy
+> — es la misma operación, solo con otro nombre. Antes de escribir el Paso 2,
+> pide al estudiante que **renombre** `insertarAlFinal` a `insertarFinal`
+> (y ajuste las llamadas que ya tenga en su propio `Main`), en vez de agregar
+> un segundo método duplicado. La lección teórica publicada usa `insertarFinal`
+> como nombre definitivo.
 
 ## Paso 0 — La clase `Transaccion` para el ejemplo
 
@@ -17,6 +27,8 @@ estructura genérica.
 
 ```java
 package model.domain;
+
+import java.util.Objects;
 
 public class Transaccion {
     private String tipo;   // "Deposito", "Retiro" o "Transferencia"
@@ -52,7 +64,17 @@ public class Transaccion {
             return false;
         }
         Transaccion t = (Transaccion) otro;
-        return tipo.equals(t.tipo) && Double.compare(monto, t.monto) == 0;
+        // Objects.equals en vez de tipo.equals(t.tipo): evita NullPointerException
+        // si algun dia "tipo" llega null (por ejemplo, un registro incompleto)
+        return Objects.equals(tipo, t.tipo) && Double.compare(monto, t.monto) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+        // obligatorio junto con equals(): dos objetos "iguales" deben devolver
+        // el mismo hash, o la clase rompe su contrato con cualquier coleccion
+        // que use tablas hash (HashSet, HashMap) mas adelante en el curso
+        return Objects.hash(tipo, monto);
     }
 }
 ```
@@ -61,6 +83,13 @@ Punto a resaltar: `equals()` está sobrescrito **a propósito**, siguiendo
 exactamente la advertencia de la lección teórica. Sin este método,
 `buscarPorValor()` compila y corre, pero nunca encuentra nada salvo que se
 le pase la referencia exacta que ya estaba guardada.
+
+Punto a resaltar: `hashCode()` se sobrescribe **siempre junto con**
+`equals()`, aunque `ListaSimple<T>` no lo use todavía — es el contrato de
+`Object` (Java lo documenta explícitamente): dos objetos que `equals()`
+considera iguales deben devolver el mismo `hashCode()`. Vale la pena
+mencionarlo ahora, antes de que el curso llegue a tablas hash, para que el
+estudiante no arrastre el hábito de sobrescribir uno sin el otro.
 
 ## Paso 1 — Insertar al inicio: `insertarInicio`
 
@@ -256,11 +285,13 @@ Explicación línea a línea:
 - El `while` usa `actual != null` como condición de corte, no un contador:
   no se sabe de antemano cuántos nodos hay que recorrer.
 - `actual.getDato().equals(dato)` — nótese el orden: se llama `equals()`
-  **sobre el dato del nodo**, pasándole el dato buscado como argumento. Con
-  la sobrescritura del `Paso 0`, ambos órdenes dan el mismo resultado, pero
-  conviene fijar la convención (`elementoDeLaLista.equals(elementoBuscado)`)
-  para evitar un `NullPointerException` si algún día `dato` llega `null` y
-  `actual.getDato()` no.
+  **sobre el dato del nodo**, pasándole el dato buscado como argumento. Esto
+  evita un `NullPointerException` cuando `dato` (el argumento buscado) es
+  `null` y `actual.getDato()` no lo es. Pero si algún nodo llegara a guardar
+  un dato `null` (`actual.getDato()` nulo), esta línea sí revienta: en ese
+  caso conviene `Objects.equals(actual.getDato(), dato)`, que es seguro en
+  ambos sentidos — vale la pena mencionarlo si algún estudiante pregunta por
+  el caso.
 - El `return true` dentro del `if` corta el recorrido apenas hay
   coincidencia — no sigue avanzando innecesariamente.
 - Si el `while` termina sin haber retornado, es porque `actual` llegó a
@@ -352,6 +383,6 @@ otro.
 - *"¿Qué pasaría si `buscarPorValor` no cortara con `return true` apenas
   encuentra la coincidencia, sino que siguiera recorriendo hasta el final
   de la lista?"* — Respuesta esperada: el resultado sería el mismo (sigue
-  devolviendo `true` si existe), pero el costo en el mejor caso dejaría de
-  ser posible ganar tiempo cuando la coincidencia está cerca del `head`: se
-  volvería siempre O(n) en vez de O(1) en el mejor caso y O(n) en el peor.
+  devolviendo `true` si existe), pero se perdería la posibilidad de ganar
+  tiempo cuando la coincidencia está cerca del `head`: en vez de O(1) en el
+  mejor caso y O(n) en el peor, el método pasaría a ser siempre O(n).

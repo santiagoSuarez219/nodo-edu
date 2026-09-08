@@ -232,7 +232,7 @@ Sesión T2 (lista doble/circular) y la Sesión P (lab `ListaDoble<T>` /
 ### Etapas y aprobaciones
 
 | Etapa | Resultado | Aprobada por el usuario |
----|---|---|
+|---|---|---|
 | E0 · Arranque | Árbol limpio, rama `feat/semana-06-estructuras-de-datos-operaciones-lista-simple` creada desde `development` | ✅ |
 | E2 · Plan de lección | Aprobado sin ajustes en la primera propuesta | ✅ |
 | E3 · Lección `.mdx` + registro TS | `operaciones-sobre-la-lista-simple`, `order: 18` — aprobada sin ajustes | ✅ |
@@ -282,14 +282,34 @@ No aplica — la Semana 6 de `estructuras-de-datos` no lleva `★`.
   método que no coincide con lo que el estudiante ve en la lección
   publicada.
 
+**Hallazgos de `@reviewer` (1.ª pasada, `CAMBIOS REQUERIDOS`) y su resolución:**
+
+| # | Severidad | Hallazgo | Resolución |
+|---|---|---|---|
+| 1 | 🔴 Bloqueante | La lección `.mdx` no tiene diagramas Mermaid | **Confirmado por el usuario como decisión deliberada** — se dejan fuera a propósito en esta lección, no es un olvido |
+| 2 | 🔴 Bloqueante | La bitácora afirmaba haber cumplido el checklist de diagramas | Corregido: ver nota en "Verificación (E7)" abajo |
+| 3 | 🟠 Mayor | Los apuntes creaban `insertarFinal()` sin resolver la colisión con `insertarAlFinal()` de la Semana 5 (mismo cuerpo, otro nombre) | Corregido: nota explícita al inicio de los apuntes para renombrar `insertarAlFinal` → `insertarFinal` en el proyecto del estudiante antes del Paso 2 |
+| 4 | 🟠 Mayor | El estado inicial declarado de `ListaSimple<T>` en los apuntes omitía `recorrerEImprimir()`, que el Paso 6 sí usa | Corregido: agregado a la lista del estado inicial |
+| 5 | 🟠 Mayor | `Transaccion` sobrescribía `equals()` sin `hashCode()` | Corregido: `hashCode()` agregado con `Objects.hash(...)`, con nota explicando el contrato de `Object` |
+| 6 | 🟡 Menor | `tipo.equals(t.tipo)` no era null-safe | Corregido: `Objects.equals(tipo, t.tipo)` |
+| 7 | 🟡 Menor | `actual.getDato().equals(dato)` en `buscarPorValor` puede lanzar NPE si un nodo guarda `null` | Explicación ampliada en los apuntes (código de la lección publicada sin cambios — el reviewer lo marcó como menor, no bloqueante) |
+| 8 | 🟡 Menor | Pregunta socrática #3 mal redactada (agramatical) | Reescrita |
+| 9 | 🟡 Menor | Tabla rota en esta misma bitácora (línea 235) | Corregida |
+
 ### Verificación (E7)
 
 - [x] `npm run build` en verde
 - [x] `npm run lint` en verde (0 errores, 10 advertencias preexistentes sin relación)
-- [x] Checklist de `lesson-authoring` §8 recorrido (sin `# H1`, sin `###`,
-  sin placeholders, `updatedAt` de hoy, `summary` en frontmatter y TS)
+- [x] Checklist de `lesson-authoring` §8 recorrido — **excepción deliberada**:
+  sin diagramas Mermaid, decisión explícita del usuario tras la 1.ª pasada de
+  `@reviewer`, no un incumplimiento. El resto del checklist (sin `# H1`, sin
+  `###`, sin placeholders, `updatedAt` de hoy, `summary` en frontmatter y TS)
+  se cumple.
 - [x] `summary` presente en frontmatter **y** en registro TS
 - [x] Coherencia cruzada: las 6 preguntas cubren exactamente las 5
   operaciones y la tabla de complejidad de la lección; apuntes consistentes
-  con el código del `.mdx` tras la corrección
-- [ ] `@reviewer`: pendiente (E9)
+  con el código del `.mdx` tras las correcciones
+- [x] `@reviewer`: 1.ª pasada `CAMBIOS REQUERIDOS` (2 bloqueantes, 3 mayores,
+  4 menores) — bloqueante de diagramas aceptado como decisión del usuario;
+  el resto corregido en la misma rama, sin nueva pasada de `@reviewer`
+  solicitada
