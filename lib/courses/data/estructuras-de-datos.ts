@@ -242,21 +242,6 @@ export const estructurasDeDatos: Course = {
       ],
     },
     {
-      id: "comparacion-de-estructuras-por-eficiencia",
-      slug: "comparacion-de-estructuras-por-eficiencia",
-      articleSlug: "comparacion-de-estructuras-por-eficiencia",
-      order: 16,
-      title: "Comparación de estructuras por eficiencia",
-      topics: [
-        {
-          title:
-            "Tabla comparativa de operaciones (acceso, búsqueda, inserción, eliminación) por estructura",
-        },
-        { title: "Cuándo determina la eficiencia la elección de una estructura" },
-        { title: "Conexión entre Big O y las decisiones de diseño del curso" },
-      ],
-    },
-    {
       id: "nodos-y-memoria-dinamica-en-java",
       slug: "nodos-y-memoria-dinamica-en-java",
       articleSlug: "nodos-y-memoria-dinamica-en-java",
