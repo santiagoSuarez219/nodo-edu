@@ -276,6 +276,8 @@ export const estructurasDeDatos: Course = {
       articleSlug: "operaciones-sobre-la-lista-simple",
       order: 18,
       title: "Operaciones sobre la lista simple",
+      summary:
+        "Cómo insertar y buscar en ListaSimple<Transaccion> reasignando referencias en vez de mover memoria, y por qué cada operación paga un costo distinto según dónde toca la cadena.",
       topics: [
         { title: "Inserción al inicio, al final y en posición arbitraria" },
         { title: "Búsqueda por valor y por índice" },
