@@ -200,8 +200,96 @@ pusheó a remoto).
 
 ## Pendientes
 
-- Proponer el cuestionario de cierre de la Semana 6 (E5).
-- Diseñar la Sesión P de la Semana 6 (Laboratorio evaluativo 1, ★, 15%) en
-  una ronda futura.
+- Proponer el cuestionario de cierre de la Semana 6 (E5) — *nota: se refiere
+  a la Semana 6 de `analisis-de-algoritmos`, ver ronda arriba. La Semana 6 de
+  `estructuras-de-datos` sí tiene su cuestionario, ver ronda abajo.*
+- Diseñar la Sesión P de la Semana 6 de `analisis-de-algoritmos` (Laboratorio
+  evaluativo 1, ★, 15%) en una ronda futura.
 - Decidir en qué apunte futuro se resuelve la discrepancia de alcance con
   `microdiseno/info.md` (Semana 3 P) anotada en `semana-05.md`.
+- Despliegue a producción de la ronda `estructuras-de-datos` de abajo:
+  pendiente de confirmación del usuario.
+
+---
+
+## Ronda — `estructuras-de-datos` (2026-09-08)
+
+**Alcance confirmado por el usuario:** Semana 6 (8–11 sep 2026), **solo
+Sesión T1** (Operaciones sobre la lista simple — inserción, búsqueda,
+complejidad). El cronograma agrupa T1 con eliminación y comparación con
+arreglos, pero el usuario acotó el alcance a la lección `order: 18` ya
+existente; la lección `order: 19` ("Eliminación en lista simple y
+comparación con arreglos") queda explícitamente fuera de esta ronda. La
+Sesión T2 (lista doble/circular) y la Sesión P (lab `ListaDoble<T>` /
+`ListaCircular<T>`) tampoco están en alcance.
+
+### Sesiones cubiertas
+
+| Sesión | Fecha | Tema | ★/◇ |
+|---|---|---|---|
+| T1 | 8 sep (hoy) | Operaciones sobre la lista simple: inserción (inicio, final, posición arbitraria), búsqueda (por índice, por valor), análisis de complejidad | — |
+
+### Etapas y aprobaciones
+
+| Etapa | Resultado | Aprobada por el usuario |
+---|---|---|
+| E0 · Arranque | Árbol limpio, rama `feat/semana-06-estructuras-de-datos-operaciones-lista-simple` creada desde `development` | ✅ |
+| E2 · Plan de lección | Aprobado sin ajustes en la primera propuesta | ✅ |
+| E3 · Lección `.mdx` + registro TS | `operaciones-sobre-la-lista-simple`, `order: 18` — aprobada sin ajustes | ✅ |
+| E4 · Apuntes del docente | Pedidos explícitamente; producidos y corregidos (ver Decisiones) | ✅ |
+| E5 · Cuestionario de cierre | Propuesto: 6 preguntas → aprobadas 6 | ✅ |
+| E6 · Guía del estudiante | No aplica — sin sesión práctica en el alcance de esta ronda | — |
+| E6 · Quiz A/B/C | No aplica — Semana 6 sin `★` | — |
+
+### Artefactos producidos
+
+| Artefacto | Ruta | Publicado |
+|---|---|---|
+| Lección teórica | `content/cursos/estructuras-de-datos/operaciones-sobre-la-lista-simple.mdx` | ✅ (en `development`, pendiente de deploy) |
+| Registro TS | `lib/courses/data/estructuras-de-datos.ts` (`order: 18`) | — |
+| Apunte de clase | `content/cursos/estructuras-de-datos/apuntes/operaciones-sobre-la-lista-simple.md` | Solo owner/admin (en `development`) |
+| Guía del estudiante | — | No aplica |
+
+### Cuestionario de cierre
+
+| Lección | Entorno | IDs de preguntas | Publicadas | Montadas (`list_lesson_questions`) |
+|---|---|---|---|---|
+| `operaciones-sobre-la-lista-simple` | desarrollo | `baa2a3c1-d505-4bba-a639-e8318e7e036e`, `c27f20cd-267e-4efe-b244-948b69594497`, `d974dcd7-3ec6-4889-9029-2232259af15a`, `c2781397-adb6-42ca-94e4-55d42b177ea6`, `e0c86ef6-4e27-4f1b-bdc2-e0787b40f0af`, `b308244c-3d38-4425-9ac8-77fdfeef777b` | ✅ | ✅ (orden 0-5) |
+| `operaciones-sobre-la-lista-simple` | **producción** | — | ⬜ | ⬜ |
+
+> Keyword nueva creada en desarrollo: `complejidad` (kind: `tema`). Las
+> preguntas **no viajan con el deploy**: pendiente de replicar en producción
+> en D3 cuando se despliegue esta ronda.
+
+### Quiz calificable A/B/C
+
+No aplica — la Semana 6 de `estructuras-de-datos` no lleva `★`.
+
+### Decisiones tomadas por Claude en nombre del docente
+
+> Todo lo que se resolvió sin preguntar y el usuario debería poder revertir.
+
+- **Apuntes del docente corregidos antes de mostrarlos**: el primer borrador
+  de `@lab-designer` asumía que `insertarAlFinal()` ya existía con ese
+  nombre desde la sesión anterior (Semana 5) y delegaba en él sin escribir
+  su código. La lección `.mdx` ya aprobada introduce el mismo método como
+  código **nuevo** de esta sesión, con el nombre `insertarFinal()` (la
+  Semana 5 solo lo había mostrado en un demo privado de sus apuntes, nunca
+  en la lección publicada). Reescribí el Paso 2 de los apuntes con el
+  código completo de `insertarFinal()` tal como aparece en el `.mdx`,
+  corregí la delegación en `insertarEnPosicion()` y renuméré los pasos (0 a
+  6) — **motivo:** evitar que el docente proyecte en clase un nombre de
+  método que no coincide con lo que el estudiante ve en la lección
+  publicada.
+
+### Verificación (E7)
+
+- [x] `npm run build` en verde
+- [x] `npm run lint` en verde (0 errores, 10 advertencias preexistentes sin relación)
+- [x] Checklist de `lesson-authoring` §8 recorrido (sin `# H1`, sin `###`,
+  sin placeholders, `updatedAt` de hoy, `summary` en frontmatter y TS)
+- [x] `summary` presente en frontmatter **y** en registro TS
+- [x] Coherencia cruzada: las 6 preguntas cubren exactamente las 5
+  operaciones y la tabla de complejidad de la lección; apuntes consistentes
+  con el código del `.mdx` tras la corrección
+- [ ] `@reviewer`: pendiente (E9)

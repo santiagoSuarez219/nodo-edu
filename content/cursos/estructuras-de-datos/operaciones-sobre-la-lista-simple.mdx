@@ -1,5 +1,243 @@
 ---
 title: "Operaciones sobre la lista simple"
-summary: ""
-updatedAt: 2026-07-18
+course: "Estructura de Datos"
+course_code: "ED"
+level: "Primeros semestres"
+type: "Apuntes teóricos"
+language: "Java 21"
+difficulty: "Básico"
+estimated_time: "50 minutos de clase (sesión T1, Semana 6)"
+presentation: true
+slides_hint: "Cada sección ## es una diapositiva. Presentación sincrona."
+date: "2026-09-08"
+author: "Asistente de Docencia"
+summary: "Cómo insertar y buscar en ListaSimple<Transaccion> reasignando referencias en vez de mover memoria, y por qué cada operación paga un costo distinto según dónde toca la cadena."
+updatedAt: "2026-09-08"
 ---
+
+## El problema: una lista que no hace nada todavía
+
+`ListaSimple<Transaccion>` ya existe: guarda `head`, cuenta su `tamano` y
+sabe responder `estaVacia()`. Pero si la instancias ahora mismo, te quedas
+con una cáscara vacía para siempre — no hay forma de meterle una transacción
+nueva ni de preguntarle si una transacción ya está adentro. Tienes la
+estructura, no el comportamiento.
+
+Eso es exactamente lo que falta hoy: los métodos que reciben un dato y lo
+enlazan en la cadena de nodos, y los métodos que recorren esa cadena para
+encontrar algo. Sin ellos, `Nodo<T>` y `ListaSimple<T>` son solo dos clases
+declaradas — no una colección que puedas usar.
+
+## Insertar al inicio: el caso más simple
+
+**Situación:** llega la transacción más reciente de una cuenta y quieres que
+el historial la muestre primero. No hay que tocar ningún nodo existente —
+solo hace falta que la lista "empiece" un lugar antes de donde empezaba.
+
+**En la práctica**, el nuevo nodo se crea apuntando al `head` actual, y
+después el `head` se reasigna para que apunte al nuevo nodo. El orden de
+esas dos líneas importa: si reasignas `head` primero, pierdes la única
+referencia que tenías al resto de la cadena.
+
+```java
+public void insertarInicio(T dato) {
+    Nodo<T> nuevo = new Nodo<>(dato);
+    nuevo.setSiguiente(head); // el nuevo nodo apunta a lo que hoy es el primero
+    head = nuevo;             // la lista ahora empieza en el nuevo nodo
+    tamano++;
+}
+```
+
+No importa cuántos nodos tenga ya la lista: crear el nodo y reasignar dos
+referencias cuesta lo mismo con 3 transacciones que con 3.000. Esta operación
+es lo que te permite llevar el historial más reciente arriba sin reescribir
+nada de lo que ya estaba guardado.
+
+## Insertar al final: hay que llegar hasta el último nodo
+
+**Situación:** ahora quieres que el historial se lea en el orden en que
+ocurrieron las transacciones — la más vieja primero. Insertar al final no
+es tan directo: no tienes una referencia guardada al último nodo, solo al
+primero.
+
+**En la práctica**, hay que recorrer la cadena nodo por nodo hasta encontrar
+uno cuyo `siguiente` sea `null` — ese es el último — y enlazar ahí el nodo
+nuevo. El único caso que hay que resolver aparte es la lista vacía: ahí no
+hay "último nodo" que recorrer, el nuevo nodo se convierte directamente en
+`head`.
+
+```java
+public void insertarFinal(T dato) {
+    Nodo<T> nuevo = new Nodo<>(dato);
+    if (estaVacia()) {
+        head = nuevo; // no hay nodos que recorrer: el nuevo es el primero y el ultimo
+    } else {
+        Nodo<T> actual = head;
+        while (actual.getSiguiente() != null) {
+            actual = actual.getSiguiente(); // avanza hasta el ultimo nodo
+        }
+        actual.setSiguiente(nuevo); // enlaza el nuevo despues del ultimo
+    }
+    tamano++;
+}
+```
+
+A diferencia de `insertarInicio()`, aquí el costo depende de cuántos nodos
+ya tiene la lista: para llegar al último hay que pasar por todos los
+anteriores. Esa diferencia entre "tocar el principio" y "tocar el final" es
+la primera pista de que no todas las operaciones de la lista cuestan lo
+mismo.
+
+## Insertar en una posición arbitraria
+
+**Situación:** un reporte necesita insertar una transacción de ajuste justo
+después de la tercera del historial, sin importar si eso es el inicio, el
+final o cualquier punto intermedio.
+
+**En la práctica**, insertar en la posición `indice` significa llegar hasta
+el nodo que hoy está **antes** de esa posición y reenlazarlo: su `siguiente`
+pasa a ser el nodo nuevo, y el nodo nuevo apunta a quien antes ocupaba esa
+posición. `insertarInicio()` e `insertarFinal()` son en realidad los dos
+casos extremos de esta misma operación — por eso conviene delegarles el
+trabajo cuando el índice cae en los bordes.
+
+```java
+public void insertarEnPosicion(int indice, T dato) {
+    if (indice < 0 || indice > tamano) {
+        throw new IndexOutOfBoundsException("Indice fuera de rango: " + indice);
+    }
+    if (indice == 0) {
+        insertarInicio(dato);
+        return;
+    }
+    if (indice == tamano) {
+        insertarFinal(dato);
+        return;
+    }
+    Nodo<T> anterior = head;
+    for (int i = 0; i < indice - 1; i++) {
+        anterior = anterior.getSiguiente(); // avanza hasta el nodo previo a "indice"
+    }
+    Nodo<T> nuevo = new Nodo<>(dato);
+    nuevo.setSiguiente(anterior.getSiguiente()); // el nuevo apunta a lo que seguia
+    anterior.setSiguiente(nuevo);                // el anterior ahora apunta al nuevo
+    tamano++;
+}
+```
+
+El orden de las dos reasignaciones no es arbitrario: si conectas primero
+`anterior` con el nuevo nodo, pierdes la referencia a lo que seguía y ya no
+puedes completar el enlace. Reenlazar en el orden correcto es lo que
+convierte "insertar en cualquier parte" en una operación de solo reescribir
+referencias, sin desplazar ningún nodo existente.
+
+## Búsqueda por índice
+
+**Situación:** necesitas mostrar la transacción número 5 del historial de
+una cuenta, tal como aparece en pantalla — por su posición, no por su
+contenido.
+
+**En la práctica**, no hay atajo: para llegar a la posición `indice` hay
+que recorrer la cadena desde `head`, avanzando un nodo por cada paso,
+contando cuántos llevas. La lista no tiene "casillas" como un arreglo —
+solo referencias que hay que seguir una por una.
+
+```java
+public T buscarPorIndice(int indice) {
+    if (indice < 0 || indice >= tamano) {
+        throw new IndexOutOfBoundsException("Indice fuera de rango: " + indice);
+    }
+    Nodo<T> actual = head;
+    for (int i = 0; i < indice; i++) {
+        actual = actual.getSiguiente(); // avanza un nodo por cada paso contado
+    }
+    return actual.getDato();
+}
+```
+
+La validación de rango va primero porque recorrer sin ella puede terminar
+intentando avanzar desde un nodo que ya es `null`, lo que revienta con
+`NullPointerException` en vez de un mensaje claro sobre el índice inválido.
+
+## Búsqueda por valor
+
+**Situación:** ahora el dato que tienes no es una posición, es la
+transacción misma — quieres saber si un depósito específico ya está
+registrado en el historial, sin conocer en qué lugar quedó.
+
+**En la práctica**, se recorre la lista comparando el dato de cada nodo con
+el que buscas, usando `equals()` en vez de contar posiciones. Es la
+diferencia central con `buscarPorIndice()`: ahí sabías dónde parar de
+antemano (el contador llega a `indice`); aquí no sabes cuántos nodos vas a
+recorrer hasta encontrar una coincidencia — o hasta comprobar que no existe.
+
+```java
+public boolean buscarPorValor(T dato) {
+    Nodo<T> actual = head;
+    while (actual != null) {
+        if (actual.getDato().equals(dato)) {
+            return true; // encontrado: no hace falta seguir recorriendo
+        }
+        actual = actual.getSiguiente();
+    }
+    return false; // se recorrio toda la lista sin encontrar coincidencia
+}
+```
+
+`equals()` en `Transaccion` decide qué significa que dos transacciones sean
+"la misma" — por defecto, Java compara referencias, así que si quieres
+comparar por contenido (mismo tipo, mismo monto, misma fecha) hay que
+sobrescribirlo en esa clase. Sin eso, `buscarPorValor()` solo encuentra el
+objeto exacto que ya tenías guardado, nunca uno "equivalente".
+
+## Análisis de complejidad de cada operación
+
+Con la notación Big O de la semana anterior, cada operación que acabas de
+escribir tiene un costo distinto según **dónde** toca la cadena. Insertar en
+el `head` no depende de cuántos nodos haya — es **O(1)**. Todo lo que
+requiere recorrer nodos antes de actuar sí depende de `n`, el tamaño de la
+lista, y es **O(n)**.
+
+| Operación            | Complejidad | Por qué                                                                  |
+| -------------------- | ----------- | ------------------------------------------------------------------------ |
+| `insertarInicio`     | **O(1)**    | Crea un nodo y reasigna dos referencias, sin recorrer nada               |
+| `insertarFinal`      | **O(n)**    | Recorre hasta el último nodo antes de enlazar                            |
+| `insertarEnPosicion` | **O(n)**    | En el peor caso (índice cercano al final) recorre `n - 1` nodos          |
+| `buscarPorIndice`    | **O(n)**    | Avanza un nodo por cada posición hasta llegar al índice                  |
+| `buscarPorValor`     | **O(n)**    | En el peor caso compara con todos los nodos antes de decidir que no está |
+
+La brecha entre `insertarInicio()` y las demás operaciones no es un detalle
+menor: en una lista con miles de transacciones, insertar al inicio sigue
+costando lo mismo que con diez, mientras que buscar por valor puede terminar
+recorriendo la cadena entera.
+
+## Resumen operativo
+
+| Operación            | Firma                                         | Precondición               | Complejidad |
+| -------------------- | --------------------------------------------- | -------------------------- | ----------- |
+| Insertar al inicio   | `void insertarInicio(T dato)`                 | Ninguna                    | O(1)        |
+| Insertar al final    | `void insertarFinal(T dato)`                  | Ninguna                    | O(n)        |
+| Insertar en posición | `void insertarEnPosicion(int indice, T dato)` | `0 <= indice <= tamano`    | O(n)        |
+| Buscar por índice    | `T buscarPorIndice(int indice)`               | `0 <= indice < tamano`     | O(n)        |
+| Buscar por valor     | `boolean buscarPorValor(T dato)`              | `equals()` definido en `T` | O(n)        |
+
+## Síntesis
+
+- `insertarInicio()` reasigna `head` y el `siguiente` del nuevo nodo, sin
+  recorrer nada: es la única operación de esta lección que no depende de
+  `n`.
+- `insertarFinal()` recorre hasta el nodo con `siguiente == null` y maneja
+  aparte el caso de lista vacía.
+- `insertarEnPosicion()` generaliza las dos anteriores: localiza el nodo
+  previo al índice y reenlaza en el orden correcto para no perder el resto
+  de la cadena.
+- `buscarPorIndice()` cuenta pasos hasta llegar a una posición;
+  `buscarPorValor()` compara contenido con `equals()` hasta encontrar una
+  coincidencia o agotar la lista — son búsquedas con criterios distintos.
+- Solo `insertarInicio()` es O(1); todas las demás son O(n) porque exigen
+  recorrer nodos antes de actuar.
+
+Esa asimetría de costos —barata al inicio, cara en cualquier otro punto— es
+el hilo que sigue abierto: falta ver qué pasa cuando la operación es
+eliminar en vez de insertar, y qué tan distinto es todo esto frente a un
+arreglo.
