@@ -93,6 +93,17 @@ export const programacionCientifica: Course = {
       ],
     },
     {
+      id: "taller-evaluativo-01-python-y-estructuras-de-datos",
+      slug: "taller-evaluativo-01-python-y-estructuras-de-datos",
+      articleSlug: "taller-evaluativo-01-python-y-estructuras-de-datos",
+      kind: "guide",
+      order: 4.5,
+      title: "Taller evaluativo 01 — Python y estructuras de datos",
+      summary:
+        "Momento evaluativo 1 (15 %): nueve ejercicios que integran variables, condicionales, bucles y estructuras nativas sobre la serie de mediciones de PM2.5 de una red de monitoreo de calidad del aire, con limpieza de datos faltantes y estadística descriptiva sin librerías.",
+      topics: [],
+    },
+    {
       id: "funciones",
       slug: "funciones",
       articleSlug: "funciones",
