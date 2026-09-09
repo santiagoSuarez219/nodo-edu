@@ -33,7 +33,7 @@ Competencias esperadas:
 - Representar registros heterogéneos con listas, tuplas y diccionarios,
   eligiendo la estructura correcta para cada caso.
 - Documentar cada ejercicio en celdas de texto y entregar el notebook en
-  GitHub con el Flujo A.
+  GitHub.
 
 ## Contexto: la red de monitoreo
 
