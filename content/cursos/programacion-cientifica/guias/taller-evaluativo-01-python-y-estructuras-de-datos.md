@@ -305,9 +305,7 @@ estaciones lanzarán `KeyError`.
 ## Entregable
 
 Suba su notebook a la carpeta `ejercicios/` de su repositorio
-`curso-programacion-cientifica`, usando `Archivo → Guardar una copia en
-GitHub` (Flujo A), igual que en los talleres anteriores. No se usan comandos
-de Git en este taller.
+`curso-programacion-cientifica`.
 
 Nombre exacto del archivo: `taller-evaluativo-01-calidad-del-aire.ipynb`.
 
@@ -382,9 +380,6 @@ Ejemplo: un notebook que obtiene **86 de 100** puntos saca **4.3** en la
 escala de 0 a 5 y aporta **12.9 %** de los 15 % que vale este momento
 evaluativo.
 
-Las "Extensiones Sugeridas (Bonus)" del final de esta guía **no suman
-puntos**: el máximo del taller son los 100 puntos de la tabla.
-
 ## Dificultades Comunes
 
 ### "Mi promedio da un número negativo enorme"
@@ -414,40 +409,4 @@ puntos**: el máximo del taller son los 100 puntos de la tabla.
   anteriores o de celdas ejecutadas en desorden. Ejecute siempre
   `Reiniciar y ejecutar todas` antes de entregar: así se va a calificar.
 
-## Extensiones Sugeridas (Bonus)
-
-Estas extensiones **no suman puntos** dentro de los 100 del taller; son para
-quien ya tenga los nueve ejercicios resueltos y quiera ir más allá.
-
-- **Mediana sin librerías:** ordene `lecturas_validas` con `sort()` y calcule
-  la mediana de la serie, distinguiendo con un `if` el caso de cantidad par
-  (promedio de los dos valores centrales) del de cantidad impar.
-- **Detección de valores atípicos:** marque como atípica toda lectura que se
-  aleje del promedio más de dos desviaciones estándar, y construya con
-  comprensión de listas la lista de las que sí lo son.
-- **Ranking de estaciones:** construya, a partir de `registros_estaciones`,
-  una lista de tuplas `(promedio, codigo)`, ordénela con `sort()` y muestre
-  cuál estación tuvo la peor calidad del aire de la campaña.
-- **Serie suavizada:** construya una lista nueva donde cada elemento sea el
-  promedio de tres lecturas consecutivas de `lecturas_validas` (media móvil),
-  recorriendo con `range()` y slicing.
-- **Cobertura de la campaña:** calcule qué porcentaje de las lecturas
-  descargadas quedó inutilizable por fallas del sensor, y clasifique con
-  `if` / `elif` / `else` la campaña como "aceptable" (menos del 10 % perdido),
-  "cuestionable" o "inválida" (más del 25 % perdido).
-
-## Recursos
-
-- **Apuntes del curso:** lecciones "Variables, tipos de datos y operadores",
-  "Condicionales y bucles" y "Estructuras de datos nativas".
-- **Talleres previos:** "Taller de variables, tipos de datos y operadores" y
-  "Taller de condicionales y bucles".
-- **Repaso del Flujo A:** lección "Configuración del entorno de trabajo
-  (Colab y GitHub) y diagnóstico".
-- **Entorno de trabajo:** Google Colab (`colab.research.google.com`), sin
-  instalación local y sin librerías externas.
-- **Documentación oficial:** secciones de tipos numéricos, sentencias de
-  control de flujo y estructuras de datos de la documentación de Python 3.
-
-**Plazo de entrega:** jueves 17 de septiembre de 2026, 11:59 p. m. Se
-califica el estado del archivo en GitHub a esa hora.
+**Plazo de entrega:** jueves 17 de septiembre de 2026.
