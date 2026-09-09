@@ -14,7 +14,7 @@ updatedAt: "2026-09-08"
 
 Integrar en un solo notebook todo lo visto en las lecciones **"Variables,
 tipos de datos y operadores"**, **"Condicionales y bucles"** y
-**"Estructuras de datos nativas"**, resolviendo once ejercicios sobre un
+**"Estructuras de datos nativas"**, resolviendo nueve ejercicios sobre un
 problema real de programación científica: el **procesamiento de la serie de
 mediciones de material particulado (PM2.5) de una red de monitoreo de
 calidad del aire**.
@@ -30,9 +30,8 @@ Competencias esperadas:
   acumulando sumas, contadores y extremos.
 - Calcular estadísticas descriptivas (promedio, mínimo, máximo, rango y
   desviación estándar) con bucles, sin librerías.
-- Representar registros heterogéneos con listas, tuplas, diccionarios y
-  conjuntos, eligiendo la estructura correcta para cada caso.
-- Construir listas derivadas con comprensión de listas.
+- Representar registros heterogéneos con listas, tuplas y diccionarios,
+  eligiendo la estructura correcta para cada caso.
 - Documentar cada ejercicio en celdas de texto y entregar el notebook en
   GitHub con el Flujo A.
 
@@ -67,7 +66,7 @@ se usa en todo el taller es esta:
 
 ## Desarrollo del Taller
 
-El taller tiene **once ejercicios**, en orden creciente de dificultad, que
+El taller tiene **nueve ejercicios**, en orden creciente de dificultad, que
 se resuelven todos en el **mismo notebook** y en el orden en que aparecen:
 varios reutilizan variables construidas en ejercicios anteriores. Cada
 ejercicio debe ir precedido por una celda de texto que explique qué hace, y
@@ -303,69 +302,6 @@ registros_estaciones = [
 valor por defecto: si usa acceso directo con corchetes, dos de las tres
 estaciones lanzarán `KeyError`.
 
-### Ejercicio 10 — Estaciones que superaron el umbral
-
-El laboratorio entrega dos reportes crudos con las estaciones que superaron
-el umbral de alerta. Vienen con estaciones repetidas, porque cada superación
-horaria quedó registrada por separado:
-
-```text
-supero_martes = ["EST-02", "EST-04", "EST-02", "EST-05"]
-supero_miercoles = ["EST-02", "EST-03", "EST-05", "EST-05", "EST-06"]
-```
-
-```python
-# TODO: declare las dos listas de arriba
-# TODO: conviértalas a conjuntos: estaciones_martes y estaciones_miercoles
-# TODO: muestre con print() cuántas estaciones distintas superaron el umbral
-#       cada día
-# TODO: el laboratorio reporta tarde que "EST-07" también superó el umbral
-#       el martes: agréguela al conjunto del martes con add
-# TODO: calcule con la unión el conjunto de estaciones que superaron el
-#       umbral al menos uno de los dos días, y muéstrelo
-# TODO: calcule con la intersección el conjunto de estaciones que lo
-#       superaron los dos días, y muéstrelo
-# TODO: muestre con print() cuántas estaciones hay en cada uno de esos dos
-#       conjuntos
-```
-
-**Requisitos:** la eliminación de duplicados debe salir de la conversión a
-conjunto, no de un bucle que revise si el elemento ya estaba. Use los
-operadores de unión (`|`) e intersección (`&`).
-
-### Ejercicio 11 — Reporte final de la campaña
-
-Cierre el taller construyendo el reporte, reutilizando `lecturas_validas` y
-`lecturas_pm25` del Ejercicio 6.
-
-```python
-# TODO: use una comprensión de listas para construir lecturas_en_mg,
-#       dividiendo cada lectura válida entre factor_conversion
-# TODO: use una comprensión de listas con condición para construir
-#       lecturas_criticas, con las lecturas válidas mayores a 35.4
-# TODO: muestre ambas listas y la cantidad de lecturas críticas con print()
-
-# TODO: declare el diccionario conteo_categorias con las cuatro categorías
-#       de la escala como claves y 0 como valor inicial de cada una
-# TODO: recorra lecturas_validas con un for y clasifique cada lectura con la
-#       misma cadena if / elif / else del Ejercicio 5
-# TODO: dentro del for, incremente en 1 el valor de la categoría
-#       correspondiente dentro de conteo_categorias
-# TODO: recorra conteo_categorias con items() y muestre cada categoría con
-#       su conteo
-
-# TODO: recorra lecturas_pm25 (la lista original, con centinelas) usando for
-#       con range(len(...)), para tener disponible el índice
-# TODO: dentro del for, cuando encuentre la primera lectura mayor a 55.4,
-#       muestre con print() ese índice y esa lectura como el inicio del
-#       episodio crítico, y corte el recorrido con break
-```
-
-**Requisitos:** las dos primeras listas deben construirse con comprensión de
-listas, en una sola línea cada una, no con `for` más `append`. El conteo por
-categoría debe quedar en un **diccionario**, no en cuatro contadores
-sueltos. El `break` debe ejecutarse exactamente una vez.
-
 ## Entregable
 
 Suba su notebook a la carpeta `ejercicios/` de su repositorio
@@ -389,7 +325,7 @@ curso-programacion-cientifica/
 Su notebook debe contener, en este orden:
 1. Una celda de texto con el título del taller, su nombre completo y la
    fecha.
-2. Los once ejercicios completos, en el orden de esta guía, cada uno
+2. Los nueve ejercicios completos, en el orden de esta guía, cada uno
    precedido por una celda de texto que explique qué hace.
 3. La celda de verificación final (abajo), sin modificar.
 
@@ -415,9 +351,6 @@ assert len(lecturas_validas) == 10, "deberían quedar 10 lecturas válidas"
 assert lecturas_descartadas == 2, "deberían descartarse 2 centinelas"
 assert abs(promedio_pm25 - 22.55) < 0.01, "revise el promedio del Ejercicio 6"
 assert maximo_pm25 == 58.3 and minimo_pm25 == 7.5, "revise los extremos"
-assert type(estaciones_martes) == set, "estaciones_martes debería ser un set"
-assert len(lecturas_criticas) == 3, "revise el filtro de lecturas críticas"
-assert sum(conteo_categorias.values()) == 10, "el conteo debe cubrir las 10 válidas"
 print("Verificación completada sin errores.")
 ```
 
@@ -429,13 +362,12 @@ se convierte después a la escala institucional de 0 a 5.
 
 | Criterio | Puntos | Descripción |
 |---|---|---|
-| **Variables, tipos y operadores (Ej. 1 a 4)** | 15 | Las siete variables del Ejercicio 1 tienen el tipo exacto pedido, verificado con `type()`; la conversión de unidades y los tres errores del Ejercicio 2 salen de operadores (no de valores escritos a mano); el Ejercicio 3 usa solo `//` y `%`; el Ejercicio 4 produce los tres booleanos correctos usando `and` y `not`, sin ningún `if`. |
+| **Variables, tipos y operadores (Ej. 1 a 4)** | 20 | Las siete variables del Ejercicio 1 tienen el tipo exacto pedido, verificado con `type()`; la conversión de unidades y los tres errores del Ejercicio 2 salen de operadores (no de valores escritos a mano); el Ejercicio 3 usa solo `//` y `%`; el Ejercicio 4 produce los tres booleanos correctos usando `and` y `not`, sin ningún `if`. |
 | **Condicionales y clasificación (Ej. 5)** | 15 | La cadena `if` / `elif` / `else` clasifica correctamente en las cuatro categorías de la escala, en orden creciente de umbral, y devuelve "Dañina para grupos sensibles" para la lectura de 41.8. Ninguna concentración queda sin categoría ni en dos a la vez. |
-| **Bucles, acumuladores y control de flujo (Ej. 6 a 8)** | 20 | El Ejercicio 6 descarta los dos centinelas con `continue` y obtiene 10 lecturas válidas y promedio 22.55; el Ejercicio 7 obtiene máximo 58.3, mínimo 7.5 y la desviación con dos recorridos y sin `max()`, `min()` ni `sum()`; el Ejercicio 8 usa `while`, actualiza la variable de la condición y termina. |
-| **Estructuras de datos nativas (Ej. 9 y 10)** | 20 | El Ejercicio 9 accede a los diccionarios por clave, desempaqueta la tupla de coordenadas en dos variables y obtiene la humedad con `get` y su valor por defecto sin lanzar `KeyError`; el Ejercicio 10 elimina duplicados con conversión a conjunto, agrega "EST-07" con `add` y calcula unión e intersección con `|` y `&`. |
-| **Comprensión de listas y reporte final (Ej. 11)** | 10 | Las dos listas derivadas se construyen con comprensión de listas en una línea cada una; el conteo por categoría queda en un diccionario con las cuatro claves y suma 10; el `break` corta el recorrido en la primera lectura mayor a 55.4. |
+| **Bucles, acumuladores y control de flujo (Ej. 6 a 8)** | 30 | El Ejercicio 6 descarta los dos centinelas con `continue` y obtiene 10 lecturas válidas y promedio 22.55; el Ejercicio 7 obtiene máximo 58.3, mínimo 7.5 y la desviación con dos recorridos y sin `max()`, `min()` ni `sum()`; el Ejercicio 8 usa `while`, actualiza la variable de la condición y termina. |
+| **Estructuras de datos nativas (Ej. 9)** | 15 | El Ejercicio 9 accede a los diccionarios por clave, desempaqueta la tupla de coordenadas en dos variables y obtiene la humedad con `get` y su valor por defecto sin lanzar `KeyError`. |
 | **Ejecución sin errores** | 10 | El notebook corre completo con `Reiniciar y ejecutar todas` sin ningún error, sin bucles que no terminen, y la celda de verificación imprime "Verificación completada sin errores." |
-| **Documentación en celdas de texto** | 5 | Cada uno de los once ejercicios tiene una celda de texto previa que explica qué hace, y las variables usan nombres significativos en `snake_case`. |
+| **Documentación en celdas de texto** | 5 | Cada uno de los nueve ejercicios tiene una celda de texto previa que explica qué hace, y las variables usan nombres significativos en `snake_case`. |
 | **Entrega correcta** | 5 | El notebook está en `ejercicios/` del repositorio del curso, con el nombre de archivo exacto indicado, subido con Flujo A y visible en GitHub antes del plazo. |
 | **TOTAL** | **100** | |
 
@@ -477,18 +409,6 @@ puntos**: el máximo del taller son los 100 puntos de la tabla.
   falla; `get` con un valor por defecto devuelve ese valor en su lugar sin
   lanzar error. Es exactamente el caso para el que existe `get`.
 
-### "Mi conjunto no conserva el orden de la lista original"
-- No lo va a conservar: un conjunto **no tiene orden**, tampoco es
-  indexable. Si necesita mostrarlo ordenado, conviértalo de nuevo a lista y
-  ordénela; para lo que pide el Ejercicio 10 basta con la cantidad de
-  elementos y los operadores de conjunto.
-
-### "Mi comprensión de listas me devuelve `None`"
-- Probablemente escribió dentro de la comprensión una operación que no
-  devuelve valor (por ejemplo un `append`). La comprensión se arma con la
-  **expresión** que produce cada elemento nuevo, no con una instrucción que
-  modifica otra lista.
-
 ### "El notebook funciona, pero al reiniciar el entorno falla"
 - Está dependiendo de variables que quedaron en memoria de ejecuciones
   anteriores o de celdas ejecutadas en desorden. Ejecute siempre
@@ -497,7 +417,7 @@ puntos**: el máximo del taller son los 100 puntos de la tabla.
 ## Extensiones Sugeridas (Bonus)
 
 Estas extensiones **no suman puntos** dentro de los 100 del taller; son para
-quien ya tenga los once ejercicios resueltos y quiera ir más allá.
+quien ya tenga los nueve ejercicios resueltos y quiera ir más allá.
 
 - **Mediana sin librerías:** ordene `lecturas_validas` con `sort()` y calcule
   la mediana de la serie, distinguiendo con un `if` el caso de cantidad par
