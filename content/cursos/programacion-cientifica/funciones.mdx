@@ -51,7 +51,8 @@ lecturas_ug_nuevo = []
 for valor in lecturas_sensor_nuevo_mg:
     lecturas_ug_nuevo.append(valor * 1000)
 
-# celda 2: convierte las lecturas de otro sensor de campo (copiado y pegado)
+# celda 2: convierte las lecturas de otro sensor de campo que llego despues (copiado y pegado)
+lecturas_sensor_campo = [0.018, 0.022]
 lecturas_ug_campo = []
 for valor in lecturas_sensor_campo:
     lecturas_ug_campo.append(valor * 1000)
@@ -78,7 +79,7 @@ print(directo, convertida)
 15.2 8.4
 ```
 
-`valor` y `unidad` son los **parámetros**: los datos que la función necesita para trabajar. `unidad="mg/m3"` es un **valor por defecto** — si no lo indicas al llamar la función, asume que la lectura viene del sensor de campo (el caso más común en la red) y la convierte. `return` entrega el resultado de vuelta a quien llamó la función, para que puedas guardarlo en una variable o usarlo en la siguiente línea.
+`valor` y `unidad` son los **parámetros**: los datos que la función necesita para trabajar. `unidad="mg/m3"` es un **valor por defecto** — si no lo indicas al llamar la función, asume que la lectura viene de un sensor de campo sin integrar todavía a la red (el caso que motivó la función) y la convierte. `return` entrega el resultado de vuelta a quien llamó la función, para que puedas guardarlo en una variable o usarlo en la siguiente línea.
 
 ```mermaid
 flowchart LR
@@ -110,7 +111,7 @@ None
 
 Si una función solo tiene `print` y ninguna otra parte del programa necesita su resultado, está bien — pero en cuanto quieras encadenar esa transformación con otra (filtrar, clasificar, promediar), necesitas `return`.
 
-> **Función:** bloque de código con nombre que recibe parámetros, ejecuta un cuerpo, y opcionalmente `return`a un valor. Se define una vez con `def` y se reutiliza tantas veces como haga falta, con datos distintos cada vez.
+> **Función:** bloque de código con nombre que recibe parámetros, ejecuta un cuerpo, y opcionalmente devuelve un valor con `return`. Se define una vez con `def` y se reutiliza tantas veces como haga falta, con datos distintos cada vez.
 
 Con `convertir_a_microgramos` definida una sola vez, las celdas del problema de entrada se reducen a una llamada por sensor: `convertir_a_microgramos(valor)`, sin repetir la constante de conversión.
 
@@ -134,13 +135,14 @@ flowchart LR
   A["[0.0084, 0.0127, 0.0152]"] -->|"map(convertir_a_microgramos, lista)"| B["[8.4, 12.7, 15.2]"]
 ```
 
-`filter` resuelve el problema complementario: quedarte solo con las lecturas que cumplen una condición. Por ejemplo, las que superan la categoría Moderada (más de 35.4 µg/m³):
+`filter` resuelve el problema complementario: quedarte solo con las lecturas que cumplen una condición. Junta las lecturas de las estaciones Norte y Centro y quédate solo con las que superan la categoría Moderada (más de 35.4 µg/m³):
 
 ```python
 def supera_moderada(valor):
     return valor > 35.4
 
-lecturas_criticas = filter(supera_moderada, registros_estaciones[1]["lecturas"])
+lecturas_norte_y_centro = registros_estaciones[0]["lecturas"] + registros_estaciones[1]["lecturas"]
+lecturas_criticas = filter(supera_moderada, lecturas_norte_y_centro)
 print(list(lecturas_criticas))
 ```
 
@@ -148,10 +150,12 @@ print(list(lecturas_criticas))
 [41.8, 58.3, 36.1]
 ```
 
+De las seis lecturas originales (`[8.4, 12.7, 15.2, 41.8, 58.3, 36.1]`), `filter` descartó las tres primeras — son de la estación Norte, dentro de la categoría Moderada — y conservó solo las de Centro, que sí superan el umbral.
+
 Cuando la condición cabe en una línea, no siempre vale la pena definirle un nombre con `def`. Python permite escribirla directamente dentro de `filter` con `lambda`:
 
 ```python
-lecturas_criticas = filter(lambda valor: valor > 35.4, registros_estaciones[1]["lecturas"])
+lecturas_criticas = filter(lambda valor: valor > 35.4, lecturas_norte_y_centro)
 print(list(lecturas_criticas))
 ```
 
@@ -166,15 +170,13 @@ print(list(lecturas_criticas))
 Ya conocías la comprensión de listas para hacer esto mismo. La diferencia es de forma, no de resultado:
 
 ```python
-lecturas_est02 = registros_estaciones[1]["lecturas"]
-
 # con map/filter
 lecturas_ug = list(map(convertir_a_microgramos, lecturas_sensor_nuevo_mg))
-criticas = list(filter(lambda v: v > 35.4, lecturas_est02))
+criticas = list(filter(lambda v: v > 35.4, lecturas_norte_y_centro))
 
 # equivalente con comprension de listas
 lecturas_ug = [convertir_a_microgramos(v) for v in lecturas_sensor_nuevo_mg]
-criticas = [v for v in lecturas_est02 if v > 35.4]
+criticas = [v for v in lecturas_norte_y_centro if v > 35.4]
 ```
 
 Ambas formas son válidas; en Python, la comprensión de listas suele preferirse por legibilidad, pero `map`/`filter` aparecen en mucho código existente y conviene reconocerlos.
@@ -243,7 +245,7 @@ Criterios concretos para las funciones que escribas de aquí en adelante:
 - **Una función, una transformación.** `convertir_a_microgramos` convierte; no debería además clasificar la lectura ni imprimir un reporte. Si notas que una función hace tres cosas, probablemente son tres funciones.
 - **El nombre describe qué hace, con un verbo.** `convertir_a_microgramos`, `supera_moderada`, `calcular_promedio_estacion` — no `procesar` o `funcion1`, que no dicen nada sin leer el cuerpo.
 - **Los parámetros son explícitos.** Una función que solo funciona porque adivina el nombre de una variable global (`registros_estaciones`) en vez de recibirla como parámetro es frágil: reutilízala con otra red de estaciones y falla en silencio o con un error confuso.
-- **Prueba tu función con un caso simple antes de aplicarla a todo el dataset.** `convertir_a_microgramos(1)` debería dar `1000.0` — verificarlo con un valor conocido cuesta una línea y evita arrastrar un error a los cientos de lecturas de la red.
+- **Prueba tu función con un caso simple antes de aplicarla a todo el dataset.** `convertir_a_microgramos(1.0)` debería dar `1000.0` — verificarlo con un valor conocido cuesta una línea y evita arrastrar un error a los cientos de lecturas de la red.
 
 Una función que junta varios de estos criterios es la que clasifica una lectura según la escala oficial:
 
@@ -265,7 +267,7 @@ print(categorias)
 ['Dañina para grupos sensibles', 'Dañina para la salud', 'Dañina para grupos sensibles']
 ```
 
-Estas funciones —`convertir_a_microgramos`, `supera_moderada`, `calcular_promedio_estacion`, `clasificar_calidad_aire`— son las piezas que vas a seguir reutilizando conforme el curso avanza: la próxima semana vas a ver cómo una función puede "vivir dentro" de un objeto, como uno de sus métodos, en vez de estar suelta en el notebook.
+Estas funciones —`convertir_a_microgramos`, `supera_moderada`, `calcular_promedio_estacion`, `clasificar_calidad_aire`— son las piezas que vas a seguir reutilizando conforme el curso avanza: en "Clases y objetos en Python" vas a ver cómo una función puede "vivir dentro" de un objeto, como uno de sus métodos, en vez de estar suelta en el notebook.
 
 ## Síntesis
 

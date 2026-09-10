@@ -401,4 +401,16 @@ usuario confirmó explícitamente no crearlo.
   lección; los apuntes del docente siguen el mismo dataset, funciones y
   progresión que el `.mdx` aprobado, incluyendo el bug de scope reproducido
   a propósito
-- [ ] `@reviewer`: pendiente (E9, antes del merge a `development`)
+- [x] `@reviewer`: 1.ª pasada **APROBADO** con 3 hallazgos mayores y varios
+  menores/sugerencias — todos los mayores y dos menores corregidos en la
+  misma rama: (1) `convertir_a_microgramos(1)` → `1.0` para que el resultado
+  prometido `1000.0` fuera real; (2) `lecturas_sensor_campo` definida en la
+  lección (antes solo existía en los apuntes, causaba `NameError` si se
+  copiaba tal cual); (3) el ejemplo de `filter` combinaba lecturas de Norte
+  y Centro para que de verdad descarte valores (antes filtraba solo sobre
+  EST-02, cuyas tres lecturas pasaban el umbral, sin demostrar nada);
+  además, contradicción del valor por defecto ("caso más común en la red")
+  y typo "`return`a" corregidos. Apuntes del docente actualizados en
+  paralelo para mantener el mismo ejemplo de `filter`. No se solicitó nueva
+  pasada de `@reviewer` (cambios acotados y verificados manualmente con
+  Python + `npm run build`/`lint` en verde tras la corrección).

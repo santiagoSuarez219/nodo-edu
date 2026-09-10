@@ -133,7 +133,8 @@ print(list(lecturas_ug))  # map devuelve un objeto perezoso: hay que envolverlo 
 def supera_moderada(valor):
     return valor > 35.4  # umbral oficial de la categoria "Moderada"
 
-lecturas_criticas = filter(supera_moderada, registros_estaciones[1]["lecturas"])
+lecturas_norte_y_centro = registros_estaciones[0]["lecturas"] + registros_estaciones[1]["lecturas"]
+lecturas_criticas = filter(supera_moderada, lecturas_norte_y_centro)
 print(list(lecturas_criticas))
 ```
 
@@ -141,11 +142,16 @@ print(list(lecturas_criticas))
 [41.8, 58.3, 36.1]
 ```
 
+Punto a resaltar: de las seis lecturas originales, `filter` descartó las tres
+primeras (estación Norte, categoría Moderada) y conservó solo las de Centro
+— dejar claro que `filter` sí está descartando algo, no solo repitiendo la
+lista de entrada.
+
 Reescribir la misma condición con `lambda`, mostrando que es la misma función
 sin nombre propio:
 
 ```python
-lecturas_criticas = filter(lambda valor: valor > 35.4, registros_estaciones[1]["lecturas"])
+lecturas_criticas = filter(lambda valor: valor > 35.4, lecturas_norte_y_centro)
 print(list(lecturas_criticas))
 ```
 
@@ -157,15 +163,13 @@ Comparación lado a lado — proyectar ambas formas juntas y remarcar que
 producen exactamente el mismo resultado:
 
 ```python
-lecturas_est02 = registros_estaciones[1]["lecturas"]
-
 # --- con map / filter ---
 lecturas_ug_map = list(map(convertir_a_microgramos, lecturas_sensor_nuevo_mg))
-criticas_filter = list(filter(lambda v: v > 35.4, lecturas_est02))
+criticas_filter = list(filter(lambda v: v > 35.4, lecturas_norte_y_centro))
 
 # --- equivalente con comprension de listas (ya vista en Semana 4) ---
 lecturas_ug_comp = [convertir_a_microgramos(v) for v in lecturas_sensor_nuevo_mg]
-criticas_comp = [v for v in lecturas_est02 if v > 35.4]
+criticas_comp = [v for v in lecturas_norte_y_centro if v > 35.4]
 
 print("map:", lecturas_ug_map, " | comprension:", lecturas_ug_comp)
 print("filter:", criticas_filter, " | comprension:", criticas_comp)
