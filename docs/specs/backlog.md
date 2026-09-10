@@ -5,6 +5,41 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+## DEBT-084 — La página del curso del estudiante no enlaza a "Evaluaciones"
+
+**Origen:** sesión de vista previa del quiz A/B/C de Estructuras de Datos en
+desarrollo (2026-09-10). Al pedir acceder a la evaluación como estudiante, la
+navegación guiada ("entrá al curso y buscá la sección de evaluaciones") no
+llevaba a ningún lado — no existe ese enlace.
+**Prioridad:** Media — bloquea a cualquier estudiante real que no tenga la URL
+directa guardada de una sesión anterior; no es un problema de datos, RLS ni
+publicación (todo eso se verificó sano).
+
+`app/cuenta/cursos/[enrollmentId]/page.tsx` (detalle de matrícula del
+estudiante) no importa ni renderiza ningún `<Link>` hacia
+`/cuenta/cursos/[enrollmentId]/evaluaciones` — el único enlace de la página es
+"Mis cursos", de vuelta al listado (línea 66-74). Las tres rutas de
+evaluaciones existen y funcionan correctamente
+(`evaluaciones/page.tsx`, `evaluaciones/[groupId]/page.tsx`,
+`evaluaciones/[groupId]/resultados/page.tsx`), y `getActiveAssignmentsByEnrollment`
+/ la RLS de `assignment_variant_groups` (`student_sees_published_groups`) ya
+resuelven correctamente qué evaluaciones publicadas y dentro de ventana le
+corresponden a la matrícula — el problema es exclusivamente de navegación, no
+de datos.
+
+Diagnosticado descartando causas de datos primero: matrícula activa,
+`is_published: true`, ventana vigente, y las 30 preguntas publicadas —
+verificado todo contra la base antes de encontrar que la UI simplemente no
+ofrece el enlace.
+
+**Acción:** agregar en `EnrollmentDetail` (o directamente en
+`app/cuenta/cursos/[enrollmentId]/page.tsx`) un enlace o tarjeta hacia
+`/cuenta/cursos/[enrollmentId]/evaluaciones`, visible cuando el curso tiene al
+menos una evaluación publicada y dentro de ventana para esa matrícula (evitar
+un enlace muerto a "No hay evaluaciones disponibles" cuando no aplica).
+
+---
+
 ## DEBT-083 — Publicar una evaluación es irreversible, y el MCP acepta `is_published` sin aplicarlo
 
 **Origen:** sesión de autoría del quiz A/B/C de Estructuras de Datos (2026-09-09).
