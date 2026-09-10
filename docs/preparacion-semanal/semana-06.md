@@ -354,12 +354,14 @@ explícitamente a problemas de ciencias de datos y programación científica.
 | Lección | Entorno | IDs de preguntas | Publicadas | Montadas (`list_lesson_questions`) |
 |---|---|---|---|---|
 | `funciones` | desarrollo | `a7d20653-158e-4211-9efc-c06acdeb54e9`, `54180b7a-5553-4364-bdfe-d5476dcab662`, `c347bf28-591a-415d-932e-cbf85e26cf00`, `7e351489-d9cf-4f43-973b-b02491fc8247`, `a485206f-4eb5-4308-bcc0-4c1dde6b79a4`, `ab8f083a-d867-4d46-9413-cfbaa90233b2` | ✅ | ✅ (orden 0-5) |
-| `funciones` | **producción** | — | ⬜ | ⬜ |
+| `funciones` | **producción** | `7369f605-b3a9-4026-92c0-722c2d8f7076`, `05ab10b2-d007-43a5-a67d-a4de2915160d`, `389fd85f-496d-4a62-80d3-648d5e50a7b5`, `7fec2e55-c74a-4a6d-9dde-63b561609a2b`, `59e37def-fe95-4ee5-a14d-8b181218d62e`, `6d22370a-5c5d-445e-8a94-8c0b7183ec6c` | ✅ | ✅ (orden 4-9, después de 4 preguntas preexistentes sin publicar en orden 0-3) |
 
-> Keywords nuevas creadas en desarrollo: `python` (lenguaje), `funciones`,
-> `map-filter`, `alcance-de-variables`, `modularizacion` (tema). Las
-> preguntas **no viajan con el deploy**: pendiente de replicar en producción
-> en D3 cuando se despliegue esta ronda.
+> Keywords nuevas creadas: en desarrollo `python`, `funciones`, `map-filter`,
+> `alcance-de-variables`, `modularizacion` (tema); en producción `python` y
+> `funciones` ya existían (reutilizadas), se crearon `map-filter` y
+> `alcance-de-variables`, y para "modularización" se reutilizó la keyword
+> `modularidad` ya existente en producción en vez de crear un slug duplicado
+> (`modularizacion` no se creó en prod).
 
 ### Quiz calificable A/B/C
 
@@ -414,3 +416,51 @@ usuario confirmó explícitamente no crearlo.
   paralelo para mantener el mismo ejemplo de `filter`. No se solicitó nueva
   pasada de `@reviewer` (cambios acotados y verificados manualmente con
   Python + `npm run build`/`lint` en verde tras la corrección).
+
+## Despliegue a producción — ronda `programacion-cientifica` (2026-09-10)
+
+| Paso | Estado | Fecha / detalle |
+|---|---|---|
+| D0 · Alcance y checklist pre-despliegue | ✅ | Solo `programacion-cientifica` Semana 6, sin cambios de esquema (`git diff --stat origin/main..HEAD -- supabase/` vacío). `funciones` ya estaba cerrada en producción desde antes ("Cierre solicitado por el docente", 2026-08-04) |
+| D1 · Lecciones nuevas cerradas por adelantado | — | No aplicó: la lección ya estaba cerrada de antemano; el usuario confirmó abrirla de inmediato tras el deploy (D4), no antes |
+| D2 · Merge a `main` y deploy en Vercel | ✅ | Rama `deploy/semana-06-programacion-cientifica`, commit `deploy: release week 6 programacion-cientifica lesson on functions`. Deploy Vercel `dpl_3wo6viF741zEQGZZ3NFWAMiaAh14`, `readyState: READY`, `target: production` |
+| D3 · Banco de preguntas replicado a producción | ✅ | IDs prod: `7369f605-b3a9-4026-92c0-722c2d8f7076`, `05ab10b2-d007-43a5-a67d-a4de2915160d`, `389fd85f-496d-4a62-80d3-648d5e50a7b5`, `7fec2e55-c74a-4a6d-9dde-63b561609a2b`, `59e37def-fe95-4ee5-a14d-8b181218d62e`, `6d22370a-5c5d-445e-8a94-8c0b7183ec6c` — publicadas y montadas en orden 4-9 (ver hallazgo debajo) |
+| D4 · Lecciones abiertas a los estudiantes | ✅ | `programacion-cientifica` → `funciones` (`order: 5`) abierta vía `courses-mcp-prod`. Verificado con `list_course_lessons`: Semana 7 en adelante sigue cerrada, `orphan_disabled_slugs: []` |
+| D5 · Verificación end-to-end en producción | ⚠️ Parcial | `https://www.nod0.dev` y `/programacion-cientifica/funciones` responden (307, redirect de autenticación normal — no confirma renderizado). Verificación visual (Mermaid, autoevaluación) no realizada: requiere navegador, fuera de alcance sin solicitud explícita |
+| D6 · Bitácora cerrada y rama `deploy/` borrada | ✅ | Esta entrada. Rama `deploy/semana-06-programacion-cientifica` pendiente de borrar (local, no se pusheó a remoto) |
+
+- [x] Verificado que las lecciones de semanas futuras siguen **cerradas**
+
+### Decisiones tomadas durante el despliegue
+
+- **Preguntas preexistentes en producción, ajenas a esta ronda**: `list_questions`
+  reveló 4 preguntas ya montadas en `programacion-cientifica`/`funciones`
+  (`code_write`/`open_text` sobre propina, reciclaje, cuenta de restaurante y
+  un acertijo lógico — sin relación con el contenido de esta lección),
+  todas sin publicar. Origen desconocido, no documentado en ninguna bitácora
+  anterior. **Decisión del usuario**: dejarlas tal cual (sin publicar, por
+  tanto invisibles) y montar las 6 nuevas encima, en orden 4-9.
+- **Hallazgo crítico antes de replicar — el banco de desarrollo no coincidía
+  con lo aprobado**: al leer las 6 preguntas reales creadas en desarrollo
+  (E5) para copiarlas a producción, resultaron ser genéricas (`saludar`,
+  `cuadrado`, `incrementar`, `numeros` pares) y **no** las preguntas sobre
+  PM2.5/`registros_estaciones` que se habían presentado y aprobado en el
+  chat. Corregido con `update_question` en **desarrollo primero** (las 6,
+  contenido exacto de la propuesta aprobada) y solo después replicado a
+  producción — nunca se publicó en producción el contenido genérico.
+- **Keyword `modularizacion` vs. `modularidad`**: la pregunta de
+  modularización usaba `modularizacion` en desarrollo, pero producción ya
+  tenía `modularidad` (mismo concepto, slug distinto). Por decisión del
+  usuario, se reutilizó `modularidad` en producción en vez de crear un
+  duplicado — la pregunta en desarrollo conserva `modularizacion` (no se
+  tocó ese catálogo).
+
+## Pendientes (despliegue)
+
+- Verificación visual en producción (Mermaid, autoevaluación) — a criterio
+  del usuario, requiere navegador.
+- Investigar el origen de las 4 preguntas ajenas ya montadas en `funciones`
+  en producción (propina, reciclaje, restaurante, acertijo lógico) — quedan
+  sin publicar, pero conviene entender de dónde salieron.
+- Borrar rama local `deploy/semana-06-programacion-cientifica` (no se
+  pusheó a remoto).
