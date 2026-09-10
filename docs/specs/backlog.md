@@ -5,6 +5,53 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+## DEBT-083 — Publicar una evaluación es irreversible, y el MCP acepta `is_published` sin aplicarlo
+
+**Origen:** sesión de autoría del quiz A/B/C de Estructuras de Datos (2026-09-09).
+El usuario publicó por accidente el grupo `ae1429ba-e5e8-4139-b033-5afb95dc1a62`
+en **producción**, con 44 estudiantes matriculados activos, y no hubo forma de
+revertirlo por los caminos soportados.
+**Prioridad:** Alta — es un camino sin retorno sobre datos que ven estudiantes
+reales, y el fallo es silencioso.
+
+Son dos defectos que se agravan entre sí:
+
+**1. No existe "despublicar".** `publish_assignment_group` sube
+`is_published` a `true` y no hay operación inversa.
+`UpdateGroupSchema` (`app/api/assignments/groups/[groupId]/route.ts:21-37`) no
+incluye `is_published` entre sus campos, y `updateGroup`
+(`lib/assignments/service.ts:194-207`) tampoco lo acepta en su tipo de
+`updates`. La única salida fue un `UPDATE` directo contra la base de
+producción, fuera de la API.
+
+**2. El MCP promete lo que no cumple.** `assignment-mcp` sí envía
+`is_published` en el PATCH (`mcp-servers/assignment-mcp/src/tools.ts:339-340`),
+pero `UpdateGroupSchema` es un `z.object` no estricto: Zod **descarta el campo
+desconocido en silencio**. La llamada devuelve `200` con el grupo intacto, así
+que un agente cree haber despublicado y no lo hizo. Es peor que no tener la
+capacidad: induce una falsa sensación de control, igual que el caso de
+`shuffle_*` en [[DEBT-034]] antes de spec-035.
+
+**Mitigación disponible mientras tanto:** poner `opens_at` en el futuro vía
+`update_assignment_group` saca el grupo del listado del estudiante
+(`lib/assignments/index.ts:95-97` filtra por `opens_at.lte.now`), sin tocar
+`is_published`. Es reversible y usa la API, pero deja el grupo figurando como
+"publicado" en el panel admin.
+
+**Acción propuesta:**
+- Agregar `is_published: z.boolean().optional()` a `UpdateGroupSchema` y a los
+  `updates` de `updateGroup`, o exponer un `unpublish_assignment_group`
+  explícito.
+- Bloquear la despublicación cuando el grupo ya tenga submissions (mismo
+  criterio que `deleteGroup`, que devuelve 409), para no esconderle a un
+  estudiante una evaluación que ya empezó.
+- Considerar `.strict()` en los schemas Zod de la API de assignments para que
+  un campo no soportado devuelva `422` en vez de descartarse sin aviso.
+- Revisar si `unpublish_question` merece el mismo tratamiento: hoy publicar una
+  pregunta del banco también es irreversible desde el MCP.
+
+---
+
 ## DEBT-074 — El copy de error de infraestructura nunca se muestra en producción: Next redacta el mensaje del error
 
 **Origen:** revisión de código de spec-054 (hallazgo 🟠-1, 2026-08-30).

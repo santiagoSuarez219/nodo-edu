@@ -623,8 +623,17 @@ perceptibles" entre modo claro/oscuro en algunos casos — es comportamiento de
 - Hallazgos escalados a `docs/specs/backlog.md`: **DEBT-008** — saltos perceptibles entre modo
   claro/oscuro en algunos casos (comportamiento global de la app, fuera del alcance de
   spec-019).
-- Limpieza de datos de prueba: **conservados intencionalmente** (decisión del usuario) — G1–G9,
-  sus submissions/answers, las 3 preguntas nuevas y las cuentas D/E quedan como fixture
-  reutilizable para futuras rondas (spec-020 necesitará submissions con preguntas abiertas
-  pendientes de revisión, como la de G2, ya lista). No se eliminó ningún dato preexistente
-  (Santiago, "Estructuras de datos", A/B/C, la cuenta retirada, "Taller 1").
+- Limpieza de datos de prueba: ✅ **Completada (2026-09-08)** — al cerrar la ronda se
+  conservaron intencionalmente (decisión del usuario) G1–G9, sus submissions/answers, las 3
+  preguntas nuevas y las cuentas D/E como fixture reutilizable para spec-020. Ya cumplido ese
+  propósito, el 2026-09-08 se eliminaron de **producción** las 10 evaluaciones del curso
+  "Estructuras de datos" (`7bd3f233-c8e0-4e9e-bf2e-634b0a883756`): G1–G9 de esta ronda y el
+  "Quiz de prueba TC-MCP-006" de `test-018`. Al momento del borrado ninguna tenía repartos ni
+  submissions (las de la ronda ya no existían), ninguna tenía `grade_item_id` vinculado, y
+  `G8` seguía publicada con ventana abierta (2026-09-01 → 2026-09-15), visible para los
+  estudiantes matriculados. Se borraron vía `delete_assignment_group` de `assignment-mcp-prod`,
+  que arrastra en cascada variantes y montajes (`assignment_questions`) **sin tocar el banco de
+  preguntas**. Verificado post-borrado: 0 grupos en el curso, 0 variantes huérfanas, 0 montajes
+  huérfanos, banco intacto (268 preguntas). Las preguntas creadas para esta ronda **siguen en el
+  banco**: su limpieza es una decisión aparte, aún pendiente. No se eliminó ningún dato
+  preexistente (Santiago, "Estructuras de datos", A/B/C, la cuenta retirada, "Taller 1").
