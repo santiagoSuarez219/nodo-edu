@@ -109,6 +109,8 @@ export const programacionCientifica: Course = {
       articleSlug: "funciones",
       order: 5,
       title: "Funciones",
+      summary:
+        "Convierte celdas repetidas de conversión de unidades y clasificación de calidad del aire en funciones reutilizables con def, map y filter, aplicadas a la red de monitoreo de PM2.5 del taller.",
       topics: [
         { title: "Definición de funciones: parámetros, valores por defecto, retorno de valores" },
         { title: "Funciones de orden superior: map, filter, funciones lambda" },
