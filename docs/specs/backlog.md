@@ -136,7 +136,14 @@ lecciones deshabilitadas. Quedó fuera de spec-055 para mantener ese cambio acot
 
 ---
 
-## DEBT-084 — La página del curso del estudiante no enlaza a "Evaluaciones"
+## DEBT-084 — La página del curso del estudiante no enlaza a "Evaluaciones" [RESUELTO — spec-055]
+
+**Resuelto por `spec-055-acceso-evaluaciones-estudiante.md`** (implementación
+2026-09-10): tarjeta `AssignmentsAccessCard` en el detalle de matrícula,
+visible con matrícula activa y al menos una evaluación publicada y dentro de
+ventana, con conteo compartido con el listado vía
+`getOpenAssignmentGroupsForStudent`. Pendiente de pasar `[TESTING]` →
+`[DONE]` (ronda manual de `test-055-acceso-evaluaciones-estudiante.md`).
 
 **Origen:** sesión de vista previa del quiz A/B/C de Estructuras de Datos en
 desarrollo (2026-09-10). Al pedir acceder a la evaluación como estudiante, la

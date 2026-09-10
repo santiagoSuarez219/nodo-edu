@@ -1,4 +1,4 @@
-# spec-055 — [NOT STARTED] Acceso a las evaluaciones desde el detalle de matrícula del estudiante
+# spec-055 — [TESTING] Acceso a las evaluaciones desde el detalle de matrícula del estudiante
 
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.
@@ -242,35 +242,35 @@ Al migrar `evaluaciones/page.tsx` al helper, `unavailable` se renderiza con
 ## Fases de implementación
 
 ### Fase 1 — Capa de dominio
-- [ ] `lib/assignments/types.ts`: agregar `OpenAssignmentGroupsResult`.
-- [ ] `lib/assignments/index.ts`: agregar `_getOpenGroupsByAcademicCourseForActor`
+- [x] `lib/assignments/types.ts`: agregar `OpenAssignmentGroupsResult`.
+- [x] `lib/assignments/index.ts`: agregar `_getOpenGroupsByAcademicCourseForActor`
       con los filtros exactos del listado actual y un único `now` por llamada.
-- [ ] `lib/assignments/index.ts`: agregar `getOpenAssignmentGroupsForStudent`
+- [x] `lib/assignments/index.ts`: agregar `getOpenAssignmentGroupsForStudent`
       con `cache()`, `getCurrentUser()` y `try/catch` que envuelva también la
       creación del cliente; ante error, `console.error` y `{ status: "unavailable" }`.
-- [ ] Mover al helper el comentario que hoy explica en el listado por qué no se
+- [x] Mover al helper el comentario que hoy explica en el listado por qué no se
       usa `getActiveAssignmentsByEnrollment`.
 
 ### Fase 2 — El listado usa el helper
-- [ ] `evaluaciones/page.tsx`: reemplazar la consulta inline por el helper.
-- [ ] Ante `unavailable`, renderizar `ErrorState` con `INFRA_ERROR_COPY` (D5).
-- [ ] Mantener sin cambios el control de matrícula y el cálculo de estado de cada intento.
-- [ ] Quitar imports que queden sin uso.
+- [x] `evaluaciones/page.tsx`: reemplazar la consulta inline por el helper.
+- [x] Ante `unavailable`, renderizar `ErrorState` con `INFRA_ERROR_COPY` (D5).
+- [x] Mantener sin cambios el control de matrícula y el cálculo de estado de cada intento.
+- [x] Quitar imports que queden sin uso.
 
 ### Fase 3 — Componente
-- [ ] Crear `components/account/AssignmentsAccessCard.tsx` (D6).
+- [x] Crear `components/account/AssignmentsAccessCard.tsx` (D6).
 
 ### Fase 4 — Integración en el detalle de matrícula
-- [ ] `app/cuenta/cursos/[enrollmentId]/page.tsx`: sumar el helper al segundo
+- [x] `app/cuenta/cursos/[enrollmentId]/page.tsx`: sumar el helper al segundo
       `Promise.all`, **solo** si `enrollment.status === "active"`.
-- [ ] Derivar la visibilidad: activa **y** (`unavailable` **o** ≥ 1 grupo).
-- [ ] Renderizar `AssignmentsAccessCard` entre el encabezado y `EnrollmentDetail`.
-- [ ] Comentario breve sobre por qué ante un fallo la tarjeta se muestra igual (D4).
+- [x] Derivar la visibilidad: activa **y** (`unavailable` **o** ≥ 1 grupo).
+- [x] Renderizar `AssignmentsAccessCard` entre el encabezado y `EnrollmentDetail`.
+- [x] Comentario breve sobre por qué ante un fallo la tarjeta se muestra igual (D4).
 
 ### Fase 5 — Cierre
-- [ ] `docs/specs/backlog.md`: marcar DEBT-084 como resuelto por spec-055.
-- [ ] `npm run lint` y `npm run build` sin errores.
-- [ ] Sin fase MCP (ver "Evaluación MCP").
+- [x] `docs/specs/backlog.md`: marcar DEBT-084 como resuelto por spec-055.
+- [x] `npm run lint` y `npm run build` sin errores.
+- [x] Sin fase MCP (ver "Evaluación MCP").
 
 ## Criterios de aceptación
 
@@ -344,5 +344,5 @@ junto con el despliegue de este spec.
 
 > Claude no escribe código de implementación hasta que esta sección esté marcada.
 
-- [ ] Paquete (spec + pruebas) aprobado por el usuario
-- **Fecha de aprobación:** —
+- [x] Paquete (spec + pruebas) aprobado por el usuario
+- **Fecha de aprobación:** 2026-09-10
