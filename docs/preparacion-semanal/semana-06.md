@@ -313,3 +313,92 @@ No aplica — la Semana 6 de `estructuras-de-datos` no lleva `★`.
   4 menores) — bloqueante de diagramas aceptado como decisión del usuario;
   el resto corregido en la misma rama, sin nueva pasada de `@reviewer`
   solicitada
+
+---
+
+## Ronda — `programacion-cientifica` (2026-09-09)
+
+**Alcance confirmado por el usuario:** Semana 6 (jueves 10 sep 2026), sesión
+única (el curso tiene una sola sesión semanal). Tema: Funciones, orientado
+explícitamente a problemas de ciencias de datos y programación científica.
+
+### Sesiones cubiertas
+
+| Sesión | Fecha | Tema | ★/◇ |
+|---|---|---|---|
+| Única | jue. 10 sep | Funciones: `def`, parámetros/valores por defecto/retorno, `map`/`filter`/`lambda`, alcance de variables (scope), buenas prácticas de modularización | ◇ (taller de seguimiento, no evaluativo) |
+
+### Etapas y aprobaciones
+
+| Etapa | Resultado | Aprobada por el usuario |
+|---|---|---|
+| E0 · Arranque | Árbol limpio, rama `feat/semana-06-programacion-cientifica` creada desde `development` | ✅ |
+| E2 · Plan de lección | Aprobado con ajuste de dataset (estación meteorológica → mediciones PM2.5) | ✅ |
+| E3 · Lección `.mdx` + registro TS | `funciones`, `order: 5` — dos rondas de corrección (ver Decisiones) | ✅ |
+| E4 · Apuntes del docente | Pedidos explícitamente; aprobados sin ajustes | ✅ |
+| E5 · Cuestionario de cierre | Propuesto: 6 preguntas → aprobadas 6 | ✅ |
+| E6 · Guía del estudiante | No aplica — sesión práctica confirmada como demo en vivo del docente | — |
+| E6 · Quiz A/B/C | No aplica — Semana 6 sin `★` y el usuario no lo pidió | — |
+
+### Artefactos producidos
+
+| Artefacto | Ruta | Publicado |
+|---|---|---|
+| Lección teórica | `content/cursos/programacion-cientifica/funciones.mdx` | ✅ (en rama, pendiente de merge/deploy) |
+| Registro TS | `lib/courses/data/programacion-cientifica.ts` (`order: 5`, `summary` agregado) | — |
+| Apunte de clase | `content/cursos/programacion-cientifica/apuntes/funciones.md` | Solo owner/admin (en rama) |
+| Guía del estudiante | — | No aplica |
+
+### Cuestionario de cierre
+
+| Lección | Entorno | IDs de preguntas | Publicadas | Montadas (`list_lesson_questions`) |
+|---|---|---|---|---|
+| `funciones` | desarrollo | `a7d20653-158e-4211-9efc-c06acdeb54e9`, `54180b7a-5553-4364-bdfe-d5476dcab662`, `c347bf28-591a-415d-932e-cbf85e26cf00`, `7e351489-d9cf-4f43-973b-b02491fc8247`, `a485206f-4eb5-4308-bcc0-4c1dde6b79a4`, `ab8f083a-d867-4d46-9413-cfbaa90233b2` | ✅ | ✅ (orden 0-5) |
+| `funciones` | **producción** | — | ⬜ | ⬜ |
+
+> Keywords nuevas creadas en desarrollo: `python` (lenguaje), `funciones`,
+> `map-filter`, `alcance-de-variables`, `modularizacion` (tema). Las
+> preguntas **no viajan con el deploy**: pendiente de replicar en producción
+> en D3 cuando se despliegue esta ronda.
+
+### Quiz calificable A/B/C
+
+No aplica — la Semana 6 de `programacion-cientifica` no lleva `★` y el
+usuario confirmó explícitamente no crearlo.
+
+### Decisiones tomadas por Claude en nombre del docente
+
+> Todo lo que se resolvió sin preguntar y el usuario debería poder revertir.
+
+- **Dataset de la lección corregido dos veces antes de la aprobación final**:
+  el primer borrador de `@lesson-writer` inventó una "estación
+  meteorológica" genérica como dataset nuevo. Al revisar el `.mdx` completo
+  detecté que rompía la continuidad narrativa con la Semana 5 (Taller
+  evaluativo 01), cuyo dataset real son mediciones de PM2.5 de una red de
+  monitoreo de calidad del aire (`registros_estaciones`) — corregido con el
+  usuario, que eligió alinear al dataset real. Una segunda relectura detectó
+  además una inconsistencia matemática: las `lecturas` de `EST-02` se usaban
+  a la vez como mg/m³ (en la sección de conversión) y como µg/m³ ya
+  convertidas (en el filtro de umbral), sin conversión real entre ambas.
+  Corregido introduciendo un "sensor nuevo" separado (`lecturas_sensor_nuevo_mg`)
+  para el escenario de conversión, dejando `registros_estaciones` siempre en
+  µg/m³ como en el taller de origen — verificado manualmente que todos los
+  resultados impresos en el `.mdx` final son matemáticamente correctos.
+- **`summary` agregado al registro TS**: la entrada `id: "funciones"` en
+  `lib/courses/data/programacion-cientifica.ts` no tenía `summary` desde
+  antes de esta ronda (a diferencia de las demás lecciones del archivo);
+  se completó como parte de E3, idéntico al del frontmatter del `.mdx`.
+
+### Verificación (E7)
+
+- [x] `npm run build` en verde
+- [x] `npm run lint` en verde (0 errores, 10 advertencias preexistentes sin relación)
+- [x] Checklist de `lesson-authoring` §8 recorrido: sin `# H1`, sin `###`,
+  sin placeholders fuera de backticks, `updatedAt` de hoy, `summary` en
+  frontmatter y TS, `order` sin duplicados, apuntes sin entrada TS, sin guía
+  de estudiante creada (sesión en vivo confirmada)
+- [x] Coherencia cruzada: las 6 preguntas cubren las 5 secciones de la
+  lección; los apuntes del docente siguen el mismo dataset, funciones y
+  progresión que el `.mdx` aprobado, incluyendo el bug de scope reproducido
+  a propósito
+- [ ] `@reviewer`: pendiente (E9, antes del merge a `development`)
