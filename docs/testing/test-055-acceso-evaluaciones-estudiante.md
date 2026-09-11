@@ -46,17 +46,17 @@
 | Curso "Test-054 Curso Vacío" (**sin** `course_slug`, fixture permanente) | `bdf3ca64-adbe-4c6b-915e-91e7e9c575d0` | n/a |
 | Estudiante Ana Gómez (activa en Curso A) | `ana.gomez.test054@nodo.local` / `Test054Ana!` | n/a |
 | Estudiante Carla Ruiz (**retirada** de Curso A) | `carla.ruiz.test054@nodo.local` / `Test054Carla!` | n/a |
-| Estudiante `dev-estudiante1` (activo en DEV-ADA; matriculado además en Curso A para esta ronda) | `dev-estudiante1@nodo.local` / `DevStudent2026!` | Matrícula en Curso A: ⬜ (`unenroll_student`) |
+| Estudiante `dev-estudiante1` (activo en DEV-ADA; matriculado además en Curso A para esta ronda) | `dev-estudiante1@nodo.local` / `DevStudent2026!` | Matrícula en Curso A: ✅ (`unenroll_student` — queda `withdrawn`, no se borra la fila; sin herramienta para eliminarla) |
 | Estudiante `dev-estudiante2` (sin cambios, no usado en esta ronda) | `dev-estudiante2@nodo.local` / `DevStudent2026!` | n/a |
-| Estudiante `dev-estudiante3` (matriculado además en Curso Vacío para esta ronda) | `dev-estudiante3@nodo.local` / `DevStudent2026!` | Matrícula en Curso Vacío: ⬜ (`unenroll_student`) |
-| Keyword `spec-055-prueba` (catálogo del banco) | `spec-055-prueba` | ⬜ (`delete` manual — sin herramienta MCP; ver nota) |
-| Pregunta de prueba compartida (reutilizada en las 12 variantes de abajo) | `4e38d3ac-51bc-4d93-98ca-44e31d83f370` | ⬜ (`delete_question`, 409 si algún grupo con envíos la sigue usando) |
-| Grupo "spec-055 — Grupo abierto 1" — DEV-ADA, publicado, abierto | `9a2680d8-cc73-4a27-9817-94990692d546` | ⬜ |
-| Grupo "spec-055 — Grupo abierto 2" — DEV-ADA, publicado, abierto | `3daec2b8-2f23-4179-a832-14b207eec366` | ⬜ |
-| Grupo "spec-055 — Grupo borrador" — DEV-ADA, **sin publicar** | `ad30c389-bf3a-4fdd-876f-1098b1a0bc3d` | ⬜ |
-| Grupo "spec-055 — Apertura futura" — DEV-PC, publicado, `opens_at` 2026-09-10 22:10 UTC | `b639d144-5311-46b0-850b-feaeda942d5a` | ⬜ |
-| Grupo "spec-055 — Curso sin course_slug" — Curso Vacío, publicado, abierto | `d1b874e8-f18d-433b-a160-e4272ccdf1db` | ⬜ |
-| Grupo "spec-055 — Grupo para envío" — Curso A, publicado, abierto (TC-055-005/006/007/008) | `4d47ea5a-4e3e-4190-a27a-6ad246f05731` | ⬜ (409 tras el envío de TC-055-005 — ver nota) |
+| Estudiante `dev-estudiante3` (matriculado además en Curso Vacío para esta ronda) | `dev-estudiante3@nodo.local` / `DevStudent2026!` | Matrícula en Curso Vacío: ✅ (`unenroll_student` — queda `withdrawn`, no se borra la fila; sin herramienta para eliminarla) |
+| Keyword `spec-055-prueba` (catálogo del banco) | `spec-055-prueba` | 🟡 No eliminada — bloqueada por FK: la pregunta compartida sigue usándola (ver fila siguiente) |
+| Pregunta de prueba compartida (reutilizada en las 12 variantes de abajo) | `4e38d3ac-51bc-4d93-98ca-44e31d83f370` | 🟡 No eliminada — 409, sigue montada en "Grupo para envío" (ver fila siguiente) |
+| Grupo "spec-055 — Grupo abierto 1" — DEV-ADA, publicado, abierto | `9a2680d8-cc73-4a27-9817-94990692d546` | ✅ |
+| Grupo "spec-055 — Grupo abierto 2" — DEV-ADA, publicado, abierto | `3daec2b8-2f23-4179-a832-14b207eec366` | ✅ |
+| Grupo "spec-055 — Grupo borrador" — DEV-ADA, **sin publicar** | `ad30c389-bf3a-4fdd-876f-1098b1a0bc3d` | ✅ |
+| Grupo "spec-055 — Apertura futura" — DEV-PC, publicado, `opens_at` 2026-09-10 22:10 UTC | `b639d144-5311-46b0-850b-feaeda942d5a` | ✅ |
+| Grupo "spec-055 — Curso sin course_slug" — Curso Vacío, publicado, abierto | `d1b874e8-f18d-433b-a160-e4272ccdf1db` | ✅ |
+| Grupo "spec-055 — Grupo para envío" — Curso A, publicado, abierto (TC-055-005/006/007/008) | `4d47ea5a-4e3e-4190-a27a-6ad246f05731` | 🟡 No eliminado — 409, tiene el envío real de Ana de TC-055-005. Queda en desarrollo por decisión de diseño del sistema (igual que los fixtures de test-019), no por omisión |
 
 > ⚠️ **Los envíos no se pueden borrar vía API:** `delete_assignment_group`
 > devuelve 409 si el grupo tiene entregas. El grupo "spec-055 — Grupo para
@@ -254,4 +254,4 @@ arriba antes de crear estos datos. **Nunca contra producción.**
 - **TC-055-012 quedó parcial**: modo claro y oscuro verificados y correctos; el ancho móvil (~375px) no se pudo verificar porque `resize_window` no afectó el viewport real de la pestaña en este entorno de automatización. Pendiente de verificación manual.
 - **TC-055-003 no se ejecutó**: el túnel SSH a `asus` se cayó a mitad de la ronda (2026-09-10, ~22:10–23:38 UTC), justo en la ventana en que había que observar el estado "antes de `opens_at`". El criterio de aceptación 2 que cubría quedó igualmente verificado por TC-055-002, 008 y 009.
 - Hallazgos escalados a `docs/specs/backlog.md`: ninguno nuevo — el hallazgo de accesibilidad de TC-055-011 se corrigió en la misma ronda, no requiere deuda; el de la matrícula retirada no clicable en "Mis cursos" (observado durante TC-055-007) ya estaba cubierto conceptualmente por el análisis de `@architect` para spec-055, sin registrar entrada propia.
-- Limpieza de datos de prueba: ⬜ Pendiente
+- Limpieza de datos de prueba: 🟡 Completada, con un residuo esperado — 5 de 6 grupos eliminados vía `delete_assignment_group`, y las 2 matrículas agregadas para la ronda retiradas vía `unenroll_student` (quedan en `withdrawn`, sin herramienta para borrar la fila). **No se pudo eliminar:** el grupo "spec-055 — Grupo para envío" (409, tiene el envío real de Ana de TC-055-005), y en cascada la pregunta de prueba compartida y la keyword `spec-055-prueba` (ambas bloqueadas por FK mientras ese grupo exista). Es el mismo patrón que los fixtures de test-019: un envío real es intencionalmente irreversible por API. Queda como dato de prueba residual en desarrollo, identificable por el prefijo "spec-055" en el título — sin impacto en producción ni en el banco real.
