@@ -1,5 +1,7 @@
+import { cache } from "react";
 import { createServerSupabaseClient } from "@/lib/auth/server";
 import { createServiceSupabaseClient } from "@/lib/auth/service";
+import { getCurrentUser } from "@/lib/auth/session";
 import type {
   AssignmentVariantGroup,
   AssignmentGroupWithVariants,
@@ -7,6 +9,7 @@ import type {
   AssignmentVariant,
   AssignmentQuestion,
   AssignmentContext,
+  OpenAssignmentGroupsResult,
 } from "./types";
 
 async function _getGroupsByAcademicCourseForActor(
@@ -23,6 +26,36 @@ async function _getGroupsByAcademicCourseForActor(
   query = query.order("created_at", { ascending: false });
 
   const { data, error } = await query;
+
+  if (error) throw new Error(error.message);
+
+  return data || [];
+}
+
+// spec-055: mismos filtros que el listado del estudiante
+// (app/cuenta/cursos/[enrollmentId]/evaluaciones/page.tsx) — publicada y
+// dentro de ventana (`opens_at` nulo o pasado, `closes_at` nulo o futuro).
+// Se extrae aquí para que el listado y la tarjeta de acceso al detalle de
+// matrícula (getOpenAssignmentGroupsForStudent, más abajo) consulten
+// exactamente el mismo criterio y no puedan divergir. `now` se recibe como
+// parámetro para que una sola llamada use un único instante, en vez de que
+// cada `.or()` evalúe `new Date()` por separado.
+async function _getOpenGroupsByAcademicCourseForActor(
+  context: AssignmentContext,
+  academicCourseId: string,
+  now: Date
+): Promise<AssignmentVariantGroup[]> {
+  const { supabase } = context;
+  const nowIso = now.toISOString();
+
+  const { data, error } = await supabase
+    .from("assignment_variant_groups")
+    .select("*")
+    .eq("academic_course_id", academicCourseId)
+    .eq("is_published", true)
+    .or(`opens_at.is.null,opens_at.lte.${nowIso}`)
+    .or(`closes_at.is.null,closes_at.gt.${nowIso}`)
+    .order("created_at", { ascending: false });
 
   if (error) throw new Error(error.message);
 
@@ -462,6 +495,36 @@ export async function getActiveAssignmentsByEnrollment(
   return _getActiveAssignmentsByEnrollmentForActor({ supabase, actorId: user.id }, enrollmentId);
 }
 
+// spec-055: envoltorio de sesión para getOpenAssignmentGroupsForStudent y su
+// consumo compartido por evaluaciones/page.tsx y la tarjeta de acceso del
+// detalle de matrícula. `cache()` de React (igual que getDisabledLessonSlugs
+// en lib/courses/availability.ts) para que varias llamadas dentro del mismo
+// render no dupliquen la consulta. Usa getCurrentUser() — ya cacheado por
+// request — en vez de `supabase.auth.getUser()` directo, para no sumar otra
+// ida y vuelta a Auth (a diferencia de los demás envoltorios de este
+// archivo — ver DEBT-088). Nunca lanza: `unavailable` es la señal para que
+// cada consumidor decida cómo degradar.
+export const getOpenAssignmentGroupsForStudent = cache(
+  async (academicCourseId: string): Promise<OpenAssignmentGroupsResult> => {
+    try {
+      const user = await getCurrentUser();
+      if (!user) return { status: "unavailable" };
+
+      const supabase = await createServerSupabaseClient();
+      const groups = await _getOpenGroupsByAcademicCourseForActor(
+        { supabase, actorId: user.id },
+        academicCourseId,
+        new Date()
+      );
+
+      return { status: "ok", groups };
+    } catch (error) {
+      console.error("Error getting open assignment groups:", error);
+      return { status: "unavailable" };
+    }
+  }
+);
+
 export async function getStudentAssignment(
   groupId: string,
   enrollmentId: string
@@ -582,6 +645,7 @@ export async function getAllocations(
 
 export {
   _getGroupsByAcademicCourseForActor,
+  _getOpenGroupsByAcademicCourseForActor,
   _getGroupByIdForActor,
   _getActiveAssignmentsByEnrollmentForActor,
   _getStudentAssignmentForActor,

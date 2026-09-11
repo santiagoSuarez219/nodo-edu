@@ -5,6 +5,184 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+## DEBT-085 — Los resultados de una evaluación son inaccesibles una vez cerrada su ventana
+
+**Origen:** análisis de `@architect` para spec-055 (2026-09-10), verificado en código.
+**Prioridad:** Media-alta — afecta a todo estudiante de toda evaluación en cuanto
+cierra, y deja sin efecto una opción de configuración entera.
+
+Un estudiante **no puede volver a ver su intento enviado** después de que la
+evaluación cierra, ni por la UI ni con la URL directa:
+
+- `_getStudentAssignmentForActor` descarta el grupo si `closes_at <= now`
+  (`lib/assignments/index.ts:157`), y `resultados/page.tsx` hace `notFound()`
+  cuando `getStudentAssignment` devuelve `null`.
+- El listado `evaluaciones/page.tsx` también filtra `closes_at > now`, así que
+  el grupo desaparece del listado al cerrar.
+
+**La RLS no lo impide:** `student_sees_published_groups`
+(`supabase/migrations/20260718000003_rls_assignment_variants.sql`) solo exige
+`is_published` y matrícula `active`, sin mirar la ventana. El bloqueo es
+exclusivamente de la aplicación.
+
+**Consecuencias:**
+- `show_feedback_on = "close"` es **inalcanzable**: la retroalimentación se
+  libera al cierre, justo cuando la página que la mostraría deja de existir.
+  Esto contradice a [[DEBT-035]], que recomienda `"close"` como la palanca
+  correcta contra la memorización de respuestas entre intentos.
+- Los estudiantes del quiz "Clases, objetos y relaciones entre clases"
+  (Estructuras de datos, 2026-09-11) no podrán repasarlo después de su cierre.
+- La nota solo sigue visible en la tarjeta de Calificaciones, y únicamente si el
+  grupo tiene `grade_item_id`.
+
+**Acción:**
+- Definir un criterio "histórico": grupos con al menos un envío de la matrícula,
+  sin importar la ventana.
+- Relajar la verificación de ventana **solo** en `resultados`, respetando
+  `show_feedback_on`.
+- Agregar una sección "Cerradas" al listado.
+- Al resolverlo, ampliar la decisión D2 de spec-055 para que la tarjeta de
+  acceso cuente también estas evaluaciones.
+
+---
+
+## DEBT-086 — Las evaluaciones próximas no se anuncian al estudiante
+
+**Origen:** análisis de `@architect` para spec-055 (2026-09-10).
+**Prioridad:** Baja — mejora de comunicación, sin pérdida de datos.
+
+Una evaluación publicada con `opens_at` en el futuro es invisible para el
+estudiante hasta el instante en que abre: el listado filtra `opens_at <= now`
+y la ruta del jugador da 404 antes de esa hora. La RLS sí permite leerla
+(`student_sees_published_groups` no filtra por ventana), así que el dato está
+disponible — simplemente no se muestra.
+
+Consecuencia: el estudiante no puede enterarse por la plataforma de que tiene
+un examen mañana; depende de que el docente lo avise por otro canal.
+
+**Acción:** sección "Próximas" en el listado (y, si aplica, en la tarjeta de
+spec-055), mostrando título y fecha de apertura **sin** permitir el acceso.
+Requiere decidir el formateo de fechas con zona horaria explícita (Vercel
+ejecuta en UTC).
+
+---
+
+## DEBT-087 — N+1 en el listado de evaluaciones del estudiante
+
+**Origen:** análisis de `@architect` para spec-055 (2026-09-10).
+**Prioridad:** Baja — el número de grupos por curso es pequeño hoy.
+
+`app/cuenta/cursos/[enrollmentId]/evaluaciones/page.tsx` llama a
+`getSubmissionByStudent` **una vez por grupo** dentro de un `Promise.all`, y
+esa función selecciona `"*, answers(*)"` (`lib/submissions/index.ts`) cuando el
+listado solo usa `status` para la etiqueta. Cada grupo trae todas las
+respuestas del último intento sin necesitarlas.
+
+**Acción:** una sola consulta a `submissions` filtrada por `enrollment_id` y
+por los `variant_group_id` visibles, seleccionando solo
+`variant_group_id, status, attempt_number`, y tomar el intento más alto por grupo.
+
+---
+
+## DEBT-088 — Los envoltorios de sesión de `lib/assignments/index.ts` no usan la caché de Auth
+
+**Origen:** análisis de `@architect` para spec-055 (2026-09-10), verificado en código.
+**Prioridad:** Baja — latencia, no corrección. Relacionado con spec-054
+(resiliencia ante latencia de Supabase).
+
+Los **siete** envoltorios públicos de `lib/assignments/index.ts` llaman
+directamente a `supabase.auth.getUser()` (líneas 432, 445, 458, 472, 486, 555
+y 576), sin pasar por `getCurrentUser()` de `lib/auth/session.ts`, que está
+envuelta en `cache()` de React y deduplica la verificación dentro del mismo
+request. Cada llamada suma una ida y vuelta a Supabase Auth, en el jugador y en
+resultados incluidos.
+
+**Acción:** reemplazar esas llamadas por `getCurrentUser()`. El helper nuevo de
+spec-055 (`getOpenAssignmentGroupsForStudent`) ya adopta ese patrón y sirve de
+referencia.
+
+---
+
+## DEBT-089 — El detalle de matrícula no rechaza matrículas retiradas
+
+**Origen:** análisis de `@architect` para spec-055 (2026-09-10), verificado en código.
+**Prioridad:** Baja — inconsistencia, no fuga de datos: el estudiante solo ve
+su propia matrícula.
+
+`app/cuenta/cursos/[enrollmentId]/page.tsx:29` solo verifica
+`enrollment.student_id !== user.id`. En cambio, el listado de evaluaciones y
+las rutas del jugador y de resultados exigen además `status === "active"` y
+hacen `notFound()` con matrículas `withdrawn`. Un estudiante retirado que entre
+por URL directa ve el detalle, con un criterio distinto al del resto de su área.
+
+**Acción:** decidir si un retirado debe poder consultar su detalle (por
+ejemplo, para ver notas finales) y unificar el criterio. spec-055 decide la
+visibilidad de su tarjeta por `status` sin depender de esto.
+
+---
+
+## DEBT-090 — Consulta en serie evitable en el detalle de matrícula
+
+**Origen:** análisis de `@architect` para spec-055 (2026-09-10), verificado en código.
+**Prioridad:** Baja — agrega una espera secuencial en cada carga de la página.
+
+En `app/cuenta/cursos/[enrollmentId]/page.tsx:59-61`,
+`getSelfAssessmentCourseSummary` se ejecuta **después** del segundo
+`Promise.all`, aunque solo depende de `course`, que ya está resuelto antes. Es
+un nivel de espera secuencial que no hace falta.
+
+**Acción:** mover la llamada al segundo `Promise.all`, junto con progreso y
+lecciones deshabilitadas. Quedó fuera de spec-055 para mantener ese cambio acotado.
+
+---
+
+## DEBT-084 — La página del curso del estudiante no enlaza a "Evaluaciones" [RESUELTO — spec-055]
+
+**Resuelto por `spec-055-acceso-evaluaciones-estudiante.md`** (`[DONE]`,
+2026-09-10): tarjeta `AssignmentsAccessCard` en el detalle de matrícula,
+visible con matrícula activa y al menos una evaluación publicada y dentro de
+ventana, con conteo compartido con el listado vía
+`getOpenAssignmentGroupsForStudent`. Ronda manual: 10/12 casos aprobados
+(`test-055-acceso-evaluaciones-estudiante.md`), cerrado con dos huecos
+conocidos y aceptados por el usuario: TC-055-003 no ejecutado (caída del
+túnel a `asus` durante la ronda) y TC-055-012 parcial (ancho móvil sin
+verificar por limitación de la herramienta de automatización). La ronda
+también encontró y corrigió un defecto real de accesibilidad en el `<Link>`
+de la tarjeta (TC-055-011).
+
+**Origen:** sesión de vista previa del quiz A/B/C de Estructuras de Datos en
+desarrollo (2026-09-10). Al pedir acceder a la evaluación como estudiante, la
+navegación guiada ("entrá al curso y buscá la sección de evaluaciones") no
+llevaba a ningún lado — no existe ese enlace.
+**Prioridad:** Media — bloquea a cualquier estudiante real que no tenga la URL
+directa guardada de una sesión anterior; no es un problema de datos, RLS ni
+publicación (todo eso se verificó sano).
+
+`app/cuenta/cursos/[enrollmentId]/page.tsx` (detalle de matrícula del
+estudiante) no importa ni renderiza ningún `<Link>` hacia
+`/cuenta/cursos/[enrollmentId]/evaluaciones` — el único enlace de la página es
+"Mis cursos", de vuelta al listado (línea 66-74). Las tres rutas de
+evaluaciones existen y funcionan correctamente
+(`evaluaciones/page.tsx`, `evaluaciones/[groupId]/page.tsx`,
+`evaluaciones/[groupId]/resultados/page.tsx`), y `getActiveAssignmentsByEnrollment`
+/ la RLS de `assignment_variant_groups` (`student_sees_published_groups`) ya
+resuelven correctamente qué evaluaciones publicadas y dentro de ventana le
+corresponden a la matrícula — el problema es exclusivamente de navegación, no
+de datos.
+
+Diagnosticado descartando causas de datos primero: matrícula activa,
+`is_published: true`, ventana vigente, y las 30 preguntas publicadas —
+verificado todo contra la base antes de encontrar que la UI simplemente no
+ofrece el enlace.
+
+**Acción:** agregar en `EnrollmentDetail` (o directamente en
+`app/cuenta/cursos/[enrollmentId]/page.tsx`) un enlace o tarjeta hacia
+`/cuenta/cursos/[enrollmentId]/evaluaciones`, visible cuando el curso tiene al
+menos una evaluación publicada y dentro de ventana para esa matrícula (evitar
+un enlace muerto a "No hay evaluaciones disponibles" cuando no aplica).
+
+---
+
 ## DEBT-083 — Publicar una evaluación es irreversible, y el MCP acepta `is_published` sin aplicarlo
 
 **Origen:** sesión de autoría del quiz A/B/C de Estructuras de Datos (2026-09-09).
@@ -31,6 +209,12 @@ desconocido en silencio**. La llamada devuelve `200` con el grupo intacto, así
 que un agente cree haber despublicado y no lo hizo. Es peor que no tener la
 capacidad: induce una falsa sensación de control, igual que el caso de
 `shuffle_*` en [[DEBT-034]] antes de spec-035.
+
+**Exposición aumentada por spec-055:** hasta ahora, publicar por accidente
+pasaba casi desapercibido porque el estudiante no tenía navegación hacia sus
+evaluaciones ([[DEBT-084]]). Con la tarjeta de acceso de spec-055, un grupo
+publicado por error aparece de inmediato para todos los matriculados. Conviene
+resolver esta deuda antes o junto con el despliegue de spec-055.
 
 **Mitigación disponible mientras tanto:** poner `opens_at` en el futuro vía
 `update_assignment_group` saca el grupo del listado del estudiante

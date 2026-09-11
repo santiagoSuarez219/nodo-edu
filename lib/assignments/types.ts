@@ -101,3 +101,13 @@ export interface AssignmentContext {
   supabase: SupabaseClient;
   actorId: string;
 }
+
+// spec-055: resultado del helper que centraliza "evaluaciones publicadas y
+// dentro de ventana para este curso académico" — usado tanto por el listado
+// del estudiante como por la tarjeta de acceso en el detalle de matrícula,
+// para que ambos no puedan divergir. `unavailable` nunca se lanza: cada
+// consumidor decide cómo degradar (mismo contrato que `DisabledLessonsResult`
+// en lib/courses/availability.ts).
+export type OpenAssignmentGroupsResult =
+  | { status: "ok"; groups: AssignmentVariantGroup[] }
+  | { status: "unavailable" };
