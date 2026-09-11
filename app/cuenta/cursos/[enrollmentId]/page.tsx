@@ -8,8 +8,10 @@ import { getCourseBySlug, countProgressibleLessons } from "@/lib/courses";
 import { getDisabledLessonSlugs } from "@/lib/courses/availability";
 import { getCourseProgress } from "@/lib/progress";
 import { getSelfAssessmentCourseSummary } from "@/lib/self-assessment";
+import { getOpenAssignmentGroupsForStudent } from "@/lib/assignments";
 import { EnrollmentDetail } from "@/components/account/EnrollmentDetail";
 import { SelfAssessmentSummaryCard } from "@/components/account/SelfAssessmentSummaryCard";
+import { AssignmentsAccessCard } from "@/components/account/AssignmentsAccessCard";
 
 export const metadata: Metadata = { title: "Detalle de matrícula — Mis cursos" };
 
@@ -32,11 +34,19 @@ export default async function EnrollmentDetailPage({ params }: Props) {
     ? await getCourseBySlug(enrollment.academic_course.course_slug)
     : null;
 
-  const [progressData, disabledResult] = await Promise.all([
+  // spec-055: la tarjeta de acceso a evaluaciones solo se consulta con
+  // matrícula activa — una `withdrawn` no debe mostrarla, y decidirlo antes
+  // de consultar evita depender de la RLS para una decisión de UI. No se
+  // condiciona a `course`: un curso académico sin `course_slug` puede tener
+  // evaluaciones igual (fixture "Curso Vacío" de test-054).
+  const [progressData, disabledResult, openGroupsResult] = await Promise.all([
     course ? getCourseProgress(enrollment.academic_course.course_slug!) : Promise.resolve([]),
     course
       ? getDisabledLessonSlugs(enrollment.academic_course.course_slug!)
       : Promise.resolve({ status: "ok" as const, slugs: new Set<string>() }),
+    enrollment.status === "active"
+      ? getOpenAssignmentGroupsForStudent(enrollment.academic_course_id)
+      : Promise.resolve(null),
   ]);
   // spec-039 (D5, D6): excluir lecciones deshabilitadas de ambos lados del
   // conteo; ante un fallo de infraestructura, degrada a "ninguna
@@ -60,6 +70,15 @@ export default async function EnrollmentDetailPage({ params }: Props) {
     ? await getSelfAssessmentCourseSummary(enrollment.academic_course.course_slug!)
     : null;
 
+  // spec-055 (D4): ante un fallo de la consulta, la tarjeta se muestra igual,
+  // en versión genérica (`openCount: null`) — es una pantalla de lectura, no
+  // el gate real (mismo criterio que `disabledResult` arriba). Ocultarla
+  // justo cuando Supabase va lento reproduciría el bug que este spec corrige.
+  const openCount =
+    openGroupsResult?.status === "ok" ? openGroupsResult.groups.length : null;
+  const showAssignmentsCard =
+    openGroupsResult?.status === "unavailable" || (openCount !== null && openCount > 0);
+
   return (
     <main className="flex-1 pt-6 pb-14 flex flex-col gap-6">
       <div>
@@ -81,6 +100,10 @@ export default async function EnrollmentDetailPage({ params }: Props) {
           </p>
         )}
       </div>
+
+      {showAssignmentsCard && (
+        <AssignmentsAccessCard enrollmentId={enrollmentId} openCount={openCount} />
+      )}
 
       <EnrollmentDetail enrollment={enrollment} gradesData={gradesData} />
 
