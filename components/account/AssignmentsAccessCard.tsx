@@ -21,9 +21,18 @@ export function AssignmentsAccessCard({ enrollmentId, openCount }: Props) {
         ? "Tienes 1 evaluación abierta."
         : `Tienes ${openCount} evaluaciones abiertas.`;
 
+  // TC-055-011: el nombre accesible del `<Link>` no se calculaba desde su
+  // contenido (verificado en el árbol de accesibilidad real de Chrome — el
+  // enlace aparecía sin nombre, a diferencia de cualquier otro de la página),
+  // pese a envolver un `<h2>` y un `<p>` con texto visible. `aria-label`
+  // explícito evita depender de ese cálculo y garantiza el nombre exigido
+  // por el criterio de aceptación 8 del spec, sin importar la causa exacta.
+  const accessibleLabel = `Evaluaciones. ${description}`;
+
   return (
     <Link
       href={`/cuenta/cursos/${enrollmentId}/evaluaciones`}
+      aria-label={accessibleLabel}
       className="flex items-center justify-between gap-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-[var(--radius-base)] px-6 py-5 hover:border-gray-300 dark:hover:border-gray-600 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-200 dark:focus-visible:ring-blue-700"
     >
       <div>
