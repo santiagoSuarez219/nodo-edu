@@ -1,4 +1,21 @@
-# spec-055 — [TESTING] Acceso a las evaluaciones desde el detalle de matrícula del estudiante
+# spec-055 — [DONE] Acceso a las evaluaciones desde el detalle de matrícula del estudiante
+
+> **Cierre (2026-09-10):** ronda manual con 10/12 casos aprobados
+> (`test-055-acceso-evaluaciones-estudiante.md`). Marcado `[DONE]` por
+> decisión explícita del usuario con dos huecos conocidos y aceptados:
+> - **TC-055-003 no ejecutado** — el túnel SSH a `asus` se cayó a mitad de la
+>   ronda, en la ventana exacta para observar el estado "antes de
+>   `opens_at`". Su criterio de aceptación (ocultar sin grupos abiertos) queda
+>   igualmente cubierto por TC-055-002, 008 y 009.
+> - **TC-055-012 parcial** — modo claro y oscuro verificados y correctos; el
+>   ancho móvil (~375px) no se pudo verificar porque `resize_window` no tuvo
+>   efecto sobre el viewport real de la pestaña en el entorno de
+>   automatización usado. Pendiente de verificación manual, sin bloquear el
+>   cierre.
+>
+> TC-055-011 encontró un defecto real de accesibilidad (nombre accesible
+> vacío en el `<Link>` de la tarjeta) y se corrigió en la misma ronda —
+> ver `components/account/AssignmentsAccessCard.tsx`.
 
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.
