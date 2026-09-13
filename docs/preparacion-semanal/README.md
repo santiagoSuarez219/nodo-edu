@@ -11,8 +11,8 @@ las seis sesiones de los tres cursos en una sola pasada.
 
 | Semana | Rango de fechas | Rama | Estado |
 |---|---|---|---|
-| [08](./semana-08.md) | 21–27 sep (AA) | `feat/semana-07-08-analisis-de-algoritmos` | En preparación |
-| [07](./semana-07.md) | 14–20 sep (AA) | `feat/semana-07-08-analisis-de-algoritmos` | En preparación |
+| [08](./semana-08.md) | 21–27 sep (AA) | `feat/semana-07-08-analisis-de-algoritmos` (borrada) | **Desplegada en producción (lección cerrada a estudiantes)** |
+| [07](./semana-07.md) | 14–20 sep (AA) | `feat/semana-07-08-analisis-de-algoritmos` (borrada) | **Desplegada en producción (lecciones cerradas a estudiantes)** |
 | [06](./semana-06.md) | 7–13 sep (AA) · 8–11 sep (ED) · 10 sep (PC) | `feat/semana-06-analisis-de-algoritmos` (borrada) · `feat/semana-06-estructuras-de-datos-operaciones-lista-simple` · `feat/semana-06-programacion-cientifica` (borrada) | AA: mergeada a `development` · ED: en preparación · PC: **desplegada y abierta en producción** |
 | [05](./semana-05.md) | 31 ago – 6 sep (AA) | `feat/semana-05-analisis-de-algoritmos` (borrada) | Mergeada a `development` |
 | [04](./semana-04.md) | 25–28 ago (ED) · 27 ago (PC) | `feat/semana-04-material` (ED) · `feat/semana-04-programacion-cientifica` (PC) | En preparación |

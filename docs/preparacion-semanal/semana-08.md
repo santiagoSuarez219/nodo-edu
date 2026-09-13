@@ -1,7 +1,7 @@
 # Semana 08 — 21 al 27 de septiembre
 
-**Rama:** `feat/semana-07-08-analisis-de-algoritmos` (cubre también la Semana 07, ver `semana-07.md`)
-**Estado:** ✅ Contenido listo · ⬜ `@reviewer` pendiente · ⬜ Merge a `development` pendiente
+**Rama:** `feat/semana-07-08-analisis-de-algoritmos` (borrada, cubre también la Semana 07, ver `semana-07.md`)
+**Estado:** ✅ Contenido listo · ✅ `@reviewer` (1.ª pasada CAMBIOS REQUERIDOS, corregidos) · ✅ Mergeada a `development` · ✅ **Desplegada y en producción (lección cerrada a estudiantes)**
 
 ---
 
@@ -43,11 +43,11 @@ del paradigma de divide y vencerás). La Sesión P — **Laboratorio evaluativo 
 | Lección | Entorno | IDs de preguntas | Publicadas | Montadas (`list_lesson_questions`) |
 |---|---|---|---|---|
 | `sintesis-del-paradigma-de-divide-y-venceras` | desarrollo | `637f7e1d-37f6-44c2-ae76-3760117a1806`, `7359f527-892d-4ce2-a359-fd1babf47155`, `1e213e80-578d-4fad-9c71-90ec9dc71dbc`, `3e04d77f-d161-47cf-baa9-cfe42066f11c` | ✅ | ✅ (orden 0-3) |
-| `sintesis-del-paradigma-de-divide-y-venceras` | **producción** | — | ⬜ | ⬜ |
+| `sintesis-del-paradigma-de-divide-y-venceras` | **producción** | `5bace282-ae5c-4914-bcd0-8a013de63c7d`, `fa905b3e-0c91-4d18-a693-f61baf990063`, `70ffbc51-d30e-41e8-90ac-182e11699604`, `e82c2e34-2095-4a8f-a00c-72d2e3300ef7` | ✅ | ✅ (orden 0-3) |
 
 > Reutiliza las keywords `divide-y-venceras`, `recurrencias`, `metodo-maestro`
-> creadas para la Semana 7, más `complejidad` (ya existente). Las preguntas
-> **no viajan con el deploy**: pendiente de replicar en producción en D3.
+> creadas para la Semana 7, más `complejidad` (ya existente). En producción
+> reutiliza las mismas keywords (ya creadas al desplegar la Semana 7).
 
 ### Quiz calificable A/B/C
 
@@ -84,7 +84,31 @@ informe en GitHub, no con un assignment de `assignment-mcp`.
   una recurrencia nueva, el caso límite de combinar-domina, el caso límite de
   subproblemas-no-se-reducen, y la distinción correcta/conveniente — todas
   montadas y verificadas con `list_lesson_questions`
-- [ ] `@reviewer`: pendiente
+- [x] `@reviewer`: 1.ª pasada **CAMBIOS REQUERIDOS** (compartida con la Semana
+  7, ver detalle completo en `semana-07.md`) — de esta lección específica:
+  el gráfico prometido en "Cuándo dividir no aporta ninguna mejora" nunca se
+  agregó (corregido reescribiendo la frase sin la promesa), el apunte
+  remitía a la sección de ética ya removida (corregido con un cálculo
+  autocontenido), y el Paso 3 del apunte tenía los Problemas A y B con solo
+  3 de las 4 preguntas del checklist cada uno pese a afirmar que las cuatro
+  se recorrían (corregido agregando la pregunta faltante a cada uno).
+
+**Merge a `development`:** ✅ completo, sin conflictos — ver detalle en
+`semana-07.md` (mismo commit de merge, cubre ambas semanas). Rama
+`feat/semana-07-08-analisis-de-algoritmos` borrada (solo local).
+
+## Despliegue a producción (2026-09-13)
+
+Mismo release que la Semana 7 — ver detalle completo (D0-D6) en
+`semana-07.md`. Resumen específico de esta lección:
+
+- **D1:** `sintesis-del-paradigma-de-divide-y-venceras` ya tenía fila de
+  cierre en producción desde el 2026-08-02, sin acción requerida.
+- **D3:** 4 preguntas creadas, publicadas y montadas en producción (ver
+  tabla de "Cuestionario de cierre" arriba), reutilizando las keywords ya
+  creadas para la Semana 7.
+- **D4:** no ejecutado — la lección sigue cerrada a estudiantes, verificado
+  con `get_lesson_availability` tras el deploy.
 
 ## Pendientes
 
@@ -92,3 +116,5 @@ informe en GitHub, no con un assignment de `assignment-mcp`.
   vivo) y el Laboratorio evaluativo 2 de la Semana 8 (★, 15%).
 - Decidir si se retoma la sección de ética/impacto removida del `.mdx` de
   esta lección.
+- Decidir cuándo abrir ambas lecciones (Semana 7 y 8) a los estudiantes —
+  siguen cerradas tras este despliegue, a la espera de esa decisión.
