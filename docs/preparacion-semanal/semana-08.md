@@ -1,7 +1,7 @@
 # Semana 08 — 21 al 27 de septiembre
 
 **Rama:** `feat/semana-07-08-analisis-de-algoritmos` (borrada, cubre también la Semana 07, ver `semana-07.md`)
-**Estado:** ✅ Contenido listo · ✅ `@reviewer` (1.ª pasada CAMBIOS REQUERIDOS, corregidos) · ✅ Mergeada a `development` · ✅ **Desplegada y en producción (lección cerrada a estudiantes)**
+**Estado:** ✅ Contenido listo · ✅ `@reviewer` (1.ª pasada CAMBIOS REQUERIDOS, corregidos) · ✅ Mergeada a `development` · ✅ **Desplegada y abierta en producción**
 
 ---
 
@@ -107,8 +107,10 @@ Mismo release que la Semana 7 — ver detalle completo (D0-D6) en
 - **D3:** 4 preguntas creadas, publicadas y montadas en producción (ver
   tabla de "Cuestionario de cierre" arriba), reutilizando las keywords ya
   creadas para la Semana 7.
-- **D4:** no ejecutado — la lección sigue cerrada a estudiantes, verificado
-  con `get_lesson_availability` tras el deploy.
+- **D4:** ✅ `sintesis-del-paradigma-de-divide-y-venceras` abierta
+  (`courses-mcp-prod`), a pedido explícito del usuario. Verificado con
+  `list_course_lessons`: Semana 9 en adelante sigue cerrada,
+  `orphan_disabled_slugs: []`.
 
 ## Pendientes
 
@@ -116,5 +118,3 @@ Mismo release que la Semana 7 — ver detalle completo (D0-D6) en
   vivo) y el Laboratorio evaluativo 2 de la Semana 8 (★, 15%).
 - Decidir si se retoma la sección de ética/impacto removida del `.mdx` de
   esta lección.
-- Decidir cuándo abrir ambas lecciones (Semana 7 y 8) a los estudiantes —
-  siguen cerradas tras este despliegue, a la espera de esa decisión.

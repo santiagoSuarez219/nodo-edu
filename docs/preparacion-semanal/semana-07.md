@@ -1,7 +1,7 @@
 # Semana 07 — 14 al 20 de septiembre
 
 **Rama:** `feat/semana-07-08-analisis-de-algoritmos` (borrada, cubre también la Semana 08, ver `semana-08.md`)
-**Estado:** ✅ Contenido listo · ✅ `@reviewer` (1.ª pasada CAMBIOS REQUERIDOS, corregidos) · ✅ Mergeada a `development` · ✅ **Desplegada y en producción (lecciones cerradas a estudiantes)**
+**Estado:** ✅ Contenido listo · ✅ `@reviewer` (1.ª pasada CAMBIOS REQUERIDOS, corregidos) · ✅ Mergeada a `development` · ✅ **Desplegada y abierta en producción**
 
 ---
 
@@ -147,9 +147,10 @@ No aplica — la Semana 7 no lleva `★`.
 - **D3 — Banco de preguntas replicado:** ver tabla de "Cuestionario de
   cierre" arriba — 4 preguntas creadas, publicadas y montadas en producción,
   orden 0-3, verificado con `list_lesson_questions`.
-- **D4 — Apertura a estudiantes:** **no ejecutado** — el usuario pidió
-  desplegar el contenido y las preguntas, no abrir las lecciones. Ambas
-  siguen cerradas (`is_disabled: true`, mismo motivo desde 2026-08-02),
-  verificado con `get_lesson_availability` tras el deploy.
+- **D4 — Apertura a estudiantes:** ✅ `subarreglo-maximo-y-strassen` abierta
+  (`courses-mcp-prod`, `set_lesson_availability enabled: true`), a pedido
+  explícito del usuario tras confirmar el despliegue. Verificado con
+  `list_course_lessons`: Semana 9 en adelante sigue cerrada,
+  `orphan_disabled_slugs: []`.
 - **D6:** rama `deploy/semana-07-08-analisis-de-algoritmos` borrada (local,
   no se pusheó a remoto).
