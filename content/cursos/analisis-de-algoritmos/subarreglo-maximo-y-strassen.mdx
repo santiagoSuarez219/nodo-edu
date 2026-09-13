@@ -137,7 +137,7 @@ es $T(n) = \Theta(n\log n)$.
 
 Frente a los `Θ(n²)` de la fuerza bruta acumulada, dividir y vencerás gana el
 mismo tipo de ventaja que ya viste con merge sort: para `n = 365` días, la
-razón `n / log₂ n` es de casi 44 veces menos operaciones, y la brecha crece
+razón `n / log₂ n` es de casi 43 veces menos operaciones, y la brecha crece
 con `n`.
 
 ## El código en Python
@@ -219,12 +219,14 @@ frente a esta versión es trabajo de práctica, no de esta lección.
 
 ## Un segundo problema: multiplicar matrices
 
-El algoritmo escolar —tres bucles
+**Situación:** al margen del subarreglo máximo, la empresa también necesita
+propagar coeficientes de calibración entre estaciones de medición mediante
+multiplicación de matrices grandes. El algoritmo escolar —tres bucles
 anidados— cuesta `Θ(n³)`. Si dividir y vencerás bajó el exponente en el
 problema anterior, ¿hace lo mismo aquí?
 
 **En la práctica**, la partición natural de una matriz `n × n` es en cuatro
-submatrices `n/2 × n/2`:
+submatrices `n/2 × n/2`.
 
 Multiplicar dos matrices particionadas así, `C = A · B`, requiere calcular
 cuatro submatrices de `C`, y cada una es la suma de dos productos de

@@ -111,7 +111,7 @@ def maximo_divide_y_venceras(numeros: list[float]) -> float:
     return izquierda if izquierda > derecha else derecha
 ```
 
-Las dos funciones son Θ(n). La segunda no es más rápida asintóticamente y en la práctica es más lenta: cada llamada recursiva reserva un nuevo marco en la pila, y `numeros[:medio]` copia una porción de la lista en cada partición. El siguiente gráfico compara el trabajo total de ambas versiones a medida que crece `n` — no hay separación entre las curvas, porque las dos son lineales:
+Las dos funciones son Θ(n). La segunda no es más rápida asintóticamente y en la práctica es más lenta: cada llamada recursiva reserva un nuevo marco en la pila, y `numeros[:medio]` copia una porción de la lista en cada partición. Al medir el trabajo total de ambas versiones a medida que crece `n`, no hay separación entre las curvas, porque las dos son lineales.
 
 Dividir el problema aquí no compra ninguna reducción de complejidad: ambas versiones son Θ(n), y la recursiva paga overhead extra sin ninguna contrapartida. Esa es la señal de que **divide y vencerás no siempre mejora las cosas** — a diferencia de merge sort, donde dividir sí cambia la clase de complejidad.
 

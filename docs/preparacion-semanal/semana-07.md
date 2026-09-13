@@ -80,16 +80,17 @@ No aplica — la Semana 7 no lleva `★`.
   completa nivel por nivel (casos base → combinaciones → raíz) de la
   recursión sobre el ejemplo de 8 días, mostrando en cada nivel el cálculo
   del barrido cruzado y qué caso gana — con la observación de que el caso
-  cruzado gana en los tres niveles con más de un elemento.
+  cruzado gana en los dos niveles con más de dos elementos.
 - **Código de conteo de multiplicaciones agregado al apunte**, para deducir
   empíricamente `Θ(n³)` del algoritmo escolar de multiplicación de matrices
   antes de introducir Strassen (razón de crecimiento verificada en
   8.00× exacto al duplicar `n`, y exactamente 8 multiplicaciones para `n=2`,
   el número que Strassen reduce a 7).
-- **Versión recursiva general de Strassen agregada al apunte** (partición en
-  bloques, relleno a potencia de 2, recorte final), más allá del caso base
-  2×2 de la lección — verificada numéricamente contra el algoritmo escolar
-  para `n = 1..17`, incluyendo tamaños que no son potencia de 2.
+- **Versión recursiva de Strassen agregada al apunte** (partición en bloques,
+  sin relleno a potencia de 2 — limitación deliberada, el apunte explica que
+  solo funciona para `n` potencia de 2 y usa `n=3` como demostración en vivo
+  del fallo), más allá del caso base 2×2 de la lección. Verificada
+  numéricamente contra el algoritmo escolar para `n = 2, 4, 8, 16`.
 - **Otra inconsistencia corregida en el apunte**: el caso de prueba de
   `strassen_2x2` (`a`, `b`) había sido editado directamente en el archivo sin
   actualizar el `esperado` ni los comentarios de la cuenta a mano — el

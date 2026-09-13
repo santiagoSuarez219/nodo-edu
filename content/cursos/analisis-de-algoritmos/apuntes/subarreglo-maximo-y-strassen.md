@@ -269,12 +269,15 @@ todavía no gana el cruzado, eso pasa en el nivel siguiente.
 - Comparar `11` (izq.) vs. `12` (der.) vs. `17` (cruzado) → **gana el
   cruzado** → retorna **`(1, 6, 17)`: días 2 a 7, suma `+17`**.
 
-Punto a resaltar (el más importante de la traza): en **los tres niveles con
-más de un elemento**, gana el caso cruzado — es la evidencia visual, trazada
-a mano, de por qué `suma_cruzada` no es un caso secundario sino el corazón
-del algoritmo. Sin él, la recursión encontraría como mucho `(3,3,8)` (el
-mejor caso izquierdo o derecho puro en algún nivel), muy por debajo del
-`+17` real.
+Punto a resaltar (el más importante de la traza): en **los dos niveles con
+más de dos elementos** (Nivel 1 y la raíz), gana el caso cruzado — en el
+Nivel 2 (pares de un solo día) el cruzado no gana ninguna de las cuatro
+veces, porque ahí "cruzar" es solo sumar dos elementos sueltos, sin barrido
+real. Es la evidencia visual, trazada a mano, de por qué `suma_cruzada` no es
+un caso secundario sino el corazón del algoritmo a medida que crece el
+arreglo. Sin él (dejando que la recursión compare solo izquierda vs.
+derecha, sin nunca considerar el cruce), la recursión encontraría `(6, 6, 9)`
+— el mejor elemento suelto de toda la serie —, muy por debajo del `+17` real.
 
 Con la traza ya hecha en el tablero, se corre el código para confirmar:
 
@@ -427,8 +430,10 @@ def deducir_complejidad_multiplicacion(tamanos: list[int]) -> None:
     anterior = None
     print(f"{'n':>4} | {'multiplicaciones':>17} | {'razon vs. anterior':>19}")
     for n in tamanos:
-        _, multiplicaciones = multiplicar_escolar(generar_matriz(n), generar_matriz(n))
-        print(f"n = {n}, multiplicaciones = {multiplicaciones} ")
+        _, multiplicaciones = multiplicar_escolar_contada(generar_matriz(n), generar_matriz(n))
+        razon = "-" if anterior is None else f"{multiplicaciones / anterior:.2f}"
+        print(f"{n:>4} | {multiplicaciones:>17} | {razon:>19}")
+        anterior = multiplicaciones
 
 
 deducir_complejidad_multiplicacion([2, 4, 8, 16, 32])
@@ -520,11 +525,13 @@ multiplicaciones **recursivamente** sobre esos bloques, y ensamblar el
 resultado.
 
 **Sobre matrices de tamaño impar o que no son potencia de 2:** la recursión
-solo puede partir en dos mitades enteras si `n` es par. La solución estándar
-(la misma que usa Cormen) es rellenar la matriz con ceros hasta la siguiente
-potencia de 2, multiplicar, y recortar el resultado al tamaño original al
-final — el relleno no cambia el producto porque multiplicar por columnas o
-filas de ceros aporta cero al resultado.
+solo puede partir en dos mitades enteras si `n` es par en cada nivel, así que
+esta versión **solo funciona para `n` potencia de 2** (2, 4, 8, 16, ...).
+Decirlo explícitamente en clase: la solución real para cualquier tamaño
+(rellenar con ceros hasta la siguiente potencia de 2 y recortar el resultado
+al final, como hace Cormen) queda fuera de este apunte a propósito — es una
+extensión natural, pero no es necesaria para entender el mecanismo de la
+recursión, que es el objetivo aquí.
 
 ```python
 import random
@@ -585,8 +592,15 @@ def deducir_complejidad_multiplicacion(tamanos: list[int]) -> None:
         _, multiplicaciones = multiplicar_escolar(generar_matriz(n), generar_matriz(n))
         print(f"n = {n}, multiplicaciones = {multiplicaciones} ")
 
-def strassen_2x2(a: Matriz, b: Matriz) -> tuple[Matriz, int]:
-    """Multiplica dos matrices 2x2 con las 7 multiplicaciones de Strassen."""
+def strassen_2x2_contada(a: Matriz, b: Matriz) -> tuple[Matriz, int]:
+    """Multiplica dos matrices 2x2 con las 7 multiplicaciones de Strassen.
+
+    Variante de `strassen_2x2` que además devuelve el conteo de
+    multiplicaciones (siempre 7), para que `strassen` pueda acumularlo a
+    través de la recursión. Nombre distinto a propósito: no reemplaza a
+    `strassen_2x2` de la sección anterior, que sigue devolviendo solo la
+    matriz.
+    """
     a11, a12 = a[0][0], a[0][1]
     a21, a22 = a[1][0], a[1][1]
     b11, b12 = b[0][0], b[0][1]
@@ -625,12 +639,31 @@ def unir_bloques(c11: Matriz, c12: Matriz, c21: Matriz, c22: Matriz) -> Matriz:
     return superior + inferior
 
 def strassen(a: Matriz, b: Matriz, tamano_base: int = 2) -> tuple[Matriz, int]:
-    """Multiplica dos matrices cuadradas de cualquier tamaño con Strassen,
-    contando las multiplicaciones escalares realizadas en toda la recursión.
+    """Multiplica dos matrices cuadradas con Strassen, contando las
+    multiplicaciones escalares realizadas en toda la recursión.
+
+    Limitación deliberada: **solo funciona si `n` es una potencia de 2**
+    (2, 4, 8, 16, ...). `dividir_en_bloques` asume que `n` siempre se puede
+    partir en mitades enteras hasta llegar a `tamano_base`; con un `n` que
+    no es potencia de 2 (p. ej. `n=3` o `n=5`), la partición deja de caer
+    exacta y el código falla. La solución real (rellenar con ceros hasta la
+    siguiente potencia de 2 y recortar el resultado al final, como hace
+    Cormen) queda fuera de este apunte a propósito — vale la pena decírselo
+    al grupo explícitamente en vez de dejar que lo descubran con un error.
+
+    Args:
+        a: Matriz izquierda, n x n, con n potencia de 2.
+        b: Matriz derecha, n x n, con n potencia de 2.
+        tamano_base: Tamaño de matriz a partir del cual se resuelve con
+            `strassen_2x2_contada` en vez de seguir dividiendo.
+
+    Returns:
+        Una tupla (producto, multiplicaciones) con la matriz resultante y el
+        total de multiplicaciones escalares usadas.
     """
     n = len(a)
     if n <= tamano_base:
-        return strassen_2x2(a, b)
+        return strassen_2x2_contada(a, b)
 
     a11, a12, a21, a22 = dividir_en_bloques(a)
     b11, b12, b21, b22 = dividir_en_bloques(b)
@@ -730,31 +763,29 @@ if __name__ == "__main__":
 
 ```
 
-Caso de prueba: verificar contra `multiplicar_escolar` para varios tamaños,
-incluyendo uno que **no** es potencia de 2 (para mostrar que el relleno
-funciona):
+Caso de prueba: verificar contra `multiplicar_escolar` para tamaños potencia
+de 2 (los únicos que esta versión soporta):
 
 ```python
 import random
 
 random.seed(0)
-for n in [1, 2, 3, 4, 5, 8, 9, 16]:
+for n in [2, 4, 8, 16]:
     a = [[random.uniform(-5, 5) for _ in range(n)] for _ in range(n)]
     b = [[random.uniform(-5, 5) for _ in range(n)] for _ in range(n)]
     esperado = multiplicar_escolar(a, b)
-    obtenido = strassen(a, b)
+    obtenido, _ = strassen(a, b)  # strassen devuelve (matriz, multiplicaciones)
     diferencia = max(
         abs(esperado[i][j] - obtenido[i][j]) for i in range(n) for j in range(n)
     )
     assert diferencia < 1e-9, f"strassen difiere de multiplicar_escolar para n={n}"
 
-print("strassen coincide con multiplicar_escolar para n = 1..16, incluyendo n=3, 5, 9")
+print("strassen coincide con multiplicar_escolar para n = 2, 4, 8, 16")
 ```
 
-Punto a resaltar: `n = 3, 5, 9` no son potencias de 2 y aun así el resultado
-es correcto — es la demostración en vivo de que Strassen **sí** sirve para
-cualquier matriz cuadrada, no solo para tamaños "convenientes"; el precio es
-el relleno con ceros (trabajo extra que no cambia el orden asintótico). Si
+Punto a resaltar: **mostrar en vivo que `strassen(a, b)` falla para `n = 3`**
+(o cualquier tamaño que no sea potencia de 2) es tan valioso como el caso que
+sí funciona — es la evidencia de la limitación que el texto ya advirtió. Si
 alguien pregunta por qué `tamano_base = 2` y no `1`: es una decisión
 práctica — parar la recursión antes, en matrices más grandes que 1×1,
 suele compensar mejor el overhead de las llamadas recursivas; el valor

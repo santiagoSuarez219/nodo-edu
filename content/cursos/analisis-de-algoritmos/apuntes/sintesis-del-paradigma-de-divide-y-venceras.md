@@ -117,11 +117,13 @@ una porción de la lista en cada partición (la iterativa no copia nada). Si
 > pena mencionar si alguien pregunta por qué no se prueba con `n` todavía
 > mayor.
 
-Cierra el paso retomando la cuenta exacta de copias que trae la lección:
-`≈ n log₂ n` elementos copiados en total contra cero de la versión iterativa,
-y la cifra ya calculada para el caso de la empresa (`≈ 3,85 × 10⁷` números de
-más cada noche, sin cambiar el resultado). Los tiempos medidos en pantalla
-son la evidencia empírica de ese mismo argumento.
+Cierra el paso con la cuenta exacta de copias (no está en la lección
+publicada, es material propio de este apunte): cada uno de los `log₂ n`
+niveles de recursión copia, entre todas sus llamadas, los `n` elementos de
+esa "capa", así que el total de copias es `≈ n log₂ n` elementos, contra
+cero de la versión iterativa — sin que el resultado final cambie en
+absoluto. Los tiempos medidos en pantalla son la evidencia empírica de ese
+mismo argumento.
 
 ## Paso 3 — repaso del checklist de 4 señales con preguntas socráticas
 
@@ -138,6 +140,9 @@ elementos".**
   tipo?"* — Respuesta esperada: sí, buscar en la mitad izquierda y buscar en
   la mitad derecha son ambos "buscar un valor en una lista", el mismo
   problema en tamaño menor.
+- *"¿Los subproblemas son sustancialmente más pequeños?"* — Respuesta
+  esperada: sí, cada mitad tiene `n/2` elementos, igual que en merge sort o
+  en el máximo.
 - *"¿Combinar cuesta menos que resolver todo de una vez?"* — Respuesta
   esperada: combinar aquí es solo "¿lo encontró la izquierda o la derecha?",
   una operación booleana casi gratis — igual que combinar en
@@ -152,6 +157,10 @@ elementos".**
 **Problema B — "Contar cuántos números pares hay en una lista de `n`
 elementos".**
 
+- *"¿El problema se descompone en subproblemas independientes del mismo
+  tipo?"* — Respuesta esperada: sí, contar pares en la mitad izquierda y en
+  la mitad derecha son ambos "contar pares en una lista", el mismo problema
+  en tamaño menor.
 - *"¿Los subproblemas son sustancialmente más pequeños?"* — Respuesta
   esperada: sí, cada mitad tiene `n/2` elementos, igual que en merge sort o
   en el máximo.
