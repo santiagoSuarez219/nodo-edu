@@ -152,6 +152,8 @@ export const analisisDeAlgoritmos: Course = {
       articleSlug: "subarreglo-maximo-y-strassen",
       order: 7,
       title: "Subarreglo máximo y Strassen",
+      summary:
+        "Dos problemas de divide y vencerás donde dividir a la mitad no basta: el subarreglo máximo, que exige resolver el caso cruzado, y la multiplicación de matrices, donde la partición ingenua no gana nada y el truco de Strassen sí — resueltos con el método maestro de la Semana 6.",
       topics: [
         { title: "El problema del subarreglo máximo resuelto por divide y vencerás" },
         { title: "El algoritmo de Strassen para multiplicación de matrices" },
@@ -164,6 +166,8 @@ export const analisisDeAlgoritmos: Course = {
       articleSlug: "sintesis-del-paradigma-de-divide-y-venceras",
       order: 8,
       title: "Síntesis del paradigma de divide y vencerás",
+      summary:
+        "El mismo esquema —dividir, conquistar, combinar— detrás de merge sort, el subarreglo máximo y Strassen, y el criterio que decide cuándo conviene usarlo: por qué dividir un arreglo para hallar su máximo no gana nada frente a recorrerlo una vez.",
       topics: [
         { title: "Repaso del esquema general: dividir, conquistar, combinar" },
         { title: "Cuándo divide y vencerás es la técnica adecuada" },
