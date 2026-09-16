@@ -275,6 +275,8 @@ export const estructurasDeDatos: Course = {
       articleSlug: "eliminacion-en-lista-simple-y-comparacion-con-arreglos",
       order: 19,
       title: "Eliminación en lista simple y comparación con arreglos",
+      summary:
+        "Cómo eliminar un nodo de ListaSimple<Transaccion> sin desplazar el resto de la cadena, y con qué criterio decides si el historial de un sistema bancario vive mejor en una lista que en un arreglo.",
       topics: [
         { title: "Eliminación al inicio, al final y por valor en lista simple" },
         { title: "Ventajas y desventajas frente a arreglos: acceso, inserción, memoria" },

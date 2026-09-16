@@ -316,6 +316,102 @@ No aplica — la Semana 6 de `estructuras-de-datos` no lleva `★`.
 
 ---
 
+## Ronda — `estructuras-de-datos` · segunda mitad de T1 (2026-09-15 a 2026-09-16)
+
+**Alcance confirmado por el usuario:** la lección `order: 19`
+("Eliminación en lista simple y comparación con arreglos"), que la ronda
+anterior de esta misma semana dejó explícitamente fuera. Es la segunda mitad
+de la Sesión T1 del cronograma (eliminación al inicio/final/por valor,
+comparación con arreglos, cuándo elegir lista sobre arreglo).
+
+### Sesiones cubiertas
+
+| Sesión | Fecha | Tema | ★/◇ |
+|---|---|---|---|
+| T1 (2.ª mitad) | 8 sep | Eliminación en lista simple (inicio, final, por valor); comparación lista vs. arreglo; criterio de decisión | — |
+
+### Etapas y aprobaciones
+
+| Etapa | Resultado | Aprobada por el usuario |
+|---|---|---|
+| E0 · Arranque | Rama `feat/semana-06-estructuras-de-datos-eliminacion-lista-simple` creada desde `development` (commit posterior a los cambios ya aprobados) | ✅ |
+| E2 · Plan de lección | Aprobado por `@lesson-designer`; 4 decisiones abiertas resueltas por el usuario (apuntes sí, caso de estudio Sistema Bancario, sin quiz A/B/C) | ✅ |
+| E3 · Lección `.mdx` + registro TS | `eliminacion-en-lista-simple-y-comparacion-con-arreglos`, `order: 19` — aprobada | ✅ |
+| E4 · Apuntes del docente | Pedidos explícitamente; producidos por `@lab-designer` | ✅ |
+| E5 · Cuestionario de cierre | Propuesto: 6 preguntas → aprobadas 5 (P6, sobre el caso Sistema Bancario, descartada por el usuario) | ✅ |
+| E6 · Guía del estudiante | No aplica — sesión T1 teórica, no práctica | — |
+| E6 · Quiz A/B/C | No aplica — Semana 6 sin `★` | — |
+
+### Artefactos producidos
+
+| Artefacto | Ruta | Publicado |
+|---|---|---|
+| Lección teórica | `content/cursos/estructuras-de-datos/eliminacion-en-lista-simple-y-comparacion-con-arreglos.mdx` | ✅ (en la rama, pendiente de merge y deploy) |
+| Registro TS | `lib/courses/data/estructuras-de-datos.ts` (`order: 19`) | — |
+| Apunte de clase | `content/cursos/estructuras-de-datos/apuntes/eliminacion-en-lista-simple-y-comparacion-con-arreglos.md` | Solo owner/admin (en la rama) |
+| Guía del estudiante | — | No aplica |
+
+### Cuestionario de cierre
+
+| Lección | Entorno | IDs de preguntas | Publicadas | Montadas (`list_lesson_questions`) |
+|---|---|---|---|---|
+| `eliminacion-en-lista-simple-y-comparacion-con-arreglos` | desarrollo | `601ddfc6-f533-410e-8dd0-862c7327a851`, `4b23c63a-162f-46dd-89f0-892b62f3c3bc`, `a4571cc0-bd1f-462e-8bae-e00e9de6c06f`, `51f94f9c-a7c1-49cc-970e-527df26e8810`, `f6ee5411-5841-4c06-b12f-85f6604a6418` | ✅ | ✅ (orden 0-4) |
+| `eliminacion-en-lista-simple-y-comparacion-con-arreglos` | **producción** | — | ⬜ | ⬜ |
+
+> Keyword nueva creada en desarrollo: `arreglos` (kind: `tema`). Las
+> preguntas **no viajan con el deploy**: pendiente de replicar en producción
+> en D3.
+
+### Quiz calificable A/B/C
+
+No aplica — la Semana 6 de `estructuras-de-datos` no lleva `★`.
+
+### Decisiones tomadas por Claude en nombre del docente
+
+> Todo lo que se resolvió sin preguntar y el usuario debería poder revertir.
+
+- **Se revirtió una edición accidental** en
+  `content/cursos/estructuras-de-datos/microdiseno/info.md` (un carácter `s`
+  suelto y un cambio de espacio en blanco) que apareció en el árbol de
+  trabajo sin que ningún agente reportara haberla hecho — probablemente
+  quedó de una lectura de un subagente anterior. Revertida con
+  `git checkout --` antes del commit; el archivo de microdiseño no forma
+  parte del alcance de esta ronda.
+
+**Hallazgos de `@reviewer` (1.ª pasada, `APROBADO`) y su resolución:**
+
+| # | Severidad | Hallazgo | Resolución |
+|---|---|---|---|
+| 1 | 🟠 Mayor | `NoSuchElementException` se usa sin `import` en `.mdx` y apuntes; el código no compila tal como está proyectado (es `java.util.*`, no `java.lang.*`, primera vez que el curso lo usa) | Corregido: nota explícita del `import` en el `.mdx` (antes del primer código) y en la nota de contexto de los apuntes |
+| 2 | 🟠 Mayor | El tercer diagrama Mermaid (comparación lista/arreglo) tenía las aristas invertidas: `LA→LB` sólida + `LB-.->LC` punteada, cuando la referencia que se rompe es `LA→LB` | Corregido: `LA-.->LB` (rota) + `LA-->LC` (reescrita) |
+| 3 | 🟡 Menor | `updatedAt: "2026-09-15"` con commit del 16 | Corregido: `2026-09-16` |
+| 4 | 🟡 Menor | La nota de contexto de los apuntes omitía `estaVacia`, `getTamano` y `recorrerEImprimir` como métodos preexistentes que los pasos sí usan — mismo hallazgo que la ronda anterior de esta semana | Corregido: agregados a la lista |
+| 5 | 🟡 Menor | Typo "una nodo" en apuntes línea 89 | Corregido: "un nodo" |
+| 6 | 🟡 Menor | El cierre del `.mdx` adelantaba la lección siguiente (lista doblemente enlazada), contra la convención de `lesson-authoring` §2.3 de solo referencias hacia atrás | Corregido: cierre reescrito sin adelantar contenido futuro |
+
+Sugerencias 🔵 (nodos flotantes en diagramas 1-2, `equals()` no null-safe en
+`eliminarPorValor`) quedaron sin aplicar — son de oportunidad, mismo
+criterio que la ronda anterior de esta semana con hallazgos equivalentes.
+
+### Verificación (E7)
+
+- [x] `npm run build` en verde (antes y después de las correcciones)
+- [x] `npm run lint` en verde (0 errores, 10 advertencias preexistentes sin relación)
+- [x] Checklist de `lesson-authoring` §8 recorrido: sin `# H1`, sin `###`,
+  sin placeholders, `updatedAt` de hoy, `summary` en frontmatter y en
+  registro TS, 3 diagramas Mermaid
+- [x] Apuntes de clase sin entrada TS propia (se resuelven por convención de
+  nombre sobre `articleSlug`)
+- [x] Preguntas publicadas y montadas en desarrollo — verificado con
+  `list_lesson_questions` (orden 0-4)
+- [x] Coherencia cruzada: las 5 preguntas cubren las secciones de
+  eliminación, complejidad y comparación de la lección
+- [x] `@reviewer`: 1.ª pasada `APROBADO` (0 bloqueantes, 2 mayores, 4
+  menores) — los 2 mayores y 3 de los 4 menores corregidos en la misma
+  rama, sin nueva pasada de `@reviewer` solicitada
+
+---
+
 ## Ronda — `programacion-cientifica` (2026-09-09)
 
 **Alcance confirmado por el usuario:** Semana 6 (jueves 10 sep 2026), sesión
