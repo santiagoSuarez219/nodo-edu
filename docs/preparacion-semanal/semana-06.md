@@ -410,6 +410,16 @@ criterio que la ronda anterior de esta semana con hallazgos equivalentes.
   menores) — los 2 mayores y 3 de los 4 menores corregidos en la misma
   rama, sin nueva pasada de `@reviewer` solicitada
 
+**Merge a `development`:** ✅ completo, sin conflictos (commit `36abd73`,
+`merge: week 6 T1 lesson on list deletion vs arrays`). `npm run build`
+verificado en verde sobre `development` ya mergeada. Push a
+`origin/development` hecho. Rama
+`feat/semana-06-estructuras-de-datos-eliminacion-lista-simple` borrada
+(solo local).
+
+**Pendiente:** despliegue a producción (Parte 2, D0-D6) — código y
+preguntas del cuestionario, aún sin iniciar.
+
 ---
 
 ## Ronda — `programacion-cientifica` (2026-09-09)
