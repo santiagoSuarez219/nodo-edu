@@ -378,9 +378,24 @@ No aplica — la Semana 6 de `estructuras-de-datos` no lleva `★`.
   `git checkout --` antes del commit; el archivo de microdiseño no forma
   parte del alcance de esta ronda.
 
+**Hallazgos de `@reviewer` (1.ª pasada, `APROBADO`) y su resolución:**
+
+| # | Severidad | Hallazgo | Resolución |
+|---|---|---|---|
+| 1 | 🟠 Mayor | `NoSuchElementException` se usa sin `import` en `.mdx` y apuntes; el código no compila tal como está proyectado (es `java.util.*`, no `java.lang.*`, primera vez que el curso lo usa) | Corregido: nota explícita del `import` en el `.mdx` (antes del primer código) y en la nota de contexto de los apuntes |
+| 2 | 🟠 Mayor | El tercer diagrama Mermaid (comparación lista/arreglo) tenía las aristas invertidas: `LA→LB` sólida + `LB-.->LC` punteada, cuando la referencia que se rompe es `LA→LB` | Corregido: `LA-.->LB` (rota) + `LA-->LC` (reescrita) |
+| 3 | 🟡 Menor | `updatedAt: "2026-09-15"` con commit del 16 | Corregido: `2026-09-16` |
+| 4 | 🟡 Menor | La nota de contexto de los apuntes omitía `estaVacia`, `getTamano` y `recorrerEImprimir` como métodos preexistentes que los pasos sí usan — mismo hallazgo que la ronda anterior de esta semana | Corregido: agregados a la lista |
+| 5 | 🟡 Menor | Typo "una nodo" en apuntes línea 89 | Corregido: "un nodo" |
+| 6 | 🟡 Menor | El cierre del `.mdx` adelantaba la lección siguiente (lista doblemente enlazada), contra la convención de `lesson-authoring` §2.3 de solo referencias hacia atrás | Corregido: cierre reescrito sin adelantar contenido futuro |
+
+Sugerencias 🔵 (nodos flotantes en diagramas 1-2, `equals()` no null-safe en
+`eliminarPorValor`) quedaron sin aplicar — son de oportunidad, mismo
+criterio que la ronda anterior de esta semana con hallazgos equivalentes.
+
 ### Verificación (E7)
 
-- [x] `npm run build` en verde
+- [x] `npm run build` en verde (antes y después de las correcciones)
 - [x] `npm run lint` en verde (0 errores, 10 advertencias preexistentes sin relación)
 - [x] Checklist de `lesson-authoring` §8 recorrido: sin `# H1`, sin `###`,
   sin placeholders, `updatedAt` de hoy, `summary` en frontmatter y en
@@ -391,7 +406,9 @@ No aplica — la Semana 6 de `estructuras-de-datos` no lleva `★`.
   `list_lesson_questions` (orden 0-4)
 - [x] Coherencia cruzada: las 5 preguntas cubren las secciones de
   eliminación, complejidad y comparación de la lección
-- [ ] `@reviewer` — pendiente, se ejecuta antes del merge a `development`
+- [x] `@reviewer`: 1.ª pasada `APROBADO` (0 bloqueantes, 2 mayores, 4
+  menores) — los 2 mayores y 3 de los 4 menores corregidos en la misma
+  rama, sin nueva pasada de `@reviewer` solicitada
 
 ---
 

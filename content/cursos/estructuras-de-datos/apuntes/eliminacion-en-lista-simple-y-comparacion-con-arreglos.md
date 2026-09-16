@@ -1,12 +1,18 @@
 > Sesión T1, Semana 6, segunda mitad — desarrollo en vivo del docente,
 > continuación directa de la primera mitad (`operaciones-sobre-la-lista-simple`).
 > `ListaSimple<Transaccion>` ya tiene `insertarInicio`, `insertarFinal`,
-> `insertarEnPosicion`, `buscarPorIndice` y `buscarPorValor`. Hoy se agregan
-> las tres eliminaciones — `eliminarInicio`, `eliminarFinal` y
-> `eliminarPorValor` — sobre la misma clase `Transaccion` y la misma
-> instancia `historial` que quedó armada al cierre de la primera mitad, y se
-> cierra con la comparación lista vs. arreglo y el criterio de decisión
-> aplicado al Sistema Bancario. Esta sesión no tiene laboratorio propio.
+> `insertarEnPosicion`, `buscarPorIndice`, `buscarPorValor`, `estaVacia`,
+> `getTamano` y `recorrerEImprimir`. Hoy se agregan las tres eliminaciones —
+> `eliminarInicio`, `eliminarFinal` y `eliminarPorValor` — sobre la misma
+> clase `Transaccion` y la misma instancia `historial` que quedó armada al
+> cierre de la primera mitad, y se cierra con la comparación lista vs.
+> arreglo y el criterio de decisión aplicado al Sistema Bancario. Esta
+> sesión no tiene laboratorio propio.
+>
+> Las tres eliminaciones lanzan `java.util.NoSuchElementException` en el
+> caso borde de lista vacía — agrega
+> `import java.util.NoSuchElementException;` al inicio de
+> `ListaSimple.java` antes del Paso 1, o el proyecto no compila.
 
 ## Paso 1 — Eliminar al inicio: `eliminarInicio`
 
@@ -80,7 +86,7 @@ Explicación línea a línea:
 - `actual.setSiguiente(null);` — única línea que modifica la cadena: el
   penúltimo suelta la referencia al último, que queda sin nadie que lo
   señale.
-- `tamano--;` se ejecuta en las dos ramas (una nodo, y más de uno).
+- `tamano--;` se ejecuta en las dos ramas (un nodo, y más de uno).
 
 Punto a resaltar: contrastar en voz alta con `eliminarInicio()` — ahí basta
 con leer `head`, acá hay que **recorrer** para encontrar el nodo correcto.

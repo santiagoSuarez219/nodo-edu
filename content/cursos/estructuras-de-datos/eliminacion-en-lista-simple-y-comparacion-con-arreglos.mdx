@@ -12,7 +12,7 @@ slides_hint: "Cada sección ## es una diapositiva. Presentación sincrona."
 date: "2026-09-15"
 author: "Asistente de Docencia"
 summary: "Cómo eliminar un nodo de ListaSimple<Transaccion> sin desplazar el resto de la cadena, y con qué criterio decides si el historial de un sistema bancario vive mejor en una lista que en un arreglo."
-updatedAt: "2026-09-15"
+updatedAt: "2026-09-16"
 ---
 
 ## El problema: quitar sin desplazar
@@ -40,6 +40,11 @@ posterior — no hace falta destruirlo explícitamente. El único caso borde es
 la lista con un solo nodo: ahí el "siguiente" del `head` es `null`, y `head`
 termina valiendo `null` también, que es exactamente la condición de lista
 vacía.
+
+Las tres eliminaciones señalan ese caso borde con `NoSuchElementException`,
+que a diferencia de `IndexOutOfBoundsException` no vive en `java.lang`:
+necesita `import java.util.NoSuchElementException;` al inicio de
+`ListaSimple.java`.
 
 ```java
 public void eliminarInicio() {
@@ -204,9 +209,8 @@ flowchart TB
   end
   subgraph ListaEliminar["Lista: eliminar en medio"]
     direction LR
-    LA["Nodo Tx1"] --> LB["Nodo Tx2"]
-    LB -.->|"referencia rota"| LC["Nodo Tx3"]
-    LA -->|"siguiente reescrito"| LC
+    LA["Nodo Tx1"] -.->|"referencia rota"| LB["Nodo Tx2"]
+    LA -->|"siguiente reescrito"| LC["Nodo Tx3"]
     LC --> LD["Nodo Tx4"]
   end
 ```
@@ -255,6 +259,6 @@ botella que sería en otro dominio.
   lista porque prioriza altas y bajas frecuentes sobre acceso aleatorio.
 
 Con inserción, búsqueda y eliminación completas, `ListaSimple<T>` ya cubre
-el ciclo entero de operaciones sobre un solo sentido de recorrido. Queda
-pendiente ver qué pasa cuando cada nodo también conoce a su anterior — lista
-doblemente enlazada.
+el ciclo entero de operaciones sobre un solo sentido de recorrido: desde el
+nodo y la memoria dinámica hasta el reenlace de referencias que reemplaza
+todo desplazamiento.
