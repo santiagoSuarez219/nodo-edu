@@ -417,6 +417,55 @@ verificado en verde sobre `development` ya mergeada. Push a
 `feat/semana-06-estructuras-de-datos-eliminacion-lista-simple` borrada
 (solo local).
 
+### Despliegue a producción (2026-09-16)
+
+- **D0 — Checklist:** sin cambios de esquema (`git diff --stat
+  origin/main..HEAD -- supabase/` vacío, despliegue solo de código);
+  `npm run build`/`lint` en verde; sin datos de prueba pendientes.
+- **D1 — Cierre preventivo:** no fue necesario ejecutar nada — la lección
+  `order: 19` ya estaba cerrada en producción de antes
+  (`is_disabled: true`, motivo "Contenido aún en stub..."), así que no
+  corría riesgo de abrirse sola al desplegar.
+- **D2 — Deploy:** rama `deploy/semana-06-ed-eliminacion-lista-simple` →
+  merge a `main` (commit `6c18965`) → push a `origin/main`. Vercel
+  desplegó en ~35s (`dpl_7Kg9Jh6Poio32AZsAd5NQD6tMZu3`, `READY`,
+  `target: production`). `https://www.nod0.dev` responde (redirige a
+  `/login` sin sesión, comportamiento esperado). Rama `deploy/` borrada
+  tras el merge.
+- **D3 — Cuestionario en producción:** confirmado explícitamente por el
+  usuario. Keywords `listas`, `nodos`, `complejidad`, `arreglos` ya
+  existían en el catálogo de producción. `list_questions` verificó 0
+  preguntas previas en esta lección (sin ronda a medias). 5 preguntas
+  creadas, publicadas y montadas en `question-bank-mcp-prod`, contenido
+  idéntico al de desarrollo:
+
+  | Orden | ID producción | Dificultad | Keywords |
+  |---|---|---|---|
+  | 0 | `320521d6-d1f1-4b58-9694-d698c6bd79ab` | 1 | listas, nodos |
+  | 1 | `d071ad39-2bef-4664-99a5-84d94b6b405a` | 2 | listas, nodos |
+  | 2 | `7d54e4a5-4c51-445c-bcb0-66667c434408` | 2 | listas, nodos |
+  | 3 | `b68b0e86-75f0-4304-9bd4-a115e0f0e801` | 3 | listas, complejidad |
+  | 4 | `a80616ed-0c35-4237-82e3-c1471412f481` | 3 | listas, arreglos, complejidad |
+
+- **D4 — Apertura a estudiantes:** confirmado explícitamente por el
+  usuario. `set_lesson_availability(enabled: true)` en
+  `courses-mcp-prod` para `eliminacion-en-lista-simple-y-comparacion-con-arreglos`.
+  Verificado con `list_course_lessons`: `order: 19` queda
+  `is_disabled: false`; `order: 20` (lista doblemente enlazada, semana
+  siguiente) confirmada **sin tocar**, sigue `is_disabled: true`.
+- **D5 — Verificación E2E:** no se abrió navegador (regla del proyecto:
+  solo si el usuario lo pide explícitamente). Verificado por API: sitio
+  responde, lección abierta, preguntas montadas.
+
+### Cuestionario de cierre (actualizado)
+
+| Lección | Entorno | IDs de preguntas | Publicadas | Montadas |
+|---|---|---|---|---|
+| `eliminacion-en-lista-simple-y-comparacion-con-arreglos` | desarrollo | `601ddfc6…`, `4b23c63a…`, `a4571cc0…`, `51f94f9c…`, `f6ee5411…` | ✅ | ✅ |
+| `eliminacion-en-lista-simple-y-comparacion-con-arreglos` | **producción** | `320521d6…`, `d071ad39…`, `7d54e4a5…`, `b68b0e86…`, `a80616ed…` | ✅ | ✅ |
+
+**Estado final de la ronda:** ✅ desplegada y abierta en producción.
+
 **Pendiente:** despliegue a producción (Parte 2, D0-D6) — código y
 preguntas del cuestionario, aún sin iniciar.
 
