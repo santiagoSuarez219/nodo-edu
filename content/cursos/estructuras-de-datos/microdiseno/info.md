@@ -13,16 +13,25 @@
 | ------------------------------------------------------------------------- | ---------- | -------------------------------- |
 | **Momento evaluativo 1:** Programación orientada a objetos — codificación de UML entregado (encapsulamiento, herencia, clases abstractas e interfaces) | 5%        | Semana 4 (28 de agosto)          |
 | **Quiz de opción múltiple — POO (complemento M1)**                        | 10%        | Semana 5 (una semana después del cierre del tema) |
-| **Momento evaluativo 2:** Listas — listas enlazadas y ordenamiento        | 15%        | Semana 7 (18 de septiembre)      |
+| **Momento evaluativo 2:** Lista simple (doble/circular y ordenamiento se evalúan dentro del Seguimiento, ver nota) | 15%        | Trabajo independiente, entrega antes del 22 de septiembre |
 | **Momento evaluativo 3:** Pilas y colas — **examen institucional**         | 20%        | Semana 9 (2 de octubre)          |
-| **Momento evaluativo 4:** Manejo de archivos                              | 10%        | Semana 11 (16 de octubre)        |
+| **Momento evaluativo 4:** Manejo de archivos                              | 10%        | Semana 11 (20 de octubre)        |
 | **Momento evaluativo 5:** Proyecto final — árboles e integración          | 20%        | Semana de exámenes (24–27 nov)   |
-| **Seguimiento** (incluye recursividad y actividades continuas)           | 20%        | Durante todo el semestre          |
+| **Seguimiento** (incluye lista doble/circular, ordenamiento, recursividad y actividades continuas) | 20%        | Durante todo el semestre          |
 | **Total**                                                                 | **100%**   |                                  |
 
 > Cada momento evaluativo se cierra **después** de que su contenido se ha enseñado por completo, y su componente práctico es el laboratorio evaluativo (★) del tema correspondiente. No existe un sistema de evaluación paralelo: el laboratorio ★ *es* la parte práctica del momento. La recursividad (Semanas 12–13) no es un momento evaluativo independiente: su laboratorio se evalúa como parte del Seguimiento continuo.
 
 > **Momento 3 — excepción.** Pilas y colas se evalúa mediante un **examen institucional del 20 %**, cuyo formato y aplicación define la institución. El laboratorio del viernes 2 de octubre se mantiene, pero **no** constituye el momento evaluativo: se califica dentro del Seguimiento continuo y funciona como preparación para el examen. Es el único momento del curso cuyo componente práctico no es su laboratorio ★.
+
+> **Replanificación del 18-sep-2026 — Momento 2.** El curso venía atrasado
+> y se redujo el alcance de M2 a lista simple únicamente; lista doble/
+> circular y ordenamiento sobre listas se dictan después de Pilas y Colas
+> (comprimidos, sin laboratorio dedicado propio) y se evalúan dentro del
+> Seguimiento continuo. El laboratorio de M2 pasó de sesión presencial a
+> trabajo independiente, con el mismo tratamiento que tuvo el laboratorio
+> de Git de la Semana 1 (festivo). Detalle completo en
+> `cronograma-dia-a-dia.md` (Semana 6 y "Módulo diferido — Listas").
 
 ### Estructura semanal
 
@@ -52,10 +61,10 @@
 | 3  | POO | Herencia y polimorfismo | |
 | 4  | POO | Relaciones entre clases, UML y diagramas de paquetes | ★ M1 |
 | 5  | Listas | Big O (sesión única) y lista simple enlazada | |
-| 6  | Listas | Operaciones, lista doble y circular | |
-| 7  | Listas | Ordenamiento sobre listas enlazadas | ★ M2 |
+| 6  | Listas | Operaciones y eliminación en lista simple (doble/circular pospuesto) | M2 (reducido, trabajo independiente) |
 | 8  | Pilas y colas | Pilas (LIFO) | |
 | 9  | Pilas y colas | Colas (FIFO) | ★ M3 |
+| — | Listas (diferido) | Lista doble/circular y ordenamiento sobre listas — dictado después de Colas | |
 | 10 | Manejo de archivos | Persistencia en archivos de texto | |
 | 11 | Manejo de archivos | Archivos binarios y modificación de registros | ★ M4 |
 | 12 | Recursividad | Fundamentos y algoritmos recursivos clásicos | |
@@ -69,7 +78,7 @@
 
 Dos temas no tienen semana propia y se trabajan distribuidos:
 
-- **Criterios de selección de estructuras (RADE1-1):** cada estructura se presenta respondiendo "¿para qué problema sirve esta?". Semanas 5, 6, 7, 8, 9 y 14.
+- **Criterios de selección de estructuras (RADE1-1):** cada estructura se presenta respondiendo "¿para qué problema sirve esta?". Semanas 5, 6, 8, 9, el módulo diferido de listas (tras Colas) y 14.
 - **Tipos abstractos de datos (TAD):** cada estructura se introduce primero como contrato (`interface` en Java) y después como implementación — TAD Pila (sem. 8), TAD Cola (sem. 9), TAD Árbol binario (sem. 14). El diseño con TAD y su representación en UML se evalúa en el Momento 1 (sem. 4).
 
 ---
@@ -280,7 +289,15 @@ Cada archivo de proyecto detalla la evaluación de viabilidad, las entidades del
 - Validar con casos de prueba que cubran listas vacías, de un elemento y con varios elementos
 - *Capas involucradas:* `Nodo<T>` y `ListaSimple<T>` van en `model/structures/`; el `Service` las usa para gestionar entidades del dominio; la `View` no referencia las estructuras directamente
 
-### Semana 6 — Operaciones, lista doble y circular
+### Semana 6 — Operaciones y eliminación en lista simple ★ (M2, reducido)
+
+> **Replanificación del 18-sep-2026:** el curso venía atrasado. Lista
+> doblemente enlazada, lista circular, ordenamiento y la síntesis del
+> módulo se posponen y se dictan (comprimidos) después de Colas — ver
+> "Módulo diferido — Listas: doble, circular y ordenamiento" tras la
+> Semana 9. M2 se redujo a lista simple; su laboratorio pasó a trabajo
+> independiente, sin sesión de laboratorio presencial. Detalle en
+> `cronograma-dia-a-dia.md`.
 
 **T1 — Operaciones sobre la lista simple y comparación con arreglos**
 - Inserción, búsqueda y eliminación al inicio, al final y en posición arbitraria
@@ -288,35 +305,16 @@ Cada archivo de proyecto detalla la evaluación de viabilidad, las entidades del
 - Ventajas y desventajas frente a arreglos: acceso, inserción, uso de memoria
 - **¿Cuándo elegir una lista enlazada sobre un arreglo?**
 
-**T2 — Lista doblemente enlazada y lista circular**
-- Nodo doble: referencias `prev` y `next`; operaciones de inserción y eliminación
-- Recorrido inverso como ventaja de la lista doble
-- Lista circular simple y doble: estructura y casos de uso típicos
-- **¿Cuándo simple, cuándo doble, cuándo circular?**
+**T — Sesión de cierre (18 de septiembre, sin laboratorio presencial)**
+- Cierre de la eliminación en lista simple
+- Presentación del alcance reducido de M2 (solo lista simple) y de su modalidad de entrega (trabajo independiente)
+- Si el tiempo alcanza: inicio de insertion sort sobre listas enlazadas
 
-**P — Laboratorio: Lista doble y circular**
-- Implementar `ListaDoble<T>` con inserción y eliminación en ambos extremos
-- Implementar una lista circular para un caso de uso concreto (ej. gestión de turnos)
-- Comparar el código de la lista simple y la doble: ¿qué cambió estructuralmente?
-- *Capas involucradas:* `ListaDoble<T>` y `ListaCircular<T>` van en `model/structures/`; el `Service` decide cuál usar según el caso de estudio
-
-### Semana 7 — Ordenamiento ★
-
-**T1 — Estrategias de ordenamiento sobre listas enlazadas**
-- Insertion sort adaptado a lista enlazada: lógica y complejidad
-- Selection sort adaptado a lista enlazada: lógica y complejidad
-- ¿Por qué ordenar listas enlazadas es más costoso que ordenar arreglos?
-
-**T2 — Síntesis del módulo de listas**
-- Comparación entre lista simple, doble y circular
-- Tabla de decisión: cuándo usar cada tipo de lista
-- Integración con los diagramas UML del módulo anterior
-
-**P ★ — Laboratorio evaluativo (Momento 2): Caso de estudio con listas**
-- Implementar una solución completa para un caso de estudio dado
-- La solución debe incluir diseño UML, código en Java y al menos una estrategia de ordenamiento
-- *Capas involucradas:* los algoritmos de ordenamiento van en el `Service`; la `View` recibe la lista ya ordenada y la muestra
-- Evaluación con rúbrica socializada previamente con el grupo (cierre del **Momento evaluativo 2 — Listas**)
+**M2 (reducido) — Trabajo independiente: Caso de estudio con lista simple**
+- Entrega antes del martes 22 de septiembre (inicio de Pilas), sin sesión presencial dedicada — mismo tratamiento que el laboratorio de Git de la Semana 1 (festivo)
+- Implementar una solución sobre `ListaSimple<T>` para un caso de estudio dado, con diseño UML y código en Java
+- *Capas involucradas:* `ListaSimple<T>` va en `model/structures/`; el `Service` la usa para gestionar entidades del dominio
+- Evaluación con rúbrica socializada previamente con el grupo (cierre del **Momento evaluativo 2 — Listas: lista simple**)
 
 ---
 
@@ -366,6 +364,31 @@ Cada archivo de proyecto detalla la evaluación de viabilidad, las entidades del
 
 ---
 
+### Módulo diferido — Listas: doble, circular y ordenamiento *(6–8 de octubre)*
+
+> Contenido pospuesto desde la Semana 6 (ver nota ahí). Comprimido de 3
+> sesiones a 2: sin laboratorio dedicado propio, la práctica se incorpora
+> a la segunda sesión. Se evalúa dentro del **Seguimiento continuo**, no
+> como momento evaluativo aparte.
+
+**T — Lista doblemente enlazada, lista circular y ordenamiento**
+- Nodo doble: referencias `prev` y `next`; operaciones de inserción y eliminación
+- Recorrido inverso como ventaja de la lista doble
+- Lista circular simple y doble: estructura y casos de uso típicos
+- **¿Cuándo simple, cuándo doble, cuándo circular?**
+- Insertion sort y selection sort adaptados a lista enlazada: lógica y complejidad
+- ¿Por qué ordenar listas enlazadas es más costoso que ordenar arreglos?
+
+**T + P combinada — Síntesis y laboratorio combinado**
+- Comparación entre lista simple, doble y circular; tabla de decisión: cuándo usar cada tipo
+- Implementar `ListaDoble<T>` con inserción y eliminación en ambos extremos
+- Implementar una lista circular para un caso de uso concreto (ej. gestión de turnos)
+- Aplicar una estrategia de ordenamiento sobre una de las listas del proyecto de aula
+- *Capas involucradas:* `ListaDoble<T>` y `ListaCircular<T>` van en `model/structures/`; los algoritmos de ordenamiento van en el `Service`
+- Se evalúa dentro del **Seguimiento continuo**
+
+---
+
 ## Módulo 5 — Manejo de archivos
 
 ### Semana 10 — Archivos de texto
@@ -375,15 +398,17 @@ Cada archivo de proyecto detalla la evaluación de viabilidad, las entidades del
 - Modelo de flujos (streams) en Java
 - Clases `File`, `FileReader`, `FileWriter`
 
-**T2 — Lectura y escritura**
+**T2 + práctica incorporada — Lectura y escritura**
+
+> Laboratorio dedicado eliminado en la replanificación del 18-sep-2026
+> para recuperar calendario; la práctica se incorpora a esta sesión. La
+> práctica evaluativa fuerte del módulo sigue siendo el laboratorio ★ de
+> Archivos binarios (Semana 11).
+
 - `BufferedReader` y `BufferedWriter`: lectura y escritura eficiente línea a línea
 - Manejo de excepciones: `IOException`, bloque `try-with-resources`
 - Lectura y escritura de datos estructurados (formato CSV-like)
-
-**P — Laboratorio: Persistencia de una lista enlazada**
-- Guardar el contenido de una lista enlazada en un archivo de texto
-- Leer el archivo y reconstruir la lista en memoria
-- Manejar correctamente errores de lectura, escritura y archivo inexistente
+- Ejercicio en clase: guardar el contenido de una lista enlazada en un archivo de texto, leerlo y reconstruir la lista en memoria; manejar correctamente errores de lectura, escritura y archivo inexistente
 - *Capas involucradas:* los métodos `guardar()` y `cargar()` van en el `Service`; los archivos `.txt` se almacenan en `data/`; ninguna otra capa accede directamente al sistema de archivos
 
 ### Semana 11 — Archivos binarios y modificación ★
@@ -432,16 +457,19 @@ Cada archivo de proyecto detalla la evaluación de viabilidad, las entidades del
 - Recorrido, búsqueda y conteo recursivos sobre una lista enlazada
 - Versión recursiva vs. iterativa del mismo recorrido: legibilidad y costo
 
-**T2 — Riesgos, límites y backtracking**
+**T2 + práctica incorporada — Riesgos, límites y backtracking**
+
+> Laboratorio dedicado eliminado en la replanificación del 18-sep-2026
+> para recuperar calendario; la práctica se incorpora a esta sesión. El
+> laboratorio de Fundamentos de recursividad (Semana 12) sigue siendo la
+> práctica dedicada del bloque de recursividad.
+
 - `StackOverflowError`, recursión sin caso base, costo exponencial del Fibonacci ingenuo
 - Introducción al backtracking
 - Puente hacia los recorridos recursivos de árboles del módulo siguiente
-
-**P — Laboratorio: Caso de estudio recursivo**
-- Diseñar y documentar un algoritmo recursivo para el proyecto de aula
-- Implementar la solución en Java y validarla con casos de prueba
+- Ejercicio en clase: diseñar e implementar un algoritmo recursivo para el proyecto de aula, validado con casos de prueba
 - *Capas involucradas:* los métodos recursivos van en el `Service` si son lógica de negocio, o dentro de la propia estructura en `model/structures/` si son operaciones de recorrido
-- Evaluación con rúbrica socializada previamente con el grupo, computada como parte del **Seguimiento continuo** (no es un momento evaluativo independiente)
+- Se evalúa como parte del **Seguimiento continuo** (no es un momento evaluativo independiente)
 
 ---
 
