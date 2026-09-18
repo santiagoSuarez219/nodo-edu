@@ -23,7 +23,7 @@ Dentro del periodo de clases, el único festivo que cae en un día de clase es e
 | Momento | Tema | Fecha de cierre | Peso |
 |---|---|---|---|
 | M1 | Programación orientada a objetos | Viernes 28 ago | 15% |
-| M2 | Lista simple (doble/circular y ordenamiento se evalúan más adelante, ver Seguimiento) | Trabajo independiente, entrega antes del 22 sep | 15% |
+| M2 | Lista simple (doble/circular y ordenamiento se evalúan más adelante, ver Seguimiento) | Exposición 25 sep + implementación (GitHub) 27 sep | 15% |
 | M3 | Pilas y colas — **examen institucional** | Semana 9 (2 oct) | 20% |
 | M4 | Manejo de archivos | Martes 20 oct | 10% |
 | M5 | Proyecto final (árboles e integración) | Sustentación 24–27 nov | 20% |
@@ -119,14 +119,23 @@ Tampoco tienen sesión propia. Cada estructura se introduce primero como contrat
 >   dicten.
 > - El laboratorio de M2 pasa a **trabajo independiente**, con el mismo
 >   tratamiento que tuvo el laboratorio de Git de la Semana 1 (festivo):
->   sin sesión presencial dedicada, entrega antes del martes 22 de
->   septiembre (inicio de Pilas).
+>   sin sesión presencial dedicada. Se define en dos partes con fechas
+>   propias, fijadas el 2026-09-18: **exposición por equipos el viernes 25
+>   de septiembre** y **entrega de la implementación en GitHub el domingo
+>   27 de septiembre**. Detalle completo en
+>   `guias/lab-m2-lista-simple.md`.
+> - La fecha de exposición (25 sep) coincide con la sesión de laboratorio
+>   de Pilas ya agendada (Semana 8, viernes) — el docente debe decidir
+>   cómo se acomodan ambas actividades ese día (p. ej. exposiciones al
+>   inicio de la sesión, o en un espacio aparte). No resuelto en esta
+>   replanificación.
 
 | Fecha | Día | Sesión | Contenido |
 |---|---|---|---|
 | 8 sep | Martes | T1 | Inserción, búsqueda y eliminación en lista simple (inicio, final, posición arbitraria); complejidad de cada operación. Comparación con arreglos: acceso, inserción, memoria. **¿Cuándo elegir una lista enlazada sobre un arreglo?** |
 | 18 sep | Viernes | T (sesión de cierre, no laboratorio) | Cierre de lista simple; presentación del alcance reducido de M2 (solo lista simple) y de su modalidad de entrega (trabajo independiente); si el tiempo alcanza, inicio de insertion sort sobre listas enlazadas. |
-| — | Trabajo independiente, entrega antes del 22 sep | **M2 (reducido)** | **Laboratorio evaluativo (M2): Caso de estudio con lista simple** — diseño UML, código en Java sobre `ListaSimple<T>` del proyecto de aula. Sin sesión presencial dedicada. **Cierre del Momento 2 — Listas: lista simple (15 %).** |
+| 25 sep | Viernes | **M2 — Exposición** | **Exposición por equipos (10 %):** cada equipo explica una operación general (inserción, búsqueda/recorrido o eliminación) sobre `ListaSimple<T>` — ver `guias/lab-m2-lista-simple.md` para la tabla de asignación equipo→operación. Coincide con la sesión de laboratorio de Pilas (Semana 8) — ver nota arriba. |
+| 27 sep | Domingo | **M2 — Implementación** | **Entrega en GitHub (5 %):** dos `ListaSimple<T>` integradas al proyecto de aula, reemplazando arreglos si aplica, con menú en consola. Trabajo independiente, sin sesión presencial. **Cierre del Momento 2 — Listas: lista simple (15 % total).** |
 
 ## Semana 8 — Pilas *(22–25 sep)* · Sprint 3
 

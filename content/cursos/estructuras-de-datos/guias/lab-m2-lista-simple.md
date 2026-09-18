@@ -37,6 +37,9 @@ su propio proyecto de aula.
 Ambas partes cierran el **Momento evaluativo 2 — Listas: lista simple
 (15 %)**. Léalas completas: no son alternativas, son complementarias.
 
+**Fechas:** exposición el **viernes 25 de septiembre**; implementación en
+GitHub antes del **domingo 27 de septiembre**.
+
 ---
 
 ## Parte 1 — Exposición por equipos (10 %)
@@ -83,8 +86,9 @@ las **3 variantes** correspondientes:
 
 ### Formato de la exposición
 
+- **Fecha: viernes 25 de septiembre.**
 - Duración y medio de apoyo (diapositivas, pizarra, o ambos) a definir por
-  el docente junto con la fecha.
+  el docente.
 - Participación de todos los integrantes del equipo: la rúbrica evalúa
   trabajo en equipo como criterio propio.
 
@@ -226,9 +230,9 @@ nota_momento2              = 8.5% + 4.5% = 13.0% (sobre 15% posible)
 
 ## Entregable
 
-**Parte 1 (exposición):** presentación ante el grupo en la fecha que
-comunique el docente. No requiere entrega de archivo aparte, salvo que el
-docente pida el material de apoyo (diapositivas) por separado.
+**Parte 1 (exposición):** presentación ante el grupo el **viernes 25 de
+septiembre**. No requiere entrega de archivo aparte, salvo que el docente
+pida el material de apoyo (diapositivas) por separado.
 
 **Parte 2 (implementación):** commit sobre la rama `main` de su proyecto de
 aula, con mensaje descriptivo (por ejemplo, `feat: reemplazo de arreglos
@@ -260,7 +264,8 @@ proyecto-aula/
       ConsoleUtils.java           # lectura de datos por consola, si ya la usaba el proyecto
 ```
 
-**Plazo de entrega:** Viernes 25 de Septiembre
+**Plazo de entrega:** Domingo 27 de septiembre — commit en GitHub sobre la
+rama `main` del proyecto de aula.
 
 ---
 

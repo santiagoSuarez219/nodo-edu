@@ -13,7 +13,7 @@
 | ------------------------------------------------------------------------- | ---------- | -------------------------------- |
 | **Momento evaluativo 1:** Programación orientada a objetos — codificación de UML entregado (encapsulamiento, herencia, clases abstractas e interfaces) | 5%        | Semana 4 (28 de agosto)          |
 | **Quiz de opción múltiple — POO (complemento M1)**                        | 10%        | Semana 5 (una semana después del cierre del tema) |
-| **Momento evaluativo 2:** Lista simple (doble/circular y ordenamiento se evalúan dentro del Seguimiento, ver nota) | 15%        | Trabajo independiente, entrega antes del 22 de septiembre |
+| **Momento evaluativo 2:** Lista simple (doble/circular y ordenamiento se evalúan dentro del Seguimiento, ver nota) | 15%        | Exposición 25 sep (10%) + implementación en GitHub 27 sep (5%) |
 | **Momento evaluativo 3:** Pilas y colas — **examen institucional**         | 20%        | Semana 9 (2 de octubre)          |
 | **Momento evaluativo 4:** Manejo de archivos                              | 10%        | Semana 11 (20 de octubre)        |
 | **Momento evaluativo 5:** Proyecto final — árboles e integración          | 20%        | Semana de exámenes (24–27 nov)   |
@@ -310,11 +310,29 @@ Cada archivo de proyecto detalla la evaluación de viabilidad, las entidades del
 - Presentación del alcance reducido de M2 (solo lista simple) y de su modalidad de entrega (trabajo independiente)
 - Si el tiempo alcanza: inicio de insertion sort sobre listas enlazadas
 
-**M2 (reducido) — Trabajo independiente: Caso de estudio con lista simple**
-- Entrega antes del martes 22 de septiembre (inicio de Pilas), sin sesión presencial dedicada — mismo tratamiento que el laboratorio de Git de la Semana 1 (festivo)
-- Implementar una solución sobre `ListaSimple<T>` para un caso de estudio dado, con diseño UML y código en Java
-- *Capas involucradas:* `ListaSimple<T>` va en `model/structures/`; el `Service` la usa para gestionar entidades del dominio
-- Evaluación con rúbrica socializada previamente con el grupo (cierre del **Momento evaluativo 2 — Listas: lista simple**)
+**M2 (reducido) — Trabajo independiente, en dos partes: Caso de estudio con lista simple**
+
+> Fechas fijadas el 2026-09-18. Detalle completo, tabla de asignación
+> equipo→operación y rúbricas en `guias/lab-m2-lista-simple.md`.
+
+- **Parte 1 — Exposición por equipos (10 %), viernes 25 de septiembre:**
+  cada equipo (de los 10 del curso) explica una operación general
+  (inserción, búsqueda/recorrido o eliminación) con sus 3 variantes:
+  qué son las listas enlazadas, pseudocódigo, diagramas nodo por nodo,
+  comparación con arreglos, y cómo la implementaron en su proyecto.
+  Coincide con la sesión de laboratorio de Pilas (Semana 8) — pendiente de
+  que el docente decida cómo se acomodan ambas actividades ese día.
+- **Parte 2 — Implementación en el proyecto (5 %), domingo 27 de
+  septiembre:** implementar dos `ListaSimple<T>` para dos relaciones
+  uno-a-muchos distintas de su proyecto (reemplazando arreglos si
+  aplica), con un menú en consola para probarlas. Sin sesión presencial
+  dedicada — mismo tratamiento que el laboratorio de Git de la Semana 1
+  (festivo). Entrega por commit en GitHub sobre `main`.
+- *Capas involucradas:* `ListaSimple<T>` va en `model/structures/`; el
+  `Service` la usa para gestionar entidades del dominio; el menú va en
+  `view/`.
+- Evaluación con rúbricas socializadas previamente con el grupo (cierre
+  del **Momento evaluativo 2 — Listas: lista simple**)
 
 ---
 
