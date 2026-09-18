@@ -284,6 +284,15 @@ export const estructurasDeDatos: Course = {
       ],
     },
     {
+      id: "lab-m2-lista-simple",
+      slug: "lab-m2-lista-simple",
+      articleSlug: "lab-m2-lista-simple",
+      kind: "guide",
+      order: 19.5,
+      title: "Laboratorio Evaluativo — Lista Simple (Momento 2)",
+      topics: [],
+    },
+    {
       id: "lista-doblemente-enlazada-y-lista-circular",
       slug: "lista-doblemente-enlazada-y-lista-circular",
       articleSlug: "lista-doblemente-enlazada-y-lista-circular",

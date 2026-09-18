@@ -13,22 +13,29 @@ Dentro del periodo de clases, el único festivo que cae en un día de clase es e
 
 ### Momentos evaluativos (resumen)
 
+> **Replanificación del 18-sep-2026** (ver nota en Semana 6): el curso venía
+> atrasado, así que el alcance de M2 se redujo a lista simple y su
+> laboratorio pasó a trabajo independiente. Doble/circular y ordenamiento
+> se recorrieron después de Colas, comprimidos, y esto movió las fechas de
+> cierre de M4 y de varios laboratorios no evaluativos. Las fechas de esta
+> tabla y del resto del documento ya reflejan la replanificación.
+
 | Momento | Tema | Fecha de cierre | Peso |
 |---|---|---|---|
 | M1 | Programación orientada a objetos | Viernes 28 ago | 15% |
-| M2 | Listas (listas enlazadas y ordenamiento) | Viernes 18 sep | 15% |
+| M2 | Lista simple (doble/circular y ordenamiento se evalúan más adelante, ver Seguimiento) | Exposición 25 sep + implementación (GitHub) 27 sep | 15% |
 | M3 | Pilas y colas — **examen institucional** | Semana 9 (2 oct) | 20% |
-| M4 | Manejo de archivos | Viernes 16 oct | 10% |
+| M4 | Manejo de archivos | Martes 20 oct | 10% |
 | M5 | Proyecto final (árboles e integración) | Sustentación 24–27 nov | 20% |
-| Seguimiento (incluye recursividad y el laboratorio de pilas y colas) | Continuo | Todo el semestre | 20% |
+| Seguimiento (incluye lista doble/circular, ordenamiento, recursividad y el laboratorio de pilas y colas) | Continuo | Todo el semestre | 20% |
 
-> Con este calendario, para el corte del **60 % registrado en el SIA (hasta el 1 de noviembre)** ya están cerrados M1 + M2 + M3 + M4 (60 %) desde el 16 de octubre, más el seguimiento acumulado, lo que cubre el requisito institucional con dos semanas de margen.
+> Con este calendario, para el corte del **60 % registrado en el SIA (hasta el 1 de noviembre)** ya están cerrados M1 + M2 + M3 + M4 (60 %) desde el 20 de octubre, más el seguimiento acumulado, lo que cubre el requisito institucional con más de una semana de margen.
 
 > **Momento 3 — excepción.** Pilas y colas se evalúa mediante un **examen institucional del 20 %**, cuyo formato y aplicación define la institución. El laboratorio del 2 de octubre se mantiene, pero se califica dentro del Seguimiento continuo y funciona como preparación para el examen: es el único momento del curso cuyo componente práctico no es su laboratorio ★.
 
 ### Criterios de selección de estructuras
 
-No tienen sesión propia: se trabajan dentro de la sesión de cada estructura, respondiendo "¿para qué problema sirve esta?" (RADE1-1 del microdiseño). Ver semanas 5 T1, 6 T1, 6 T2, 7 T2, 8 T1, 9 T1 y 14 T1.
+No tienen sesión propia: se trabajan dentro de la sesión de cada estructura, respondiendo "¿para qué problema sirve esta?" (RADE1-1 del microdiseño). Ver semanas 5 T1, 6 T1, 8 T1, 9 T1, el módulo diferido de listas (6-8 oct) y 14 T1.
 
 ### Tipos abstractos de datos (TAD)
 
@@ -91,21 +98,44 @@ Tampoco tienen sesión propia. Cada estructura se introduce primero como contrat
 | 3 sep | Jueves | T2 | Nodos y memoria dinámica en Java: atributo dato y referencia al siguiente; estructura de la lista (`head`, tamaño, lista vacía). |
 | 4 sep | Viernes | P | Lab: implementar `Nodo<T>` y `ListaSimple<T>` genérica en `model/structures/`, con inserción y recorrido completo. |
 
-## Semana 6 — Listas: operaciones, doble y circular *(8–11 sep)* · Sprint 2
+## Semana 6 — Listas: operaciones y eliminación en lista simple *(8–18 sep)* · Sprint 2 · M2
+
+> **Replanificación del 18-sep-2026.** El curso venía atrasado: las
+> sesiones originalmente planeadas para el 10 y 11 de septiembre (lista
+> doblemente enlazada y circular) y para el 15 y 17 de septiembre
+> (ordenamiento sobre listas y síntesis del módulo) no se dictaron. Se
+> decidió:
+> - Consolidar en la sesión del **18 de septiembre** (originalmente el
+>   laboratorio evaluativo de M2) el cierre teórico de lista simple, la
+>   presentación del alcance de M2 y, si el tiempo alcanzaba, el inicio de
+>   ordenamiento sobre listas — **sin laboratorio presencial ese día**.
+> - **Lista doblemente enlazada, lista circular y ordenamiento sobre
+>   listas** se posponen y se dictan, comprimidos, **después de Pilas y
+>   Colas** (ver "Módulo diferido — Listas", más abajo), para no perder el
+>   contacto reciente del estudiante con listas antes de meterse con
+>   pilas/colas sin abandonar el orden pilas→colas ya anunciado.
+> - **M2 se redujo de alcance** a lista simple únicamente. Doble/circular
+>   y ordenamiento se evalúan dentro del Seguimiento continuo cuando se
+>   dicten.
+> - El laboratorio de M2 pasa a **trabajo independiente**, con el mismo
+>   tratamiento que tuvo el laboratorio de Git de la Semana 1 (festivo):
+>   sin sesión presencial dedicada. Se define en dos partes con fechas
+>   propias, fijadas el 2026-09-18: **exposición por equipos el viernes 25
+>   de septiembre** y **entrega de la implementación en GitHub el domingo
+>   27 de septiembre**. Detalle completo en
+>   `guias/lab-m2-lista-simple.md`.
+> - La fecha de exposición (25 sep) coincide con la sesión de laboratorio
+>   de Pilas ya agendada (Semana 8, viernes) — el docente debe decidir
+>   cómo se acomodan ambas actividades ese día (p. ej. exposiciones al
+>   inicio de la sesión, o en un espacio aparte). No resuelto en esta
+>   replanificación.
 
 | Fecha | Día | Sesión | Contenido |
 |---|---|---|---|
 | 8 sep | Martes | T1 | Inserción, búsqueda y eliminación en lista simple (inicio, final, posición arbitraria); complejidad de cada operación. Comparación con arreglos: acceso, inserción, memoria. **¿Cuándo elegir una lista enlazada sobre un arreglo?** |
-| 10 sep | Jueves | T2 | Lista doblemente enlazada (`prev`/`next`, recorrido inverso); lista circular simple y doble; casos de uso típicos. **¿Cuándo simple, doble o circular?** |
-| 11 sep | Viernes | P | Lab: `ListaDoble<T>` con inserción y eliminación en ambos extremos, y `ListaCircular<T>` para un caso concreto (gestión de turnos). |
-
-## Semana 7 — Listas: ordenamiento y síntesis *(15–18 sep)* · Sprint 2 · ★ M2
-
-| Fecha | Día | Sesión | Contenido |
-|---|---|---|---|
-| 15 sep | Martes | T1 | Insertion sort y selection sort adaptados a listas enlazadas: lógica y complejidad. ¿Por qué ordenar listas enlazadas cuesta más que ordenar arreglos? |
-| 17 sep | Jueves | T2 | Síntesis del módulo: tabla de decisión simple/doble/circular e integración con los diagramas UML del proyecto. |
-| 18 sep | Viernes | **P ★** | **Lab evaluativo (M2): Caso de estudio con listas** — diseño UML, código en Java y al menos una estrategia de ordenamiento. Los algoritmos van en el `Service`; la `View` recibe la lista ya ordenada. **Cierre del Momento 2 — Listas (15 %).** |
+| 18 sep | Viernes | T (sesión de cierre, no laboratorio) | Cierre de lista simple; presentación del alcance reducido de M2 (solo lista simple) y de su modalidad de entrega (trabajo independiente); si el tiempo alcanza, inicio de insertion sort sobre listas enlazadas. |
+| 25 sep | Viernes | **M2 — Exposición** | **Exposición por equipos (10 %):** cada equipo explica una operación general (inserción, búsqueda/recorrido o eliminación) sobre `ListaSimple<T>` — ver `guias/lab-m2-lista-simple.md` para la tabla de asignación equipo→operación. Coincide con la sesión de laboratorio de Pilas (Semana 8) — ver nota arriba. |
+| 27 sep | Domingo | **M2 — Implementación** | **Entrega en GitHub (5 %):** dos `ListaSimple<T>` integradas al proyecto de aula, reemplazando arreglos si aplica, con menú en consola. Trabajo independiente, sin sesión presencial. **Cierre del Momento 2 — Listas: lista simple (15 % total).** |
 
 ## Semana 8 — Pilas *(22–25 sep)* · Sprint 3
 
@@ -125,39 +155,62 @@ Tampoco tienen sesión propia. Cada estructura se introduce primero como contrat
 
 > **★ Momento evaluativo 3 — Examen institucional de pilas y colas (20 %).** Cubre TAD Pila y TAD Cola, sus operaciones, implementación y criterios de uso (semanas 8–9). Formato y fecha de aplicación definidos por la institución; la semana 9 es la referencia de cierre del contenido.
 
-## Semana 10 — Manejo de archivos: texto *(6–9 oct)* · Sprint 4
+## Módulo diferido — Listas: doblemente enlazada, circular y ordenamiento *(6–8 oct)*
+
+> Contenido pospuesto desde la Semana 6 (ver nota ahí). Comprimido de 3
+> sesiones a 2 para no seguir corriendo el resto del calendario: sin
+> laboratorio dedicado propio, el trabajo práctico se incorpora a la
+> sesión T2. Se evalúa dentro del **Seguimiento continuo**, no como
+> momento evaluativo aparte.
 
 | Fecha | Día | Sesión | Contenido |
 |---|---|---|---|
-| 6 oct | Martes | T1 | Fundamentos: archivos de texto vs. binarios, ventajas y desventajas según el contexto de uso; modelo de flujos (streams); clases `File`, `FileReader`, `FileWriter`. |
-| 8 oct | Jueves | T2 | Lectura y escritura eficiente con `BufferedReader`/`BufferedWriter`; manejo de excepciones (`IOException`, `try-with-resources`); datos estructurados en formato CSV-like. |
-| 9 oct | Viernes | P | Lab: guardar el contenido de una lista enlazada en un archivo de texto y reconstruirla en memoria; manejo de archivo inexistente. Los métodos `guardar()` y `cargar()` van en el `Service`; los `.txt` en `data/`. |
+| 6 oct | Martes | T | Lista doblemente enlazada (`prev`/`next`, recorrido inverso); lista circular simple y doble; casos de uso típicos. **¿Cuándo simple, doble o circular?** Insertion sort y selection sort adaptados a listas enlazadas: lógica y complejidad. ¿Por qué ordenar listas enlazadas cuesta más que ordenar arreglos? |
+| 8 oct | Jueves | T + P combinada | Síntesis del módulo de listas (tabla de decisión simple/doble/circular). Lab combinado: `ListaDoble<T>` con inserción y eliminación en ambos extremos, `ListaCircular<T>` para un caso concreto (gestión de turnos), y aplicar una estrategia de ordenamiento sobre una de las listas del proyecto de aula. |
 
-## Semana 11 — Manejo de archivos: binarios y modificación *(13–16 oct)* · Sprint 4 · ★ M4
+## Semana 10 — Manejo de archivos: texto *(9–13 oct)* · Sprint 4
 
-| Fecha | Día | Sesión | Contenido |
-|---|---|---|---|
-| 13 oct | Martes | T1 | Archivos binarios: `DataOutputStream`/`DataInputStream`; serialización de objetos con `ObjectOutputStream`/`ObjectInputStream`; comparación de tamaño y velocidad frente a texto. |
-| 15 oct | Jueves | T2 | Modificación de registros: actualizar y eliminar sin reescribir todo el archivo; estrategia de archivo temporal; integridad de los datos ante errores a mitad de escritura. |
-| 16 oct | Viernes | **P ★** | **Lab evaluativo (M4): Persistencia completa del proyecto** — guardar y cargar el estado del caso de estudio en texto y en binario, con actualización y eliminación de registros y manejo correcto de errores. **Cierre del Momento 4 — Manejo de archivos (10 %).** |
-
-> *Hito institucional:* evaluaciones institucionales (16–20 oct).
-
-## Semana 12 — Recursividad: fundamentos *(20–23 oct)* · Sprint 4
+> Laboratorio dedicado eliminado para recuperar calendario (ver nota del
+> módulo diferido, arriba): la práctica de persistencia de texto se
+> incorpora a la sesión T2. La práctica evaluativa fuerte del módulo de
+> archivos sigue siendo el laboratorio ★ de Archivos binarios (Semana 11).
 
 | Fecha | Día | Sesión | Contenido |
 |---|---|---|---|
-| 20 oct | Martes | T1 | Concepto de recursividad: caso base y caso recursivo; pila de llamadas (call stack) y cómo vive la recursión en memoria; prueba de escritorio paso a paso. |
-| 22 oct | Jueves | T2 | Algoritmos recursivos clásicos: factorial, Fibonacci y Torres de Hanói; comparación con la versión iterativa; ¿cuándo preferir recursión sobre iteración? |
-| 23 oct | Viernes | P | Lab: diseñar, documentar e implementar dos algoritmos recursivos con prueba de escritorio para al menos dos casos cada uno. |
+| 9 oct | Viernes | T1 | Fundamentos: archivos de texto vs. binarios, ventajas y desventajas según el contexto de uso; modelo de flujos (streams); clases `File`, `FileReader`, `FileWriter`. |
+| 13 oct | Martes | T2 + práctica incorporada | Lectura y escritura eficiente con `BufferedReader`/`BufferedWriter`; manejo de excepciones (`IOException`, `try-with-resources`); datos estructurados en formato CSV-like. Ejercicio en clase: guardar el contenido de una lista enlazada en un archivo de texto y reconstruirla en memoria; manejo de archivo inexistente. Los métodos `guardar()` y `cargar()` van en el `Service`; los `.txt` en `data/`. |
 
-## Semana 13 — Recursividad sobre estructuras *(27–30 oct)* · Sprint 4
+## Semana 11 — Manejo de archivos: binarios y modificación *(15–20 oct)* · Sprint 4 · ★ M4
 
 | Fecha | Día | Sesión | Contenido |
 |---|---|---|---|
-| 27 oct | Martes | T1 | Recursión aplicada a estructuras: recorrido, búsqueda y conteo recursivos sobre una lista enlazada; versión recursiva vs. iterativa del mismo recorrido. |
-| 29 oct | Jueves | T2 | Riesgos y límites: `StackOverflowError`, recursión sin caso base, costo exponencial del Fibonacci ingenuo. Introducción al backtracking. Puente hacia los recorridos de árboles. |
-| 30 oct | Viernes | **P** | **Lab: Caso de estudio recursivo** aplicado al proyecto de aula. Los métodos recursivos van en el `Service` si son lógica de negocio, o dentro de la estructura en `model/structures/` si son operaciones de recorrido. Se evalúa como parte del **Seguimiento continuo**. |
+| 15 oct | Jueves | T1 | Archivos binarios: `DataOutputStream`/`DataInputStream`; serialización de objetos con `ObjectOutputStream`/`ObjectInputStream`; comparación de tamaño y velocidad frente a texto. |
+| 16 oct | Viernes | T2 | Modificación de registros: actualizar y eliminar sin reescribir todo el archivo; estrategia de archivo temporal; integridad de los datos ante errores a mitad de escritura. |
+| 20 oct | Martes | **P ★** | **Lab evaluativo (M4): Persistencia completa del proyecto** — guardar y cargar el estado del caso de estudio en texto y en binario, con actualización y eliminación de registros y manejo correcto de errores. **Cierre del Momento 4 — Manejo de archivos (10 %).** |
+
+> *Hito institucional:* evaluaciones institucionales (16–20 oct) — se
+> superpone con el cierre de esta semana; el laboratorio ★ del 20 de
+> octubre no se ve afectado.
+
+## Semana 12 — Recursividad: fundamentos *(22–27 oct)* · Sprint 4
+
+| Fecha | Día | Sesión | Contenido |
+|---|---|---|---|
+| 22 oct | Jueves | T1 | Concepto de recursividad: caso base y caso recursivo; pila de llamadas (call stack) y cómo vive la recursión en memoria; prueba de escritorio paso a paso. |
+| 23 oct | Viernes | T2 | Algoritmos recursivos clásicos: factorial, Fibonacci y Torres de Hanói; comparación con la versión iterativa; ¿cuándo preferir recursión sobre iteración? |
+| 27 oct | Martes | P | Lab: diseñar, documentar e implementar dos algoritmos recursivos con prueba de escritorio para al menos dos casos cada uno. |
+
+## Semana 13 — Recursividad sobre estructuras *(29–30 oct)* · Sprint 4
+
+> Laboratorio dedicado eliminado para recuperar calendario (ver nota del
+> módulo diferido, arriba): la práctica se incorpora a la sesión T2. El
+> laboratorio de Recursividad: fundamentos (Semana 12) sigue siendo la
+> práctica dedicada del bloque de recursividad.
+
+| Fecha | Día | Sesión | Contenido |
+|---|---|---|---|
+| 29 oct | Jueves | T1 | Recursión aplicada a estructuras: recorrido, búsqueda y conteo recursivos sobre una lista enlazada; versión recursiva vs. iterativa del mismo recorrido. |
+| 30 oct | Viernes | T2 + práctica incorporada | Riesgos y límites: `StackOverflowError`, recursión sin caso base, costo exponencial del Fibonacci ingenuo. Introducción al backtracking. Puente hacia los recorridos de árboles. Ejercicio en clase: caso de estudio recursivo aplicado al proyecto de aula (métodos recursivos en el `Service` si son lógica de negocio, o en `model/structures/` si son operaciones de recorrido). Se evalúa como parte del **Seguimiento continuo**. |
 
 > *Hito institucional:* segunda evaluación de estudiantes a docentes (26 oct – 1 nov); registro del 60 % en el SIA (hasta 1 nov).
 
@@ -185,6 +238,9 @@ Tampoco tienen sesión propia. Cada estructura se introduce primero como contrat
 | 19 nov | Jueves | T2 | Integración: revisión de la separación de las tres capas en el proyecto; criterios y rúbrica de la sustentación, socializados con el grupo. |
 | 20 nov | Viernes | P | Lab: integración final — el proyecto debe articular al menos tres estructuras vistas en el curso sobre el caso de estudio elegido; ensayo de sustentación y retroalimentación entre pares. |
 
+> Con esta replanificación, el calendario vuelve a cerrar exactamente el
+> 20 de noviembre, sin invadir la semana de sustentación (24–27 nov).
+
 > *Hito institucional:* fecha límite de cancelación de asignaturas y matrícula (hasta 22 nov).
 
 ## Semana de exámenes — Sustentación del proyecto final *(24–27 nov)* · ★ M5
@@ -201,8 +257,13 @@ Tampoco tienen sesión propia. Cada estructura se introduce primero como contrat
 
 ## Resumen de sesiones
 
-- **48 sesiones planeadas** (16 semanas × 3) + 3 días de sustentación en la semana de exámenes.
+- **48 sesiones planeadas originalmente** (16 semanas × 3) + 3 días de sustentación en la semana de exámenes.
 - **1 sesión afectada por festivo:** viernes 7 de agosto (laboratorio de Git → trabajo independiente guiado).
+- **Replanificación del 18-sep-2026** (ver nota en Semana 6): el curso venía atrasado. Se recuperó el calendario comprimiendo **5 sesiones** en total —
+  - la sesión del 18 de septiembre pasó de laboratorio evaluativo (M2 completo) a sesión de cierre teórica, con el laboratorio de M2 (reducido a lista simple) convertido en trabajo independiente;
+  - el módulo de lista doblemente enlazada/circular y ordenamiento, antes 3 sesiones, se dicta después de Colas comprimido a 2 (sin laboratorio dedicado propio);
+  - los laboratorios dedicados de Archivos de texto y de Recursividad sobre estructuras se eliminaron, con su práctica incorporada a la sesión T2 correspondiente.
+- Con esas 5 sesiones recuperadas, el calendario vuelve a cerrar el **20 de noviembre** sin invadir la semana de sustentación — **43 sesiones** de clase en total desde el 4 de agosto.
 - Cada laboratorio evaluativo (★) es el componente práctico de su momento evaluativo; no hay evaluaciones paralelas.
 - **Pilas y colas quedan cerradas el 2 de octubre**, al final de la semana 9.
 
