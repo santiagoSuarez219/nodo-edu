@@ -371,6 +371,7 @@ export const estructurasDeDatos: Course = {
       articleSlug: "tad-cola",
       order: 27,
       title: "TAD Cola",
+      summary: "El TAD Cola y su disciplina FIFO: operaciones, precondiciones, el contrato como interface en Java y los problemas que piden una cola y no una pila.",
       topics: [
         { title: "Concepto FIFO (First In, First Out)" },
         { title: "Operaciones: enqueue, dequeue, front, isEmpty, size" },
@@ -383,6 +384,8 @@ export const estructurasDeDatos: Course = {
       articleSlug: "implementacion-de-colas-en-java",
       order: 28,
       title: "Implementación de colas en Java",
+      summary:
+        "Implementación de ColaEnlazada<T> con frente y fin en O(1) y precondición con NoSuchElementException; Queue<E>, LinkedList<E> y PriorityQueue<E> del API: vocabularios, costos y criterios de uso.",
       topics: [
         { title: "Implementación propia con lista enlazada simple" },
         { title: "Interface Queue<E> y clase LinkedList<E> del API de Java" },
