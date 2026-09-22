@@ -110,7 +110,8 @@ export const tools: Tool[] = [
   },
   {
     name: "enroll_student",
-    description: "Matricula a un estudiante existente en un curso, por UUID o por enrollment_code.",
+    description:
+      "Matricula a un estudiante existente en un curso, por UUID o por enrollment_code. Si ya existía una matrícula retirada ('withdrawn') para ese estudiante y ese curso, la REACTIVA en vez de rechazarla — es el camino para revertir un retiro accidental (ver unenroll_student). La respuesta trae 'meta.reactivated: true' cuando fue una reactivación, en vez de un alta nueva; sin esa marca, fue un alta nueva. Solo devuelve error si la matrícula ya está activa ('Ya está matriculado en este curso.').",
     inputSchema: {
       type: "object",
       properties: {
@@ -123,7 +124,8 @@ export const tools: Tool[] = [
   },
   {
     name: "unenroll_student",
-    description: "Retira a un estudiante de un curso (deja la matrícula en estado 'withdrawn', no la borra).",
+    description:
+      "Retira a un estudiante de un curso (deja la matrícula en estado 'withdrawn', no la borra). Para deshacer un retiro hecho por error, usa enroll_student con el mismo estudiante y curso: reactiva la matrícula existente en vez de crear una nueva.",
     inputSchema: {
       type: "object",
       properties: {

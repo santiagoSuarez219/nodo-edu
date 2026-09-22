@@ -1,4 +1,4 @@
-import { withdrawStudentAction } from "@/lib/enrollments/actions";
+import { withdrawStudentAction, reactivateStudentAction } from "@/lib/enrollments/actions";
 import { ResetPasswordButton } from "./ResetPasswordButton";
 import type { EnrollmentWithStudent } from "@/lib/enrollments/types";
 
@@ -127,25 +127,43 @@ export function EnrollmentTable({ enrollments, academicCourseId }: Props) {
                   <th className="px-5 py-3">Fecha matrícula</th>
                   <th className="px-5 py-3">Fecha retiro</th>
                   <th className="px-5 py-3 text-right">Nota total</th>
+                  <th className="px-5 py-3 text-right">Acción</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-gray-700 bg-white dark:bg-gray-800">
-                {withdrawn.map((enrollment) => (
-                  <tr key={enrollment.id} className="opacity-60">
-                    <td className="px-5 py-4 text-gray-700 dark:text-gray-300">
-                      {enrollment.profile.full_name}
-                    </td>
-                    <td className="px-5 py-4 text-gray-500 dark:text-gray-400">
-                      {formatDate(enrollment.enrolled_at)}
-                    </td>
-                    <td className="px-5 py-4 text-gray-500 dark:text-gray-400">
-                      {enrollment.withdrawn_at ? formatDate(enrollment.withdrawn_at) : "—"}
-                    </td>
-                    <td className="px-5 py-4 text-right font-mono text-gray-500 dark:text-gray-400">
-                      {gradeDisplay(enrollment.total_grade)}
-                    </td>
-                  </tr>
-                ))}
+                {withdrawn.map((enrollment) => {
+                  const reactivateAction = reactivateStudentAction.bind(
+                    null,
+                    enrollment.id,
+                    academicCourseId
+                  );
+                  return (
+                    <tr key={enrollment.id}>
+                      <td className="px-5 py-4 text-gray-700 dark:text-gray-300 opacity-60">
+                        {enrollment.profile.full_name}
+                      </td>
+                      <td className="px-5 py-4 text-gray-500 dark:text-gray-400 opacity-60">
+                        {formatDate(enrollment.enrolled_at)}
+                      </td>
+                      <td className="px-5 py-4 text-gray-500 dark:text-gray-400 opacity-60">
+                        {enrollment.withdrawn_at ? formatDate(enrollment.withdrawn_at) : "—"}
+                      </td>
+                      <td className="px-5 py-4 text-right font-mono text-gray-500 dark:text-gray-400 opacity-60">
+                        {gradeDisplay(enrollment.total_grade)}
+                      </td>
+                      <td className="px-5 py-4 text-right">
+                        <form action={reactivateAction}>
+                          <button
+                            type="submit"
+                            className="text-sm font-medium text-blue-700 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 hover:underline transition-colors"
+                          >
+                            Reactivar
+                          </button>
+                        </form>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

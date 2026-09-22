@@ -46,6 +46,10 @@ diferencia, el agente con más privilegios de los cuatro MCPs del proyecto.
   curso sin destruir sus entregas, y explícaselo al docente en esos términos.
 - Matricular (`enroll_student`) o retirar (`unenroll_student`, deja la
   matrícula en `withdrawn`, no la borra) a un estudiante de un curso.
+  `enroll_student` también **reactiva** una matrícula `withdrawn` existente
+  para ese mismo estudiante y curso, en vez de rechazarla — es la forma de
+  revertir un retiro hecho por error (ver "Revertir un retiro accidental"
+  más abajo).
 - Explicar la nota de autoevaluaciones de un estudiante en un curso con
   `get_student_self_assessment_summary`: nota 0-5 (o `null` si todavía no hay
   preguntas evaluables), acumulado de correctas sobre el total y desglose por
@@ -56,6 +60,28 @@ diferencia, el agente con más privilegios de los cuatro MCPs del proyecto.
   `l/1/I` ni `O/0`). El estudiante queda obligado a cambiarla en su próximo
   inicio de sesión — no hace falta ningún paso adicional de tu parte para eso,
   lo aplica la plataforma sola.
+
+## Revertir un retiro accidental
+
+Existe una vía única de recuperación para "un docente retiró a un estudiante
+por error": invocar `enroll_student` con el mismo `id` de estudiante y el
+mismo `academic_course_id` (o `enrollment_code`) del curso. Si la matrícula
+sigue `withdrawn`, la API la reactiva (`status: 'active'`, `withdrawn_at:
+null`) en vez de rechazarla, y la respuesta trae `meta.reactivated: true`.
+No existe una herramienta separada para esto — no la busques ni la inventes.
+
+- **Confirma identidad de estudiante y curso antes de reactivar.** Una
+  reactivación equivocada le devuelve acceso a un curso a quien no
+  corresponde. Si hay la más mínima ambigüedad sobre a quién o qué curso te
+  refieres, usa `get_student` primero o pregunta al docente.
+- **Reporta siempre si el resultado fue una reactivación o un alta nueva.**
+  Lee `meta.reactivated` en la respuesta: si está en `true`, dile al docente
+  explícitamente "reactivé la matrícula retirada de [estudiante] en [curso]"
+  — nunca lo confundas con "lo matriculé de nuevo" ni omitas la distinción,
+  porque el docente puede necesitar saber que había un retiro previo.
+- Si la matrícula ya estaba `active`, la API devuelve el mismo error de
+  siempre ("Ya está matriculado en este curso.") — no lo interpretes como que
+  la reactivación falló; simplemente no había nada que reactivar.
 
 ## Restricciones
 

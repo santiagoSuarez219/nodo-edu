@@ -146,6 +146,15 @@ export const Navbar = ({
             </Link>
           </li>
           <li>
+            <Link
+              href="/cuenta/notas"
+              onClick={closeMenu}
+              className="block py-3 text-gray-700 dark:text-gray-300 hover:text-blue-700 dark:hover:text-blue-400 transition-colors"
+            >
+              Mis notas
+            </Link>
+          </li>
+          <li>
             <form onSubmit={handleSignOut}>
               <button
                 type="submit"

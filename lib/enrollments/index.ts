@@ -240,3 +240,29 @@ export async function withdrawStudent(
     .update({ status: "withdrawn", withdrawn_at: new Date().toISOString() })
     .eq("id", enrollmentId);
 }
+
+// spec-056 (D6, Fase 3): reactiva una matrícula `withdrawn` desde el panel
+// docente, con el cliente de SESIÓN — la política "enrollments: update
+// teacher or admin" ya autoriza al docente dueño (o admin) a hacer este
+// UPDATE, el mismo camino que ya usa withdrawStudent arriba, sin necesidad de
+// service_role. A diferencia de withdrawStudent, sí se comprueba el resultado
+// del update: el incidente que motiva este spec (DEBT-091) fue justamente una
+// mutación de matrícula que falló en silencio. RLS deniega un UPDATE sin
+// `error` (afecta 0 filas, no lanza) — `.select("id").maybeSingle()` es el
+// mismo patrón que gradeAnswer() en lib/submissions/index.ts para distinguir
+// eso de un guardado real.
+export async function reactivateEnrollment(
+  enrollmentId: string
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  const supabase = await createServerSupabaseClient();
+  const { data, error } = await supabase
+    .from("enrollments")
+    .update({ status: "active", withdrawn_at: null })
+    .eq("id", enrollmentId)
+    .select("id")
+    .maybeSingle();
+
+  if (error) return { ok: false, error: error.message };
+  if (!data) return { ok: false, error: "No tienes acceso a esta matrícula o no existe." };
+  return { ok: true };
+}
