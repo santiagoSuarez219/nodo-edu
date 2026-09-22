@@ -5,6 +5,27 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+## DEBT-092 — Esquemas de nombre de estudiante sin límite superior de longitud
+
+**Origen:** análisis de `@architect` para spec-057 (2026-09-22), verificado
+en código.
+**Prioridad:** Baja — no es una fuga de datos, es una inconsistencia menor.
+
+`CreateStudentSchema` y `UpdateStudentSchema`
+(`lib/students/schemas.ts`) validan `full_name` solo con `min(2)`, sin
+`max`. El `EditStudentNameSchema` nuevo de spec-057 sí agrega
+`max(100)`, pero solo para el camino de edición inline del panel
+docente — los caminos de alta/edición vía `students-mcp` y el registro
+público (`/registro`) siguen sin límite superior.
+
+**Acción:** decidir un máximo razonable (100 parece consistente con lo
+que ya usa spec-057) y aplicarlo a `CreateStudentSchema` y
+`UpdateStudentSchema`. Cambia el contrato de `students-mcp` y de
+`/registro`, así que requiere su propia revisión de impacto — no se hizo
+dentro de spec-057 para no ampliar su scope.
+
+---
+
 ## DEBT-085 — Los resultados de una evaluación son inaccesibles una vez cerrada su ventana
 
 **Origen:** análisis de `@architect` para spec-055 (2026-09-10), verificado en código.
