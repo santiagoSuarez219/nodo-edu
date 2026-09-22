@@ -1,4 +1,4 @@
-# spec-056 — [TESTING] Mis notas del estudiante y rematrícula docente
+# spec-056 — [DONE] Mis notas del estudiante y rematrícula docente
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.
 

@@ -136,7 +136,7 @@ lecciones deshabilitadas. Quedó fuera de spec-055 para mantener ese cambio acot
 
 ---
 
-## DEBT-091 — Retirar a un estudiante por error no se podía revertir sin tocar la base directo
+## DEBT-091 — Retirar a un estudiante por error no se podía revertir sin tocar la base directo [RESUELTO — spec-056]
 
 **Origen:** incidente en producción del 2026-09-22 — un docente retiró por
 accidente a dos estudiantes de Estructuras de datos y solo se pudo revertir
@@ -153,11 +153,13 @@ UI docente tenía el mismo agujero: `EnrollmentTable.tsx` pintaba la tabla
 "Retirados" en solo lectura, y `lib/enrollments/actions.ts` solo exponía
 `withdrawStudentAction`.
 
-**Acción:** resuelto por `spec-056-mis-notas-y-rematricula.md` — agrega
-`reactivateEnrollment`/`reactivateStudentAction` (panel docente, cliente de
-sesión) y hace que `enrollServiceStudent` reactive una matrícula `withdrawn`
-en vez de rechazarla (API de servicio y `students-mcp`). Pendiente de cerrar
-la Fase 6 (pruebas) del spec antes de marcar esta entrada como resuelta.
+**Resuelto por `spec-056-mis-notas-y-rematricula.md`** (`[DONE]`,
+2026-09-22): agrega `reactivateEnrollment`/`reactivateStudentAction` (panel
+docente, cliente de sesión) y hace que `enrollServiceStudent` reactive una
+matrícula `withdrawn` en vez de rechazarla (API de servicio y
+`students-mcp`). Ronda manual: 14/14 casos aprobados
+(`test-056-mis-notas-y-rematricula.md`), incluida la verificación de que
+asistencia, notas y entregas quedan intactas tras retirar y reactivar.
 
 ---
 
