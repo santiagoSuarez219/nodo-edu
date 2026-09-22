@@ -353,27 +353,16 @@ export const estructurasDeDatos: Course = {
       ],
     },
     {
-      id: "tad-pila",
-      slug: "tad-pila",
-      articleSlug: "tad-pila",
-      order: 25,
-      title: "TAD Pila",
-      topics: [
-        { title: "Concepto LIFO (Last In, First Out)" },
-        { title: "Operaciones: push, pop, peek, isEmpty, size" },
-        { title: "Aplicaciones reales: historial de navegación, call stack, deshacer/rehacer" },
-      ],
-    },
-    {
       id: "implementacion-de-pilas-en-java",
       slug: "implementacion-de-pilas-en-java",
       articleSlug: "implementacion-de-pilas-en-java",
       order: 26,
       title: "Implementación de pilas en Java",
+      summary: "El contrato LIFO detrás de deshacer un cambio o volver atrás en el navegador, y cómo construirlo tú mismo en Java encadenando nodos por referencia, sin usar ninguna clase ya hecha del lenguaje.",
       topics: [
-        { title: "Implementación propia con lista enlazada simple" },
-        { title: "Clase Stack<E> del API de Java" },
-        { title: "Comparación entre la implementación propia y la del API" },
+        { title: "Concepto LIFO (Last In, First Out) y sus aplicaciones reales" },
+        { title: "Operaciones del TAD: push, pop, peek, isEmpty, size" },
+        { title: "Implementación propia de Pila<T> con nodos enlazados, sin la Collections Framework" },
       ],
     },
     {
