@@ -4,6 +4,8 @@ import { fetchStudentProfilesPublic } from "@/lib/enrollments";
 import type {
   Answer,
   AnswerForReview,
+  AssignmentScoreRow,
+  AssignmentScoresResult,
   QuestionDetail,
   Submission,
   SubmissionFailure,
@@ -423,6 +425,110 @@ export async function getSubmissionByStudent(
 
   if (!data) return null;
   return { ...data, answers: (data.answers as Answer[]) ?? [] };
+}
+
+// spec-056 (D2, Fase 1): resuelve el último intento de CADA estudiante sobre
+// CADA evaluación abarcada por `enrollmentIds` en una sola consulta, para que
+// "Mis notas" no repita `getSubmissionByStudent` por (curso, grupo) — evitaría
+// exactamente el problema de N+1 que D2 señala para las calificaciones.
+// D5: nunca lanza; "unavailable" es la señal para que el consumidor reemplace
+// la sección de evaluaciones por ErrorState sin tumbar el resto de la página.
+export async function getAssignmentScoresByEnrollments(
+  enrollmentIds: string[]
+): Promise<AssignmentScoresResult> {
+  if (enrollmentIds.length === 0) return { status: "ok", rows: [] };
+
+  const supabase = await createServerSupabaseClient();
+  const { data, error } = await supabase
+    .from("submissions")
+    .select(
+      "enrollment_id, variant_group_id, assignment_id, status, auto_score, final_score, attempt_number, submitted_at, assignment_variant_groups (id, academic_course_id, title, closes_at, grade_item_id, max_attempts)"
+    )
+    .in("enrollment_id", enrollmentIds)
+    .order("attempt_number", { ascending: false });
+
+  if (error) {
+    console.error("getAssignmentScoresByEnrollments: fallo al leer submissions:", error.message);
+    return { status: "unavailable" };
+  }
+
+  const nowIso = new Date().toISOString();
+  // Ya ordenado por attempt_number descendente: la primera fila que se ve por
+  // cada (enrollment_id, variant_group_id) es el intento de mayor número.
+  // `assignment_id` (la VARIANTE del intento, distinta de variant_group_id)
+  // se conserva solo para resolver `max_points` abajo — no forma parte de
+  // AssignmentScoreRow, que expone la fila ya resuelta.
+  const latestByKey = new Map<string, Omit<AssignmentScoreRow, "max_points"> & { assignment_id: string }>();
+
+  for (const row of data ?? []) {
+    const group = row.assignment_variant_groups as unknown as {
+      id: string;
+      academic_course_id: string;
+      title: string;
+      closes_at: string | null;
+    } | null;
+    // RLS deniega el embed (grupo no publicado) o el grupo ya no existe —
+    // sin datos del grupo no hay curso ni título que mostrar; se descarta la
+    // fila en vez de fabricar un valor.
+    if (!group) continue;
+
+    const key = `${row.enrollment_id}:${row.variant_group_id}`;
+    if (latestByKey.has(key)) continue;
+
+    latestByKey.set(key, {
+      enrollment_id: row.enrollment_id,
+      variant_group_id: row.variant_group_id,
+      assignment_id: row.assignment_id,
+      academic_course_id: group.academic_course_id,
+      title: group.title,
+      score: row.final_score ?? row.auto_score,
+      status: row.status as AssignmentScoreRow["status"],
+      attempt_number: row.attempt_number,
+      submitted_at: row.submitted_at,
+      is_closed: group.closes_at !== null && group.closes_at <= nowIso,
+    });
+  }
+
+  const latestRows = [...latestByKey.values()];
+
+  // `assignment_id` identifica la VARIANTE (A/B/C) que le tocó a este
+  // estudiante, no el grupo — cada variante puede tener un total de puntos
+  // distinto, así que el máximo se suma por assignment_id, no por
+  // variant_group_id. La política "inherits_variant_select" de
+  // assignment_questions ya permite esta lectura para el propio estudiante
+  // (matrícula activa + grupo publicado, mismo criterio que el resto de la
+  // consulta).
+  const assignmentIds = [...new Set(latestRows.map((r) => r.assignment_id))];
+  const maxPointsByAssignment = new Map<string, number>();
+
+  if (assignmentIds.length > 0) {
+    const { data: questionRows, error: questionsError } = await supabase
+      .from("assignment_questions")
+      .select("assignment_id, points")
+      .in("assignment_id", assignmentIds);
+
+    if (questionsError) {
+      console.error(
+        "getAssignmentScoresByEnrollments: fallo al leer assignment_questions:",
+        questionsError.message
+      );
+      return { status: "unavailable" };
+    }
+
+    for (const q of questionRows ?? []) {
+      maxPointsByAssignment.set(
+        q.assignment_id,
+        (maxPointsByAssignment.get(q.assignment_id) ?? 0) + Number(q.points)
+      );
+    }
+  }
+
+  const rows: AssignmentScoreRow[] = latestRows.map(({ assignment_id, ...row }) => ({
+    ...row,
+    max_points: maxPointsByAssignment.get(assignment_id) ?? 0,
+  }));
+
+  return { status: "ok", rows };
 }
 
 // Todos los envíos de una evaluación, a través de sus 3 variantes (spec-020

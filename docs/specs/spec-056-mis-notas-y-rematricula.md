@@ -1,4 +1,4 @@
-# spec-056 — [NOT STARTED] Mis notas del estudiante y rematrícula docente
+# spec-056 — [TESTING] Mis notas del estudiante y rematrícula docente
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.
 
@@ -207,18 +207,18 @@ expone una acción ni un dato nuevo que un agente necesite.
 ## Fases de implementación
 
 ### Fase 1 — Helpers y consultas de "Mis notas"
-- [ ] Crear `lib/grades/overview.ts` con `getStudentGradesOverview()`:
+- [x] Crear `lib/grades/overview.ts` con `getStudentGradesOverview()`:
       parte de `getEnrollmentsByStudent()` (`lib/enrollments/index.ts`),
       separa activas de retiradas y resuelve en lote los ítems y puntajes de
       las activas (2 consultas: `grade_items` por
       `academic_course_id in (...)` ordenado por `order_index`;
       `student_grades` por `enrollment_id in (...)`).
-- [ ] Añadir a `lib/grades/types.ts` los tipos `CourseGradesSummary`
+- [x] Añadir a `lib/grades/types.ts` los tipos `CourseGradesSummary`
       (matrícula + curso + `items: GradeItemWithScore[]` + `total_grade` +
       `self_assessment` + `assignments`) y `StudentGradesOverview`
       (`{ active: CourseGradesSummary[]; withdrawn: WithdrawnCourseSummary[] }`),
       reutilizando `GradeItemWithScore` ya existente.
-- [ ] Crear en `lib/submissions/index.ts` el helper
+- [x] Crear en `lib/submissions/index.ts` el helper
       `getAssignmentScoresByEnrollments(enrollmentIds)`: consulta
       `submissions` con embed a
       `assignment_variant_groups (id, academic_course_id, title, closes_at, grade_item_id, max_attempts)`
@@ -229,93 +229,93 @@ expone una acción ni un dato nuevo que un agente necesite.
       `final_score ?? auto_score`, `status` (`SubmissionStatus`, ya
       existente), `attempt_number`, `submitted_at` e `is_closed` (derivado
       de `closes_at`).
-- [ ] Reutilizar tal cual `getSelfAssessmentCourseSummary(courseSlug)`
+- [x] Reutilizar tal cual `getSelfAssessmentCourseSummary(courseSlug)`
       (`lib/self-assessment/index.ts:749`) — una llamada por curso con
       `course_slug`, en `Promise.all`, ya degrada a `null` por sí sola.
-- [ ] No tocar `getGradesByEnrollment` ni `EnrollmentDetail`: el detalle
+- [x] No tocar `getGradesByEnrollment` ni `EnrollmentDetail`: el detalle
       por matrícula sigue igual.
 
 ### Fase 2 — UI de "Mis notas"
-- [ ] `app/cuenta/notas/page.tsx` (Server Component, `requireUser("/cuenta/notas")`,
+- [x] `app/cuenta/notas/page.tsx` (Server Component, `requireUser("/cuenta/notas")`,
       `metadata.title = "Mis notas — Mi cuenta"`), con la estructura
       `<main className="flex-1 pt-6 pb-14 flex flex-col gap-6">` de las
       demás páginas de `/cuenta/cursos`.
-- [ ] `components/account/GradesOverview.tsx` — orquesta las secciones
+- [x] `components/account/GradesOverview.tsx` — orquesta las secciones
       "Cursos activos" y "Cursos retirados"; estado vacío cuando no hay
       matrículas.
-- [ ] `components/account/CourseGradesCard.tsx` — por curso: nombre +
+- [x] `components/account/CourseGradesCard.tsx` — por curso: nombre +
       código + docente, tabla de ítems con puntaje, nota total (mismo
       formato y semáforo ≥3 que `EnrollmentDetail`), nota de
       autoevaluaciones y enlace "Ver curso" a `/cuenta/cursos/[enrollmentId]`.
-- [ ] `components/account/AssignmentScoreList.tsx` — filas por evaluación:
+- [x] `components/account/AssignmentScoreList.tsx` — filas por evaluación:
       título, estado (extraer el mapa `STATUS_LABELS` de
       `app/cuenta/cursos/[enrollmentId]/evaluaciones/page.tsx` a un módulo
       compartido para no duplicar etiquetas), puntaje sobre total, e
       intento; enlace a `resultados` **solo si la evaluación sigue abierta**
       (D3).
-- [ ] Navegación: entrada "Mis notas" en `components/navbar/UserMenu.tsx` y
+- [x] Navegación: entrada "Mis notas" en `components/navbar/UserMenu.tsx` y
       en el menú móvil de `components/navbar/Navbar.tsx`; enlace desde el
       encabezado de `app/cuenta/cursos/page.tsx`.
-- [ ] Verificar tokens semánticos y la tabla claro/oscuro de `DESIGN.md`;
+- [x] Verificar tokens semánticos y la tabla claro/oscuro de `DESIGN.md`;
       Flowbite primero.
 
 ### Fase 3 — Acción y endpoint de rematrícula
-- [ ] `lib/enrollments/index.ts`: `reactivateEnrollment(enrollmentId)` —
+- [x] `lib/enrollments/index.ts`: `reactivateEnrollment(enrollmentId)` —
       `UPDATE enrollments SET status='active', withdrawn_at=null` con el
       cliente de sesión, simétrico a `withdrawStudent` (línea 234). A
       diferencia de aquella, **sí** comprobar el error del `update` y
       devolver un resultado (`{ok:true} | {ok:false; error}`) en vez de
       ignorarlo en silencio.
-- [ ] `lib/enrollments/actions.ts`:
+- [x] `lib/enrollments/actions.ts`:
       `reactivateStudentAction(enrollmentId, academicCourseId)` con
       `"use server"`, `requireUser()`, `revalidatePath("/admin/courses/[id]")`
       y `revalidatePath("/admin/courses")` — mismo patrón que
       `withdrawStudentAction`.
-- [ ] `lib/students/service.ts`: en `enrollServiceStudent` cambiar el
+- [x] `lib/students/service.ts`: en `enrollServiceStudent` cambiar el
       `select("id")` por `select("id, status")` y bifurcar:
       `status === 'active'` → error actual; `status === 'withdrawn'` →
       `UPDATE` a `active` con `withdrawn_at = null`, devolviendo
       `{ ok: true, enrollment, reactivated: true }` con las mismas
       columnas que ya selecciona (`id, academic_course_id, status,
       enrolled_at, withdrawn_at`).
-- [ ] `app/api/students/[studentId]/enrollments/route.ts` (`POST`):
+- [x] `app/api/students/[studentId]/enrollments/route.ts` (`POST`):
       responder `200` con `{ data, meta: { reactivated: true } }` cuando
       hubo reactivación y conservar `201` para la inserción. No tocar `GET`
       ni `DELETE`; `EnrollStudentSchema` (`lib/students/schemas.ts`) no
       cambia.
-- [ ] Añadir un comentario `// spec-056` en `enrollServiceStudent`
+- [x] Añadir un comentario `// spec-056` en `enrollServiceStudent`
       explicando *por qué* el duplicado retirado se reactiva (incidente del
       2026-09-22).
 
 ### Fase 4 — UI docente de rematrícula
-- [ ] `components/admin/EnrollmentTable.tsx`: agregar columna "Acción" a la
+- [x] `components/admin/EnrollmentTable.tsx`: agregar columna "Acción" a la
       tabla "Retirados" con un botón "Reactivar" dentro de un
       `<form action={reactivateAction}>`, igual que el "Retirar" de la
       tabla de activos, en tono neutro/positivo.
-- [ ] Revisar si el `opacity-60` de la fila retirada estorba la
+- [x] Revisar si el `opacity-60` de la fila retirada estorba la
       legibilidad del botón nuevo; ajustar si hace falta.
-- [ ] `app/(admin)/admin/courses/[academicCourseId]/page.tsx` no requiere
+- [x] `app/(admin)/admin/courses/[academicCourseId]/page.tsx` no requiere
       cambios.
 
 ### Fase 5 — MCP: actualizar `students-mcp`
-- [ ] `mcp-servers/students-mcp/src/tools.ts`: reescribir la `description`
+- [x] `mcp-servers/students-mcp/src/tools.ts`: reescribir la `description`
       de `enroll_student` — matricula a un estudiante; si ya existía una
       matrícula `withdrawn`, la reactiva en vez de rechazarla (es el
       camino para revertir un retiro accidental); solo devuelve error si
       la matrícula ya está activa. Ajustar también la descripción de
       `unenroll_student` para que apunte a `enroll_student` como forma de
       deshacer.
-- [ ] Verificar que `processToolCall` devuelve el cuerpo íntegro (incluida
+- [x] Verificar que `processToolCall` devuelve el cuerpo íntegro (incluida
       la marca `reactivated`) — `callStudentsApi` ya retorna el JSON
       completo.
-- [ ] Registrar o actualizar entrada en `docs/mcps/README.md`.
-- [ ] Actualizar `docs/mcps/students-agent.system-prompt.md`: sección
+- [x] Registrar o actualizar entrada en `docs/mcps/README.md`.
+- [x] Actualizar `docs/mcps/students-agent.system-prompt.md`: sección
       "Capacidades" (matricular **o reactivar**) y un apartado nuevo
       "Revertir un retiro accidental" en el bloque de flujos, con la
       instrucción de **confirmar identidad de estudiante y curso antes de
       reactivar** y de reportar al docente si la operación fue alta nueva
       o reactivación.
-- [ ] Verificar que el MCP responde correctamente a las herramientas
+- [x] Verificar que el MCP responde correctamente a las herramientas
       declaradas: recompilar (`cd mcp-servers/students-mcp && npm run build`)
       y comprobar el servidor aislado con
       `./mcp-servers/run-local-mcp.sh students-mcp </dev/null` (requiere
@@ -394,5 +394,5 @@ que actualizarlo en la Fase 5 y no antes del despliegue conjunto.
 
 ## Aprobación de implementación
 > Claude no escribe código de implementación hasta que esta sección esté marcada.
-- [ ] Paquete (spec + pruebas) aprobado por el usuario
-- **Fecha de aprobación:** _pendiente_
+- [x] Paquete (spec + pruebas) aprobado por el usuario
+- **Fecha de aprobación:** 2026-09-22

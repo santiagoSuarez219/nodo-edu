@@ -100,3 +100,32 @@ export interface SubmissionForReview extends Submission {
   student_name: string;
   answers: AnswerForReview[];
 }
+
+// spec-056: fila resumida de "el último intento de este estudiante sobre esta
+// evaluación", para la vista consolidada de notas (getAssignmentScoresByEnrollments).
+// `is_closed` se deriva de `closes_at` en el momento de la consulta — determina si
+// "Mis notas" enlaza a la página de resultados (D3: esa página hace `notFound()`
+// con el grupo cerrado, ver DEBT-085).
+export interface AssignmentScoreRow {
+  enrollment_id: string;
+  variant_group_id: string;
+  academic_course_id: string;
+  title: string;
+  score: number | null;
+  // Suma de assignment_questions.points de la VARIANTE del intento
+  // (submissions.assignment_id), no de todo el grupo — cada variante puede
+  // tener un total distinto. 0 si no se pudo resolver ninguna pregunta.
+  max_points: number;
+  status: SubmissionStatus;
+  attempt_number: number;
+  submitted_at: string | null;
+  is_closed: boolean;
+}
+
+// D5 (spec-056): mismo contrato de degradación que OpenAssignmentGroupsResult
+// (lib/assignments/types.ts) y DisabledLessonsResult (lib/courses/availability.ts)
+// — nunca lanza; "unavailable" es la señal para que el consumidor decida cómo
+// degradar (ver getAssignmentScoresByEnrollments).
+export type AssignmentScoresResult =
+  | { status: "ok"; rows: AssignmentScoreRow[] }
+  | { status: "unavailable" };

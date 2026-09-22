@@ -136,6 +136,31 @@ lecciones deshabilitadas. Quedó fuera de spec-055 para mantener ese cambio acot
 
 ---
 
+## DEBT-091 — Retirar a un estudiante por error no se podía revertir sin tocar la base directo
+
+**Origen:** incidente en producción del 2026-09-22 — un docente retiró por
+accidente a dos estudiantes de Estructuras de datos y solo se pudo revertir
+con un `UPDATE` SQL directo.
+**Prioridad:** Alta — un error de un clic en el panel docente no tenía camino
+de reversión desde la UI ni desde los MCPs.
+
+Causa: `unenrollServiceStudent()` (`lib/students/service.ts`) deja la
+matrícula en `status='withdrawn'` sin borrar la fila, pero
+`enrollServiceStudent()` buscaba duplicados solo por `student_id` +
+`academic_course_id`, sin mirar `status` — así que reintentar la matrícula
+devolvía `400 "Ya está matriculado en este curso."` en vez de reactivarla. La
+UI docente tenía el mismo agujero: `EnrollmentTable.tsx` pintaba la tabla
+"Retirados" en solo lectura, y `lib/enrollments/actions.ts` solo exponía
+`withdrawStudentAction`.
+
+**Acción:** resuelto por `spec-056-mis-notas-y-rematricula.md` — agrega
+`reactivateEnrollment`/`reactivateStudentAction` (panel docente, cliente de
+sesión) y hace que `enrollServiceStudent` reactive una matrícula `withdrawn`
+en vez de rechazarla (API de servicio y `students-mcp`). Pendiente de cerrar
+la Fase 6 (pruebas) del spec antes de marcar esta entrada como resuelta.
+
+---
+
 ## DEBT-084 — La página del curso del estudiante no enlaza a "Evaluaciones" [RESUELTO — spec-055]
 
 **Resuelto por `spec-055-acceso-evaluaciones-estudiante.md`** (`[DONE]`,

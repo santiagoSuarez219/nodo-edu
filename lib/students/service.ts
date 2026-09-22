@@ -414,7 +414,10 @@ export async function deleteServiceStudent(
 export async function enrollServiceStudent(
   studentId: string,
   target: { academicCourseId?: string; enrollmentCode?: string }
-): Promise<{ ok: true; enrollment: AdminEnrollmentSummary } | { ok: false; error: string }> {
+): Promise<
+  | { ok: true; enrollment: AdminEnrollmentSummary; reactivated?: true }
+  | { ok: false; error: string }
+> {
   const supabase = createServiceSupabaseClient();
 
   let academicCourseId = target.academicCourseId;
@@ -429,11 +432,33 @@ export async function enrollServiceStudent(
 
   const { data: existing } = await supabase
     .from("enrollments")
-    .select("id")
+    .select("id, status")
     .eq("student_id", studentId)
     .eq("academic_course_id", academicCourseId)
     .maybeSingle();
-  if (existing) return { ok: false, error: "Ya está matriculado en este curso." };
+
+  if (existing) {
+    if (existing.status === "active") {
+      return { ok: false, error: "Ya está matriculado en este curso." };
+    }
+
+    // spec-056: incidente en producción del 2026-09-22 (DEBT-091) — un
+    // docente retiró por accidente a dos estudiantes y reintentar la
+    // matrícula fallaba con el mismo 400 de arriba porque esta búsqueda no
+    // miraba `status`. Una fila `withdrawn` para (student_id,
+    // academic_course_id) es exactamente el caso a revertir: se reactiva en
+    // vez de rechazarse, y `reactivated: true` le permite al agente
+    // distinguir esto de un alta nueva.
+    const { data, error } = await supabase
+      .from("enrollments")
+      .update({ status: "active", withdrawn_at: null })
+      .eq("id", existing.id)
+      .select("id, academic_course_id, status, enrolled_at, withdrawn_at")
+      .single();
+
+    if (error) return { ok: false, error: "No se pudo reactivar la matrícula." };
+    return { ok: true, enrollment: data, reactivated: true };
+  }
 
   const { data, error } = await supabase
     .from("enrollments")

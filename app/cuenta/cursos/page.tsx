@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { requireUser } from "@/lib/auth/session";
 import { getEnrollmentsByStudent } from "@/lib/enrollments/index";
 import { EnrollmentForm } from "@/components/account/EnrollmentForm";
@@ -18,13 +19,21 @@ export default async function MisCursosPage({ searchParams }: MisCursosPageProps
 
   return (
     <main className="flex-1 pt-6 pb-14 flex flex-col gap-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">
-          Mis cursos
-        </h1>
-        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-          Consulta tus cursos matriculados y calificaciones.
-        </p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">
+            Mis cursos
+          </h1>
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            Consulta tus cursos matriculados y calificaciones.
+          </p>
+        </div>
+        <Link
+          href="/cuenta/notas"
+          className="shrink-0 text-sm font-medium text-blue-700 dark:text-blue-400 hover:underline mt-1"
+        >
+          Ver mis notas
+        </Link>
       </div>
 
       {noAccessCourse && (
