@@ -115,6 +115,16 @@ export async function POST(
       });
     }
 
+    // spec-056: una matrícula `withdrawn` reactivada responde 200 (recurso ya
+    // existía, se actualizó) en vez del 201 de una inserción nueva, con
+    // `meta.reactivated` para que el agente distinga los dos caminos.
+    if (result.reactivated) {
+      return NextResponse.json(
+        { data: result.enrollment, meta: { reactivated: true } },
+        { status: 200 }
+      );
+    }
+
     return NextResponse.json({ data: result.enrollment }, { status: 201 });
   } catch (err) {
     console.error("POST /api/students/[studentId]/enrollments error:", err);
