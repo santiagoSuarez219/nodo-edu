@@ -33,6 +33,16 @@ export const ResetStudentPasswordSchema = z.object({
   password: z.string().min(8, "La contraseña debe tener al menos 8 caracteres").optional(),
 });
 
+// spec-057: máx. 100 caracteres — UpdateStudentSchema y CreateStudentSchema
+// no lo tienen (deuda documentada en docs/specs/backlog.md); no se les
+// agrega aquí para no cambiar el contrato del MCP ni de /cuenta fuera de
+// este spec.
+export const EditStudentNameSchema = z
+  .string()
+  .trim()
+  .min(2, "El nombre debe tener al menos 2 caracteres")
+  .max(100, "El nombre no puede superar los 100 caracteres");
+
 export const EnrollStudentSchema = z
   .object({
     academic_course_id: z.string().uuid().optional(),

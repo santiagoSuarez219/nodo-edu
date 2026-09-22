@@ -1,5 +1,6 @@
 import { withdrawStudentAction, reactivateStudentAction } from "@/lib/enrollments/actions";
 import { ResetPasswordButton } from "./ResetPasswordButton";
+import { StudentNameCell } from "./StudentNameCell";
 import type { EnrollmentWithStudent } from "@/lib/enrollments/types";
 
 interface Props {
@@ -73,8 +74,12 @@ export function EnrollmentTable({ enrollments, academicCourseId }: Props) {
                   );
                   return (
                     <tr key={enrollment.id}>
-                      <td className="px-5 py-4 font-medium text-gray-900 dark:text-white">
-                        {enrollment.profile.full_name}
+                      <td className="px-5 py-4">
+                        <StudentNameCell
+                          studentId={enrollment.student_id}
+                          academicCourseId={academicCourseId}
+                          initialName={enrollment.profile.full_name}
+                        />
                       </td>
                       <td className="px-5 py-4 text-gray-500 dark:text-gray-400">
                         {formatDate(enrollment.enrolled_at)}
