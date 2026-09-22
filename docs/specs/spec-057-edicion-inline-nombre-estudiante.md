@@ -1,4 +1,4 @@
-# spec-057 — [TESTING] Edición inline del nombre del estudiante desde la lista de matriculados
+# spec-057 — [DONE] Edición inline del nombre del estudiante desde la lista de matriculados
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.
 
