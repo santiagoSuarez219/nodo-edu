@@ -160,8 +160,8 @@ No aplica — la Semana 7 no lleva `★`.
 
 ## Ronda — `programacion-cientifica` (2026-09-23 a 2026-09-24)
 
-**Rama:** `feat/semana-07-programacion-cientifica`
-**Estado:** ✅ Contenido listo · ⬜ `@reviewer` · ⬜ Mergeada a `development` · ⬜ Desplegada y abierta
+**Rama:** `feat/semana-07-programacion-cientifica` (borrada tras el merge)
+**Estado:** ✅ Contenido listo · ✅ `@reviewer` (APROBADO) · ✅ Mergeada a `development` (local, push pendiente) · ⬜ Desplegada y abierta
 
 **Alcance confirmado por el usuario:** Semana 7, sesión única (jue. 17 sep,
 "Programación orientada a objetos"): lección `clases-y-objetos-en-python`
