@@ -72,7 +72,8 @@ Cada ejercicio debe ir precedido por una celda de texto que explique qué
 hace, y cada resultado debe mostrarse con `print()`.
 
 Todas las funciones, clases y métodos que escriba llevan un **docstring de
-una línea** que diga qué hacen. Los nombres van en `snake_case` (funciones y
+una línea** (la frase entre triples comillas que va en la primera línea del
+cuerpo, como en las lecciones) que diga qué hacen. Los nombres van en `snake_case` (funciones y
 variables) y `PascalCase` (clases), sin tildes.
 
 ### Ejercicio 1 — Calibrar una lectura
@@ -284,14 +285,16 @@ trabajan con funciones auxiliares que usted ya escribió.
 #       que guarde ambos objetos en atributos internos
 # TODO: defina el método promedio_calibrado(self) que: (1) tome los valores
 #       de la estación, (2) descarte con filter y es_lectura_valida los que
-#       no sirven, (3) calibre el resto con map y el método calibrar del
-#       sensor, y (4) devuelva su promedio usando promedio_valido
+#       no sirven, (3) calibre el resto con map (con una lambda o con el propio
+#       método calibrar del sensor), y (4) devuelva su promedio usando
+#       promedio_valido
 # TODO: defina el método categoria(self) que devuelva la categoría del
 #       promedio calibrado usando categoria_pm25
 # TODO: defina __str__ para que print(informe) muestre exactamente
 #       EST-04: 31.9 ug/m3 - Moderada
 #       (código de la estación, promedio calibrado redondeado a un decimal
-#       con round, y categoría)
+#       con round(valor, 1), que redondea al número de decimales indicado,
+#       y categoría)
 
 # TODO: cree informe = InformeEstacion(estacion_oriente, sensor_a)
 # TODO: muestre con print() informe y informe.promedio_calibrado()
@@ -443,3 +446,5 @@ evaluativo.
   ejecuciones anteriores, de celdas ejecutadas en desorden, o dejó una celda
   de prueba de `ValueError` sin borrar. Ejecute siempre `Reiniciar y
   ejecutar todas` antes de entregar: así se va a calificar.
+
+**Plazo de entrega:** sábado 3 de octubre de 2026.

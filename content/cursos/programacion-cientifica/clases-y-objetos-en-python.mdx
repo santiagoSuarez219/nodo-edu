@@ -110,6 +110,10 @@ flowchart LR
 ```
 
 > **`__init__`:** método que se ejecuta al crear un objeto y sirve para dejar guardados sus atributos iniciales.
+
+> **Docstring:** frase entre triples comillas que va en la primera línea del cuerpo de una función, una clase o un método y explica qué hace. Es la documentación que acompaña al código, como la línea `"""Una lectura de PM2.5 de una estacion."""` de arriba.
+
+Fíjate también en el nombre: las clases se escriben en `PascalCase` (`Medicion`, `Estacion`), con cada palabra en mayúscula inicial y sin guiones bajos, mientras que las variables y las funciones siguen en `snake_case`.
 >
 > **`self`:** el objeto que se está creando (o sobre el que se llama un método). Siempre es el primer parámetro; al llamar no lo escribes, Python lo pasa solo.
 
@@ -372,7 +376,7 @@ La línea con rombo relleno significa **composición**: una estación contiene s
 
 > **Composición:** relación en la que un objeto guarda otros objetos como parte de sus datos. La estación "tiene" mediciones; no es una medición.
 
-Esta forma de organizar datos con su comportamiento es la que sostiene a las librerías científicas que vienen: un arreglo de NumPy o una tabla de Pandas son objetos, y los métodos que les aplicarás (como calcular un promedio) se llaman igual que `estacion.promedio()`.
+Esta forma de organizar datos con su comportamiento es la que sostiene a las librerías científicas que vienen: un arreglo de NumPy o una tabla de Pandas son objetos, y los métodos que les aplicarás (como calcular un promedio) se invocan de la misma forma que `estacion.promedio()`.
 
 ## Resumen operativo
 

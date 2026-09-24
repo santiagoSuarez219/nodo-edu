@@ -1,7 +1,8 @@
 # Semana 07 — 14 al 20 de septiembre
 
 **Rama:** `feat/semana-07-08-analisis-de-algoritmos` (borrada, cubre también la Semana 08, ver `semana-08.md`)
-**Estado:** ✅ Contenido listo · ✅ `@reviewer` (1.ª pasada CAMBIOS REQUERIDOS, corregidos) · ✅ Mergeada a `development` · ✅ **Desplegada y abierta en producción**
+**Estado (ronda `analisis-de-algoritmos`):** ✅ Contenido listo · ✅ `@reviewer` (1.ª pasada CAMBIOS REQUERIDOS, corregidos) · ✅ Mergeada a `development` · ✅ **Desplegada y abierta en producción**
+> La ronda de `programacion-cientifica` de esta semana tiene su propio estado más abajo.
 
 ---
 
@@ -171,7 +172,7 @@ No aplica — la Semana 7 no lleva `★`.
 
 | Sesión | Fecha | Tema | ★/◇ |
 |---|---|---|---|
-| Única (S7) | 17 sep | Clases y objetos en Python (`__init__`, `self`, encapsulamiento, `__repr__`/`__str__`) | ◇ |
+| Única (S7) | 17 sep | Clases y objetos en Python (`__init__`, `self`, encapsulamiento, `__repr__`/`__str__`) | — |
 | Única (S8) | 24 sep | Momento evaluativo 2 — taller de funciones y POO | ★ |
 
 ### Etapas y aprobaciones
@@ -181,7 +182,7 @@ No aplica — la Semana 7 no lleva `★`.
 | E2 · Plan de lección | Aprobado; `@property` excluido a pedido del usuario | ✅ |
 | E3 · Lección `.mdx` + registro TS | `clases-y-objetos-en-python`, `order: 6`, `summary` agregado | ✅ (avance implícito a E4) |
 | E4 · Apuntes del docente | Pedidos explícitamente por el usuario | ✅ (avance implícito a E5) |
-| E5 · Cuestionario de cierre | Propuesto: 5 preguntas → aprobadas 4 (la pregunta 3, `__repr__` vs `__str__`, quedó sin decidir: ni descartada ni reescrita) | ✅ (4) |
+| E5 · Cuestionario de cierre | Propuesto: 5 preguntas → aprobadas 4 (la pregunta 3, `__repr__` vs `__str__`, **descartada por el usuario**: el cuestionario queda en 4) | ✅ (4) |
 | E6 · Guía del estudiante | Taller evaluativo 02 (`kind: "guide"`, `order: 6.5`), pedido explícitamente | ✅ |
 | E6 · Quiz A/B/C | No pedido | — |
 
@@ -218,18 +219,19 @@ No aplica — no pedido. El Momento evaluativo 2 se resuelve como taller
   programación científica) y continuidad del hilo.
 - **Validación de unidad además de valor negativo** en `Medicion.__init__`
   (`UNIDADES_VALIDAS`), no prevista en el plan.
-- **Lección con 8 secciones `##` y 5 diagramas Mermaid** (el plan decía 4):
+- **Lección con 9 secciones `##` y 5 diagramas Mermaid** (el plan decía 8 y 4):
   se añadió el de composición `Estacion`–`Medicion`.
-- **Pregunta 3 del cuestionario no creada** — el usuario aprobó "todas menos
-  3" sin indicar si descartarla o reescribirla; la keyword `metodos-especiales`
-  tampoco se creó.
+- **Pregunta 3 del cuestionario no creada** — el usuario la descartó y
+  confirmó que el cuestionario queda en 4 preguntas; la keyword
+  `metodos-especiales` no se creó.
 - **Taller 02 cubre funciones y POO**, aunque `microdiseno/info.md` §Semana 8
   dice solo POO — **motivo:** instrucción explícita del usuario.
 - **Caso del taller 02:** calibración del sensor de bajo costo SBC-A en
   EST-04 (`valor calibrado = 1.2 x lectura - 0.5`), datos de juguete nuevos.
 - **Validación de `Sensor` (ejercicio 6) sin `try/except`:** se comprueba con
   una celda temporal que el estudiante debe quitar antes de entregar.
-- **Plazo de entrega del taller 02 omitido a propósito** (no se inventó fecha).
+- **Plazo de entrega del taller 02:** sábado 3 de octubre de 2026, fecha dada por el usuario (el 3 de octubre de 2026 cae sábado).
+- **Correcciones del `@reviewer` (2.º commit):** definición de *docstring* y nota de `PascalCase` añadidas a la lección (el taller los califica); `round(valor, 1)` aclarado en el ejercicio 8, y `map` con `lambda` o método permitido; estación `mixta` del apunte pasó de `EST-04` a `EST-05` (EST-04 es Oriente en el taller); reformulado "hasta tres argumentos" en el apunte y "se invocan de la misma forma" en la lección.
 
 ### Verificación (E7)
 
@@ -238,7 +240,7 @@ No aplica — no pedido. El Momento evaluativo 2 se resuelve como taller
 - [x] Código de lección, apuntes y solución de referencia del taller ejecutados con python3; salidas mostradas verificadas
 - [x] `summary` presente en frontmatter **y** en registro TS (lección) y en registro TS (taller)
 - [x] Coherencia cruzada: el taller usa solo lo enseñado en `funciones` y `clases-y-objetos-en-python`
-- [ ] `@reviewer`: pendiente
+- [x] `@reviewer`: **APROBADO** (1 mayor + menores, corregidos en el 2.º commit)
 
 ## Despliegue — `programacion-cientifica` (pendiente)
 
@@ -256,7 +258,5 @@ No aplica — no pedido. El Momento evaluativo 2 se resuelve como taller
 
 ## Pendientes (`programacion-cientifica`)
 
-- **Plazo de entrega del taller 02:** definir fecha y agregar la línea "Plazo de entrega:".
-- **Pregunta 3 del cuestionario** (`__repr__` vs `__str__`): descartar o reescribir.
 - El taller 01 dice "Plazo de entrega: jueves 17 de septiembre de 2026", ya vencido; revisar.
 - `arreglos-y-dimensiones-numpy` (order 7) tampoco tiene `summary` en el registro.

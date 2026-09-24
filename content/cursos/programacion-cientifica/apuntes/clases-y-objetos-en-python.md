@@ -90,8 +90,8 @@ print(otra.valor, otra.unidad, otra.estacion)
 ```
 
 Punto a resaltar: `Medicion(15.2)` no llama a `__init__` a mano; Python crea
-un objeto vacío y se lo pasa como `self`. Por eso al llamar solo se escriben
-tres argumentos y la función recibe cuatro. `m` y `otra` salen del mismo molde
+un objeto vacío y se lo pasa como `self`. Por eso al llamar se escriben
+hasta tres argumentos y la función recibe uno más: el objeto (`self`). `m` y `otra` salen del mismo molde
 pero guardan datos distintos. Señalar también que los valores por defecto
 funcionan igual que en las funciones.
 
@@ -377,7 +377,7 @@ usa.
 Demostrar que `Estacion` delega y no depende de la unidad:
 
 ```python
-mixta = Estacion("EST-04", "Este")
+mixta = Estacion("EST-05", "Este")
 mixta.agregar(Medicion(0.0084, "mg/m3"))   # 8.4 ug/m3
 mixta.agregar(Medicion(15.2))              # ya en ug/m3
 print(mixta.promedio())
