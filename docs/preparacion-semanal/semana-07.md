@@ -1,7 +1,8 @@
 # Semana 07 — 14 al 20 de septiembre
 
 **Rama:** `feat/semana-07-08-analisis-de-algoritmos` (borrada, cubre también la Semana 08, ver `semana-08.md`)
-**Estado:** ✅ Contenido listo · ✅ `@reviewer` (1.ª pasada CAMBIOS REQUERIDOS, corregidos) · ✅ Mergeada a `development` · ✅ **Desplegada y abierta en producción**
+**Estado (ronda `analisis-de-algoritmos`):** ✅ Contenido listo · ✅ `@reviewer` (1.ª pasada CAMBIOS REQUERIDOS, corregidos) · ✅ Mergeada a `development` · ✅ **Desplegada y abierta en producción**
+> La ronda de `programacion-cientifica` de esta semana tiene su propio estado más abajo.
 
 ---
 
@@ -154,3 +155,108 @@ No aplica — la Semana 7 no lleva `★`.
   `orphan_disabled_slugs: []`.
 - **D6:** rama `deploy/semana-07-08-analisis-de-algoritmos` borrada (local,
   no se pusheó a remoto).
+
+---
+
+## Ronda — `programacion-cientifica` (2026-09-23 a 2026-09-24)
+
+**Rama:** `feat/semana-07-programacion-cientifica` (borrada tras el merge)
+**Estado:** ✅ Contenido listo · ✅ `@reviewer` (APROBADO) · ✅ Mergeada a `development` (local, push pendiente) · ⬜ Desplegada y abierta
+
+**Alcance confirmado por el usuario:** Semana 7, sesión única (jue. 17 sep,
+"Programación orientada a objetos"): lección `clases-y-objetos-en-python`
+(estaba como stub vacío), apuntes del docente, cuestionario de cierre y el
+**taller evaluativo 02** (Momento evaluativo 2, ★ de la Semana 8, jue. 24 sep).
+
+### Sesiones cubiertas
+
+| Sesión | Fecha | Tema | ★/◇ |
+|---|---|---|---|
+| Única (S7) | 17 sep | Clases y objetos en Python (`__init__`, `self`, encapsulamiento, `__repr__`/`__str__`) | — |
+| Única (S8) | 24 sep | Momento evaluativo 2 — taller de funciones y POO | ★ |
+
+### Etapas y aprobaciones
+
+| Etapa | Resultado | Aprobada por el usuario |
+|---|---|---|
+| E2 · Plan de lección | Aprobado; `@property` excluido a pedido del usuario | ✅ |
+| E3 · Lección `.mdx` + registro TS | `clases-y-objetos-en-python`, `order: 6`, `summary` agregado | ✅ (avance implícito a E4) |
+| E4 · Apuntes del docente | Pedidos explícitamente por el usuario | ✅ (avance implícito a E5) |
+| E5 · Cuestionario de cierre | Propuesto: 5 preguntas → aprobadas 4 (la pregunta 3, `__repr__` vs `__str__`, **descartada por el usuario**: el cuestionario queda en 4) | ✅ (4) |
+| E6 · Guía del estudiante | Taller evaluativo 02 (`kind: "guide"`, `order: 6.5`), pedido explícitamente | ✅ |
+| E6 · Quiz A/B/C | No pedido | — |
+
+### Artefactos producidos
+
+| Artefacto | Ruta | Publicado |
+|---|---|---|
+| Lección teórica | `content/cursos/programacion-cientifica/clases-y-objetos-en-python.mdx` | ⬜ (en rama) |
+| Registro TS | `lib/courses/data/programacion-cientifica.ts` (`order: 6` con `summary`; nueva entrada `order: 6.5`) | — |
+| Apunte de clase | `content/cursos/programacion-cientifica/apuntes/clases-y-objetos-en-python.md` | Solo owner/admin (en rama) |
+| Guía del estudiante | `content/cursos/programacion-cientifica/guias/taller-evaluativo-02-funciones-y-poo.md` | ⬜ (en rama) |
+
+### Cuestionario de cierre
+
+| Lección | Entorno | IDs de preguntas | Publicadas | Montadas (`list_lesson_questions`) |
+|---|---|---|---|---|
+| `clases-y-objetos-en-python` | desarrollo | `705af87f-8ae2-45cb-93f6-b148c4972542`, `efcb2e68-9eab-49f9-8d12-7552e144a813`, `929787f5-4929-4391-b570-eb2a2963142a`, `736e69ad-52b9-48d6-900d-d721e22ec95e` | ✅ | ✅ (orden 0-3) |
+| `clases-y-objetos-en-python` | **producción** | — | ⬜ | ⬜ |
+
+> Las preguntas **no viajan con el deploy**: se recrean en producción en D3.
+> Keywords usadas (`python`, `poo`, `clases-y-objetos`, `encapsulamiento`)
+> existen en desarrollo; **falta confirmar que existen en producción**.
+
+### Quiz calificable A/B/C
+
+No aplica — no pedido. El Momento evaluativo 2 se resuelve como taller
+(guía con rúbrica), no como quiz.
+
+### Decisiones tomadas por Claude en nombre del docente
+
+- **Dominio científico con `Medicion` / `Estacion`** sobre la red de PM2.5 ya
+  sembrada en `funciones` y el taller 01, en vez de `Estudiante` / `Producto`
+  del microdiseño — **motivo:** requisito del usuario (orientación a
+  programación científica) y continuidad del hilo.
+- **Validación de unidad además de valor negativo** en `Medicion.__init__`
+  (`UNIDADES_VALIDAS`), no prevista en el plan.
+- **Lección con 9 secciones `##` y 5 diagramas Mermaid** (el plan decía 8 y 4):
+  se añadió el de composición `Estacion`–`Medicion`.
+- **Pregunta 3 del cuestionario no creada** — el usuario la descartó y
+  confirmó que el cuestionario queda en 4 preguntas; la keyword
+  `metodos-especiales` no se creó.
+- **Taller 02 cubre funciones y POO**, aunque `microdiseno/info.md` §Semana 8
+  dice solo POO — **motivo:** instrucción explícita del usuario.
+- **Caso del taller 02:** calibración del sensor de bajo costo SBC-A en
+  EST-04 (`valor calibrado = 1.2 x lectura - 0.5`), datos de juguete nuevos.
+- **Validación de `Sensor` (ejercicio 6) sin `try/except`:** se comprueba con
+  una celda temporal que el estudiante debe quitar antes de entregar.
+- **Plazo de entrega del taller 02:** sábado 3 de octubre de 2026, fecha dada por el usuario (el 3 de octubre de 2026 cae sábado).
+- **Correcciones del `@reviewer` (2.º commit):** definición de *docstring* y nota de `PascalCase` añadidas a la lección (el taller los califica); `round(valor, 1)` aclarado en el ejercicio 8, y `map` con `lambda` o método permitido; estación `mixta` del apunte pasó de `EST-04` a `EST-05` (EST-04 es Oriente en el taller); reformulado "hasta tres argumentos" en el apunte y "se invocan de la misma forma" en la lección.
+
+### Verificación (E7)
+
+- [x] `npm run build` en verde
+- [x] `npm run lint` en verde (0 errores, 10 advertencias preexistentes sin relación)
+- [x] Código de lección, apuntes y solución de referencia del taller ejecutados con python3; salidas mostradas verificadas
+- [x] `summary` presente en frontmatter **y** en registro TS (lección) y en registro TS (taller)
+- [x] Coherencia cruzada: el taller usa solo lo enseñado en `funciones` y `clases-y-objetos-en-python`
+- [x] `@reviewer`: **APROBADO** (1 mayor + menores, corregidos en el 2.º commit)
+
+## Despliegue — `programacion-cientifica` (pendiente)
+
+| Paso | Estado | Fecha / detalle |
+|---|---|---|
+| D0 · Alcance y checklist pre-despliegue | ⬜ | |
+| D1 · Lecciones nuevas cerradas por adelantado | ⬜ | `clases-y-objetos-en-python` y `taller-evaluativo-02-funciones-y-poo` |
+| D2 · Merge a `main` y deploy en Vercel | ⬜ | |
+| D3 · Banco de preguntas replicado a producción | ⬜ | 4 preguntas |
+| D4 · Lecciones abiertas a los estudiantes | ⬜ | |
+| D5 · Verificación end-to-end en producción | ⬜ | |
+| D6 · Bitácora cerrada y rama `deploy/` borrada | ⬜ | |
+
+- [ ] Verificado que las lecciones de semanas futuras siguen **cerradas**
+
+## Pendientes (`programacion-cientifica`)
+
+- El taller 01 dice "Plazo de entrega: jueves 17 de septiembre de 2026", ya vencido; revisar.
+- `arreglos-y-dimensiones-numpy` (order 7) tampoco tiene `summary` en el registro.

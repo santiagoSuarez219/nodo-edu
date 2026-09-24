@@ -123,11 +123,24 @@ export const programacionCientifica: Course = {
       articleSlug: "clases-y-objetos-en-python",
       order: 6,
       title: "Clases y objetos en Python",
+      summary:
+        "Convierte una lista de diccionarios con lecturas de PM2.5 en objetos que se validan y se muestran solos: clases con `__init__` y `self`, atributos con convención de encapsulamiento y `__repr__`/`__str__`, aplicados a la red de monitoreo.",
       topics: [
         { title: "Clases y objetos: __init__, self, atributos y métodos" },
         { title: "Encapsulamiento y convenciones de nombres" },
         { title: "Métodos especiales básicos: __str__, __repr__" },
       ],
+    },
+    {
+      id: "taller-evaluativo-02-funciones-y-poo",
+      slug: "taller-evaluativo-02-funciones-y-poo",
+      articleSlug: "taller-evaluativo-02-funciones-y-poo",
+      kind: "guide",
+      order: 6.5,
+      title: "Taller evaluativo 02 — Funciones y POO",
+      summary:
+        "Momento evaluativo 2 (15 %): ocho ejercicios que integran funciones (parámetros, retorno, map, filter, lambda) y programación orientada a objetos (clases, validación, encapsulamiento, __repr__ y __str__) en la calibración de un sensor de bajo costo de PM2.5 frente a la red de monitoreo.",
+      topics: [],
     },
     {
       id: "arreglos-y-dimensiones-numpy",
