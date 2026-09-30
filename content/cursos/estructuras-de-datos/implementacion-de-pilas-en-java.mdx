@@ -9,145 +9,72 @@ difficulty: "Básico"
 estimated_time: "50 minutos de clase (Semana 8)"
 presentation: true
 slides_hint: "Cada sección ## es una diapositiva. Presentación sincrona."
-date: "2026-09-22"
+date: "2026-09-30"
 author: "Asistente de Docencia"
-summary: "El contrato LIFO detrás de deshacer un cambio o volver atrás en el navegador, y cómo construirlo tú mismo en Java encadenando nodos por referencia, sin usar ninguna clase ya hecha del lenguaje."
-updatedAt: 2026-09-22
+summary: "Parte de una pila de platos en la cocina para deducir las reglas LIFO —push, pop, peek— y luego construye en Java tu propia pila encadenando nodos, hasta llegar a deshacer una transacción en tu proyecto."
+updatedAt: "2026-09-30"
 ---
 
-## El problema: deshacer solo el último cambio
+> 📖 Lectura previa a la clase — unos 15 minutos. Al final, responde la autoevaluación.
 
-Escribes un párrafo, lo formateas, le cambias el color y presionas `Ctrl+Z`
-tres veces seguidas. Cada vez se deshace exactamente **la acción más
-reciente**, nunca una al azar ni la primera que hiciste. El editor no guarda
-tus acciones en una lista cualquiera: las guarda en un orden muy particular,
-donde lo último que entra es lo primero que sale.
+## La pila de platos del escurridor
 
-Ese mismo patrón aparece en el botón "atrás" del navegador y en la manera en
-que un programa recuerda a qué función volver cuando termina una llamada
-anidada. ¿Qué estructura modela "lo último que entró es lo primero que sale"?
+Terminas de lavar los platos A, B y C, en ese orden. Los pones en el escurridor uno encima del otro: A queda abajo, B en medio y C arriba. Cuando llega la hora de cenar, ¿qué plato tomas? El de arriba, C. Luego B y al final A. Nadie saca A primero: tendría que desarmar toda la torre.
 
-## El mismo patrón en tres lugares distintos
+Tres cosas pasan siempre con esa pila:
 
-Antes de nombrar la estructura, nota que resuelve problemas que a primera
-vista parecen distintos:
+- El plato limpio nuevo **solo se pone encima**; no lo metes en el medio.
+- El plato que tomas **solo sale de arriba**: el último en llegar es el primero en salir.
+- Puedes **mirar** cuál es el plato de arriba sin llevártelo. Y si no quedan platos, no hay nada que tomar: extender la mano al vacío es un error, no te da "un plato nulo".
 
-- **Historial de navegación:** cada página visitada se apila; "atrás" retira
-  la más reciente y te deja en la anterior.
-- **Llamadas a funciones:** cuando una función llama a otra, la ejecución de
-  la primera queda pendiente hasta que la segunda termine. El programa debe
-  recordar, en orden inverso, a qué función volver.
-- **Balanceo de símbolos:** un compilador valida que cada `(`, `[` o `{`
-  tenga su cierre correspondiente, en el orden correcto de anidamiento.
+## Del ejemplo a las reglas: el TAD Pila
 
-Los tres comparten una restricción: solo importa el elemento más reciente que
-sigue "abierto". No necesitas consultar todo el historial, solo lo último.
+Cada regla de la cocina es una operación. Un **tipo abstracto de dato (TAD)** dice *qué* se puede hacer con una estructura, sin decir cómo está construida por dentro.
 
-## El TAD Pila: el contrato LIFO
+| En la cocina | Operación |
+|---|---|
+| Pongo un plato encima | `push(valor)` |
+| Tomo el plato de arriba | `pop()` |
+| Miro el plato de arriba sin tomarlo | `peek()` |
+| ¿Hay platos? | `isEmpty()` |
+| ¿Cuántos platos hay? | `size()` |
 
-Un **tipo abstracto de dato (TAD)** define *qué* operaciones puede hacer una
-estructura y *qué* garantiza cada una, sin decir *cómo* está construida por
-dentro. El TAD Pila especifica un contrato con disciplina **LIFO**
-(_Last In, First Out_): el último elemento agregado es el primero en salir.
+> **Pila (stack):** TAD lineal en el que las inserciones y eliminaciones ocurren siempre por un único extremo, llamado **tope**, con disciplina **LIFO** (_Last In, First Out_): el último en entrar es el primero en salir.
 
-```mermaid
-flowchart TB
-  subgraph Pila["Pila (vista lateral)"]
-    direction TB
-    C["3 <- tope"]
-    B["2"]
-    A["1"]
-    C --- B --- A
-  end
-  Entrada["push(4)"] -.->|"entra por arriba"| C
-```
+## push y pop: poner y tomar por arriba
 
-> **Pila (stack):** TAD lineal en el que las inserciones y eliminaciones
-> ocurren siempre por un único extremo, llamado **tope**, con disciplina
-> LIFO.
+**Así en la vida real:** apilas A, B y C; los retiras en el orden C, B, A. Cada plato nuevo se suma encima de los que ya estaban; cada retiro saca únicamente el de arriba.
 
-El contrato tiene cinco operaciones: `push`, `pop`, `peek`, `isEmpty` y
-`size`. Verlas primero como reglas te permite razonar sobre una pila sin
-haber escrito una línea de código todavía.
+**Así en código:** `push` agrega en el tope y `pop` retira y devuelve el elemento del tope. Si apilas `"A"`, `"B"`, `"C"`, tres `pop()` seguidos devuelven `"C"`, `"B"` y `"A"`. Esa restricción —un solo extremo— es lo que hace predecible el orden de salida.
 
-## push y pop: agregar y retirar por el mismo extremo
+> **push:** agrega un elemento en el tope. **pop:** retira y devuelve el elemento del tope; modifica la pila.
 
-**Situación:** el navegador carga una página nueva. Ese evento no reemplaza
-el historial: se suma encima de todo lo que ya visitaste. Presionar "atrás"
-hace lo opuesto: retira exactamente la página más reciente.
+## peek, isEmpty y size: mirar sin tomar
 
-```text
-Pila antes de push("pagina-C"):        Pila despues de push("pagina-C"):
-  tope -> pagina-B                       tope -> pagina-C
-          pagina-A                               pagina-B
-                                                  pagina-A
+**Así en la vida real:** echas un vistazo al plato de arriba para decidir si sirve; el escurridor queda igual.
 
-pop() -> retorna "pagina-C"; la pila vuelve a quedar con tope en pagina-B
-```
+**Así en código:** `peek` devuelve el elemento del tope **sin retirarlo**. Piensa en el botón "atrás" del navegador: la barra de direcciones te muestra la página más reciente del historial (`peek`), y solo al presionar "atrás" esa página se descarta (`pop`). Confundir `peek` con `pop` es el error conceptual más común con pilas.
 
-> **push:** agrega un elemento en el tope. No existe forma de insertar en
-> otra posición — esa restricción es lo que hace predecible el orden de
-> salida.
->
-> **pop:** retira y devuelve el elemento del tope. Modifica la pila.
+`isEmpty` y `size` responden lo que tú responderías mirando el escurridor: si hay platos y cuántos. Sirven para protegerte *antes* de tomar.
 
-En la pila de llamadas de un programa, cada llamada a una función hace
-`push`; cuando esa función termina, ocurre un `pop`. Por eso una función
-recursiva sin caso base agota la memoria: cada llamada apila y ninguna
-desapila, hasta que no queda espacio (_stack overflow_).
+> **peek:** devuelve el elemento del tope sin modificar la pila. **isEmpty:** indica si no hay elementos. **size:** devuelve la cantidad actual.
 
-## peek, isEmpty y size: consultar sin romper el contrato
+## Pila vacía: la mano en el vacío es un error
 
-**Situación:** la barra de direcciones del navegador te muestra en qué
-página estás. Eso no elimina nada del historial — solo consulta.
+**Así en la vida real:** no quedan platos. Extender la mano no produce un plato "nulo": te avisa que hiciste algo imposible.
 
-> **peek:** devuelve el elemento del tope sin retirarlo. No modifica la
-> pila. Confundir `peek` con `pop` es el error conceptual más común al
-> trabajar con pilas.
->
-> **isEmpty:** indica si la pila no tiene elementos. Toda pila debe tratar
-> `pop` y `peek` sobre una pila vacía como un error, nunca como un valor
-> cualquiera.
->
-> **size:** devuelve la cantidad de elementos actuales.
+**Así en código:** `pop()` y `peek()` sobre una pila vacía deben **lanzar un error**, no devolver `null`. Un `null` silencioso viajaría por el programa y estallaría lejos de donde nació, con un `NullPointerException` difícil de rastrear. Lanzar `IllegalStateException` en el punto exacto del error lo hace visible de inmediato.
 
-```mermaid
-stateDiagram-v2
-  [*] --> Vacia
-  Vacia --> ConElementos: push()
-  ConElementos --> ConElementos: push() / peek()
-  ConElementos --> Vacia: pop() del ultimo elemento
-  ConElementos --> ConElementos: pop() (queda al menos uno)
-```
+## Del escurridor a la memoria: un nodo por plato
 
-`isEmpty` y `size` le permiten a quien *usa* la pila protegerse antes de
-llamar `pop` o `peek`, sin necesitar saber nada de cómo está construida por
-dentro. Eso es exactamente lo que resolvemos a partir de aquí.
+**Así en la vida real:** cada plato está apoyado sobre el de abajo, y para llegar a cualquiera hay que empezar por el de arriba. Solo necesitas saber cuál es el de arriba.
 
-## Del contrato a la memoria: un nodo por cada elemento
-
-El TAD dice *qué* hace una pila, no *cómo* se guardan los datos. Vas a
-construir tu propia `Pila<T>` sin usar ninguna clase ya hecha de Java:
-la vas a armar encadenando objetos pequeños llamados **nodos**, cada uno
-apuntando al que quedó justo debajo.
-
-Piensa en cada nodo como una caja con dos compartimentos: uno guarda el
-valor, el otro guarda la dirección de la caja que quedó debajo de ella. La
-pila completa es solo una referencia a la caja de arriba — el **tope** —
-porque desde ahí, siguiendo las direcciones, se llega a todas las demás.
-
-```mermaid
-flowchart LR
-  Tope["tope"] --> N3["dato: 3"]
-  N3 -->|"siguiente"| N2["dato: 2"]
-  N2 -->|"siguiente"| N1["dato: 1"]
-  N1 -->|"siguiente"| Null["null"]
-```
+**Así en código:** cada plato es un **nodo**: una cajita con el valor y la referencia al nodo que quedó debajo. La pila completa es una sola referencia, `tope`, al nodo de arriba.
 
 ```java
 public class Nodo<T> {
     T dato;
-    Nodo<T> siguiente;
+    Nodo<T> siguiente; // el "plato de abajo"; null si no hay ninguno
 
     Nodo(T dato) {
         this.dato = dato;
@@ -155,34 +82,11 @@ public class Nodo<T> {
 }
 ```
 
-`siguiente` empieza en `null` porque, al crear un nodo suelto, todavía no
-sabe qué otro nodo queda debajo de él. Eso se decide cuando lo insertas en
-la pila.
+## La clase `Pila<T>`: mover el tope
 
-## La clase `Pila<T>`: push y pop moviendo el tope
+**Así en la vida real:** poner un plato es apoyarlo sobre el que era el tope; tomar uno es dejar como nuevo tope al plato que estaba debajo. Ningún plato cambia de sitio.
 
-`Pila<T>` solo necesita **una** referencia propia: `tope`, el nodo que está
-arriba de todos. `push` y `pop` no mueven datos de un lugar a otro — solo
-reacomodan a qué nodo apunta `tope`.
-
-```mermaid
-classDiagram
-  class Pila~T~ {
-    -Nodo~T~ tope
-    -int tamano
-    +push(T valor) void
-    +pop() T
-    +peek() T
-    +isEmpty() boolean
-    +size() int
-  }
-  class Nodo~T~ {
-    -T dato
-    -Nodo~T~ siguiente
-  }
-  Pila~T~ --> Nodo~T~
-  Nodo~T~ --> Nodo~T~
-```
+**Así en código:** `push` y `pop` solo reacomodan a qué nodo apunta `tope`.
 
 ```java
 public class Pila<T> {
@@ -191,8 +95,8 @@ public class Pila<T> {
 
     public void push(T valor) {
         Nodo<T> nuevo = new Nodo<>(valor);
-        nuevo.siguiente = tope;
-        tope = nuevo;
+        nuevo.siguiente = tope; // 1. el nodo nuevo se apoya en el tope actual
+        tope = nuevo;           // 2. ahora el nuevo es el tope
         tamano++;
     }
 
@@ -200,49 +104,40 @@ public class Pila<T> {
         if (isEmpty()) {
             throw new IllegalStateException("La pila está vacía");
         }
-        T valor = tope.dato;
-        tope = tope.siguiente;
+        T valor = tope.dato;    // guarda el dato antes de perder el nodo
+        tope = tope.siguiente;  // el tope "baja" un lugar
         tamano--;
         return valor;
     }
 }
 ```
 
-`push` crea el nodo nuevo, lo apunta hacia el tope actual (`nuevo.siguiente
-= tope`) y recién después mueve `tope` para que apunte al nodo nuevo. Si
-invirtieras esas dos líneas, perderías la referencia al resto de la pila.
-`pop` hace lo inverso: guarda el dato del tope, avanza `tope` un lugar hacia
-abajo (`tope = tope.siguiente`) y devuelve el dato guardado. El nodo viejo
-queda sin ninguna referencia apuntándolo — Java lo libera solo.
+Si invirtieras las dos líneas de `push`, perderías la referencia al resto de la pila. En `pop`, el nodo retirado queda sin ninguna referencia apuntándolo y Java lo libera solo. El estado intermedio —invisible en el código— se ve así:
 
 ```mermaid
-sequenceDiagram
-  participant Cliente
-  participant Pila
-  Cliente->>Pila: push(1)
-  Note over Pila: tope apunta a [1]
-  Cliente->>Pila: push(2)
-  Note over Pila: tope apunta a [2], que apunta a [1]
-  Cliente->>Pila: pop()
-  Note over Pila: retorna 2 y tope vuelve a apuntar a [1]
+flowchart LR
+  subgraph Antes["Antes de push(C)"]
+    T1["tope"] --> B1["B"] --> A1["A"]
+  end
+  subgraph Despues["Despues de push(C)"]
+    T2["tope"] --> C2["C"] --> B2["B"] --> A2["A"]
+  end
 ```
 
-## peek, isEmpty y size en la implementación
+Tras `push(C)`, `C` apunta a `B` y `tope` apunta a `C`. Un `pop()` hace el camino inverso: devuelve `C` y `tope` vuelve a `B`.
 
-Las tres operaciones de consulta no modifican ningún nodo: `peek` solo
-mira `tope.dato`, e `isEmpty`/`size` solo miran el contador que ya llevas
-actualizado en `push` y `pop`.
+Las consultas no modifican ningún nodo:
 
 ```java
 public T peek() {
     if (isEmpty()) {
         throw new IllegalStateException("La pila está vacía");
     }
-    return tope.dato;
+    return tope.dato; // solo lee; no toca tope ni tamano
 }
 
 public boolean isEmpty() {
-    return tope == null;
+    return tope == null; // ningún plato encima de nada
 }
 
 public int size() {
@@ -250,38 +145,41 @@ public int size() {
 }
 ```
 
-Nota que `isEmpty` compara `tope == null`, no `tamano == 0` — ambas
-condiciones deberían coincidir siempre, pero comparar contra `tope`
-directamente es la comprobación más cercana a lo que realmente representa
-una pila vacía: ninguna caja apuntada. Con esto, `push`, `pop`, `peek`,
-`isEmpty` y `size` quedan completas, y ninguna recorre la cadena de nodos:
-todas operan sobre `tope`, así que cuestan lo mismo sin importar cuántos
-elementos tenga la pila.
+Ninguna operación recorre la cadena: todas trabajan sobre `tope`, así que cuestan lo mismo con 3 elementos que con 3 000.
+
+## Dónde se rompe la analogía
+
+Un escurridor real permite cosas que `Pila<T>` prohíbe a propósito:
+
+- **Acceso al medio:** en la cocina puedes sacar con cuidado el plato de abajo. En `Pila<T>` no existe esa operación: el único acceso es el tope, y esa limitación es lo que garantiza el orden LIFO.
+- **Límite de altura:** el escurridor se llena y los platos se caen. `Pila<T>` no tiene tope físico: crece mientras haya memoria.
+- **Vacío:** con la pila vacía, en la cocina simplemente te quedas sin cenar; en código, la excepción es la forma de que el programa no siga como si nada.
 
 ## Resumen operativo
 
 | Operación | Qué hace con `tope` | ¿Modifica la pila? | Precondición |
 |-----------|----------------------|----------------------|--------------|
 | `push(valor)` | Crea un nodo, lo enlaza al tope actual y lo vuelve el nuevo tope | Sí | Ninguna |
-| `pop()` | Guarda `tope.dato`, avanza `tope` a `tope.siguiente` | Sí | La pila no está vacía |
-| `peek()` | Lee `tope.dato` sin tocar `tope` | No | La pila no está vacía |
+| `pop()` | Guarda `tope.dato`, avanza `tope` a `tope.siguiente` | Sí | Pila no vacía |
+| `peek()` | Lee `tope.dato` sin tocar `tope` | No | Pila no vacía |
 | `isEmpty()` | Verifica si `tope == null` | No | Ninguna |
-| `size()` | Devuelve el contador `tamano` | No | Ninguna |
+| `size()` | Devuelve `tamano` | No | Ninguna |
+
+## ¿Dónde aparece en tu proyecto?
+
+En el **Sistema Bancario**, cada depósito o retiro se apila como una `Transaccion`; "deshacer última transacción" es un `pop()` que retira justo la más reciente, nunca una al azar. En la **Papelería**, `Pila<Venta>` permite anular la última venta y restaurar el stock. En el **Consultorio Médico**, `peek()` da la última consulta de un paciente sin sacarla del historial.
+
+Fuera de tu proyecto, el mismo patrón está en todas partes:
+
+- **Deshacer de un editor:** `Ctrl+Z` retira la acción más reciente.
+- **Botón "atrás" del navegador:** cada página visitada se apila; "atrás" retira la más reciente y te deja en la anterior.
+- **Pila de llamadas:** cuando una función llama a otra, la primera queda pendiente; el programa vuelve en orden inverso, la última llamada primero. Una recursión sin caso base apila sin desapilar hasta agotar la memoria (_stack overflow_).
 
 ## Síntesis
 
-- Una **pila** es un TAD con disciplina **LIFO**: el último elemento en
-  entrar es el primero en salir. Historial de navegación, llamadas a
-  funciones y balanceo de símbolos son la misma disciplina aplicada a datos
-  distintos.
-- `push` agrega y `pop` retira, siempre por el mismo extremo: el **tope**.
-  `peek` consulta el tope sin modificarlo — confundirla con `pop` es el
-  error más frecuente.
-- `isEmpty` y `size` permiten verificar el estado antes de operar, porque
-  `pop`/`peek` sobre una pila vacía violan el contrato.
-- Construyes la pila encadenando objetos `Nodo<T>`, cada uno con su dato y
-  una referencia `siguiente` al nodo de abajo. La pila entera se reduce a
-  una única referencia: `tope`.
-- `push` y `pop` solo reacomodan a qué nodo apunta `tope` — nunca desplazan
-  datos ni recorren la cadena, así que las cinco operaciones cuestan lo
-  mismo sin importar cuántos elementos tenga la pila.
+- Una **pila** es un TAD **LIFO**: como los platos del escurridor, el último en entrar es el primero en salir (A, B, C entran; C, B, A salen).
+- `push` agrega en el **tope** y `pop` retira del tope; `peek` lo consulta sin modificar la pila.
+- `pop` o `peek` sobre una pila vacía deben lanzar un error, nunca devolver `null`.
+- Se construye con nodos `Nodo<T>` encadenados hacia abajo; la pila entera es la referencia `tope`.
+- La analogía se rompe donde importa: `Pila<T>` no da acceso al medio ni tiene altura máxima física.
+- Deshacer, historial y pila de llamadas son la misma pila aplicada a datos distintos.

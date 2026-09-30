@@ -3,122 +3,98 @@ title: "TAD Cola"
 course: "Estructura de Datos"
 course_code: "ED"
 level: "Primeros semestres"
-type: "Apuntes teóricos"
+type: "Lectura previa"
 language: "Java 21"
 difficulty: "Básico"
-estimated_time: "50 minutos de clase (sesión T1, Semana 9)"
+estimated_time: "12 minutos de lectura previa (sesión T1, Semana 9)"
 presentation: true
-slides_hint: "Cada sección ## es una diapositiva. Presentación sincrona."
-date: "2026-09-20"
+slides_hint: "Cada sección ## es una diapositiva. Lectura previa a la clase."
+date: "2026-09-30"
 author: "Asistente de Docencia"
-summary: "El TAD Cola y su disciplina FIFO: operaciones, precondiciones, el contrato como interface en Java y los problemas que piden una cola y no una pila."
-updatedAt: "2026-09-20"
+summary: "De la fila de una caja de supermercado al TAD Cola: FIFO, enqueue, dequeue, front, isEmpty y size, el contrato en Java y dónde aparece en turnos, impresión y scheduling."
+updatedAt: "2026-09-30"
 ---
 
-## El problema: la ventanilla y el turno
+> 📖 Lectura previa a la clase — unos 12 minutos. Al final, responde la autoevaluación.
 
-Imagina que ahora eres quien organiza la ventanilla del Sistema Bancario. A las 8:00 llegan tres clientes, uno tras otro: primero Ana, después Bruno y por último Carla. Cuando el cajero queda libre, ¿a quién llama?
+## La fila de la caja del supermercado
 
-```text
-Llegada a la ventanilla (de la más antigua a la más reciente):
-Ana
-Bruno
-Carla
-```
+Llegas a pagar con el carrito lleno y ves la fila de una caja. Haces lo que hace todo el mundo: te pones **al final**. La cajera atiende a quien está **al frente**; cuando termina, esa persona se va y el siguiente da un paso adelante. Nadie se pasa de la mitad para adelante, y nadie atiende desde atrás.
 
-Si guardas a los clientes con la lógica del deshacer, el primero en salir sería Carla, la última en llegar. Ana llevaría media hora esperando y vería pasar a todos los demás por delante. Eso es injusto y, en un banco, es un reclamo seguro.
+Mientras esperas puedes hacer dos cosas más sin mover a nadie: **mirar quién sigue** y **contar cuántos hay** delante. Y hay un caso límite que ya viviste: a las 10 de la noche, la cajera libre pregunta "¿quién sigue?" y no hay nadie. No puede atender a una persona que no existe.
 
-- ¿Cómo garantizas que el primero en llegar sea el primero en ser atendido?
-- Cuando atiendes a Ana, ¿quién pasa a ser "el siguiente"?
-- ¿Qué debe pasar si el cajero pide al siguiente y la fila está vacía?
+Fíjate en el orden: sale primero quien llegó primero. Si el supermercado atendiera a la última persona en llegar, la primera se quedaría esperando media hora viendo pasar a todos.
 
-Lo que necesitas es una estructura donde se entre por un extremo y se salga por el otro, de modo que el orden de salida sea el orden de llegada.
+## De la fila a las reglas: el TAD Cola
 
-## Más problemas con la misma forma
+Cada cosa que hiciste en la fila es una operación, y las reglas del supermercado son las de la estructura:
 
-La fila de la ventanilla no es un caso aislado. Estas situaciones comparten su forma: quien lleva más tiempo esperando es quien se atiende primero.
+| En la fila | En la cola |
+| --- | --- |
+| Te haces al final | `enqueue` |
+| Pasas a la caja | `dequeue` |
+| Miras quién sigue | `front` |
+| ¿Hay alguien en la fila? | `isEmpty` |
+| ¿Cuántos hay? | `size` |
 
-| Situación | ¿Qué entra? | ¿Qué sale primero? |
-| --- | --- | --- |
-| Turnos de un banco | Cada cliente que llega | El cliente que llegó primero |
-| Cola de impresión | Cada documento enviado | El documento enviado primero |
-| _Scheduling_ de procesos | Cada proceso listo para ejecutar | El proceso que lleva más tiempo esperando |
-| Sala de espera del consultorio o la veterinaria | Cada paciente que se registra | El paciente que se registró primero |
+> **TAD Cola (_queue_):** colección ordenada de elementos en la que las inserciones se hacen por un extremo, el **fin**, y las eliminaciones por el otro, el **frente**. Sigue la disciplina **FIFO** (_First In, First Out_): el primero en entrar es el primero en salir.
 
-En los cuatro casos el orden de salida es **igual** al de llegada, lo contrario de lo que viste con la pila. Y en los cuatro, nadie se cuela en el medio: para atender a alguien, hay que haber atendido antes a todos los que llegaron antes.
-
-## La solución: la cola (FIFO)
-
-Piensa en la fila de personas frente a una taquilla. Quien llega se pone al final; quien es atendido sale por el frente. Nadie entra por adelante ni sale por atrás.
+Igual que con la pila, la definición no dice nada de arreglos ni nodos: dice _qué_ se puede hacer, no _cómo_ se guarda. Eso te permite usar una cola sin conocer su interior.
 
 ```mermaid
 flowchart LR
-  E["Entra por el fin"] --> C["Carla"]
+  E["enqueue\nentra por el fin"] --> C["Carla\nfin"]
   C --> B["Bruno"]
   B --> A["Ana\nfrente"]
-  A --> S["Sale por el frente"]
+  A --> S["dequeue\nsale por el frente"]
 ```
 
-La fila de la ventanilla, vista como cola: Ana está en el **frente**, así que es la única accesible y la primera en salir; Carla, en el **fin**, es la última.
-
-> **TAD Cola (_queue_):** colección ordenada de elementos en la que las inserciones se hacen por un extremo, llamado **fin**, y las eliminaciones por el otro, llamado **frente**. Sigue la disciplina **FIFO** (_First In, First Out_): el primer elemento en entrar es el primero en salir.
-
-Igual que con la pila, la definición **no** dice nada de arreglos, nodos ni referencias: describe _qué_ se puede hacer y _qué garantías_ se cumplen, no _cómo_ se guarda por dentro. Ese "qué" es lo que te permite usar una cola sin conocer su interior.
+Aquí el diagrama sí aporta algo que el texto no muestra: hay **dos extremos** con funciones distintas, uno para entrar y otro para salir.
 
 ## enqueue, dequeue y front
 
-**Situación:** llegan tres clientes a la ventanilla y el cajero atiende al primero.
+**Así en la vida real:** Ana llega y se pone en la fila; después llegan Bruno y Carla. La cajera atiende a Ana. Mientras tanto, Bruno puede ver que él sigue, sin que nadie se mueva.
 
-**En la práctica**, tres operaciones bastan. `enqueue` coloca un elemento al fin de la cola; `dequeue` **quita y devuelve** el elemento del frente; `front` **devuelve el frente sin quitarlo**. Aquí, `cola` llega como parámetro y el comentario muestra cómo queda tras cada línea (el frente es el elemento más a la izquierda):
+**Así en código:** llegar al final es `enqueue`, pasar a la caja es `dequeue` (quita y devuelve al que estaba al frente) y ver quién sigue es `front` (devuelve sin quitar). El comentario muestra la cola tras cada línea, con el frente a la izquierda:
 
 ```java
-static void registrarJornada(Cola<Cliente> cola) {
-    cola.enqueue(new Cliente("Ana"));      // [Ana]
-    cola.enqueue(new Cliente("Bruno"));    // [Ana, Bruno]
-    cola.enqueue(new Cliente("Carla"));    // [Ana, Bruno, Carla]
+static void abrirCaja(Cola<Cliente> fila) {
+    fila.enqueue(new Cliente("Ana"));      // [Ana]
+    fila.enqueue(new Cliente("Bruno"));    // [Ana, Bruno]
+    fila.enqueue(new Cliente("Carla"));    // [Ana, Bruno, Carla]
 
-    Cliente proximo = cola.front();        // devuelve Ana; la cola no cambia
-    Cliente atendido = cola.dequeue();     // devuelve Ana; [Bruno, Carla]
-    // ahora el frente es Bruno: es el nuevo "siguiente en ser atendido"
+    Cliente quienSigue = fila.front();     // devuelve Ana; la fila no cambia
+    Cliente atendido = fila.dequeue();     // devuelve Ana; [Bruno, Carla]
+    // el frente ahora es Bruno: nuevo "siguiente"
 }
-```
-
-_Nota:_ en estos ejemplos `Cliente` se simplifica a un constructor con el nombre; en el Sistema Bancario completo también lleva identificación, teléfono y dirección.
-
-```mermaid
-flowchart LR
-  A["Estado inicial\nAna, Bruno\nfrente: Ana"] -->|"enqueue(Carla)"| B["Después de enqueue\nAna, Bruno, Carla\nfrente: Ana"]
-  B -->|"dequeue()"| C["Después de dequeue\nBruno, Carla\nfrente: Bruno"]
 ```
 
 > **enqueue(x):** coloca `x` al fin de la cola. **dequeue():** retira y devuelve el elemento del frente. **front():** devuelve el elemento del frente sin retirarlo.
 
-Fíjate en que `enqueue` no cambia el frente, mientras que `dequeue` sí. La diferencia entre `dequeue` y `front` es la diferencia entre _atender_ y _mirar_: el cajero puede ver quién es el siguiente (`front`) antes de llamarlo de verdad (`dequeue`).
+`enqueue` nunca cambia el frente; `dequeue` sí. La diferencia entre `dequeue` y `front` es la de _atender_ y _mirar_.
 
 ## isEmpty y size: preguntar antes de actuar
 
-**Situación:** es la hora de cierre, el cajero atendió a todos los clientes y, por costumbre, pide "el siguiente" una vez más. ¿Qué debería devolver `dequeue` si nadie espera? Ni `null` ni un cliente inventado serían honestos: no hay nadie a quien entregar.
+**Así en la vida real:** la cajera no llama a nadie si la fila está vacía; primero mira. Y si quiere saber cuánta gente hay, la cuenta sin sacar a nadie.
 
-**En la práctica**, el contrato de la cola define que `dequeue` y `front` tienen una **precondición**: la cola no debe estar vacía. Si se viola, lanzan `java.util.NoSuchElementException`, una excepción no verificada (_unchecked_). Para no llegar ahí, la cola ofrece dos consultas que no modifican nada:
+**Así en código:** `dequeue` y `front` tienen una **precondición**: la cola no debe estar vacía. Si se viola, lanzan `java.util.NoSuchElementException`, una excepción no verificada (_unchecked_). Para no llegar ahí existen `isEmpty` y `size`, que no modifican nada:
 
 ```java
-static void llamarSiguiente(Cola<Cliente> cola) {
-    if (!cola.isEmpty()) {
-        Cliente cliente = cola.dequeue();
-        System.out.println("Pase a la ventanilla: " + cliente);
+static void llamarSiguiente(Cola<Cliente> fila) {
+    if (!fila.isEmpty()) {
+        System.out.println("Pase a la caja: " + fila.dequeue());
     }
+    System.out.println("Personas en espera: " + fila.size());
 }
-
-System.out.println("Clientes en espera: " + cola.size());
 ```
 
-> **Precondición:** condición que quien llama debe garantizar antes de invocar una operación. **isEmpty():** indica si la cola no tiene elementos. **size():** indica cuántos elementos tiene.
+> **Precondición:** condición que quien llama debe garantizar antes de invocar una operación. **isEmpty():** indica si la cola no tiene elementos. **size():** indica cuántos tiene.
 
-El método no devuelve un valor de relleno cuando la fila está vacía: simplemente no llama a nadie. El contrato dice qué ocurre si la precondición se viola (la excepción), y tú decides con `isEmpty` cuándo evitarlo.
+El contrato no inventa un cliente de relleno: si no hay nadie, avisa con una excepción, y tú decides con `isEmpty` cuándo evitarla.
 
 ## El contrato en Java: una interface
 
-Todo lo que has visto se puede escribir en Java sin decir cómo se guarda nada. Una `interface` declara las operaciones y sus precondiciones, y deja los cuerpos para quien la implemente:
+Las cinco reglas de la fila caben en una `interface`: declara operaciones y precondiciones y deja los cuerpos para quien la implemente.
 
 ```java
 import java.util.NoSuchElementException;
@@ -150,69 +126,24 @@ public interface Cola<T> {
 }
 ```
 
-```mermaid
-classDiagram
-  class Cola~T~ {
-    <<interface>>
-    +enqueue(T elemento) void
-    +dequeue() T
-    +front() T
-    +isEmpty() boolean
-    +size() int
-  }
-  class ServicioVentanilla {
-    -Cola~Cliente~ turnos
-    +llamarSiguiente() void
-  }
-  ServicioVentanilla ..> Cola : "solo conoce el contrato"
-```
+El `T` genérico sirve para `Cola<Cliente>`, `Cola<String>` o cualquier otro tipo, igual que `Pila<T>`. Quien use la fila solo conoce este contrato, no cómo se guarda por dentro.
 
-Observa que `ServicioVentanilla` depende de `Cola`, no de una forma concreta de guardar los datos. El `T` genérico permite que la misma interface sirva para `Cola<Cliente>`, `Cola<String>` o cualquier otro tipo, igual que `Pila<T>` y `ListaSimple<T>`.
+## Dónde se rompe la analogía
+
+La fila real permite cosas que la cola **no**. Alguien se cuela en la mitad ("solo voy a preguntar algo"), otro se cansa y se sale del medio, y tú puedes preguntar "¿en qué puesto voy?" y recorrer con la mirada a todos.
+
+En el TAD Cola no existe ninguna de esas operaciones: solo se entra por el fin y solo se sale por el frente. No es una carencia: es la garantía. Si cualquiera pudiera colarse o salirse, ya no podrías asegurar que el orden de salida es el de llegada. Y si necesitas buscar o quitar a alguien del medio, ese problema no pide una cola.
 
 ## Pila y cola frente a frente
 
-Las dos estructuras aceptan los mismos elementos y ofrecen operaciones casi gemelas. Lo único que cambia es **por dónde salen**. Toma las tres llegadas de la ventanilla, Ana, Bruno y Carla, y procésalas con cada disciplina:
+La pila de platos de "Implementación de pilas en Java" y la fila del supermercado aceptan los mismos elementos; solo cambia **por dónde salen**. Con Ana, Bruno y Carla llegando en ese orden:
 
-```mermaid
-flowchart LR
-  subgraph P["Pila (LIFO)"]
-    direction LR
-    P1["Carla"] --> P2["Bruno"] --> P3["Ana"]
-  end
-  subgraph Q["Cola (FIFO)"]
-    direction LR
-    Q1["Ana"] --> Q2["Bruno"] --> Q3["Carla"]
-  end
-```
-
-| Estructura | Orden de llegada | Orden de salida | Extremos |
+| Estructura | Analogía | Orden de salida | Extremos |
 | --- | --- | --- | --- |
-| Pila | Ana, Bruno, Carla | Carla, Bruno, Ana | Uno solo: el tope |
-| Cola | Ana, Bruno, Carla | Ana, Bruno, Carla | Dos: fin (entrada) y frente (salida) |
+| Pila (LIFO) | Pila de platos | Carla, Bruno, Ana | Uno solo: el tope |
+| Cola (FIFO) | Fila de la caja | Ana, Bruno, Carla | Dos: fin (entrada) y frente (salida) |
 
-Elegir entre una y otra no es cuestión de gusto: es decidir qué significa "el siguiente" para el problema. Si el siguiente es el más reciente, pila; si es el que más lleva esperando, cola.
-
-## La cola que el sistema operativo ya usa
-
-En la lección "TAD Pila" viste que la JVM usa una pila sin que lo pidas: la pila de llamadas. El sistema operativo hace lo mismo con colas. Cuando envías tres documentos a la impresora, el sistema los guarda en una **cola de impresión** y los imprime en el orden en que los enviaste; no reordena por su cuenta ni le da prioridad al último.
-
-Con los procesos ocurre igual. Un procesador ejecuta un proceso a la vez y los demás esperan su turno en una cola de procesos listos. Cuando un proceso termina o cede el procesador, el que lleva más tiempo esperando pasa a ejecutarse. Es el mismo mecanismo de la ventanilla: cada elemento espera su turno y el orden de llegada decide el orden de atención.
-
-## ¿Qué problemas piden una cola y no una pila?
-
-Una cola es la respuesta cuando el enunciado dice, con otras palabras, "el que llegó primero es el primero que se atiende". Las señales típicas: _en orden de llegada_, _por turnos_, _el que lleva más tiempo esperando_, _atender en el orden en que se recibieron_.
-
-Con esto se cierra la pregunta que dejó la lección "TAD Pila": la fila de turnos de la ventanilla es justo lo que **no** es una pila, y ahora tiene nombre propio.
-
-| Señal en el enunciado | ¿Cola? |
-| --- | --- |
-| "Atender los clientes en orden de llegada" | Sí |
-| "Imprimir los documentos en el orden en que se enviaron" | Sí |
-| "Anular la última operación registrada" | No, es una pila |
-| "Atender primero al cliente más urgente" | Ni cola ni pila simples: pide otra regla de orden |
-| "Buscar la transacción número 37 del historial" | No, exige acceso por posición |
-
-La fila del "más urgente" merece atención: en una cola, la urgencia no cuenta, solo el orden de llegada. Si el problema exige saltarse la fila según algún criterio, ese criterio es una regla de orden distinta a FIFO y a LIFO, y ninguna de las dos estructuras la cumple por sí sola.
+Elegir entre una y otra es decidir qué significa "el siguiente": el más reciente (pila) o el que más lleva esperando (cola).
 
 ## Resumen operativo
 
@@ -224,17 +155,26 @@ La fila del "más urgente" merece atención: en una cola, la urgencia no cuenta,
 | `isEmpty()` | Pregunta si no hay elementos | `boolean` | Ninguna | **O(1)** |
 | `size()` | Cuenta los elementos | `int` | Ninguna | **O(1)** |
 
-El costo **O(1)** es lo que el contrato espera de cada operación: ninguna debería recorrer los elementos almacenados.
+El costo **O(1)** es lo que el contrato espera: ninguna operación debería recorrer los elementos.
+
+## ¿Dónde aparece en tu proyecto?
+
+Una cola es la respuesta cuando el enunciado dice "en orden de llegada" o "por turnos". En los proyectos de aula aparece así:
+
+- **Sistema Bancario:** `Cola<Cliente>` para la atención en ventanilla, con el turno y el siguiente cliente.
+- **Consultorio Médico:** `Cola<Paciente>` para la sala de espera del día; el médico atiende al siguiente.
+- **Clínica Veterinaria:** `Cola<Animal>` para la sala de espera.
+- **Papelería:** `Cola<Pedido>` para los pedidos a proveedor, procesados en orden de llegada.
+
+Fuera del proyecto, es lo que hace el sistema operativo: la **cola de impresión** imprime los documentos en el orden en que los enviaste, y el _scheduling_ mantiene una cola de procesos listos donde pasa a ejecutarse el que lleva más tiempo esperando.
 
 ## Síntesis
 
-- **El problema:** atender la ventanilla en orden justo exige una estructura donde salga primero quien llegó primero.
-- **Misma forma:** turnos, impresión, _scheduling_ y sala de espera comparten el orden de salida igual al de llegada.
-- **La cola:** TAD con disciplina FIFO, con entrada por el fin y salida por el frente.
+- **La fila:** entras por el final, sales por el frente; sale primero quien llegó primero.
+- **La cola:** TAD con disciplina FIFO y dos extremos, fin y frente.
 - **Operaciones base:** `enqueue` encola, `dequeue` quita y devuelve, `front` solo mira.
-- **Consultas:** `isEmpty` y `size` permiten evitar la violación de la precondición, que lanza `NoSuchElementException`.
+- **Consultas:** `isEmpty` y `size` evitan violar la precondición, que lanza `NoSuchElementException`.
 - **Contrato:** la `interface` `Cola<T>` declara operaciones y excepciones sin decir cómo se almacena.
-- **Pila y cola:** las mismas llegadas producen salidas opuestas; cambia el significado de "el siguiente".
-- **Sistema operativo:** la cola de impresión y la de procesos listos aplican FIFO.
-- **Cuándo usarla:** cuando el primero en llegar es el primero en atenderse; si es al revés, es una pila, y si importa la urgencia, hace falta otra regla de orden.
-- **Resumen operativo:** cinco operaciones, todas con costo esperado O(1).
+- **Dónde se rompe la analogía:** colarse o salirse del medio no existe en la cola, y por eso el orden FIFO se garantiza.
+- **Pila y cola:** las mismas llegadas producen salidas opuestas.
+- **Aplicaciones:** turnos, impresión y _scheduling_ aplican FIFO.
