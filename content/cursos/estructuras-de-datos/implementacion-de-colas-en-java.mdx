@@ -78,6 +78,8 @@ public class Nodo<T> {
 ```
 
 ```java
+import java.util.NoSuchElementException;
+
 public class ColaEnlazada<T> {
     private Nodo<T> frente;   // primer nodo: el que sale; null si la cola está vacía
     private Nodo<T> fin;      // último nodo: detrás de él entra el siguiente; null si está vacía
@@ -120,8 +122,6 @@ Un nodo, dos asignaciones y un incremento, sin importar cuántas personas espere
 **Así en código:** la precondición se vuelve una línea, y el caso de la última persona exige actualizar **también** `fin`:
 
 ```java
-import java.util.NoSuchElementException;
-
 public T dequeue() {
     if (isEmpty()) {
         throw new NoSuchElementException("La cola está vacía");   // precondición violada

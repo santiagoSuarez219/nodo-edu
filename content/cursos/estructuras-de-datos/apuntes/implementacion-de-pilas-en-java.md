@@ -170,7 +170,7 @@ System.out.println(p.pop());
 ¿Qué imprime, línea por línea?
 
 - (a) `B`, `C`, `2`, `A`
-- (b) `B`, `C`, `1`, `A`
+- (b) `B`, `C`, `1` y luego una excepción
 - (c) `A`, `B`, `2`, `C`
 - (d) `B`, `C`, `3`, `A`
 
@@ -181,8 +181,9 @@ imprime `A`.
 
 Qué revela cada distractor:
 
-- (b) → cree que `peek` retira el elemento (confunde mirar con tomar), así
-  que `size` le da 1.
+- (b) → cree que `peek` retira el elemento (confunde mirar con tomar): con
+  ese modelo `size` da 1, el `pop` sin imprimir vacía la pila y el último
+  `pop` lanza la excepción de pila vacía.
 - (c) → razona como fila del supermercado (FIFO): el primero que entró sale
   primero. No interiorizó LIFO.
 - (d) → cree que `pop` no reduce la cuenta, o que `size` cuenta los platos
@@ -299,7 +300,7 @@ paso.
 
 ## Paso 4 — Demo: verificación de paréntesis balanceados
 
-Aplicación clásica que combina las cinco operaciones en un algoritmo real: cada
+Aplicación clásica que combina `push`, `pop` e `isEmpty` en un algoritmo real: cada
 apertura es un plato que se apila; cada cierre debe encontrar, arriba, la
 apertura que le corresponde. Como todavía no usamos ninguna clase de
 `java.util`, el "diccionario" de cierres se resuelve con una comparación
