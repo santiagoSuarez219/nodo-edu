@@ -366,30 +366,17 @@ export const estructurasDeDatos: Course = {
       ],
     },
     {
-      id: "tad-cola",
-      slug: "tad-cola",
-      articleSlug: "tad-cola",
-      order: 27,
-      title: "TAD Cola",
-      summary: "De la fila de una caja de supermercado al TAD Cola: FIFO, enqueue, dequeue, front, isEmpty y size, el contrato en Java y dónde aparece en turnos, impresión y scheduling.",
-      topics: [
-        { title: "Concepto FIFO (First In, First Out)" },
-        { title: "Operaciones: enqueue, dequeue, front, isEmpty, size" },
-        { title: "Aplicaciones reales: gestión de turnos, impresión, scheduling" },
-      ],
-    },
-    {
       id: "implementacion-de-colas-en-java",
       slug: "implementacion-de-colas-en-java",
       articleSlug: "implementacion-de-colas-en-java",
       order: 28,
       title: "Implementación de colas en Java",
-      summary:
-        "De la fila del supermercado a ColaEnlazada<T>: por qué frente y fin hacen enqueue y dequeue O(1), la fila vacía y su precondición; la cola que Java ya trae (Queue<E>, LinkedList<E>, ArrayDeque<E>) y la fila preferencial como PriorityQueue<E>.",
+      summary: "Parte de la fila de la caja del supermercado para deducir las reglas FIFO —enqueue, dequeue, front— y luego construye en Java tu propia cola con frente y fin, hasta la cola que Java ya trae y la fila preferencial con PriorityQueue.",
       topics: [
-        { title: "Implementación propia con lista enlazada simple" },
-        { title: "Interface Queue<E> y clase LinkedList<E> del API de Java" },
-        { title: "Introducción a la cola de prioridad (PriorityQueue<E>)" },
+        { title: "Concepto FIFO (First In, First Out) y sus aplicaciones reales" },
+        { title: "Operaciones del TAD: enqueue, dequeue, front, isEmpty, size" },
+        { title: "Implementación propia de ColaEnlazada<T> con nodos enlazados, frente y fin en O(1)" },
+        { title: "Queue<E> y PriorityQueue<E> del API de Java" },
       ],
     },
     {

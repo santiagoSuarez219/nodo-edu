@@ -5,59 +5,100 @@ course_code: "ED"
 level: "Primeros semestres"
 type: "Apuntes teóricos"
 language: "Java 21"
-difficulty: "Intermedio"
-estimated_time: "Lectura previa de 15 minutos (sesión T2, Semana 9)"
+difficulty: "Básico"
+estimated_time: "Lectura previa de 15 minutos (Semana 9)"
 presentation: true
 slides_hint: "Cada sección ## es una diapositiva. Presentación sincrona."
 date: "2026-09-30"
 author: "Asistente de Docencia"
-summary: "De la fila del supermercado a ColaEnlazada<T>: por qué frente y fin hacen enqueue y dequeue O(1), la fila vacía y su precondición; la cola que Java ya trae (Queue<E>, LinkedList<E>, ArrayDeque<E>) y la fila preferencial como PriorityQueue<E>."
+summary: "Parte de la fila de la caja del supermercado para deducir las reglas FIFO —enqueue, dequeue, front— y luego construye en Java tu propia cola con frente y fin, hasta la cola que Java ya trae y la fila preferencial con PriorityQueue."
 updatedAt: "2026-09-30"
 ---
 
 > 📖 Lectura previa a la clase — unos 15 minutos. Al final, responde la autoevaluación.
 
-## La fila de la caja, vista desde adentro
+## La fila de la caja del supermercado
 
-En "TAD Cola" armaste el contrato con la fila del supermercado. Ahora mírala como quien la organiza: la cajera **no cuenta** a las personas para saber a quién atender; le basta con saber quién es **el primero**. Quien llega tampoco recorre la fila para ubicarse; le basta con ver quién es **el último** y ponerse detrás. Y cada persona solo sabe quién tiene **detrás**: si la primera se va, la cajera mira a quien venía después, sin preguntarle a nadie más.
+Llegas a pagar con el carrito lleno y ves la fila de una caja. Haces lo que hace todo el mundo: te pones **al final**. La cajera atiende a quien está **al frente**; cuando termina, esa persona se va y el siguiente da un paso adelante. Nadie se pasa de la mitad para adelante, y nadie atiende desde atrás.
 
-Ni la cajera ni el recién llegado recorren la fila: todo es de costo constante. Pero `Cola<T>` es una `interface` y no se instancia con `new`; necesita una clase. Con una `ListaSimple<T>` que solo guarda `head`, llegar al último costaría **O(n)** por cada persona. Falta darle a la clase lo que tiene la caja: una referencia al primero y otra al último.
+Mientras esperas puedes hacer dos cosas más sin mover a nadie: **mirar quién sigue** y **contar cuántos hay** delante. Y hay un caso límite que ya viviste: a las 10 de la noche, la cajera libre pregunta "¿quién sigue?" y no hay nadie. No puede atender a una persona que no existe.
 
-## De la fila a `ColaEnlazada<T>`
+Fíjate en el orden: sale primero quien llegó primero. Si atendieran a la última persona en llegar, la primera se quedaría esperando media hora.
 
-**Así en la vida real:** la cajera señala al primero (`frente`), el recién llegado ubica al último (`fin`), y cada persona conoce a quien tiene detrás.
+## De la fila a las reglas: el TAD Cola
 
-**Así en código**, cada elemento vive en un `Nodo<T>` que solo conoce a su siguiente, y la clase guarda los dos extremos más un contador:
+Cada cosa que hiciste en la fila es una operación. Un **tipo abstracto de dato (TAD)** dice *qué* se puede hacer con una estructura, sin decir cómo está construida por dentro.
+
+| En la fila | Operación |
+|---|---|
+| Te haces al final | `enqueue(x)` |
+| Pasas a la caja | `dequeue()` |
+| Miras quién sigue | `front()` |
+| ¿Hay alguien en la fila? | `isEmpty()` |
+| ¿Cuántos hay? | `size()` |
+
+> **Cola (_queue_):** TAD lineal en el que las inserciones se hacen por un extremo, el **fin**, y las eliminaciones por el otro, el **frente**, con disciplina **FIFO** (_First In, First Out_): el primero en entrar es el primero en salir.
+
+`dequeue` y `front` tienen una **precondición**: la cola no debe estar vacía. Igual que la cajera no llama a nadie si la fila está vacía, la operación **lanza un error** (`java.util.NoSuchElementException`) en vez de inventar un cliente de relleno o devolver `null`. Para no llegar ahí existen `isEmpty` y `size`, que no modifican nada.
+
+## enqueue, dequeue y front en acción
+
+**Así en la vida real:** Ana llega y se pone en la fila; después llegan Bruno y Carla. La cajera atiende a Ana. Bruno puede ver que él sigue, sin que nadie se mueva.
+
+**Así en código:** llegar al final es `enqueue`, pasar a la caja es `dequeue` (quita y devuelve al del frente) y ver quién sigue es `front` (devuelve sin quitar). El comentario muestra la cola con el frente a la izquierda:
 
 ```java
-package model.structures;
+ColaEnlazada<Cliente> fila = new ColaEnlazada<>();
+fila.enqueue(new Cliente("Ana"));      // [Ana]
+fila.enqueue(new Cliente("Bruno"));    // [Ana, Bruno]
+fila.enqueue(new Cliente("Carla"));    // [Ana, Bruno, Carla]
 
-public class ColaEnlazada<T> implements Cola<T> {
+Cliente quienSigue = fila.front();     // Ana; la fila no cambia
+Cliente atendido = fila.dequeue();     // Ana; queda [Bruno, Carla]
+```
 
-    private Nodo<T> frente;   // primer nodo: el que sale; null si la cola está vacía
-    private Nodo<T> fin;      // último nodo: detrás de él entra el siguiente; null si está vacía
-    private int tamano;       // cantidad de nodos en la cola; el constructor deja todo en null y 0
+> **enqueue(x):** coloca `x` al fin de la cola. **dequeue():** retira y devuelve el elemento del frente. **front():** devuelve el elemento del frente sin retirarlo. **isEmpty() / size():** indican si hay elementos y cuántos.
 
-    @Override
-    public boolean isEmpty() { return frente == null; }   // O(1)
+## La fila vista desde adentro: frente y fin
 
-    @Override
-    public int size() { return tamano; }                  // O(1): el contador se mantiene solo
+**Así en la vida real:** la cajera **no cuenta** a las personas para saber a quién atender; le basta con saber quién es **el primero**. Quien llega tampoco recorre la fila para ubicarse; le basta con ver quién es **el último** y ponerse detrás. Y cada persona solo sabe quién tiene **detrás**.
+
+**Así en código:** cada persona es un `Nodo<T>` que solo conoce a su siguiente, y la cola guarda los dos extremos más un contador:
+
+```java
+public class Nodo<T> {
+    private T dato;
+    private Nodo<T> siguiente;   // quien tiene detrás; null si es el último
+
+    public Nodo(T dato) { this.dato = dato; }
+    public T getDato() { return dato; }
+    public Nodo<T> getSiguiente() { return siguiente; }
+    public void setSiguiente(Nodo<T> siguiente) { this.siguiente = siguiente; }
 }
 ```
 
-¿Por qué se entra por `fin` y se sale por `frente` y no al revés? Porque cada nodo conoce a su siguiente, no a su anterior: quitar el primero solo exige leer `frente.siguiente`; quitar el último exigiría recorrer la cadena hasta el penúltimo, **O(n)**. Por eso la cola no envuelve una `ListaSimple<T>`: necesita `fin`, y la lista solo conoce `head`.
+```java
+public class ColaEnlazada<T> {
+    private Nodo<T> frente;   // primer nodo: el que sale; null si la cola está vacía
+    private Nodo<T> fin;      // último nodo: detrás de él entra el siguiente; null si está vacía
+    private int tamano;       // cantidad de nodos
 
-> **`ColaEnlazada<T>`:** implementación de `Cola<T>` sobre una cadena de `Nodo<T>`, con `frente` en el primer nodo y `fin` en el último. Al tener ambos extremos, `enqueue` y `dequeue` cuestan **O(1)** en el peor caso.
+    public boolean isEmpty() { return frente == null; }   // O(1)
+    public int size() { return tamano; }                  // O(1)
+}
+```
 
-## `enqueue`: llega alguien a la fila
+¿Por qué se entra por `fin` y se sale por `frente`, y no al revés? Porque cada nodo conoce a su siguiente, no a su anterior: quitar el primero solo exige leer `frente.getSiguiente()`; quitar el último exigiría recorrer la cadena hasta el penúltimo, **O(n)**. Y sin `fin`, llegar al último costaría **O(n)** por cada persona que entra.
+
+> **`ColaEnlazada<T>`:** cola construida sobre una cadena de `Nodo<T>`, con `frente` en el primer nodo y `fin` en el último. Al tener ambos extremos, `enqueue` y `dequeue` cuestan **O(1)** en el peor caso.
+
+## enqueue: llega alguien a la fila
 
 **Así en la vida real:** el recién llegado se pone detrás del último. Pero si la fila estaba vacía, no hay nadie detrás de quien ponerse: esa persona es el primero **y** el último a la vez.
 
-**Así en código**, son esos dos casos y un paso común, mover `fin`:
+**Así en código:** son esos dos casos y un paso común, mover `fin`:
 
 ```java
-@Override
 public void enqueue(T elemento) {
     Nodo<T> nuevo = new Nodo<>(elemento);
     if (isEmpty()) {
@@ -72,16 +113,15 @@ public void enqueue(T elemento) {
 
 Un nodo, dos asignaciones y un incremento, sin importar cuántas personas esperen: **O(1)**.
 
-## `dequeue` y `front`: atender a quien va primero
+## dequeue y front: atender a quien va primero
 
-**Así en la vida real:** la cajera atiende al primero, y el siguiente pasa a ser el primero. Con la fila vacía no hay a quién atender: pedirlo es un error de quien pregunta. Y cuando se va **la última persona**, no queda ni primero ni último.
+**Así en la vida real:** la cajera atiende al primero, y el siguiente pasa a ser el primero. Con la fila vacía no hay a quién atender. Y cuando se va **la última persona**, no queda ni primero ni último.
 
-**Así en código**, la precondición de "TAD Cola" se vuelve una línea, y el caso de la última persona exige actualizar **también** `fin`:
+**Así en código:** la precondición se vuelve una línea, y el caso de la última persona exige actualizar **también** `fin`:
 
 ```java
 import java.util.NoSuchElementException;
 
-@Override
 public T dequeue() {
     if (isEmpty()) {
         throw new NoSuchElementException("La cola está vacía");   // precondición violada
@@ -95,7 +135,6 @@ public T dequeue() {
     return dato;
 }
 
-@Override
 public T front() {
     if (isEmpty()) {
         throw new NoSuchElementException("La cola está vacía");
@@ -119,13 +158,11 @@ flowchart LR
   end
 ```
 
-Un `dequeue` de más lanza `NoSuchElementException`: no es un fallo de la clase, es el contrato cumpliéndose. `front` repite la precondición pero no modifica nada.
-
 ## La cola que Java ya trae: `Queue<E>`
 
-**Así en la vida real:** a veces no montas tú la fila; el supermercado ya la trae organizada con sus barandas. `java.util.Queue<E>` es esa fila ya organizada: una `interface` con implementaciones como `LinkedList<E>` y `ArrayDeque<E>`.
+**Así en la vida real:** a veces no montas tú la fila; el supermercado ya la trae con sus barandas. `java.util.Queue<E>` es esa fila: una `interface` con implementaciones como `LinkedList<E>` y `ArrayDeque<E>`.
 
-**Así en código**, cada operación viene en **dos familias**: una lanza excepción cuando la fila está vacía y otra devuelve un valor especial:
+**Así en código:** cada operación viene en **dos familias**: una lanza excepción cuando la fila está vacía y otra devuelve un valor especial.
 
 ```java
 Queue<Cliente> turnos = new ArrayDeque<>();   // declarada como Queue: solo ves el contrato
@@ -144,13 +181,13 @@ Cliente atendido = turnos.poll();    // Ana; en fila vacía devolvería null
 
 `isEmpty()` y `size()` coinciden en todas. Los costos son **O(1)** (en `ArrayDeque`, amortizado).
 
-¿Cuál implementación elegir? `LinkedList<E>` también implementa `List`: declarada como tal permite `get(2)` o `add(1, x)` y colarse en medio de la fila, lo que FIFO prohíbe; además admite `null`, que se confunde con el "vacía" de `poll()`. `ArrayDeque<E>` no tiene esos lastres y, según su Javadoc, es probablemente más rápida como cola. En código real, `Queue<E>` con `ArrayDeque`; `ColaEnlazada<T>` cuando la estructura es el objeto de estudio; `LinkedList` solo para leer código heredado.
+¿Cuál implementación elegir? `LinkedList<E>` también implementa `List`: declarada como tal permite `get(2)` o `add(1, x)` y colarse en medio de la fila, lo que FIFO prohíbe; además admite `null`, que se confunde con el "vacía" de `poll()`. `ArrayDeque<E>` no tiene esos lastres y es probablemente más rápida. En código real, `Queue<E>` con `ArrayDeque`.
 
 ## La fila preferencial: `PriorityQueue<E>`
 
-**Así en la vida real:** en la caja preferencial, una embarazada o un adulto mayor pasa antes que quienes llegaron primero. Ya no manda el orden de llegada sino la **prioridad**.
+**Así en la vida real:** en la misma caja hay un letrero de atención preferencial: una embarazada o un adulto mayor pasa antes que quienes llegaron primero. Ya no manda el orden de llegada sino la **prioridad**.
 
-**Así en código**, se usa como cualquier `Queue<E>`; lo que cambia es la regla de salida, que se da con el orden natural del tipo o con una función de comparación:
+**Así en código:** se usa como cualquier `Queue<E>`; lo que cambia es la regla de salida, que se da con el orden natural del tipo o con una función de comparación:
 
 ```java
 // Regla: menor prioridad numérica sale primero (0 es la más urgente)
@@ -164,9 +201,20 @@ Cliente atendido = turnos.poll();          // Carla, aunque llegó última
 
 _El atributo `prioridad` es solo un ejemplo: no forma parte de la clase `Cliente` real._ Sus costos: `offer` y `poll` son **O(log n)** y `peek` es **O(1)**; los enuncio sin demostrarlos. No admite `null`, y entre elementos de igual prioridad, como Ana y Bruno, **no garantiza** que salga primero quien llegó antes.
 
+## Pila y cola frente a frente
+
+La pila de platos de "Implementación de pilas en Java" y la fila del supermercado aceptan los mismos elementos; solo cambia **por dónde salen**. Con Ana, Bruno y Carla llegando en ese orden:
+
+| Estructura | Analogía | Orden de salida | Extremos |
+| --- | --- | --- | --- |
+| Pila (LIFO) | Pila de platos | Carla, Bruno, Ana | Uno solo: el tope |
+| Cola (FIFO) | Fila de la caja | Ana, Bruno, Carla | Dos: fin (entrada) y frente (salida) |
+
+Elegir entre una y otra es decidir qué significa "el siguiente": el más reciente (pila) o el que más lleva esperando (cola).
+
 ## Dónde se rompe la analogía
 
-- **En la fila real ves a todos; en `ColaEnlazada<T>` solo ves `frente` y `fin`.** Para saber quién está en el medio habría que recorrer la cadena, y el contrato no lo ofrece. Es a propósito: si necesitas mirar en medio, quizá no necesitas una cola.
+- **En la fila real ves a todos; en `ColaEnlazada<T>` solo ves `frente` y `fin`.** Alguien se cuela en la mitad, otro se sale del medio, tú preguntas "¿en qué puesto voy?": nada de eso existe en la cola. No es una carencia: es la garantía de que el orden de salida es el de llegada. Si necesitas mirar o quitar a alguien del medio, ese problema no pide una cola.
 - **La fila preferencial real se ve ordenada de una vez; la `PriorityQueue<E>` no.** Solo `poll` entrega los elementos en orden de prioridad. Recorrerla con un `for-each` o imprimirla **no** muestra el orden de salida.
 
 ## Resumen operativo
@@ -180,14 +228,19 @@ _El atributo `prioridad` es solo un ejemplo: no forma parte de la clase `Cliente
 
 ## ¿Dónde aparece en tu proyecto?
 
-- **Sistema Bancario:** `Cola<Cliente>` para la ventanilla. Es la fila del supermercado tal cual: llegada con `enqueue`, turno con `dequeue`, y la excepción cuando el cajero pide al siguiente y nadie espera.
-- **Consultorio Médico o Clínica Veterinaria:** la sala de espera del día como `Cola<Paciente>` o `Cola<Animal>`. Si quieres que una urgencia pase antes que quien llegó primero, ya no es FIFO: es la fila preferencial, una `PriorityQueue<E>` con la gravedad como regla de orden.
+Una cola es la respuesta cuando el enunciado dice "en orden de llegada" o "por turnos":
+
+- **Sistema Bancario:** `ColaEnlazada<Cliente>` para la ventanilla: llegada con `enqueue`, turno con `dequeue`, y la excepción cuando el cajero pide al siguiente y nadie espera.
+- **Consultorio Médico o Clínica Veterinaria:** la sala de espera del día como cola de `Paciente` o `Animal`. Si una urgencia debe pasar antes que quien llegó primero, ya no es FIFO: es la fila preferencial, una `PriorityQueue<E>` con la gravedad como regla de orden.
 - **Papelería, Sistema Académico y Liga de Fútbol:** pedidos a proveedor, solicitudes de matrícula y partidos pendientes se procesan en orden de llegada: la misma fila, con otros elementos.
+
+Fuera del proyecto, es lo que hace el sistema operativo: la **cola de impresión** imprime los documentos en el orden en que los enviaste, y el _scheduling_ mantiene una cola de procesos listos donde pasa a ejecutarse el que lleva más tiempo esperando.
 
 ## Síntesis
 
-- **La fila por dentro:** la cajera solo necesita al primero, el recién llegado al último, y cada persona conoce a quien tiene detrás.
-- **`ColaEnlazada<T>`:** guarda `frente`, `fin` y `tamano`; `enqueue` y `dequeue` son **O(1)**, y al irse la última persona `fin` también queda en `null`.
-- **`dequeue` y `front`:** validan la precondición con `NoSuchElementException`.
-- **`Queue<E>`:** la cola que Java ya trae, con dos familias de métodos y `ArrayDeque` como elección habitual.
-- **`PriorityQueue<E>`:** manda la prioridad, no la llegada; su recorrido no muestra el orden de salida.
+- Una **cola** es un TAD **FIFO**: como la fila de la caja, el primero en entrar es el primero en salir (Ana, Bruno y Carla entran; salen en ese orden).
+- `enqueue` agrega por el **fin**, `dequeue` retira por el **frente** y `front` lo consulta sin modificar la cola.
+- `dequeue` y `front` sobre una cola vacía lanzan `NoSuchElementException`, nunca devuelven `null`.
+- `ColaEnlazada<T>` guarda `frente`, `fin` y `tamano` sobre nodos `Nodo<T>`; `enqueue` y `dequeue` son **O(1)**, y al irse la última persona `fin` también queda en `null`.
+- `Queue<E>` es la cola que Java ya trae, con dos familias de métodos y `ArrayDeque` como elección habitual; `PriorityQueue<E>` cambia el orden de llegada por prioridad.
+- La analogía se rompe donde importa: la cola no permite colarse ni salirse del medio, y la `PriorityQueue<E>` no se recorre en orden de salida. Pila y cola reciben las mismas llegadas y producen salidas opuestas.
