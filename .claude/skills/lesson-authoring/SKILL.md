@@ -108,6 +108,45 @@ Esqueleto pragmático (problema → teoría → práctica), 8–10 secciones `##
 ## Síntesis                                 ← bullets, uno por sección anterior
 ```
 
+#### Variante `estructuras-de-datos`: cotidiano → concepto → código → aplicación
+
+> Decisión del docente (2026-09-30), motivada por baja participación en clase.
+> **Solo aplica a `estructuras-de-datos`**; los otros dos cursos siguen con el
+> esqueleto pragmático de arriba.
+
+La lección **abre con un ejemplo de la vida cotidiana** que el estudiante ya
+manipuló con las manos —una pila de platos, la fila del supermercado, el
+árbol genealógico, una lista de reproducción— y deriva el concepto de él,
+no del proyecto de aula ni de un problema técnico:
+
+```
+## <El ejemplo cotidiano>                   ← contado con detalle: qué se puede hacer, qué no, qué pasa si está vacío
+## Del ejemplo a las reglas: <concepto>     ← cada regla del ejemplo → una operación del TAD + definición formal
+## <Operación u idea 1>                     ← Así en la vida real → así en código → (diagrama solo si hace falta) → definición
+## <Operación u idea 2>
+## <Operación u idea N>
+## Dónde se rompe la analogía               ← qué hace el ejemplo real que la estructura NO permite (y por qué importa)
+## <Resumen operativo>                      ← tabla de operaciones y complejidades
+## ¿Dónde aparece en tu proyecto?           ← aplicación: el caso de estudio del proyecto de aula / un caso técnico real
+## Síntesis
+```
+
+- El micro-patrón de las secciones de concepto cambia de
+  `Situación → En la práctica` a **`Así en la vida real → Así en código`**:
+  la misma analogía del inicio vuelve en cada sección antes del código
+  ("solo tomas el plato de arriba" → `pop()`). No cambiar de analogía a mitad
+  de la lección.
+- El proyecto de aula (`microdiseno/projects/`) **no desaparece: pasa al
+  final**, como aplicación del concepto ya entendido.
+- **Aula invertida:** en este curso la lección es la **lectura previa** a la
+  clase. El estudiante la lee antes de la sesión y responde el cuestionario de
+  cierre (§5) como verificación; el tiempo de clase se dedica a las dinámicas
+  de los apuntes (§3). Por eso la lección es **más corta**: 10–15 minutos de
+  lectura, ~100–130 líneas, 7–9 secciones `##`. Puede abrir con una línea en
+  blockquote que lo indique (`> 📖 Lectura previa a la clase — unos 12 minutos.
+  Al final, responde la autoevaluación.`); esto no viola la regla de no
+  anunciar laboratorios.
+
 Cada `##` es una diapositiva (por `slides_hint`), así que se mantiene corta:
 5–15 líneas, 1–4 párrafos. **Cero `###`** — si necesitas un nivel más, la
 sección debería partirse en dos. Sin separadores `---`.
@@ -138,7 +177,9 @@ flowchart LR
 ````
 
 Medidas de referencia de una lección completa: ~170 líneas, 9 secciones `##`,
-4 diagramas Mermaid, 6 bloques de código, 1 tabla, 6 blockquotes de definición.
+6 bloques de código, 1 tabla, 6 blockquotes de definición (en
+`estructuras-de-datos`, ~100–130 líneas: ver la variante de arriba). El
+número de diagramas **no es una medida**: ver §2.4.
 
 ### 2.3 Tono
 
@@ -203,8 +244,15 @@ Cualquier tipo de diagrama de Mermaid v11 sirve. Referencia completa en
 | Cronograma de sprints del proyecto | `gantt` |
 | Modelo de datos / entidades | `erDiagram` |
 
-Apuntar a **3–5 diagramas por lección**, cada uno ganándose su lugar: un
-diagrama que solo repite el texto es ruido.
+**No hay número mínimo ni objetivo de diagramas** (decisión del docente,
+2026-09-30; antes era "3–5 por lección"). Un diagrama entra **solo cuando es
+verdaderamente importante**: muestra algo que el texto y el código no pueden
+—un estado intermedio invisible (cómo quedan los punteros tras un `pop`), un
+flujo con bifurcaciones, una jerarquía—. Si el párrafo y el código ya lo
+dejan claro, el diagrama sobra. Una lección con uno o con cero diagramas es
+válida; tres diagramas que repiten el texto son un defecto. Ante la duda,
+pregúntate: *¿el estudiante entendería menos sin este diagrama?* Si la
+respuesta es no, no va.
 
 ### 2.5 Código, matemáticas y tablas
 
@@ -372,6 +420,60 @@ Punto a resaltar: qué observar o señalar en pantalla mientras se demuestra.
 aparato de planificación de sesión ya no se produce como artefacto aparte —
 si algo de eso es indispensable para dictar la clase, se resuelve en la
 conversación con el usuario, no en un documento versionado.
+
+### 3.1 Dinámicas de clase en `estructuras-de-datos` (obligatorias)
+
+> Decisión del docente (2026-09-30). En este curso la lección es lectura
+> previa (aula invertida, ver §2.2), así que **el tiempo de clase vive en los
+> apuntes**. Cuando se escriben apuntes de `estructuras-de-datos`, llevan
+> siempre estas cuatro dinámicas. Los otros cursos no las exigen.
+
+**1. 🐞 Error planeado (live coding con errores deliberados)** — dentro de los
+`## Paso N` de live coding, 1–2 por sesión en total. El docente escribe el
+código en vivo, se equivoca a propósito y el grupo le ayuda a depurar:
+
+```
+**🐞 Error planeado:** escribe primero `tope = nuevo;` sin `nuevo.siguiente = tope;`.
+**Síntoma:** tras tres `push`, `size()` dice 3 pero recorrer la pila imprime un solo elemento.
+**Pregunta al grupo:** "¿Dónde quedaron los otros dos platos?"
+**Corrección:** el código correcto del paso (el bloque principal ya lo trae) y por qué.
+```
+
+El error tiene que ser **uno que los estudiantes cometen de verdad** (olvidar
+actualizar `tail`, no validar `isEmpty()` antes de `pop`, un recorrido que
+nunca avanza), no un error de tipeo. No es la "tabla de errores frecuentes"
+prohibida arriba: es un momento del guion.
+
+**2. 🗳️ Pregunta de votación (instrucción entre pares, Mazur)** — 1–2 por
+sesión, como `##` propio en el punto del guion donde se lanzan:
+
+```
+## 🗳️ Votación — <concepto>
+Cuándo: <tras qué paso se lanza>
+Pregunta + opciones (a)–(d), en general "¿qué imprime este código?"
+Correcta: (x)
+Qué revela cada distractor: (a) → confunde LIFO con FIFO; (b) → …
+Dinámica: votan solos → si hay entre 30 % y 70 % de aciertos, discuten en parejas 2 min y vuelven a votar;
+si hay más de 70 %, explicas rápido y sigues; si hay menos de 30 %, vuelves a explicar antes de discutir.
+```
+
+Tienen que ser **distintas** de las preguntas del cuestionario de cierre: el
+estudiante ya respondió ese cuestionario antes de clase, y una pregunta
+repetida no diagnostica nada.
+
+**3. 👥 Reto en parejas (pair programming)** — 1 por sesión, como `##` propio:
+enunciado corto, tiempo sugerido (un solo número, p. ej. "15 min"; esto no es
+el minutado prohibido), roles (*driver* escribe, *navigator* dirige, cambian a
+mitad) y la **solución completa documentada**. Ligado al concepto de la
+sesión y, cuando sea natural, al caso de estudio del proyecto de aula.
+
+**4. 🏆 Práctica externa** — al final de los apuntes, un `## Práctica externa`
+con 1–3 problemas **reales y verificables** de HackerRank, LeetCode o Kattis
+equivalentes al tema (p. ej. LeetCode 20 *Valid Parentheses* para pilas), con
+el enlace, la dificultad y por qué sirve. **Nunca inventes un problema ni un
+enlace**: si no puedes confirmar que el problema existe con ese número y
+nombre, no lo pongas, o márcalo como "por verificar". Opcionalmente se sugiere
+un tablero de puntos, pero la plataforma no lo gestiona.
 
 ⚠️ El pipeline compila `.md` como MDX (igual que las guías de laboratorio,
 ver §4): todo placeholder o genérico (`<tu-usuario>`, `List<Nodo>`) fuera de
@@ -607,6 +709,14 @@ conceptuales reales (no opciones absurdas de relleno). `keywords` con el
 módulo y el concepto (ej. `recursion`, `python`) — confirmadas en el catálogo,
 nunca inventadas al vuelo.
 
+> **En `estructuras-de-datos` el cuestionario es la verificación de la lectura
+> previa** (aula invertida, §2.2): el estudiante lo responde **antes** de la
+> clase. Por eso evalúa lo que la lectura instala (la analogía traducida a
+> operaciones, la traza de un `push`/`pop`), no lo que se construye en clase.
+> Sus preguntas **no se repiten** en las votaciones de los apuntes (§3.1).
+> Y la lección y sus preguntas tienen que estar **abiertas en producción antes
+> de la sesión**, no después.
+
 ---
 
 ## 6. Quiz calificable A/B/C (solo a demanda)
@@ -671,7 +781,9 @@ y que `mcp-servers/<nombre>/dist/` está compilado.
 
 - [ ] `.mdx` sin `# H1`, empieza en `##`, sin `###`, sin `---`.
 - [ ] `updatedAt` con la fecha de hoy.
-- [ ] 3–5 diagramas Mermaid, etiquetas entre comillas dobles, sin `end` minúscula.
+- [ ] Cada diagrama Mermaid se gana su lugar (no hay cuota; cero es válido). Etiquetas entre comillas dobles, sin `end` minúscula.
+- [ ] En `estructuras-de-datos`: la lección abre con un ejemplo cotidiano, tiene "Dónde se rompe la analogía" y cierra con la aplicación al proyecto; ~100–130 líneas (lectura previa).
+- [ ] En apuntes de `estructuras-de-datos`: 🐞 error planeado, 🗳️ votación (distinta del cierre), 👥 reto en parejas y 🏆 práctica externa con enlaces verificados.
 - [ ] Ningún `$` sin escapar; ningún `<`/`{` suelto en prosa (crítico en `.md` de guías).
 - [ ] Solo `Callout`, `Tabs`, `Tab`, `YouTubeEmbed` como JSX.
 - [ ] Entrada en `lib/courses/data/<curso>.ts` con `articleSlug`, `order` único y `summary` escrito.
