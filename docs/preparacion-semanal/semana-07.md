@@ -161,7 +161,7 @@ No aplica — la Semana 7 no lleva `★`.
 ## Ronda — `programacion-cientifica` (2026-09-23 a 2026-09-24)
 
 **Rama:** `feat/semana-07-programacion-cientifica` (borrada tras el merge)
-**Estado:** ✅ Contenido listo · ✅ `@reviewer` (APROBADO) · ✅ Mergeada a `development` (local, push pendiente) · ⬜ Desplegada y abierta
+**Estado:** ✅ Contenido listo · ✅ `@reviewer` (APROBADO) · ✅ Mergeada a `development` · ✅ **Desplegada y abierta en producción (2026-09-24)**
 
 **Alcance confirmado por el usuario:** Semana 7, sesión única (jue. 17 sep,
 "Programación orientada a objetos"): lección `clases-y-objetos-en-python`
@@ -200,7 +200,7 @@ No aplica — la Semana 7 no lleva `★`.
 | Lección | Entorno | IDs de preguntas | Publicadas | Montadas (`list_lesson_questions`) |
 |---|---|---|---|---|
 | `clases-y-objetos-en-python` | desarrollo | `705af87f-8ae2-45cb-93f6-b148c4972542`, `efcb2e68-9eab-49f9-8d12-7552e144a813`, `929787f5-4929-4391-b570-eb2a2963142a`, `736e69ad-52b9-48d6-900d-d721e22ec95e` | ✅ | ✅ (orden 0-3) |
-| `clases-y-objetos-en-python` | **producción** | — | ⬜ | ⬜ |
+| `clases-y-objetos-en-python` | **producción** | `d34d53b8-b88f-4514-bdc4-5f03ee077119`, `f9232634-a6d5-4a65-8436-6e843af11af6`, `faacfb55-e39e-495a-a43c-5b8d6840da57`, `4442986e-e777-4152-9aaf-d762a651ffbc` | ✅ | ✅ (orden 0-3) |
 
 > Las preguntas **no viajan con el deploy**: se recrean en producción en D3.
 > Keywords usadas (`python`, `poo`, `clases-y-objetos`, `encapsulamiento`)
@@ -246,15 +246,15 @@ No aplica — no pedido. El Momento evaluativo 2 se resuelve como taller
 
 | Paso | Estado | Fecha / detalle |
 |---|---|---|
-| D0 · Alcance y checklist pre-despliegue | ⬜ | |
-| D1 · Lecciones nuevas cerradas por adelantado | ⬜ | `clases-y-objetos-en-python` y `taller-evaluativo-02-funciones-y-poo` |
-| D2 · Merge a `main` y deploy en Vercel | ⬜ | |
-| D3 · Banco de preguntas replicado a producción | ⬜ | 4 preguntas |
-| D4 · Lecciones abiertas a los estudiantes | ⬜ | |
-| D5 · Verificación end-to-end en producción | ⬜ | |
-| D6 · Bitácora cerrada y rama `deploy/` borrada | ⬜ | |
+| D0 · Alcance y checklist pre-despliegue | ✅ | 4 commits de `programacion-cientifica`; `git diff --stat origin/main..HEAD -- supabase/` vacío (solo código); build y lint en verde; keywords `python`, `poo`, `clases-y-objetos`, `encapsulamiento` ya existían en producción |
+| D1 · Lecciones nuevas cerradas por adelantado | ✅ (no aplicó) | El usuario pidió abrir ambas al desplegar. `clases-y-objetos-en-python` ya tenía fila de cierre (4 ago); el taller 02 nació abierto |
+| D2 · Merge a `main` y deploy en Vercel | ✅ | rama `deploy/semana-07-programacion-cientifica`, commit `724b1d3`, build verde sobre `main`; deploy `dpl_4rG8LZ7seaCU6CcpeW2FWEqrT3FX` `READY` en `www.nod0.dev` |
+| D3 · Banco de preguntas replicado a producción | ✅ | 4 preguntas creadas, publicadas y montadas (`list_lesson_questions` en producción: orden 0-3); sin keywords nuevas |
+| D4 · Lecciones abiertas a los estudiantes | ✅ | `clases-y-objetos-en-python` abierta con `courses-mcp-prod`; `taller-evaluativo-02-funciones-y-poo` abierto (sin fila de cierre) |
+| D5 · Verificación end-to-end en producción | ◐ | Deploy `READY`, catálogo y preguntas verificados por API. No se navegó la UI (lo verifica el usuario) |
+| D6 · Bitácora cerrada y rama `deploy/` borrada | ✅ | rama `deploy/` borrada (solo local) |
 
-- [ ] Verificado que las lecciones de semanas futuras siguen **cerradas**
+- [x] Verificado que las lecciones de semanas futuras siguen **cerradas** (`arreglos-y-dimensiones-numpy` y posteriores; `disabled_count: 5`, sin huérfanas)
 
 ## Pendientes (`programacion-cientifica`)
 

@@ -358,24 +358,11 @@ export const estructurasDeDatos: Course = {
       articleSlug: "implementacion-de-pilas-en-java",
       order: 26,
       title: "Implementación de pilas en Java",
-      summary: "El contrato LIFO detrás de deshacer un cambio o volver atrás en el navegador, y cómo construirlo tú mismo en Java encadenando nodos por referencia, sin usar ninguna clase ya hecha del lenguaje.",
+      summary: "Parte de una pila de platos en la cocina para deducir las reglas LIFO —push, pop, peek— y luego construye en Java tu propia pila encadenando nodos, hasta llegar a deshacer una transacción en tu proyecto.",
       topics: [
         { title: "Concepto LIFO (Last In, First Out) y sus aplicaciones reales" },
         { title: "Operaciones del TAD: push, pop, peek, isEmpty, size" },
         { title: "Implementación propia de Pila<T> con nodos enlazados, sin la Collections Framework" },
-      ],
-    },
-    {
-      id: "tad-cola",
-      slug: "tad-cola",
-      articleSlug: "tad-cola",
-      order: 27,
-      title: "TAD Cola",
-      summary: "El TAD Cola y su disciplina FIFO: operaciones, precondiciones, el contrato como interface en Java y los problemas que piden una cola y no una pila.",
-      topics: [
-        { title: "Concepto FIFO (First In, First Out)" },
-        { title: "Operaciones: enqueue, dequeue, front, isEmpty, size" },
-        { title: "Aplicaciones reales: gestión de turnos, impresión, scheduling" },
       ],
     },
     {
@@ -384,12 +371,12 @@ export const estructurasDeDatos: Course = {
       articleSlug: "implementacion-de-colas-en-java",
       order: 28,
       title: "Implementación de colas en Java",
-      summary:
-        "Implementación de ColaEnlazada<T> con frente y fin en O(1) y precondición con NoSuchElementException; Queue<E>, LinkedList<E> y PriorityQueue<E> del API: vocabularios, costos y criterios de uso.",
+      summary: "Parte de la fila de la caja del supermercado para deducir las reglas FIFO —enqueue, dequeue, front— y luego construye en Java tu propia cola con frente y fin, hasta la cola que Java ya trae y la fila preferencial con PriorityQueue.",
       topics: [
-        { title: "Implementación propia con lista enlazada simple" },
-        { title: "Interface Queue<E> y clase LinkedList<E> del API de Java" },
-        { title: "Introducción a la cola de prioridad (PriorityQueue<E>)" },
+        { title: "Concepto FIFO (First In, First Out) y sus aplicaciones reales" },
+        { title: "Operaciones del TAD: enqueue, dequeue, front, isEmpty, size" },
+        { title: "Implementación propia de ColaEnlazada<T> con nodos enlazados, frente y fin en O(1)" },
+        { title: "Queue<E> y PriorityQueue<E> del API de Java" },
       ],
     },
     {
