@@ -375,7 +375,7 @@ export const estructurasDeDatos: Course = {
       topics: [
         { title: "Concepto FIFO (First In, First Out) y sus aplicaciones reales" },
         { title: "Operaciones del TAD: enqueue, dequeue, front, isEmpty, size" },
-        { title: "Implementación propia de ColaEnlazada<T> con nodos enlazados, frente y fin en O(1)" },
+        { title: "Implementación propia de Cola<T> con nodos enlazados, frente y fin en O(1)" },
         { title: "Queue<E> y PriorityQueue<E> del API de Java" },
       ],
     },
