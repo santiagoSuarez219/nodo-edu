@@ -111,6 +111,14 @@ imprime?" o "¿en qué caso conviene X sobre Y?" antes que "¿cuál es la defini
 de X?". En Análisis de Algoritmos, pregunta por el orden de crecimiento y la
 justificación, no por la fórmula memorizada.
 
+**En `estructuras-de-datos` el cierre es verificación de lectura previa**
+(aula invertida, `lesson-authoring` §5): el estudiante lo responde antes de
+clase, así que pregunta por lo que la lectura instala —la analogía traducida a
+operaciones, la traza de un `push`/`pop`, dónde se rompe la analogía— y no
+por lo que se construye en clase. Si ya existen apuntes con preguntas de
+🗳️ votación, **no las repitas**: pierden su valor diagnóstico si el estudiante
+ya las vio.
+
 **Calibra al curso**: Programación Científica va al nivel de entrada más bajo
 (grupo heterogéneo, primer semestre); Estructuras de Datos exige rigor en
 encapsulamiento y complejidad; Análisis de Algoritmos exige justificación formal.

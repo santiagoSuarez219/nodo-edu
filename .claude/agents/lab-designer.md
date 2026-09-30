@@ -117,6 +117,31 @@ hace útiles:
 - Si la sesión es una demo en vivo (no hay guía de estudiante), los apuntes
   son el único material de la sesión: deben bastar por sí solos para dictarla.
 
+### Dinámicas de clase obligatorias en `estructuras-de-datos`
+
+En este curso la lección es lectura previa (aula invertida) y **la clase vive
+en los apuntes**. Todo apunte de `estructuras-de-datos` lleva las cuatro
+dinámicas de `lesson-authoring` §3.1:
+
+- **🐞 Error planeado** (1–2 por sesión, dentro de los pasos de live coding):
+  un error que los estudiantes cometen de verdad, con su síntoma visible, la
+  pregunta que se le lanza al grupo y la corrección.
+- **🗳️ Votación** (1–2 por sesión): pregunta conceptual de opción múltiple
+  con el diagnóstico de cada distractor y la regla 30 %/70 % para decidir si
+  se discute en parejas. **Léelas contra el cuestionario de cierre** (vía
+  `list_lesson_questions` de `question-bank-mcp`, si ya existe): no repitas
+  ninguna.
+- **👥 Reto en parejas** (1 por sesión): enunciado, tiempo sugerido, roles
+  driver/navigator y solución completa documentada.
+- **🏆 Práctica externa**: 1–3 problemas de HackerRank, LeetCode o Kattis
+  equivalentes. **Solo problemas cuya existencia puedas verificar** (número,
+  nombre y enlace); si no puedes, márcalo "por verificar" en vez de
+  inventarlo.
+
+Sigue usando la analogía cotidiana de la lección (pila de platos, fila del
+supermercado) al explicar en los pasos: es el hilo que el estudiante trae de
+la lectura previa.
+
 ## Guía del estudiante — solo si se confirmó trabajo independiente
 
 Si el usuario confirmó que la sesión es trabajo independiente, sigue la

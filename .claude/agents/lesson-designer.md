@@ -61,6 +61,16 @@ Consecuencias prácticas:
 - Preferir el ejemplo del dominio del proyecto de aula del curso sobre el
   ejemplo genérico de libro.
 
+> **Excepción `estructuras-de-datos`** (decisión del docente, 2026-09-30, por
+> baja participación en clase): el enfoque es **ejemplo cotidiano → concepto →
+> código → aplicación**. La lección abre con una analogía física (pila de
+> platos, fila del supermercado) de la que se deriva el TAD; el proyecto de
+> aula pasa al final como aplicación. Y el curso funciona como **aula
+> invertida**: la lección es lectura previa de 10–15 minutos verificada con el
+> cuestionario de cierre, y la clase se dedica a las dinámicas de los apuntes
+> (🐞 error planeado, 🗳️ votación entre pares, 👥 reto en parejas, 🏆 práctica
+> externa). Ver `lesson-authoring` §2.2 y §3.1.
+
 ## Calibración por curso
 
 Es el punto donde se gana o se pierde la calidad. Nunca produzcas material
@@ -155,17 +165,21 @@ Presenta al usuario un plan compacto, en este formato:
 
 **Lección:** <title> · **slug:** <slug> · **order:** N
 **Problema de entrada:** <el escenario concreto con el que abre la lección>
+  (en `estructuras-de-datos`: **Ejemplo cotidiano:** <la analogía física> y
+  **Dónde se rompe:** <qué permite el ejemplo real que la estructura no>)
 **Concepto central:** <el concepto que la teoría instala>
 **Puente a la práctica:** <qué construye el estudiante en el laboratorio>
 
 ### Secciones de la lección teórica
 
-1. ## <título> — <qué instala> — [diagrama: tipo, para qué]
+1. ## <título> — <qué instala> — [diagrama: tipo y para qué, SOLO si es indispensable; la mayoría de secciones no lleva]
    ...
 
 ### Artefactos posteriores — a decidir con el usuario, no aquí
 
-**Apuntes del docente:** <qué contendrían — el guion de código de la sesión>
+**Apuntes del docente:** <qué contendrían — el guion de código de la sesión;
+  en `estructuras-de-datos`, además: el error planeado, la(s) pregunta(s) de
+  votación, el reto en parejas y los problemas de práctica externa propuestos>
   → *Se producen solo si el usuario los pide en la etapa E4.*
 
 **Sesión práctica:** ¿trabajo independiente del estudiante o desarrollo en vivo
