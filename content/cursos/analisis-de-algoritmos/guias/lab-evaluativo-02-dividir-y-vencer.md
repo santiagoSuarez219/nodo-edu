@@ -5,7 +5,7 @@ updatedAt: "2026-10-03"
 
 # Laboratorio evaluativo 02 — Dividir y vencer
 
-> **Evaluación:** este laboratorio es la **parte práctica del Momento 2 (Dividir y vencer)**. El Momento 2 vale 15 % de la nota del curso y se reparte en partes iguales con el quiz teórico, así que este laboratorio vale **7,5 %** del curso. Se entrega como informe en GitHub, en la carpeta `lab2-divide-y-vencer/` de su repositorio del curso.
+> **Evaluación:** este laboratorio es el **Momento evaluativo 2 (Dividir y vencer)** y corresponde al **Laboratorio 2 (15 %)** de la nota del curso. Se entrega como informe en GitHub, en la carpeta `lab2-divide-y-vencer/` de su repositorio del curso.
 
 ## Objetivo
 
@@ -189,7 +189,7 @@ Haga `push` a su repositorio en la rama `main` antes del cierre del plazo. Se ca
 | **Documentación y organización del informe** | 10 | El repositorio tiene la estructura de carpetas exacta del entregable, el `README.md` sigue el orden pedido con la gráfica visible en GitHub, cada parte práctica enlaza su código, hay instrucciones de reproducción y existen al menos tres commits descriptivos. |
 | **TOTAL** | **100** | |
 
-La nota del laboratorio se convierte a la escala del curso así: `nota_curso = (puntos / 100) x 7,5 %`. Por ejemplo, 80 puntos equivalen a `0,80 x 7,5 % = 6 %` de la nota del curso.
+La nota del laboratorio se convierte a la escala del curso así: `nota_curso = (puntos / 100) x 15 %`. Por ejemplo, 80 puntos equivalen a `0,80 x 15 % = 12 %` de la nota del curso.
 
 ## Dificultades Comunes
 
