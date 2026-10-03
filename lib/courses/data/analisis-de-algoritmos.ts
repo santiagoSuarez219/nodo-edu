@@ -175,6 +175,15 @@ export const analisisDeAlgoritmos: Course = {
       ],
     },
     {
+      id: "lab-evaluativo-02-dividir-y-vencer",
+      slug: "lab-evaluativo-02-dividir-y-vencer",
+      articleSlug: "lab-evaluativo-02-dividir-y-vencer",
+      kind: "guide",
+      order: 8.5,
+      title: "Laboratorio evaluativo 02 — Dividir y vencer",
+      topics: [],
+    },
+    {
       id: "medianas-seleccion-y-estructuras-elementales",
       slug: "medianas-seleccion-y-estructuras-elementales",
       articleSlug: "medianas-seleccion-y-estructuras-elementales",

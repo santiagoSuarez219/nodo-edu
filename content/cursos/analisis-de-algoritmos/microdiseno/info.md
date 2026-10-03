@@ -11,7 +11,7 @@
 | Actividad                                                                          | Porcentaje | Momento    |
 | -------------------------------------------------------------------------------------- | ---------- | ---------- |
 | **Laboratorio 1:** Fundamentos, complejidad y recurrencias                            | 15%        | Semana 6   |
-| **Laboratorio 2:** Dividir y vencer                                                    | 15%        | Lunes 5 oct (Semana 10) |
+| **Momento 2 — Dividir y vencer** (quiz A/B/C teórico 7,5 % + laboratorio práctico 7,5 %) | 15%        | Quiz: abre lunes 5 oct, cierra domingo 11 oct. Laboratorio: plazo por definir |
 | **Laboratorio 3:** Estructuras de datos                                                | 15%        | Lunes 26 oct (Semana 13) |
 | **Laboratorio 4:** Programación dinámica y algoritmos voraces                          | 15%        | Entrega hasta el 22 nov |
 | **Proyecto final:** por definir                                                         | 20%        | Por definir |
@@ -84,9 +84,9 @@ Cada uno de los cuatro laboratorios evaluativos se entrega como un **informe de 
 | 5   | Crecimiento de funciones (Cormen Cap. 3)       | Notación asintótica O, Θ, Ω y funciones comunes                      |                     |
 | 6   | Recurrencias (Cormen Cap. 4)                   | Sustitución, árbol de recursión y método maestro                     | ★ Laboratorio 1     |
 | 7   | Divide y vencer (Cormen Cap. 4)                | Subarreglo máximo y algoritmo de Strassen                            |                     |
-| 8   | Divide y vencer (Cormen Cap. 4)                | Consolidación: aplicaciones adicionales de divide y vencer           | ★ Laboratorio 2     |
+| 8   | —                                              | Reprogramada: la síntesis pasa a la Semana 10                        |                     |
 | 9   | —                                              | Sin sesiones (Ordenamiento retirado del curso)                       |                     |
-| 10  | Divide y vencer (Cormen Cap. 4)                | Lunes 5 oct: Strassen y síntesis de divide y vencer                  | ★ Laboratorio 2     |
+| 10  | Divide y vencer (Cormen Cap. 4)                | Lunes 5 oct: Strassen y síntesis de divide y vencer                  | ★ Momento 2 (quiz + laboratorio) |
 | 11  | —                                              | Lunes 12 oct: festivo, sin clase                                     |                     |
 | 12  | Estructuras de datos (Cormen Cap. 9–10)        | Lunes 19 oct: selección/medianas; pilas, colas, listas enlazadas     |                     |
 | 13  | Estructuras de datos (Cormen Cap. 11)          | Lunes 26 oct: tablas hash                                            | ★ Laboratorio 3     |
@@ -242,12 +242,10 @@ curso-analisis-algoritmos/
 - ¿Cuándo divide y vencer es la técnica adecuada? Relación entre la forma de la recurrencia y la eficiencia obtenida
 - Casos límite: cuándo dividir el problema no aporta ninguna mejora
 
-**P ★ — Laboratorio evaluativo 2: Dividir y vencer**
-- Preguntas de selección múltiple sobre el esquema de divide y vencer y sus recurrencias asociadas
-- Preguntas abiertas: comparar dos soluciones (una por divide y vencer, otra de fuerza bruta) para un mismo problema
-- Explicación de un tema: el estudiante explica el algoritmo de Strassen o el problema del subarreglo máximo, incluyendo su recurrencia
-- Parte práctica: resolver un problema nuevo (no visto en clase) aplicando divide y vencer; incluir gráfica de tiempo de ejecución vs. tamaño de entrada y análisis de la complejidad obtenida frente a la esperada por el método maestro
-- Informe de laboratorio en GitHub (`lab2-divide-y-vencer/`) con rúbrica socializada previamente — **cierre de la evaluación Laboratorio 2 (15%)**
+**P ★ — Momento evaluativo 2: Dividir y vencer** *(reajuste 2026-10-03: dos partes)*
+- **Parte teórica — quiz calificable A/B/C (7,5 %):** 8 preguntas de selección múltiple por variante, 5,0 puntos, 40 min y un intento. Abre el lunes 5 oct y cierra el domingo 11 oct. Cubre solo lo dictado: caso cruzado del subarreglo máximo, Strassen, método maestro aplicado a divide y vencer y la síntesis (cuándo conviene dividir).
+- **Parte práctica — laboratorio simple (7,5 %):** implementar el subarreglo máximo por fuerza bruta y por divide y vencer, medir tiempos, graficarlos y contrastarlos con Θ(n²) y Θ(n log n). Informe en GitHub (`lab2-divide-y-vencer/`) con rúbrica de 5 criterios socializada previamente; plazo de entrega por definir. Strassen no se implementa.
+- **Cierre del Momento evaluativo 2 (15 %)** = quiz (7,5 %) + laboratorio (7,5 %)
 
 ---
 
