@@ -77,7 +77,7 @@
 - **Sesión 1 (T):** Algoritmo de Strassen; síntesis del paradigma de divide y vencer (¿cuándo es la técnica adecuada?)
 - **Sesión 2 (P ★):** **Momento evaluativo 2 — Dividir y vencer (15%)**, en dos partes:
   - Quiz A/B/C teórico (7,5%): abre el lunes 5 oct y cierra el domingo 11 oct
-  - Laboratorio práctico (7,5%): informe en GitHub (`lab2-divide-y-vencer/`), plazo por definir
+  - Laboratorio práctico (7,5%): informe en GitHub (`lab2-divide-y-vencer/`), entrega el domingo 11 oct
   - Solo se evalúa lo dictado: subarreglo máximo, Strassen y la síntesis.
 
 ### Semana 11 — lunes 12 de octubre
