@@ -334,6 +334,8 @@ export const estructurasDeDatos: Course = {
       articleSlug: "fundamentos-de-archivos",
       order: 23,
       title: "Fundamentos de archivos",
+      summary:
+        "Parte de la pizarra que se borra y el cuaderno que se conserva para explicar qué es un archivo, cómo lo modela Java con flujos y qué diferencia hay entre texto y binario, y termina escribiendo y leyendo un archivo de texto con File, FileWriter y FileReader.",
       topics: [
         { title: "Archivos de texto vs. archivos binarios" },
         { title: "Modelo de flujos (streams) en Java" },
