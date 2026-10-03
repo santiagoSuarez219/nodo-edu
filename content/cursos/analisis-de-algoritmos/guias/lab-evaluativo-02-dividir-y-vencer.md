@@ -152,8 +152,6 @@ Responda, con sus palabras, las cinco preguntas siguientes. Entre todas, no pase
 4. **¿Cuándo conviene dividir?** Compare con un problema distinto: hallar el máximo de un arreglo de `n` números. ¿Mejora dividirlo a la mitad frente a recorrerlo una vez? Justifique con el costo de combinar y la recurrencia resultante.
 5. **Concepto para la gerente.** Recomiende un algoritmo para la cooperativa y estime, a partir de su medición, cuánto tardaría cada uno con una serie de 1.000.000 de registros. Declare que es una **estimación** y explique el razonamiento (no use una regla de tres lineal).
 
-Incluya además, en una o dos frases, **por qué Strassen no se implementó aquí**: qué tiene en común con el subarreglo máximo (la forma de su recurrencia) y qué lo hace distinto (de dónde viene su ganancia).
-
 ## Entregable
 
 ```
@@ -172,7 +170,7 @@ El `README.md` es el informe completo y **el único documento que se califica co
 1. Su nombre completo y las instrucciones para reproducir el experimento (cómo activar el entorno y qué comando ejecutar para las pruebas y para la medición).
 2. **Parte 1** — breve descripción de cómo verificó las soluciones y qué casos cubrió.
 3. **Parte 2** — la gráfica incrustada y una nota sobre cómo midió (por ejemplo, si repitió cada medición).
-4. **Parte 3** — las cinco respuestas del análisis y la nota sobre Strassen.
+4. **Parte 3** — las cinco respuestas del análisis.
 
 **Cada parte práctica debe enlazar su código**: al inicio de la Parte 1 incluya un enlace en Markdown a `subarreglo.py` y a `pruebas.py`, y al inicio de la Parte 2 un enlace a `medicion.py`, apuntando a los archivos dentro del repositorio. Un informe que describe resultados sin enlazar el código que los produjo pierde el criterio de documentación.
 
@@ -185,7 +183,7 @@ Haga `push` a su repositorio en la rama `main` antes del cierre del plazo. Se ca
 | Criterio | Puntos | Descripción |
 |---|---|---|
 | **Corrección conceptual** | 20 | Las preguntas 3, 4 y 5 de la Parte 3 responden lo que se pregunta: identifican el tamaño desde el cual divide y vencerás gana (o explican por qué no aparece en su rango), comparan con el máximo de un arreglo justificando con el costo de combinar, y recomiendan un algoritmo con una estimación a 1.000.000 de registros declarada como estimación. |
-| **Calidad de la explicación teórica** | 20 | La pregunta 1 plantea la recurrencia explicando cada término, la resuelve con el método maestro verificando la condición del caso, y justifica el `Θ(n²)` de la fuerza bruta. La nota sobre Strassen nombra la forma de su recurrencia y el origen de su ganancia. |
+| **Calidad de la explicación teórica** | 20 | La pregunta 1 plantea la recurrencia explicando cada término, la resuelve con el método maestro verificando la condición del caso, y justifica el `Θ(n²)` de la fuerza bruta. |
 | **Corrección de la implementación** | 25 | Las tres funciones devuelven la suma correcta en la serie de ocho días, en el caso de un elemento, con todos los valores negativos, con todos positivos y en un caso cruzado; coinciden entre sí en al menos veinte listas aleatorias; `subarreglo_maximo` resuelve los tres casos sin llamar a la fuerza bruta; el código cumple PEP 8, con *type hints* y *docstring* Google-style. |
 | **Calidad del análisis de las gráficas** | 25 | La gráfica existe, con ambas curvas en los mismos ejes, título, ejes rotulados con unidades y leyenda; cubre al menos seis tamaños; la pregunta 2 calcula el factor de crecimiento al duplicar `n` para cada algoritmo y lo contrasta con `Θ(n²)` y `Θ(n log n)`; las afirmaciones de desempeño se apoyan en valores leídos de la gráfica. |
 | **Documentación y organización del informe** | 10 | El repositorio tiene la estructura de carpetas exacta del entregable, el `README.md` sigue el orden pedido con la gráfica visible en GitHub, cada parte práctica enlaza su código, hay instrucciones de reproducción y existen al menos tres commits descriptivos. |
@@ -221,4 +219,4 @@ La nota del laboratorio se convierte a la escala del curso así: `nota_curso = (
 - **Libro de texto:** Cormen et al., *Introduction to Algorithms*, capítulo 4 (Divide y vencerás).
 - **Documentación:** `time.perf_counter()` en la biblioteca estándar de Python y `matplotlib.pyplot.plot`.
 
-**Plazo de entrega:** por definir.
+**Plazo de entrega:** domingo 11 de octubre.

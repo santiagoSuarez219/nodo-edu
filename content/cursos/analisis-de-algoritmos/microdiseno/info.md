@@ -11,7 +11,7 @@
 | Actividad                                                                          | Porcentaje | Momento    |
 | -------------------------------------------------------------------------------------- | ---------- | ---------- |
 | **Laboratorio 1:** Fundamentos, complejidad y recurrencias                            | 15%        | Semana 6   |
-| **Momento 2 — Dividir y vencer** (quiz A/B/C teórico 7,5 % + laboratorio práctico 7,5 %) | 15%        | Quiz: abre lunes 5 oct, cierra domingo 11 oct. Laboratorio: plazo por definir |
+| **Momento 2 — Dividir y vencer** (quiz A/B/C teórico 7,5 % + laboratorio práctico 7,5 %) | 15%        | Quiz: abre lunes 5 oct, cierra domingo 11 oct. Laboratorio: entrega el domingo 11 oct |
 | **Laboratorio 3:** Estructuras de datos                                                | 15%        | Lunes 26 oct (Semana 13) |
 | **Laboratorio 4:** Programación dinámica y algoritmos voraces                          | 15%        | Entrega hasta el 22 nov |
 | **Proyecto final:** por definir                                                         | 20%        | Por definir |
@@ -244,7 +244,7 @@ curso-analisis-algoritmos/
 
 **P ★ — Momento evaluativo 2: Dividir y vencer** *(reajuste 2026-10-03: dos partes)*
 - **Parte teórica — quiz calificable A/B/C (7,5 %):** 8 preguntas de selección múltiple por variante, 5,0 puntos, 40 min y un intento. Abre el lunes 5 oct y cierra el domingo 11 oct. Cubre solo lo dictado: caso cruzado del subarreglo máximo, Strassen, método maestro aplicado a divide y vencer y la síntesis (cuándo conviene dividir).
-- **Parte práctica — laboratorio simple (7,5 %):** implementar el subarreglo máximo por fuerza bruta y por divide y vencer, medir tiempos, graficarlos y contrastarlos con Θ(n²) y Θ(n log n). Informe en GitHub (`lab2-divide-y-vencer/`) con rúbrica de 5 criterios socializada previamente; plazo de entrega por definir. Strassen no se implementa.
+- **Parte práctica — laboratorio simple (7,5 %):** implementar el subarreglo máximo por fuerza bruta y por divide y vencer, medir tiempos, graficarlos y contrastarlos con Θ(n²) y Θ(n log n). Informe en GitHub (`lab2-divide-y-vencer/`) con rúbrica de 5 criterios socializada previamente; entrega el domingo 11 de octubre. Strassen no se implementa.
 - **Cierre del Momento evaluativo 2 (15 %)** = quiz (7,5 %) + laboratorio (7,5 %)
 
 ---
