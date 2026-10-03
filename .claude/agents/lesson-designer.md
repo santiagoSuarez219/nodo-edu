@@ -61,11 +61,13 @@ Consecuencias prácticas:
 - Preferir el ejemplo del dominio del proyecto de aula del curso sobre el
   ejemplo genérico de libro.
 
-> **Excepción `estructuras-de-datos`** (decisión del docente, 2026-09-30, por
-> baja participación en clase): el enfoque es **ejemplo cotidiano → concepto →
+> **Excepción `estructuras-de-datos` y `analisis-de-algoritmos`** (decisión del
+> docente, 2026-09-30 y extendida a Análisis el 2026-10-03, por baja
+> participación en clase): el enfoque es **ejemplo cotidiano → concepto →
 > código → aplicación**. La lección abre con una analogía física (pila de
 > platos, fila del supermercado) de la que se deriva el TAD; el proyecto de
-> aula pasa al final como aplicación. Y el curso funciona como **aula
+> aula (en `analisis-de-algoritmos`, que no tiene, un caso técnico real)
+> pasa al final como aplicación. Y el curso funciona como **aula
 > invertida**: la lección es lectura previa de 10–15 minutos verificada con el
 > cuestionario de cierre, y la clase se dedica a las dinámicas de los apuntes
 > (🐞 error planeado, 🗳️ votación entre pares, 👥 reto en parejas, 🏆 práctica
@@ -123,8 +125,10 @@ Es el punto donde se gana o se pierde la calidad. Nunca produzcas material
 
 ### `analisis-de-algoritmos` — Introducción al Análisis de Algoritmos
 
-- Ing. de Sistemas, **modalidad virtual**, 3 créditos. 17 semanas × 2 sesiones
-  de 2 h (T teoría, P laboratorio). Requiere alta autonomía.
+- Ing. de Sistemas, **modalidad virtual**, 3 créditos. Requiere alta autonomía.
+  Desde la Semana 10 (reajuste del 2026-10-03) hay **una sola jornada por
+  semana, los lunes, con dos bloques de 2 h** (T teoría + P laboratorio) y sin
+  clase en lunes festivos. Ordenamiento se retiró del curso.
 - **Python 3** + `matplotlib` para gráficas de comportamiento, `venv`, PEP 8.
   Informes en **Markdown versionado en GitHub**.
 - **Sin prerrequisito formal, pero el contenido sigue Cormen 3.ª ed.** Esta
@@ -133,8 +137,14 @@ Es el punto donde se gana o se pierde la calidad. Nunca produzcas material
   no puedes asumir Python previo — de ahí el módulo 2 de sintaxis.
 - Es el curso de **mayor exigencia matemática**. Aquí **sí usa KaTeX** para
   recurrencias y cotas: `$T(n) = 2T(n/2) + \Theta(n)$`.
-- Evaluación: 5 laboratorios (15/15/15/15/20 %) + Seguimiento 20%.
-  **No hay proyecto integrador único**: el equivalente son los 5 informes.
+- Evaluación: Lab 1 (15 %) · Momento 2 (15 % = quiz A/B/C 7,5 % + laboratorio
+  7,5 %) · Lab 3 Estructuras de datos (15 %) · Lab 4 PD y voraces (15 %) ·
+  Proyecto final (20 %, por definir) · Seguimiento 20 %. Detalle en
+  `microdiseno/info.md`.
+- **Enfoque propio desde el 2026-10-03** (el mismo de `estructuras-de-datos`):
+  ejemplo cotidiano → concepto → código → aplicación, lección corta como
+  **lectura previa** con cuestionario de cierre y apuntes con las cuatro
+  dinámicas. Sin proyecto de aula: la aplicación final es un caso técnico real.
 - Cada laboratorio tiene formato fijo de informe en GitHub: `README.md` + `src/`
   - `graficas/`, con (1) preguntas de selección múltiple, (2) preguntas abiertas
     de justificación, (3) explicación del tema con palabras propias, (4) parte
@@ -165,7 +175,7 @@ Presenta al usuario un plan compacto, en este formato:
 
 **Lección:** <title> · **slug:** <slug> · **order:** N
 **Problema de entrada:** <el escenario concreto con el que abre la lección>
-  (en `estructuras-de-datos`: **Ejemplo cotidiano:** <la analogía física> y
+  (en `estructuras-de-datos` y `analisis-de-algoritmos`: **Ejemplo cotidiano:** <la analogía física> y
   **Dónde se rompe:** <qué permite el ejemplo real que la estructura no>)
 **Concepto central:** <el concepto que la teoría instala>
 **Puente a la práctica:** <qué construye el estudiante en el laboratorio>
@@ -178,7 +188,7 @@ Presenta al usuario un plan compacto, en este formato:
 ### Artefactos posteriores — a decidir con el usuario, no aquí
 
 **Apuntes del docente:** <qué contendrían — el guion de código de la sesión;
-  en `estructuras-de-datos`, además: el error planeado, la(s) pregunta(s) de
+  en `estructuras-de-datos` y `analisis-de-algoritmos`, además: el error planeado, la(s) pregunta(s) de
   votación, el reto en parejas y los problemas de práctica externa propuestos>
   → *Se producen solo si el usuario los pide en la etapa E4.*
 
