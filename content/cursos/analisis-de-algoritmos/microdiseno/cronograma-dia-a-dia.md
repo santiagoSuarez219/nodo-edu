@@ -19,7 +19,7 @@
 | 23 – 29 nov                     | Exámenes finales institucionales                                    | No aplica — el curso ya terminó |
 | 23 – 29 nov                     | Fecha límite de registro del 100% evaluado                          | Sí — registrar Laboratorio 4, Proyecto final y Seguimiento en esta ventana |
 
-**Nota sobre el 60% evaluado (plazo: 1 de noviembre):** con el calendario de abajo, para esa fecha estarán calificados el Laboratorio 1 (15%), Laboratorio 2 (15%) y Laboratorio 3 (15%, entrega el lunes 26 oct) = 45% formal, más el avance de Seguimiento. El Laboratorio 3 deja solo cinco días para calificar antes del plazo: programa esa calificación de inmediato. Si tu programa exige el 60% *numéricamente* registrado, conviene tener una nota parcial de Seguimiento calculada a esa altura.
+**Nota sobre el 60% evaluado (plazo: 1 de noviembre):** con el calendario de abajo, para esa fecha estarán calificados el Laboratorio 1 (15%), Momento 2 (15%) y Laboratorio 3 (15%, entrega el lunes 26 oct) = 45% formal, más el avance de Seguimiento. El Laboratorio 3 deja solo cinco días para calificar antes del plazo: programa esa calificación de inmediato. Si tu programa exige el 60% *numéricamente* registrado, conviene tener una nota parcial de Seguimiento calculada a esa altura.
 
 ---
 
@@ -75,9 +75,10 @@
 ### Semana 10 — lunes 5 de octubre
 **Módulo 5: cierre de divide y vencer**
 - **Sesión 1 (T):** Algoritmo de Strassen; síntesis del paradigma de divide y vencer (¿cuándo es la técnica adecuada?)
-- **Sesión 2 (P ★):** **Laboratorio evaluativo 2 — Dividir y vencer (15%)**
-  - Entrega: informe en GitHub (`lab2-divide-y-vencer/`)
-  - La guía solo puede evaluar lo dictado: subarreglo máximo, Strassen y la síntesis.
+- **Sesión 2 (P ★):** **Momento evaluativo 2 — Dividir y vencer (15%)**, en dos partes:
+  - Quiz A/B/C teórico (7,5%): abre el lunes 5 oct y cierra el domingo 11 oct
+  - Laboratorio práctico (7,5%): informe en GitHub (`lab2-divide-y-vencer/`), plazo por definir
+  - Solo se evalúa lo dictado: subarreglo máximo, Strassen y la síntesis.
 
 ### Semana 11 — lunes 12 de octubre
 **Sin clase (festivo: Día de la Raza).**
@@ -119,7 +120,7 @@
 | Semana | Fecha                  | Evaluación                                                  | %    |
 | ------ | ---------------------- | ----------------------------------------------------------- | ---- |
 | 6      | 7 – 13 sep             | Laboratorio 1: Fundamentos, complejidad y recurrencias       | 15%  |
-| 10     | lunes 5 oct            | Laboratorio 2: Dividir y vencer                              | 15%  |
+| 10     | quiz 5–11 oct          | Momento 2: Dividir y vencer (quiz 7,5% + laboratorio 7,5%)   | 15%  |
 | 13     | lunes 26 oct           | Laboratorio 3: Estructuras de datos                          | 15%  |
 | 16     | hasta el 22 nov        | Laboratorio 4: Programación dinámica y algoritmos voraces    | 15%  |
 | —      | Por definir            | Proyecto final                                               | 20%  |
