@@ -137,8 +137,7 @@ Es el punto donde se gana o se pierde la calidad. Nunca produzcas material
   no puedes asumir Python previo — de ahí el módulo 2 de sintaxis.
 - Es el curso de **mayor exigencia matemática**. Aquí **sí usa KaTeX** para
   recurrencias y cotas: `$T(n) = 2T(n/2) + \Theta(n)$`.
-- Evaluación: Lab 1 (15 %) · Momento 2 (15 % = quiz A/B/C 7,5 % + laboratorio
-  7,5 %) · Lab 3 Estructuras de datos (15 %) · Lab 4 PD y voraces (15 %) ·
+- Evaluación: Lab 1 (15 %) · Lab 2 (15 %, solo laboratorio, sin quiz) · Lab 3 Estructuras de datos (15 %) · Lab 4 PD y voraces (15 %) ·
   Proyecto final (20 %, por definir) · Seguimiento 20 %. Detalle en
   `microdiseno/info.md`.
 - **Enfoque propio desde el 2026-10-03** (el mismo de `estructuras-de-datos`):
