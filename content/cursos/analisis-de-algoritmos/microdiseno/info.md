@@ -2,7 +2,7 @@
 
 **Programa:** Ingeniería de Sistemas
 **Créditos:** 3 | **Modalidad:** Virtual
-**Duración:** 17 semanas (4 h sincrónicas/semana)
+**Duración:** 16 semanas; desde la Semana 10, una jornada de lunes (2 sesiones de 2 h)
 **Horas sincrónicas:** 68 h (34 sesiones de 2 h) | **Horas independientes:** 80 h
 **Prerrequisito:** Ninguno
 
@@ -11,18 +11,20 @@
 | Actividad                                                                          | Porcentaje | Momento    |
 | -------------------------------------------------------------------------------------- | ---------- | ---------- |
 | **Laboratorio 1:** Fundamentos, complejidad y recurrencias                            | 15%        | Semana 6   |
-| **Laboratorio 2:** Dividir y vencer                                                    | 15%        | Semana 8   |
-| **Laboratorio 3:** Algoritmos de ordenamiento                                          | 15%        | Semana 11  |
-| **Laboratorio 4:** Estructuras de datos                                                | 15%        | Semana 13  |
-| **Laboratorio 5:** Programación dinámica y algoritmos voraces                          | 20%        | Semana 16  |
+| **Laboratorio 2:** Dividir y vencer                                                    | 15%        | Lunes 5 oct (Semana 10) |
+| **Laboratorio 3:** Estructuras de datos                                                | 15%        | Lunes 26 oct (Semana 13) |
+| **Laboratorio 4:** Programación dinámica y algoritmos voraces                          | 15%        | Entrega hasta el 22 nov |
+| **Proyecto final:** por definir                                                         | 20%        | Por definir |
 | **Seguimiento:** evaluación continua (quices cortos, participación, consistencia de commits, ejercicios de clase) | 20%        | Durante todo el semestre |
 | **Total**                                                                                 | **100%**   |            |
+
+> **Reajuste del 2026-10-03.** Se retiró el Módulo 6 (Ordenamiento) y, con él, el laboratorio evaluativo de ordenamiento. Los laboratorios pasan de cinco a cuatro y se agrega un proyecto final (20 %, por definir). Desde la Semana 10 el curso se dicta solo los lunes (dos bloques de 2 h) y los lunes festivos —12 oct, 2 nov y 16 nov— no hay clase. Ver `cronograma-dia-a-dia.md`.
 
 > Cada laboratorio se aplica **después** de que su contenido se ha enseñado por completo, y su componente práctico es la sesión evaluativa (★) del tema correspondiente. No existe un sistema de evaluación paralelo: la sesión ★ *es* el laboratorio.
 
 ### Formato de los laboratorios (informes en GitHub)
 
-Cada uno de los cinco laboratorios evaluativos se entrega como un **informe de laboratorio en GitHub**: una carpeta dentro del repositorio del curso con un `README.md` que documenta el trabajo, acompañado de código Python bien estructurado que lo respalda. Las guías buscan evaluar tanto la comprensión de los conceptos teóricos como su correcta aplicación sobre problemas ya definidos, y cada una se entrega junto con su rúbrica de calificación.
+Cada uno de los cuatro laboratorios evaluativos se entrega como un **informe de laboratorio en GitHub**: una carpeta dentro del repositorio del curso con un `README.md` que documenta el trabajo, acompañado de código Python bien estructurado que lo respalda. Las guías buscan evaluar tanto la comprensión de los conceptos teóricos como su correcta aplicación sobre problemas ya definidos, y cada una se entrega junto con su rúbrica de calificación.
 
 **Estructura típica de una guía de laboratorio:**
 
@@ -34,7 +36,7 @@ Cada uno de los cinco laboratorios evaluativos se entrega como un **informe de l
    - Gráficas del comportamiento del algoritmo (tiempo de ejecución vs. tamaño de entrada, número de comparaciones/operaciones vs. *n*, etc.) generadas con `matplotlib`
    - Un análisis breve que conecte los resultados empíricos con la complejidad teórica esperada
 
-**Rúbrica de calificación (estructura común a las cinco guías):**
+**Rúbrica de calificación (estructura común a las cuatro guías):**
 
 | Criterio                                                    | Qué evalúa |
 | -------------------------------------------------------------- | ---------- |
@@ -53,6 +55,8 @@ Cada uno de los cinco laboratorios evaluativos se entrega como un **informe de l
 | Clase 1 | Teoría                | 2 h      |
 | Clase 2 | Laboratorio práctico  | 2 h      |
 
+*Desde la Semana 10, ambas clases se dictan el mismo lunes.*
+
 **Convenciones:** `T` sesión teórica · `P` laboratorio práctico (no evaluativo) · `P ★` laboratorio evaluativo (informe en GitHub)
 
 ---
@@ -67,7 +71,7 @@ Cada uno de los cinco laboratorios evaluativos se entrega como un **informe de l
 
 ---
 
-## Mapa general del curso (17 semanas)
+## Mapa general del curso (16 semanas)
 
 *El orden de los módulos sigue las Partes I–IV de Cormen et al., **Introduction to Algorithms** (3.ª ed.): Fundamentos → Ordenamiento y estadísticos de orden → Estructuras de datos → Técnicas avanzadas de diseño y análisis. El Módulo 2 (Python) es un añadido previo a esa estructura, necesario porque el curso no exige conocimientos previos de programación.*
 
@@ -81,21 +85,20 @@ Cada uno de los cinco laboratorios evaluativos se entrega como un **informe de l
 | 6   | Recurrencias (Cormen Cap. 4)                   | Sustitución, árbol de recursión y método maestro                     | ★ Laboratorio 1     |
 | 7   | Divide y vencer (Cormen Cap. 4)                | Subarreglo máximo y algoritmo de Strassen                            |                     |
 | 8   | Divide y vencer (Cormen Cap. 4)                | Consolidación: aplicaciones adicionales de divide y vencer           | ★ Laboratorio 2     |
-| 9   | Ordenamiento (Cormen Cap. 6)                   | Heapsort y colas de prioridad                                        |                     |
-| 10  | Ordenamiento (Cormen Cap. 7)                   | Quicksort determinista y aleatorizado                                 |                     |
-| 11  | Ordenamiento (Cormen Cap. 8)                   | Ordenamiento en tiempo lineal — counting, radix y bucket sort         | ★ Laboratorio 3     |
-| 12  | Estructuras de datos (Cormen Cap. 9–10)        | Selección/medianas; pilas, colas, listas enlazadas                    |                     |
-| 13  | Estructuras de datos (Cormen Cap. 11)          | Tablas hash: funciones hash y manejo de colisiones                    | ★ Laboratorio 4     |
-| 14  | Programación dinámica (Cormen Cap. 15)         | Corte de varillas (rod cutting) y multiplicación de cadenas de matrices |                   |
-| 15  | Programación dinámica (Cormen Cap. 15)         | Elementos de la PD; subsecuencia común más larga (LCS)                 |                     |
-| 16  | Algoritmos voraces (Cormen Cap. 16)            | Selección de actividades, elementos de la estrategia voraz, Huffman   | ★ Laboratorio 5     |
-| 17  | Cierre del curso                               | Repaso general, retroalimentación y taller opcional de grafos         |                     |
+| 9   | —                                              | Sin sesiones (Ordenamiento retirado del curso)                       |                     |
+| 10  | Divide y vencer (Cormen Cap. 4)                | Lunes 5 oct: Strassen y síntesis de divide y vencer                  | ★ Laboratorio 2     |
+| 11  | —                                              | Lunes 12 oct: festivo, sin clase                                     |                     |
+| 12  | Estructuras de datos (Cormen Cap. 9–10)        | Lunes 19 oct: selección/medianas; pilas, colas, listas enlazadas     |                     |
+| 13  | Estructuras de datos (Cormen Cap. 11)          | Lunes 26 oct: tablas hash                                            | ★ Laboratorio 3     |
+| 14  | —                                              | Lunes 2 nov: festivo, sin clase                                      |                     |
+| 15  | Programación dinámica y voraces (Cormen Cap. 15–16) | Lunes 9 nov: rod cutting y fundamentos de la PD; estrategia voraz (resto en lectura autónoma) |  |
+| 16  | —                                              | Lunes 16 nov: festivo, sin clase. Entrega asincrónica hasta el 22 nov | ★ Laboratorio 4 (entrega) |
 
 ---
 
 ## Organización del repositorio del curso
 
-A partir del Módulo 1, todo el trabajo del curso vive en un único repositorio. Los cinco laboratorios evaluativos se organizan en carpetas independientes, cada una con su informe (`README.md`), su código y sus gráficas; el resto de sesiones prácticas (no evaluativas) se agrupan aparte.
+A partir del Módulo 1, todo el trabajo del curso vive en un único repositorio. Los cuatro laboratorios evaluativos se organizan en carpetas independientes, cada una con su informe (`README.md`), su código y sus gráficas; el resto de sesiones prácticas (no evaluativas) se agrupan aparte.
 
 ```
 curso-analisis-algoritmos/
@@ -105,9 +108,8 @@ curso-analisis-algoritmos/
 │   │   ├── src/              # código Python del laboratorio
 │   │   └── graficas/         # gráficas de comportamiento generadas
 │   ├── lab2-divide-y-vencer/
-│   ├── lab3-ordenamiento/
-│   ├── lab4-estructuras-datos/
-│   └── lab5-pd-voraces/
+│   ├── lab3-estructuras-datos/
+│   └── lab4-pd-voraces/
 ├── ejercicios-clase/         # código de las sesiones prácticas no evaluativas (incluye los ejercicios del Módulo 2 — Python)
 ├── benchmarks/                # scripts compartidos de medición de tiempos y graficación
 └── README.md
@@ -221,6 +223,8 @@ curso-analisis-algoritmos/
 
 ### Semana 7 — Aplicaciones de divide y vencer
 
+> **Reajuste 2026-10-03:** el subarreglo máximo se dictó; **Strassen no se alcanzó a ver** y se dicta el lunes 5 oct (Semana 10).
+
 **T — Subarreglo máximo y Strassen**
 - El problema del subarreglo máximo (*maximum-subarray problem*) resuelto por divide y vencer
 - El algoritmo de Strassen para multiplicación de matrices como ejemplo de divide y vencer no trivial
@@ -231,7 +235,7 @@ curso-analisis-algoritmos/
 - Implementar (o simular con matrices pequeñas) el algoritmo de Strassen
 - Medir el desempeño de ambas soluciones frente a su versión de fuerza bruta
 
-### Semana 8 — Consolidación de divide y vencer ★
+### Semana 8 — Consolidación de divide y vencer ★ (se dicta el lunes 5 oct, Semana 10)
 
 **T — Síntesis del paradigma de divide y vencer**
 - Repaso del esquema general: dividir, conquistar, combinar
@@ -247,51 +251,15 @@ curso-analisis-algoritmos/
 
 ---
 
-## Módulo 6 — Ordenamiento (Cormen, Cap. 6–8)
+## Módulo 6 — Ordenamiento (retirado del curso)
 
-### Semana 9 — Heapsort y colas de prioridad
-
-**T — Heaps y heapsort**
-- La propiedad de heap (max-heap y min-heap)
-- Mantener la propiedad de heap; construir un heap desde un arreglo
-- El algoritmo heapsort; colas de prioridad como aplicación de los heaps
-
-**P — Laboratorio: Heapsort y cola de prioridad**
-- Implementar un max-heap con las operaciones `build-max-heap` y `max-heapify`
-- Implementar heapsort a partir del heap
-- Implementar una cola de prioridad simple usando el heap (inserción y extracción del máximo)
-
-### Semana 10 — Quicksort
-
-**T — Quicksort determinista y aleatorizado**
-- Descripción de quicksort: partición y recursión
-- Desempeño de quicksort: peor caso O(n²) frente a caso promedio O(n log n)
-- Versión aleatorizada de quicksort y por qué mejora el comportamiento esperado
-
-**P — Laboratorio: Quicksort**
-- Implementar quicksort determinista (pivote fijo) y aleatorizado (pivote aleatorio)
-- Medir el desempeño de ambas versiones frente a entradas ya ordenadas y entradas aleatorias
-- Instrumentar el conteo de comparaciones para contrastar con el análisis teórico
-
-### Semana 11 — Ordenamiento en tiempo lineal ★
-
-**T — Counting sort, radix sort y bucket sort**
-- Cota inferior para el ordenamiento por comparaciones: Ω(n log n)
-- Counting sort: cuándo es aplicable y por qué logra O(n)
-- Radix sort y bucket sort: ideas generales y supuestos sobre los datos de entrada
-
-**P ★ — Laboratorio evaluativo 3: Algoritmos de ordenamiento**
-- Preguntas de selección múltiple sobre la complejidad y las condiciones de aplicabilidad de cada algoritmo de ordenamiento visto
-- Preguntas abiertas: justificar cuál algoritmo de ordenamiento conviene para un conjunto de datos con características dadas
-- Explicación de un tema: el estudiante explica por qué counting sort logra O(n) sin violar la cota inferior Ω(n log n) del ordenamiento por comparaciones
-- Parte práctica: implementar al menos un algoritmo de ordenamiento por comparación (heapsort o quicksort) y uno de tiempo lineal (counting, radix o bucket); graficar tiempo de ejecución vs. tamaño de entrada para ambos y comparar
-- Informe de laboratorio en GitHub (`lab3-ordenamiento/`) con rúbrica socializada previamente — **cierre de la evaluación Laboratorio 3 (15%)**
+> **Reajuste 2026-10-03:** heapsort, quicksort, ordenamiento en tiempo lineal y el laboratorio evaluativo de ordenamiento no se dictan. El curso pasa directo de divide y vencer a estructuras de datos.
 
 ---
 
 ## Módulo 7 — Estructuras de datos (Cormen, Cap. 9–11) ★
 
-### Semana 12 — Selección y estructuras elementales
+### Semana 12 — Selección y estructuras elementales (lunes 19 oct)
 
 **T — Medianas, selección y estructuras elementales**
 - Mínimo y máximo; selección en tiempo lineal esperado
@@ -299,87 +267,71 @@ curso-analisis-algoritmos/
 - Listas enlazadas: simple, doble; representación de árboles enraizados
 
 **P — Laboratorio: Selección y estructuras elementales**
-- Implementar el algoritmo de selección en tiempo lineal esperado (basado en partición tipo quicksort)
+- Implementar el algoritmo de selección en tiempo lineal esperado (basado en partición tipo quicksort; al retirarse Ordenamiento, la partición se explica en esta sesión)
 - Implementar pila y cola con arreglo, y una lista simplemente enlazada
 - Comparar el costo de encontrar el k-ésimo menor elemento por selección vs. por ordenamiento completo
 
-### Semana 13 — Tablas hash ★
+### Semana 13 — Tablas hash ★ (lunes 26 oct)
 
 **T — Tablas hash**
 - Tablas de direccionamiento directo vs. tablas hash
 - Funciones hash: método de la división, método de la multiplicación
 - Manejo de colisiones: encadenamiento y direccionamiento abierto (sondeo lineal, cuadrático, doble hashing)
 
-**P ★ — Laboratorio evaluativo 4: Estructuras de datos**
+**P ★ — Laboratorio evaluativo 3: Estructuras de datos**
 - Preguntas de selección múltiple sobre operaciones y complejidades de pilas, colas, listas enlazadas y tablas hash
 - Preguntas abiertas: justificar la elección de una estructura de datos para un escenario dado
 - Explicación de un tema: el estudiante explica el manejo de colisiones (encadenamiento o direccionamiento abierto) en tablas hash
 - Parte práctica: partir de una solución basada en listas enlazadas con tiempos de respuesta deficientes y rediseñarla con una tabla hash propia; graficar y comparar los tiempos de búsqueda antes y después de la optimización
-- Informe de laboratorio en GitHub (`lab4-estructuras-datos/`) con rúbrica socializada previamente — **cierre de la evaluación Laboratorio 4 (15%)**
+- Informe de laboratorio en GitHub (`lab3-estructuras-datos/`) con rúbrica socializada previamente — **cierre de la evaluación Laboratorio 3 (15%)**
 
 ---
 
 ## Módulo 8 — Programación dinámica y algoritmos voraces (Cormen, Cap. 15–16) ★
 
-### Semana 14 — Rod cutting y multiplicación de cadenas de matrices
+> **Reajuste 2026-10-03:** el módulo se comprime en un solo lunes (9 nov, Semana 15). Las semanas 14 y 16 caen en festivo.
+
+### Lunes 9 de noviembre (Semana 15) — Fundamentos de PD y estrategia voraz
 
 **T — Fundamentos de programación dinámica**
 - Corte de varillas (*rod cutting*): solución recursiva ingenua vs. memoización vs. tabulación
-- Multiplicación de cadenas de matrices: planteamiento del problema y la recurrencia asociada
+- Subestructura óptima y subproblemas traslapados: cómo reconocerlos
 - Reconstrucción de la solución óptima (no solo el valor óptimo)
 
-**P — Laboratorio: Rod cutting y matrix-chain**
-- Implementar el corte de varillas con memoización (*top-down*) y con tabulación (*bottom-up*)
-- Implementar la solución de programación dinámica para la multiplicación de cadenas de matrices
-- Comparar el tiempo de ejecución de la versión recursiva ingenua frente a las versiones optimizadas
-
-### Semana 15 — Elementos de la PD y subsecuencia común más larga
-
-**T — Elementos de la programación dinámica y LCS**
-- Subestructura óptima y subproblemas traslapados: cómo reconocerlos
-- Subsecuencia común más larga (LCS): planteamiento, tabla de subproblemas y reconstrucción de la solución
-- Cuándo memoización, cuándo tabulación: consideraciones prácticas
-
-**P — Laboratorio: Subsecuencia común más larga**
-- Implementar el cálculo de la LCS con programación dinámica
-- Reconstruir la subsecuencia óptima (no solo su longitud)
-- Medir el tiempo de ejecución frente al tamaño de las cadenas de entrada
-
-### Semana 16 — Algoritmos voraces ★
-
-**T — Estrategia voraz**
+**P — Estrategia voraz**
 - El problema de selección de actividades (*activity-selection problem*)
 - Elementos de la estrategia voraz: elección voraz y subestructura óptima
-- Códigos de Huffman: construcción del árbol y compresión
+- Implementar la selección de actividades y contrastarla con un enfoque de programación dinámica
 
-**P ★ — Laboratorio evaluativo 5: Programación dinámica y algoritmos voraces**
+**Lectura autónoma (sin sesión):** multiplicación de cadenas de matrices, subsecuencia común más larga (LCS) y códigos de Huffman, con las lecciones publicadas.
+
+### Entrega — Laboratorio evaluativo 4: Programación dinámica y algoritmos voraces ★
+
+Entrega asincrónica, plazo hasta el **22 de noviembre** (el lunes 16 es festivo).
+
 - Preguntas de selección múltiple sobre subestructura óptima, subproblemas traslapados y la propiedad de elección voraz
 - Preguntas abiertas: dado un problema, argumentar si un enfoque voraz produce la solución óptima o si se requiere programación dinámica
 - Explicación de un tema: el estudiante explica, con sus palabras, por qué la propiedad de subestructura óptima es necesaria (pero no suficiente) para que un enfoque voraz funcione
-- Parte práctica: implementar un problema de programación dinámica (mochila 0/1 o LCS) y un problema voraz (selección de actividades o Huffman); graficar el comportamiento de ambos y comparar sus complejidades
-- Informe de laboratorio en GitHub (`lab5-pd-voraces/`) con rúbrica socializada previamente — **cierre de la evaluación Laboratorio 5 (20%)**
+- Parte práctica: implementar un problema de programación dinámica (rod cutting, mochila 0/1 o LCS) y un problema voraz (selección de actividades o Huffman); graficar el comportamiento de ambos y comparar sus complejidades
+- Informe de laboratorio en GitHub (`lab4-pd-voraces/`) con rúbrica socializada previamente — **cierre de la evaluación Laboratorio 4 (15%)**
 
 ---
 
-## Módulo 9 — Cierre del curso
+## Proyecto final (20%)
 
-### Semana 17 — Repaso, retroalimentación y enriquecimiento
+*Por definir en un paso aparte. Su alcance, fecha de entrega y rúbrica aún no existen.*
 
-**T — Síntesis del semestre**
-- Repaso integrador de las técnicas de diseño vistas (recurrencias, divide y vencer, ordenamiento, estructuras de datos, programación dinámica, voraces)
-- Retroalimentación general sobre los cinco informes de laboratorio entregados
-- Espacio para resolver dudas pendientes antes del cierre del semestre
+---
 
-**P — Taller opcional: introducción a grafos**
-- Representaciones de grafos (matriz y lista de adyacencia) y recorrido BFS/DFS a manera de cierre motivador
-- No es una sesión evaluativa; su desempeño alimenta la nota de **seguimiento**
-- Espacio para que cada estudiante complete o pula los `README.md` de sus cinco informes de laboratorio antes del cierre del repositorio
+## Módulo 9 — Cierre del curso (retirado como semana)
+
+> **Reajuste 2026-10-03:** la antigua Semana 17 no se dicta: el lunes 16 nov es festivo y la semana siguiente son los exámenes finales institucionales. La síntesis del semestre y el taller de grafos quedan como lectura autónoma, sin sesión ni evaluación.
 
 ---
 
 ## Temas opcionales
 
-*No tienen semana asignada. Se abordan como trabajo independiente, en el taller de la Semana 17, o si el avance del curso lo permite, en el orden indicado a continuación (todos corresponden a partes posteriores de Cormen et al.).*
+*No tienen semana asignada. Se abordan como trabajo independiente o, si el avance del curso lo permite, en el orden indicado a continuación (todos corresponden a partes posteriores de Cormen et al.).*
 
 ### Grafos (Cormen, Cap. 22–24)
 
