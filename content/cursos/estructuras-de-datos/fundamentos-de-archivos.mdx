@@ -1,5 +1,159 @@
 ---
 title: "Fundamentos de archivos"
-summary: ""
-updatedAt: 2026-07-18
+course: "Estructura de Datos"
+course_code: "ED"
+level: "Primeros semestres"
+type: "Lectura previa"
+language: "Java 21"
+difficulty: "Básico"
+estimated_time: "Lectura previa de 12 minutos (Semana 10)"
+presentation: true
+slides_hint: "Cada sección ## es una diapositiva. Presentación sincrona."
+date: "2026-09-30"
+author: "Asistente de Docencia"
+summary: "Parte de la pizarra que se borra y el cuaderno que se conserva para explicar qué es un archivo, cómo lo modela Java con flujos y qué diferencia hay entre texto y binario, y termina escribiendo y leyendo un archivo de texto con File, FileWriter y FileReader."
+updatedAt: "2026-09-30"
 ---
+
+> 📖 Lectura previa a la clase — unos 12 minutos. Al final, responde la autoevaluación.
+
+## La pizarra y el cuaderno
+
+En el salón, el profesor resuelve un ejercicio en la **pizarra**. Es rápida: escribe, borra, corrige. Pero si alguien apaga la luz y limpia el salón, lo que estaba ahí desaparece. Por eso, lo que importa se copia en el **cuaderno**.
+
+El cuaderno tiene su ritual. Lo tomas del estante, lo abres, y si quieres agregar algo, escribes **al final**, después de lo último anotado. Si prefieres empezar de cero, arrancas las hojas y escribes desde la primera. Para leerlo, vas de principio a fin. Al terminar, lo cierras y lo devuelves. Y a veces vas al estante y el cuaderno **no está**: no puedes leer lo que no existe.
+
+Hoy tus listas, pilas y colas viven en la pizarra: en la memoria del programa. Cierras el programa y se borran. La pregunta es cómo pasarlas al cuaderno.
+
+## Del cuaderno a las reglas: el archivo y el flujo
+
+La pizarra es la **memoria RAM**: rápida y **volátil**. El cuaderno es el **disco**: más lento de abrir, pero **persistente**.
+
+> **Archivo:** conjunto de datos con nombre guardado en un dispositivo de almacenamiento persistente, que sobrevive a que el programa termine.
+
+Java no manipula el cuaderno directamente: lo hace a través de un **flujo**, un canal por donde los datos pasan de uno en uno, en orden.
+
+> **Flujo (_stream_):** secuencia ordenada de datos que se lee o se escribe de manera secuencial, entre el programa y una fuente o destino externo, como un archivo.
+
+| Con el cuaderno | En Java |
+|---|---|
+| La pizarra | La memoria RAM del programa |
+| El cuaderno | El archivo en disco |
+| Abrir el cuaderno | Abrir el flujo (crear el `FileReader` o el `FileWriter`) |
+| Avanzar el bolígrafo o el dedo | Leer o escribir en secuencia |
+| Cerrar el cuaderno | `close()` |
+| El cuaderno no está en el estante | Un error: `FileNotFoundException` |
+
+Entrada y salida se miden **desde el programa**: leer del archivo es **entrada**; escribir en el archivo es **salida**. Hay flujos de **caracteres** (`Reader` y `Writer`) y de **bytes** (`InputStream` y `OutputStream`); estos últimos los verás más adelante.
+
+## Texto o binario: en qué idioma se escribe el cuaderno
+
+Todo archivo, al final, son bytes. Lo que cambia es si esos bytes se **interpretan como caracteres**.
+
+> **Archivo de texto:** sus bytes representan caracteres, así que cualquier editor puede mostrarlo. **Archivo binario:** sus bytes tienen un formato propio que solo entiende el programa que lo escribió.
+
+Un cuaderno en español lo lee cualquiera que sepa español; uno escrito en un código secreto lo lee solo quien conoce el código. Los de texto son legibles, portables y fáciles de depurar: abres el archivo y ves qué pasó. Los binarios suelen ser más compactos y rápidos, pero a cambio no puedes revisarlos a ojo.
+
+| Si el archivo... | Conviene |
+|---|---|
+| Lo va a abrir y revisar el docente o tú, con un editor | Texto |
+| Es una tabla sencilla de clientes o ventas | Texto |
+| Solo lo va a leer tu programa y ya no importa verlo | Binario |
+
+Por ahora trabajarás con archivos de texto.
+
+## File: la portada del cuaderno
+
+**Así en la vida real:** la portada dice cómo se llama el cuaderno y dónde está en el estante. Mirar la portada no lo abre ni lo lee.
+
+**Así en código:** `File` representa una **ruta**, no el contenido. `new File("data/clientes.txt")` no crea el archivo, no lo abre y no lo lee: solo guarda la ruta y te deja preguntar por ella.
+
+```java
+import java.io.File;
+
+File archivo = new File("data/clientes.txt");   // ruta relativa a donde corre el programa
+
+archivo.exists();     // true si el archivo o carpeta existe
+archivo.isFile();     // true si existe y es un archivo (no una carpeta)
+archivo.getName();    // "clientes.txt"
+archivo.length();     // tamaño en bytes; 0 si no existe
+```
+
+> **`File`:** clase de `java.io` que representa la ruta de un archivo o carpeta. Consulta datos sobre esa ruta (existencia, nombre, tamaño), pero no lee ni escribe su contenido.
+
+## FileWriter y FileReader: escribir y leer el cuaderno
+
+**Así en la vida real:** para escribir, abres el cuaderno de dos maneras: arrancando las hojas para empezar de cero, o escribiendo al final de lo anotado. Para leer, lo abres y recorres cada letra hasta que no quede más.
+
+**Así en código:** `new FileWriter(archivo)` **sobrescribe**: si el archivo existía, su contenido se pierde. Con el segundo argumento `true`, **agrega** al final. Ambos crean el archivo si no existe.
+
+```java
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+
+public static void guardar(File archivo, String texto, boolean agregar) throws IOException {
+    FileWriter escritor = new FileWriter(archivo, agregar);   // true agrega; false sobrescribe
+    escritor.write(texto);
+    escritor.close();   // cierra el cuaderno: sin esto, lo escrito podría no llegar al disco
+}
+```
+
+`FileReader.read()` devuelve un `int`: el siguiente carácter, o `-1` cuando el archivo se acabó. Por eso se guarda en un `int` y se compara con `-1` **antes** de convertirlo a `char`; si el archivo no existe, lanza `FileNotFoundException`.
+
+```java
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+
+public static void mostrar(File archivo) throws IOException {
+    FileReader lector = new FileReader(archivo);
+    int c = lector.read();               // un carácter como int, o -1 si no hay más
+    while (c != -1) {
+        System.out.print((char) c);      // ahora sí, se convierte a char
+        c = lector.read();               // avanza el bolígrafo
+    }
+    lector.close();
+}
+```
+
+Las tres operaciones **pueden fallar**, como cuando el cuaderno no está en el estante; por eso las firmas declaran `throws IOException`. Cómo manejar esos fallos de forma segura lo verás después. Y leer letra a letra es recorrer el cuaderno con el dedo: hay una forma mejor, que también verás después.
+
+## Dónde se rompe la analogía
+
+- **Un cuaderno se hojea; un flujo solo avanza.** En el cuaderno saltas a la página 12, borras una línea del medio, corriges una palabra. Un `FileWriter` o un `FileReader` avanzan en un solo sentido y no editan en el medio. Modificar algo ya guardado exige reescribir el archivo o usar otra estrategia, que se verá más adelante.
+- **El cuaderno lo lee una persona; el archivo son bytes.** Lo que decide cómo salen tildes y ñ es el **juego de caracteres**. Java 21 usa **UTF-8** por defecto, pero un archivo escrito con otro juego de caracteres puede mostrar símbolos extraños.
+
+## Resumen operativo
+
+| Clase | Qué representa | Cómo se obtiene | Métodos clave | Cuándo falla / riesgo |
+|---|---|---|---|---|
+| `File` | La ruta de un archivo o carpeta | `new File("data/clientes.txt")` | `exists()`, `isFile()`, `getName()`, `length()` | No falla al crearse: tener un `File` no garantiza que el archivo exista |
+| `FileWriter` (sobrescribe) | Un flujo de salida que reemplaza el contenido | `new FileWriter(archivo)` | `write(String)`, `close()` | Borra lo que había; `IOException` si no puede abrir la ruta |
+| `FileWriter` (agrega) | Un flujo de salida que escribe al final | `new FileWriter(archivo, true)` | `write(String)`, `close()` | `IOException`; si olvidas `close()`, lo escrito puede perderse |
+| `FileReader` | Un flujo de entrada de caracteres | `new FileReader(archivo)` | `read()`, `close()` | `FileNotFoundException` si no existe; `read()` devuelve `-1` al final |
+
+## ¿Dónde aparece en tu proyecto?
+
+Tus listas, pilas y colas viven en la pizarra y desaparecen al cerrar el programa; persistirlas es sacarlas al cuaderno. En tu arquitectura de capas, **solo el `Service` toca el sistema de archivos**: ni la `View` ni el `Model` leen o escriben. Los archivos viven en `data/`, uno por entidad:
+
+| Proyecto | Archivos en `data/` |
+|---|---|
+| Sistema Bancario | `clientes.txt`, `cuentas.txt` |
+| Papelería | `inventario.txt`, `ventas.txt` |
+| Consultorio Médico | `pacientes.txt`, `consultas.txt` |
+| Clínica Veterinaria | `mascotas.txt`, `consultas.txt` |
+| Sistema Académico | `estudiantes.txt`, `calificaciones.txt` |
+| Liga de Fútbol | `partidos.txt`, `estadisticas.txt` |
+
+Con lo que ya sabes puedes escribir texto y leerlo carácter a carácter. Faltan tres piezas: leer línea por línea, manejar los fallos de forma segura y guardar objetos completos, no solo texto suelto.
+
+## Síntesis
+
+- La **RAM** es la pizarra: rápida y volátil. El **archivo** es el cuaderno: persistente y más lento de abrir.
+- Java accede a los archivos mediante **flujos**; entrada y salida se miden desde el programa, y los flujos de caracteres (`Reader`/`Writer`) se distinguen de los de bytes.
+- Un archivo de **texto** se puede leer con cualquier editor; uno **binario** solo lo entiende el programa que lo escribió.
+- `File` es la portada: representa una ruta, no abre ni lee nada.
+- `new FileWriter(archivo)` sobrescribe y `new FileWriter(archivo, true)` agrega; `FileReader.read()` devuelve `-1` al final y ambos se cierran con `close()`.
+- La analogía se rompe: un flujo no salta ni edita en el medio, y el juego de caracteres decide cómo salen tildes y ñ.
+- En tu proyecto, el `Service` es el único que toca los archivos de `data/`, uno por entidad.
