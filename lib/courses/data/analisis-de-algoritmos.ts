@@ -175,42 +175,6 @@ export const analisisDeAlgoritmos: Course = {
       ],
     },
     {
-      id: "heaps-y-heapsort",
-      slug: "heaps-y-heapsort",
-      articleSlug: "heaps-y-heapsort",
-      order: 9,
-      title: "Heaps y heapsort",
-      topics: [
-        { title: "La propiedad de heap (max-heap y min-heap)" },
-        { title: "Mantener la propiedad de heap; construir un heap desde un arreglo" },
-        { title: "El algoritmo heapsort; colas de prioridad como aplicación de los heaps" },
-      ],
-    },
-    {
-      id: "quicksort-determinista-y-aleatorizado",
-      slug: "quicksort-determinista-y-aleatorizado",
-      articleSlug: "quicksort-determinista-y-aleatorizado",
-      order: 10,
-      title: "Quicksort determinista y aleatorizado",
-      topics: [
-        { title: "Descripción de quicksort: partición y recursión" },
-        { title: "Desempeño: peor caso O(n²) frente a caso promedio O(n log n)" },
-        { title: "Versión aleatorizada de quicksort y por qué mejora el comportamiento esperado" },
-      ],
-    },
-    {
-      id: "counting-radix-y-bucket-sort",
-      slug: "counting-radix-y-bucket-sort",
-      articleSlug: "counting-radix-y-bucket-sort",
-      order: 11,
-      title: "Counting sort, radix sort y bucket sort",
-      topics: [
-        { title: "Cota inferior para el ordenamiento por comparaciones: Ω(n log n)" },
-        { title: "Counting sort: cuándo es aplicable y por qué logra O(n)" },
-        { title: "Radix sort y bucket sort: ideas generales y supuestos sobre los datos" },
-      ],
-    },
-    {
       id: "medianas-seleccion-y-estructuras-elementales",
       slug: "medianas-seleccion-y-estructuras-elementales",
       articleSlug: "medianas-seleccion-y-estructuras-elementales",
@@ -282,9 +246,9 @@ export const analisisDeAlgoritmos: Course = {
       topics: [
         {
           title:
-            "Repaso integrador: recurrencias, divide y vencerás, ordenamiento, estructuras de datos, programación dinámica, voraces",
+            "Repaso integrador: recurrencias, divide y vencerás, estructuras de datos, programación dinámica, voraces",
         },
-        { title: "Retroalimentación general sobre los cinco informes de laboratorio" },
+        { title: "Retroalimentación general sobre los informes de laboratorio" },
       ],
     },
   ],
