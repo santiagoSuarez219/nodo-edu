@@ -1,7 +1,7 @@
 # Semana 13 — 26 de octubre – 1 de noviembre
 
 **Rama:** `feat/semana-13-analisis-de-algoritmos`
-**Estado:** ⬜ En preparación / ⬜ Material y cuestionarios listos en desarrollo / ✅ Mergeada a `development` / ⬜ Desplegada y abierta
+**Estado:** ⬜ En preparación / ⬜ Material y cuestionarios listos en desarrollo / ⬜ Mergeada a `development` / ✅ Desplegada y abierta (2026-10-04)
 
 ---
 
@@ -47,7 +47,8 @@ con rúbrica es una etapa aparte, aún no producida.
 |---|---|---|---|---|
 | `tablas-hash` | desarrollo | `44d157ce-0d02-42a8-b0b0-f5ead288bd42`, `6adbe40a-f60e-44fa-bf4d-340a480758a1`, `52bbc4b8-59c7-40fa-b028-4afba2b7ece4`, `a02badf8-568f-47eb-9903-f345ec0ac724`, `f91df846-9c7f-42fc-bc76-721e27639baf` | ✅ | ✅ (5) |
 | `arboles-de-busqueda-binarios` | desarrollo | `bb179a51-4e32-4817-b032-dd89febf0d1f`, `173459cb-cb9f-4130-ba9c-c43798f206ca`, `2436c9e3-7902-42eb-aabd-f80bf08332a8`, `6fc4ab07-6e7a-46a9-a58c-6f78a24d2723` | ✅ | ✅ (4) |
-| `tablas-hash` · `arboles-de-busqueda-binarios` | **producción** | — | ⬜ | ⬜ |
+| `tablas-hash` | **producción** | `738d3125-da6c-4ca6-a78b-4543ac54fefa`, `83f91ea0-e562-4b97-bbfb-b488f492775d`, `eed2b058-f84c-46a2-a6ec-8ca993dc1706`, `f90c138b-589e-4700-a50d-c0322c2dabf2`, `b3a643e0-2f5c-4519-8463-3bbb616f912c` | ✅ | ✅ (5) |
+| `arboles-de-busqueda-binarios` | **producción** | `3a8b693e-9b0c-440d-ba21-a9c528af7e2e`, `40c84d09-67dd-4f97-925b-17331b9d5337`, `98bd267b-8417-4522-8c64-5e8bbc1a33f2`, `3d3f7840-6602-4676-b129-16951d4443dd` | ✅ | ✅ (4) |
 
 > Las preguntas **no viajan con el deploy**: se recrean en producción en D3,
 > junto con las keywords nuevas `tablas-hash` y `arboles-de-busqueda`, que hoy
@@ -83,19 +84,18 @@ No aplica.
 
 | Paso | Estado | Fecha / detalle |
 |---|---|---|
-| D0 · Alcance y checklist pre-despliegue | ⬜ | |
-| D1 · Lecciones nuevas cerradas por adelantado | ⬜ | `tablas-hash` ya existía como stub; `arboles-de-busqueda-binarios` es nueva |
-| D2 · Merge a `main` y deploy en Vercel | ⬜ | rama `deploy/semana-13` |
-| D3 · Banco de preguntas replicado a producción | ⬜ | keywords `tablas-hash` y `arboles-de-busqueda` + 9 preguntas |
-| D4 · Lecciones abiertas a los estudiantes | ⬜ | `tablas-hash`, `arboles-de-busqueda-binarios` |
-| D5 · Verificación end-to-end en producción | ⬜ | |
-| D6 · Bitácora cerrada y rama `deploy/` borrada | ⬜ | |
+| D0 · Alcance y checklist pre-despliegue | ✅ | 2026-10-04 — sin cambios de esquema ni de variables de entorno; incluyó el cambio `ColaEnlazada`→`Cola` de Estructuras de Datos |
+| D1 · Lecciones nuevas cerradas por adelantado | ✅ | 2026-10-04 — el catálogo no acepta cerrar un slug no desplegado (404); `arboles-de-busqueda-binarios` se cerró justo tras el deploy |
+| D2 · Merge a `main` y deploy en Vercel | ✅ | 2026-10-04 — rama `deploy/semana-12-13`, `main` en `8eee0c9`, despliegue `READY` |
+| D3 · Banco de preguntas replicado a producción | ✅ | 2026-10-04 — keywords `tablas-hash` y `arboles-de-busqueda` + 14 preguntas publicadas y montadas |
+| D4 · Lecciones abiertas a los estudiantes | ✅ | 2026-10-04 — `tablas-hash` y `arboles-de-busqueda-binarios` abiertas |
+| D5 · Verificación end-to-end en producción | ⬜ | Pendiente: el docente comprueba en el navegador que cada lección carga, los diagramas Mermaid renderizan y la autoevaluación aparece al final |
+| D6 · Bitácora cerrada y rama `deploy/` borrada | ✅ | 2026-10-04 — rama `deploy/semana-12-13` solo existía en local y se borró |
 
-- [ ] Verificado que las lecciones de semanas futuras siguen **cerradas**
+- [x] Verificado que las lecciones de semanas futuras siguen **cerradas** (programación dinámica, voraces y síntesis del semestre)
 
 ## Pendientes
 
 - Guía del Laboratorio evaluativo 3 con rúbrica (BST evaluable).
-- Las lecciones deben estar abiertas en producción **antes del lunes 26 oct** (lectura previa).
 - Abrir en el navegador los enlaces de LeetCode de los apuntes antes de compartirlos (dan 403 a herramientas automáticas).
 - Textos para estudiantes que aún dicen "cinco laboratorios".

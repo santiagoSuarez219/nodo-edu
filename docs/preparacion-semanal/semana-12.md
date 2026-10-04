@@ -1,7 +1,7 @@
 # Semana 12 — 19–25 de octubre
 
 **Rama:** `feat/semana-12-analisis-de-algoritmos`
-**Estado:** ⬜ En preparación / ⬜ Material y cuestionario listos en desarrollo / ✅ Mergeada a `development` / ⬜ Desplegada y abierta
+**Estado:** ⬜ En preparación / ⬜ Material y cuestionario listos en desarrollo / ⬜ Mergeada a `development` / ✅ Desplegada y abierta (2026-10-04)
 
 ---
 
@@ -42,7 +42,7 @@ el docente decidió dictar esa clase **sin sesión P**.
 | Lección | Entorno | IDs de preguntas | Publicadas | Montadas (`list_lesson_questions`) |
 |---|---|---|---|---|
 | `medianas-seleccion-y-estructuras-elementales` | desarrollo | `737396be-ee51-468b-b7a6-7afc40f2d34f`, `d5775d18-b586-4b72-9bc6-a596f2779033`, `4cd62ac7-9ee8-495d-9ce9-192c67f8557c`, `3d7e4732-3d93-457e-9176-ef6b34eb8247`, `0359aa7d-23ed-4951-ab64-f9526f38ca88` | ✅ | ✅ (5) |
-| `medianas-seleccion-y-estructuras-elementales` | **producción** | — | ⬜ | ⬜ |
+| `medianas-seleccion-y-estructuras-elementales` | **producción** | `680dce63-a2d2-4c44-a7a3-c4d9bcb93c15`, `8b53d196-00d5-4820-889b-55d3af8c09c1`, `a025501c-a1a3-4a39-8708-964d83aa8f29`, `a649e776-2724-4bd6-a12f-19566ffdee2d`, `53640acd-d404-42b5-ad55-0e62769c3d62` | ✅ | ✅ (5) |
 
 > Las preguntas **no viajan con el deploy**: se recrean en producción en D3.
 > Mientras la fila de producción esté vacía, la autoevaluación no existe para
@@ -76,17 +76,16 @@ No aplica.
 
 | Paso | Estado | Fecha / detalle |
 |---|---|---|
-| D0 · Alcance y checklist pre-despliegue | ⬜ | |
-| D1 · Lecciones nuevas cerradas por adelantado | ⬜ | `medianas-seleccion-y-estructuras-elementales` ya existía como stub |
-| D2 · Merge a `main` y deploy en Vercel | ⬜ | rama `deploy/semana-12` |
-| D3 · Banco de preguntas replicado a producción | ⬜ | 5 preguntas |
-| D4 · Lecciones abiertas a los estudiantes | ⬜ | `medianas-seleccion-y-estructuras-elementales` |
-| D5 · Verificación end-to-end en producción | ⬜ | |
-| D6 · Bitácora cerrada y rama `deploy/` borrada | ⬜ | |
+| D0 · Alcance y checklist pre-despliegue | ✅ | 2026-10-04 — sin cambios de esquema ni de variables de entorno; incluyó el cambio `ColaEnlazada`→`Cola` de Estructuras de Datos |
+| D1 · Lecciones nuevas cerradas por adelantado | ✅ | 2026-10-04 — el catálogo no acepta cerrar un slug no desplegado (404); `arboles-de-busqueda-binarios` se cerró justo tras el deploy |
+| D2 · Merge a `main` y deploy en Vercel | ✅ | 2026-10-04 — rama `deploy/semana-12-13`, `main` en `8eee0c9`, despliegue `READY` |
+| D3 · Banco de preguntas replicado a producción | ✅ | 2026-10-04 — keywords `tablas-hash` y `arboles-de-busqueda` + 14 preguntas publicadas y montadas |
+| D4 · Lecciones abiertas a los estudiantes | ✅ | 2026-10-04 — `medianas-seleccion-y-estructuras-elementales` abierta |
+| D5 · Verificación end-to-end en producción | ⬜ | Pendiente: el docente comprueba en el navegador que cada lección carga, los diagramas Mermaid renderizan y la autoevaluación aparece al final |
+| D6 · Bitácora cerrada y rama `deploy/` borrada | ✅ | 2026-10-04 — rama `deploy/semana-12-13` solo existía en local y se borró |
 
-- [ ] Verificado que las lecciones de semanas futuras siguen **cerradas**
+- [x] Verificado que las lecciones de semanas futuras siguen **cerradas** (programación dinámica, voraces y síntesis del semestre)
 
 ## Pendientes
 
-- La lección debe estar abierta en producción **antes del lunes 19 oct** (lectura previa).
 - Abrir en el navegador los enlaces de LeetCode de los apuntes antes de compartirlos (dan 403 a herramientas automáticas).
