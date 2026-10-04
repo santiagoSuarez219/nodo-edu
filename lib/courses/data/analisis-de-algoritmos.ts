@@ -189,10 +189,12 @@ export const analisisDeAlgoritmos: Course = {
       articleSlug: "medianas-seleccion-y-estructuras-elementales",
       order: 12,
       title: "Medianas, selección y estructuras elementales",
+      summary:
+        "Cómo hallar el valor que ocuparía la posición k sin ordenar todo —selección en tiempo lineal esperado— y las estructuras elementales sobre las que se apoya casi todo lo demás: pilas, colas y listas enlazadas, con su costo por operación.",
       topics: [
         { title: "Mínimo y máximo; selección en tiempo lineal esperado" },
         { title: "Pilas y colas: operaciones e implementación con arreglos" },
-        { title: "Listas enlazadas: simple, doble; representación de árboles enraizados" },
+        { title: "Listas enlazadas simples y dobles; árboles enraizados (mención)" },
       ],
     },
     {
