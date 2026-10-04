@@ -201,6 +201,8 @@ export const analisisDeAlgoritmos: Course = {
       articleSlug: "tablas-hash",
       order: 13,
       title: "Tablas hash",
+      summary:
+        "Cómo encontrar un dato sin recorrer la colección: funciones hash, colisiones resueltas con encadenamiento o direccionamiento abierto, y el factor de carga que explica por qué el costo esperado de buscar es Θ(1 + α) y no Θ(n).",
       topics: [
         { title: "Tablas de direccionamiento directo vs. tablas hash" },
         { title: "Funciones hash: método de la división, método de la multiplicación" },
@@ -208,6 +210,24 @@ export const analisisDeAlgoritmos: Course = {
           title:
             "Manejo de colisiones: encadenamiento y direccionamiento abierto (sondeo lineal, cuadrático, doble hashing)",
         },
+        { title: "Factor de carga y costo esperado: Θ(1 + α) y redimensionamiento" },
+      ],
+    },
+    {
+      id: "arboles-de-busqueda-binarios",
+      slug: "arboles-de-busqueda-binarios",
+      articleSlug: "arboles-de-busqueda-binarios",
+      order: 13.5,
+      title: "Árboles de búsqueda binarios",
+      summary:
+        "Un árbol de búsqueda binario cuelga las claves como carpetas en un tablero: buscar e insertar cuestan Θ(h), y la altura h decide si el tablero es un atajo o una fila.",
+      topics: [
+        { title: "Propiedad del árbol de búsqueda binario y vocabulario (raíz, hijos, hoja, subárbol, altura)" },
+        { title: "Búsqueda iterativa en un BST" },
+        { title: "Inserción iterativa en un BST" },
+        { title: "Recorrido en orden, mínimo y máximo" },
+        { title: "Altura y degeneración: Θ(h), Θ(n) frente a Θ(log n)" },
+        { title: "BST frente a tabla hash: consultas por rango y orden" },
       ],
     },
     {
