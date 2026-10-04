@@ -334,6 +334,8 @@ export const estructurasDeDatos: Course = {
       articleSlug: "fundamentos-de-archivos",
       order: 23,
       title: "Fundamentos de archivos",
+      summary:
+        "Parte de la pizarra que se borra y el cuaderno que se conserva para explicar qué es un archivo, cómo lo modela Java con flujos y qué diferencia hay entre texto y binario, y termina escribiendo y leyendo un archivo de texto con File, FileWriter y FileReader.",
       topics: [
         { title: "Archivos de texto vs. archivos binarios" },
         { title: "Modelo de flujos (streams) en Java" },
@@ -375,7 +377,7 @@ export const estructurasDeDatos: Course = {
       topics: [
         { title: "Concepto FIFO (First In, First Out) y sus aplicaciones reales" },
         { title: "Operaciones del TAD: enqueue, dequeue, front, isEmpty, size" },
-        { title: "Implementación propia de ColaEnlazada<T> con nodos enlazados, frente y fin en O(1)" },
+        { title: "Implementación propia de Cola<T> con nodos enlazados, frente y fin en O(1)" },
         { title: "Queue<E> y PriorityQueue<E> del API de Java" },
       ],
     },

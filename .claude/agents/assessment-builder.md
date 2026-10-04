@@ -111,7 +111,7 @@ imprime?" o "¿en qué caso conviene X sobre Y?" antes que "¿cuál es la defini
 de X?". En Análisis de Algoritmos, pregunta por el orden de crecimiento y la
 justificación, no por la fórmula memorizada.
 
-**En `estructuras-de-datos` el cierre es verificación de lectura previa**
+**En `estructuras-de-datos` y `analisis-de-algoritmos` el cierre es verificación de lectura previa**
 (aula invertida, `lesson-authoring` §5): el estudiante lo responde antes de
 clase, así que pregunta por lo que la lectura instala —la analogía traducida a
 operaciones, la traza de un `push`/`pop`, dónde se rompe la analogía— y no

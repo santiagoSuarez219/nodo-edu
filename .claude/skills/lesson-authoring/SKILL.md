@@ -108,11 +108,21 @@ Esqueleto pragmático (problema → teoría → práctica), 8–10 secciones `##
 ## Síntesis                                 ← bullets, uno por sección anterior
 ```
 
-#### Variante `estructuras-de-datos`: cotidiano → concepto → código → aplicación
+#### Variante `estructuras-de-datos` y `analisis-de-algoritmos`: cotidiano → concepto → código → aplicación
 
-> Decisión del docente (2026-09-30), motivada por baja participación en clase.
-> **Solo aplica a `estructuras-de-datos`**; los otros dos cursos siguen con el
+> Decisión del docente (2026-09-30 para `estructuras-de-datos`, extendida el
+> 2026-10-03 a `analisis-de-algoritmos`), motivada por baja participación en
+> clase. **Aplica a `estructuras-de-datos` y `analisis-de-algoritmos`**; `programacion-cientifica` sigue con el
 > esqueleto pragmático de arriba.
+>
+> **Adaptación en `analisis-de-algoritmos`:** no hay proyecto de aula, así que
+> la sección final se titula `## ¿Dónde aparece en la práctica?` y aplica el
+> concepto a un caso técnico real y medible (un sistema con tamaño de entrada
+> y restricción concretos). El ejemplo cotidiano debe poder traducirse a
+> costo (pasos, comparaciones, tiempo): contar páginas de un libro, buscar en
+> una agenda, repartir tareas entre un equipo. "Dónde se rompe la analogía"
+> señala el supuesto que el ejemplo real no cumple (tamaño, orden, costo de
+> combinar).
 
 La lección **abre con un ejemplo de la vida cotidiana** que el estudiante ya
 manipuló con las manos —una pila de platos, la fila del supermercado, el
@@ -138,7 +148,7 @@ no del proyecto de aula ni de un problema técnico:
   de la lección.
 - El proyecto de aula (`microdiseno/projects/`) **no desaparece: pasa al
   final**, como aplicación del concepto ya entendido.
-- **Aula invertida:** en este curso la lección es la **lectura previa** a la
+- **Aula invertida:** en estos cursos la lección es la **lectura previa** a la
   clase. El estudiante la lee antes de la sesión y responde el cuestionario de
   cierre (§5) como verificación; el tiempo de clase se dedica a las dinámicas
   de los apuntes (§3). Por eso la lección es **más corta**: 10–15 minutos de
@@ -178,7 +188,7 @@ flowchart LR
 
 Medidas de referencia de una lección completa: ~170 líneas, 9 secciones `##`,
 6 bloques de código, 1 tabla, 6 blockquotes de definición (en
-`estructuras-de-datos`, ~100–130 líneas: ver la variante de arriba). El
+`estructuras-de-datos` y `analisis-de-algoritmos`, ~100–130 líneas: ver la variante de arriba). El
 número de diagramas **no es una medida**: ver §2.4.
 
 ### 2.3 Tono
@@ -421,12 +431,15 @@ aparato de planificación de sesión ya no se produce como artefacto aparte —
 si algo de eso es indispensable para dictar la clase, se resuelve en la
 conversación con el usuario, no en un documento versionado.
 
-### 3.1 Dinámicas de clase en `estructuras-de-datos` (obligatorias)
+### 3.1 Dinámicas de clase en `estructuras-de-datos` y `analisis-de-algoritmos` (obligatorias)
 
-> Decisión del docente (2026-09-30). En este curso la lección es lectura
-> previa (aula invertida, ver §2.2), así que **el tiempo de clase vive en los
-> apuntes**. Cuando se escriben apuntes de `estructuras-de-datos`, llevan
-> siempre estas cuatro dinámicas. Los otros cursos no las exigen.
+> Decisión del docente (2026-09-30; extendida a `analisis-de-algoritmos` el
+> 2026-10-03). En estos cursos la lección es lectura previa (aula invertida,
+> ver §2.2), así que **el tiempo de clase vive en los apuntes**. Cuando se
+> escriben apuntes de `estructuras-de-datos` y `analisis-de-algoritmos`, llevan siempre estas cuatro
+> dinámicas. `programacion-cientifica` no las exige. En `analisis-de-algoritmos`
+> (virtual) la votación se hace con encuesta o chat y el reto en parejas en
+> salas, sin cambiar la dinámica.
 
 **1. 🐞 Error planeado (live coding con errores deliberados)** — dentro de los
 `## Paso N` de live coding, 1–2 por sesión en total. El docente escribe el
@@ -709,7 +722,7 @@ conceptuales reales (no opciones absurdas de relleno). `keywords` con el
 módulo y el concepto (ej. `recursion`, `python`) — confirmadas en el catálogo,
 nunca inventadas al vuelo.
 
-> **En `estructuras-de-datos` el cuestionario es la verificación de la lectura
+> **En `estructuras-de-datos` y `analisis-de-algoritmos` el cuestionario es la verificación de la lectura
 > previa** (aula invertida, §2.2): el estudiante lo responde **antes** de la
 > clase. Por eso evalúa lo que la lectura instala (la analogía traducida a
 > operaciones, la traza de un `push`/`pop`), no lo que se construye en clase.
@@ -782,8 +795,8 @@ y que `mcp-servers/<nombre>/dist/` está compilado.
 - [ ] `.mdx` sin `# H1`, empieza en `##`, sin `###`, sin `---`.
 - [ ] `updatedAt` con la fecha de hoy.
 - [ ] Cada diagrama Mermaid se gana su lugar (no hay cuota; cero es válido). Etiquetas entre comillas dobles, sin `end` minúscula.
-- [ ] En `estructuras-de-datos`: la lección abre con un ejemplo cotidiano, tiene "Dónde se rompe la analogía" y cierra con la aplicación al proyecto; ~100–130 líneas (lectura previa).
-- [ ] En apuntes de `estructuras-de-datos`: 🐞 error planeado, 🗳️ votación (distinta del cierre), 👥 reto en parejas y 🏆 práctica externa con enlaces verificados.
+- [ ] En `estructuras-de-datos` y `analisis-de-algoritmos`: la lección abre con un ejemplo cotidiano, tiene "Dónde se rompe la analogía" y cierra con la aplicación (al proyecto de aula en `estructuras-de-datos`; a un caso técnico real en `analisis-de-algoritmos`); ~100–130 líneas (lectura previa).
+- [ ] En apuntes de `estructuras-de-datos` y `analisis-de-algoritmos`: 🐞 error planeado, 🗳️ votación (distinta del cierre), 👥 reto en parejas y 🏆 práctica externa con enlaces verificados.
 - [ ] Ningún `$` sin escapar; ningún `<`/`{` suelto en prosa (crítico en `.md` de guías).
 - [ ] Solo `Callout`, `Tabs`, `Tab`, `YouTubeEmbed` como JSX.
 - [ ] Entrada en `lib/courses/data/<curso>.ts` con `articleSlug`, `order` único y `summary` escrito.

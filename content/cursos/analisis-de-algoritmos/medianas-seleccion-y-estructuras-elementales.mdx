@@ -1,5 +1,245 @@
 ---
 title: "Medianas, selección y estructuras elementales"
-summary: ""
-updatedAt: 2026-07-18
+course: "Análisis de Algoritmos"
+course_code: "AA"
+level: "Ultimos semestres"
+type: "Apuntes teóricos"
+language: "Python 3"
+difficulty: "Intermedio"
+estimated_time: "Lectura previa de 12 minutos (sesión T, Semana 12)"
+presentation: true
+slides_hint: "Cada sección ## es una diapositiva. Presentación sincrona."
+date: "2026-10-03"
+author: "Asistente de Docencia"
+summary: "Cómo hallar el valor que ocuparía la posición k sin ordenar todo —selección en tiempo lineal esperado— y las estructuras elementales sobre las que se apoya casi todo lo demás: pilas, colas y listas enlazadas, con su costo por operación."
+updatedAt: "2026-10-03"
 ---
+
+> 📖 Lectura previa a la clase — unos 12 minutos. Al final, responde la autoevaluación.
+
+## El problema: el escritorio del profesor el día del parcial
+
+Imagina el escritorio de un profesor el día del parcial: un montón de 40 exámenes sin ordenar, una bandeja donde va apilando los que ya revisó, la fila de estudiantes que esperan entregar y, pegados en cada examen, post-its que dicen cuál sigue. Alguien le pregunta: **¿qué nota ocupa el puesto 10, o cuál es la del medio?** No quiere la lista completa de notas, solo ese valor.
+
+Traducido a un problema computacional:
+
+- **Entra:** `n` valores sin orden previo y un rango `k`.
+- **Sale:** el valor que quedaría en la posición `k` — no el arreglo ordenado.
+- **Restricciones:** no hay orden previo y `n` puede crecer sin límite.
+- **Qué domina el costo:** las comparaciones entre elementos.
+
+## Mínimo, máximo y la tentación de ordenar
+
+**Así en la vida real:** para hallar la nota más baja, el profesor recorre el montón una vez, con un examen en la mano que cambia cuando aparece uno peor. Son `n − 1` comparaciones; con el máximo, igual. Como cerró la lección anterior, partir este recorrido por la mitad no gana nada.
+
+**Así en código:**
+
+```python
+def minimo_maximo(valores: list[int]) -> tuple[int, int]:
+    """Halla el mínimo y el máximo con un solo recorrido.
+
+    Args:
+        valores: Lista no vacía de enteros.
+
+    Returns:
+        Una tupla (mínimo, máximo).
+    """
+    menor = mayor = valores[0]
+    for valor in valores[1:]:
+        menor = min(menor, valor)
+        mayor = max(mayor, valor)
+    return menor, mayor
+```
+
+Para el puesto `k` la idea ingenua es ordenar los 40 exámenes y contar hasta `k`. Con el Θ(n log n) de merge sort funciona, pero paga por un orden completo cuando solo se pidió un valor. La pregunta es inevitable: ¿y si repartimos en vez de ordenar?
+
+## Repartir en tres montones según un examen de referencia
+
+**Así en la vida real:** el profesor toma un examen cualquiera como referencia y reparte los demás en tres montones: los de nota menor, los de nota igual y los de nota mayor. Mira cada examen una sola vez. Con las notas `[72, 45, 90, 45, 60, 88, 30, 55]` y referencia 60 quedan: menores `[45, 45, 30, 55]`, iguales `[60]`, mayores `[72, 90, 88]`. Ningún montón está en orden interno, y no hace falta.
+
+**Así en código:**
+
+```python
+def repartir(valores: list[int], referencia: int) -> tuple[list[int], list[int], list[int]]:
+    """Reparte los valores en tres listas según una referencia.
+
+    Args:
+        valores: Valores a repartir.
+        referencia: Valor contra el que se compara cada elemento.
+
+    Returns:
+        Tres listas: menores, iguales y mayores que la referencia.
+    """
+    menores, iguales, mayores = [], [], []
+    for valor in valores:
+        if valor < referencia:
+            menores.append(valor)
+        elif valor == referencia:
+            iguales.append(valor)
+        else:
+            mayores.append(valor)
+    return menores, iguales, mayores
+```
+
+Cuesta Θ(n) comparaciones y maneja bien los valores repetidos. Su precio es memoria extra: las tres listas suman otros `n` elementos. Existe una versión que reparte sobre el mismo arreglo, sin copias (Cormen 9.2), que no se desarrolla aquí.
+
+## Seguir solo el montón que contiene la posición k
+
+**Así en la vida real:** el profesor cuenta los montones. Si el puesto buscado es el 6.º (`k = 5` contando desde 0) y los menores son 4 más 1 igual, el puesto cae entre los mayores: los otros dos montones se descartan y el puesto pasa a ser el 1.º dentro de `[72, 90, 88]`. Repite el reparto solo con ese montón.
+
+**Así en código:**
+
+```python
+import random
+
+
+def seleccionar(valores: list[int], k: int) -> int:
+    """Devuelve el valor que ocuparía la posición k (desde 0) en orden creciente.
+
+    Args:
+        valores: Lista no vacía de enteros.
+        k: Posición buscada, con 0 menor o igual que k menor que len(valores).
+
+    Returns:
+        El k-ésimo valor.
+    """
+    menores, iguales, mayores = repartir(valores, random.choice(valores))
+    if k < len(menores):
+        return seleccionar(menores, k)
+    if k < len(menores) + len(iguales):
+        return iguales[0]
+    return seleccionar(mayores, k - len(menores) - len(iguales))
+```
+
+**Por qué es rápido.** Cada ronda cuesta recorrer el montón actual, unos n pasos. Con una referencia elegida al azar, el montón que conservamos suele quedar en una fracción del anterior, digamos la mitad. Entonces las rondas cuestan aproximadamente n + n/2 + n/4 + … ≤ 2n: el costo total es proporcional a n, es decir $\Theta(n)$. Es un argumento intuitivo; la demostración rigurosa está en Cormen 9.2.
+
+**Cuándo se estropea.** Si la referencia sale siempre la más baja o la más alta, el montón solo se achica en un examen por ronda y el costo cae a $\Theta(n^2)$. Elegirla al azar hace muy improbable que eso pase.
+
+## La pila de revisión y la fila de entrega: pilas y colas
+
+**Así en la vida real:** la bandeja de revisión es una **pila** (_LIFO_): el último examen que pones es el primero que sacas. La fila de entrega es una **cola** (_FIFO_): quien llegó primero entrega primero.
+
+**Así en código**, ambas sobre un arreglo de capacidad fija:
+
+```python
+class Pila:
+    """Pila de enteros sobre un arreglo de capacidad fija."""
+
+    def __init__(self, capacidad: int) -> None:
+        """Crea una pila vacía.
+
+        Args:
+            capacidad: Número máximo de elementos.
+        """
+        self.datos: list[int] = [0] * capacidad
+        self.tope: int = 0
+
+    def push(self, valor: int) -> None:
+        """Apila un valor; falla si la pila está llena.
+
+        Args:
+            valor: Valor a apilar.
+        """
+        if self.tope == len(self.datos):
+            raise OverflowError("pila llena")
+        self.datos[self.tope] = valor
+        self.tope += 1
+
+    def pop(self) -> int:
+        """Desapila el valor de arriba; falla si la pila está vacía.
+
+        Returns:
+            El último valor apilado.
+        """
+        if self.tope == 0:
+            raise IndexError("pila vacía")
+        self.tope -= 1
+        return self.datos[self.tope]
+```
+
+La **cola circular** usa `inicio` y `tamano`: `enqueue` escribe en la posición `(inicio + tamano) % capacidad` y suma uno a `tamano`; `dequeue` lee en `inicio`, lo avanza con el mismo módulo y resta uno. El módulo hace que las posiciones liberadas se reutilicen. Ambas fallan con cola llena al encolar y con cola vacía al desencolar.
+
+| Operación | Estructura | Costo |
+| --- | --- | --- |
+| `push`, `pop` | Pila | Θ(1) |
+| `enqueue`, `dequeue` | Cola circular | Θ(1) |
+
+## Post-its entre exámenes: listas enlazadas simple y doble
+
+**Así en la vida real:** las sillas numeradas son un **arreglo**: ir a la silla 7 es inmediato, pero meter a alguien en medio obliga a correr a todos los siguientes. Los exámenes con post-its son una **lista enlazada**: cada examen indica cuál sigue, así que insertar es reescribir un post-it, y llegar al 7.º exige seguir la cadena desde el primero.
+
+**Así en código:**
+
+```python
+class Nodo:
+    """Nodo de una lista enlazada simple."""
+
+    def __init__(self, valor: int, siguiente: "Nodo | None" = None) -> None:
+        """Crea un nodo.
+
+        Args:
+            valor: Dato que guarda el nodo.
+            siguiente: Nodo al que apunta, o None si es el último.
+        """
+        self.valor = valor
+        self.siguiente = siguiente
+
+
+def insertar_al_inicio(cabeza: Nodo | None, valor: int) -> Nodo:
+    """Inserta un valor antes de la cabeza.
+
+    Args:
+        cabeza: Primer nodo actual, o None si la lista está vacía.
+        valor: Valor a insertar.
+
+    Returns:
+        El nuevo primer nodo.
+    """
+    return Nodo(valor, cabeza)
+
+
+def buscar(cabeza: Nodo | None, valor: int) -> Nodo | None:
+    """Busca un valor siguiendo los punteros desde la cabeza.
+
+    Args:
+        cabeza: Primer nodo de la lista.
+        valor: Valor buscado.
+
+    Returns:
+        El primer nodo con ese valor, o None si no está.
+    """
+    actual = cabeza
+    while actual is not None and actual.valor != valor:
+        actual = actual.siguiente
+    return actual
+```
+
+En la **lista doble**, cada examen lleva dos post-its: el que sigue y el anterior. Eso permite recorrerla en ambos sentidos y borrar un nodo que ya tienes en la mano sin buscar a su antecesor. Un nodo con puntero a su primer hijo y a su hermano derecho es una lista enlazada más; así se representan los árboles enraizados.
+
+| Operación | Arreglo | Lista simple | Lista doble |
+| --- | --- | --- | --- |
+| Acceso por posición | Θ(1) | Θ(n) | Θ(n) |
+| Insertar al inicio | Θ(n) | Θ(1) | Θ(1) |
+| Buscar un valor | Θ(n) | Θ(n) | Θ(n) |
+| Borrar un nodo ya en mano | Θ(n) | Θ(n) | Θ(1) |
+
+## Dónde se rompe la analogía
+
+El profesor ve todo el montón de un vistazo; el programa compara de a dos valores, y por eso las comparaciones son el costo. Repartir en montones físicos es gratis; en memoria cuesta tiempo y, en la versión de tres listas, espacio extra. El examen de referencia lo elige a ojo con criterio; el programa lo saca al azar y puede salir mal. Y la fila de estudiantes nunca se "llena", mientras que una pila o cola sobre un arreglo tiene capacidad fija y falla cuando se agota.
+
+## ¿Dónde aparece en la práctica?
+
+Un sistema de telemedición consolida 1.850.000 lecturas diarias y necesita las 500 de mayor consumo, sin importar su orden entre sí. Ordenar todo cuesta del orden de n · log₂ n ≈ 1,85 · 10⁶ × 20,8 ≈ 3,85 · 10⁷ operaciones. Seleccionar la posición `n − 500` cuesta del orden de n = 1,85 · 10⁶ y un filtrado final suma otras 1,85 · 10⁶: en total 3,7 · 10⁶, es decir, en papel unas 10 veces menos operaciones. Esa cifra es un techo, no una predicción: la constante real de la selección es mayor que 1, y al medirla en código la ventaja baja a unas pocas veces. Lo que no cambia es la forma: ordenar crece como n log n y seleccionar como n, así que la ventaja aumenta con n. Si además se quiere ese top 500 ordenado, ordenar solo esas 500 es barato.
+
+## Síntesis
+
+- **El problema:** pedir el puesto `k` no es pedir el orden completo; el modelado separa lo que sale de lo que se paga.
+- **Mínimo y máximo:** `n − 1` comparaciones cada uno con un recorrido; ordenar para el puesto `k` es Θ(n log n).
+- **Repartir:** tres montones según una referencia cuestan Θ(n) y sirven de pieza para seleccionar.
+- **Seguir un montón:** la selección conserva solo el montón con la posición `k` y cuesta Θ(n) esperado, Θ(n²) con mala suerte.
+- **Pilas y colas:** LIFO y FIFO con operaciones Θ(1) sobre arreglos de capacidad fija.
+- **Listas enlazadas:** insertar al inicio es Θ(1), buscar es Θ(n); la lista doble borra en Θ(1) un nodo ya localizado.
+- **La analogía:** el programa compara de a dos, el reparto cuesta memoria y el azar puede fallar.
+- **En la práctica:** seleccionar 500 de 1.850.000 lecturas es, en papel, unas 10 veces más barato que ordenar todo (medido, unas pocas veces).
+
+Lecturas: Cormen, cap. 9 (9.1 y 9.2) y cap. 10 (10.1 y 10.2).

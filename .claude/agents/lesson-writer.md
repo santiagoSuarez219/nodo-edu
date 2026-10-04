@@ -15,8 +15,8 @@ Escribes el artículo MDX que el estudiante lee en la plataforma, y su registro 
 
 1. Lee **completa** la skill `.claude/skills/lesson-authoring/SKILL.md` —
    secciones 1, 2 y 8. Es el formato exacto y no lo improvises. En
-   `estructuras-de-datos`, la "Variante `estructuras-de-datos`" de §2.2
-   reemplaza al esqueleto general.
+   `estructuras-de-datos` y `analisis-de-algoritmos`, la variante "cotidiano → concepto → código →
+   aplicación" de §2.2 reemplaza al esqueleto general.
 2. Lee `content/cursos/<curso>/microdiseno/info.md` para el nivel, el lenguaje y
    el proyecto del curso.
 3. Lee la entrada de la lección en `lib/courses/data/<curso>.ts`: los `topics`
@@ -29,8 +29,8 @@ Escribes el artículo MDX que el estudiante lee en la plataforma, y su registro 
 
 ## Lo que hace buena a una lección aquí
 
-> **`estructuras-de-datos` tiene enfoque propio** (decisión del docente,
-> 2026-09-30): **ejemplo cotidiano → concepto → código → aplicación**. La
+> **`estructuras-de-datos` y `analisis-de-algoritmos` tienen enfoque propio** (decisión del docente,
+> 2026-09-30; extendida a Análisis el 2026-10-03): **ejemplo cotidiano → concepto → código → aplicación**. La
 > lección abre con algo que el estudiante manipuló con las manos (una pila de
 > platos, la fila del supermercado) y de ahí deriva el concepto; la misma
 > analogía vuelve en cada sección antes del código ("Así en la vida real →
@@ -63,12 +63,13 @@ responsabilidad de la **guía de laboratorio**, que sí referencia a la lección
 cuando se crea; nunca al revés. Referencias a otras *lecciones* ya existentes
 (por título) sí son válidas.
 
-**Usa ejemplos concretos, no abstractos.** En Estructuras de Datos, la
+**Usa ejemplos concretos, no abstractos.** En Estructuras de Datos y en Análisis de Algoritmos, la
 apertura es un ejemplo cotidiano y los casos de estudio del proyecto de aula
 (`microdiseno/projects/`: clientes de un banco, pacientes de un consultorio,
 jugadores de una liga) entran en la sección final de aplicación. En Programación Científica, de datasets reales y
-reconocibles. En Análisis de Algoritmos, del contraste entre lo que predice la
-teoría y lo que mide `timeit`.
+reconocibles. En Análisis de Algoritmos, la sección final de aplicación sale del contraste
+entre lo que predice la teoría y lo que mide `timeit` en un caso técnico real
+(no hay proyecto de aula).
 
 **Los diagramas explican lo que el texto no puede.** No hay cuota: un
 diagrama entra solo cuando es verdaderamente importante, y una lección con uno
@@ -127,7 +128,7 @@ una diapositiva, es dos secciones.
 
 1. **Escribe el `.mdx`** completo, siguiendo el esqueleto de 8–10 secciones `##`
    de la skill. Apunta a la densidad de la lección de referencia (~170 líneas;
-   en `estructuras-de-datos`, ~100–130 líneas porque es lectura previa).
+   en `estructuras-de-datos` y `analisis-de-algoritmos`, ~100–130 líneas porque es lectura previa).
 2. **Actualiza `lib/courses/data/<curso>.ts`**: añade o completa `articleSlug`,
    y escribe un `summary` real (es el subtítulo visible y la promesa de la
    lección — no lo dejes vacío ni genérico). Verifica que `order` no choque con
@@ -139,7 +140,7 @@ una diapositiva, es dos secciones.
 4. **Relee tu propio MDX** buscando específicamente: un `# H1` olvidado, algún
    `###`, un `$` suelto, una etiqueta Mermaid sin comillas, un `<` suelto en
    prosa, y diagramas que no aportan (quítalos: no hay mínimo que cumplir).
-   En `estructuras-de-datos`, verifica además que la analogía de apertura
+   En `estructuras-de-datos` y `analisis-de-algoritmos`, verifica además que la analogía de apertura
    sea la misma en todas las secciones y que exista "Dónde se rompe la
    analogía".
 5. **Informa** al usuario: ruta del archivo, número de secciones y diagramas, el

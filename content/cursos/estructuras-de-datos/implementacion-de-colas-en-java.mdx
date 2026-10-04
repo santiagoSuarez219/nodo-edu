@@ -48,7 +48,7 @@ Cada cosa que hiciste en la fila es una operación. Un **tipo abstracto de dato 
 **Así en código:** llegar al final es `enqueue`, pasar a la caja es `dequeue` (quita y devuelve al del frente) y ver quién sigue es `front` (devuelve sin quitar). El comentario muestra la cola con el frente a la izquierda:
 
 ```java
-ColaEnlazada<Cliente> fila = new ColaEnlazada<>();
+Cola<Cliente> fila = new Cola<>();
 fila.enqueue(new Cliente("Ana"));      // [Ana]
 fila.enqueue(new Cliente("Bruno"));    // [Ana, Bruno]
 fila.enqueue(new Cliente("Carla"));    // [Ana, Bruno, Carla]
@@ -80,7 +80,7 @@ public class Nodo<T> {
 ```java
 import java.util.NoSuchElementException;
 
-public class ColaEnlazada<T> {
+public class Cola<T> {
     private Nodo<T> frente;   // primer nodo: el que sale; null si la cola está vacía
     private Nodo<T> fin;      // último nodo: detrás de él entra el siguiente; null si está vacía
     private int tamano;       // cantidad de nodos
@@ -92,7 +92,7 @@ public class ColaEnlazada<T> {
 
 ¿Por qué se entra por `fin` y se sale por `frente`, y no al revés? Porque cada nodo conoce a su siguiente, no a su anterior: quitar el primero solo exige leer `frente.getSiguiente()`; quitar el último exigiría recorrer la cadena hasta el penúltimo, **O(n)**. Y sin `fin`, llegar al último costaría **O(n)** por cada persona que entra.
 
-> **`ColaEnlazada<T>`:** cola construida sobre una cadena de `Nodo<T>`, con `frente` en el primer nodo y `fin` en el último. Al tener ambos extremos, `enqueue` y `dequeue` cuestan **O(1)** en el peor caso.
+> **`Cola<T>`:** tu clase propia de cola, construida sobre una cadena de `Nodo<T>`, con `frente` en el primer nodo y `fin` en el último. Al tener ambos extremos, `enqueue` y `dequeue` cuestan **O(1)** en el peor caso.
 
 ## enqueue: llega alguien a la fila
 
@@ -173,7 +173,7 @@ Cliente siguiente = turnos.peek();   // Ana, sin atenderla
 Cliente atendido = turnos.poll();    // Ana; en fila vacía devolvería null
 ```
 
-| TAD Cola | `ColaEnlazada<T>` | `Queue<E>` lanza excepción | `Queue<E>` devuelve `null` o `false` |
+| TAD Cola | `Cola<T>` | `Queue<E>` lanza excepción | `Queue<E>` devuelve `null` o `false` |
 | --- | --- | --- | --- |
 | Encolar | `enqueue(x)` | `add(x)` | `offer(x)` |
 | Retirar el frente | `dequeue()` | `remove()` | `poll()` |
@@ -214,12 +214,12 @@ Elegir entre una y otra es decidir qué significa "el siguiente": el más recien
 
 ## Dónde se rompe la analogía
 
-- **En la fila real ves a todos; en `ColaEnlazada<T>` solo ves `frente` y `fin`.** Alguien se cuela en la mitad, otro se sale del medio, tú preguntas "¿en qué puesto voy?": nada de eso existe en la cola. No es una carencia: es la garantía de que el orden de salida es el de llegada. Si necesitas mirar o quitar a alguien del medio, ese problema no pide una cola.
+- **En la fila real ves a todos; en `Cola<T>` solo ves `frente` y `fin`.** Alguien se cuela en la mitad, otro se sale del medio, tú preguntas "¿en qué puesto voy?": nada de eso existe en la cola. No es una carencia: es la garantía de que el orden de salida es el de llegada. Si necesitas mirar o quitar a alguien del medio, ese problema no pide una cola.
 - **La fila preferencial real se ve ordenada de una vez; la `PriorityQueue<E>` no.** Solo `poll` entrega los elementos en orden de prioridad. Recorrerla con un `for-each` o imprimirla **no** muestra el orden de salida.
 
 ## Resumen operativo
 
-| Operación | `ColaEnlazada<T>` | `Queue<E>` | Costo | Cola vacía |
+| Operación | `Cola<T>` | `Queue<E>` | Costo | Cola vacía |
 | --- | --- | --- | --- | --- |
 | Encolar | `enqueue(x)` | `add(x)` / `offer(x)` | **O(1)** | No aplica |
 | Retirar | `dequeue()` | `remove()` / `poll()` | **O(1)** | Lanza excepción / devuelve `null` |
@@ -230,7 +230,7 @@ Elegir entre una y otra es decidir qué significa "el siguiente": el más recien
 
 Una cola es la respuesta cuando el enunciado dice "en orden de llegada" o "por turnos":
 
-- **Sistema Bancario:** `ColaEnlazada<Cliente>` para la ventanilla: llegada con `enqueue`, turno con `dequeue`, y la excepción cuando el cajero pide al siguiente y nadie espera.
+- **Sistema Bancario:** `Cola<Cliente>` para la ventanilla: llegada con `enqueue`, turno con `dequeue`, y la excepción cuando el cajero pide al siguiente y nadie espera.
 - **Consultorio Médico o Clínica Veterinaria:** la sala de espera del día como cola de `Paciente` o `Animal`. Si una urgencia debe pasar antes que quien llegó primero, ya no es FIFO: es la fila preferencial, una `PriorityQueue<E>` con la gravedad como regla de orden.
 - **Papelería, Sistema Académico y Liga de Fútbol:** pedidos a proveedor, solicitudes de matrícula y partidos pendientes se procesan en orden de llegada: la misma fila, con otros elementos.
 
@@ -241,6 +241,6 @@ Fuera del proyecto, es lo que hace el sistema operativo: la **cola de impresión
 - Una **cola** es un TAD **FIFO**: como la fila de la caja, el primero en entrar es el primero en salir (Ana, Bruno y Carla entran; salen en ese orden).
 - `enqueue` agrega por el **fin**, `dequeue` retira por el **frente** y `front` lo consulta sin modificar la cola.
 - `dequeue` y `front` sobre una cola vacía lanzan `NoSuchElementException`, nunca devuelven `null`.
-- `ColaEnlazada<T>` guarda `frente`, `fin` y `tamano` sobre nodos `Nodo<T>`; `enqueue` y `dequeue` son **O(1)**, y al irse la última persona `fin` también queda en `null`.
+- `Cola<T>` guarda `frente`, `fin` y `tamano` sobre nodos `Nodo<T>`; `enqueue` y `dequeue` son **O(1)**, y al irse la última persona `fin` también queda en `null`.
 - `Queue<E>` es la cola que Java ya trae, con dos familias de métodos y `ArrayDeque` como elección habitual; `PriorityQueue<E>` cambia el orden de llegada por prioridad.
 - La analogía se rompe donde importa: la cola no permite colarse ni salirse del medio, y la `PriorityQueue<E>` no se recorre en orden de salida. Pila y cola reciben las mismas llegadas y producen salidas opuestas.

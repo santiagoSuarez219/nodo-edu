@@ -117,10 +117,10 @@ hace útiles:
 - Si la sesión es una demo en vivo (no hay guía de estudiante), los apuntes
   son el único material de la sesión: deben bastar por sí solos para dictarla.
 
-### Dinámicas de clase obligatorias en `estructuras-de-datos`
+### Dinámicas de clase obligatorias en `estructuras-de-datos` y `analisis-de-algoritmos`
 
-En este curso la lección es lectura previa (aula invertida) y **la clase vive
-en los apuntes**. Todo apunte de `estructuras-de-datos` lleva las cuatro
+En estos cursos la lección es lectura previa (aula invertida) y **la clase vive
+en los apuntes**. Todo apunte de `estructuras-de-datos` y `analisis-de-algoritmos` lleva las cuatro
 dinámicas de `lesson-authoring` §3.1:
 
 - **🐞 Error planeado** (1–2 por sesión, dentro de los pasos de live coding):

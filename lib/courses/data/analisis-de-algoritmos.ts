@@ -175,40 +175,13 @@ export const analisisDeAlgoritmos: Course = {
       ],
     },
     {
-      id: "heaps-y-heapsort",
-      slug: "heaps-y-heapsort",
-      articleSlug: "heaps-y-heapsort",
-      order: 9,
-      title: "Heaps y heapsort",
-      topics: [
-        { title: "La propiedad de heap (max-heap y min-heap)" },
-        { title: "Mantener la propiedad de heap; construir un heap desde un arreglo" },
-        { title: "El algoritmo heapsort; colas de prioridad como aplicación de los heaps" },
-      ],
-    },
-    {
-      id: "quicksort-determinista-y-aleatorizado",
-      slug: "quicksort-determinista-y-aleatorizado",
-      articleSlug: "quicksort-determinista-y-aleatorizado",
-      order: 10,
-      title: "Quicksort determinista y aleatorizado",
-      topics: [
-        { title: "Descripción de quicksort: partición y recursión" },
-        { title: "Desempeño: peor caso O(n²) frente a caso promedio O(n log n)" },
-        { title: "Versión aleatorizada de quicksort y por qué mejora el comportamiento esperado" },
-      ],
-    },
-    {
-      id: "counting-radix-y-bucket-sort",
-      slug: "counting-radix-y-bucket-sort",
-      articleSlug: "counting-radix-y-bucket-sort",
-      order: 11,
-      title: "Counting sort, radix sort y bucket sort",
-      topics: [
-        { title: "Cota inferior para el ordenamiento por comparaciones: Ω(n log n)" },
-        { title: "Counting sort: cuándo es aplicable y por qué logra O(n)" },
-        { title: "Radix sort y bucket sort: ideas generales y supuestos sobre los datos" },
-      ],
+      id: "lab-evaluativo-02-dividir-y-vencer",
+      slug: "lab-evaluativo-02-dividir-y-vencer",
+      articleSlug: "lab-evaluativo-02-dividir-y-vencer",
+      kind: "guide",
+      order: 8.5,
+      title: "Laboratorio evaluativo 02 — Dividir y vencer",
+      topics: [],
     },
     {
       id: "medianas-seleccion-y-estructuras-elementales",
@@ -216,10 +189,12 @@ export const analisisDeAlgoritmos: Course = {
       articleSlug: "medianas-seleccion-y-estructuras-elementales",
       order: 12,
       title: "Medianas, selección y estructuras elementales",
+      summary:
+        "Cómo hallar el valor que ocuparía la posición k sin ordenar todo —selección en tiempo lineal esperado— y las estructuras elementales sobre las que se apoya casi todo lo demás: pilas, colas y listas enlazadas, con su costo por operación.",
       topics: [
         { title: "Mínimo y máximo; selección en tiempo lineal esperado" },
         { title: "Pilas y colas: operaciones e implementación con arreglos" },
-        { title: "Listas enlazadas: simple, doble; representación de árboles enraizados" },
+        { title: "Listas enlazadas simples y dobles; árboles enraizados (mención)" },
       ],
     },
     {
@@ -228,6 +203,8 @@ export const analisisDeAlgoritmos: Course = {
       articleSlug: "tablas-hash",
       order: 13,
       title: "Tablas hash",
+      summary:
+        "Cómo encontrar un dato sin recorrer la colección: funciones hash, colisiones resueltas con encadenamiento o direccionamiento abierto, y el factor de carga que explica por qué el costo esperado de buscar es Θ(1 + α) y no Θ(n).",
       topics: [
         { title: "Tablas de direccionamiento directo vs. tablas hash" },
         { title: "Funciones hash: método de la división, método de la multiplicación" },
@@ -235,6 +212,24 @@ export const analisisDeAlgoritmos: Course = {
           title:
             "Manejo de colisiones: encadenamiento y direccionamiento abierto (sondeo lineal, cuadrático, doble hashing)",
         },
+        { title: "Factor de carga y costo esperado: Θ(1 + α) y redimensionamiento" },
+      ],
+    },
+    {
+      id: "arboles-de-busqueda-binarios",
+      slug: "arboles-de-busqueda-binarios",
+      articleSlug: "arboles-de-busqueda-binarios",
+      order: 13.5,
+      title: "Árboles de búsqueda binarios",
+      summary:
+        "Un árbol de búsqueda binario cuelga las claves como carpetas en un tablero: buscar e insertar cuestan Θ(h), y la altura h decide si el tablero es un atajo o una fila.",
+      topics: [
+        { title: "Propiedad del árbol de búsqueda binario y vocabulario (raíz, hijos, hoja, subárbol, altura)" },
+        { title: "Búsqueda iterativa en un BST" },
+        { title: "Inserción iterativa en un BST" },
+        { title: "Recorrido en orden, mínimo y máximo" },
+        { title: "Altura y degeneración: Θ(h), Θ(n) frente a Θ(log n)" },
+        { title: "BST frente a tabla hash: consultas por rango y orden" },
       ],
     },
     {
@@ -282,9 +277,9 @@ export const analisisDeAlgoritmos: Course = {
       topics: [
         {
           title:
-            "Repaso integrador: recurrencias, divide y vencerás, ordenamiento, estructuras de datos, programación dinámica, voraces",
+            "Repaso integrador: recurrencias, divide y vencerás, estructuras de datos, programación dinámica, voraces",
         },
-        { title: "Retroalimentación general sobre los cinco informes de laboratorio" },
+        { title: "Retroalimentación general sobre los informes de laboratorio" },
       ],
     },
   ],
