@@ -88,8 +88,8 @@ Cada uno de los cuatro laboratorios evaluativos se entrega como un **informe de 
 | 9   | —                                              | Sin sesiones (Ordenamiento retirado del curso)                       |                     |
 | 10  | Divide y vencer (Cormen Cap. 4)                | Lunes 5 oct: Strassen y síntesis de divide y vencer                  | ★ Laboratorio 2     |
 | 11  | —                                              | Lunes 12 oct: festivo, sin clase                                     |                     |
-| 12  | Estructuras de datos (Cormen Cap. 9–10)        | Lunes 19 oct: selección/medianas; pilas, colas, listas enlazadas     |                     |
-| 13  | Estructuras de datos (Cormen Cap. 11)          | Lunes 26 oct: tablas hash                                            | ★ Laboratorio 3     |
+| 12  | Estructuras de datos (Cormen Cap. 9–10)        | Lunes 19 oct: selección/medianas; pilas, colas, listas enlazadas (sin sesión P) |                     |
+| 13  | Estructuras de datos (Cormen Cap. 11–12)       | Lunes 26 oct: tablas hash y árboles de búsqueda binarios             | ★ Laboratorio 3     |
 | 14  | —                                              | Lunes 2 nov: festivo, sin clase                                      |                     |
 | 15  | Programación dinámica y voraces (Cormen Cap. 15–16) | Lunes 9 nov: rod cutting y fundamentos de la PD; estrategia voraz (resto en lectura autónoma) |  |
 | 16  | —                                              | Lunes 16 nov: festivo, sin clase. Entrega asincrónica hasta el 22 nov | ★ Laboratorio 4 (entrega) |
@@ -256,7 +256,7 @@ curso-analisis-algoritmos/
 
 ---
 
-## Módulo 7 — Estructuras de datos (Cormen, Cap. 9–11) ★
+## Módulo 7 — Estructuras de datos (Cormen, Cap. 9–12) ★
 
 ### Semana 12 — Selección y estructuras elementales (lunes 19 oct)
 
@@ -265,22 +265,24 @@ curso-analisis-algoritmos/
 - Pilas y colas: operaciones e implementación con arreglos
 - Listas enlazadas: simple, doble; representación de árboles enraizados
 
-**P — Laboratorio: Selección y estructuras elementales**
+**P — Laboratorio: Selección y estructuras elementales** *(reajuste 2026-10-04: el lunes 19 oct se dicta sin sesión P; el material de la sesión queda en los apuntes de la T)*
 - Implementar el algoritmo de selección en tiempo lineal esperado (basado en partición tipo quicksort; al retirarse Ordenamiento, la partición se explica en esta sesión)
 - Implementar pila y cola con arreglo, y una lista simplemente enlazada
 - Comparar el costo de encontrar el k-ésimo menor elemento por selección vs. por ordenamiento completo
 
-### Semana 13 — Tablas hash ★ (lunes 26 oct)
+### Semana 13 — Tablas hash y árboles de búsqueda binarios ★ (lunes 26 oct)
 
-**T — Tablas hash**
+**T — Tablas hash y árboles de búsqueda binarios** *(reajuste 2026-10-04: se agregan los árboles de búsqueda, Cormen 12.1–12.3, como lección aparte)*
 - Tablas de direccionamiento directo vs. tablas hash
 - Funciones hash: método de la división, método de la multiplicación
 - Manejo de colisiones: encadenamiento y direccionamiento abierto (sondeo lineal, cuadrático, doble hashing)
+- Factor de carga y costo esperado Θ(1 + α)
+- Árboles de búsqueda binarios: propiedad, búsqueda e inserción, recorrido en orden, altura y degeneración (el borrado no se desarrolla)
 
 **P ★ — Laboratorio evaluativo 3: Estructuras de datos**
-- Preguntas de selección múltiple sobre operaciones y complejidades de pilas, colas, listas enlazadas y tablas hash
-- Preguntas abiertas: justificar la elección de una estructura de datos para un escenario dado
-- Explicación de un tema: el estudiante explica el manejo de colisiones (encadenamiento o direccionamiento abierto) en tablas hash
+- Preguntas de selección múltiple sobre operaciones y complejidades de pilas, colas, listas enlazadas, tablas hash y árboles de búsqueda binarios
+- Preguntas abiertas: justificar la elección de una estructura de datos para un escenario dado (incluye cuándo conviene un árbol de búsqueda por orden o rango frente a una tabla hash)
+- Explicación de un tema: el estudiante explica el manejo de colisiones (encadenamiento o direccionamiento abierto) en tablas hash, o la altura y la degeneración de un árbol de búsqueda binario
 - Parte práctica: partir de una solución basada en listas enlazadas con tiempos de respuesta deficientes y rediseñarla con una tabla hash propia; graficar y comparar los tiempos de búsqueda antes y después de la optimización
 - Informe de laboratorio en GitHub (`lab3-estructuras-datos/`) con rúbrica socializada previamente — **cierre de la evaluación Laboratorio 3 (15%)**
 

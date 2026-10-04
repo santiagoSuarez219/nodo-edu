@@ -1,7 +1,7 @@
 # Semana 12 — 19–25 de octubre
 
 **Rama:** `feat/semana-12-analisis-de-algoritmos`
-**Estado:** ⬜ En preparación / ✅ Material y cuestionario listos en desarrollo, pendiente de merge / ⬜ Mergeada a `development` / ⬜ Desplegada y abierta
+**Estado:** ⬜ En preparación / ⬜ Material y cuestionario listos en desarrollo / ✅ Mergeada a `development` / ⬜ Desplegada y abierta
 
 ---
 
