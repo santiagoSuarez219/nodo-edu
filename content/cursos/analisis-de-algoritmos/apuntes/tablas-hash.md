@@ -455,7 +455,7 @@ comparaciones; el costo crece con α, no con n por sí solo. Tras
 `redimensionar(1009)` el mismo conjunto de 800 códigos baja de 4,97 a 1,4
 comparaciones por búsqueda. Contrapunto honesto: redimensionar cuesta Θ(n + m)
 de una vez; se acepta porque se hace pocas veces. La regla práctica es
-redimensionar cuando α pasa de un umbral (p. ej. 1) y duplicar `m`.
+redimensionar cuando α pasa de un umbral (p. ej. 1) y pasar a un primo cercano al doble de `m`.
 
 **🐞 Error planeado:** escribe `redimensionar` «rápido», con la idea de que
 basta con alargar el arreglo:

@@ -384,8 +384,8 @@ frente a 1000. El costo de la poda es Θ(h + k), con `h` la altura (23 en este
 árbol) y `k` las claves devueltas (7), tal como dice la lectura. Una tabla
 hash no puede hacer esto: no conserva el orden, así que un rango obligaría a
 mirar todo. Y la consulta depende de `h`: en el árbol degenerado de 1000
-claves, la poda también sirve, pero el camino hasta el rango tiene 1000
-niveles de longitud.
+claves, la poda también sirve, pero el camino hasta el rango baja cientos
+de niveles.
 
 ## 👥 Reto en parejas — contar lecturas en un rango
 

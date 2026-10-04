@@ -144,9 +144,9 @@ En el tablero físico puedes elegir la primera carpeta a propósito, por ejemplo
 
 ## ¿Dónde aparece en la práctica?
 
-En un sistema de consolidación de telemedición hay 1.850.000 cuentas. Para una consulta puntual ("lectura de la cuenta 4417") la tabla hash de la lección anterior es $\Theta(1)$ esperado y no tiene rival. El BST gana donde el hash no puede: el **mínimo y el máximo** en $\Theta(h)$, el **recorrido ordenado** en $\Theta(n)$ y los **rangos**, como todas las lecturas de una cuenta entre dos fechas, en $\Theta(h + k)$ con $k$ resultados.
+En un sistema de consolidación de telemedición hay 1.850.000 cuentas. Para una consulta puntual ("lectura de la cuenta 4417") la tabla hash de la lección anterior es $\Theta(1)$ esperado y no tiene rival. El BST gana donde el hash no puede: el **mínimo y el máximo** en $\Theta(h)$, el **recorrido ordenado** en $\Theta(n)$ y los **rangos**, como todas las lecturas de una cuenta entre dos fechas (si la clave del árbol es el par cuenta-fecha), en $\Theta(h + k)$ con $k$ resultados.
 
-> ⚠️ **Advertencia con números:** el archivo de consolidación llega ordenado por cuenta. Insertarlo en orden en un BST da $h \approx n \approx 1{,}85 \cdot 10^6$: una lista. Las inserciones sumarían unas $n^2/2 \approx 1{,}7 \cdot 10^{12}$ comparaciones (cerca de dos días a $10^7$ por segundo), frente a $n \log_2 n \approx 3{,}9 \cdot 10^7$ si el árbol estuviera equilibrado ($\log_2 n \approx 21$). Una versión recursiva fallaría con `RecursionError` pasados unos 1.000 niveles, el límite por defecto de Python, y por eso `buscar` e `insertar` son iterativos. El hash no se ve afectado por el orden de entrada.
+> ⚠️ **Advertencia con números:** el archivo de consolidación llega ordenado por cuenta. Insertarlo en orden en un BST da $h \approx n \approx 1{,}85 \cdot 10^6$: una lista. Las inserciones sumarían unas $n^2/2 \approx 1{,}7 \cdot 10^{12}$ comparaciones (cerca de dos días a $10^7$ por segundo), frente a $n \log_2 n \approx 3{,}9 \cdot 10^7$ si el árbol estuviera equilibrado ($\log_2 n \approx 21$). Una versión recursiva fallaría con `RecursionError` pasados unos 1.000 niveles, el límite por defecto de Python, y por eso `buscar` e `insertar` son iterativos; el `en_orden` recursivo de esta lección sufriría lo mismo en un árbol así de profundo. El hash no se ve afectado por el orden de entrada.
 
 ## Síntesis
 

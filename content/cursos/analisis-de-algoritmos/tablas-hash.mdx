@@ -30,7 +30,7 @@ La secretaría resolvió esto con un mueble de 61 cajones numerados del 0 al 60.
 **Así en código:** una tabla de tamaño `m` y una función que comprime cualquier clave `k` a una posición entre 0 y m−1.
 
 - **Método de la división:** $h(k) = k \bmod m$. Con `m = 61` y `k = 2418307`: 2418307 = 61 · 39644 + 23, así que va al cajón 23. Conviene un `m` primo y lejos de una potencia de 2, para que no dependa solo de los últimos dígitos binarios del código.
-- **Método de la multiplicación:** $h(k) = \lfloor m \cdot (kA \bmod 1) \rfloor$, con $A \approx 0{,}618$. Con el mismo `k`: $kA \approx 1\,494\,513{,}726$, la parte fraccionaria es 0,726 y $\lfloor 61 \cdot 0{,}726 \rfloor = 44$. Aquí `m` no necesita ser primo; la idea es que la parte fraccionaria "revuelve" los dígitos.
+- **Método de la multiplicación:** $h(k) = \lfloor m \cdot (kA \bmod 1) \rfloor$, con $A = 0{,}618$ (una constante entre 0 y 1; Knuth sugiere un valor cercano a este). Con el mismo `k`: $kA \approx 1\,494\,513{,}726$, la parte fraccionaria es 0,726 y $\lfloor 61 \cdot 0{,}726 \rfloor = 44$. Aquí `m` no necesita ser primo; la idea es que la parte fraccionaria "revuelve" los dígitos.
 
 > **Función hash:** función `h` que asigna a cada clave posible una posición de una tabla de `m` casillas. Debe ser barata de calcular y repartir las claves de forma pareja.
 
@@ -176,7 +176,7 @@ Con esto puedes escribir una `TablaHash`, medir `insertar` y `buscar` al variar 
 ## Síntesis
 
 - **Archivador:** una pila cuesta Θ(n) por búsqueda; un mueble de cajones indexado por la clave la reduce a abrir un cajón.
-- **Función hash:** comprime la clave a un índice; división (`k mod m`, `m` primo) o multiplicación (con A ≈ 0,618).
+- **Función hash:** comprime la clave a un índice; división (`k mod m`, `m` primo) o multiplicación (con una constante A entre 0 y 1, p. ej. A = 0,618).
 - **Encadenamiento:** cada cajón guarda una lista; las colisiones se apilan, nada se pierde.
 - **Direccionamiento abierto:** sondeo lineal, cuadrático o doble hashing, con lápidas al borrar.
 - **Factor de carga:** α = n/m; costo esperado Θ(1 + α) bajo hash uniforme simple, Θ(n) en el peor caso.

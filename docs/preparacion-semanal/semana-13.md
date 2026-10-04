@@ -64,7 +64,7 @@ No aplica.
 - `tablas-hash` ganó un cuarto `topic` (factor de carga y costo esperado) y su `summary`; `title` y `order` no cambiaron.
 - En `insertar` del BST, dos ramas `if` en lugar de `getattr`/`setattr` — **motivo:** transparencia para quien nunca vio un árbol.
 - Se quitó de la lección del árbol la frase que decía que el caso de telemedición está "en estado de propuesta" — **motivo:** no debe llegar al estudiante.
-- Las lecciones superan el objetivo de longitud (186 y 157 líneas frente a 125–135 y 105–115) — **motivo:** el código con docstring completo; el usuario las aprobó así.
+- Las lecciones superan el objetivo de longitud (186 y 161 líneas frente a 125–135 y 105–115) — **motivo:** el código con docstring completo; el usuario las aprobó así.
 - Se igualó la longitud de las opciones del cuestionario y se reformuló la correcta de la P4 de hash para ceñirse a la lección.
 - Se actualizaron `info.md` y el cronograma (BST evaluable en el Lab 3) con aprobación del usuario.
 
@@ -75,7 +75,7 @@ No aplica.
 - [x] Checklist de `lesson-authoring` §8 recorrido
 - [x] `summary` presente en frontmatter **y** en registro TS
 - [ ] Coherencia cruzada teoría ↔ práctica ↔ cuestionario ↔ rúbrica (la rúbrica del Lab 3 aún no existe)
-- [ ] `@reviewer`: pendiente
+- [x] `@reviewer`: APROBADO con un hallazgo Mayor (constante del método de la multiplicación) y menores — corregidos: `A = 0,618` exacta en el ejemplo, clave compuesta del rango, mención del `en_orden` recursivo, «primo cercano al doble» al redimensionar, longitud de la bitácora. Sin corregir: frontmatter `level`/`type` distinto entre las dos lecciones (sin efecto en ejecución)
 
 ---
 
