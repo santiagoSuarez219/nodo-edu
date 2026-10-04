@@ -11,7 +11,7 @@ las seis sesiones de los tres cursos en una sola pasada.
 
 | Semana | Rango de fechas | Rama | Estado |
 |---|---|---|---|
-| [13](./semana-13.md) | 26 oct – 1 nov (AA) | `feat/semana-13-analisis-de-algoritmos` | AA: material y cuestionarios listos en desarrollo, pendiente de merge |
+| [13](./semana-13.md) | 26 oct – 1 nov (AA) | `feat/semana-13-analisis-de-algoritmos` (borrada) | AA: mergeada a `development` |
 | [12](./semana-12.md) | 19–25 oct (AA) | `feat/semana-12-analisis-de-algoritmos` (borrada) | AA: mergeada a `development` |
 | [08](./semana-08.md) | 21–27 sep (AA) | `feat/semana-07-08-analisis-de-algoritmos` (borrada) | **Desplegada y abierta en producción** |
 | [07](./semana-07.md) | 14–20 sep (AA) · 17 sep (PC) | `feat/semana-07-08-analisis-de-algoritmos` (borrada) · `feat/semana-07-programacion-cientifica` (borrada) | AA: **desplegada y abierta en producción** · PC: **desplegada y abierta en producción** |

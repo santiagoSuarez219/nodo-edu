@@ -1,7 +1,7 @@
 # Semana 13 — 26 de octubre – 1 de noviembre
 
 **Rama:** `feat/semana-13-analisis-de-algoritmos`
-**Estado:** ⬜ En preparación / ✅ Material y cuestionarios listos en desarrollo, pendiente de merge / ⬜ Mergeada a `development` / ⬜ Desplegada y abierta
+**Estado:** ⬜ En preparación / ⬜ Material y cuestionarios listos en desarrollo / ✅ Mergeada a `development` / ⬜ Desplegada y abierta
 
 ---
 
