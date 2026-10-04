@@ -86,12 +86,12 @@
 *Coincide con las Evaluaciones institucionales (16-20 oct) — clase normal.*
 **Módulo 7: Estructuras de datos (Cormen Cap. 9-10)**
 - **Sesión 1 (T):** Medianas y selección en tiempo lineal esperado; pilas, colas, listas enlazadas
-- **Sesión 2 (P):** Laboratorio — Selección y estructuras elementales
-  - La selección en tiempo lineal esperado usa una partición tipo quicksort; como Ordenamiento ya no se dicta, la partición se explica dentro de esta sesión.
+- **Sesión 2 (P):** Sin sesión de laboratorio (reajuste 2026-10-04). El material práctico de selección y estructuras elementales queda en los apuntes de la T.
+  - La selección en tiempo lineal esperado usa una partición tipo quicksort; como Ordenamiento ya no se dicta, la partición se explica dentro de la lección y los apuntes.
 
 ### Semana 13 — lunes 26 de octubre
-**Módulo 7: Estructuras de datos (Cormen Cap. 11)**
-- **Sesión 1 (T):** Tablas hash — funciones hash, encadenamiento, direccionamiento abierto
+**Módulo 7: Estructuras de datos (Cormen Cap. 11-12)**
+- **Sesión 1 (T):** Tablas hash — funciones hash, encadenamiento, direccionamiento abierto; árboles de búsqueda binarios (propiedad, búsqueda, inserción, recorrido en orden, altura y degeneración)
 - **Sesión 2 (P ★):** **Laboratorio evaluativo 3 — Estructuras de datos (15%)** *(antes Laboratorio 4)*
   - Entrega: informe en GitHub (`lab3-estructuras-datos/`)
   - ⚠️ Registrar en el SIA el acumulado de Laboratorios 1-3 (y el avance de Seguimiento) antes del 1 de noviembre
