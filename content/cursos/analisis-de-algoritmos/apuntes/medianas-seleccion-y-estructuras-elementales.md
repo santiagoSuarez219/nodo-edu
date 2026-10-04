@@ -1,5 +1,6 @@
-> Sesión P (Semana 12, lunes 19 de octubre de 2026) — laboratorio dictado en
-> vivo por el docente. Es la continuación práctica de la lección «Medianas,
+> Sesión T (Semana 12, lunes 19 de octubre de 2026) — clase dictada en vivo
+> por el docente; ese lunes no hay sesión P, así que aquí se reúne toda la
+> práctica. Es la continuación práctica de la lección «Medianas,
 > selección y estructuras elementales»: el estudiante ya la leyó y respondió el
 > cuestionario de cierre, así que aquí no se re-explica; se construye. Hilo
 > conductor: el escritorio del profesor el día del parcial (la pila de
@@ -295,7 +296,7 @@ for n in (1000, 2000, 4000):
 # 4000 6000999  15606
 ```
 
-Punto a resaltar: la columna del azar es varios cientos de veces menor y,
+Punto a resaltar: la columna del azar es cien veces menor o más y,
 aunque salta de una ejecución a otra, crece de forma aproximadamente lineal
 con `n`; la columna de referencia fija se multiplica por 4 cada vez que `n`
 se duplica y no cambia entre ejecuciones. La referencia al azar no elimina el peor caso: lo vuelve **improbable**
@@ -361,7 +362,7 @@ mayores) pero **sin copiar**: el arreglo queda en tres zonas contiguas. Es la
 partición de tres vías (la bandera holandesa de Dijkstra). Se escribe en vivo
 con un segundo error planeado y una función de verificación.
 
-Antes de escribirlo, ponga las tres versiones frente a frente:
+Antes de escribirlo, pon las tres versiones frente a frente:
 
 | | Tres listas (paso 1) | Dos zonas, Lomuto (paso 2) | Tres zonas (paso 5) |
 |---|---|---|---|
@@ -386,7 +387,7 @@ casilla `i`? ¿Ya lo miramos?»
 
 **Corrección:** al intercambiar con la casilla `mayor`, el elemento que
 llega a `i` viene del extremo derecho y **todavía no fue examinado**; hay
-que mirarlo, así que `i` no avanza. Solo avanzan `i` cuando el elemento
+que mirarlo, así que `i` no avanza. Solo avanza `i` cuando el elemento
 queda clasificado: menor (que además mueve `menor`) o igual.
 
 ```python
@@ -852,7 +853,8 @@ def ordenar_mezcla(valores: list[int], contador: Contador) -> list[int]:
         contador: Acumula comparaciones.
 
     Returns:
-        Una lista nueva, ordenada de menor a mayor.
+        La lista ordenada de menor a mayor (si tiene 0 o 1 elementos,
+        devuelve la misma lista recibida).
     """
     if len(valores) <= 1:
         return valores
@@ -1042,7 +1044,8 @@ def mayores_k(consumos: list[int], k: int, contador: Contador) -> list[int]:
         Una lista con k valores: los k mayores, con repetidos incluidos.
     """
     n = len(consumos)
-    # El valor que ocuparía el puesto n - k deja k puestos por encima de él.
+    # El valor que ocuparía el puesto n - k deja k - 1 puestos por encima
+    # de él (k contándolo a él).
     umbral = seleccionar_tres_zonas(consumos, n - k, contador)
     mayores = [x for x in consumos if x > umbral]  # estrictamente mayores
     # Son menos de k (a lo sumo k - 1). Los que faltan valen exactamente
@@ -1057,7 +1060,8 @@ obtenidas = mayores_k(muestra, 20, Contador())
 assert sorted(obtenidas) == sorted(muestra)[-20:]
 print(len(obtenidas), sorted(obtenidas)[:3])
 
-# Escala real del caso (en Python puro tarda un instante: medio segundo o menos en una laptop actual; el tiempo depende del equipo).
+# Escala real del caso (en Python puro tarda un instante, medio segundo o
+# menos en una laptop actual; el tiempo depende del equipo).
 consumos = generar(1_850_000)
 c_real = Contador()
 t0 = time.perf_counter()

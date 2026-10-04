@@ -229,7 +229,7 @@ El profesor ve todo el montón de un vistazo; el programa compara de a dos valor
 
 ## ¿Dónde aparece en la práctica?
 
-Un sistema de telemedición consolida 1.850.000 lecturas diarias y necesita las 500 de mayor consumo, sin importar su orden entre sí. Ordenar todo cuesta del orden de n · log₂ n ≈ 1,85 · 10⁶ × 20,8 ≈ 3,85 · 10⁷ operaciones. Seleccionar la posición `n − 500` cuesta del orden de n = 1,85 · 10⁶ y un filtrado final suma otras 1,85 · 10⁶: en total 3,7 · 10⁶: en papel, unas 10 veces menos operaciones. Esa cifra es un techo, no una predicción: la constante real de la selección es mayor que 1, y al medirla en código la ventaja baja a unas pocas veces (en la sesión de clase la medirás tú). Lo que no cambia es la forma: ordenar crece como n log n y seleccionar como n, así que la ventaja aumenta con n. Si además se quiere ese top 500 ordenado, ordenar solo esas 500 es barato.
+Un sistema de telemedición consolida 1.850.000 lecturas diarias y necesita las 500 de mayor consumo, sin importar su orden entre sí. Ordenar todo cuesta del orden de n · log₂ n ≈ 1,85 · 10⁶ × 20,8 ≈ 3,85 · 10⁷ operaciones. Seleccionar la posición `n − 500` cuesta del orden de n = 1,85 · 10⁶ y un filtrado final suma otras 1,85 · 10⁶: en total 3,7 · 10⁶, es decir, en papel unas 10 veces menos operaciones. Esa cifra es un techo, no una predicción: la constante real de la selección es mayor que 1, y al medirla en código la ventaja baja a unas pocas veces. Lo que no cambia es la forma: ordenar crece como n log n y seleccionar como n, así que la ventaja aumenta con n. Si además se quiere ese top 500 ordenado, ordenar solo esas 500 es barato.
 
 ## Síntesis
 
@@ -240,6 +240,6 @@ Un sistema de telemedición consolida 1.850.000 lecturas diarias y necesita las 
 - **Pilas y colas:** LIFO y FIFO con operaciones Θ(1) sobre arreglos de capacidad fija.
 - **Listas enlazadas:** insertar al inicio es Θ(1), buscar es Θ(n); la lista doble borra en Θ(1) un nodo ya localizado.
 - **La analogía:** el programa compara de a dos, el reparto cuesta memoria y el azar puede fallar.
-- **En la práctica:** seleccionar 500 de 1.850.000 lecturas es del orden de 10 a 20 veces más barato que ordenar todo.
+- **En la práctica:** seleccionar 500 de 1.850.000 lecturas es, en papel, unas 10 veces más barato que ordenar todo (medido, unas pocas veces).
 
 Lecturas: Cormen, cap. 9 (9.1 y 9.2) y cap. 10 (10.1 y 10.2).

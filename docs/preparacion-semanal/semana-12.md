@@ -68,7 +68,7 @@ No aplica.
 - [x] Checklist de `lesson-authoring` §8 recorrido
 - [x] `summary` presente en frontmatter **y** en registro TS
 - [x] Coherencia cruzada teoría ↔ apuntes ↔ cuestionario (las preguntas evitan las dos votaciones de los apuntes)
-- [ ] `@reviewer`: pendiente
+- [x] `@reviewer`: CAMBIOS REQUERIDOS → corregidos (cifra de la Síntesis alineada a «unas 10 veces en papel; medido, unas pocas»; promesa «la medirás tú» y etiqueta «Sesión P» de los apuntes retiradas; erratas menores). Pendiente de revisión: imports a mitad de archivo en el paso 8 de los apuntes (E402), que se pegan en un solo archivo
 
 ---
 
