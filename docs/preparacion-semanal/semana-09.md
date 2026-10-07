@@ -24,7 +24,7 @@ juguete del docente.
 |---|---|---|
 | E2 · Plan de lección | Aprobado | ✅ |
 | E3 · Lección `.mdx` + registro TS | `arreglos-y-dimensiones-numpy`, `order: 7`, `summary` agregado; se eliminaron "Dónde se rompe la analogía" y "¿Dónde aparece en tu trabajo con datos?" a pedido | ✅ |
-| E4 · Apuntes del docente | Pedidos por el usuario | ✅ (avance implícito a E5) |
+| E4 · Apuntes del docente | Pedidos por el usuario | ✅ (avance implícito a E5; sin aprobación explícita) |
 | E5 · Cuestionario de cierre | Propuesto: 6 preguntas → aprobadas 6 | ✅ |
 | E6 · Guía del estudiante | No — sesión en vivo (supuesto, **por confirmar**) | ⬜ |
 | E6 · Quiz A/B/C | No aplica — semana sin ★ | — |
@@ -70,7 +70,7 @@ No aplica — semana sin ★.
 - [x] Apuntes sin entrada TS; sin guía del estudiante (sesión en vivo)
 - [x] Preguntas publicadas y montadas en desarrollo (`list_lesson_questions`)
 - [x] Cambios de esquema: ninguno (`git diff --stat origin/main..HEAD -- supabase/` vacío)
-- [ ] `@reviewer`: pendiente
+- [x] `@reviewer`: APROBADO (1 mayor + menores, corregidos en el 2.º commit)
 
 ---
 
@@ -78,7 +78,7 @@ No aplica — semana sin ★.
 
 | Paso | Estado | Fecha / detalle |
 |---|---|---|
-| D0 · Alcance y checklist pre-despliegue | ✅ | Solo código, sin migraciones; build y lint en verde; catálogo de PC en producción listado: 15 entradas, 5 cerradas, sin huérfanas |
+| D0 · Alcance y checklist pre-despliegue | ✅ (preparativo en solo lectura; pendiente de merge) | Solo código, sin migraciones; build y lint en verde; catálogo de PC en producción listado: 15 entradas, 5 cerradas, sin huérfanas |
 | D1 · Lecciones nuevas cerradas por adelantado | ✅ (no aplica) | `arreglos-y-dimensiones-numpy` ya tiene fila de cierre en producción (4 ago, "Cierre solicitado por el docente") |
 | D2 · Merge a `main` y deploy en Vercel | ⬜ | rama `deploy/semana-09-programacion-cientifica` |
 | D3 · Banco de preguntas replicado a producción | ⬜ | crear keywords `numpy`, `slicing`, `mascaras-booleanas` + 6 preguntas |

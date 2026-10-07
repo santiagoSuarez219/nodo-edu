@@ -19,11 +19,11 @@ updatedAt: "2026-10-07"
 
 ## El libro de hojas de cálculo
 
-Abre en tu mente un libro de Excel o de Google Sheets donde registras temperaturas. Una **columna** guarda los días de una semana: siete celdas, una debajo de otra. Una **hoja** completa es una tabla: cada fila es una estación meteorológica y cada columna un día, así que 4 estaciones por 7 días son 28 celdas. Y el **libro** entero tiene una hoja por semana: la hoja 1 es la primera semana, la hoja 2 la segunda.
+Abre en tu mente un libro de Excel o de Google Sheets donde registras temperaturas. Una **fila** guarda los días de una semana de una estación: siete celdas, una al lado de otra. Una **hoja** completa es una tabla: cada fila es una estación meteorológica y cada columna un día, así que 4 estaciones por 7 días son 28 celdas. Y el **libro** entero tiene una hoja por semana: la hoja 1 es la primera semana, la hoja 2 la segunda.
 
-Para señalar una celda dices tres cosas, de lo grande a lo pequeño: "hoja 2, fila 3, columna 5". Con dos datos recorres una hoja; con uno, una columna.
+Para señalar una celda dices tres cosas, de lo grande a lo pequeño: "hoja 2, fila 3, columna 5". Con dos datos recorres una hoja; con uno, una fila.
 
-Hay reglas tácitas: todas las celdas guardan números, todas las filas tienen la misma cantidad de columnas y todas las hojas tienen el mismo tamaño. Una celda vacía no desaparece: sigue ocupando su lugar en la tabla. Puedes seleccionar un rango con el mouse, filtrar las filas que cumplen una condición o autollenar una serie (1, 2, 3, …) arrastrando. Todo eso tiene su versión en NumPy.
+Hay reglas tácitas: todas las celdas guardan números, todas las filas tienen la misma cantidad de columnas y todas las hojas tienen el mismo tamaño. Una celda vacía no desaparece: sigue ocupando su lugar en la tabla. Puedes seleccionar un rango con el mouse, filtrar las celdas que cumplen una condición o autollenar una serie (1, 2, 3, …) arrastrando. Todo eso tiene su versión en NumPy.
 
 ## Del libro al arreglo: dimensiones y ejes
 
@@ -31,7 +31,7 @@ NumPy es la librería de Python para trabajar con tablas numéricas. En Colab ya
 
 | En el libro | En NumPy | Dimensiones |
 |---|---|---|
-| Una columna | arreglo de una dimensión | 1D |
+| Una fila | arreglo de una dimensión | 1D |
 | Una hoja | arreglo de dos dimensiones | 2D |
 | El libro completo | arreglo de tres dimensiones | 3D |
 
@@ -39,8 +39,8 @@ NumPy es la librería de Python para trabajar con tablas numéricas. En Colab ya
 import numpy as np
 
 lista_plana = [21.5, 23.0, 22.4]
-columna = np.array(lista_plana)
-print(columna)
+fila = np.array(lista_plana)
+print(fila)
 ```
 
 ```text
@@ -70,7 +70,7 @@ En la hoja de cálculo puedes escribir celda por celda, llenar una tabla con cer
 
 ```python
 print(np.zeros((2, 3)))      # tabla de 2 filas x 3 columnas llena de ceros
-print(np.ones(4))            # una columna de cuatro unos
+print(np.ones(4))            # una fila de cuatro unos
 print(np.arange(0, 10, 2))   # serie de 0 a 10 saltando de 2 en 2
 print(np.linspace(0, 1, 5))  # 5 valores equidistantes entre 0 y 1
 ```
@@ -160,13 +160,15 @@ print(temps[(temps > 20) & (temps < 30)])
 [24.5 25.1 26.3 27.  25.8 24.9 26.1 29.4 29.8]
 ```
 
+Ojo: el resultado de `temps[mascara]` es una lista plana de valores; ya no hay filas ni columnas, porque se pierde la forma de tabla.
+
 Para combinar condiciones se usan `&` (y) y `|` (o), cada comparación entre paréntesis; `and` y `or` no funcionan con arreglos. Esto te permite quedarte con los datos que importan sin escribir un bucle.
 
 > **Máscara booleana:** arreglo de `True`/`False` con la misma forma que los datos; al usarla como índice conserva solo las posiciones en `True`.
 
 ## Síntesis
 
-- **El libro de hojas de cálculo:** columna = 1D, hoja = 2D, libro = 3D; a una celda se llega con "hoja, fila, columna".
+- **El libro de hojas de cálculo:** fila = 1D, hoja = 2D, libro = 3D; a una celda se llega con "hoja, fila, columna".
 - **Dimensiones y ejes:** un `ndarray` es una tabla numérica; `np.array` convierte listas, y las listas de listas son filas.
 - **Crear arreglos:** `zeros`, `ones`, `arange` (sin el final), `linspace` (con el final).
 - **Atributos:** `shape`, `ndim`, `size` y `dtype` son la etiqueta de la hoja.

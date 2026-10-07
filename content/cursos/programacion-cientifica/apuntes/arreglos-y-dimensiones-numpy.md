@@ -43,7 +43,7 @@ es 4 × 7 = 28 celdas. Pedir al grupo que prediga la salida **antes** de
 ejecutar. Señalar también que `27.0` se imprime como `27.` y `31.0` como
 `31.`: NumPy solo recorta la presentación, el valor sigue siendo decimal.
 
-Ahora una sola columna de la hoja (los siete días de EST-01) para comparar
+Ahora una sola fila de la hoja (los siete días de EST-01) para comparar
 una dimensión con dos:
 
 ```python
@@ -68,7 +68,7 @@ línea por separado y pedir al grupo que adivine la salida antes:
 
 ```python
 print(np.zeros((2, 3)))      # hoja de 2 filas x 3 columnas llena de ceros
-print(np.ones(4))            # una columna de cuatro unos
+print(np.ones(4))            # una fila de cuatro unos
 print(np.arange(0, 10, 2))   # serie de 0 a 10 saltando de 2 en 2 (el 10 NO entra)
 print(np.linspace(0, 1, 5))  # 5 valores equidistantes entre 0 y 1 (el 1 SI entra)
 ```
@@ -301,8 +301,7 @@ si hay más de 70 %, explicas rápido y sigues; si hay menos de 30 %, vuelves a 
 > arreglo de enteros y ver que se trunca a `9`) usa un comportamiento que la
 > lección no cubre, así que no diagnostica la lectura previa. Se cambió por
 > esta pregunta, que sí cae en lo leído (máscaras y forma) y es distinta de
-> las del cuestionario de cierre. Revisar contra `list_lesson_questions` una
-> vez creado el cuestionario. El truncamiento de `dtype` queda como pregunta
+> las del cuestionario de cierre. El truncamiento de `dtype` queda como pregunta
 > socrática opcional, marcada como fuera de la lectura.
 
 ## 👥 Reto en parejas — matriz de notas
