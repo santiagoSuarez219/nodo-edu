@@ -148,8 +148,10 @@ export const programacionCientifica: Course = {
       articleSlug: "arreglos-y-dimensiones-numpy",
       order: 7,
       title: "Arreglos y dimensiones (NumPy)",
+      summary:
+        "Organiza las temperaturas de varias estaciones como una tabla numérica: arreglos NumPy de una, dos y tres dimensiones, sus atributos (shape, dtype, ndim, size), y cómo señalar celdas, recortar bloques y filtrar con máscaras booleanas, igual que en una hoja de cálculo.",
       topics: [
-        { title: "Instalación e importación de NumPy" },
+        { title: "Importación de NumPy en Colab (ya viene instalado)" },
         { title: "Creación de arreglos 1D, 2D y n-D: array, zeros, ones, arange, linspace" },
         { title: "Atributos de un arreglo: shape, dtype, ndim, size" },
         { title: "Indexación, slicing y máscaras booleanas" },
