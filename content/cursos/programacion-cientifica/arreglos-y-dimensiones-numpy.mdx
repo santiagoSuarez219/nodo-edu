@@ -1,5 +1,181 @@
 ---
 title: "Arreglos y dimensiones (NumPy)"
-summary: ""
-updatedAt: 2026-07-18
+course: "Programación Científica"
+course_code: "PC"
+level: "Primeros semestres"
+type: "Apuntes teóricos"
+language: "Python 3 (Google Colab)"
+difficulty: "Básico"
+estimated_time: "Lectura previa de 12 minutos (Semana 9)"
+presentation: true
+slides_hint: "Cada sección ## es una diapositiva. Presentación sincrona."
+date: "2026-10-07"
+author: "Asistente de Docencia"
+summary: "Organiza las temperaturas de varias estaciones como una tabla numérica: arreglos NumPy de una, dos y tres dimensiones, sus atributos (shape, dtype, ndim, size), y cómo señalar celdas, recortar bloques y filtrar con máscaras booleanas, igual que en una hoja de cálculo."
+updatedAt: "2026-10-07"
 ---
+
+> 📖 Lectura previa a la clase — unos 12 minutos. Al final, responde la autoevaluación.
+
+## El libro de hojas de cálculo
+
+Abre en tu mente un libro de Excel o de Google Sheets donde registras temperaturas. Una **columna** guarda los días de una semana: siete celdas, una debajo de otra. Una **hoja** completa es una tabla: cada fila es una estación meteorológica y cada columna un día, así que 4 estaciones por 7 días son 28 celdas. Y el **libro** entero tiene una hoja por semana: la hoja 1 es la primera semana, la hoja 2 la segunda.
+
+Para señalar una celda dices tres cosas, de lo grande a lo pequeño: "hoja 2, fila 3, columna 5". Con dos datos recorres una hoja; con uno, una columna.
+
+Hay reglas tácitas: todas las celdas guardan números, todas las filas tienen la misma cantidad de columnas y todas las hojas tienen el mismo tamaño. Una celda vacía no desaparece: sigue ocupando su lugar en la tabla. Puedes seleccionar un rango con el mouse, filtrar las filas que cumplen una condición o autollenar una serie (1, 2, 3, …) arrastrando. Todo eso tiene su versión en NumPy.
+
+## Del libro al arreglo: dimensiones y ejes
+
+NumPy es la librería de Python para trabajar con tablas numéricas. En Colab ya viene instalada: solo la importas, con el alias estándar `np`.
+
+| En el libro | En NumPy | Dimensiones |
+|---|---|---|
+| Una columna | arreglo de una dimensión | 1D |
+| Una hoja | arreglo de dos dimensiones | 2D |
+| El libro completo | arreglo de tres dimensiones | 3D |
+
+```python
+import numpy as np
+
+lista_plana = [21.5, 23.0, 22.4]
+columna = np.array(lista_plana)
+print(columna)
+```
+
+```text
+[21.5 23.  22.4]
+```
+
+Una lista de listas se convierte en una hoja: cada lista interna es una fila.
+
+```python
+hoja = np.array([[21.5, 23.0, 22.4],
+                 [18.2, 19.0, 17.8]])
+print(hoja)
+```
+
+```text
+[[21.5 23.  22.4]
+ [18.2 19.  17.8]]
+```
+
+> **Arreglo (`ndarray`):** tabla de valores numéricos organizados en una o más dimensiones, todos del mismo tipo y con forma rectangular.
+
+> **Eje:** cada dirección en la que puedes moverte dentro del arreglo. En una hoja, el eje 0 recorre las filas (baja) y el eje 1 recorre las columnas (avanza). En el libro, el eje 0 son las hojas.
+
+## Crear arreglos: escribirlos, llenarlos y generar series
+
+En la hoja de cálculo puedes escribir celda por celda, llenar una tabla con ceros o arrastrar para autollenar una serie. NumPy hace lo mismo con funciones:
+
+```python
+print(np.zeros((2, 3)))      # tabla de 2 filas x 3 columnas llena de ceros
+print(np.ones(4))            # una columna de cuatro unos
+print(np.arange(0, 10, 2))   # serie de 0 a 10 saltando de 2 en 2
+print(np.linspace(0, 1, 5))  # 5 valores equidistantes entre 0 y 1
+```
+
+```text
+[[0. 0. 0.]
+ [0. 0. 0.]]
+[1. 1. 1. 1.]
+[0 2 4 6 8]
+[0.   0.25 0.5  0.75 1.  ]
+```
+
+Fíjate en la diferencia: `np.arange(inicio, fin, paso)` **no incluye** el final (llega hasta 8), mientras que `np.linspace(inicio, fin, cantidad)` **sí lo incluye** y tú eliges cuántos valores quieres. Para el libro de dos semanas, 4 estaciones y 7 días, pasas tres dimensiones: `np.zeros((2, 4, 7))`.
+
+> **Tupla de forma:** el par o terna entre paréntesis, como `(2, 3)`, que indica cuántos elementos hay en cada eje, de afuera hacia adentro.
+
+## Leer la etiqueta de la hoja: shape, ndim, size, dtype
+
+Antes de trabajar con una hoja ajena, miras cuántas filas y columnas tiene. Un arreglo expone esa "etiqueta" en cuatro atributos. Esta es la hoja de la semana, con las temperaturas en °C:
+
+```python
+temps = np.array([
+    [24.5, 25.1, 26.3, 27.0, 25.8, 24.9, 26.1],   # EST-01
+    [29.4, 30.8, 31.5, 32.1, 30.2, 29.8, 31.0],   # EST-02
+    [14.2, 13.8, 15.1, 14.6, 13.5, 14.9, 15.4],   # EST-03
+    [33.0, 34.2, 35.1, 33.8, 32.6, 31.9, 34.5],   # EST-04
+])
+print(temps.shape, temps.ndim, temps.size, temps.dtype)
+```
+
+```text
+(4, 7) 2 28 float64
+```
+
+`shape` dice cuántas filas y columnas hay, `ndim` cuántos ejes, `size` cuántas celdas en total y `dtype` qué tipo de número guarda cada una. Si en la lista hay un solo decimal, todo el arreglo se vuelve decimal: `np.array([1, 2, 3.5])` tiene `dtype` `float64`, y `np.array([1, 2, 3])` tiene `int64`.
+
+> **`shape`:** tupla con el tamaño de cada eje. **`dtype`:** tipo de dato común a todos los elementos del arreglo.
+
+## Señalar una celda y recortar un bloque: indexación y slicing
+
+Señalar una celda es dar sus coordenadas, y como en Python se cuenta desde 0, la estación 1 es la fila 0. Seleccionar un rango con el mouse es el **slicing**: `inicio:fin`, con el fin excluido, y `:` solo significa "todo el eje".
+
+```python
+print(temps[1, 2])        # fila 1, columna 2
+print(temps[-1, 0])       # ultima fila, primera columna
+print(temps[:, 2])        # toda la columna 2 (un dia, todas las estaciones)
+print(temps[1, :])        # toda la fila 1 (una estacion, todos los dias)
+print(temps[0:2, 1:4])    # bloque: filas 0-1, columnas 1-3
+```
+
+```text
+31.5
+33.0
+[26.3 31.5 15.1 35.1]
+[29.4 30.8 31.5 32.1 30.2 29.8 31. ]
+[[25.1 26.3 27. ]
+ [30.8 31.5 32.1]]
+```
+
+En el libro de tres ejes, la dirección "hoja, fila, columna" se escribe con tres índices en una sola línea:
+
+```python
+libro = np.array([temps, temps])   # dos semanas (aqui, la misma hoja repetida)
+print(libro.shape, libro[0, 1, 2])
+```
+
+```text
+(2, 4, 7) 31.5
+```
+
+Con esto lees cualquier celda, fila, columna o bloque sin recorrer nada con un `for`.
+
+## Filtrar con una condición: máscaras booleanas
+
+Filtrar las celdas por una condición en la hoja de cálculo marca las que cumplen. NumPy lo hace con una **máscara**: una tabla del mismo tamaño llena de `True` y `False`.
+
+```python
+mascara = temps > 30
+print(mascara[1])          # la fila de EST-02
+print(temps[mascara])      # solo los valores que cumplen
+print(temps[(temps > 20) & (temps < 30)])
+```
+
+```text
+[False  True  True  True  True False  True]
+[30.8 31.5 32.1 30.2 31.  33.  34.2 35.1 33.8 32.6 31.9 34.5]
+[24.5 25.1 26.3 27.  25.8 24.9 26.1 29.4 29.8]
+```
+
+Para combinar condiciones se usan `&` (y) y `|` (o), cada comparación entre paréntesis; `and` y `or` no funcionan con arreglos. Esto te permite quedarte con los datos que importan sin escribir un bucle.
+
+> **Máscara booleana:** arreglo de `True`/`False` con la misma forma que los datos; al usarla como índice conserva solo las posiciones en `True`.
+
+## Síntesis
+
+- **El libro de hojas de cálculo:** columna = 1D, hoja = 2D, libro = 3D; a una celda se llega con "hoja, fila, columna".
+- **Dimensiones y ejes:** un `ndarray` es una tabla numérica; `np.array` convierte listas, y las listas de listas son filas.
+- **Crear arreglos:** `zeros`, `ones`, `arange` (sin el final), `linspace` (con el final).
+- **Atributos:** `shape`, `ndim`, `size` y `dtype` son la etiqueta de la hoja.
+- **Indexación y slicing:** `a[i, j]` para una celda, `a[:, j]` y `a[i, :]` para columna y fila, `a[i:j, k:l]` para un bloque.
+- **Máscaras booleanas:** `a[a > x]`, combinando condiciones con `&` y `|` entre paréntesis.
+
+| Quiero… | Escribo… |
+|---|---|
+| Una celda | `a[i, j]` |
+| Una columna / una fila | `a[:, j]` / `a[i, :]` |
+| Un bloque | `a[i0:i1, j0:j1]` |
+| Los valores que cumplen una condición | `a[a > x]` |
