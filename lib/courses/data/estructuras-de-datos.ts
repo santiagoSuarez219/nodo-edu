@@ -368,6 +368,15 @@ export const estructurasDeDatos: Course = {
       ],
     },
     {
+      id: "lab-pilas-proyecto-de-aula",
+      slug: "lab-pilas-proyecto-de-aula",
+      articleSlug: "lab-pilas-proyecto-de-aula",
+      kind: "guide",
+      order: 26.5,
+      title: "Laboratorio — Pilas en el proyecto de aula",
+      topics: [],
+    },
+    {
       id: "implementacion-de-colas-en-java",
       slug: "implementacion-de-colas-en-java",
       articleSlug: "implementacion-de-colas-en-java",
