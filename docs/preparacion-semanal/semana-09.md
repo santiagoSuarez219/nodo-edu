@@ -42,11 +42,11 @@ juguete del docente.
 | Lección | Entorno | IDs de preguntas | Publicadas | Montadas (`list_lesson_questions`) |
 |---|---|---|---|---|
 | `arreglos-y-dimensiones-numpy` | desarrollo | `a173b6cf-f65d-4b8f-8500-a090c5e43955`, `bcd843b3-51f8-4e83-8c31-7aebaf4fcb3e`, `d1bd6231-01eb-4b62-b366-23553af2ace9`, `4922a441-77da-4e1a-8b82-c74c01cd0d83`, `0510c95a-a775-410d-9040-793104f7b159`, `ab865cb0-4510-4b24-8364-7f8c0f962e3f` | ✅ | ✅ (orden 0-5) |
-| `arreglos-y-dimensiones-numpy` | **producción** | — | ⬜ | ⬜ (0 preguntas al 2026-10-07) |
+| `arreglos-y-dimensiones-numpy` | **producción** | `d7f2eed8-78af-4c2d-9fa1-e4abdb705a4f`, `2ec25159-8b05-40e0-8139-72bf80a15e3c`, `b246f57f-a06f-4ef7-8cd9-01262c883932`, `07253fdd-9f71-48af-a45d-12f41845d689`, `c7da5236-6c88-478c-9c3c-f0a6d8f374c9`, `a34042f4-3ac1-4932-b689-c57ff24b6411` | ✅ | ✅ (orden 0-5, 2026-10-07) |
 
 > Las preguntas **no viajan con el deploy**: se recrean en producción en D3.
 > Keywords nuevas creadas en desarrollo: `numpy`, `slicing`, `mascaras-booleanas`.
-> **Confirmado el 2026-10-07 que no existen en producción**: crearlas primero.
+> Keywords creadas en producción el 2026-10-07 (`numpy`, `slicing`, `mascaras-booleanas`, kind `tema`).
 
 ### Quiz calificable A/B/C
 
@@ -80,17 +80,19 @@ No aplica — semana sin ★.
 |---|---|---|
 | D0 · Alcance y checklist pre-despliegue | ✅ (preparativo en solo lectura; pendiente de merge) | Solo código, sin migraciones; build y lint en verde; catálogo de PC en producción listado: 15 entradas, 5 cerradas, sin huérfanas |
 | D1 · Lecciones nuevas cerradas por adelantado | ✅ (no aplica) | `arreglos-y-dimensiones-numpy` ya tiene fila de cierre en producción (4 ago, "Cierre solicitado por el docente") |
-| D2 · Merge a `main` y deploy en Vercel | ⬜ | rama `deploy/semana-09-programacion-cientifica` |
-| D3 · Banco de preguntas replicado a producción | ⬜ | crear keywords `numpy`, `slicing`, `mascaras-booleanas` + 6 preguntas |
-| D4 · Lecciones abiertas a los estudiantes | ⬜ | programacion-cientifica → `arreglos-y-dimensiones-numpy` (cuando el docente lo indique) |
+| D2 · Merge a `main` y deploy en Vercel | ✅ | rama `deploy/semana-09-y-lab-pilas`, commit `6949a6c`; deploy `dpl_3wj4aVuK1RXFnLFgaJr4DUoHc1H1` `READY` en `www.nod0.dev` (2026-10-07). Incluyó el lab de Pilas (ED) |
+| D3 · Banco de preguntas replicado a producción | ✅ | 3 keywords + 6 preguntas creadas, publicadas y montadas (`list_lesson_questions` en producción: 6, orden 0-5) |
+| D4 · Lecciones abiertas a los estudiantes | ⬜ | **Pendiente:** `arreglos-y-dimensiones-numpy` sigue cerrada hasta que el docente indique abrirla |
 | D5 · Verificación end-to-end en producción | ⬜ | |
-| D6 · Bitácora cerrada y rama `deploy/` borrada | ⬜ | |
+| D6 · Bitácora cerrada y rama `deploy/` borrada | ◐ | rama `deploy/` borrada (local); D4/D5 pendientes |
 
-- [ ] Verificado que las lecciones de semanas futuras siguen **cerradas** (hoy: `operaciones-vectorizadas…`, `carga-e-inspeccion…`, `filtrado-agregacion…`, `matplotlib-y-seaborn` cerradas)
+- [x] Verificado que las lecciones de semanas futuras siguen **cerradas** (`disabled_count: 5`, sin huérfanas, 2026-10-07)
 
 ## Pendientes
 
-- Confirmar la fecha real de la clase para planificar el margen de despliegue.
+- Abrir `arreglos-y-dimensiones-numpy` a los estudiantes (D4) cuando el docente lo indique.
+- Guía `lab-pilas-proyecto-de-aula` (ED): nació abierta al desplegar y se cerró minutos después (`courses-mcp-prod`, 2026-10-07 21:14 UTC); abrir cuando se defina la fecha de entrega junto con el lab de Colas.
+- D5: verificación visual en producción, a cargo del usuario.
 - Confirmar que la sesión es en vivo (sin guía del estudiante).
 - Decidir si se recorta la lección (181 líneas).
 - Decidir si se actualizan las skills por la excepción metodológica de PC.
