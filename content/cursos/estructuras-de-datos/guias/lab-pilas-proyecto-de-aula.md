@@ -1,6 +1,6 @@
 ---
 title: "Laboratorio — Pilas en el proyecto de aula"
-updatedAt: "2026-10-07"
+updatedAt: "2026-10-13"
 ---
 
 # Laboratorio — Pilas en el proyecto de aula
@@ -36,6 +36,7 @@ consola que solo llama al `Service`.
   `model/structures/` de su proyecto, junto con `ListaSimple<T>`.
 - Laboratorio "Lista Simple (Momento 2)": su proyecto ya tiene entidades con
   colecciones, un `Service` por entidad y un menú en `view/`.
+- Clase de utilidad `ConsoleUtils` (Parte 5): toda la lectura por consola pasa por ella.
 - Lección "Diseño con TAD y orientación a objetos": la `View` pide datos y
   muestra resultados; las reglas viven en el `Service`.
 
@@ -257,35 +258,68 @@ operaciones, consultar la última, deshacerla y contar las que quedan.
 ### Parte 5 — Construya el menú en `view/`
 
 **Archivo nuevo:** `src/view/MenuPilaView.java`. Sigue el mismo patrón de
-`MenuPrincipal`: recibe el `Service` por constructor, lee con `Scanner`, llama
-**un** método del `Service` por opción y muestra el resultado. La `View` no
-importa `Pila`, `Nodo` ni ningún paquete de `model.structures`.
+`MenuPrincipal`: recibe el `Service` por constructor, lee con la clase de
+utilidad `ConsoleUtils` (no use `Scanner` directamente), llama **un** método del
+`Service` por opción y muestra el resultado. La `View` no importa `Pila`,
+`Nodo` ni ningún paquete de `model.structures`.
+
+Si su proyecto aún no tiene `src/utils/ConsoleUtils.java`, créelo tal cual:
+
+```java
+package utils;
+
+import java.util.Scanner;
+
+public class ConsoleUtils {
+    private static final Scanner scanner = new Scanner(System.in);
+
+    private ConsoleUtils() {
+    }
+
+    public static String leerTexto(String mensaje) {
+        System.out.print(mensaje);
+        return scanner.nextLine();
+    }
+
+    public static int leerEntero(String mensaje) {
+        System.out.print(mensaje);
+        int valor = scanner.nextInt();
+        scanner.nextLine();
+        return valor;
+    }
+
+    public static double leerDecimal(String mensaje) {
+        System.out.print(mensaje);
+        double valor = scanner.nextDouble();
+        scanner.nextLine();
+        return valor;
+    }
+
+    public static void cerrar() {
+        scanner.close();
+    }
+}
+```
 
 ```java
 package view;
 
 import model.domain.Transaccion;
 import service.CuentaService;
-
-import java.util.Scanner;
+import utils.ConsoleUtils;
 
 public class MenuPilaView {
     private final CuentaService cuentaService;
-    private final Scanner entrada;
 
     public MenuPilaView(CuentaService cuentaService) {
         this.cuentaService = cuentaService;
-        this.entrada = new Scanner(System.in);
     }
 
     public void iniciar() {
         int opcion;
         do {
             mostrarOpciones();
-            opcion = Integer.parseInt(entrada.nextLine());
-            // TODO 1: envolver el switch en try / catch de IllegalStateException y
-            //         IllegalArgumentException; el catch imprime e.getMessage() y el
-            //         menú sigue en pie (una pila vacía NO debe cerrar el programa)
+            opcion = ConsoleUtils.leerEntero("Elija una opción: ");
             switch (opcion) {
                 case 1 -> registrar();
                 case 2 -> deshacer();
@@ -307,40 +341,39 @@ public class MenuPilaView {
         System.out.println("5. Cantidad de operaciones (size)");
         System.out.println("6. Listar operaciones (Parte 7)");
         System.out.println("0. Salir");
-        System.out.print("Elija una opción: ");
     }
 
     private void registrar() {
-        System.out.print("Número de cuenta: ");
-        String numeroCuenta = entrada.nextLine();
-        System.out.print("Tipo (Deposito / Retiro): ");
-        String tipo = entrada.nextLine();
-        System.out.print("Monto: ");
-        double monto = Double.parseDouble(entrada.nextLine());
-        // TODO 2: llamar a cuentaService.registrarOperacion y confirmar por consola
+        String numeroCuenta = ConsoleUtils.leerTexto("Número de cuenta: ");
+        String tipo = ConsoleUtils.leerTexto("Tipo (Deposito / Retiro): ");
+        double monto = ConsoleUtils.leerDecimal("Monto: ");
+        // TODO 1: llamar a cuentaService.registrarOperacion y confirmar por consola
     }
 
     private void deshacer() {
-        System.out.print("Número de cuenta: ");
-        String numeroCuenta = entrada.nextLine();
-        // TODO 3: llamar a deshacerUltimaOperacion y mostrar la transacción deshecha
+        String numeroCuenta = ConsoleUtils.leerTexto("Número de cuenta: ");
+        // TODO 2: si cuentaService.sinOperacionesPorDeshacer(numeroCuenta) es true,
+        //         mostrar "No hay operaciones por deshacer" y salir del método;
+        //         si no, llamar a deshacerUltimaOperacion y mostrar la transacción deshecha
+        //         -- sin este chequeo, un pop sobre pila vacía lanza la excepción y cierra el programa
     }
 
     private void consultarUltima() {
-        // TODO 4: pedir la cuenta, llamar a consultarUltimaOperacion y mostrarla
+        // TODO 3: pedir la cuenta; si no hay operaciones, mostrar el mismo mensaje del TODO 2;
+        //         si hay, llamar a consultarUltimaOperacion y mostrarla
     }
 
     private void verSiHayOperaciones() {
-        // TODO 5: pedir la cuenta, llamar a sinOperacionesPorDeshacer y mostrar un
+        // TODO 4: pedir la cuenta, llamar a sinOperacionesPorDeshacer y mostrar un
         //         mensaje legible ("No hay operaciones por deshacer" / "Hay operaciones")
     }
 
     private void contar() {
-        // TODO 6: pedir la cuenta, llamar a contarOperaciones y mostrar el número
+        // TODO 5: pedir la cuenta, llamar a contarOperaciones y mostrar el número
     }
 
     private void listar() {
-        // TODO 7: se completa en la Parte 7, cuando exista listarOperaciones en el Service
+        // TODO 6: se completa en la Parte 7, cuando exista listarOperaciones en el Service
     }
 }
 ```
@@ -348,10 +381,15 @@ public class MenuPilaView {
 **Requisitos:**
 - Cada opción 1 a 5 ejecuta exactamente una de las cinco operaciones del TAD;
   la opción 6 usa `listarOperaciones` de la Parte 7.
-- La `View` no contiene reglas de negocio: ningún `if` que decida si se puede
-  deshacer; esa decisión es de la pila y del `Service`.
-- Una operación inválida (pila vacía, cuenta inexistente, tipo desconocido)
-  imprime el mensaje de la excepción y regresa al menú.
+- Toda lectura de consola pasa por `ConsoleUtils`: la `View` no crea ni importa
+  `Scanner`.
+- La `View` no usa `try` / `catch`. Antes de deshacer o consultar, pregunta al
+  `Service` con `sinOperacionesPorDeshacer` y, si no hay nada, muestra un
+  mensaje y vuelve al menú: una pila vacía no cierra el programa.
+- La `View` no contiene otras reglas de negocio: qué se revierte, cómo y en qué
+  orden es del `Service` y de la pila.
+- El menú asume datos válidos (cuenta existente, tipo `Deposito` o `Retiro`);
+  no se valida en la `View`.
 
 ---
 
@@ -438,11 +476,12 @@ repositorio al vencer el plazo; no se entrega `.zip`.
 
 ```
 proyecto-aula/
-  README.md                     # secuencia de verificación
   src/
     Main.java                   # cablea el menú de pilas
+    utils/
+      ConsoleUtils.java         # lectura de consola (créelo si aún no existe)
     view/
-      MenuPilaView.java         # nuevo: menú de las cinco operaciones y el listado
+      <Menú de la entidad>View.java   # nuevo: menú de las cinco operaciones y el listado
     service/
       <Service de la entidad>.java   # seis métodos nuevos (cinco del TAD + listarOperaciones)
     model/
@@ -454,8 +493,8 @@ proyecto-aula/
         Pila.java               # nuevo
 ```
 
-El `README.md` incluye el resultado de ejecutar esta **secuencia de verificación** desde el menú (texto pegado de la
-consola o capturas):
+Su menú debe poder recorrer, sin cerrarse, esta **secuencia de verificación**,
+que el docente ejecutará al revisar:
 
 1. Registrar tres operaciones sobre la misma cuenta.
 2. Consultar la última operación y comprobar que es la tercera.
@@ -465,8 +504,8 @@ consola o capturas):
    estaba antes de ella.
 5. Contar: debe decir 2.
 6. Deshacer las dos restantes. Preguntar si hay operaciones: debe decir que no.
-7. Intentar deshacer otra vez: el menú muestra el mensaje de pila vacía y sigue
-   funcionando.
+7. Intentar deshacer otra vez: el menú muestra el mensaje de que no hay
+   operaciones por deshacer y sigue funcionando.
 
 **Plazo de entrega:** por definir. Se anunciará junto con el laboratorio de
 Colas, que continúa sobre este mismo proyecto.
@@ -477,11 +516,10 @@ Colas, que continúa sobre este mismo proyecto.
 
 | Criterio | Puntos | Descripción |
 |---|---|---|
-| **`Pila<T>` correcta** | 25 | `push`, `pop`, `peek`, `isEmpty` y `size` funcionan con `Nodo<T>`, cuestan O(1) sin ningún ciclo, mantienen `tamano` al día y no importan nada de `java.util`; `push` enlaza el nodo nuevo al tope **antes** de mover el tope. |
+| **`Pila<T>` correcta** | 30 | `push`, `pop`, `peek`, `isEmpty` y `size` funcionan con `Nodo<T>`, cuestan O(1) sin ningún ciclo, mantienen `tamano` al día y no importan nada de `java.util`; `push` enlaza el nodo nuevo al tope **antes** de mover el tope. |
 | **Casos límite** | 10 | `pop` y `peek` sobre pila vacía lanzan `IllegalStateException` con mensaje; `push(null)` lanza `IllegalArgumentException` sin alterar la pila; ninguna operación devuelve `null` para señalar un error. |
-| **Integración en entidad y `Service`** | 25 | La pila es un atributo `private` de la entidad indicada en la Parte 1 e inicializado en el constructor; el `Service` expone los cinco métodos más `listarOperaciones`, ninguno devuelve ni recibe `Pila<T>`, deshacer revierte el efecto en el dominio sin volver a apilar, y listar deja la pila intacta (mismo tamaño y mismo orden). |
-| **Menú en `view/`** | 15 | `MenuPilaView` ofrece las cinco operaciones y el listado, cada opción llama a un solo método del `Service`, no importa nada de `model.structures`, y una pila vacía no cierra el programa. |
-| **Pruebas y documentación** | 10 | El `README.md` contiene la secuencia de verificación completa con los resultados esperados. |
+| **Integración en entidad y `Service`** | 30 | La pila es un atributo `private` de la entidad indicada en la Parte 1 e inicializado en el constructor; el `Service` expone los cinco métodos más `listarOperaciones`, ninguno devuelve ni recibe `Pila<T>`, deshacer revierte el efecto en el dominio sin volver a apilar, y listar deja la pila intacta (mismo tamaño y mismo orden). |
+| **Menú en `view/`** | 15 | El menú ofrece las cinco operaciones y el listado, cada opción llama a un solo método del `Service`, lee solo con `ConsoleUtils` (sin `Scanner` ni `try` / `catch`), no importa nada de `model.structures`, y una pila vacía no cierra el programa porque el menú consulta `sinOperacionesPorDeshacer` antes de deshacer o consultar. |
 | **Buenas prácticas** | 15 | Commits descriptivos y frecuentes sobre la rama `feature/`, fusionada a `main`; nombres de clases, métodos y variables siguiendo las convenciones de Java. |
 | **TOTAL** | **100** | |
 
