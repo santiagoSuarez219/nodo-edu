@@ -391,6 +391,15 @@ export const estructurasDeDatos: Course = {
       ],
     },
     {
+      id: "lab-colas-proyecto-de-aula",
+      slug: "lab-colas-proyecto-de-aula",
+      articleSlug: "lab-colas-proyecto-de-aula",
+      kind: "guide",
+      order: 28.5,
+      title: "Laboratorio — Colas en el proyecto de aula",
+      topics: [],
+    },
+    {
       id: "fundamentos-de-recursividad",
       slug: "fundamentos-de-recursividad",
       articleSlug: "fundamentos-de-recursividad",
