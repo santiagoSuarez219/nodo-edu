@@ -569,7 +569,7 @@ recorrer letra por letra.
 - *"En el Paso 4, ¿qué pasa si convertimos con `(char) lector.read()` antes de
   comparar con `-1`?"* — Respuesta esperada: el `-1` convertido a `char`
   deja de ser `-1` (se vuelve el carácter de código 65535) y la condición
-  `c != -1` nunca se cumple: el ciclo no termina. Por eso se guarda en `int`
+  `c != -1` es siempre verdadera: el ciclo no termina. Por eso se guarda en `int`
   y solo después se convierte.
 - *"¿Por qué `guardar()` del Service usa `true` y no `false`? ¿Cuándo
   usaríamos `false`?"* — Respuesta esperada: `true` conserva los clientes
@@ -595,7 +595,7 @@ se eligen problemas que ejercitan la misma destreza de esta sesión: recorrer
 una secuencia de caracteres de principio a fin y decidir qué hacer con cada
 uno.
 
-- **HackerRank — Java Stdin and Stdout II** (Fácil):
+- **HackerRank — Java Stdin and Stdout II**:
   [hackerrank.com/challenges/java-stdin-stdout](https://www.hackerrank.com/challenges/java-stdin-stdout/problem).
   Leer datos de la entrada estándar (el flujo de entrada de la consola) e
   imprimirlos.
