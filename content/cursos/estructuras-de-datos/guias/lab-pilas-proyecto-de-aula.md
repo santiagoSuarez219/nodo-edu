@@ -1,6 +1,6 @@
 ---
 title: "Laboratorio — Pilas en el proyecto de aula"
-updatedAt: "2026-10-07"
+updatedAt: "2026-10-13"
 ---
 
 # Laboratorio — Pilas en el proyecto de aula

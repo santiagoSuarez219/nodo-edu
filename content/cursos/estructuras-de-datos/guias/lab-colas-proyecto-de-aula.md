@@ -5,7 +5,7 @@ updatedAt: "2026-10-13"
 
 # Laboratorio — Colas en el proyecto de aula
 
-Repositorio de referencia del proyecto (Sistema Bancario), donde este laboratorio ya está resuelto: [github.com/santiagoSuarez219/estructura-de-datos-sistema-bancario](https://github.com/santiagoSuarez219/estructura-de-datos-sistema-bancario). Úsalo como referencia para ver cómo encaja cada pieza; la implementación en tu proyecto debe ser tuya y adaptada a tu dominio.
+Repositorio de referencia del proyecto (Sistema Bancario), donde este laboratorio ya está resuelto: [github.com/santiagoSuarez219/estructura-de-datos-sistema-bancario](https://github.com/santiagoSuarez219/estructura-de-datos-sistema-bancario). Úselo como referencia para ver cómo encaja cada pieza; la implementación en su proyecto debe ser suya y adaptada a su dominio.
 
 ## Objetivo
 
@@ -335,10 +335,11 @@ del TAD. El `Service` es el único que toca la cola: recibe datos simples de la
 
 ```java
 // Dentro de ClienteService (ajuste los nombres a su entidad)
+// Imports necesarios: model.domain.Ventanilla y model.structures.Cola
 
+// Una sola ventanilla por Service: si se creara una nueva en cada método,
+// cada operación vería una fila distinta
 private final Ventanilla ventanilla = new Ventanilla("Ventanilla 1");
-// TODO 0: una sola ventanilla por Service; si creara una nueva en cada método,
-//         cada operación vería una fila distinta
 
 public void registrarLlegada(String identificacion) {
     // TODO 1: buscar al cliente con el buscador que su Service ya tiene
@@ -519,7 +520,7 @@ desde el frente. La `Cola<T>` sigue sin salir del `Service`: la `View` solo
 recibe texto.
 
 ```java
-// Dentro de ClienteService
+// Dentro de ClienteService (ya importa Ventanilla y Cola)
 
 public String listarEnEspera() {
     Cola<Cliente> fila = ventanilla.getFila();
