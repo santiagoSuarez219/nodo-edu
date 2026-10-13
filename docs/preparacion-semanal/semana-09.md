@@ -82,16 +82,15 @@ No aplica — semana sin ★.
 | D1 · Lecciones nuevas cerradas por adelantado | ✅ (no aplica) | `arreglos-y-dimensiones-numpy` ya tiene fila de cierre en producción (4 ago, "Cierre solicitado por el docente") |
 | D2 · Merge a `main` y deploy en Vercel | ✅ | rama `deploy/semana-09-y-lab-pilas`, commit `6949a6c`; deploy `dpl_3wj4aVuK1RXFnLFgaJr4DUoHc1H1` `READY` en `www.nod0.dev` (2026-10-07). Incluyó el lab de Pilas (ED) |
 | D3 · Banco de preguntas replicado a producción | ✅ | 3 keywords + 6 preguntas creadas, publicadas y montadas (`list_lesson_questions` en producción: 6, orden 0-5) |
-| D4 · Lecciones abiertas a los estudiantes | ⬜ | **Pendiente:** `arreglos-y-dimensiones-numpy` sigue cerrada hasta que el docente indique abrirla |
+| D4 · Lecciones abiertas a los estudiantes | ✅ | 2026-10-07: `arreglos-y-dimensiones-numpy` (PC) y `lab-pilas-proyecto-de-aula` (ED) abiertas con `courses-mcp-prod`; semanas 10 a 13 de PC siguen cerradas (`disabled_count: 4`) |
 | D5 · Verificación end-to-end en producción | ⬜ | |
-| D6 · Bitácora cerrada y rama `deploy/` borrada | ◐ | rama `deploy/` borrada (local); D4/D5 pendientes |
+| D6 · Bitácora cerrada y rama `deploy/` borrada | ◐ | rama `deploy/` borrada (local); D5 pendiente |
 
 - [x] Verificado que las lecciones de semanas futuras siguen **cerradas** (`disabled_count: 5`, sin huérfanas, 2026-10-07)
 
 ## Pendientes
 
-- Abrir `arreglos-y-dimensiones-numpy` a los estudiantes (D4) cuando el docente lo indique.
-- Guía `lab-pilas-proyecto-de-aula` (ED): nació abierta al desplegar y se cerró minutos después (`courses-mcp-prod`, 2026-10-07 21:14 UTC); abrir cuando se defina la fecha de entrega junto con el lab de Colas.
+- Guía `lab-pilas-proyecto-de-aula` (ED) abierta sin fecha de entrega: definirla junto con el lab de Colas.
 - D5: verificación visual en producción, a cargo del usuario.
 - Confirmar que la sesión es en vivo (sin guía del estudiante).
 - Decidir si se recorta la lección (181 líneas).
