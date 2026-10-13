@@ -51,26 +51,31 @@ const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 //      función de guarda sin exponer nada: no es reversible, y para pasar la
 //      comprobación hay que tener ya la clave.
 // ─────────────────────────────────────────────────────────────
+// Desde 2026-10-13 el entorno de desarrollo también puede ser el proyecto
+// cloud `nodo-dev`: se acepta solo su URL exacta (nunca un patrón *.supabase.co).
+const DEV_CLOUD_URL = 'https://amkghsjjrmfjjvxuzadm.supabase.co';
 const isLocalUrl = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?/i.test(supabaseUrl);
-if (!isLocalUrl) {
+const isDevCloudUrl = supabaseUrl.replace(/\/+$/, '') === DEV_CLOUD_URL;
+if (!isLocalUrl && !isDevCloudUrl) {
   console.error('❌ ABORTADO: este script solo puede correr contra la base de DESARROLLO.');
   console.error(`   NEXT_PUBLIC_SUPABASE_URL apunta a: ${supabaseUrl}`);
-  console.error('   Se esperaba localhost/127.0.0.1 (túnel SSH a mirp-lab, ver CLAUDE.md → "Base de datos").');
+  console.error('   Se esperaba localhost/127.0.0.1 o el proyecto cloud nodo-dev (ver CLAUDE.md → "Base de datos").');
   process.exit(1);
 }
 
 // Huellas SHA-256 de las claves `service_role` aceptadas: la del stack local
-// de `mirp-lab` y la clave demo del CLI de Supabase (formato JWT heredado,
-// que aún aparece según la versión). Si alguna vez se regenera el stack local
-// con claves nuevas, recalcular con:
-//   node -e 'console.log(require("crypto").createHash("sha256").update(process.env.SUPABASE_SERVICE_ROLE_KEY).digest("hex"))'
+// de `mirp-lab`, la clave demo del CLI de Supabase (formato JWT heredado,
+// que aún aparece según la versión) y la del proyecto cloud `nodo-dev`. Si
+// alguna vez se regeneran las claves, recalcular con:
+//   node --env-file=.env.local -e 'console.log(require("crypto").createHash("sha256").update(process.env.SUPABASE_SERVICE_ROLE_KEY).digest("hex"))'
 const LOCAL_SERVICE_KEY_HASHES = new Set([
   'c85debb55f2f204d868cc1552c42faa143b4c675f61363ab040dd50b5b5304cd',
   '70541e07fd4f900b66e289f5be55c85f9bef1def4924a5b0c518c45ea1688c12',
+  '76215085e37438fbe723bdb91f636e48bb2362bd2353cf1213ebf750fe93907e', // nodo-dev (cloud)
 ]);
 const keyHash = createHash('sha256').update(serviceRoleKey).digest('hex');
 if (!LOCAL_SERVICE_KEY_HASHES.has(keyHash)) {
-  console.error('❌ ABORTADO: la SUPABASE_SERVICE_ROLE_KEY no es la del stack local.');
+  console.error('❌ ABORTADO: la SUPABASE_SERVICE_ROLE_KEY no es la de un entorno de desarrollo.');
   console.error(`   La URL dice "${supabaseUrl}", pero la clave no coincide con ninguna clave local conocida.`);
   console.error('   Eso significa que el destino real puede ser producción — por ejemplo, un');
   console.error('   túnel SSH o el proxy de scripts/latency-proxy.mjs reenviando a la base real.');

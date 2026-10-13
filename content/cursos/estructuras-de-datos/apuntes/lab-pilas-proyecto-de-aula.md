@@ -140,7 +140,7 @@ public class CuentaService {
     // pop: retira la última transacción y revierte su efecto en el saldo
     public Transaccion deshacerUltimaOperacion(String numeroCuenta) {
         Cuenta cuenta = buscarCuentaOFallar(numeroCuenta);
-        // si la pila está vacía, pop lanza IllegalStateException y se propaga a la View
+        // si la pila está vacía, pop lanza IllegalStateException; la View lo evita preguntando antes con isEmpty
         Transaccion ultima = cuenta.getOperacionesRecientes().pop();
         if (ultima.getTipo().equals("Deposito")) {
             cuenta.retirar(ultima.getMonto());   // lo contrario de depositar
@@ -185,43 +185,75 @@ hoy.
 
 ## Paso 4 — `MenuPilaView` en `view/`
 
+Primero, la lectura de consola. Si el proyecto aún no tiene `ConsoleUtils`, se
+crea en `src/utils/`; con ella ningún menú vuelve a tocar `Scanner`:
+
+```java
+package utils;
+
+import java.util.Scanner;
+
+public class ConsoleUtils {
+    private static final Scanner scanner = new Scanner(System.in); // un único Scanner para todo el programa
+
+    private ConsoleUtils() {
+    }
+
+    public static String leerTexto(String mensaje) {
+        System.out.print(mensaje);
+        return scanner.nextLine();
+    }
+
+    public static int leerEntero(String mensaje) {
+        System.out.print(mensaje);
+        int valor = scanner.nextInt();
+        scanner.nextLine();
+        return valor;
+    }
+
+    public static double leerDecimal(String mensaje) {
+        System.out.print(mensaje);
+        double valor = scanner.nextDouble();
+        scanner.nextLine();
+        return valor;
+    }
+
+    public static void cerrar() {
+        scanner.close();
+    }
+}
+```
+
 ```java
 package view;
 
 import model.domain.Transaccion;
 import service.CuentaService;
-
-import java.util.Scanner;
+import utils.ConsoleUtils;
 
 public class MenuPilaView {
+    private static final String SIN_OPERACIONES = "No hay operaciones por deshacer";
+
     private final CuentaService cuentaService;
-    private final Scanner entrada;
 
     public MenuPilaView(CuentaService cuentaService) {
         this.cuentaService = cuentaService;
-        this.entrada = new Scanner(System.in);
     }
 
     public void iniciar() {
         int opcion;
         do {
             mostrarOpciones();
-            opcion = Integer.parseInt(entrada.nextLine());
-            try {
-                switch (opcion) {
-                    case 1 -> registrar();
-                    case 2 -> deshacer();
-                    case 3 -> consultarUltima();
-                    case 4 -> verSiHayOperaciones();
-                    case 5 -> contar();
-                    case 6 -> listar();
-                    case 0 -> System.out.println("Saliendo del menú de pilas...");
-                    default -> System.out.println("Opción inválida");
-                }
-            } catch (IllegalStateException | IllegalArgumentException e) {
-                // pila vacía, cuenta inexistente o tipo inválido: se informa y el
-                // menú sigue en pie. La View no decide nada; solo muestra el mensaje
-                System.out.println("No se pudo completar: " + e.getMessage());
+            opcion = ConsoleUtils.leerEntero("Elija una opción: ");
+            switch (opcion) {
+                case 1 -> registrar();
+                case 2 -> deshacer();
+                case 3 -> consultarUltima();
+                case 4 -> verSiHayOperaciones();
+                case 5 -> contar();
+                case 6 -> listar();
+                case 0 -> System.out.println("Saliendo del menú de pilas...");
+                default -> System.out.println("Opción inválida");
             }
         } while (opcion != 0);
     }
@@ -234,37 +266,43 @@ public class MenuPilaView {
         System.out.println("5. Cantidad de operaciones (size)");
         System.out.println("6. Listar operaciones");
         System.out.println("0. Salir");
-        System.out.print("Elija una opción: ");
     }
 
     private String pedirCuenta() {
-        System.out.print("Número de cuenta: ");
-        return entrada.nextLine();
+        return ConsoleUtils.leerTexto("Número de cuenta: ");
     }
 
     private void registrar() {
         String numeroCuenta = pedirCuenta();
-        System.out.print("Tipo (Deposito / Retiro): ");
-        String tipo = entrada.nextLine();
-        System.out.print("Monto: ");
-        double monto = Double.parseDouble(entrada.nextLine());
+        String tipo = ConsoleUtils.leerTexto("Tipo (Deposito / Retiro): ");
+        double monto = ConsoleUtils.leerDecimal("Monto: ");
         cuentaService.registrarOperacion(numeroCuenta, tipo, monto);
         System.out.println("Operación registrada: " + tipo + " " + monto);
     }
 
     private void deshacer() {
-        Transaccion deshecha = cuentaService.deshacerUltimaOperacion(pedirCuenta());
+        String numeroCuenta = pedirCuenta();
+        // sin try / catch: se pregunta primero con isEmpty, así pop nunca se llama con la pila vacía
+        if (cuentaService.sinOperacionesPorDeshacer(numeroCuenta)) {
+            System.out.println(SIN_OPERACIONES);
+            return;
+        }
+        Transaccion deshecha = cuentaService.deshacerUltimaOperacion(numeroCuenta);
         System.out.println("Operación deshecha: " + deshecha);
     }
 
     private void consultarUltima() {
-        Transaccion ultima = cuentaService.consultarUltimaOperacion(pedirCuenta());
-        System.out.println("Última operación: " + ultima);
+        String numeroCuenta = pedirCuenta();
+        if (cuentaService.sinOperacionesPorDeshacer(numeroCuenta)) {
+            System.out.println(SIN_OPERACIONES);
+            return;
+        }
+        System.out.println("Última operación: " + cuentaService.consultarUltimaOperacion(numeroCuenta));
     }
 
     private void verSiHayOperaciones() {
         boolean vacia = cuentaService.sinOperacionesPorDeshacer(pedirCuenta());
-        System.out.println(vacia ? "No hay operaciones por deshacer" : "Hay operaciones por deshacer");
+        System.out.println(vacia ? SIN_OPERACIONES : "Hay operaciones por deshacer");
     }
 
     private void contar() {
@@ -278,9 +316,13 @@ public class MenuPilaView {
 }
 ```
 
-Punto a resaltar: ninguna importación de `model.structures`. El único tipo de
-dominio que la `View` conoce es `Transaccion`, y solo para imprimirlo; `toString()`
-de `Transaccion` ya fue definido en la lección de operaciones sobre la lista.
+Punto a resaltar: ninguna importación de `model.structures` ni de `java.util`.
+El único tipo de dominio que la `View` conoce es `Transaccion`, y solo para
+imprimirlo; `toString()` de `Transaccion` ya fue definido en la lección de
+operaciones sobre la lista. La protección contra la pila vacía no es un
+`try` / `catch`: es preguntar con `isEmpty` (vía `sinOperacionesPorDeshacer`)
+antes de llamar a `pop` o `peek`, igual que la cajera mira si hay alguien antes
+de llamar al siguiente.
 
 ## Paso 5 — `Main`
 
@@ -393,7 +435,7 @@ Sobre una cuenta con saldo inicial 1000 y número `"001"`:
 2  → Operación deshecha: Retiro 50.0      (saldo 1200)
 2  → Operación deshecha: Deposito 200.0   (saldo 1000)
 4  → No hay operaciones por deshacer
-2  → No se pudo completar: La pila está vacía   (el menú sigue)
+2  → No hay operaciones por deshacer   (el menú sigue)
 ```
 
 Si el equipo falla este bloque, la causa casi siempre es una de tres: `push`
