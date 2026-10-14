@@ -110,7 +110,7 @@ No aplica — semana sin ★.
 ## Ronda 2 — `estructuras-de-datos`, T2 (2026-10-14)
 
 **Rama:** `feat/semana-10-estructuras-de-datos` (nueva, desde `development`)
-**Estado:** ✅ Contenido listo · ✅ `@reviewer` (aprobado, correcciones aplicadas) · ⬜ Mergeada a `development` · ⬜ Desplegada en producción
+**Estado:** ✅ Contenido listo · ✅ `@reviewer` (aprobado, correcciones aplicadas) · ✅ Mergeada a `development` (2026-10-14, `efcb6cc`; rama borrada) · ⬜ Desplegada en producción
 
 **Alcance confirmado por el usuario:** lección de la sesión T2 de la Semana 10
 (martes 13 oct, **ya dictada**; la ronda empezó el 14 oct): `BufferedReader` y
