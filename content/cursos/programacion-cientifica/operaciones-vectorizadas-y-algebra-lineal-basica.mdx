@@ -50,7 +50,7 @@ print(fahrenheit.shape)
 (4, 7)
 ```
 
-Compara con una lista de Python: `[1, 2] * 2` repite la lista (`[1, 2, 1, 2]`), mientras que `np.array([1, 2]) * 2` multiplica cada celda (`[2 4]`).
+Compara con una lista de Python: `[1, 2] * 2` repite la lista (`[1, 2, 1, 2]`) y `[1, 2] + [3, 4]` las une (`[1, 2, 3, 4]`), mientras que `np.array([1, 2]) * 2` multiplica cada celda (`[2 4]`) y `np.array([1, 2]) + np.array([3, 4])` las suma celda por celda (`[4 6]`).
 
 > **Operación vectorizada:** operación que se aplica a todos los elementos de un arreglo a la vez, sin escribir un bucle. El recorrido ocurre dentro de NumPy, en código compilado.
 
@@ -72,10 +72,10 @@ print(temps[2] ** 2)       # cada temperatura de EST-03 al cuadrado
 [201.64 190.44 228.01 213.16 182.25 222.01 237.16]
 ```
 
-Las comparaciones también son vectorizadas y devuelven una máscara, como viste en la lección anterior. Con ella puedes leer los valores que cumplen una condición o reemplazarlos:
+Las comparaciones también son vectorizadas y devuelven una máscara, como viste en «Arreglos y dimensiones (NumPy)». Con ella puedes leer los valores que cumplen una condición o reemplazarlos:
 
 ```python
-topada = temps.copy()          # copia, para no modificar temps
+topada = temps.copy()          # copia: sin ella, topada y temps serian la misma tabla y el cambio de abajo tambien alteraria temps
 topada[topada > 30] = 30       # ninguna celda pasa de 30
 print(topada[3])
 ```
@@ -140,7 +140,7 @@ Las **funciones universales** (_ufuncs_) son funciones de NumPy que se aplican c
 
 ```python
 print(np.round(temps[0] / 3, 1))         # redondea a 1 decimal
-desv = temps - temps.mean()              # desviacion de cada celda frente al promedio
+desv = temps - temps.mean()              # frente al promedio de las 28 celdas (mean se explica en la siguiente seccion)
 print(np.abs(desv[0]).round(2))          # valor absoluto
 print(np.maximum(temps[2], 20))          # el mayor entre cada celda y 20
 print(np.sqrt(temps[2]).round(2))        # raiz cuadrada de cada celda
@@ -228,7 +228,7 @@ zonas = np.array([[0.5, 0.5, 0.0, 0.0],
 por_zona = zonas @ temps
 print(por_zona.shape)
 print(por_zona[:, 0])                         # dia 0, las dos zonas
-print((pesos @ temps).shape)                  # el promedio ponderado de los 7 dias
+print((pesos @ temps).shape)                  # 7 promedios ponderados, uno por dia
 ```
 
 ```text
@@ -237,7 +237,7 @@ print((pesos @ temps).shape)                  # el promedio ponderado de los 7 d
 (7,)
 ```
 
-Cada celda de `zonas @ temps` es el producto punto de una fila de `zonas` con una columna de `temps`. Para que sea posible, las formas deben encajar:
+Cada celda de `zonas @ temps` es el producto punto de una fila de `zonas` con una columna de `temps`. Con `pesos @ temps` pasa lo mismo: `pesos` tiene forma `(4,)`, NumPy lo trata como una sola fila `(1, 4)` y el resultado, una fila de 7 valores, queda de forma `(7,)`. Para que el producto sea posible, las formas deben encajar:
 
 ```text
 (n, m) @ (m, p) = (n, p)

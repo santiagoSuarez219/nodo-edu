@@ -1,7 +1,7 @@
 # Semana 10 — 9–13 oct (ED) · 8 oct (PC)
 
-**Rama:** `feat/semana-10-estructuras-de-datos`
-**Estado:** ✅ Contenido listo · ✅ `@reviewer` · ✅ Mergeada a `development` (2026-10-14, `e1a5d0c`; rama borrada) · ✅ Desplegada en producción (2026-10-14, `c95785b`) · ⬜ Abierta a estudiantes (decisión del usuario: se deja **cerrada**)
+**Rama (ronda 1, ED):** `feat/semana-10-estructuras-de-datos`
+**Estado (ronda 1, ED):** ✅ Contenido listo · ✅ `@reviewer` · ✅ Mergeada a `development` (2026-10-14, `e1a5d0c`; rama borrada) · ✅ Desplegada en producción (2026-10-14, `c95785b`) · ⬜ Abierta a estudiantes (decisión del usuario: se deja **cerrada**)
 
 > Una ronda cubre **un curso**. Esta semana tiene rondas de `estructuras-de-datos` (rondas 1 y 2) y de `programacion-cientifica` (ronda 3, al final del archivo).
 
@@ -258,12 +258,12 @@ No aplica — semana sin ★.
 
 ### Decisiones tomadas por Claude en nombre del docente
 
-- **Lección de 280 líneas, el doble de la meta (100–130)** — **motivo:** los bloques de código con su salida real y las trazas a mano ocupan casi todo; recortarlos sacaba contenido comprometido. El usuario aprobó sin pedir recorte. Lo más prescindible: la sección 4 (ufuncs) o el ejemplo de `keepdims`.
+- **Lección de 280 líneas, sin recorte** — **motivo:** las 100–130 líneas son la medida de ED/AA (aula invertida); PC usa el esqueleto pragmático y sus lecciones previas miden entre 183 y 401 líneas, así que 280 está dentro de lo habitual del curso. Los bloques con su salida real y las trazas a mano ocupan casi todo. El usuario aprobó sin pedir recorte.
 - **Formato de lectura previa (aula invertida) en PC** — **motivo:** la lección de la Semana 9 ya lo usa; la skill dice que PC no lo exige, pero se siguió el precedente por continuidad.
 - **Salidas redondeadas con `np.round`/`.round(2)`** — **motivo:** sin ello el producto punto imprime `24.759999999999998`.
 - **Datos ilustrativos inventados:** `ajuste_dia`, `ajuste_est`, `pesos` (0.4, 0.3, 0.2, 0.1) y `zonas` (norte/sur 0.5 cada una) — **motivo:** hacen falta para ilustrar broadcasting y producto matricial.
 - **Errores deliberados de los apuntes dentro de `try/except`** — **motivo:** para que el cuaderno de Colab no se detenga en vivo.
-- **Reto de extensión de los apuntes mide la fórmula de Fahrenheit con `%timeit`** (1.000.000 de valores; ~23 ms lista y ~0,5 ms arreglo en una ejecución local, no en Colab) — **motivo:** la S9 lo prometía; los tiempos son orden de magnitud.
+- **Reto de extensión de los apuntes mide la fórmula de Fahrenheit con `%timeit`** (1.000.000 de valores; ~23 ms lista y ~0,5 ms arreglo en una ejecución local, no en Colab) — **motivo:** los apuntes de la S9 solo anotan que las operaciones vectorizadas son de la Semana 10, no que se medirían tiempos; es un reto opcional de este apunte. Los tiempos son orden de magnitud.
 - **Preguntas del cuestionario con ejemplos distintos a los de la lección** (`[10, 20]`, tabla (3,5), vectores `[1,2,3]` y `[4,5,6]`, matrices (3,4) y (4,2)) — **motivo:** el cuestionario es verificación de lectura y no debe repetir lo ya resuelto.
 - **Ufuncs y `keepdims` sin pregunta de cierre** — **motivo:** se propusieron 5 preguntas, una por concepto de peso; el usuario las aprobó así.
 - **Las explicaciones de cada pregunta no quedaron en el banco** — **motivo:** `create_question` no tiene campo para ellas.
@@ -279,8 +279,12 @@ No aplica — semana sin ★.
 - [x] Código de la lección y de los apuntes ejecutado con NumPy por los agentes que los escribieron; respuestas del cuestionario verificadas con NumPy
 - [x] Preguntas publicadas **y montadas**, verificado con `list_lesson_questions`
 - [x] Apuntes sin entrada TS; no existe guía del estudiante
-- [ ] Coherencia cruzada teoría ↔ apuntes ↔ cuestionario: revisada solo a nivel de estructura; la revisión fina queda a `@reviewer`
-- [ ] `@reviewer`: pendiente
+- [x] Coherencia cruzada teoría ↔ apuntes ↔ cuestionario: revisada por `@reviewer` (el banco no es accesible para él; el texto exacto de las preguntas lo comprobé yo al crearlas)
+- [x] `@reviewer`: **APROBADO** (sin bloqueantes; 39 salidas de código coinciden con la ejecución real). Hallazgos aplicados en un segundo commit:
+  - **Mayor:** la P1 usa `lista + lista`, que la lección no enseñaba; se agregó a la sección 1 que `[1, 2] + [3, 4]` une las listas y que `np.array(...) + np.array(...)` suma celda por celda (el banco no se tocó).
+  - **Menores:** comentario sobre `mean()` en ufuncs, `pesos @ temps` explicado como 7 promedios ponderados, explicación de `.copy()`, y lección previa citada por su título.
+  - **Bitácora:** corregida la «meta» de líneas, la «promesa» de la S9 y el encabezado Rama/Estado.
+  - **No aplicado (sugerencias):** nota inicial de los apuntes y tensión del «reto de extensión» con §3 de `lesson-authoring`.
 
 ---
 
@@ -301,7 +305,6 @@ No aplica — semana sin ★.
 ### Pendientes
 
 - **Calendario:** el Momento evaluativo 3 (NumPy) es el jue. 15 oct. Para que el estudiante tenga la lección y su cuestionario antes, hay que desplegar y abrir antes de esa fecha.
-- Decidir si se recorta la lección (280 líneas frente a la meta de 100–130).
 - El taller del Momento evaluativo 3 no existe: el registro no tiene una guía equivalente a `taller-evaluativo-02` (`order: 6.5`). Es de la Semana 11, fuera de esta ronda.
 - Opcional: añadir ufuncs y `keepdims` al cuestionario.
 - El push de `development` a `origin` queda a cargo del usuario.
