@@ -1,9 +1,9 @@
-# Semana 10 — 9–13 oct (ED)
+# Semana 10 — 9–13 oct (ED) · 8 oct (PC)
 
-**Rama:** `feat/semana-10-estructuras-de-datos`
-**Estado:** ✅ Contenido listo · ✅ `@reviewer` · ✅ Mergeada a `development` (2026-10-14, `e1a5d0c`; rama borrada) · ⬜ Desplegada y abierta
+**Rama (ronda 1, ED):** `feat/semana-10-estructuras-de-datos`
+**Estado (ronda 1, ED):** ✅ Contenido listo · ✅ `@reviewer` · ✅ Mergeada a `development` (2026-10-14, `e1a5d0c`; rama borrada) · ✅ Desplegada en producción (2026-10-14, `c95785b`) · ⬜ Abierta a estudiantes (decisión del usuario: se deja **cerrada**)
 
-> Una ronda cubre **un curso**. Esta semana solo tiene ronda de `estructuras-de-datos`.
+> Una ronda cubre **un curso**. Esta semana tiene rondas de `estructuras-de-datos` (rondas 1 y 2) y de `programacion-cientifica` (ronda 3, al final del archivo).
 
 ---
 
@@ -45,7 +45,7 @@ con las cuatro dinámicas y cuestionario de cierre. La lección y su registro TS
 | Lección | Entorno | IDs de preguntas | Publicadas | Montadas (`list_lesson_questions`) |
 |---|---|---|---|---|
 | `fundamentos-de-archivos` | desarrollo | `50406de2-94a2-4615-933b-603a06bca23c`, `b6f29fc5-8dc3-444a-b9e0-bdc797282755`, `56a2a0a3-1a42-4446-b879-ef13cc66b749`, `62e70694-1956-421f-ab1c-a9f9629b268c`, `013fbf5f-d036-44ec-9bc8-43eef3d7affc`, `86dc7a7a-f225-4f63-bf30-dedbe2e83e9a` | ✅ | ✅ (orden 0-5, dificultades 1, 2, 2, 3, 3, 4) |
-| `fundamentos-de-archivos` | **producción** | — | ⬜ | ⬜ |
+| `fundamentos-de-archivos` | **producción** | `01fd9e91-369a-463e-868b-4cadc4f137a1`, `feae03fd-64e7-4908-8d14-2e8e7c22fb94`, `5ad3c8aa-f20b-4593-b3af-5dbeb68db9fb`, `296d31a5-4a18-4bd6-a237-fa5f54708432`, `f69625b4-a981-473a-b435-51416d48d7ae`, `ffb7d3be-e812-446d-96e4-c4f4e1a99ca0` | ✅ | ✅ (orden 0-5, 2026-10-14) |
 
 > Las preguntas **no viajan con el deploy**: se recrean en producción en D3.
 > Mientras la fila de producción esté vacía, la autoevaluación no existe para
@@ -86,21 +86,225 @@ No aplica — semana sin ★.
 
 | Paso | Estado | Fecha / detalle |
 |---|---|---|
-| D0 · Alcance y checklist pre-despliegue | ⬜ | |
-| D1 · Lecciones nuevas cerradas por adelantado | ⬜ | no hay lecciones nuevas: solo apuntes (owner/admin) |
-| D2 · Merge a `main` y deploy en Vercel | ⬜ | rama `deploy/semana-10` |
-| D3 · Banco de preguntas replicado a producción | ⬜ | keywords + 6 preguntas |
-| D4 · Lecciones abiertas a los estudiantes | ⬜ | `fundamentos-de-archivos` ya está en producción: comprobar su estado con `list_course_lessons` |
-| D5 · Verificación end-to-end en producción | ⬜ | |
-| D6 · Bitácora cerrada y rama `deploy/` borrada | ⬜ | |
+| D0 · Alcance y checklist pre-despliegue | ✅ | 4 commits (3 archivos, solo contenido y docs), sin cambios de esquema. La lección ya estaba en producción pero **deshabilitada** desde 2026-08-03 («Contenido aún en stub…») |
+| D1 · Lecciones nuevas cerradas por adelantado | ✅ No aplica | no hay lección nueva y ya existe la fila de cierre; los apuntes son solo owner/admin |
+| D2 · Merge a `main` y deploy en Vercel | ✅ | rama `deploy/semana-10`, merge `c95785b`, push a `main`; deploy `dpl_416mc3RQxAeVvYaBS2nvKjoQFFgb` en `READY` |
+| D3 · Banco de preguntas replicado a producción | ✅ | 8 keywords creadas (`archivos`, `persistencia`, `flujos`, `texto-binario`, `arquitectura`, `file`, `filewriter`, `cierre`); `java` ya existía (sin `kind`) y se reutilizó. 6 preguntas creadas, publicadas y montadas; sin duplicados previos |
+| D4 · Lecciones abiertas a los estudiantes | ⏸ Omitido | decisión del usuario: `fundamentos-de-archivos` **sigue cerrada** (`is_disabled: true`, comprobado tras el deploy). Para abrirla: `set_lesson_availability` con `enabled: true` en `courses-mcp-prod` |
+| D5 · Verificación end-to-end en producción | ⬜ Parcial | verificado por API: deploy `READY`, preguntas montadas, lección cerrada. No se abrió el navegador; la revisión visual de los apuntes y de la autoevaluación queda al usuario |
+| D6 · Bitácora cerrada y rama `deploy/` borrada | ✅ | `deploy/semana-10` borrada en local (nunca se subió a `origin`) |
 
-- [ ] Verificado que las lecciones de semanas futuras siguen **cerradas**
+- [x] Verificado que `fundamentos-de-archivos` sigue **cerrada**. Las lecciones de semanas futuras no se tocaron (D4 omitido); `lectura-escritura-y-modificacion` (stub) sigue cerrada.
 
 ## Pendientes
 
 - Confirmar si la sesión T1 requiere guía del estudiante (se asumió demo en vivo).
 - La lección mide 159 líneas, sobre la meta de 100–130; decidir si se recorta.
 - `lectura-escritura-y-modificacion.mdx` (T2, `order: 24`) sigue siendo un stub de 5 líneas.
-- Comprobar en producción si la lección ya tiene preguntas montadas antes de recrearlas (D3).
+- Decidir cuándo abrir `fundamentos-de-archivos` a los estudiantes (D4): la autoevaluación ya está montada en producción y quedará visible en cuanto se abra.
 - Opcional: añadir a los apuntes el aviso de JDK 18+ para la demo de bytes del Paso 3.
+- El push de `development` a `origin` queda a cargo del usuario.
+
+---
+
+## Ronda 2 — `estructuras-de-datos`, T2 (2026-10-14)
+
+**Rama:** `feat/semana-10-estructuras-de-datos` (nueva, desde `development`)
+**Estado:** ✅ Contenido listo · ✅ `@reviewer` (aprobado, correcciones aplicadas) · ✅ Mergeada a `development` (2026-10-14, `efcb6cc`; rama borrada) · ⬜ Desplegada en producción
+
+**Alcance confirmado por el usuario:** lección de la sesión T2 de la Semana 10
+(martes 13 oct, **ya dictada**; la ronda empezó el 14 oct): `BufferedReader` y
+`BufferedWriter`, `IOException` y `try-with-resources`, formato CSV-like, con el
+ejercicio de guardar la lista enlazada en un `.txt` y reconstruirla. Excluidas:
+modificación de registros (T2 Sem. 11, 16 oct) y binarios (T1 Sem. 11, 15 oct).
+
+### Sesiones cubiertas
+
+| Sesión | Fecha | Tema | ★/◇ |
+|---|---|---|---|
+| T2 + práctica incorporada | mar. 13 oct (ya dictada) | Lectura y escritura eficiente, excepciones y CSV-like | — |
+
+### Etapas y aprobaciones
+
+| Etapa | Resultado | Aprobada por el usuario |
+|---|---|---|
+| E2 · Plan de lección | 9 secciones, sin Mermaid, ~125–135 líneas previstas | ✅ (las 4 preguntas abiertas del plan no se respondieron; ver decisiones) |
+| E3 · Lección `.mdx` + registro TS | `lectura-escritura-y-modificacion`, `order: 24`, `summary` agregado, 183 líneas | ✅ (avance implícito a E4; sin respuesta sobre longitud, `getHead()` ni título) |
+| E4 · Apuntes del docente | Pedidos por el usuario, con las cuatro dinámicas | ✅ (avance implícito a E5) |
+| E5 · Cuestionario de cierre | Propuesto: 5 preguntas → aprobadas 5 | ✅ («Apruebo» sin elegir keywords ni Q4; ver decisiones) |
+| E6 · Guía del estudiante | No — sesión con demo en vivo (supuesto, **por confirmar**) | ⬜ |
+| E6 · Quiz A/B/C | No aplica — semana sin ★ | — |
+
+### Artefactos producidos
+
+| Artefacto | Ruta | Publicado |
+|---|---|---|
+| Lección teórica | `content/cursos/estructuras-de-datos/lectura-escritura-y-modificacion.mdx` | ⬜ (en rama; el slug ya está en producción como stub, **cerrado**) |
+| Registro TS | `lib/courses/data/estructuras-de-datos.ts` (`order: 24`, solo se agregó `summary`) | — |
+| Apunte de clase | `content/cursos/estructuras-de-datos/apuntes/lectura-escritura-y-modificacion.md` | Solo owner/admin (en rama) |
+
+### Cuestionario de cierre
+
+| Lección | Entorno | IDs de preguntas | Publicadas | Montadas (`list_lesson_questions`) |
+|---|---|---|---|---|
+| `lectura-escritura-y-modificacion` | desarrollo | `7926ad4b-3385-44cc-ad87-2e93943c5f21`, `ad503176-c922-4316-a3eb-f7ef1d238605`, `214630fe-c8f9-4681-a532-37f2959ef54e`, `0e3decee-a6f7-46a0-aeb5-a7be3c5a4066`, `3dd63226-f8d2-4356-9d66-7c9c75ac64c5` | ✅ | ✅ (orden 0-4, dificultades 1, 2, 2, 3, 3) |
+| `lectura-escritura-y-modificacion` | **producción** | — | ⬜ | ⬜ |
+
+> Las preguntas **no viajan con el deploy**: se recrean en producción en D3.
+> Keywords nuevas creadas en desarrollo: `buffer`, `try-with-resources`,
+> `excepciones`, `csv` (kind `tema`). En producción ya existen `archivos`,
+> `persistencia`, `flujos`, `texto-binario`, `arquitectura`, `file`,
+> `filewriter`, `cierre` y `java` (ronda 1); faltan las cuatro nuevas.
+
+### Quiz calificable A/B/C
+
+No aplica — semana sin ★.
+
+### Decisiones tomadas por Claude en nombre del docente
+
+- **Título sin cambios** («Lectura, escritura y modificación») — **motivo:** ya está desplegado y el usuario no respondió la pregunta del plan. El plan recomendaba «Lectura y escritura de archivos de texto» (slug y `order` no cambian). La *modificación* es la T2 del 16 oct.
+- **Línea mal formada en `cargar()`: ignora líneas en blanco y lanza `IOException` con el número de línea** — **motivo:** propuesta del plan, sin respuesta del usuario.
+- **`guardar(Cliente)` de ayer pasa a `agregar(Cliente)`; `guardar(ListaSimple<Cliente>)` reescribe todo** — **motivo:** propuesta del plan, sin respuesta del usuario.
+- **La lección usa `clientes.getHead()` sin definirlo** — **motivo:** el `ListaSimple` publicado solo tiene `estaVacia()` y `getTamano()`; los apuntes añaden `getHead()` en el Paso 4. Un estudiante que no asistió a clase no lo tiene.
+- **Keywords: 4 nuevas en lugar de las 7 propuestas** — **motivo:** recomendación mía, para no inflar el catálogo (que también se replica en producción). El usuario respondió «Apruebo» sin elegir.
+- **Q1 reescrita** («Ayer usaste `FileWriter` y `FileReader`») y **Q4 mantenida** — **motivo:** el enunciado original decía «ayer copiaste la agenda letra a letra», que la lección de ayer no hacía; Q4 se parece a una predicción del Paso 3 de los apuntes, pero la lección también la cubre.
+- **Las explicaciones de cada pregunta no quedaron en el banco** — **motivo:** `create_question` no tiene campo para ellas.
+- **Sesión tratada como demo en vivo, sin guía del estudiante** — **motivo:** igual que la T1 y los apuntes de pilas y colas; no se preguntó de forma explícita. Por confirmar.
+- **Práctica externa:** LeetCode 468 y 206 comprobados por su API pública; HackerRank *Java String Tokens* existe con ese título, su dificultad no se confirmó. Ninguno se resolvió.
+
+### Verificación (E7)
+
+- [x] `npm run build` en verde
+- [x] `npm run lint` en verde (0 errores; 10 avisos preexistentes en archivos no tocados)
+- [x] Checklist de `lesson-authoring` §8 recorrido (`.mdx` sin H1, sin `###`, sin `---`, sin `$`; `updatedAt` 2026-10-14)
+- [x] `summary` presente en frontmatter **y** en registro TS, idénticos
+- [x] Código de la lección compilado y ejecutado con `javac` 17 (el curso usa Java 21; nada es específico de 21): `copiar`, `mostrar`, `mostrarSeguro`, `split(";", -1)`, y `guardar`/`cargar` armados en un `ClienteService` (archivo inexistente → lista vacía; teléfono vacío conservado; guardar dos veces no duplica; renglón mal formado → `Línea 6 inválida: 2;mal`)
+- [x] Código de los apuntes compilado y ejecutado por el agente que los escribió (proyecto completo, errores planeados, votaciones y reto)
+- [x] Coherencia cruzada teoría ↔ apuntes ↔ cuestionario: revisada por mí y por `@reviewer` (el cuestionario, solo por mí: el reviewer no tiene acceso al MCP)
+- [x] `@reviewer`: **APROBADO** (sin bloqueantes). Dos Mayores y tres Menores, aplicados por orden del usuario:
+  - **Mayor 1:** la lección daba por conocidos `ClienteService`, `ARCHIVO` y `guardar(Cliente)`, que solo existen en los apuntes privados de la T1. Se reescribió la frase de la sección 8 («el `ClienteService` que armamos en clase…»).
+  - **Mayor 2:** el Paso 5 renombra `guardar(Cliente)` a `agregar(Cliente)`, pero la `ClienteView` de la T1 seguía llamando `guardar`, y el proyecto no compilaba hasta el Paso 7. Se añadió la instrucción de cambiar la llamada a `agregar`, y se corrigió el comentario «la View todavía no existe».
+  - **Menores:** instrucción de borrar `data/clientes.txt` antes de la prueba del Paso 5 y `data/` antes de la «primera ejecución»; precisar «primer renglón (el de Ana)» en el archivo dañado; nota para ejecutar el `try` de la votación 1 dentro de un `main`.
+  - **No aplicado (sugerencias):** recortar `cargar()` de la lección; la tabla atribuye `FileNotFoundException` a `BufferedReader` cuando en rigor la lanza el `FileReader` interno (aceptable para el nivel).
+
+### Despliegue
+
+Pendiente. Cuando se despliegue: el slug `lectura-escritura-y-modificacion` ya existe en producción **cerrado** desde 2026-08-03 («Contenido aún en stub…»); recrear las 4 keywords nuevas y las 5 preguntas (D3); decidir si se abre (D4).
+
+### Pendientes
+
+- Confirmar si T2 lleva guía del estudiante (se asumió demo en vivo).
+- La lección mide 183 líneas, sobre la meta de 100–130; el recorte que falta es `cargar()`.
+- La lección usa `clientes.getHead()` sin definirlo (los apuntes lo añaden en el Paso 4). Añadir una frase que diga que se agrega ese método, o reescribir `guardar` sin él. El Mayor 1 del reviewer se resolvió con `ClienteService`/`ARCHIVO`; `getHead()` sigue abierto.
+- Decidir el título («Lectura y escritura de archivos de texto» recomendado) antes de crear la lección de modificación de registros (T2 Sem. 11, 16 oct), que no tiene entrada en el registro TS. El `order` 25 está libre.
+- `cargar()` es O(n²) por `insertarFinal`; está como gancho en los apuntes y no se menciona en la lección.
+- Los apuntes asumen el `Cliente` de 3 campos de ayer; los apuntes de eliminación en lista simple usan uno de 4.
+- La T2 ya se dictó: la lección y su cuestionario no pudieron abrirse antes de la clase.
+
+---
+
+## Ronda 3 — `programacion-cientifica` (2026-10-14)
+
+**Rama:** `feat/semana-10-programacion-cientifica` (nueva, desde `development`)
+**Estado:** ✅ Contenido listo · ✅ `@reviewer` (aprobado, correcciones aplicadas) · ✅ Mergeada a `development` (2026-10-14, `efb2574`; rama borrada) · ⬜ Desplegada en producción
+
+**Alcance confirmado por el usuario:** sesión del jueves 8 oct (**ya dictada**; la
+ronda empezó el 14 oct): operaciones vectorizadas y álgebra lineal básica,
+completando el stub existente. Sin corrimientos de calendario. El Momento
+evaluativo 3 (NumPy, 15 %) es el jue. 15 oct (Semana 11); el usuario pidió seguir
+el flujo normal, sin priorizar el despliegue.
+
+### Sesiones cubiertas
+
+| Sesión | Fecha | Tema | ★/◇ |
+|---|---|---|---|
+| Única (jueves) | jue. 8 oct (ya dictada) | NumPy: operaciones vectorizadas y álgebra lineal | — (◇ de seguimiento en `info.md`) |
+
+### Etapas y aprobaciones
+
+| Etapa | Resultado | Aprobada por el usuario |
+|---|---|---|
+| E2 · Plan de lección | 9 secciones, sin Mermaid, sin KaTeX, `keepdims` incluido, sin `.T`/`np.linalg` | ✅ (aprobado tal cual) |
+| E3 · Lección `.mdx` + registro TS | `operaciones-vectorizadas-y-algebra-lineal-basica`, `order: 8`, `summary` agregado, 280 líneas | ✅ (sin pedir recorte) |
+| E4 · Apuntes del docente | Pedidos por el usuario; sin las cuatro dinámicas de ED/AA (PC no las exige) | ✅ (avance implícito a E5) |
+| E5 · Cuestionario de cierre | Propuesto: 5 preguntas → aprobadas 5; 6 keywords nuevas aprobadas | ✅ |
+| E6 · Guía del estudiante | No — sesión en vivo (confirmado por el usuario) | ✅ |
+| E6 · Quiz A/B/C | No aplica — semana sin ★ (confirmado por el usuario) | ✅ |
+
+### Artefactos producidos
+
+| Artefacto | Ruta | Publicado |
+|---|---|---|
+| Lección teórica | `content/cursos/programacion-cientifica/operaciones-vectorizadas-y-algebra-lineal-basica.mdx` | ⬜ (en rama; el slug ya está en producción como stub) |
+| Registro TS | `lib/courses/data/programacion-cientifica.ts` (`order: 8`, solo se agregó `summary`) | — |
+| Apunte de clase | `content/cursos/programacion-cientifica/apuntes/operaciones-vectorizadas-y-algebra-lineal-basica.md` (542 líneas) | Solo owner/admin (en rama) |
+
+### Cuestionario de cierre
+
+| Lección | Entorno | IDs de preguntas | Publicadas | Montadas (`list_lesson_questions`) |
+|---|---|---|---|---|
+| `operaciones-vectorizadas-y-algebra-lineal-basica` | desarrollo | `4168bb5c-00f6-4275-b9a9-b29a9cb596a8`, `b601d6d1-0bc1-41d3-b953-626628e4eb11`, `edad303c-83e4-408f-9c8a-2529cdd1b5b9`, `9b74fff8-657e-4988-9d2e-8793a1737276`, `37178be2-cef9-4f47-bdac-d5023d5db8ed` | ✅ | ✅ (orden 0-4, dificultades 1, 2, 3, 3, 4) |
+| `operaciones-vectorizadas-y-algebra-lineal-basica` | **producción** | — | ⬜ | ⬜ |
+
+> Las preguntas **no viajan con el deploy**: se recrean en producción en D3.
+> Keywords nuevas creadas en desarrollo: `python` (`lenguaje`), `numpy`,
+> `vectorizacion`, `broadcasting`, `estadistica-descriptiva`, `algebra-lineal`
+> (`tema`). `cierre` ya existía. En producción hay que verificar cuáles existen
+> antes de crearlas (`python` puede existir ya con otro `kind`).
+
+### Quiz calificable A/B/C
+
+No aplica — semana sin ★.
+
+### Decisiones tomadas por Claude en nombre del docente
+
+- **Lección de 280 líneas, sin recorte** — **motivo:** las 100–130 líneas son la medida de ED/AA (aula invertida); PC usa el esqueleto pragmático y sus lecciones previas miden entre 183 y 401 líneas, así que 280 está dentro de lo habitual del curso. Los bloques con su salida real y las trazas a mano ocupan casi todo. El usuario aprobó sin pedir recorte.
+- **Formato de lectura previa (aula invertida) en PC** — **motivo:** la lección de la Semana 9 ya lo usa; la skill dice que PC no lo exige, pero se siguió el precedente por continuidad.
+- **Salidas redondeadas con `np.round`/`.round(2)`** — **motivo:** sin ello el producto punto imprime `24.759999999999998`.
+- **Datos ilustrativos inventados:** `ajuste_dia`, `ajuste_est`, `pesos` (0.4, 0.3, 0.2, 0.1) y `zonas` (norte/sur 0.5 cada una) — **motivo:** hacen falta para ilustrar broadcasting y producto matricial.
+- **Errores deliberados de los apuntes dentro de `try/except`** — **motivo:** para que el cuaderno de Colab no se detenga en vivo.
+- **Reto de extensión de los apuntes mide la fórmula de Fahrenheit con `%timeit`** (1.000.000 de valores; ~23 ms lista y ~0,5 ms arreglo en una ejecución local, no en Colab) — **motivo:** los apuntes de la S9 solo anotan que las operaciones vectorizadas son de la Semana 10, no que se medirían tiempos; es un reto opcional de este apunte. Los tiempos son orden de magnitud.
+- **Preguntas del cuestionario con ejemplos distintos a los de la lección** (`[10, 20]`, tabla (3,5), vectores `[1,2,3]` y `[4,5,6]`, matrices (3,4) y (4,2)) — **motivo:** el cuestionario es verificación de lectura y no debe repetir lo ya resuelto.
+- **Ufuncs y `keepdims` sin pregunta de cierre** — **motivo:** se propusieron 5 preguntas, una por concepto de peso; el usuario las aprobó así.
+- **Las explicaciones de cada pregunta no quedaron en el banco** — **motivo:** `create_question` no tiene campo para ellas.
+- **Avance implícito a E5 sin aprobación explícita de los apuntes** — **motivo:** el usuario escribió «Pasa a E5»; lo tomé como visto bueno.
+
+### Verificación (E7)
+
+- [x] `npm run build` en verde
+- [x] `npm run lint` en verde (0 errores; 10 avisos preexistentes en archivos no tocados)
+- [x] Checklist de `lesson-authoring` §8 recorrido (`.mdx` sin H1, sin `###`, sin `---` en el cuerpo, sin `$`, sin Mermaid; `updatedAt` 2026-10-14)
+- [x] `summary` presente en frontmatter **y** en registro TS, idénticos
+- [x] Lección y apuntes compilados como MDX (`next-mdx-remote` con `remark-math` y `remark-gfm`): ambos OK
+- [x] Código de la lección y de los apuntes ejecutado con NumPy por los agentes que los escribieron; respuestas del cuestionario verificadas con NumPy
+- [x] Preguntas publicadas **y montadas**, verificado con `list_lesson_questions`
+- [x] Apuntes sin entrada TS; no existe guía del estudiante
+- [x] Coherencia cruzada teoría ↔ apuntes ↔ cuestionario: revisada por `@reviewer` (el banco no es accesible para él; el texto exacto de las preguntas lo comprobé yo al crearlas)
+- [x] `@reviewer`: **APROBADO** (sin bloqueantes; 39 salidas de código coinciden con la ejecución real). Hallazgos aplicados en un segundo commit:
+  - **Mayor:** la P1 usa `lista + lista`, que la lección no enseñaba; se agregó a la sección 1 que `[1, 2] + [3, 4]` une las listas y que `np.array(...) + np.array(...)` suma celda por celda (el banco no se tocó).
+  - **Menores:** comentario sobre `mean()` en ufuncs, `pesos @ temps` explicado como 7 promedios ponderados, explicación de `.copy()`, y lección previa citada por su título.
+  - **Bitácora:** corregida la «meta» de líneas, la «promesa» de la S9 y el encabezado Rama/Estado.
+  - **No aplicado (sugerencias):** nota inicial de los apuntes y tensión del «reto de extensión» con §3 de `lesson-authoring`.
+
+---
+
+### Despliegue
+
+| Paso | Estado | Fecha / detalle |
+|---|---|---|
+| D0 · Alcance y checklist pre-despliegue | ⬜ | |
+| D1 · Lecciones nuevas cerradas por adelantado | ⬜ | el slug ya existe en producción como stub; comprobar su fila de visibilidad |
+| D2 · Merge a `main` y deploy en Vercel | ⬜ | |
+| D3 · Banco de preguntas replicado a producción | ⬜ | 6 keywords + 5 preguntas |
+| D4 · Lecciones abiertas a los estudiantes | ⬜ | `programacion-cientifica` → `operaciones-vectorizadas-y-algebra-lineal-basica` |
+| D5 · Verificación end-to-end en producción | ⬜ | |
+| D6 · Bitácora cerrada y rama `deploy/` borrada | ⬜ | |
+
+- [ ] Verificado que las lecciones de semanas futuras siguen **cerradas**
+
+### Pendientes
+
+- **Calendario:** el Momento evaluativo 3 (NumPy) es el jue. 15 oct. Para que el estudiante tenga la lección y su cuestionario antes, hay que desplegar y abrir antes de esa fecha.
+- El taller del Momento evaluativo 3 no existe: el registro no tiene una guía equivalente a `taller-evaluativo-02` (`order: 6.5`). Es de la Semana 11, fuera de esta ronda.
+- Opcional: añadir ufuncs y `keepdims` al cuestionario.
 - El push de `development` a `origin` queda a cargo del usuario.

@@ -348,6 +348,8 @@ export const estructurasDeDatos: Course = {
       articleSlug: "lectura-escritura-y-modificacion",
       order: 24,
       title: "Lectura, escritura y modificación",
+      summary:
+        "Retoma la pizarra y el cuaderno para copiar una agenda por renglones en vez de letra a letra: BufferedWriter y BufferedReader, cierre seguro con try-with-resources, y el formato de una línea por registro con campos separados por punto y coma.",
       topics: [
         { title: "BufferedReader y BufferedWriter: lectura y escritura eficiente" },
         { title: "Manejo de excepciones: IOException, try-with-resources" },
