@@ -110,7 +110,7 @@ No aplica — semana sin ★.
 ## Ronda 2 — `estructuras-de-datos`, T2 (2026-10-14)
 
 **Rama:** `feat/semana-10-estructuras-de-datos` (nueva, desde `development`)
-**Estado:** ✅ Contenido listo · ⬜ `@reviewer` · ⬜ Mergeada a `development` · ⬜ Desplegada en producción
+**Estado:** ✅ Contenido listo · ✅ `@reviewer` (aprobado, correcciones aplicadas) · ⬜ Mergeada a `development` · ⬜ Desplegada en producción
 
 **Alcance confirmado por el usuario:** lección de la sesión T2 de la Semana 10
 (martes 13 oct, **ya dictada**; la ronda empezó el 14 oct): `BufferedReader` y
@@ -180,8 +180,12 @@ No aplica — semana sin ★.
 - [x] `summary` presente en frontmatter **y** en registro TS, idénticos
 - [x] Código de la lección compilado y ejecutado con `javac` 17 (el curso usa Java 21; nada es específico de 21): `copiar`, `mostrar`, `mostrarSeguro`, `split(";", -1)`, y `guardar`/`cargar` armados en un `ClienteService` (archivo inexistente → lista vacía; teléfono vacío conservado; guardar dos veces no duplica; renglón mal formado → `Línea 6 inválida: 2;mal`)
 - [x] Código de los apuntes compilado y ejecutado por el agente que los escribió (proyecto completo, errores planeados, votaciones y reto)
-- [ ] Coherencia cruzada teoría ↔ apuntes ↔ cuestionario: revisada por mí, pendiente de `@reviewer`
-- [ ] `@reviewer`: pendiente
+- [x] Coherencia cruzada teoría ↔ apuntes ↔ cuestionario: revisada por mí y por `@reviewer` (el cuestionario, solo por mí: el reviewer no tiene acceso al MCP)
+- [x] `@reviewer`: **APROBADO** (sin bloqueantes). Dos Mayores y tres Menores, aplicados por orden del usuario:
+  - **Mayor 1:** la lección daba por conocidos `ClienteService`, `ARCHIVO` y `guardar(Cliente)`, que solo existen en los apuntes privados de la T1. Se reescribió la frase de la sección 8 («el `ClienteService` que armamos en clase…»).
+  - **Mayor 2:** el Paso 5 renombra `guardar(Cliente)` a `agregar(Cliente)`, pero la `ClienteView` de la T1 seguía llamando `guardar`, y el proyecto no compilaba hasta el Paso 7. Se añadió la instrucción de cambiar la llamada a `agregar`, y se corrigió el comentario «la View todavía no existe».
+  - **Menores:** instrucción de borrar `data/clientes.txt` antes de la prueba del Paso 5 y `data/` antes de la «primera ejecución»; precisar «primer renglón (el de Ana)» en el archivo dañado; nota para ejecutar el `try` de la votación 1 dentro de un `main`.
+  - **No aplicado (sugerencias):** recortar `cargar()` de la lección; la tabla atribuye `FileNotFoundException` a `BufferedReader` cuando en rigor la lanza el `FileReader` interno (aceptable para el nivel).
 
 ### Despliegue
 
@@ -191,7 +195,7 @@ Pendiente. Cuando se despliegue: el slug `lectura-escritura-y-modificacion` ya e
 
 - Confirmar si T2 lleva guía del estudiante (se asumió demo en vivo).
 - La lección mide 183 líneas, sobre la meta de 100–130; el recorte que falta es `cargar()`.
-- Añadir en la lección una frase que diga que `getHead()` se agrega a `ListaSimple`, o reescribir `guardar` sin él.
+- La lección usa `clientes.getHead()` sin definirlo (los apuntes lo añaden en el Paso 4). Añadir una frase que diga que se agrega ese método, o reescribir `guardar` sin él. El Mayor 1 del reviewer se resolvió con `ClienteService`/`ARCHIVO`; `getHead()` sigue abierto.
 - Decidir el título («Lectura y escritura de archivos de texto» recomendado) antes de crear la lección de modificación de registros (T2 Sem. 11, 16 oct), que no tiene entrada en el registro TS. El `order` 25 está libre.
 - `cargar()` es O(n²) por `insertarFinal`; está como gancho en los apuntes y no se menciona en la lección.
 - Los apuntes asumen el `Cliente` de 3 campos de ayer; los apuntes de eliminación en lista simple usan uno de 4.

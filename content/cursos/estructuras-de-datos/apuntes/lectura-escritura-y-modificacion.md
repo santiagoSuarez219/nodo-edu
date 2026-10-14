@@ -177,6 +177,9 @@ el código sin ejecutarlo. `Recurso` es una clase mínima que imprime al
 cerrarse; implementa `AutoCloseable`, la interfaz que cumple también
 `BufferedReader`, y por eso puede ir entre los paréntesis del `try`:
 
+Para ejecutarlo, el `try` de abajo va dentro de un `main` (con
+`import java.io.IOException;`), en el mismo archivo que `Recurso`:
+
 ```java
 class Recurso implements AutoCloseable {
     private final String nombre;
@@ -292,7 +295,11 @@ método de recorrido, sin resolverla.
 La regla de siempre: **solo el `Service` toca archivos**. Dos cambios sobre
 el `ClienteService` de ayer. El primero, cosmético: `guardar(Cliente)`, que
 agregaba un cliente al final, pasa a llamarse `agregar(Cliente)` (el cuerpo
-no cambia) para dejar libre el nombre `guardar`. El segundo, el método
+no cambia) para dejar libre el nombre `guardar`. **Y la `ClienteView` de
+ayer llamaba a `servicio.guardar(new Cliente(...))` en `registrar()`:** esa
+llamada deja de compilar contra la firma nueva. Cámbiala ahora por
+`servicio.agregar(new Cliente(...))`; si no, el proyecto no compila hasta el
+Paso 7, donde la `View` se reemplaza entera. El segundo cambio es el método
 nuevo, que no agrega: **reescribe todo el archivo** con lo que hay hoy en la
 lista en memoria. Imports del `Service` tras los cambios de hoy:
 
@@ -329,8 +336,11 @@ public void guardar(ListaSimple<Cliente> clientes) throws IOException {
 }
 ```
 
+Antes de correr la prueba, **borra `data/clientes.txt`**: la demo de ayer lo
+dejó con clientes, y esos renglones extra tapan el síntoma.
+
 ```java
-// Prueba rápida, en un main aparte (la View todavía no existe)
+// Prueba rápida, en un main aparte, sin pasar por la View
 ClienteService servicio = new ClienteService();
 ListaSimple<Cliente> lista = new ListaSimple<>();
 lista.insertarFinal(new Cliente("1001", "Ana", "300123"));
@@ -581,7 +591,8 @@ public class Main {
 
 Demo, en este orden, con el grupo prediciendo cada resultado:
 
-1. **Primera ejecución, sin `data/`:** imprime `0 cliente(s) cargado(s).` y el
+1. **Primera ejecución, sin `data/`** (borra la carpeta `data/` entera antes;
+   la prueba del Paso 5 y `agenda.txt` ya la habían creado): imprime `0 cliente(s) cargado(s).` y el
    menú. Es la prueba de "archivo inexistente": el programa no se cae.
 2. Registrar Ana y Bruno (dejar el teléfono de Bruno vacío), opción 2 para
    verlos en memoria, opción 3 para guardar, salir. Abrir `data/clientes.txt`:
@@ -589,8 +600,8 @@ Demo, en este orden, con el grupo prediciendo cada resultado:
 3. **Segunda ejecución:** `2 cliente(s) cargado(s).` y la opción 2 los lista,
    incluido Bruno con su teléfono vacío (gracias al `-1`). La lista enlazada
    viajó al archivo y volvió.
-4. **Archivo dañado:** editar a mano `data/clientes.txt`, quitar un `;` de un
-   renglón y ejecutar de nuevo: el programa no se cae, avisa
+4. **Archivo dañado:** editar a mano `data/clientes.txt`, quitar un `;` del
+   **primer renglón** (el de Ana) y ejecutar de nuevo: el programa no se cae, avisa
    `No se pudo cargar el archivo: Línea 1 inválida: ...` y arranca con la
    lista vacía.
 

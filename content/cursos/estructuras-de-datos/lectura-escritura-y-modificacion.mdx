@@ -130,7 +130,7 @@ Dos trampas, una línea cada una. El `-1` hace que `split` conserve los campos v
 
 ## ¿Dónde aparece en tu proyecto?
 
-Retomas el `ClienteService` de ayer: `ARCHIVO` apunta a `data/clientes.txt` y cada línea es `identificacion;nombre;telefono`. `guardar(Cliente)` solo **agregaba** un cliente; la evolución natural es `guardar(ListaSimple<Cliente>)`, que reescribe todo el archivo desde la lista que tienes en memoria (el modo agregar puede renombrarse `agregar`). Y `cargar()` hace el camino inverso: del cuaderno a la pizarra.
+Retomas el `ClienteService` que armamos en clase, el que guarda en un archivo: una constante `ARCHIVO` apunta a `data/clientes.txt` y cada línea es `identificacion;nombre;telefono`. `guardar(Cliente)` solo **agregaba** un cliente; la evolución natural es `guardar(ListaSimple<Cliente>)`, que reescribe todo el archivo desde la lista que tienes en memoria (el modo agregar puede renombrarse `agregar`). Y `cargar()` hace el camino inverso: del cuaderno a la pizarra.
 
 ```java
 public void guardar(ListaSimple<Cliente> clientes) throws IOException {
