@@ -1,0 +1,157 @@
+---
+title: "Pilas, colas y listas enlazadas"
+course: "Análisis de Algoritmos"
+course_code: "AA"
+level: "Ultimos semestres"
+type: "Apuntes teóricos"
+language: "Python 3"
+difficulty: "Intermedio"
+estimated_time: "Lectura previa de 10 minutos (sesión T, Semana 12)"
+presentation: true
+slides_hint: "Cada sección ## es una diapositiva. Presentación sincrona."
+date: "2026-10-14"
+author: "Asistente de Docencia"
+summary: "Las estructuras elementales sobre las que se apoya casi todo lo demás: pilas, colas y listas enlazadas, con su costo por operación y lo que cada representación gana o pierde."
+updatedAt: "2026-10-14"
+---
+
+> 📖 Lectura previa a la clase — unos 10 minutos. Al final, responde la autoevaluación.
+
+## El problema: el escritorio del profesor el día del parcial
+
+Imagina el escritorio de un profesor el día del parcial: 40 exámenes que van llegando, una bandeja donde apila los que ya revisó, la fila de estudiantes que esperan entregar y, pegados en cada examen, post-its que dicen cuál sigue. Sin una regla, todo se mezcla. Quiere poder hacer tres cosas **sin reacomodar todo cada vez**: retomar el último examen que dejó, atender a los estudiantes en el orden en que llegaron y meter un examen en medio de otros.
+
+Traducido a un problema computacional:
+
+- **Entra:** una colección de valores que crece y se reduce con el tiempo, y una regla de cuál se atiende primero.
+- **Sale:** acceder al elemento correcto en cada momento, sin recorrer toda la colección.
+- **Restricciones:** el tamaño no se conoce de antemano y la memoria no es infinita.
+- **Qué domina el costo:** cuántos elementos hay que mover o cuántos enlaces hay que seguir por operación.
+
+## La pila de revisión y la fila de entrega: pilas y colas
+
+**Así en la vida real:** la bandeja de revisión es una **pila** (_LIFO_): el último examen que pones es el primero que sacas. La fila de entrega es una **cola** (_FIFO_): quien llegó primero entrega primero.
+
+**Así en código**, ambas sobre un arreglo de capacidad fija:
+
+```python
+class Pila:
+    """Pila de enteros sobre un arreglo de capacidad fija."""
+
+    def __init__(self, capacidad: int) -> None:
+        """Crea una pila vacía.
+
+        Args:
+            capacidad: Número máximo de elementos.
+        """
+        self.datos: list[int] = [0] * capacidad
+        self.tope: int = 0
+
+    def push(self, valor: int) -> None:
+        """Apila un valor; falla si la pila está llena.
+
+        Args:
+            valor: Valor a apilar.
+        """
+        if self.tope == len(self.datos):
+            raise OverflowError("pila llena")
+        self.datos[self.tope] = valor
+        self.tope += 1
+
+    def pop(self) -> int:
+        """Desapila el valor de arriba; falla si la pila está vacía.
+
+        Returns:
+            El último valor apilado.
+        """
+        if self.tope == 0:
+            raise IndexError("pila vacía")
+        self.tope -= 1
+        return self.datos[self.tope]
+```
+
+La **cola circular** usa `inicio` y `tamano`: `enqueue` escribe en la posición `(inicio + tamano) % capacidad` y suma uno a `tamano`; `dequeue` lee en `inicio`, lo avanza con el mismo módulo y resta uno. El módulo hace que las posiciones liberadas se reutilicen. Ambas fallan con cola llena al encolar y con cola vacía al desencolar.
+
+| Operación | Estructura | Costo |
+| --- | --- | --- |
+| `push`, `pop` | Pila | Θ(1) |
+| `enqueue`, `dequeue` | Cola circular | Θ(1) |
+
+## Post-its entre exámenes: listas enlazadas simple y doble
+
+**Así en la vida real:** las sillas numeradas son un **arreglo**: ir a la silla 7 es inmediato, pero meter a alguien en medio obliga a correr a todos los siguientes. Los exámenes con post-its son una **lista enlazada**: cada examen indica cuál sigue, así que insertar es reescribir un post-it, y llegar al 7.º exige seguir la cadena desde el primero.
+
+**Así en código:**
+
+```python
+class Nodo:
+    """Nodo de una lista enlazada simple."""
+
+    def __init__(self, valor: int, siguiente: "Nodo | None" = None) -> None:
+        """Crea un nodo.
+
+        Args:
+            valor: Dato que guarda el nodo.
+            siguiente: Nodo al que apunta, o None si es el último.
+        """
+        self.valor = valor
+        self.siguiente = siguiente
+
+
+def insertar_al_inicio(cabeza: Nodo | None, valor: int) -> Nodo:
+    """Inserta un valor antes de la cabeza.
+
+    Args:
+        cabeza: Primer nodo actual, o None si la lista está vacía.
+        valor: Valor a insertar.
+
+    Returns:
+        El nuevo primer nodo.
+    """
+    return Nodo(valor, cabeza)
+
+
+def buscar(cabeza: Nodo | None, valor: int) -> Nodo | None:
+    """Busca un valor siguiendo los punteros desde la cabeza.
+
+    Args:
+        cabeza: Primer nodo de la lista.
+        valor: Valor buscado.
+
+    Returns:
+        El primer nodo con ese valor, o None si no está.
+    """
+    actual = cabeza
+    while actual is not None and actual.valor != valor:
+        actual = actual.siguiente
+    return actual
+```
+
+En la **lista doble**, cada examen lleva dos post-its: el que sigue y el anterior. Eso permite recorrerla en ambos sentidos y borrar un nodo que ya tienes en la mano sin buscar a su antecesor. Un nodo con puntero a su primer hijo y a su hermano derecho es una lista enlazada más; así se representan los árboles enraizados.
+
+| Operación | Arreglo | Lista simple | Lista doble |
+| --- | --- | --- | --- |
+| Acceso por posición | Θ(1) | Θ(n) | Θ(n) |
+| Insertar al inicio | Θ(n) | Θ(1) | Θ(1) |
+| Buscar un valor | Θ(n) | Θ(n) | Θ(n) |
+| Borrar un nodo ya en mano | Θ(n) | Θ(n) | Θ(1) |
+
+## Dónde se rompe la analogía
+
+El profesor ve todo el escritorio de un vistazo; el programa solo accede al tope de la pila, al frente de la cola o a la cabeza de la lista, y llegar a cualquier otro punto cuesta pasos. La fila de estudiantes nunca se "llena", mientras que una pila o cola sobre un arreglo tiene capacidad fija y falla cuando se agota. Y un post-it es gratis; un enlace ocupa memoria en cada nodo y obliga a seguir la cadena en vez de saltar a una posición.
+
+## ¿Dónde aparece en la práctica?
+
+Un sistema de telemedición recibe 500 lecturas por segundo y las procesa a 400 por segundo, guardándolas mientras esperan en una cola circular de capacidad 10.000. Cada `enqueue` y cada `dequeue` cuestan Θ(1), así que el ritmo de llegada no encarece la operación. Pero la cola crece 100 lecturas por segundo: se llena en torno a los 10.000 / 100 = 100 segundos y desde ahí `enqueue` falla. La capacidad fija, que en la analogía no existía, es lo que decide cuánto aguanta el sistema.
+
+Si el mismo sistema mantuviera sus 1.850.000 lecturas del día en un arreglo y quisiera insertar cada nueva al inicio, cada inserción movería hasta 1.850.000 elementos. En una lista enlazada, insertar al inicio sigue costando un enlace nuevo, Θ(1). A cambio, consultar la lectura número 1.000.000 es inmediato en el arreglo y exige seguir un millón de enlaces en la lista. No hay estructura mejor en abstracto: depende de qué operación se repite más.
+
+## Síntesis
+
+- **El problema:** el costo de una colección lo decide qué operaciones se repiten y cuántos elementos hay que mover o recorrer en cada una.
+- **Pilas y colas:** LIFO y FIFO con operaciones Θ(1) sobre arreglos de capacidad fija; la cola circular reutiliza las posiciones liberadas con el módulo.
+- **Listas enlazadas:** insertar al inicio es Θ(1), buscar es Θ(n); la lista doble borra en Θ(1) un nodo ya localizado.
+- **La analogía:** el programa no ve todo de un vistazo, la capacidad del arreglo es fija y cada enlace cuesta memoria.
+- **En la práctica:** una cola de 10.000 posiciones con 100 lecturas por segundo de exceso se llena en torno a los 100 segundos; un arreglo paga n movimientos por insertar al inicio, una lista paga uno.
+
+Lecturas: Cormen, cap. 10 (10.1 y 10.2).

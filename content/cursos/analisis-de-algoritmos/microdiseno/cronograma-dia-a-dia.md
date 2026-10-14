@@ -84,10 +84,9 @@
 
 ### Semana 12 — lunes 19 de octubre
 *Coincide con las Evaluaciones institucionales (16-20 oct) — clase normal.*
-**Módulo 7: Estructuras de datos (Cormen Cap. 9-10)**
-- **Sesión 1 (T):** Medianas y selección en tiempo lineal esperado; pilas, colas, listas enlazadas
-- **Sesión 2 (P):** Sin sesión de laboratorio (reajuste 2026-10-04). El material práctico de selección y estructuras elementales queda en los apuntes de la T.
-  - La selección en tiempo lineal esperado usa una partición tipo quicksort; como Ordenamiento ya no se dicta, la partición se explica dentro de la lección y los apuntes.
+**Módulo 7: Estructuras de datos (Cormen Cap. 10)**
+- **Sesión 1 (T):** Pilas, colas y listas enlazadas *(reajuste 2026-10-14: se retiran medianas y selección)*
+- **Sesión 2 (P):** Sin sesión de laboratorio (reajuste 2026-10-04). El material práctico de pilas, colas y listas enlazadas queda en los apuntes de la T.
 
 ### Semana 13 — lunes 26 de octubre
 **Módulo 7: Estructuras de datos (Cormen Cap. 11-12)**

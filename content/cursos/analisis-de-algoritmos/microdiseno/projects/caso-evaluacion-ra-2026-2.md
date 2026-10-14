@@ -317,7 +317,7 @@ entrega razonable:
 |---|---|---|
 | Deduplicación | Comparación exhaustiva O(n²) → tabla hash con encadenamiento o direccionamiento abierto | Semana 13 (Lab 4) |
 | Ordenamiento | Insertion sort → merge sort, heapsort, quicksort; counting/radix sort si el rango de claves lo permite | Semanas 4, 9, 10, 11 (Lab 3) |
-| Mayores consumos (top-k) | Ordenar todo y tomar k → selección en tiempo lineal esperado, o heap de tamaño k | Semanas 9 y 12 |
+| Mayores consumos (top-k) | Ordenar todo con merge sort y tomar los k últimos, Θ(n log n) → recorrer una vez manteniendo una lista ordenada de los k mayores, Θ(n·k) | Semanas 4 y 12 |
 | Consulta puntual | Búsqueda lineal → búsqueda binaria sobre el arreglo ordenado, o tabla hash | Semanas 12 y 13 |
 
 El caso **no exige** grafos, *backtracking*, NP-completitud ni programación
