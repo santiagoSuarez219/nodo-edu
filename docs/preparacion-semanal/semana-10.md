@@ -1,7 +1,7 @@
 # Semana 10 — 9–13 oct (ED)
 
 **Rama:** `feat/semana-10-estructuras-de-datos`
-**Estado:** ✅ Contenido listo · ⬜ `@reviewer` · ⬜ Mergeada a `development` · ⬜ Desplegada y abierta
+**Estado:** ✅ Contenido listo · ✅ `@reviewer` · ✅ Mergeada a `development` (2026-10-14, `e1a5d0c`; rama borrada) · ⬜ Desplegada y abierta
 
 > Una ronda cubre **un curso**. Esta semana solo tiene ronda de `estructuras-de-datos`.
 
@@ -67,6 +67,7 @@ No aplica — semana sin ★.
 - **Sin `BufferedReader/Writer`, `try-with-resources` ni binarios** en apuntes y cuestionario — **motivo:** son de T2 y de la Semana 11; los métodos declaran `throws IOException`.
 - **Votación 2 de los apuntes (`read()` sobre `Hi`) y cuestionario sin solapamiento** — **motivo:** el cuestionario es lectura previa y no puede anticipar lo que la clase descubre.
 - **Enlace de HackerRank corregido a «Java Stdin and Stdout II»** — **motivo:** el enlace del apunte abría el problema II, no el I. Los dos de LeetCode (434 y 58) se comprobaron por su API pública el 2026-10-13.
+- **Dos correcciones menores del `@reviewer` aplicadas sin consultar** (`ce259a1`) — **motivo:** eran errores claros (una frase lógicamente incorrecta y una etiqueta sin verificar).
 - **Las explicaciones de cada pregunta no quedaron en el banco** — **motivo:** `create_question` no tiene campo para ellas.
 
 ### Verificación (E7)
@@ -77,7 +78,7 @@ No aplica — semana sin ★.
 - [x] `summary` presente en frontmatter **y** en registro TS (lección previa)
 - [x] Coherencia cruzada teoría ↔ apuntes ↔ cuestionario
 - [x] Código de los apuntes compilado y ejecutado con `javac` 17 (el curso usa Java 21; no hay nada específico de 21)
-- [ ] `@reviewer`: pendiente
+- [x] `@reviewer`: **APROBADO** (sin bloqueantes ni mayores). Dos menores aplicados en `ce259a1`: la respuesta de la pregunta socrática sobre `(char)` (`c != -1` es siempre verdadera, no «nunca se cumple») y la etiqueta «Fácil» de HackerRank, retirada por no estar confirmada. Sugerencia no aplicada: avisar al docente de que la demo de «José» = 5 bytes exige JDK 18+ (UTF-8 por defecto).
 
 ---
 
@@ -101,3 +102,5 @@ No aplica — semana sin ★.
 - La lección mide 159 líneas, sobre la meta de 100–130; decidir si se recorta.
 - `lectura-escritura-y-modificacion.mdx` (T2, `order: 24`) sigue siendo un stub de 5 líneas.
 - Comprobar en producción si la lección ya tiene preguntas montadas antes de recrearlas (D3).
+- Opcional: añadir a los apuntes el aviso de JDK 18+ para la demo de bytes del Paso 3.
+- El push de `development` a `origin` queda a cargo del usuario.
