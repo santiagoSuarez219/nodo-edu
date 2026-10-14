@@ -206,7 +206,7 @@ Pendiente. Cuando se despliegue: el slug `lectura-escritura-y-modificacion` ya e
 ## Ronda 3 — `programacion-cientifica` (2026-10-14)
 
 **Rama:** `feat/semana-10-programacion-cientifica` (nueva, desde `development`)
-**Estado:** ✅ Contenido listo · ⬜ `@reviewer` · ⬜ Mergeada a `development` · ⬜ Desplegada en producción
+**Estado:** ✅ Contenido listo · ✅ `@reviewer` (aprobado, correcciones aplicadas) · ✅ Mergeada a `development` (2026-10-14, `efb2574`; rama borrada) · ⬜ Desplegada en producción
 
 **Alcance confirmado por el usuario:** sesión del jueves 8 oct (**ya dictada**; la
 ronda empezó el 14 oct): operaciones vectorizadas y álgebra lineal básica,
