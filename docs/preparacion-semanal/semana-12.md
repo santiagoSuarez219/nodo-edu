@@ -15,8 +15,8 @@ el docente decidió dictar esa clase **sin sesión P**.
 
 | Sesión | Fecha | Tema | ★/◇ |
 |---|---|---|---|
-| T | lun 19 oct | Medianas, selección y estructuras elementales | |
-| P | lun 19 oct | Laboratorio — Selección y estructuras elementales (**sin sesión**, decisión del docente) | |
+| T | lun 19 oct | Pilas, colas y listas enlazadas *(reajuste 2026-10-14: se retiran medianas y selección; lección renombrada de `medianas-seleccion-y-estructuras-elementales`)* | |
+| P | lun 19 oct | Laboratorio — Estructuras elementales (**sin sesión**, decisión del docente) | |
 
 ### Etapas y aprobaciones
 
@@ -33,9 +33,9 @@ el docente decidió dictar esa clase **sin sesión P**.
 
 | Artefacto | Ruta | Publicado |
 |---|---|---|
-| Lección teórica | `content/cursos/analisis-de-algoritmos/medianas-seleccion-y-estructuras-elementales.mdx` | ⬜ |
+| Lección teórica | `content/cursos/analisis-de-algoritmos/pilas-colas-y-listas.mdx` | ⬜ |
 | Registro TS | `lib/courses/data/analisis-de-algoritmos.ts` (`order: 12`) | — |
-| Apunte de clase | `content/cursos/analisis-de-algoritmos/apuntes/medianas-seleccion-y-estructuras-elementales.md` | Solo owner/admin |
+| Apunte de clase | `content/cursos/analisis-de-algoritmos/apuntes/pilas-colas-y-listas.md` | Solo owner/admin |
 
 ### Cuestionario de cierre
 
@@ -43,6 +43,8 @@ el docente decidió dictar esa clase **sin sesión P**.
 |---|---|---|---|---|
 | `medianas-seleccion-y-estructuras-elementales` | desarrollo | `737396be-ee51-468b-b7a6-7afc40f2d34f`, `d5775d18-b586-4b72-9bc6-a596f2779033`, `4cd62ac7-9ee8-495d-9ce9-192c67f8557c`, `3d7e4732-3d93-457e-9176-ef6b34eb8247`, `0359aa7d-23ed-4951-ab64-f9526f38ca88` | ✅ | ✅ (5) |
 | `medianas-seleccion-y-estructuras-elementales` | **producción** | `680dce63-a2d2-4c44-a7a3-c4d9bcb93c15`, `8b53d196-00d5-4820-889b-55d3af8c09c1`, `a025501c-a1a3-4a39-8708-964d83aa8f29`, `a649e776-2724-4bd6-a12f-19566ffdee2d`, `53640acd-d404-42b5-ad55-0e62769c3d62` | ✅ | ✅ (5) |
+| `pilas-colas-y-listas` | desarrollo | `479d6679-96cc-4485-8a69-a73969bb05a0`, `054828d4-aab0-47ca-817b-b969cb7fe548`, `932228f8-d36a-4269-99a5-d0d1ec784c72`, `895fe615-dbf4-4dd0-8db8-2cdc0a78381e`, `03fcd459-9d4c-4058-8905-87b92b0b0f0c` | ✅ | ✅ (5) — reajuste 2026-10-14 |
+| `pilas-colas-y-listas` | **producción** | `a9e6298e-96b0-4256-b6f0-a51884950eb1`, `0642b03a-f040-47bf-8279-79e1b292389d`, `09ae73b3-6e05-4c26-b042-71384ba0721a`, `524f04a1-9ca0-4c38-9688-7c8a011a818f`, `53640acd-d404-42b5-ad55-0e62769c3d62` (reutilizada, lista doble) | ✅ | ✅ (5), montadas en el slug nuevo; **pendiente**: desmontar las 4 viejas de selección (`680dce63…`, `8b53d196…`, `a025501c…`, `a649e776…`) del slug viejo y la quinta, al desplegar |
 
 > Las preguntas **no viajan con el deploy**: se recrean en producción en D3.
 > Mientras la fila de producción esté vacía, la autoevaluación no existe para
@@ -89,3 +91,26 @@ No aplica.
 ## Pendientes
 
 - Abrir en el navegador los enlaces de LeetCode de los apuntes antes de compartirlos (dan 403 a herramientas automáticas).
+
+
+## Reajuste 2026-10-14 — retiro de medianas y selección (renombre del slug)
+
+La lección `medianas-seleccion-y-estructuras-elementales` pasó a `pilas-colas-y-listas`. Estado de los datos en producción al 2026-10-14 (consulta de solo lectura):
+
+| Tabla | Filas con slug viejo | Decisión |
+|---|---|---|
+| `lesson_progress` | 56 (56 estudiantes, 23 completadas) | **Migrar** al slug nuevo al desplegar |
+| `self_assessment_attempts` | 24 (24 estudiantes) | **Dejar** bajo el slug viejo: la restricción `UNIQUE (user_id, course_slug, lesson_slug)` los bloquearía para responder las preguntas nuevas |
+| `disabled_lessons` | 0 | Nada que migrar (la lección no está cerrada) |
+| `lesson_questions` | 5 | Las 5 preguntas nuevas ya están montadas en el slug nuevo |
+| `self_assessment_attempts_discarded`, `questions` | 0 | Nada que migrar |
+
+Desarrollo (`nodo-dev`): sin progreso ni intentos; solo las 5 preguntas montadas en el slug nuevo.
+
+**Procedimiento de despliegue (confirmación explícita del usuario en cada paso de escritura):**
+
+1. Desplegar el código (merge a `main` → Vercel), sin cambios de esquema: no se ejecuta ningún comando de migración de base de datos.
+2. Justo después de que el despliegue esté en vivo, migrar el progreso (verificar antes que el slug nuevo siga con 0 filas y mostrar el conteo):
+   `update lesson_progress set lesson_slug = 'pilas-colas-y-listas' where course_slug = 'analisis-de-algoritmos' and lesson_slug = 'medianas-seleccion-y-estructuras-elementales';` → esperado: 56 filas.
+3. Verificar: slug viejo con 0 filas y slug nuevo con 56 en `lesson_progress`; `list_lesson_questions` del slug nuevo con 5 preguntas.
+4. Limpieza opcional: desmontar del slug viejo las 4 preguntas de selección (`680dce63…`, `8b53d196…`, `a025501c…`, `a649e776…`) y la lista doble (`53640acd…`). Tras el despliegue ese slug ya no existe en el sitio.
