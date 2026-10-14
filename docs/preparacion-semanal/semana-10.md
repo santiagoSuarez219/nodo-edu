@@ -1,9 +1,9 @@
-# Semana 10 — 9–13 oct (ED)
+# Semana 10 — 9–13 oct (ED) · 8 oct (PC)
 
 **Rama:** `feat/semana-10-estructuras-de-datos`
 **Estado:** ✅ Contenido listo · ✅ `@reviewer` · ✅ Mergeada a `development` (2026-10-14, `e1a5d0c`; rama borrada) · ✅ Desplegada en producción (2026-10-14, `c95785b`) · ⬜ Abierta a estudiantes (decisión del usuario: se deja **cerrada**)
 
-> Una ronda cubre **un curso**. Esta semana solo tiene ronda de `estructuras-de-datos`.
+> Una ronda cubre **un curso**. Esta semana tiene rondas de `estructuras-de-datos` (rondas 1 y 2) y de `programacion-cientifica` (ronda 3, al final del archivo).
 
 ---
 
@@ -200,3 +200,108 @@ Pendiente. Cuando se despliegue: el slug `lectura-escritura-y-modificacion` ya e
 - `cargar()` es O(n²) por `insertarFinal`; está como gancho en los apuntes y no se menciona en la lección.
 - Los apuntes asumen el `Cliente` de 3 campos de ayer; los apuntes de eliminación en lista simple usan uno de 4.
 - La T2 ya se dictó: la lección y su cuestionario no pudieron abrirse antes de la clase.
+
+---
+
+## Ronda 3 — `programacion-cientifica` (2026-10-14)
+
+**Rama:** `feat/semana-10-programacion-cientifica` (nueva, desde `development`)
+**Estado:** ✅ Contenido listo · ⬜ `@reviewer` · ⬜ Mergeada a `development` · ⬜ Desplegada en producción
+
+**Alcance confirmado por el usuario:** sesión del jueves 8 oct (**ya dictada**; la
+ronda empezó el 14 oct): operaciones vectorizadas y álgebra lineal básica,
+completando el stub existente. Sin corrimientos de calendario. El Momento
+evaluativo 3 (NumPy, 15 %) es el jue. 15 oct (Semana 11); el usuario pidió seguir
+el flujo normal, sin priorizar el despliegue.
+
+### Sesiones cubiertas
+
+| Sesión | Fecha | Tema | ★/◇ |
+|---|---|---|---|
+| Única (jueves) | jue. 8 oct (ya dictada) | NumPy: operaciones vectorizadas y álgebra lineal | — (◇ de seguimiento en `info.md`) |
+
+### Etapas y aprobaciones
+
+| Etapa | Resultado | Aprobada por el usuario |
+|---|---|---|
+| E2 · Plan de lección | 9 secciones, sin Mermaid, sin KaTeX, `keepdims` incluido, sin `.T`/`np.linalg` | ✅ (aprobado tal cual) |
+| E3 · Lección `.mdx` + registro TS | `operaciones-vectorizadas-y-algebra-lineal-basica`, `order: 8`, `summary` agregado, 280 líneas | ✅ (sin pedir recorte) |
+| E4 · Apuntes del docente | Pedidos por el usuario; sin las cuatro dinámicas de ED/AA (PC no las exige) | ✅ (avance implícito a E5) |
+| E5 · Cuestionario de cierre | Propuesto: 5 preguntas → aprobadas 5; 6 keywords nuevas aprobadas | ✅ |
+| E6 · Guía del estudiante | No — sesión en vivo (confirmado por el usuario) | ✅ |
+| E6 · Quiz A/B/C | No aplica — semana sin ★ (confirmado por el usuario) | ✅ |
+
+### Artefactos producidos
+
+| Artefacto | Ruta | Publicado |
+|---|---|---|
+| Lección teórica | `content/cursos/programacion-cientifica/operaciones-vectorizadas-y-algebra-lineal-basica.mdx` | ⬜ (en rama; el slug ya está en producción como stub) |
+| Registro TS | `lib/courses/data/programacion-cientifica.ts` (`order: 8`, solo se agregó `summary`) | — |
+| Apunte de clase | `content/cursos/programacion-cientifica/apuntes/operaciones-vectorizadas-y-algebra-lineal-basica.md` (542 líneas) | Solo owner/admin (en rama) |
+
+### Cuestionario de cierre
+
+| Lección | Entorno | IDs de preguntas | Publicadas | Montadas (`list_lesson_questions`) |
+|---|---|---|---|---|
+| `operaciones-vectorizadas-y-algebra-lineal-basica` | desarrollo | `4168bb5c-00f6-4275-b9a9-b29a9cb596a8`, `b601d6d1-0bc1-41d3-b953-626628e4eb11`, `edad303c-83e4-408f-9c8a-2529cdd1b5b9`, `9b74fff8-657e-4988-9d2e-8793a1737276`, `37178be2-cef9-4f47-bdac-d5023d5db8ed` | ✅ | ✅ (orden 0-4, dificultades 1, 2, 3, 3, 4) |
+| `operaciones-vectorizadas-y-algebra-lineal-basica` | **producción** | — | ⬜ | ⬜ |
+
+> Las preguntas **no viajan con el deploy**: se recrean en producción en D3.
+> Keywords nuevas creadas en desarrollo: `python` (`lenguaje`), `numpy`,
+> `vectorizacion`, `broadcasting`, `estadistica-descriptiva`, `algebra-lineal`
+> (`tema`). `cierre` ya existía. En producción hay que verificar cuáles existen
+> antes de crearlas (`python` puede existir ya con otro `kind`).
+
+### Quiz calificable A/B/C
+
+No aplica — semana sin ★.
+
+### Decisiones tomadas por Claude en nombre del docente
+
+- **Lección de 280 líneas, el doble de la meta (100–130)** — **motivo:** los bloques de código con su salida real y las trazas a mano ocupan casi todo; recortarlos sacaba contenido comprometido. El usuario aprobó sin pedir recorte. Lo más prescindible: la sección 4 (ufuncs) o el ejemplo de `keepdims`.
+- **Formato de lectura previa (aula invertida) en PC** — **motivo:** la lección de la Semana 9 ya lo usa; la skill dice que PC no lo exige, pero se siguió el precedente por continuidad.
+- **Salidas redondeadas con `np.round`/`.round(2)`** — **motivo:** sin ello el producto punto imprime `24.759999999999998`.
+- **Datos ilustrativos inventados:** `ajuste_dia`, `ajuste_est`, `pesos` (0.4, 0.3, 0.2, 0.1) y `zonas` (norte/sur 0.5 cada una) — **motivo:** hacen falta para ilustrar broadcasting y producto matricial.
+- **Errores deliberados de los apuntes dentro de `try/except`** — **motivo:** para que el cuaderno de Colab no se detenga en vivo.
+- **Reto de extensión de los apuntes mide la fórmula de Fahrenheit con `%timeit`** (1.000.000 de valores; ~23 ms lista y ~0,5 ms arreglo en una ejecución local, no en Colab) — **motivo:** la S9 lo prometía; los tiempos son orden de magnitud.
+- **Preguntas del cuestionario con ejemplos distintos a los de la lección** (`[10, 20]`, tabla (3,5), vectores `[1,2,3]` y `[4,5,6]`, matrices (3,4) y (4,2)) — **motivo:** el cuestionario es verificación de lectura y no debe repetir lo ya resuelto.
+- **Ufuncs y `keepdims` sin pregunta de cierre** — **motivo:** se propusieron 5 preguntas, una por concepto de peso; el usuario las aprobó así.
+- **Las explicaciones de cada pregunta no quedaron en el banco** — **motivo:** `create_question` no tiene campo para ellas.
+- **Avance implícito a E5 sin aprobación explícita de los apuntes** — **motivo:** el usuario escribió «Pasa a E5»; lo tomé como visto bueno.
+
+### Verificación (E7)
+
+- [x] `npm run build` en verde
+- [x] `npm run lint` en verde (0 errores; 10 avisos preexistentes en archivos no tocados)
+- [x] Checklist de `lesson-authoring` §8 recorrido (`.mdx` sin H1, sin `###`, sin `---` en el cuerpo, sin `$`, sin Mermaid; `updatedAt` 2026-10-14)
+- [x] `summary` presente en frontmatter **y** en registro TS, idénticos
+- [x] Lección y apuntes compilados como MDX (`next-mdx-remote` con `remark-math` y `remark-gfm`): ambos OK
+- [x] Código de la lección y de los apuntes ejecutado con NumPy por los agentes que los escribieron; respuestas del cuestionario verificadas con NumPy
+- [x] Preguntas publicadas **y montadas**, verificado con `list_lesson_questions`
+- [x] Apuntes sin entrada TS; no existe guía del estudiante
+- [ ] Coherencia cruzada teoría ↔ apuntes ↔ cuestionario: revisada solo a nivel de estructura; la revisión fina queda a `@reviewer`
+- [ ] `@reviewer`: pendiente
+
+---
+
+### Despliegue
+
+| Paso | Estado | Fecha / detalle |
+|---|---|---|
+| D0 · Alcance y checklist pre-despliegue | ⬜ | |
+| D1 · Lecciones nuevas cerradas por adelantado | ⬜ | el slug ya existe en producción como stub; comprobar su fila de visibilidad |
+| D2 · Merge a `main` y deploy en Vercel | ⬜ | |
+| D3 · Banco de preguntas replicado a producción | ⬜ | 6 keywords + 5 preguntas |
+| D4 · Lecciones abiertas a los estudiantes | ⬜ | `programacion-cientifica` → `operaciones-vectorizadas-y-algebra-lineal-basica` |
+| D5 · Verificación end-to-end en producción | ⬜ | |
+| D6 · Bitácora cerrada y rama `deploy/` borrada | ⬜ | |
+
+- [ ] Verificado que las lecciones de semanas futuras siguen **cerradas**
+
+### Pendientes
+
+- **Calendario:** el Momento evaluativo 3 (NumPy) es el jue. 15 oct. Para que el estudiante tenga la lección y su cuestionario antes, hay que desplegar y abrir antes de esa fecha.
+- Decidir si se recorta la lección (280 líneas frente a la meta de 100–130).
+- El taller del Momento evaluativo 3 no existe: el registro no tiene una guía equivalente a `taller-evaluativo-02` (`order: 6.5`). Es de la Semana 11, fuera de esta ronda.
+- Opcional: añadir ufuncs y `keepdims` al cuestionario.
+- El push de `development` a `origin` queda a cargo del usuario.

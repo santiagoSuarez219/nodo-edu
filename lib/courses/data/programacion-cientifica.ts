@@ -163,6 +163,7 @@ export const programacionCientifica: Course = {
       articleSlug: "operaciones-vectorizadas-y-algebra-lineal-basica",
       order: 8,
       title: "Operaciones vectorizadas y álgebra lineal básica",
+      summary: "Aplica una fórmula a las 28 temperaturas de la red de estaciones sin escribir un bucle: operaciones vectorizadas, broadcasting, funciones universales y estadística por estación, y cierra con el promedio ponderado como producto punto y producto matricial.",
       topics: [
         { title: "Operaciones vectorizadas y broadcasting" },
         { title: "Funciones universales (ufuncs) y estadística descriptiva básica" },
