@@ -114,3 +114,13 @@ Desarrollo (`nodo-dev`): sin progreso ni intentos; solo las 5 preguntas montadas
    `update lesson_progress set lesson_slug = 'pilas-colas-y-listas' where course_slug = 'analisis-de-algoritmos' and lesson_slug = 'medianas-seleccion-y-estructuras-elementales';` → esperado: 56 filas.
 3. Verificar: slug viejo con 0 filas y slug nuevo con 56 en `lesson_progress`; `list_lesson_questions` del slug nuevo con 5 preguntas.
 4. Limpieza opcional: desmontar del slug viejo las 4 preguntas de selección (`680dce63…`, `8b53d196…`, `a025501c…`, `a649e776…`) y la lista doble (`53640acd…`). Tras el despliegue ese slug ya no existe en el sitio.
+
+### Cierre del despliegue — 2026-10-14
+
+- `main` en `f436849` (`deploy: release semana 12 AA`); Vercel `READY`, dominio `www.nod0.dev` asignado. Sin cambios de esquema: no se ejecutó ningún comando de base de datos.
+- Lección abierta en producción: `pilas-colas-y-listas` (sin fila en `disabled_lessons`, abierta por defecto). Las 4 lecciones de PD y síntesis siguen cerradas.
+- `lesson_progress` migrado: 56 filas (23 completadas) de `medianas-seleccion-y-estructuras-elementales` a `pilas-colas-y-listas`. Verificado: 0 en el slug viejo, 56 en el nuevo.
+- `self_assessment_attempts`: 24 intentos conservados bajo el slug viejo (historial); 0 en el slug nuevo, así que los estudiantes pueden responder las preguntas nuevas.
+- Preguntas de cierre en producción: 5 montadas en `pilas-colas-y-listas`, en orden.
+- Limpieza hecha (2026-10-14): las 4 preguntas de selección (`680dce63…`, `8b53d196…`, `a025501c…`, `a649e776…`) y la lista doble (`53640acd…`) se desmontaron del slug viejo con `unmount_question_from_lesson`. Verificado: 0 montajes en `medianas-seleccion-y-estructuras-elementales` y 5 en `pilas-colas-y-listas`. Las 4 preguntas de selección siguen publicadas en el banco, sin montar; la lista doble sigue montada en el slug nuevo.
+- **Pendientes:** ninguno de datos. Falta solo que el docente confirme visualmente en `www.nod0.dev` que la lección carga y que la autoevaluación aparece al final.
