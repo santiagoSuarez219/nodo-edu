@@ -184,7 +184,7 @@ compara dos estrategias algorítmicas para cada una.
 Por qué encaja:
 
 - Se resuelve íntegramente con contenido dictado —tablas hash, algoritmos de
-  ordenamiento, selección en tiempo lineal, búsqueda binaria— y **no requiere**
+  ordenamiento, listas enlazadas, búsqueda binaria— y **no requiere**
   grafos ni *backtracking*.
 - El contraste empírico-teórico que pide la rúbrica (RADT1, 30%) es la práctica
   que los laboratorios del curso vienen ejercitando desde la Semana 3.

@@ -88,7 +88,7 @@ Cada uno de los cuatro laboratorios evaluativos se entrega como un **informe de 
 | 9   | —                                              | Sin sesiones (Ordenamiento retirado del curso)                       |                     |
 | 10  | Divide y vencer (Cormen Cap. 4)                | Lunes 5 oct: Strassen y síntesis de divide y vencer                  | ★ Laboratorio 2     |
 | 11  | —                                              | Lunes 12 oct: festivo, sin clase                                     |                     |
-| 12  | Estructuras de datos (Cormen Cap. 9–10)        | Lunes 19 oct: selección/medianas; pilas, colas, listas enlazadas (sin sesión P) |                     |
+| 12  | Estructuras de datos (Cormen Cap. 10)          | Lunes 19 oct: pilas, colas, listas enlazadas (sin sesión P) |                     |
 | 13  | Estructuras de datos (Cormen Cap. 11–12)       | Lunes 26 oct: tablas hash y árboles de búsqueda binarios             | ★ Laboratorio 3     |
 | 14  | —                                              | Lunes 2 nov: festivo, sin clase                                      |                     |
 | 15  | Programación dinámica y voraces (Cormen Cap. 15–16) | Lunes 9 nov: rod cutting y fundamentos de la PD; estrategia voraz (resto en lectura autónoma) |  |
@@ -256,19 +256,16 @@ curso-analisis-algoritmos/
 
 ---
 
-## Módulo 7 — Estructuras de datos (Cormen, Cap. 9–12) ★
+## Módulo 7 — Estructuras de datos (Cormen, Cap. 10–12) ★
 
-### Semana 12 — Selección y estructuras elementales (lunes 19 oct)
+### Semana 12 — Estructuras elementales (lunes 19 oct)
 
-**T — Medianas, selección y estructuras elementales**
-- Mínimo y máximo; selección en tiempo lineal esperado
+**T — Pilas, colas y listas enlazadas** *(reajuste 2026-10-14: se retiran medianas y selección)*
 - Pilas y colas: operaciones e implementación con arreglos
 - Listas enlazadas: simple, doble; representación de árboles enraizados
 
-**P — Laboratorio: Selección y estructuras elementales** *(reajuste 2026-10-04: el lunes 19 oct se dicta sin sesión P; el material de la sesión queda en los apuntes de la T)*
-- Implementar el algoritmo de selección en tiempo lineal esperado (basado en partición tipo quicksort; al retirarse Ordenamiento, la partición se explica en esta sesión)
+**P — Laboratorio: Estructuras elementales** *(reajuste 2026-10-04: el lunes 19 oct se dicta sin sesión P; el material de la sesión queda en los apuntes de la T)*
 - Implementar pila y cola con arreglo, y una lista simplemente enlazada
-- Comparar el costo de encontrar el k-ésimo menor elemento por selección vs. por ordenamiento completo
 
 ### Semana 13 — Tablas hash y árboles de búsqueda binarios ★ (lunes 26 oct)
 
