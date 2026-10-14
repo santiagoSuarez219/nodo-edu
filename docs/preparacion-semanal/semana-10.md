@@ -1,7 +1,7 @@
 # Semana 10 — 9–13 oct (ED)
 
 **Rama:** `feat/semana-10-estructuras-de-datos`
-**Estado:** ✅ Contenido listo · ✅ `@reviewer` · ✅ Mergeada a `development` (2026-10-14, `e1a5d0c`; rama borrada) · ⬜ Desplegada y abierta
+**Estado:** ✅ Contenido listo · ✅ `@reviewer` · ✅ Mergeada a `development` (2026-10-14, `e1a5d0c`; rama borrada) · ✅ Desplegada en producción (2026-10-14, `c95785b`) · ⬜ Abierta a estudiantes (decisión del usuario: se deja **cerrada**)
 
 > Una ronda cubre **un curso**. Esta semana solo tiene ronda de `estructuras-de-datos`.
 
@@ -45,7 +45,7 @@ con las cuatro dinámicas y cuestionario de cierre. La lección y su registro TS
 | Lección | Entorno | IDs de preguntas | Publicadas | Montadas (`list_lesson_questions`) |
 |---|---|---|---|---|
 | `fundamentos-de-archivos` | desarrollo | `50406de2-94a2-4615-933b-603a06bca23c`, `b6f29fc5-8dc3-444a-b9e0-bdc797282755`, `56a2a0a3-1a42-4446-b879-ef13cc66b749`, `62e70694-1956-421f-ab1c-a9f9629b268c`, `013fbf5f-d036-44ec-9bc8-43eef3d7affc`, `86dc7a7a-f225-4f63-bf30-dedbe2e83e9a` | ✅ | ✅ (orden 0-5, dificultades 1, 2, 2, 3, 3, 4) |
-| `fundamentos-de-archivos` | **producción** | — | ⬜ | ⬜ |
+| `fundamentos-de-archivos` | **producción** | `01fd9e91-369a-463e-868b-4cadc4f137a1`, `feae03fd-64e7-4908-8d14-2e8e7c22fb94`, `5ad3c8aa-f20b-4593-b3af-5dbeb68db9fb`, `296d31a5-4a18-4bd6-a237-fa5f54708432`, `f69625b4-a981-473a-b435-51416d48d7ae`, `ffb7d3be-e812-446d-96e4-c4f4e1a99ca0` | ✅ | ✅ (orden 0-5, 2026-10-14) |
 
 > Las preguntas **no viajan con el deploy**: se recrean en producción en D3.
 > Mientras la fila de producción esté vacía, la autoevaluación no existe para
@@ -86,21 +86,21 @@ No aplica — semana sin ★.
 
 | Paso | Estado | Fecha / detalle |
 |---|---|---|
-| D0 · Alcance y checklist pre-despliegue | ⬜ | |
-| D1 · Lecciones nuevas cerradas por adelantado | ⬜ | no hay lecciones nuevas: solo apuntes (owner/admin) |
-| D2 · Merge a `main` y deploy en Vercel | ⬜ | rama `deploy/semana-10` |
-| D3 · Banco de preguntas replicado a producción | ⬜ | keywords + 6 preguntas |
-| D4 · Lecciones abiertas a los estudiantes | ⬜ | `fundamentos-de-archivos` ya está en producción: comprobar su estado con `list_course_lessons` |
-| D5 · Verificación end-to-end en producción | ⬜ | |
-| D6 · Bitácora cerrada y rama `deploy/` borrada | ⬜ | |
+| D0 · Alcance y checklist pre-despliegue | ✅ | 4 commits (3 archivos, solo contenido y docs), sin cambios de esquema. La lección ya estaba en producción pero **deshabilitada** desde 2026-08-03 («Contenido aún en stub…») |
+| D1 · Lecciones nuevas cerradas por adelantado | ✅ No aplica | no hay lección nueva y ya existe la fila de cierre; los apuntes son solo owner/admin |
+| D2 · Merge a `main` y deploy en Vercel | ✅ | rama `deploy/semana-10`, merge `c95785b`, push a `main`; deploy `dpl_416mc3RQxAeVvYaBS2nvKjoQFFgb` en `READY` |
+| D3 · Banco de preguntas replicado a producción | ✅ | 8 keywords creadas (`archivos`, `persistencia`, `flujos`, `texto-binario`, `arquitectura`, `file`, `filewriter`, `cierre`); `java` ya existía (sin `kind`) y se reutilizó. 6 preguntas creadas, publicadas y montadas; sin duplicados previos |
+| D4 · Lecciones abiertas a los estudiantes | ⏸ Omitido | decisión del usuario: `fundamentos-de-archivos` **sigue cerrada** (`is_disabled: true`, comprobado tras el deploy). Para abrirla: `set_lesson_availability` con `enabled: true` en `courses-mcp-prod` |
+| D5 · Verificación end-to-end en producción | ⬜ Parcial | verificado por API: deploy `READY`, preguntas montadas, lección cerrada. No se abrió el navegador; la revisión visual de los apuntes y de la autoevaluación queda al usuario |
+| D6 · Bitácora cerrada y rama `deploy/` borrada | ✅ | `deploy/semana-10` borrada en local (nunca se subió a `origin`) |
 
-- [ ] Verificado que las lecciones de semanas futuras siguen **cerradas**
+- [x] Verificado que `fundamentos-de-archivos` sigue **cerrada**. Las lecciones de semanas futuras no se tocaron (D4 omitido); `lectura-escritura-y-modificacion` (stub) sigue cerrada.
 
 ## Pendientes
 
 - Confirmar si la sesión T1 requiere guía del estudiante (se asumió demo en vivo).
 - La lección mide 159 líneas, sobre la meta de 100–130; decidir si se recorta.
 - `lectura-escritura-y-modificacion.mdx` (T2, `order: 24`) sigue siendo un stub de 5 líneas.
-- Comprobar en producción si la lección ya tiene preguntas montadas antes de recrearlas (D3).
+- Decidir cuándo abrir `fundamentos-de-archivos` a los estudiantes (D4): la autoevaluación ya está montada en producción y quedará visible en cuanto se abra.
 - Opcional: añadir a los apuntes el aviso de JDK 18+ para la demo de bytes del Paso 3.
 - El push de `development` a `origin` queda a cargo del usuario.
