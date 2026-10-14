@@ -104,3 +104,99 @@ No aplica — semana sin ★.
 - Decidir cuándo abrir `fundamentos-de-archivos` a los estudiantes (D4): la autoevaluación ya está montada en producción y quedará visible en cuanto se abra.
 - Opcional: añadir a los apuntes el aviso de JDK 18+ para la demo de bytes del Paso 3.
 - El push de `development` a `origin` queda a cargo del usuario.
+
+---
+
+## Ronda 2 — `estructuras-de-datos`, T2 (2026-10-14)
+
+**Rama:** `feat/semana-10-estructuras-de-datos` (nueva, desde `development`)
+**Estado:** ✅ Contenido listo · ✅ `@reviewer` (aprobado, correcciones aplicadas) · ⬜ Mergeada a `development` · ⬜ Desplegada en producción
+
+**Alcance confirmado por el usuario:** lección de la sesión T2 de la Semana 10
+(martes 13 oct, **ya dictada**; la ronda empezó el 14 oct): `BufferedReader` y
+`BufferedWriter`, `IOException` y `try-with-resources`, formato CSV-like, con el
+ejercicio de guardar la lista enlazada en un `.txt` y reconstruirla. Excluidas:
+modificación de registros (T2 Sem. 11, 16 oct) y binarios (T1 Sem. 11, 15 oct).
+
+### Sesiones cubiertas
+
+| Sesión | Fecha | Tema | ★/◇ |
+|---|---|---|---|
+| T2 + práctica incorporada | mar. 13 oct (ya dictada) | Lectura y escritura eficiente, excepciones y CSV-like | — |
+
+### Etapas y aprobaciones
+
+| Etapa | Resultado | Aprobada por el usuario |
+|---|---|---|
+| E2 · Plan de lección | 9 secciones, sin Mermaid, ~125–135 líneas previstas | ✅ (las 4 preguntas abiertas del plan no se respondieron; ver decisiones) |
+| E3 · Lección `.mdx` + registro TS | `lectura-escritura-y-modificacion`, `order: 24`, `summary` agregado, 183 líneas | ✅ (avance implícito a E4; sin respuesta sobre longitud, `getHead()` ni título) |
+| E4 · Apuntes del docente | Pedidos por el usuario, con las cuatro dinámicas | ✅ (avance implícito a E5) |
+| E5 · Cuestionario de cierre | Propuesto: 5 preguntas → aprobadas 5 | ✅ («Apruebo» sin elegir keywords ni Q4; ver decisiones) |
+| E6 · Guía del estudiante | No — sesión con demo en vivo (supuesto, **por confirmar**) | ⬜ |
+| E6 · Quiz A/B/C | No aplica — semana sin ★ | — |
+
+### Artefactos producidos
+
+| Artefacto | Ruta | Publicado |
+|---|---|---|
+| Lección teórica | `content/cursos/estructuras-de-datos/lectura-escritura-y-modificacion.mdx` | ⬜ (en rama; el slug ya está en producción como stub, **cerrado**) |
+| Registro TS | `lib/courses/data/estructuras-de-datos.ts` (`order: 24`, solo se agregó `summary`) | — |
+| Apunte de clase | `content/cursos/estructuras-de-datos/apuntes/lectura-escritura-y-modificacion.md` | Solo owner/admin (en rama) |
+
+### Cuestionario de cierre
+
+| Lección | Entorno | IDs de preguntas | Publicadas | Montadas (`list_lesson_questions`) |
+|---|---|---|---|---|
+| `lectura-escritura-y-modificacion` | desarrollo | `7926ad4b-3385-44cc-ad87-2e93943c5f21`, `ad503176-c922-4316-a3eb-f7ef1d238605`, `214630fe-c8f9-4681-a532-37f2959ef54e`, `0e3decee-a6f7-46a0-aeb5-a7be3c5a4066`, `3dd63226-f8d2-4356-9d66-7c9c75ac64c5` | ✅ | ✅ (orden 0-4, dificultades 1, 2, 2, 3, 3) |
+| `lectura-escritura-y-modificacion` | **producción** | — | ⬜ | ⬜ |
+
+> Las preguntas **no viajan con el deploy**: se recrean en producción en D3.
+> Keywords nuevas creadas en desarrollo: `buffer`, `try-with-resources`,
+> `excepciones`, `csv` (kind `tema`). En producción ya existen `archivos`,
+> `persistencia`, `flujos`, `texto-binario`, `arquitectura`, `file`,
+> `filewriter`, `cierre` y `java` (ronda 1); faltan las cuatro nuevas.
+
+### Quiz calificable A/B/C
+
+No aplica — semana sin ★.
+
+### Decisiones tomadas por Claude en nombre del docente
+
+- **Título sin cambios** («Lectura, escritura y modificación») — **motivo:** ya está desplegado y el usuario no respondió la pregunta del plan. El plan recomendaba «Lectura y escritura de archivos de texto» (slug y `order` no cambian). La *modificación* es la T2 del 16 oct.
+- **Línea mal formada en `cargar()`: ignora líneas en blanco y lanza `IOException` con el número de línea** — **motivo:** propuesta del plan, sin respuesta del usuario.
+- **`guardar(Cliente)` de ayer pasa a `agregar(Cliente)`; `guardar(ListaSimple<Cliente>)` reescribe todo** — **motivo:** propuesta del plan, sin respuesta del usuario.
+- **La lección usa `clientes.getHead()` sin definirlo** — **motivo:** el `ListaSimple` publicado solo tiene `estaVacia()` y `getTamano()`; los apuntes añaden `getHead()` en el Paso 4. Un estudiante que no asistió a clase no lo tiene.
+- **Keywords: 4 nuevas en lugar de las 7 propuestas** — **motivo:** recomendación mía, para no inflar el catálogo (que también se replica en producción). El usuario respondió «Apruebo» sin elegir.
+- **Q1 reescrita** («Ayer usaste `FileWriter` y `FileReader`») y **Q4 mantenida** — **motivo:** el enunciado original decía «ayer copiaste la agenda letra a letra», que la lección de ayer no hacía; Q4 se parece a una predicción del Paso 3 de los apuntes, pero la lección también la cubre.
+- **Las explicaciones de cada pregunta no quedaron en el banco** — **motivo:** `create_question` no tiene campo para ellas.
+- **Sesión tratada como demo en vivo, sin guía del estudiante** — **motivo:** igual que la T1 y los apuntes de pilas y colas; no se preguntó de forma explícita. Por confirmar.
+- **Práctica externa:** LeetCode 468 y 206 comprobados por su API pública; HackerRank *Java String Tokens* existe con ese título, su dificultad no se confirmó. Ninguno se resolvió.
+
+### Verificación (E7)
+
+- [x] `npm run build` en verde
+- [x] `npm run lint` en verde (0 errores; 10 avisos preexistentes en archivos no tocados)
+- [x] Checklist de `lesson-authoring` §8 recorrido (`.mdx` sin H1, sin `###`, sin `---`, sin `$`; `updatedAt` 2026-10-14)
+- [x] `summary` presente en frontmatter **y** en registro TS, idénticos
+- [x] Código de la lección compilado y ejecutado con `javac` 17 (el curso usa Java 21; nada es específico de 21): `copiar`, `mostrar`, `mostrarSeguro`, `split(";", -1)`, y `guardar`/`cargar` armados en un `ClienteService` (archivo inexistente → lista vacía; teléfono vacío conservado; guardar dos veces no duplica; renglón mal formado → `Línea 6 inválida: 2;mal`)
+- [x] Código de los apuntes compilado y ejecutado por el agente que los escribió (proyecto completo, errores planeados, votaciones y reto)
+- [x] Coherencia cruzada teoría ↔ apuntes ↔ cuestionario: revisada por mí y por `@reviewer` (el cuestionario, solo por mí: el reviewer no tiene acceso al MCP)
+- [x] `@reviewer`: **APROBADO** (sin bloqueantes). Dos Mayores y tres Menores, aplicados por orden del usuario:
+  - **Mayor 1:** la lección daba por conocidos `ClienteService`, `ARCHIVO` y `guardar(Cliente)`, que solo existen en los apuntes privados de la T1. Se reescribió la frase de la sección 8 («el `ClienteService` que armamos en clase…»).
+  - **Mayor 2:** el Paso 5 renombra `guardar(Cliente)` a `agregar(Cliente)`, pero la `ClienteView` de la T1 seguía llamando `guardar`, y el proyecto no compilaba hasta el Paso 7. Se añadió la instrucción de cambiar la llamada a `agregar`, y se corrigió el comentario «la View todavía no existe».
+  - **Menores:** instrucción de borrar `data/clientes.txt` antes de la prueba del Paso 5 y `data/` antes de la «primera ejecución»; precisar «primer renglón (el de Ana)» en el archivo dañado; nota para ejecutar el `try` de la votación 1 dentro de un `main`.
+  - **No aplicado (sugerencias):** recortar `cargar()` de la lección; la tabla atribuye `FileNotFoundException` a `BufferedReader` cuando en rigor la lanza el `FileReader` interno (aceptable para el nivel).
+
+### Despliegue
+
+Pendiente. Cuando se despliegue: el slug `lectura-escritura-y-modificacion` ya existe en producción **cerrado** desde 2026-08-03 («Contenido aún en stub…»); recrear las 4 keywords nuevas y las 5 preguntas (D3); decidir si se abre (D4).
+
+### Pendientes
+
+- Confirmar si T2 lleva guía del estudiante (se asumió demo en vivo).
+- La lección mide 183 líneas, sobre la meta de 100–130; el recorte que falta es `cargar()`.
+- La lección usa `clientes.getHead()` sin definirlo (los apuntes lo añaden en el Paso 4). Añadir una frase que diga que se agrega ese método, o reescribir `guardar` sin él. El Mayor 1 del reviewer se resolvió con `ClienteService`/`ARCHIVO`; `getHead()` sigue abierto.
+- Decidir el título («Lectura y escritura de archivos de texto» recomendado) antes de crear la lección de modificación de registros (T2 Sem. 11, 16 oct), que no tiene entrada en el registro TS. El `order` 25 está libre.
+- `cargar()` es O(n²) por `insertarFinal`; está como gancho en los apuntes y no se menciona en la lección.
+- Los apuntes asumen el `Cliente` de 3 campos de ayer; los apuntes de eliminación en lista simple usan uno de 4.
+- La T2 ya se dictó: la lección y su cuestionario no pudieron abrirse antes de la clase.

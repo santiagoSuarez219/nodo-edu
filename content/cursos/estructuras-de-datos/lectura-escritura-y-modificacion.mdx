@@ -1,5 +1,183 @@
 ---
 title: "Lectura, escritura y modificación"
-summary: ""
-updatedAt: 2026-07-18
+course: "Estructura de Datos"
+course_code: "ED"
+level: "Primeros semestres"
+type: "Lectura previa"
+language: "Java 21"
+difficulty: "Básico"
+estimated_time: "Lectura previa de 12 minutos (Semana 10)"
+presentation: true
+slides_hint: "Cada sección ## es una diapositiva. Presentación sincrona."
+date: "2026-10-14"
+author: "Asistente de Docencia"
+summary: "Retoma la pizarra y el cuaderno para copiar una agenda por renglones en vez de letra a letra: BufferedWriter y BufferedReader, cierre seguro con try-with-resources, y el formato de una línea por registro con campos separados por punto y coma."
+updatedAt: "2026-10-14"
 ---
+
+> 📖 Lectura previa a la clase — unos 12 minutos. Al final, responde la autoevaluación.
+
+## Copiar la agenda de la pizarra al cuaderno
+
+En la pizarra está la agenda de contactos del grupo: nombre y teléfono de cada compañero. Hay que pasarla al **cuaderno** para que sobreviva cuando se borre la pizarra. Ayer viste cómo abrir y cerrar el cuaderno; hoy importa **cómo copias**.
+
+Tienes tres decisiones por tomar. ¿Copias **letra a letra** o **por páginas**? ¿Cómo separas el nombre del teléfono para que, al releer, sepas dónde termina uno y empieza el otro? ¿Y si cuando vas por el cuaderno **no está** o está dañado?
+
+Lo natural es escribir **un contacto por renglón**, con los campos **siempre en el mismo orden**. Después, para reconstruir la agenda en la pizarra, lees **renglón por renglón**.
+
+## Del cuaderno a las reglas: buffer, registro y campo
+
+| Con el cuaderno | En Java |
+|---|---|
+| Pasar una página entera de una vez | El **buffer**: `BufferedWriter` y `BufferedReader` |
+| Un renglón con un contacto | Un **registro**: una línea del archivo |
+| Una columna (nombre, teléfono) | Un **campo** |
+| La raya que separa nombre de teléfono | El **delimitador**, aquí `;` |
+
+> **Buffer:** zona intermedia de memoria donde se acumulan los datos para moverlos al archivo (o desde él) en bloques, en lugar de uno por uno.
+
+> **Registro y campo:** un **registro** es la unidad completa de información (aquí, una línea con un contacto); un **campo** es cada dato dentro del registro (nombre, teléfono).
+
+Hay un contraste que conviene fijar desde ya: `read()` devolvía `-1` al acabarse el archivo; `readLine()` devuelve un `String` con el renglón completo y `null` cuando ya no hay más.
+
+## BufferedWriter y BufferedReader: por páginas, no por letras
+
+**Así en la vida real:** en vez de copiar letra por letra, lees un renglón completo y lo escribes de una vez. **Así en código:** `BufferedWriter` y `BufferedReader` **envuelven** al `FileWriter` y al `FileReader` de ayer y les añaden el buffer.
+
+```java
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+
+public static void copiar(File archivo, String[] contactos) throws IOException {
+    BufferedWriter escritor = new BufferedWriter(new FileWriter(archivo));   // sobrescribe, como ayer
+    for (String contacto : contactos) {
+        escritor.write(contacto);   // escribe el renglón...
+        escritor.newLine();         // ...y el salto de línea correcto para el sistema operativo
+    }
+    escritor.close();               // cerrar el Buffered cierra también el FileWriter de adentro
+}
+```
+
+Leer sigue el mismo ritmo de ayer: una lectura **antes** del ciclo y otra al **final del cuerpo**. Una sola llamada a `readLine()` por vuelta: si la repites dentro del ciclo, te saltas renglones.
+
+```java
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+
+public static void mostrar(File archivo) throws IOException {
+    BufferedReader lector = new BufferedReader(new FileReader(archivo));
+    String linea = lector.readLine();      // un renglón completo, o null si no hay más
+    while (linea != null) {
+        System.out.println(linea);
+        linea = lector.readLine();         // avanza al siguiente renglón
+    }
+    lector.close();
+}
+```
+
+Esto es lo que te permite recorrer un archivo sin saber de antemano cuántos registros tiene.
+
+## Cerrar siempre, aunque algo falle: IOException y try-with-resources
+
+Ayer olvidar `close()` dejaba el archivo vacío en silencio. Peor: si algo falla **antes** de llegar a `close()`, esa línea nunca se ejecuta y el cuaderno queda abierto. Java lo resuelve con **try-with-resources**.
+
+```java
+public static void mostrarSeguro(File archivo) throws IOException {
+    try (BufferedReader lector = new BufferedReader(new FileReader(archivo))) {
+        String linea = lector.readLine();
+        while (linea != null) {
+            System.out.println(linea);
+            linea = lector.readLine();
+        }
+    }   // aquí se llama a lector.close() solo, haya o no excepción
+}
+```
+
+> **try-with-resources:** forma de `try` que declara el recurso entre paréntesis y garantiza que se cierre al terminar el bloque, aunque se lance una excepción.
+
+Quien llama al método decide qué hacer con el fallo, y dos situaciones merecen respuestas distintas: que el archivo no exista es **esperable** (la primera vez nadie lo ha creado); que no se pueda leer o escribir es **grave**. Como `FileNotFoundException` es una `IOException`, el `catch` más específico va **primero**: `catch (FileNotFoundException e)` para avisar que aún no hay datos, y después `catch (IOException e)` para reportar el error con `e.getMessage()`.
+
+## Una línea, un registro: el formato CSV-like
+
+Para escribir un registro, une los campos con el delimitador; para leerlo, sepáralos:
+
+```java
+String linea = String.join(";", "1001", "Ana", "300123");     // "1001;Ana;300123"
+String[] campos = linea.split(";", -1);                        // ["1001", "Ana", "300123"]
+if (campos.length != 3) {
+    throw new IOException("Se esperaban 3 campos y llegaron " + campos.length);
+}
+```
+
+Dos trampas, una línea cada una. El `-1` hace que `split` conserve los campos vacíos al final (`"1;Ana;"` da tres campos, no dos), así que la validación de cantidad no se engaña. Y el delimitador **no puede aparecer dentro de un campo**: un nombre con `;` se partiría en dos.
+
+## Dónde se rompe la analogía
+
+- **Quien lee el cuaderno adivina; el programa no.** Si un renglón quedó mal copiado, una persona intuye qué quiso decir. `split` solo cuenta pedazos: un renglón con un campo de más o de menos es un error que debes detectar tú.
+- **En la agenda editas en el medio; en un archivo de texto no.** Cambiar un teléfono ya guardado exige reescribir el archivo, algo que se verá más adelante.
+
+## Resumen operativo
+
+| Pieza | Qué hace | Firma clave | Cuándo falla |
+|---|---|---|---|
+| `BufferedWriter` | Escribe por bloques envolviendo un `FileWriter` | `write(String)`, `newLine()`, `close()` | `IOException` si no puede abrir o escribir la ruta |
+| `BufferedReader` | Lee renglón por renglón envolviendo un `FileReader` | `String readLine()` | `FileNotFoundException` si no existe; `null` al final |
+| `split(";", -1)` | Separa los campos de un registro | `String[] split(String, int)` | Si el delimitador está dentro de un campo, el conteo no cuadra |
+
+## ¿Dónde aparece en tu proyecto?
+
+Retomas el `ClienteService` que armamos en clase, el que guarda en un archivo: una constante `ARCHIVO` apunta a `data/clientes.txt` y cada línea es `identificacion;nombre;telefono`. `guardar(Cliente)` solo **agregaba** un cliente; la evolución natural es `guardar(ListaSimple<Cliente>)`, que reescribe todo el archivo desde la lista que tienes en memoria (el modo agregar puede renombrarse `agregar`). Y `cargar()` hace el camino inverso: del cuaderno a la pizarra.
+
+```java
+public void guardar(ListaSimple<Cliente> clientes) throws IOException {
+    ARCHIVO.getParentFile().mkdirs();                  // crea data/ si falta
+    try (BufferedWriter escritor = new BufferedWriter(new FileWriter(ARCHIVO))) {   // sobrescribe
+        Nodo<Cliente> actual = clientes.getHead();
+        while (actual != null) {                       // recorre la lista nodo a nodo
+            Cliente c = actual.getDato();
+            escritor.write(String.join(";", c.getIdentificacion(), c.getNombre(), c.getTelefono()));
+            escritor.newLine();
+            actual = actual.getSiguiente();
+        }
+    }
+}
+
+public ListaSimple<Cliente> cargar() throws IOException {
+    ListaSimple<Cliente> clientes = new ListaSimple<>();
+    if (!ARCHIVO.exists()) {
+        return clientes;                               // primera ejecución: lista vacía, no es un error
+    }
+    try (BufferedReader lector = new BufferedReader(new FileReader(ARCHIVO))) {
+        int numero = 0;
+        String linea = lector.readLine();
+        while (linea != null) {
+            numero++;
+            if (!linea.isBlank()) {                    // ignora líneas en blanco
+                String[] campos = linea.split(";", -1);
+                if (campos.length != 3) {
+                    throw new IOException("Línea " + numero + " inválida: " + linea);
+                }
+                clientes.insertarFinal(new Cliente(campos[0], campos[1], campos[2]));
+            }
+            linea = lector.readLine();
+        }
+    }
+    return clientes;
+}
+```
+
+La `View` captura la `IOException` y muestra un mensaje; solo el `Service` toca archivos. Ejecuta siempre desde la **raíz del proyecto**, porque `data/clientes.txt` es una ruta relativa. Con esto tus datos ya sobreviven al programa y vuelven a la lista.
+
+## Síntesis
+
+- Copiar la agenda es elegir el método: `BufferedWriter` y `BufferedReader` trabajan por páginas, no por letras, envolviendo al `FileWriter` y al `FileReader`.
+- Un renglón es un **registro**, una columna es un **campo** y la raya es el **delimitador**; `readLine()` devuelve `null` donde `read()` devolvía `-1`.
+- `write(String)` más `newLine()` escribe un registro; `readLine()` en ciclo lee uno por vuelta.
+- try-with-resources cierra el archivo aunque falle algo; el `catch` de `FileNotFoundException` va antes que el de `IOException`.
+- Un registro es `String.join(";", ...)` al escribir y `split(";", -1)` con validación de cantidad al leer; el delimitador no puede aparecer en un campo.
+- La analogía se rompe: el programa no adivina renglones mal copiados y no edita en el medio de un archivo de texto.
+- En tu proyecto, `guardar(ListaSimple)` reescribe el archivo y `cargar()` reconstruye la lista; solo el `Service` toca archivos y la `View` atrapa la `IOException`.
