@@ -206,7 +206,7 @@ Pendiente. Cuando se despliegue: el slug `lectura-escritura-y-modificacion` ya e
 ## Ronda 3 — `programacion-cientifica` (2026-10-14)
 
 **Rama:** `feat/semana-10-programacion-cientifica` (nueva, desde `development`)
-**Estado:** ✅ Contenido listo · ✅ `@reviewer` (aprobado, correcciones aplicadas) · ✅ Mergeada a `development` (2026-10-14, `efb2574`; rama borrada) · ⬜ Desplegada en producción
+**Estado:** ✅ Contenido listo · ✅ `@reviewer` (aprobado, correcciones aplicadas) · ✅ Mergeada a `development` (2026-10-14, `efb2574`; rama borrada) · ✅ Desplegada en producción y abierta (2026-10-14, `ed4b8d1`)
 
 **Alcance confirmado por el usuario:** sesión del jueves 8 oct (**ya dictada**; la
 ronda empezó el 14 oct): operaciones vectorizadas y álgebra lineal básica,
@@ -235,16 +235,16 @@ el flujo normal, sin priorizar el despliegue.
 
 | Artefacto | Ruta | Publicado |
 |---|---|---|
-| Lección teórica | `content/cursos/programacion-cientifica/operaciones-vectorizadas-y-algebra-lineal-basica.mdx` | ⬜ (en rama; el slug ya está en producción como stub) |
+| Lección teórica | `content/cursos/programacion-cientifica/operaciones-vectorizadas-y-algebra-lineal-basica.mdx` | ✅ producción, abierta (2026-10-14) |
 | Registro TS | `lib/courses/data/programacion-cientifica.ts` (`order: 8`, solo se agregó `summary`) | — |
-| Apunte de clase | `content/cursos/programacion-cientifica/apuntes/operaciones-vectorizadas-y-algebra-lineal-basica.md` (542 líneas) | Solo owner/admin (en rama) |
+| Apunte de clase | `content/cursos/programacion-cientifica/apuntes/operaciones-vectorizadas-y-algebra-lineal-basica.md` (542 líneas) | Solo owner/admin (producción) |
 
 ### Cuestionario de cierre
 
 | Lección | Entorno | IDs de preguntas | Publicadas | Montadas (`list_lesson_questions`) |
 |---|---|---|---|---|
 | `operaciones-vectorizadas-y-algebra-lineal-basica` | desarrollo | `4168bb5c-00f6-4275-b9a9-b29a9cb596a8`, `b601d6d1-0bc1-41d3-b953-626628e4eb11`, `edad303c-83e4-408f-9c8a-2529cdd1b5b9`, `9b74fff8-657e-4988-9d2e-8793a1737276`, `37178be2-cef9-4f47-bdac-d5023d5db8ed` | ✅ | ✅ (orden 0-4, dificultades 1, 2, 3, 3, 4) |
-| `operaciones-vectorizadas-y-algebra-lineal-basica` | **producción** | — | ⬜ | ⬜ |
+| `operaciones-vectorizadas-y-algebra-lineal-basica` | **producción** | `3ca82d20-0c99-4d40-b14b-e380eb99d17e`, `d11e734c-2550-4616-ae5f-6257177d46ae`, `563d6b7a-a34f-4549-a466-8e95bacf2f3a`, `afb1c401-6329-45b2-adc3-f14355a0d074`, `b45125ea-53ee-4f7b-bdbe-64fe3ba7646d` | ✅ | ✅ (orden 0-4) |
 
 > Las preguntas **no viajan con el deploy**: se recrean en producción en D3.
 > Keywords nuevas creadas en desarrollo: `python` (`lenguaje`), `numpy`,
@@ -292,19 +292,19 @@ No aplica — semana sin ★.
 
 | Paso | Estado | Fecha / detalle |
 |---|---|---|
-| D0 · Alcance y checklist pre-despliegue | ⬜ | |
-| D1 · Lecciones nuevas cerradas por adelantado | ⬜ | el slug ya existe en producción como stub; comprobar su fila de visibilidad |
-| D2 · Merge a `main` y deploy en Vercel | ⬜ | |
-| D3 · Banco de preguntas replicado a producción | ⬜ | 6 keywords + 5 preguntas |
-| D4 · Lecciones abiertas a los estudiantes | ⬜ | `programacion-cientifica` → `operaciones-vectorizadas-y-algebra-lineal-basica` |
-| D5 · Verificación end-to-end en producción | ⬜ | |
-| D6 · Bitácora cerrada y rama `deploy/` borrada | ⬜ | |
+| D0 · Alcance y checklist pre-despliegue | ✅ | build 0, lint 0 errores; sin cambios de `supabase/`; el despliegue incluyó también ED T2 (cerrada) |
+| D1 · Lecciones nuevas cerradas por adelantado | ✅ | el slug ya estaba cerrado en producción (fila del 2026-08-04); no hizo falta crear nada |
+| D2 · Merge a `main` y deploy en Vercel | ✅ | `ed4b8d1` (`deploy/semana-10-pc`); `dpl_AAuxLdBBxFHDD2SaVukEPSahcjEb` READY; push ejecutado por el usuario (el clasificador de permisos bloqueó el comando) |
+| D3 · Banco de preguntas replicado a producción | ✅ | keywords creadas: `vectorizacion`, `broadcasting`, `estadistica-descriptiva`, `algebra-lineal` (`python`, `numpy`, `cierre` ya existían); 5 preguntas publicadas y montadas |
+| D4 · Lecciones abiertas a los estudiantes | ✅ | `programacion-cientifica` → `operaciones-vectorizadas-y-algebra-lineal-basica` abierta (2026-10-14) |
+| D5 · Verificación end-to-end en producción | ⬜ | pendiente: el docente comprueba en el navegador que la lección carga y la autoevaluación muestra las 5 preguntas |
+| D6 · Bitácora cerrada y rama `deploy/` borrada | ✅ | rama `deploy/semana-10-pc` borrada local (nunca se subió al remoto) |
 
-- [ ] Verificado que las lecciones de semanas futuras siguen **cerradas**
+- [x] Verificado que las lecciones de semanas futuras siguen **cerradas** (órdenes 9, 10 y 11 de PC cerradas tras la apertura)
 
 ### Pendientes
 
-- **Calendario:** el Momento evaluativo 3 (NumPy) es el jue. 15 oct. Para que el estudiante tenga la lección y su cuestionario antes, hay que desplegar y abrir antes de esa fecha.
+- **Calendario:** resuelto: lección y cuestionario abiertos el 2026-10-14, antes del Momento evaluativo 3 (15 oct).
 - El taller del Momento evaluativo 3 no existe: el registro no tiene una guía equivalente a `taller-evaluativo-02` (`order: 6.5`). Es de la Semana 11, fuera de esta ronda.
 - Opcional: añadir ufuncs y `keepdims` al cuestionario.
 - El push de `development` a `origin` queda a cargo del usuario.
