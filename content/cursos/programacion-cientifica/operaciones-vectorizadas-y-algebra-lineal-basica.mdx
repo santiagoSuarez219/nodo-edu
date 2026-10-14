@@ -1,5 +1,280 @@
 ---
 title: "Operaciones vectorizadas y álgebra lineal básica"
-summary: ""
-updatedAt: 2026-07-18
+course: "Programación Científica"
+course_code: "PC"
+level: "Primeros semestres"
+type: "Apuntes teóricos"
+language: "Python 3 (Google Colab)"
+difficulty: "Básico"
+estimated_time: "Lectura previa de 12 minutos (Semana 10)"
+presentation: true
+slides_hint: "Cada sección ## es una diapositiva. Presentación sincrona."
+date: "2026-10-14"
+author: "Asistente de Docencia"
+summary: "Aplica una fórmula a las 28 temperaturas de la red de estaciones sin escribir un bucle: operaciones vectorizadas, broadcasting, funciones universales y estadística por estación, y cierra con el promedio ponderado como producto punto y producto matricial."
+updatedAt: "2026-10-14"
 ---
+
+> 📖 Lectura previa a la clase — unos 12 minutos. Al final, responde la autoevaluación.
+
+## El problema: la fórmula que se arrastra
+
+En la hoja de cálculo escribes `=A1*1.8+32` en una celda y arrastras la esquina: la fórmula se aplica a todas las demás. Con la tabla `temps` de la lección anterior (4 estaciones por 7 días, en °C) querrías lo mismo para pasar las 28 temperaturas a °F. Con lo que sabes de Python, la respuesta es un bucle:
+
+```python
+import numpy as np
+
+temps = np.array([
+    [24.5, 25.1, 26.3, 27.0, 25.8, 24.9, 26.1],   # EST-01
+    [29.4, 30.8, 31.5, 32.1, 30.2, 29.8, 31.0],   # EST-02
+    [14.2, 13.8, 15.1, 14.6, 13.5, 14.9, 15.4],   # EST-03
+    [33.0, 34.2, 35.1, 33.8, 32.6, 31.9, 34.5],   # EST-04
+])
+
+fahrenheit = np.zeros((4, 7))
+for i in range(4):
+    for j in range(7):
+        fahrenheit[i, j] = temps[i, j] * 1.8 + 32
+```
+
+Funciona, pero son cuatro líneas para una fórmula de una línea. NumPy permite arrastrar la fórmula completa de una sola vez:
+
+```python
+fahrenheit = temps * 1.8 + 32
+print(fahrenheit[0])
+print(fahrenheit.shape)
+```
+
+```text
+[76.1  77.18 79.34 80.6  78.44 76.82 78.98]
+(4, 7)
+```
+
+Compara con una lista de Python: `[1, 2] * 2` repite la lista (`[1, 2, 1, 2]`) y `[1, 2] + [3, 4]` las une (`[1, 2, 3, 4]`), mientras que `np.array([1, 2]) * 2` multiplica cada celda (`[2 4]`) y `np.array([1, 2]) + np.array([3, 4])` las suma celda por celda (`[4 6]`).
+
+> **Operación vectorizada:** operación que se aplica a todos los elementos de un arreglo a la vez, sin escribir un bucle. El recorrido ocurre dentro de NumPy, en código compilado.
+
+## Operar celda por celda
+
+Los operadores `+ - * / **` actúan celda por celda. Con un número, el número se aplica a todas las celdas; con otro arreglo del mismo `shape`, se combinan las celdas que ocupan la misma posición.
+
+```python
+a = temps[0]               # EST-01, 7 dias
+b = temps[1]               # EST-02, 7 dias
+print(b - a)               # diferencia dia por dia
+print(temps[2] / 2)        # la mitad de cada temperatura de EST-03
+print(temps[2] ** 2)       # cada temperatura de EST-03 al cuadrado
+```
+
+```text
+[4.9 5.7 5.2 5.1 4.4 4.9 4.9]
+[7.1  6.9  7.55 7.3  6.75 7.45 7.7 ]
+[201.64 190.44 228.01 213.16 182.25 222.01 237.16]
+```
+
+Las comparaciones también son vectorizadas y devuelven una máscara, como viste en «Arreglos y dimensiones (NumPy)». Con ella puedes leer los valores que cumplen una condición o reemplazarlos:
+
+```python
+topada = temps.copy()          # copia: sin ella, topada y temps serian la misma tabla y el cambio de abajo tambien alteraria temps
+topada[topada > 30] = 30       # ninguna celda pasa de 30
+print(topada[3])
+```
+
+```text
+[30. 30. 30. 30. 30. 30. 30.]
+```
+
+Es la versión de "reemplazar todas las celdas que cumplen una condición" de la hoja de cálculo, y no necesita ningún `for`.
+
+## Cuando las formas no coinciden: broadcasting
+
+¿Qué pasa si sumas un arreglo de otra forma? Si tienes un ajuste de calibración por día (7 valores), NumPy lo "estira" sobre las 4 filas:
+
+```python
+ajuste_dia = np.array([0.5, 0.5, 0.0, -0.5, 0.0, 0.5, 0.0])   # shape (7,)
+print((temps + ajuste_dia)[0])
+```
+
+```text
+[25.  25.6 26.3 26.5 25.8 25.4 26.1]
+```
+
+Pero si el ajuste es por estación (4 valores, uno por fila), el mismo intento falla:
+
+```python
+ajuste_est = np.array([1.0, -1.0, 0.5, 0.0])                  # shape (4,)
+temps + ajuste_est
+```
+
+```text
+ValueError: operands could not be broadcast together with shapes (4,7) (4,)
+```
+
+NumPy alinea las formas **de derecha a izquierda**, eje por eje:
+
+```text
+temps       (4, 7)
+ajuste_dia     (7,)   -> 7 con 7: coincide, se repite en las 4 filas
+ajuste_est     (4,)   -> 4 con 7: no coincide, error
+ajuste_est  (4, 1)    -> 1 con 7: el 1 se estira, 4 con 4: coincide
+```
+
+Para que el ajuste sea una columna, conviértelo en una tabla de 4 filas y 1 columna con `reshape(4, 1)` o con `[:, np.newaxis]`:
+
+```python
+col = ajuste_est.reshape(4, 1)          # equivale a ajuste_est[:, np.newaxis]
+print(col.shape)
+print((temps + col)[:, 0])              # dia 0 de las cuatro estaciones
+```
+
+```text
+(4, 1)
+[25.5 28.4 14.7 33. ]
+```
+
+> **Broadcasting:** regla con la que NumPy opera arreglos de formas distintas. Alinea las formas de derecha a izquierda; en cada eje, los tamaños deben ser iguales o uno de ellos debe ser 1, y el que vale 1 se repite para igualar al otro.
+
+## Funciones universales
+
+Las **funciones universales** (_ufuncs_) son funciones de NumPy que se aplican celda por celda, igual que los operadores. Con ellas redondeas, mides distancias o recortas sin bucle:
+
+```python
+print(np.round(temps[0] / 3, 1))         # redondea a 1 decimal
+desv = temps - temps.mean()              # frente al promedio de las 28 celdas (mean se explica en la siguiente seccion)
+print(np.abs(desv[0]).round(2))          # valor absoluto
+print(np.maximum(temps[2], 20))          # el mayor entre cada celda y 20
+print(np.sqrt(temps[2]).round(2))        # raiz cuadrada de cada celda
+```
+
+```text
+[8.2 8.4 8.8 9.  8.6 8.3 8.7]
+[1.61 1.01 0.19 0.89 0.31 1.21 0.01]
+[20. 20. 20. 20. 20. 20. 20.]
+[3.77 3.71 3.89 3.82 3.67 3.86 3.92]
+```
+
+Fíjate en que `np.maximum` recibe dos entradas: compara celda con celda, y el `20` se estira por broadcasting.
+
+> **Ufunc:** función de NumPy que opera elemento a elemento sobre un arreglo (o dos) y devuelve un arreglo de la misma forma.
+
+## Resumir la hoja: estadística descriptiva
+
+Una hoja de cálculo también resume: promedio, mediana, máximo. Los métodos del arreglo (`mean`, `std`, `min`, `max`, `sum`) y `np.median` lo hacen con toda la tabla. Con `axis` eliges la dirección en la que se resume:
+
+```python
+print(np.round(temps.mean(), 2), np.median(temps), temps.min(), temps.max(), temps.sum())
+print(np.round(temps.mean(axis=0), 2))   # un valor por dia (colapsa las estaciones)
+print(np.round(temps.mean(axis=1), 2))   # un valor por estacion (colapsa los dias)
+print(temps.max(axis=1))                 # maximo de cada estacion
+```
+
+```text
+26.11 28.2 13.5 35.1 731.1
+[25.28 25.98 27.   26.88 25.52 25.38 26.75]
+[25.67 30.69 14.5  33.59]
+[27.  32.1 15.4 35.1]
+```
+
+`axis=0` recorre las filas y deja un valor por columna (7 valores); `axis=1` recorre las columnas y deja un valor por fila (4 valores). Con una máscara resumes solo lo que cumple la condición:
+
+```python
+print(np.round(temps[temps > 30].mean(), 2))   # media de las temperaturas sobre 30
+print(np.round(temps.std(), 2))                # desviacion estandar (divide entre n)
+```
+
+```text
+32.56
+7.33
+```
+
+Para restar a cada estación su propio promedio, `temps - temps.mean(axis=1)` falla, porque el resultado tiene forma `(4,)`. Con `keepdims=True` el eje resumido se conserva con tamaño 1 y el resultado queda `(4, 1)`, justo lo que pide el broadcasting:
+
+```python
+centradas = temps - temps.mean(axis=1, keepdims=True)
+print(np.round(centradas[0], 2))
+```
+
+```text
+[-1.17 -0.57  0.63  1.33  0.13 -0.77  0.43]
+```
+
+## Vectores y producto punto: el promedio ponderado
+
+Una fila o una columna es un **vector**: una lista ordenada de números. Si las estaciones no pesan igual (por ejemplo, según el área que representan), el promedio de un día es un promedio ponderado: multiplicas cada temperatura por su peso y sumas.
+
+```python
+pesos = np.array([0.4, 0.3, 0.2, 0.1])    # un peso por estacion
+dia0 = temps[:, 0]                        # [24.5 29.4 14.2 33. ]
+print(pesos * dia0)                       # producto celda por celda
+print(np.round(pesos @ dia0, 2))          # producto punto
+```
+
+```text
+[9.8  8.82 2.84 3.3 ]
+24.76
+```
+
+A mano: `0.4*24.5 + 0.3*29.4 + 0.2*14.2 + 0.1*33.0 = 9.8 + 8.82 + 2.84 + 3.3 = 24.76`. El producto punto es "multiplicar celda por celda y sumar". Con `*` obtienes los cuatro términos; con `@` (o `np.dot(pesos, dia0)`) obtienes un solo número.
+
+> **Producto punto:** operación entre dos vectores de la misma longitud que multiplica elemento a elemento y suma los resultados. El resultado es un número.
+
+## Producto matricial
+
+Una matriz es una tabla de números, como `temps`. Imagina que agrupas las estaciones en dos zonas y que cada zona promedia sus estaciones: la zona norte promedia EST-01 y EST-02; la zona sur, EST-03 y EST-04. Cada fila de `zonas` es un vector de pesos:
+
+```python
+zonas = np.array([[0.5, 0.5, 0.0, 0.0],
+                  [0.0, 0.0, 0.5, 0.5]])      # shape (2, 4)
+por_zona = zonas @ temps
+print(por_zona.shape)
+print(por_zona[:, 0])                         # dia 0, las dos zonas
+print((pesos @ temps).shape)                  # 7 promedios ponderados, uno por dia
+```
+
+```text
+(2, 7)
+[26.95 23.6 ]
+(7,)
+```
+
+Cada celda de `zonas @ temps` es el producto punto de una fila de `zonas` con una columna de `temps`. Con `pesos @ temps` pasa lo mismo: `pesos` tiene forma `(4,)`, NumPy lo trata como una sola fila `(1, 4)` y el resultado, una fila de 7 valores, queda de forma `(7,)`. Para que el producto sea posible, las formas deben encajar:
+
+```text
+(n, m) @ (m, p) = (n, p)
+
+zonas (2, 4) @ temps (4, 7) = (2, 7)   -> el 4 con 4 coincide
+temps (4, 7) @ zonas (2, 4)            -> el 7 con 2 no coincide, error
+```
+
+```python
+temps @ zonas
+```
+
+```text
+ValueError: matmul: Input operand 1 has a mismatch in its core dimension 0, with gufunc signature (n?,k),(k,m?)->(n?,m?) (size 2 is different from 7)
+```
+
+> **Producto matricial (`@`):** operación entre una matriz de forma `(n, m)` y otra de forma `(m, p)` que produce una matriz `(n, p)`; cada celda es el producto punto de una fila de la primera con una columna de la segunda.
+
+## Resumen operativo
+
+| Quiero… | Escribo… |
+|---|---|
+| Aplicar una fórmula a toda la tabla | `temps * 1.8 + 32` |
+| Multiplicar celda por celda | `a * b` |
+| Multiplicar y sumar (producto punto / matricial) | `a @ b` |
+| Sumar un valor por día / por estación | `temps + v` / `temps + v[:, np.newaxis]` |
+| Reemplazar las celdas que cumplen una condición | `a[a > x] = valor` |
+| Redondear, valor absoluto, raíz | `np.round(a, 1)`, `np.abs(a)`, `np.sqrt(a)` |
+| Resumir por día / por estación | `a.mean(axis=0)` / `a.mean(axis=1)` |
+| Restar a cada fila su promedio | `a - a.mean(axis=1, keepdims=True)` |
+
+## Síntesis
+
+- **El problema:** una operación vectorizada reemplaza al bucle y aplica la fórmula a toda la tabla; `np.array([1, 2]) * 2` no es `[1, 2] * 2`.
+- **Operar celda por celda:** los operadores y las comparaciones actúan elemento a elemento, y con una máscara puedes reemplazar valores.
+- **Broadcasting:** las formas se alinean de derecha a izquierda; `reshape(4, 1)` o `np.newaxis` convierten un vector en columna.
+- **Funciones universales:** `np.round`, `np.abs`, `np.maximum` y `np.sqrt` también operan celda por celda.
+- **Estadística descriptiva:** `axis=0` resume por día, `axis=1` por estación, y `keepdims=True` conserva la forma para restar.
+- **Producto punto:** multiplicar celda por celda y sumar da un número, como en un promedio ponderado.
+- **Producto matricial:** `(n, m) @ (m, p)` da `(n, p)`; si el eje interno no coincide, hay `ValueError`.
