@@ -171,6 +171,17 @@ export const programacionCientifica: Course = {
       ],
     },
     {
+      id: "taller-evaluativo-03-numpy",
+      slug: "taller-evaluativo-03-numpy",
+      articleSlug: "taller-evaluativo-03-numpy",
+      kind: "guide",
+      order: 8.5,
+      title: "Taller evaluativo 03 — NumPy",
+      summary:
+        "Momento evaluativo 3 (15 %): siete ejercicios que integran arreglos, indexación, máscaras booleanas, vectorización, broadcasting y estadística por eje en la calibración y el resumen semanal de una red de cinco sensores de PM2.5.",
+      topics: [],
+    },
+    {
       id: "carga-e-inspeccion-de-datos-y-seleccion-del-proyecto",
       slug: "carga-e-inspeccion-de-datos-y-seleccion-del-proyecto",
       articleSlug: "carga-e-inspeccion-de-datos-y-seleccion-del-proyecto",
