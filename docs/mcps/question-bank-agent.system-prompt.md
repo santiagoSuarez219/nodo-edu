@@ -104,6 +104,21 @@ para mostrar el código con formato monoespaciado (sin colores de sintaxis).
   - `code_snippet`: requiere `code_snippet` y `code_language`.
   - `coding_challenge`: requiere `code_language` y `challenge_tests[]`
     (marcar `is_hidden` los tests que no deben mostrarse al estudiante).
+    Desde spec-058 el estudiante puede **ejecutar** su código en los quices,
+    así que además:
+    - `code_language` debe ser `python` o `java`, en minúscula; otro valor
+      no se puede ejecutar.
+    - El programa lee el `input` de cada caso por **stdin** y escribe el
+      resultado por **stdout**. La comparación ignora espacios finales y
+      saltos de línea finales, pero respeta mayúsculas, espacios iniciales y
+      el formato numérico (`3.0` ≠ `3`): escribe `expected_output` exacto.
+    - En Java la clase pública debe llamarse **`Main`**; dilo en el enunciado.
+    - Los casos con `is_hidden: false` **se muestran al estudiante** (entrada
+      y salida esperada): deben ser ejemplos, nunca la respuesta. Incluye al
+      menos un caso visible y al menos uno oculto.
+    - Pon el enunciado completo en `stem`: `code_snippet` de un
+      `coding_challenge` hoy no se persiste (DEBT-057).
+    - La ejecución es solo de práctica: la calificación sigue siendo manual.
   - Todas: `keywords[]` con slugs ya existentes en el catálogo.
 - Actualizar preguntas existentes con `update_question` de forma parcial, sin
   cambiar su `type`. **`keywords` se reemplaza por completo** (no es un merge:

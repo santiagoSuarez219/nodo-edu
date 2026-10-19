@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { runCodeAction } from "@/lib/submissions/actions";
+import { runChallengeAction } from "@/lib/submissions/actions";
+import type { ChallengeRunResult } from "@/lib/code-runner/types";
+import { CodeRunResults } from "./CodeRunResults";
 import type { QuestionDetail } from "@/lib/submissions/types";
 import { QuestionText } from "@/components/questions/QuestionText";
 import { isServerActionTransportError, SERVER_ACTION_TRANSPORT_ERROR_MESSAGE } from "@/lib/errors/server-action";
@@ -17,11 +19,16 @@ interface Props {
   answer: QuestionAnswer;
   onChange?: (answer: QuestionAnswer) => void;
   disabled?: boolean;
+  // spec-058: solo la rama coding_challenge lo usa; sin él no hay botón "Ejecutar".
+  submissionId?: string;
 }
 
-export function QuestionRenderer({ question, answer, onChange, disabled = false }: Props) {
+export function QuestionRenderer({ question, answer, onChange, disabled = false, submissionId }: Props) {
   const { type, choices, code_snippet, code_language } = question;
-  const [runResult, setRunResult] = useState<string | null>(null);
+  const [running, setRunning] = useState(false);
+  const [runResult, setRunResult] = useState<ChallengeRunResult | null>(null);
+  const [transportMessage, setTransportMessage] = useState<string | null>(null);
+  const [ranCode, setRanCode] = useState<string | null>(null);
 
   if (type === "multiple_choice") {
     const correctCount = choices.filter((c) => c.is_correct === true).length;
@@ -186,32 +193,40 @@ export function QuestionRenderer({ question, answer, onChange, disabled = false 
           spellCheck={false}
           className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-900 dark:bg-gray-950 px-4 py-3 text-sm text-green-300 font-mono placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 resize-y disabled:opacity-70 disabled:cursor-not-allowed"
         />
-        {!disabled && (
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={async () => {
-                try {
-                  const result = await runCodeAction(code_language ?? "text", answer.text_response);
-                  setRunResult(
-                    result.status === "disabled"
-                      ? "La ejecución de código no está disponible en esta versión."
-                      : (result.output ?? result.error ?? "Sin salida.")
-                  );
-                } catch (err) {
-                  // spec-053: ver LoginForm.tsx para el motivo.
-                  if (!isServerActionTransportError(err)) throw err;
-                  reportTransportError(err, "runCodeAction");
-                  setRunResult(SERVER_ACTION_TRANSPORT_ERROR_MESSAGE);
-                }
-              }}
-              className="rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-xs font-semibold px-3 py-1.5 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-            >
-              Ejecutar
-            </button>
-            {runResult && (
-              <p className="text-xs text-yellow-600 dark:text-yellow-400">{runResult}</p>
-            )}
+        {!disabled && submissionId && (
+          <div className="flex flex-col gap-3">
+            <div>
+              <button
+                type="button"
+                disabled={running}
+                aria-busy={running}
+                onClick={async () => {
+                  const codeToRun = answer.text_response;
+                  setRunning(true);
+                  setTransportMessage(null);
+                  try {
+                    const result = await runChallengeAction(submissionId, question.question_id, codeToRun);
+                    setRunResult(result);
+                    setRanCode(codeToRun);
+                  } catch (err) {
+                    // spec-053: ver LoginForm.tsx para el motivo.
+                    if (!isServerActionTransportError(err)) throw err;
+                    reportTransportError(err, "runChallengeAction");
+                    setTransportMessage(SERVER_ACTION_TRANSPORT_ERROR_MESSAGE);
+                  } finally {
+                    setRunning(false);
+                  }
+                }}
+                className="rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-xs font-semibold px-3 py-1.5 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 disabled:opacity-70 disabled:cursor-not-allowed"
+              >
+                {running ? "Ejecutando…" : "Ejecutar"}
+              </button>
+            </div>
+            <CodeRunResults
+              result={runResult}
+              transportMessage={transportMessage}
+              stale={ranCode !== null && ranCode !== answer.text_response}
+            />
           </div>
         )}
       </div>
