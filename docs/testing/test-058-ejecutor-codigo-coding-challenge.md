@@ -158,6 +158,28 @@
 **Hallazgos:** Ejecutado por Claude en el navegador (autorizado por el usuario, 2026-10-19). Lado estudiante verificado: tras enviar, /resultados muestra 'Pendiente de revisión por el docente', puntaje 0.00/4.00 y sin resultados por caso; por API `submissions.status=submitted`, `auto_score=0.00`, `answers.auto_score` y `manual_score` nulos. Lado docente confirmado por el usuario (2026-10-19): las preguntas aparecen pendientes de calificación manual, sin puntaje automático ni resultados por caso, igual que antes del spec.
 
 ## Resumen de la ronda
-- Aprobados: 13 — Fallidos: 0 — Pendientes: 0
+- Aprobados: 13 — Fallidos: 0 — Pendientes: 0 (Ronda 1). Ronda 2 (repetición tras `claim_code_run`): TC-001, TC-006, TC-009 y TC-013 aprobados, 0 fallidos.
 - Hallazgos escalados a `docs/specs/backlog.md`: ninguno (el mensaje del rechazo por intervalo se corrigió durante la ronda; `get_variant_question_details` fuera de alcance queda por registrar)
 - Limpieza de datos de prueba: ✅ Completada (la API devolvía 409 con intentos o preguntas en uso; el usuario eligió borrar por SQL en `nodo-dev`, verificado por consulta)
+
+## Ronda 2 — repetición tras `claim_code_run` (2026-10-19)
+> Se repiten TC-001, TC-009, TC-006 y TC-013 porque `runChallenge` pasó a reservar la ejecución con la función atómica `claim_code_run`. Datos creados en `nodo-dev`; deben eliminarse al cerrar (borrado por SQL con confirmación si la API devuelve 409).
+
+| Recurso | Herramienta de creación | Identificador | Eliminado |
+|---------|-------------------------|---------------|-----------|
+| Pregunta Python "[TEST-058] Suma de dos enteros" (2 visibles + 1 oculto: 400000, 599999 → 999999) | `question-bank-mcp` → `create_question` + `publish_question` | `9fc0d933-69cc-430f-8640-224a00a42472` | ✅ (SQL) |
+| Pregunta Python "[TEST-058] Doble de un entero" (1 visible + 1 oculto: 500000 → 1000000) | `question-bank-mcp` → `create_question` + `publish_question` | `7c394397-f8dd-48eb-b7a5-b07249dd94e3` | ✅ (SQL) |
+| Quiz "[TEST-058] Quiz Python (repetición)" en DEV-ADA, 3 intentos, variantes A/B/C iguales | `assignment-mcp` → `create_assignment_group` + `publish_assignment_group` | `4a9a554e-a8ef-4f51-b770-ca1088a7285c` (variantes `83d1e44b-a707-4a98-9eab-6cb219b720af`, `957f956d-0741-4fff-890e-0e60fd346526`, `1ac42091-5572-4738-ab7b-2c7a4bba9b2d`) | ✅ (SQL) |
+
+Estudiante: `dev-estudiante1@nodo.local` (`88db2cf9-792b-49eb-b5e0-2abf53ba465d`), matriculado en DEV-ADA.
+
+### Resultados observados de la Ronda 2 (ejecutados por Claude en el navegador, autorizado por el usuario, 2026-10-19)
+Intento `09b32b14-def4-46db-a37d-03c47502cb18` (variante A) de `dev-estudiante1`. **Aprobados por el usuario el 2026-10-19** (TC-058-001, TC-058-006, TC-058-009 y TC-058-013).
+
+- ✅ **TC-058-001 (ejecución normal):** con la solución correcta, "Ejecutar" mostró 2 tarjetas ("Pasa", entrada, salida esperada y salida obtenida), "2 de 2 casos pasan.", "Te quedan 19 ejecuciones…", sin nada del caso oculto (no aparece `999999`) y sin errores en consola. `code_runs`: 1 fila `completed` para la pregunta 1.
+- ✅ **TC-058-009 (límites, tras `claim_code_run`):** 30 llamadas simultáneas a `claim_code_run` (intervalo 0, máx. 20) dieron exactamente 20 `ok`, 6 `limit` y 4 `interval`; el límite no se salta en paralelo. Con intervalo de 5 s: `ok` tras 7 s y `interval` (`retry_after: 5`) en la llamada inmediata siguiente. En la UI, "Ejecutar" en la pregunta 2 (20 ejecuciones agotadas) mostró "Alcanzaste el límite de ejecuciones para esta pregunta." y no sumó filas (siguen 20). El límite de ejecuciones de la UI no se agotó con Judge0 real: se simuló vía RPC para no gastar cuota.
+- ✅ **TC-058-006 (casos ocultos):** en el texto de la página nunca aparecen las salidas ocultas (`999999`, `1000000`). No se inspeccionó el cuerpo de la respuesta de red.
+- ✅ **TC-058-013 (calificación manual):** tras enviar, `submissions.status=submitted`, `auto_score=0.00`, `answers.auto_score` y `manual_score` nulos; `/resultados` muestra "Pendiente de revisión por el docente" y 0.00 / 4.00 sin resultados por caso. Lado docente no revisado en esta ronda.
+- **Hallazgo menor:** con `p_min_interval_seconds` = 0, 4 de 30 llamadas simultáneas devolvieron `interval`, porque `now()` es la hora de inicio de la transacción y puede ser anterior al `created_at` de una inserción concurrente. Es conservador (rechaza de más, nunca de menos); usar `clock_timestamp()` lo eliminaría.
+
+**Limpieza Ronda 2:** completada el 2026-10-19. La API devolvió 409 ("ya tiene submissions"); con confirmación del usuario se borró por SQL en `nodo-dev` (`code_runs`, `answers`, el intento, `assignment_questions`, las 3 variantes, el quiz y las 2 preguntas), verificado con consultas (0 filas restantes). No se tocó producción.
