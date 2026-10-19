@@ -1,4 +1,4 @@
-# spec-058 — [TESTING] Ejecutor de código para preguntas coding_challenge
+# spec-058 — [DONE] Ejecutor de código para preguntas coding_challenge
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.
 
@@ -561,7 +561,7 @@ obtener en la siguiente ejecución).
 ### Fase 8 — Pruebas
 - [x] Ejecutar `docs/testing/test-058-ejecutor-codigo-coding-challenge.md`
       con el usuario (13/13 aprobados, 2026-10-19) (protocolo "Pruebas manuales asistidas por Claude").
-- [ ] (Cuando exista framework) pruebas automáticas vía `@tester`.
+- [x] (Cuando exista framework) pruebas automáticas vía `@tester`. No aplica por ahora: el proyecto no tiene framework de testing; el usuario aceptó cerrar el spec sin ellas (2026-10-19). Revisión de `@reviewer`: aprobado y hallazgos aplicados.
 
 ## Criterios de aceptación
 
