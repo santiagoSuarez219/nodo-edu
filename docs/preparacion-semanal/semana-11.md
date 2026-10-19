@@ -1,7 +1,7 @@
 # Semana 11 — 12–18 oct (PC: jue. 15 oct)
 
 **Rama:** `feat/semana-11-programacion-cientifica`
-**Estado:** ⬜ En preparación · ⬜ Mergeada a `development` · ⬜ Desplegada y abierta
+**Estado:** ✅ Contenido listo · ✅ Mergeada a `development` (2026-10-15, `572a6ff`; rama borrada) · ✅ Desplegada en producción (2026-10-15, `746cdf8`) · ✅ Abierta a estudiantes
 
 > Una ronda cubre **un curso**. Esta semana solo tiene la ronda de `programacion-cientifica`.
 
@@ -35,7 +35,7 @@ Sin lección teórica, apuntes ni cuestionario: la semana 11 no tiene contenido 
 
 | Artefacto | Ruta | Publicado |
 |---|---|---|
-| Guía del estudiante | `content/cursos/programacion-cientifica/guias/taller-evaluativo-03-numpy.md` | ⬜ |
+| Guía del estudiante | `content/cursos/programacion-cientifica/guias/taller-evaluativo-03-numpy.md` | ✅ |
 | Registro TS | `lib/courses/data/programacion-cientifica.ts` (`order: 8.5`, `kind: "guide"`) | — |
 
 ### Cuestionario de cierre
@@ -68,15 +68,15 @@ No aplica.
 | Paso | Estado | Fecha / detalle |
 |---|---|---|
 | D0 · Alcance y checklist pre-despliegue | ✅ | 2026-10-15: sin cambios de esquema; catálogo prod con órdenes 9, 10 y 11 cerradas, sin filas huérfanas |
-| D1 · Lecciones nuevas cerradas por adelantado | ⬜ | No se cierra: el usuario pidió abrirla al desplegar |
-| D2 · Merge a `main` y deploy en Vercel | ⬜ | rama `deploy/semana-11` |
+| D1 · Lecciones nuevas cerradas por adelantado | — | No se cierra: el usuario pidió abrirla al desplegar |
+| D2 · Merge a `main` y deploy en Vercel | ✅ | 2026-10-15, `746cdf8`, build READY, alias `www.nod0.dev` |
 | D3 · Banco de preguntas replicado a producción | — | No aplica |
-| D4 · Lecciones abiertas a los estudiantes | ⬜ | `programacion-cientifica` → `taller-evaluativo-03-numpy` (nace abierta) |
-| D5 · Verificación end-to-end en producción | ⬜ | |
-| D6 · Bitácora cerrada y rama `deploy/` borrada | ⬜ | |
+| D4 · Lecciones abiertas a los estudiantes | ✅ | `taller-evaluativo-03-numpy` abierta (nació abierta, sin fila de cierre) |
+| D5 · Verificación end-to-end en producción | ✅ parcial | Disponibilidad confirmada con `courses-mcp-prod`; el render lo revisa el usuario |
+| D6 · Bitácora cerrada y rama `deploy/` borrada | ✅ | 2026-10-15 |
 
-- [ ] Verificado que las lecciones de semanas futuras siguen **cerradas** (órdenes 9, 10 y 11)
+- [x] Verificado que las lecciones de semanas futuras siguen **cerradas** (órdenes 9, 10 y 11)
 
 ## Pendientes
 
-- Registrar `feat/semana-11-...` como borrada tras el merge.
+- Ninguno.
