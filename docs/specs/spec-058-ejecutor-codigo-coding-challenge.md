@@ -463,10 +463,14 @@ obtener en la siguiente ejecución).
       datos.
 - [x] Completar D16 con los grupos reales (estudiantes por curso, quices
       planeados con `coding_challenge`).
-- [ ] Consulta **de solo lectura** en producción: cuántas preguntas
-      `coding_challenge` existen, sus `code_language` y cuántos casos
-      visibles/ocultos tiene cada una (validar alias de D6 y el riesgo de
-      "casos visibles ahora se muestran").
+- [x] Consulta **de solo lectura** en producción (2026-10-19, `list_questions`):
+      77 `coding_challenge`, 61 `python` y 16 `java`, todos con al menos un
+      caso visible; ninguno montado en una lección. Publicadas: 16 Java (1 caso
+      visible descriptivo, no stdin/stdout, sin ocultos) y 1 Python de prueba
+      (`5` → `5`). Alias de D6 válidos. Riesgo: los 16 Java publicados no son
+      ejecutables tal cual (texto en lugar de entrada/salida real) y sus casos
+      visibles se mostrarían al estudiante si se usan en un quiz; revisarlos
+      antes de usarlos.
 - [x] Registrar la elección como **D1-bis** en este spec (proveedor, plan,
       precio, límites, versiones, ids, URL consultada, fecha) y ajustar D5/D9
       si el proveedor lo exige.
@@ -497,6 +501,10 @@ obtener en la siguiente ejecución).
       visto bueno. Nunca `--linked`.
 - [x] Verificar en `nodo-dev` que la tabla existe con RLS y los `GRANT`s
       estándar.
+- [x] Revisión de código: `20261019000001_add_claim_code_run.sql` añade la
+      función `claim_code_run` (advisory lock por intento; conteo, intervalo
+      e inserción atómicos; `execute` solo para `service_role`). Aplicada en
+      `nodo-dev` con el visto bueno del usuario.
 
 ### Fase 4 — Núcleo del ejecutor (`lib/code-runner/`)
 - [x] `languages.ts`: normalización + alias (D6) e ids verificados en Fase 1.
@@ -518,7 +526,7 @@ obtener en la siguiente ejecución).
       `lib/submissions/actions.ts` (`requireUser()`, validación de tamaño y
       vacío, delega en `lib/code-runner`); eliminar `runCodeAction` y su
       comentario de stub.
-- [x] `npm run lint` (0 errores) y typecheck; `npm run build` pendiente en verde.
+- [x] `npm run lint` (0 errores) y typecheck; `npm run build` en verde.
 
 ### Fase 6 — UI del estudiante
 - [x] `AssignmentPlayer` pasa `submissionId={submission.id}` a
@@ -546,12 +554,13 @@ obtener en la siguiente ejecución).
 - [x] Actualizar `docs/mcps/question-bank-agent.system-prompt.md` con las
       convenciones listadas en "Evaluación MCP" (sin cambios en
       `mcp-servers/question-bank-mcp/`).
-- [ ] Actualizar la entrada de `question-bank-mcp` en `docs/mcps/README.md`
-      si su descripción menciona que `coding_challenge` no se ejecuta.
+- [x] Actualizar la entrada de `question-bank-mcp` en `docs/mcps/README.md`
+      si su descripción menciona que `coding_challenge` no se ejecuta. No
+      aplica: la descripción no lo menciona.
 
 ### Fase 8 — Pruebas
-- [ ] Ejecutar `docs/testing/test-058-ejecutor-codigo-coding-challenge.md`
-      con el usuario (protocolo "Pruebas manuales asistidas por Claude").
+- [x] Ejecutar `docs/testing/test-058-ejecutor-codigo-coding-challenge.md`
+      con el usuario (13/13 aprobados, 2026-10-19) (protocolo "Pruebas manuales asistidas por Claude").
 - [ ] (Cuando exista framework) pruebas automáticas vía `@tester`.
 
 ## Criterios de aceptación

@@ -5,6 +5,63 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+## DEBT-095 — `get_variant_answer_key` expone las respuestas correctas a cualquier estudiante durante el quiz
+
+**Origen:** revisión de código al redactar spec-058 (2026-10-19).
+**Prioridad:** Alta — compromete la integridad de todos los quices con
+preguntas `multiple_choice`.
+
+La RPC `get_variant_answer_key`
+(`supabase/migrations/20260724000002_variant_question_content_rpcs.sql:114`)
+es `security definer`, tiene `grant execute ... to authenticated` (línea 145)
+y devuelve `correct_choice_ids` de cada pregunta `multiple_choice` de la
+variante **sin ningún gating** por estado de la entrega ni por
+`show_feedback_on`. Su comentario dice que se usa "exclusivamente" desde
+`submitSubmission` y nunca se reenvía al cliente, pero
+`lib/submissions/index.ts:265` la llama con el **cliente de sesión** del
+estudiante, y la propia migración reconoce (líneas 20-23) que estas funciones
+son alcanzables directo por la API REST de Supabase con la sesión del
+estudiante. Su única verificación es que la matrícula tenga asignada esa
+variante, y el estudiante conoce sus propios `assignment_id` y
+`enrollment_id`.
+
+Consecuencia (inferida del código, no reproducida): un estudiante autenticado
+puede pedir la clave de respuestas de su propia variante mientras el quiz está
+`in_progress`.
+
+**Acción:**
+- `revoke execute ... from authenticated` (y de `anon`/`public`) y llamarla
+  solo con un cliente de servicio desde el servidor (`submitSubmission`), o
+  convertirla en lógica interna de una RPC de envío que ya valide propiedad y
+  estado.
+- Verificar, de solo lectura, si la función está expuesta en producción y si
+  hay otras RPC `security definer` con el mismo patrón (`grant ... to
+  authenticated` + parámetros elegidos por el cliente).
+- Añadir una prueba automática que confirme que un estudiante no puede
+  invocarla.
+
+---
+
+## DEBT-094 — `get_variant_question_details` no verifica que la matrícula pertenezca al usuario
+
+**Origen:** revisión de código al redactar spec-058 (2026-10-19).
+**Prioridad:** Baja — requiere conocer el UUID de matrícula de otro
+estudiante y no expone respuestas correctas antes del envío.
+
+La RPC `get_variant_question_details`
+(`supabase/migrations/20260724000002_variant_question_content_rpcs.sql:24`) es
+`security definer` con `grant execute ... to authenticated` (línea 107). Solo
+comprueba que `p_enrollment_id` tenga asignada la variante, no que esa
+matrícula sea de `auth.uid()`. Con el id de matrícula de otro estudiante, un
+usuario autenticado puede leer el contenido de su variante (enunciados,
+opciones y, si esa entrega ya reveló feedback, `is_correct`).
+
+**Acción:** añadir a la condición `allowed` la verificación de que
+`p_enrollment_id` pertenece a `auth.uid()` (join con la matrícula), con una
+migración. Conviene resolverla junto con DEBT-095, en la misma migración.
+
+---
+
 ## DEBT-092 — Esquemas de nombre de estudiante sin límite superior de longitud
 
 **Origen:** análisis de `@architect` para spec-057 (2026-09-22), verificado
