@@ -199,7 +199,6 @@ export function QuestionRenderer({ question, answer, onChange, disabled = false,
               <button
                 type="button"
                 disabled={running}
-                aria-busy={running}
                 onClick={async () => {
                   const codeToRun = answer.text_response;
                   setRunning(true);
@@ -226,6 +225,7 @@ export function QuestionRenderer({ question, answer, onChange, disabled = false,
               result={runResult}
               transportMessage={transportMessage}
               stale={ranCode !== null && ranCode !== answer.text_response}
+              running={running}
             />
           </div>
         )}

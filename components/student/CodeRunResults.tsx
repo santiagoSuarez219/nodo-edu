@@ -4,6 +4,7 @@ interface Props {
   result: ChallengeRunResult | null;
   transportMessage: string | null;
   stale: boolean;
+  running?: boolean;
 }
 
 const VERDICT_LABELS: Record<CaseVerdict, string> = {
@@ -62,7 +63,18 @@ function CaseCard({ item, showVerdict }: { item: VisibleCaseResult; showVerdict:
   );
 }
 
-export function CodeRunResults({ result, transportMessage, stale }: Props) {
+function summarize(result: ChallengeRunResult | null, transportMessage: string | null, running: boolean): string {
+  if (running) return "Ejecutando tu código.";
+  if (transportMessage) return transportMessage;
+  if (!result) return "";
+  if (result.status !== "completed") return result.status === "disabled" ? "La ejecución no está disponible." : result.message;
+  if (result.compileError !== undefined) return "Error de compilación o de sintaxis.";
+  if (result.noExamples) return "Tu código se ejecutó sin casos de ejemplo.";
+  const passed = result.cases.filter((c) => c.verdict === "passed").length;
+  return `${passed} de ${result.cases.length} casos pasan.`;
+}
+
+export function CodeRunResults({ result, transportMessage, stale, running = false }: Props) {
   let body: React.ReactNode = null;
 
   if (transportMessage) {
@@ -129,7 +141,11 @@ export function CodeRunResults({ result, transportMessage, stale }: Props) {
   }
 
   return (
-    <div role="region" aria-label="Resultados de la ejecución" aria-live="polite" className="flex flex-col gap-2">
+    <div role="region" aria-label="Resultados de la ejecución" className="flex flex-col gap-2">
+      {/* Solo se anuncia un resumen; el detalle por caso se lee navegando. */}
+      <p role="status" aria-live="polite" className="sr-only">
+        {summarize(result, transportMessage, running)}
+      </p>
       {body}
     </div>
   );

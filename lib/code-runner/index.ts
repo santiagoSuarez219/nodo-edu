@@ -22,7 +22,7 @@ import type {
 
 export type { ChallengeRunResult, VisibleCaseResult } from "./types";
 
-const UNAVAILABLE_MESSAGE =
+export const UNAVAILABLE_MESSAGE =
   "No pudimos ejecutar tu código en este momento. Tu respuesta sigue guardada; puedes intentarlo de nuevo o enviar la evaluación.";
 const TRUNCATION_MARKER = "\n… (salida truncada)";
 const JAVA_MAIN_HINT = "\n\nEn Java, la clase pública debe llamarse Main.";
@@ -72,7 +72,8 @@ function buildOutcome(
 ): VisibleRunOutcome {
   const noExamples = tests.length === 0;
 
-  // Un error de compilación es idéntico en todos los casos: se muestra una vez.
+  // Un error de compilación es idéntico en todos los casos (la compilación no
+  // depende del stdin): basta con inspeccionar el primero y se muestra una vez.
   const first = runs[0];
   const isJavaCompile = first !== undefined && mapVerdict(first) === "compile_error";
   const isPythonSyntax =
@@ -131,53 +132,49 @@ export async function runChallenge(
   if (!isCodeRunnerConfigured()) return { status: "disabled" };
 
   const service = createServiceSupabaseClient();
-
-  const { count, error: countError } = await service
-    .from("code_runs")
-    .select("id", { count: "exact", head: true })
-    .eq("submission_id", submissionId)
-    .eq("question_id", questionId);
-  if (countError) throw countError;
-  if ((count ?? 0) >= MAX_RUNS_PER_QUESTION) return reject("rate_limited", { runsRemaining: 0 });
-
-  const { data: last, error: lastError } = await service
-    .from("code_runs")
-    .select("created_at")
-    .eq("submission_id", submissionId)
-    .order("created_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-  if (lastError) throw lastError;
-  if (last) {
-    const elapsed = (Date.now() - new Date(last.created_at).getTime()) / 1000;
-    if (elapsed < MIN_RUN_INTERVAL_SECONDS) {
-      return reject("rate_limited", {
-        message: "Ejecutaste hace muy poco.",
-        runsRemaining: MAX_RUNS_PER_QUESTION - (count ?? 0),
-        retryAfterSeconds: Math.ceil(MIN_RUN_INTERVAL_SECONDS - elapsed),
-      });
-    }
-  }
-
   const inputs = access.tests.length > 0 ? access.tests.map((t) => t.input) : [""];
-  const { data: run, error: insertError } = await service
-    .from("code_runs")
-    .insert({
-      submission_id: submissionId,
-      question_id: questionId,
-      language: access.language,
-      cases_count: inputs.length,
-    })
-    .select("id")
-    .single();
-  if (insertError) throw insertError;
+
+  // Conteo, intervalo e inserción en una sola transacción serializada por
+  // intento (claim_code_run): evita saltarse los límites con llamadas en paralelo.
+  const { data: claim, error: claimError } = await service.rpc("claim_code_run", {
+    p_submission_id: submissionId,
+    p_question_id: questionId,
+    p_language: access.language,
+    p_cases_count: inputs.length,
+    p_max_runs: MAX_RUNS_PER_QUESTION,
+    p_min_interval_seconds: MIN_RUN_INTERVAL_SECONDS,
+  });
+  if (claimError) throw claimError;
+
+  const claimed = claim as {
+    status: "ok" | "limit" | "interval";
+    count: number;
+    run_id?: string;
+    retry_after?: number;
+  };
+  if (claimed.status === "limit") return reject("rate_limited", { runsRemaining: 0 });
+  if (claimed.status === "interval") {
+    return reject("rate_limited", {
+      message: "Ejecutaste hace muy poco.",
+      runsRemaining: MAX_RUNS_PER_QUESTION - claimed.count,
+      retryAfterSeconds: claimed.retry_after,
+    });
+  }
+  const runId = claimed.run_id as string;
 
   const startedAt = Date.now();
   const finish = async (outcome: "completed" | "compile_error" | "provider_error") => {
-    await service
+    const { error } = await service
       .from("code_runs")
       .update({ outcome, duration_ms: Date.now() - startedAt })
-      .eq("id", run.id);
+      .eq("id", runId);
+    // El contador ya cuenta la fila; solo se pierde la métrica de resultado.
+    if (error && isSentryEnabled) {
+      Sentry.captureMessage("code runner outcome update failed", {
+        level: "warning",
+        tags: { "code_runner.phase": "finish" },
+      });
+    }
   };
 
   let runs: ProviderRun[];
@@ -196,6 +193,6 @@ export async function runChallenge(
   return {
     status: "completed",
     ...outcome,
-    runsRemaining: MAX_RUNS_PER_QUESTION - ((count ?? 0) + 1),
+    runsRemaining: MAX_RUNS_PER_QUESTION - claimed.count,
   };
 }

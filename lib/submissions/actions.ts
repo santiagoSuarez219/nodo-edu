@@ -5,7 +5,8 @@ import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/auth/session";
 import { getOrAllocateVariant } from "@/lib/assignments";
 import * as Sentry from "@sentry/nextjs";
-import { runChallenge, type ChallengeRunResult } from "@/lib/code-runner";
+import { UNAVAILABLE_MESSAGE, runChallenge, type ChallengeRunResult } from "@/lib/code-runner";
+import { isSentryEnabled } from "@/lib/observability/sentry-enabled";
 import { createSubmission, finalizeGrading, gradeAnswer, saveAnswer, submitSubmission } from "./index";
 import type { AuthResult } from "@/lib/auth/types";
 import type { SubmissionFailure } from "./types";
@@ -81,12 +82,10 @@ export async function runChallengeAction(
   } catch (error) {
     // Un fallo inesperado (p. ej. Supabase) no debe romper el quiz: el
     // ejecutor es opcional y la respuesta ya está guardada.
-    Sentry.captureException(error, { level: "warning", tags: { action: "runChallengeAction" } });
-    return {
-      status: "unavailable",
-      message:
-        "No pudimos ejecutar tu código en este momento. Tu respuesta sigue guardada; puedes intentarlo de nuevo o enviar la evaluación.",
-    };
+    if (isSentryEnabled) {
+      Sentry.captureException(error, { level: "warning", tags: { action: "runChallengeAction" } });
+    }
+    return { status: "unavailable", message: UNAVAILABLE_MESSAGE };
   }
 }
 
