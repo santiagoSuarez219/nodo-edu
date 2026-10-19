@@ -271,6 +271,7 @@ export function AssignmentPlayer({
                 answer={answer}
                 onChange={(next) => handleAnswerChange(q.question_id, q.assignment_question_id, next)}
                 disabled={isSubmitting}
+                submissionId={submission.id}
               />
             </div>
           );

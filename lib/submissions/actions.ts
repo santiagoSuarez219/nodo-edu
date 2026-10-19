@@ -4,7 +4,9 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/auth/session";
 import { getOrAllocateVariant } from "@/lib/assignments";
-import { runCode, type CodeRunResult } from "@/lib/code-runner";
+import * as Sentry from "@sentry/nextjs";
+import { UNAVAILABLE_MESSAGE, runChallenge, type ChallengeRunResult } from "@/lib/code-runner";
+import { isSentryEnabled } from "@/lib/observability/sentry-enabled";
 import { createSubmission, finalizeGrading, gradeAnswer, saveAnswer, submitSubmission } from "./index";
 import type { AuthResult } from "@/lib/auth/types";
 import type { SubmissionFailure } from "./types";
@@ -67,15 +69,24 @@ export async function startNewAttemptAction(
   redirect(`/cuenta/cursos/${enrollmentId}/evaluaciones/${variantGroupId}`);
 }
 
-// coding_challenge se renderiza y guarda como respuesta abierta, pero no se
-// ejecuta (stub de spec-005): siempre devuelve { status: "disabled" }.
-export async function runCodeAction(
-  language: string,
-  code: string,
-  input?: string
-): Promise<CodeRunResult> {
-  await requireUser();
-  return runCode(language, code, input);
+// spec-058 (D2): el cliente envía solo contexto; el lenguaje y los casos
+// visibles se resuelven en servidor. La ejecución nunca cambia una nota.
+export async function runChallengeAction(
+  submissionId: string,
+  questionId: string,
+  code: string
+): Promise<ChallengeRunResult> {
+  const user = await requireUser();
+  try {
+    return await runChallenge(user.id, submissionId, questionId, code);
+  } catch (error) {
+    // Un fallo inesperado (p. ej. Supabase) no debe romper el quiz: el
+    // ejecutor es opcional y la respuesta ya está guardada.
+    if (isSentryEnabled) {
+      Sentry.captureException(error, { level: "warning", tags: { action: "runChallengeAction" } });
+    }
+    return { status: "unavailable", message: UNAVAILABLE_MESSAGE };
+  }
 }
 
 function reviewPaths(academicCourseId: string, groupId: string, submissionId: string) {

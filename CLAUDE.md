@@ -237,6 +237,9 @@ npm run seed:dev
 | `NEXT_PUBLIC_SITE_URL` | URL base del sitio. Reservada: sin uso actual en el código (no hay OAuth ni recuperación de contraseña implementados); se carga por si un flujo futuro la requiere (ver DEBT-014 en `docs/specs/backlog.md`) |
 | `STUDENTS_ADMIN_API_KEY` | Clave de servicio del dominio de estudiantes (`/api/students/*`, `students-mcp`) — permisos de admin, distinta de `QUESTION_BANK_API_KEY` |
 | `COURSES_ADMIN_API_KEY` | Clave de servicio del dominio de cursos (`/api/courses/*`, `courses-mcp`) — abre y cierra lecciones a los estudiantes. Propia y distinta de `QUESTION_BANK_API_KEY` y `STUDENTS_ADMIN_API_KEY`: debe poder revocarse sin apagar el banco de preguntas (spec-039 M2). Si falta, la ruta responde `500 configuration_error`, nunca `401` |
+| `CODE_RUNNER_API_URL` | URL base del ejecutor de código (Judge0 CE gestionado, spec-058). Server-only. Si falta, "Ejecutar" en los quices responde "no disponible" (estado de producto, no error de despliegue) |
+| `CODE_RUNNER_API_KEY` | Clave del ejecutor de código (RapidAPI, plan "Per use": se factura por uso). Server-only; nunca en cliente ni en logs |
+| `CODE_RUNNER_API_HOST` | Host RapidAPI del ejecutor (cabecera `x-rapidapi-host`). Opcional fuera de RapidAPI |
 | `NEXT_PUBLIC_SENTRY_DSN` | DSN del proyecto Sentry `nodo-edu` (spec-052). Se carga **solo** en Vercel → Production; nunca en `.env.local` — su sola presencia, junto con `NODE_ENV === "production"`, activa el reporte de errores (ver `lib/observability/sentry-enabled.ts`) |
 
 > ⚠️ Nunca escribas valores reales de variables de entorno en este archivo
