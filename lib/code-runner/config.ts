@@ -9,7 +9,7 @@ export const MAX_DISPLAY_OUTPUT_CHARS = 4_096;
 export const ACTION_BUDGET_MS = 25_000;
 export const POLL_INTERVAL_MS = 700;
 
-export const MAX_RUNS_PER_QUESTION = 20;
+export const MAX_RUNS_PER_QUESTION = 3;
 export const MIN_RUN_INTERVAL_SECONDS = 5;
 
 // Memoria en KB, tiempos en segundos: son las unidades de Judge0.

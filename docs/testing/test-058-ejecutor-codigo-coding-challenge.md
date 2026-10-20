@@ -183,3 +183,19 @@ Intento `09b32b14-def4-46db-a37d-03c47502cb18` (variante A) de `dev-estudiante1`
 - **Hallazgo menor:** con `p_min_interval_seconds` = 0, 4 de 30 llamadas simultáneas devolvieron `interval`, porque `now()` es la hora de inicio de la transacción y puede ser anterior al `created_at` de una inserción concurrente. Es conservador (rechaza de más, nunca de menos); usar `clock_timestamp()` lo eliminaría.
 
 **Limpieza Ronda 2:** completada el 2026-10-19. La API devolvió 409 ("ya tiene submissions"); con confirmación del usuario se borró por SQL en `nodo-dev` (`code_runs`, `answers`, el intento, `assignment_questions`, las 3 variantes, el quiz y las 2 preguntas), verificado con consultas (0 filas restantes). No se tocó producción.
+
+## Prueba de humo en producción (2026-10-19)
+> Pedida por el usuario para validar "Ejecutar" en producción antes de usarlo en el quiz de Pilas y Colas de Estructuras de datos. Datos creados en **producción** (`academy-page`) con confirmación del usuario; deben eliminarse al terminar. El quiz está publicado en el curso real, sin ítem de calificación y con ventana corta, así que también lo ven sus estudiantes.
+
+| Recurso | Herramienta de creación | Identificador | Eliminado |
+|---------|-------------------------|---------------|-----------|
+| Pregunta Java "[PRUEBA] Pilas — paréntesis balanceados" (2 visibles + 3 ocultos) | `question-bank-mcp-prod` → `create_question` + `update_question` + `publish_question` | `eb7919ff-730a-4be4-888f-0e1d87d2d725` | ✅ (SQL) |
+| Pregunta Java "[PRUEBA] Colas — simulación FIFO" (2 visibles + 2 ocultos) | `question-bank-mcp-prod` → `create_question` + `update_question` + `publish_question` | `fce3c5c4-34f1-4381-86f0-98ccbf9a48c7` | ✅ (SQL) |
+| Estudiante "[PRUEBA] Estudiante spec-058" (`prueba.spec058@nodo.test`), matriculado en Estructuras de datos `580506004-20` | `students-mcp-prod` → `create_student` | `d4491469-f4b8-453b-9a00-8deea3b9bfce` (matrícula `e60ca0dc-a747-4da1-abf8-64a490fc7699`) | ✅ (API) |
+| Quiz "[PRUEBA] Ejecutor de código — no responder", 2 intentos, 45 min, ventana 20:50–22:30 UTC, variantes A/B iguales | `assignment-mcp-prod` → `create_assignment_group` + `publish_assignment_group` | `6431d2cc-b6a8-45bb-a525-58f604d1d4aa` (variantes `03f1ace5-0cc5-408a-af63-5e62d21e6278`, `3ce35ac6-de6a-446e-9aa2-e2e601a79a8c`) | ✅ (SQL) |
+
+Las soluciones de referencia de ambas preguntas se verificaron localmente con Java 17 contra todos los casos antes de crearlas. La contraseña del estudiante no se registra aquí.
+
+**Resultado (2026-10-19):** ✅ el usuario ejecutó el quiz con el estudiante de prueba en `www.nod0.dev` y reportó que todo funcionó. Solo el estudiante de prueba recibió variante (A); ningún estudiante real abrió el quiz. Tras la prueba se adelantó el cierre a 20:58 UTC para que nadie más pudiera abrirlo.
+
+**Limpieza:** completada el 2026-10-19. `delete_assignment_group` devolvió 409 ("ya tiene submissions"); con autorización del usuario se borró por SQL en producción, en una transacción: el intento del estudiante de prueba (con sus `answers` y `code_runs` en cascada), el grupo del quiz (variantes, `assignment_questions` y asignación en cascada) y las 2 preguntas (casos y keywords en cascada). El estudiante se borró por la API (`delete_student`). Verificado por consulta: 0 filas restantes en todas las tablas, incluido `auth.users`.

@@ -35,7 +35,7 @@ Desde el 2026-07-31 hay **dos bases separadas**, y cada una tiene su MCP:
 
 | Entorno | MCP | Cuándo |
 |---|---|---|
-| Desarrollo (local, vía túnel) | `question-bank-mcp`, `assignment-mcp` | Producción del material (etapa E5 del flujo) |
+| Desarrollo (Supabase cloud `nodo-dev`) | `question-bank-mcp`, `assignment-mcp` | Producción del material (etapa E5 del flujo) |
 | **Producción** | `question-bank-mcp-prod`, `assignment-mcp-prod` | **Solo** en la fase de despliegue, con confirmación explícita del usuario en esa misma sesión |
 
 **Las preguntas no viajan con el deploy de código**: viven en Supabase, no en
@@ -124,8 +124,9 @@ ya las vio.
 encapsulamiento y complejidad; Análisis de Algoritmos exige justificación formal.
 
 **Redacta el `stem` sin ambigüedad.** Una sola pregunta por `stem`, sin dobles
-negaciones, sin "todas las anteriores". Markdown y código inline con backticks
-están soportados en el `stem`.
+negaciones, sin "todas las anteriores". Del Markdown solo se interpretan el
+código inline con backticks y los bloques con triple backtick; negritas,
+cursivas, listas y enlaces se muestran literales, con sus asteriscos y guiones.
 
 `keywords`: incluye el módulo y el concepto (p. ej.
 `["listas", "insercion", "big-o"]`), siempre tomados del catálogo.
@@ -171,7 +172,9 @@ generación automática: las compones eligiendo del banco.
    (obligatorio, y debe pertenecer al docente).
 2. **Muestra la composición propuesta al usuario y espera aprobación**: matriz
    tema × dificultad, qué pregunta va en cada variante y con cuántos puntos.
-   Igual que con el cuestionario, la propuesta va antes de crear nada.
+   Igual que con el cuestionario, la propuesta va antes de crear nada. Si
+   incluye `coding_challenge`, la propuesta lleva también lo que exige
+   "Preguntas `coding_challenge` en quices".
 3. Asegúrate de que las preguntas existen y están **publicadas** en el banco **de
    ese mismo entorno** (la API no lo valida al publicar el grupo — es tu
    responsabilidad).
@@ -203,6 +206,56 @@ y cubrir los mismos temas** — si no, estás calificando a los estudiantes con
 exámenes de dificultad distinta. Construye la matriz tema × dificultad primero y
 llena las tres columnas en paralelo.
 
+### Preguntas `coding_challenge` en quices
+
+Desde spec-058 el estudiante puede pulsar **"Ejecutar"** en un quiz y ver, por
+cada caso **visible**, la entrada, la salida esperada, su salida y si pasa. Los
+casos ocultos no se ejecutan ni se muestran. La calificación sigue siendo
+**manual**: "Ejecutar" es práctica, no nota. Una pregunta que no cumple estas
+reglas se ve rota ante el estudiante (casos que nunca pasan aunque el código
+sea correcto).
+
+- **Lenguaje:** `code_language` es `python` o `java`, en minúscula. Otro valor
+  no se puede ejecutar. Usa el lenguaje del curso (Estructuras de Datos: Java).
+- **Contrato de entrada y salida:** el programa lee el `input` de cada caso por
+  **stdin** y escribe el resultado por **stdout**. El `stem` debe describir el
+  formato exacto de ambos (qué hay en cada línea y qué se imprime), porque el
+  estudiante no tiene otra forma de saberlo.
+- **Java:** la clase pública debe llamarse **`Main`**; dilo en el `stem`. Si no,
+  el estudiante ve un error de compilación.
+- **`expected_output` exacto:** la comparación ignora espacios y saltos de línea
+  **finales**, pero respeta mayúsculas, espacios iniciales y el formato numérico
+  (`3.0` ≠ `3`). Prefiere salidas sin ambigüedad de formato (enteros, palabras
+  fijas como `SI`/`NO`) antes que decimales.
+- **Casos:** al menos **un visible** y al menos **un oculto**. Los visibles se
+  muestran completos al estudiante: son ejemplos del formato, nunca la
+  respuesta de los ocultos. Los ocultos cubren bordes (estructura vacía,
+  desbalanceo, un solo elemento) y sirven al docente para corregir. Solo se
+  ejecutan los primeros 10 visibles. Entradas de varias líneas van con `\n`.
+- **Casos pequeños:** cada ejecución tiene límite de tiempo y memoria. Nada de
+  entradas enormes ni algoritmos que tarden segundos.
+- **Todo el enunciado en `stem`:** el `code_snippet` de un `coding_challenge`
+  hoy no se persiste (DEBT-057). Si hay código de partida, va en el `stem`
+  dentro de un bloque con triple backtick.
+- **Verifica antes de crear:** escribe una **solución de referencia**, ejecútala
+  localmente contra **todos** los casos (visibles y ocultos) y compara con
+  `expected_output`. Hay `java` 17 y `python3` en la máquina; trabaja en el
+  scratchpad, no en el repo. Si una salida no coincide, corrige el caso antes
+  de proponerlo.
+- **La propuesta muestra todo:** `stem` exacto, lenguaje, dificultad, keywords,
+  cada caso con su `input`, `expected_output` y si es visible u oculto, y la
+  solución de referencia (para el docente; no se guarda en la pregunta).
+- **No reutilices a ciegas** las `coding_challenge` ya publicadas en el banco:
+  muchas tienen casos descriptivos ("una lista vacía → error") en vez de
+  entrada y salida reales, y fallan al ejecutarlas. Revisa sus
+  `challenge_tests` con `get_question` antes de ponerlas en una variante.
+- **No se montan en lecciones:** el cierre de lección las ignora. Para un quiz
+  basta con publicarlas; la regla "nunca dejes una pregunta publicada sin
+  montar" aplica solo al cuestionario de cierre.
+- **Límites que conviene decir en la descripción del quiz:** 3 ejecuciones por
+  pregunta y por intento, con al menos 5 s entre ejecuciones, y la nota la pone
+  el docente.
+
 Cuidado con las herramientas destructivas:
 
 - `replace_variant_questions` **borra y reinserta** todas las preguntas de una
@@ -217,8 +270,9 @@ Cuidado con las herramientas destructivas:
 - **Nunca crees ni publiques una pregunta o un grupo sin que el usuario haya
   visto su contenido textual y lo haya aprobado en esa misma sesión.** Publicar
   no se deshace.
-- **Nunca dejes una pregunta publicada sin montar.** Publicar y montar son dos
-  pasos; solo el segundo la hace visible.
+- **Nunca dejes una pregunta de cierre publicada sin montar.** Publicar y
+  montar son dos pasos; solo el segundo la hace visible. Las preguntas de quiz
+  (`coding_challenge`, `open_text`, etc.) no se montan.
 - **Nunca uses las variantes `-prod` de los MCP** salvo en la fase de despliegue
   y con confirmación explícita del usuario en esa misma sesión.
 - **Nunca inventes `course_slug`, `lesson_slug` ni slugs de keyword.**
