@@ -344,8 +344,10 @@ En serverless un contador en memoria no es global (precedente explícito en
 `lib/auth/rate-limit.ts`), y el límite del proveedor es **por cuenta**, no
 por estudiante: un solo estudiante podría agotar la cuota diaria de todo el
 salón. *Por defecto:*
-- **20 ejecuciones por (intento, pregunta)** y un **intervalo mínimo de 5 s**
-  entre ejecuciones del mismo intento.
+- **3 ejecuciones por (intento, pregunta)** y un **intervalo mínimo de 5 s**
+  entre ejecuciones del mismo intento. (Inicialmente 20; bajado a 3 el
+  2026-10-20 por decisión del docente. Las estimaciones de costo de este spec
+  se calcularon con 20 y quedan como cota superior.)
 - Tabla nueva `public.code_runs`: `id uuid pk`, `submission_id uuid not null
   references submissions(id) on delete cascade`, `question_id uuid not null
   references questions(id) on delete cascade`, `language text not null`,
@@ -585,7 +587,7 @@ obtener en la siguiente ejecución).
 8. `runChallengeAction` con un `questionId` que no pertenece a la variante
    del intento, o con un `submissionId` de otro estudiante (o invocada por
    el docente), devuelve `rejected` y no ejecuta nada.
-9. Tras 20 ejecuciones de una misma pregunta en un intento, la siguiente se
+9. Tras 3 ejecuciones de una misma pregunta en un intento, la siguiente se
    rechaza con un mensaje claro y el contador en 0; el intervalo mínimo de
    5 s también se respeta.
 10. El lenguaje usado en la ejecución es siempre el de la pregunta

@@ -252,7 +252,7 @@ sea correcto).
 - **No se montan en lecciones:** el cierre de lección las ignora. Para un quiz
   basta con publicarlas; la regla "nunca dejes una pregunta publicada sin
   montar" aplica solo al cuestionario de cierre.
-- **Límites que conviene decir en la descripción del quiz:** 20 ejecuciones por
+- **Límites que conviene decir en la descripción del quiz:** 3 ejecuciones por
   pregunta y por intento, con al menos 5 s entre ejecuciones, y la nota la pone
   el docente.
 
