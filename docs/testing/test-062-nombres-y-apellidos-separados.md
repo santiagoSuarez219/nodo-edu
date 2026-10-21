@@ -25,8 +25,8 @@
 | Cambio de nombres de Dev Uno a "Ana" / "Álvarez" | UI lista de matriculados (TC-062-02) | `dev-estudiante1@nodo.local` | ✅ (restaurar con `students-mcp update_student` → `first_name: "Estudiante Dev"`, `last_name: "Uno"`) |
 | Cuenta "Test Registro Sesentaydos" | `POST /api/students` con partes (el registro por UI no fue posible, ver TC-062-03) | `registro.test062@nodo.local` / `db0c818b-1a95-443f-a7f2-43e9c1e1b07b` | ✅ (`students-mcp delete_student`) |
 | Estudiante "Mononimo" (una sola palabra) | `POST /api/students` con `full_name: "Mononimo"` + `enrollment_code: "DEVEDD2026"` (TC-062-11) | `mononimo.test062@nodo.local` / `5956ee62-0973-44c3-abe3-925414bbece0` | ✅ (`students-mcp delete_student`) |
-| Sesión manual de asistencia en DEVEDD2026, con Dev Uno y Dev Dos presentes | UI planilla de asistencia (TC-062-06) | `c7273ff5-97db-4f41-be02-1015c93176d4` | ❌ permanente (dato de prueba; si no hay eliminación por UI, anotarlo como permanente) |
-| Evaluación publicada con envíos de Dev Uno y Dev Dos en DEVEDD2026 | `assignment-mcp create_assignment_group` + `publish_assignment_group`; envíos desde la UI del estudiante (TC-062-08, -09) | `4e00ed9b-c8b3-4ebc-93ad-d11e7de99449` | ❌ permanente (`delete_assignment_group` responde 409 con envíos: anotarlo como permanente, igual que en test-056) |
+| Sesión manual de asistencia en DEVEDD2026, con Dev Uno y Dev Dos presentes | UI planilla de asistencia (TC-062-06) | `c7273ff5-97db-4f41-be02-1015c93176d4` | ✅ 2026-10-21, borrada por el usuario desde la planilla; verificado por REST (`class_sessions` y `attendance_records` vacíos) |
+| Evaluación publicada con envíos de Dev Uno y Dev Dos en DEVEDD2026 | `assignment-mcp create_assignment_group` + `publish_assignment_group`; envíos desde la UI del estudiante (TC-062-08, -09) | `4e00ed9b-c8b3-4ebc-93ad-d11e7de99449` | ✅ 2026-10-21, con autorización del usuario: REST con service role en `nodo-dev` (la API responde 409 con envíos) — borrados sus 3 `submissions` (respuestas y `code_runs` en cascada) y el grupo (3 variantes en cascada); verificado vacío |
 | Retiro de Dev Uno de DEVADA2026 | `students-mcp unenroll_student` (TC-062-10) | `9d945a68-0067-468e-8cfe-98e25bdcc141` | ✅ (revertir con `enroll_student`) |
 | Estudiante "Mcp Prueba Sesentaydos" | `students-mcp create_student` (TC-MCP-062-01) | `mcp.test062@nodo.local` / `004897f8-13cc-411f-bedb-185855e7674d` | ✅ (`students-mcp delete_student`) |
 
@@ -84,8 +84,8 @@ usuario de cada estudiante sigue mostrando "Estudiante Dev Uno".
 2. Error de validación; no se crea la cuenta.
 3. Se crea y queda matriculada (flujo de spec-027 intacto).
 4. Aparece "Sesentaydos, Test Registro" **sin** insignia "Revisar".
-**Estado:** ⚠️ Parcial
-**Hallazgos:** El formulario muestra "Nombres" y "Apellidos"; Apellidos de 1 letra da el error de validación y no crea cuenta. El alta completa NO se pudo ejecutar por UI: `nodo-dev` tiene "Confirm email" activo y Supabase responde `over_email_send_rate_limit` / `email_address_invalid` (dominio .local). Se verificó la misma ruta (`handle_new_user` con partes en `user_metadata`) creando la cuenta por `POST /api/students`: queda con partes, sin marca de revisión, matriculada, y aparece como "Sesentaydos, Test Registro" sin insignia. Pendiente: desactivar "Confirm email" en nodo-dev para probar el registro real (ver CLAUDE.md, Base de datos, punto 4).
+**Estado:** ✅ Aprobado
+**Hallazgos:** El formulario muestra "Nombres" y "Apellidos"; Apellidos de 1 letra da el error de validación y no crea cuenta. El alta completa NO se pudo ejecutar por UI: `nodo-dev` tiene "Confirm email" activo y Supabase responde `over_email_send_rate_limit` / `email_address_invalid` (dominio .local). Se verificó la misma ruta (`handle_new_user` con partes en `user_metadata`) creando la cuenta por `POST /api/students`: queda con partes, sin marca de revisión, matriculada, y aparece como "Sesentaydos, Test Registro" sin insignia. **2026-10-21, producción:** registro real por UI (usuario) en https://www.nod0.dev/registro con `santiago8628+test062@gmail.com`, "Prueba Registro" / "Sesenta Dos" y un código de matrícula real: alta sin errores; perfil verificado vía `students-mcp-prod` (`first_name`/`last_name` correctos, `name_needs_review = false`). Cuenta y matrícula eliminadas con `delete_student` (búsqueda posterior vacía). Aprobado por el usuario.
 
 ### TC-062-04 — El estudiante edita sus nombres y apellidos en `/cuenta`
 **Precondición:** TC-062-03 aprobado.
@@ -184,8 +184,8 @@ vacío).
 **Resultado esperado:** insignia "Revisar" con el estilo de advertencia de
 `DESIGN.md`; los dos campos de edición caben en la celda sin desbordar la
 tabla; el formulario de registro se apila en móvil.
-**Estado:** ⚠️ Parcial
-**Hallazgos:** Modo oscuro verificado (insignia amarilla de advertencia, dos campos caben en la celda en desktop). Modo claro y ancho móvil NO verificados: `resize_window` no cambia el viewport real y el navegador quedó bloqueado por un diálogo de confirmación al borrar el ítem de calificación. Por revisar por el usuario.
+**Estado:** ✅ Aprobado
+**Hallazgos:** Modo oscuro verificado (insignia amarilla de advertencia, dos campos caben en la celda en desktop). Modo claro y ancho móvil NO verificados: `resize_window` no cambia el viewport real y el navegador quedó bloqueado por un diálogo de confirmación al borrar el ítem de calificación. Modo claro y ancho móvil: aprobado por el usuario el 2026-10-21.
 
 ## Casos de prueba — MCP
 
@@ -248,6 +248,6 @@ y `marked_at`, en orden de llegada (D11), no por apellido.
 **Hallazgos:** Registros con partes en orden de llegada: Dev Dos (…:46) antes que Ana (…:50).
 
 ## Resumen de la ronda
-- Aprobados: 16 — Fallidos: 0 — Parciales: 2 (TC-062-03, TC-062-12) — Pendientes: 0
+- Aprobados: 18 — Fallidos: 0 — Parciales: 0 — Pendientes: 0 (TC-062-03 y TC-062-12 cerrados el 2026-10-21)
 - Hallazgos escalados a `docs/specs/backlog.md`: ninguno nuevo (la matrícula cruzada de TC-062-08 se anota abajo)
-- Limpieza de datos de prueba: ⚠️ Casi completa. Eliminados: estudiantes registro/mcp/mononimo; Ana reactivada en DEVADA y con sus nombres restaurados; Dev Dos con nombres confirmados. **Permanentes:** evaluación "Quiz test-062" (`4e00ed9b-c8b3-4ebc-93ad-d11e7de99449`, 409 con envíos), sesión de asistencia manual del 19/10 en DEVEDD2026 y el ítem de calificación "Parcial test-062" (el navegador se bloqueó con un diálogo de confirmación al eliminarlo: borrarlo desde la UI).
+- Limpieza de datos de prueba: ✅ Completada (2026-10-21). Eliminados: estudiantes registro/mcp/mononimo; Ana reactivada en DEVADA y con sus nombres restaurados; Dev Dos con nombres confirmados; evaluación "Quiz test-062" (`4e00ed9b-…`, borrada por REST en `nodo-dev` con autorización del usuario); sesión de asistencia del 19/10 (`c7273ff5-…`) e ítem de calificación "Parcial test-062", borrados por el usuario desde la UI y verificados por REST. En producción, la cuenta de prueba de TC-062-03 se eliminó con `students-mcp-prod`.

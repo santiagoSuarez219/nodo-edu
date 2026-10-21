@@ -5,9 +5,9 @@
 > de la lección teórica — `insertarInicio`, `insertarFinal`,
 > `insertarEnPosicion`, `buscarPorIndice` y `buscarPorValor` — y se instancia
 > con `Transaccion` en vez de `String`, para que el ejemplo se vea con el
-> tipo real del proyecto. Esta sesión no tiene laboratorio propio — la `P`
-> de esta semana (`ListaDoble<T>` y `ListaCircular<T>`) es una práctica
-> distinta, fuera de esta ronda.
+> tipo real del proyecto. Esta sesión no tiene laboratorio propio.
+> `ListaDoble<T>` y `ListaCircular<T>` se ven en la sesión siguiente, como demo
+> en vivo con sus propios apuntes (`lista-doblemente-enlazada-y-lista-circular`).
 >
 > ⚠️ **Antes de empezar, renombra en el proyecto del estudiante**: la sesión
 > práctica de la Semana 5 dejó un método `insertarAlFinal(T dato)` en
