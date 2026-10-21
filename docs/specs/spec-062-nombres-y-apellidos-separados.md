@@ -580,7 +580,7 @@ grant execute on function public.get_student_profiles_public(uuid[]) to authenti
       salida y aplicar solo si lista exactamente esas cuatro.
 - [x] Verificar por REST que existe `profiles.first_name` (`42703` = no
       aplicada).
-- [ ] Registrar una cuenta de prueba en producción solo con confirmación
+- [x] Registrar una cuenta de prueba en producción solo con confirmación
       explícita del usuario (CLAUDE.md: no crear datos de prueba en
       producción sin confirmación) y borrarla; alternativa: verificar con el
       primer registro real.
@@ -594,7 +594,10 @@ grant execute on function public.get_student_profiles_public(uuid[]) to authenti
 > --linked` aplicó las cuatro migraciones (dry-run idéntico); REST: 157 perfiles
 > con `name_needs_review = true`, 2 con `last_name` vacío. Merge `c774ecf` a
 > `main`, deployment Vercel `dpl_58zs4V6tB4BMUQ1iYggsYznkqUVx` READY. Pendiente:
-> verificar con el primer registro real y avisar al docente.
+> avisar al docente. Registro de prueba en producción (2026-10-21,
+> `santiago8628+test062@gmail.com`, con código de matrícula real): perfil con
+> `first_name`/`last_name` correctos y `name_needs_review = false`; cuenta y su
+> matrícula eliminadas vía `students-mcp-prod` (`delete_student`, verificado vacío).
 
 ## Criterios de aceptación
 
