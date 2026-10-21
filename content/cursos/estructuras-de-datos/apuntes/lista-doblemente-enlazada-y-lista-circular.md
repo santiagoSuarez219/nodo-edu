@@ -69,6 +69,10 @@ public class ListaDoble<T> {
             actual = actual.getSiguiente();
         }
     }
+
+    // Pasos 2 y 3: aquí dentro, antes de esta llave final, se agregan
+    // recorrerInverso, buscar y eliminar. Los bloques siguientes son
+    // fragmentos de ListaDoble<T> y se pegan en ese lugar, en orden.
 }
 ```
 
@@ -81,7 +85,7 @@ en los dos sentidos y agregar C: nacen **dos** flechas (`B -> C` y `C -> B`) y
 ## Paso 2 — `recorrerInverso` y `buscar`
 
 El premio de la referencia extra: ir hacia atrás cuesta lo mismo que ir hacia
-adelante. En la lista simple, esto obligaba a recorrer desde `head` hasta el
+adelante. Los dos métodos de este paso se agregan **dentro** de `ListaDoble<T>`. En la lista simple, esto obligaba a recorrer desde `head` hasta el
 nodo previo en cada paso (O(n²) en total).
 
 ```java
@@ -114,6 +118,9 @@ nodo y no el dato a propósito: localizar cuesta O(n), pero lo que viene
 (`eliminar`) ya no necesita buscar a nadie.
 
 ## Paso 3 — `eliminar(NodoDoble<T>)`: cuatro referencias, tres casos
+
+(Los dos bloques de este paso son el mismo método dentro de `ListaDoble<T>`:
+primero la versión con el error, luego la corrección que la reemplaza.)
 
 La lección dice que aquí la lista doble gana: el nodo mismo sabe quién está
 antes y quién después. Pero "saber" no es "avisar": hay que **avisarle a los dos

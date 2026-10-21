@@ -38,10 +38,10 @@ Cada gesto es una referencia que el nodo debe guardar:
 
 ```mermaid
 flowchart LR
-  N1["null"] <-->|"anterior"| A["A"]
+  A["A"] -->|"anterior"| N1["null"]
   A <-->|"siguiente / anterior"| B["B"]
   B <-->|"siguiente / anterior"| C["C"]
-  C <-->|"siguiente"| N2["null"]
+  C -->|"siguiente"| N2["null"]
 ```
 
 > **Nodo doble:** nodo que guarda un dato y **dos** referencias: al nodo que lo sigue y al nodo que lo precede.
