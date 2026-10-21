@@ -1,4 +1,4 @@
-# spec-062 — [IN PROGRESS] Nombres y apellidos separados, orden por apellido en el panel docente
+# spec-062 — [TESTING] Nombres y apellidos separados, orden por apellido en el panel docente
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.
 
@@ -523,53 +523,53 @@ grant execute on function public.get_student_profiles_public(uuid[]) to authenti
 ## Fases de implementación
 
 ### Fase 1 — Esquema
-- [ ] Crear las tres migraciones del "DDL propuesto".
-- [ ] **Antes de producción**, correr la heurística en modo lectura sobre los
+- [x] Crear las tres migraciones del "DDL propuesto".
+- [x] **Antes de producción**, correr la heurística en modo lectura sobre los
       perfiles reales (`select p.full_name, s.* from profiles p,
       propose_name_split(p.full_name) s`, tras crear solo la función en una
       sesión de prueba o con una copia local) y mostrar la muestra al usuario.
-- [ ] `supabase db push --db-url "$DEV_DB_URL" --dry-run`, mostrar la salida y,
+- [x] `supabase db push --db-url "$DEV_DB_URL" --dry-run`, mostrar la salida y,
       con visto bueno, aplicar en `nodo-dev` (**nunca** `--linked`).
-- [ ] Verificar en `nodo-dev`: backfill (perfiles sembrados con
+- [x] Verificar en `nodo-dev`: backfill (perfiles sembrados con
       `name_needs_review = true`); trigger (escritura legada de `full_name`
       re-propone; escritura de partes recalcula `full_name`); alta de usuario
       con y sin partes en los metadatos; RPC ampliado.
 
 ### Fase 2 — Registro, `/cuenta` y servicio de estudiantes
-- [ ] `lib/auth/schemas.ts`, `lib/auth/actions.ts`, `SignUpForm.tsx` (D4).
-- [ ] `lib/students/types.ts`, `schemas.ts`, `service.ts`, `index.ts`,
+- [x] `lib/auth/schemas.ts`, `lib/auth/actions.ts`, `SignUpForm.tsx` (D4).
+- [x] `lib/students/types.ts`, `schemas.ts`, `service.ts`, `index.ts`,
       `actions.ts` (`updateAccountAction`) y `AccountForm.tsx`.
-- [ ] Contrato de API (D10); `fetchStudentProfilesPublic` con partes.
-- [ ] `scripts/seed-dev-data.mjs` con partes.
-- [ ] `grep -rn "full_name:" lib app components` solo muestra lecturas o el
+- [x] Contrato de API (D10); `fetchStudentProfilesPublic` con partes.
+- [x] `scripts/seed-dev-data.mjs` con partes.
+- [x] `grep -rn "full_name:" lib app components` solo muestra lecturas o el
       `full_name` derivado de `options.data`.
 
 ### Fase 3 — Formato y orden en las listas del panel docente
-- [ ] `lib/students/names.ts` (D6, D7).
-- [ ] Aplicar a las seis listas del inventario (D8): cargadores en
+- [x] `lib/students/names.ts` (D6, D7).
+- [x] Aplicar a las seis listas del inventario (D8): cargadores en
       `lib/enrollments`, `lib/grades`, `lib/attendance` (incluido
       `service.ts`, D11), `lib/submissions`, `lib/assignments` (D12), y sus
       componentes.
-- [ ] Leer `DESIGN.md`; sin cambios de estilo salvo la insignia "Revisar".
+- [x] Leer `DESIGN.md`; sin cambios de estilo salvo la insignia "Revisar".
 
 ### Fase 4 — Edición de nombres (extensión de spec-057)
-- [ ] `StudentNameCell` con dos campos, insignia y confirmación (D5);
+- [x] `StudentNameCell` con dos campos, insignia y confirmación (D5);
       `updateStudentNameAction` con `{ first_name, last_name }`.
-- [ ] Aviso "N estudiantes con nombres por revisar" en `EnrollmentTable`.
+- [x] Aviso "N estudiantes con nombres por revisar" en `EnrollmentTable`.
 
 ### Fase 5 — MCP: actualizar `students-mcp` y `attendance-mcp`
 > Según `.claude/agents/mcp-builder.md` (modo construcción/actualización).
-- [ ] `students-mcp/src/tools.ts`: `create_student`, `update_student`,
+- [x] `students-mcp/src/tools.ts`: `create_student`, `update_student`,
       `list_students` (`name_review_pending`), `get_student`; `api.ts`.
-- [ ] `attendance-mcp/src/tools.ts`: descripciones de las dos tools (D11).
-- [ ] `npm run build` de ambos MCPs.
-- [ ] `docs/mcps/README.md` (dos filas), `students-agent.system-prompt.md` y
+- [x] `attendance-mcp/src/tools.ts`: descripciones de las dos tools (D11).
+- [x] `npm run build` de ambos MCPs.
+- [x] `docs/mcps/README.md` (dos filas), `students-agent.system-prompt.md` y
       `attendance-agent.system-prompt.md`.
-- [ ] Verificar con `./mcp-servers/run-local-mcp.sh <mcp>` (con `npm run dev`
+- [x] Verificar con `./mcp-servers/run-local-mcp.sh <mcp>` (con `npm run dev`
       arriba) que las tools responden con las partes y el orden esperado.
 
 ### Fase 6 — Pruebas
-- [ ] Ejecutar con el usuario `docs/testing/test-062-nombres-y-apellidos-separados.md`.
+- [x] Ejecutar (Claude, por delegación del usuario) `docs/testing/test-062-nombres-y-apellidos-separados.md`.
 - [ ] Cuando exista framework, implementar los casos de "Pruebas asociadas".
 
 ### Fase 7 — Despliegue (solo con confirmación explícita del usuario)
@@ -633,6 +633,24 @@ grant execute on function public.get_student_profiles_public(uuid[]) to authenti
     devuelve filas ordenadas; `getAllocations` resuelve nombres; respuestas de
     `/api/attendance/*` con partes y resumen ordenado.
   - **e2e (criterios 3, 4, 7):** flujos de `TC-062-02`, `-03`, `-05`.
+
+## Desviaciones respecto del diseño (implementación)
+
+- **Migración 4 (`20261020000003_student_profiles_public_name_review.sql`)**: el RPC
+  `get_student_profiles_public` también devuelve `name_needs_review` (la insignia
+  "Revisar" de D5 lo necesita y el docente no puede leerlo de `profiles` por RLS).
+  Se añadió como migración nueva y no editando la 3, que ya estaba aplicada en
+  `nodo-dev`. **Son cuatro migraciones, no tres**: la Fase 7 debe listar las cuatro
+  en el `--dry-run`.
+- **`update_student` / `PATCH`** acepta una sola parte (`last_name` solo): se fusiona
+  con la existente (lo que pide `TC-MCP-062-02`). `create_student` sí exige ambas
+  (o `full_name`).
+- **`list_students`** ordena en memoria con `compareStudentsBySurname` (la paginación
+  ya era en memoria), así que coincide con el orden de la UI también con tildes.
+- La lista de asignación de variantes ordena por apellido (antes por fecha de
+  asignación).
+- Fase 1, muestra sobre perfiles reales de producción: no se ejecutó (requiere leer
+  producción). Hacerla en la Fase 7 antes del `db push`.
 
 ## Preguntas abiertas para el usuario
 
