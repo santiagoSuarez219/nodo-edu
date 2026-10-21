@@ -42,6 +42,36 @@ puede pedir la clave de respuestas de su propia variante mientras el quiz está
 
 ---
 
+## DEBT-099 — Hallazgos menores de la revisión de spec-059 (notas ponderadas)
+
+**Origen:** `@reviewer` sobre `feat/grade-weights` (2026-10-21).
+**Prioridad:** Baja — ninguno afecta cifras ni seguridad; se pospusieron para
+no ampliar el alcance de spec-059.
+
+- **"Mis notas" consulta de más:** `lib/grades/overview.ts` llama a
+  `getEnrollmentsWithGradesByStudent`, que pide al RPC las líneas de todas las
+  matrículas, también las activas, cuyo `grade_summary` se vuelve a calcular
+  por RLS. Bastaría pedir el RPC solo para las retiradas.
+- **Un fallo del RPC se ve como dato válido:** `lib/enrollments/index.ts`
+  (`getEnrollmentsWithGradesByStudent`) usa `data ?? []` sin aviso; el
+  estudiante ve "Promedio simple —", igual que un curso sin pesos.
+- **Colores de paleta cruda:** `GradeBreakdown`, `GradeSummaryBlock`,
+  `GradesTable` y `GradeItemsPanel` usan `text-amber-700`, `bg-blue-700`,
+  `text-gray-*` en vez de los tokens de `DESIGN.md`. Es el patrón dominante del
+  repo; conviene migrarlo en bloque, no por archivo.
+- **Advertencia de pesos duplicada:** `GradesTable` recalcula a mano lo que ya
+  devuelve `summary.groups[].weight_mismatch`.
+- **Copiar columna sin aviso de error:** `GradesTable` descarta el rechazo del
+  portapapeles sin mostrar mensaje.
+- **Triggers de suma:** `enforce_grade_items_weight_sum` y
+  `enforce_grade_groups_target_sum` se disparan solo con `update of weight` /
+  `update of target_weight`; añadir `academic_course_id` cerraría la invariante
+  si algún día una ruta mueve un ítem de curso.
+- **Vista "Por corte" sin cortes:** muestra solo Estudiante, Acumulado y
+  Promedio; falta un mensaje de estado vacío.
+
+---
+
 ## DEBT-094 — `get_variant_question_details` no verifica que la matrícula pertenezca al usuario
 
 **Origen:** revisión de código al redactar spec-058 (2026-10-19).

@@ -258,7 +258,13 @@ export function GradeItemsPanel({ academicCourseId, initialItems, initialGroups 
     setGroupError(null);
     startTransition(async () => {
       const error = await run("createGradeGroupAction", () =>
-        createGradeGroupAction(academicCourseId, groupName.trim(), weight, initialGroups.length)
+        createGradeGroupAction(
+          academicCourseId,
+          groupName.trim(),
+          weight,
+          // max + 1, no length: borrar un corte intermedio deja huecos y repetiría el índice.
+          initialGroups.reduce((max, g) => Math.max(max, g.order_index), -1) + 1
+        )
       );
       if (error) {
         setGroupError(error);
@@ -308,17 +314,25 @@ export function GradeItemsPanel({ academicCourseId, initialItems, initialGroups 
     const a = initialGroups[index];
     const b = initialGroups[index + direction];
     if (!a || !b) return;
+    // Se re-numera toda la lista (0..n-1) tras el intercambio: intercambiar solo
+    // los dos valores no mueve nada si hay índices repetidos.
+    const reordered = [...initialGroups];
+    reordered[index] = b;
+    reordered[index + direction] = a;
     startTransition(async () => {
-      // Intercambia el orden de ambos cortes; se re-numera para no depender de
-      // que order_index sea contiguo.
-      const first = await run("updateGradeGroupAction", () =>
-        updateGradeGroupAction(a.id, academicCourseId, a.name, a.target_weight, b.order_index)
-      );
-      if (first) return setGroupError(first);
-      const second = await run("updateGradeGroupAction", () =>
-        updateGradeGroupAction(b.id, academicCourseId, b.name, b.target_weight, a.order_index)
-      );
-      if (second) setGroupError(second);
+      for (const [position, group] of reordered.entries()) {
+        if (group.order_index === position) continue;
+        const error = await run("updateGradeGroupAction", () =>
+          updateGradeGroupAction(
+            group.id,
+            academicCourseId,
+            group.name,
+            group.target_weight,
+            position
+          )
+        );
+        if (error) return setGroupError(error);
+      }
     });
   }
 
