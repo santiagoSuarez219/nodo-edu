@@ -44,10 +44,6 @@ export const UpdateStudentSchema = z
   })
   .refine((data) => Object.keys(data).length > 0, {
     message: "Debes indicar al menos un campo para actualizar",
-  })
-  .refine((data) => (data.first_name === undefined) === (data.last_name === undefined), {
-    message: "first_name y last_name se envían juntos",
-    path: ["last_name"],
   });
 
 // spec-051 (Fase 3/5): `password` es opcional — sin ella,

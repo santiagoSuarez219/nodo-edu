@@ -355,9 +355,15 @@ export async function updateServiceStudent(
     if (error) throw error;
   }
 
+  // Una sola parte se fusiona con la existente; guardar partes confirma la
+  // separación (spec-062 D5, D10).
   const namePatch =
-    input.first_name !== undefined && input.last_name !== undefined
-      ? { first_name: input.first_name, last_name: input.last_name, name_needs_review: false }
+    input.first_name !== undefined || input.last_name !== undefined
+      ? {
+          first_name: input.first_name ?? existing.first_name,
+          last_name: input.last_name ?? existing.last_name,
+          name_needs_review: false,
+        }
       : input.full_name !== undefined
         ? { full_name: input.full_name }
         : {};

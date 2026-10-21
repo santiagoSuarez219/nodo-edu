@@ -76,13 +76,13 @@ export const tools = [
     },
     {
         name: "update_student",
-        description: "Corrige nombres, apellidos, correo, carrera, semestre o usuario de GitHub de un estudiante existente. first_name y last_name se envían siempre juntos; al guardarlos se confirma la separación (name_needs_review pasa a false). Nota: para borrar el usuario de GitHub ya guardado, esta herramienta no admite enviar null — usa la API directamente con {\"github_username\": null} si hace falta limpiarlo.",
+        description: "Corrige nombres, apellidos, correo, carrera, semestre o usuario de GitHub de un estudiante existente. Puedes enviar solo una de las dos partes (la otra se conserva); al guardar se confirma la separación (name_needs_review pasa a false). Nota: para borrar el usuario de GitHub ya guardado, esta herramienta no admite enviar null — usa la API directamente con {\"github_username\": null} si hace falta limpiarlo.",
         inputSchema: {
             type: "object",
             properties: {
                 id: { type: "string", description: "UUID del estudiante" },
-                first_name: { type: "string", description: "Nombres (enviar junto con last_name)" },
-                last_name: { type: "string", description: "Apellidos (enviar junto con first_name)" },
+                first_name: { type: "string", description: "Nombres" },
+                last_name: { type: "string", description: "Apellidos" },
                 email: { type: "string" },
                 career: { type: "string" },
                 semester: { type: "integer", minimum: 1, maximum: 20 },

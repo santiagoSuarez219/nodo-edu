@@ -71,8 +71,8 @@ separado, más `full_name` (derivado, en orden natural) y `name_needs_review`.
 automática** (la heurística parte un nombre de 3 palabras como 1 nombre + 2
 apellidos y suele fallar con nombres compuestos) y nadie la ha confirmado.
 
-- **Usa siempre las partes por separado** en `create_student` y
-  `update_student` (`first_name` y `last_name` se envían juntos).
+- **Usa siempre las partes por separado** en `create_student` (ambas) y
+  `update_student` (basta la que cambia; la otra se conserva).
 - **No inventes la separación.** Si el docente te da un nombre completo
   ambiguo ("Juan Carlos Pérez"), pregúntale dónde termina el nombre y empiezan
   los apellidos antes de crear o corregir.
