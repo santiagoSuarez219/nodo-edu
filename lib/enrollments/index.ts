@@ -5,17 +5,17 @@ import { getCurrentUser } from "@/lib/auth/session";
 import type { AcademicCoursePublic } from "@/lib/academic-courses/types";
 import { compareStudentsBySurname } from "@/lib/students/names";
 import type { StudentProfilePublic } from "@/lib/students/types";
-import type { Enrollment, EnrollmentWithCourse, EnrollmentWithStudent } from "./types";
+import { computeGradeSummary } from "@/lib/grades/compute";
+import type { GradeGroup, GradeItem } from "@/lib/grades/types";
+import type {
+  Enrollment,
+  EnrollmentWithCourse,
+  EnrollmentWithCourseAndGrades,
+  EnrollmentWithStudent,
+} from "./types";
 
 export { hasCourseAccess, requireCourseAccess } from "./access";
 export type { CourseAccess } from "./access";
-
-function computeTotalGrade(scores: (number | null)[]): number | null {
-  const valid = scores.filter((s): s is number => s !== null);
-  if (valid.length === 0) return null;
-  const sum = valid.reduce((acc, s) => acc + s, 0);
-  return Math.round((sum / valid.length) * 100) / 100;
-}
 
 // El estudiante no tiene acceso vía RLS a academic_courses (solo el docente
 // dueño o admin) ni a profiles de otros usuarios, así que el embed de
@@ -137,6 +137,8 @@ export async function enrollNewUserInCourse(
   return insertEnrollment(supabase, userId, academicCourseId);
 }
 
+// spec-059 D9: sin embed de notas — es el camino caliente de
+// requireCourseAccess y ese llamador no usa la nota.
 export async function getEnrollmentsByStudent(): Promise<EnrollmentWithCourse[]> {
   const user = await getCurrentUser();
   if (!user) return [];
@@ -145,7 +147,7 @@ export async function getEnrollmentsByStudent(): Promise<EnrollmentWithCourse[]>
 
   const { data } = await supabase
     .from("enrollments")
-    .select("*, student_grades(score)")
+    .select("*")
     .eq("student_id", user.id)
     .order("enrolled_at", { ascending: false });
 
@@ -155,7 +157,6 @@ export async function getEnrollmentsByStudent(): Promise<EnrollmentWithCourse[]>
   const courses = await fetchAcademicCoursesPublic(supabase, courseIds);
 
   return data.map((row) => {
-    const scores = (row.student_grades as { score: number | null }[]).map((g) => g.score);
     const courseEntry = courses.get(row.academic_course_id);
     return {
       id: row.id,
@@ -166,11 +167,48 @@ export async function getEnrollmentsByStudent(): Promise<EnrollmentWithCourse[]>
       withdrawn_at: row.withdrawn_at,
       academic_course: courseEntry?.course,
       teacher_name: courseEntry?.teacher_name ?? null,
-      total_grade: computeTotalGrade(scores),
     } as EnrollmentWithCourse;
   });
 }
 
+// spec-059 D8/D9: nota a la fecha de TODAS las matrículas propias (activas y
+// retiradas) con una sola llamada al RPC acotado, porque la RLS le niega
+// grade_items a un retirado. El RPC no calcula; el cálculo es compute.ts.
+export async function getEnrollmentsWithGradesByStudent(): Promise<
+  EnrollmentWithCourseAndGrades[]
+> {
+  const enrollments = await getEnrollmentsByStudent();
+  if (enrollments.length === 0) return [];
+
+  const supabase = await createServerSupabaseClient();
+  const { data } = await supabase.rpc("get_own_enrollment_grade_lines", {
+    p_enrollment_ids: enrollments.map((e) => e.id),
+  });
+
+  const linesByEnrollment = new Map<
+    string,
+    { items: { id: string; weight: number | null; group_id: null }[]; scores: Record<string, number | null> }
+  >();
+  for (const line of (data ?? []) as {
+    enrollment_id: string;
+    grade_item_id: string;
+    weight: number | null;
+    score: number | null;
+  }[]) {
+    const entry = linesByEnrollment.get(line.enrollment_id) ?? { items: [], scores: {} };
+    entry.items.push({ id: line.grade_item_id, weight: line.weight, group_id: null });
+    entry.scores[line.grade_item_id] = line.score;
+    linesByEnrollment.set(line.enrollment_id, entry);
+  }
+
+  return enrollments.map((e) => {
+    const lines = linesByEnrollment.get(e.id) ?? { items: [], scores: {} };
+    return { ...e, grade_summary: computeGradeSummary(lines.items, [], lines.scores) };
+  });
+}
+
+// spec-059 D9: la nota ya no se calcula aquí (su `total_grade` no tenía
+// consumidores).
 export async function getEnrollmentById(
   enrollmentId: string
 ): Promise<EnrollmentWithCourse | null> {
@@ -178,7 +216,7 @@ export async function getEnrollmentById(
 
   const { data } = await supabase
     .from("enrollments")
-    .select("*, student_grades(score)")
+    .select("*")
     .eq("id", enrollmentId)
     .single();
 
@@ -186,7 +224,6 @@ export async function getEnrollmentById(
 
   const courses = await fetchAcademicCoursesPublic(supabase, [data.academic_course_id]);
   const courseEntry = courses.get(data.academic_course_id);
-  const scores = (data.student_grades as { score: number | null }[]).map((g) => g.score);
   return {
     id: data.id,
     student_id: data.student_id,
@@ -196,7 +233,6 @@ export async function getEnrollmentById(
     withdrawn_at: data.withdrawn_at,
     academic_course: courseEntry?.course,
     teacher_name: courseEntry?.teacher_name ?? null,
-    total_grade: computeTotalGrade(scores),
   } as EnrollmentWithCourse;
 }
 
@@ -205,11 +241,15 @@ export async function getEnrollmentsByAcademicCourse(
 ): Promise<EnrollmentWithStudent[]> {
   const supabase = await createServerSupabaseClient();
 
-  const { data } = await supabase
-    .from("enrollments")
-    .select("*, student_grades(score)")
-    .eq("academic_course_id", academicCourseId)
-    .order("enrolled_at", { ascending: true });
+  const [{ data }, { data: gradeItems }, { data: groups }] = await Promise.all([
+    supabase
+      .from("enrollments")
+      .select("*, student_grades(grade_item_id, score)")
+      .eq("academic_course_id", academicCourseId)
+      .order("enrolled_at", { ascending: true }),
+    supabase.from("grade_items").select("*").eq("academic_course_id", academicCourseId),
+    supabase.from("grade_groups").select("*").eq("academic_course_id", academicCourseId),
+  ]);
 
   if (!data) return [];
 
@@ -217,9 +257,10 @@ export async function getEnrollmentsByAcademicCourse(
   const profiles = await fetchStudentProfilesPublic(supabase, studentIds);
 
   const rows = data.map((row) => {
-    const scores = (row.student_grades as { score: number | null }[]).map(
-      (g) => g.score
-    );
+    const scores: Record<string, number | null> = {};
+    for (const g of row.student_grades as { grade_item_id: string; score: number | null }[]) {
+      scores[g.grade_item_id] = g.score;
+    }
     return {
       id: row.id,
       student_id: row.student_id,
@@ -234,7 +275,11 @@ export async function getEnrollmentsByAcademicCourse(
         last_name: "",
         name_needs_review: false,
       },
-      total_grade: computeTotalGrade(scores),
+      grade_summary: computeGradeSummary(
+        (gradeItems ?? []) as GradeItem[],
+        (groups ?? []) as GradeGroup[],
+        scores
+      ),
     } as EnrollmentWithStudent;
   });
 

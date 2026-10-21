@@ -8,44 +8,65 @@ import {
   updateGradeItem,
   deleteGradeItem,
   upsertStudentGrade,
+  createGradeGroup,
+  updateGradeGroup,
+  deleteGradeGroup,
+  ensureSelfAssessmentGradeItem,
 } from "./index";
+import { GradeGroupSchema, GradeItemWeightSchema } from "./schemas";
 import type { AuthResult } from "@/lib/auth/types";
+
+const gradesPath = (academicCourseId: string) =>
+  `/admin/courses/${academicCourseId}/grades`;
+
+function parseWeight(weight: number | null): { ok: true; value: number | null } | { ok: false; error: string } {
+  const parsed = GradeItemWeightSchema.safeParse(weight);
+  if (!parsed.success) return { ok: false, error: parsed.error.issues[0].message };
+  return { ok: true, value: parsed.data };
+}
 
 export async function createGradeItemAction(
   academicCourseId: string,
   name: string,
-  orderIndex: number
+  orderIndex: number,
+  weight: number | null = null,
+  groupId: string | null = null
 ): Promise<AuthResult<{ id: string }>> {
   await requireUser();
 
   if (!name.trim()) return { ok: false, error: "El nombre del ítem es requerido." };
+  const w = parseWeight(weight);
+  if (!w.ok) return w;
 
-  try {
-    const item = await createGradeItem(academicCourseId, name.trim(), orderIndex);
-    revalidatePath(`/admin/courses/${academicCourseId}/grades`);
-    return { ok: true, data: { id: item.id } };
-  } catch {
-    return { ok: false, error: "No se pudo crear el ítem. El nombre puede estar duplicado." };
-  }
+  const result = await createGradeItem(academicCourseId, name.trim(), orderIndex, w.value, groupId);
+  if (!result.ok) return result;
+  revalidatePath(gradesPath(academicCourseId));
+  return { ok: true, data: { id: result.data.id } };
 }
 
 export async function updateGradeItemAction(
   gradeItemId: string,
   academicCourseId: string,
   name: string,
-  orderIndex: number
+  orderIndex: number,
+  weight: number | null,
+  groupId: string | null
 ): Promise<AuthResult> {
   await requireUser();
 
   if (!name.trim()) return { ok: false, error: "El nombre del ítem es requerido." };
+  const w = parseWeight(weight);
+  if (!w.ok) return w;
 
-  const updated = await updateGradeItem(gradeItemId, {
+  const result = await updateGradeItem(gradeItemId, {
     name: name.trim(),
     order_index: orderIndex,
+    weight: w.value,
+    group_id: groupId,
   });
-  if (!updated) return { ok: false, error: "No se pudo actualizar el ítem." };
+  if (!result.ok) return result;
 
-  revalidatePath(`/admin/courses/${academicCourseId}/grades`);
+  revalidatePath(gradesPath(academicCourseId));
   return { ok: true };
 }
 
@@ -106,4 +127,72 @@ export async function recalculateCourseSelfAssessmentGrades(
 
   revalidatePath(`/admin/courses/${academicCourseId}/grades`);
   return { ok: true, data: { updatedCount: (data as number) ?? 0 } };
+}
+
+export async function createGradeGroupAction(
+  academicCourseId: string,
+  name: string,
+  targetWeight: number,
+  orderIndex: number
+): Promise<AuthResult<{ id: string }>> {
+  await requireUser();
+
+  const parsed = GradeGroupSchema.safeParse({ name, target_weight: targetWeight });
+  if (!parsed.success) return { ok: false, error: parsed.error.issues[0].message };
+
+  const result = await createGradeGroup(
+    academicCourseId,
+    parsed.data.name,
+    parsed.data.target_weight,
+    orderIndex
+  );
+  if (!result.ok) return result;
+  revalidatePath(gradesPath(academicCourseId));
+  return { ok: true, data: { id: result.data.id } };
+}
+
+export async function updateGradeGroupAction(
+  groupId: string,
+  academicCourseId: string,
+  name: string,
+  targetWeight: number,
+  orderIndex: number
+): Promise<AuthResult> {
+  await requireUser();
+
+  const parsed = GradeGroupSchema.safeParse({ name, target_weight: targetWeight });
+  if (!parsed.success) return { ok: false, error: parsed.error.issues[0].message };
+
+  const result = await updateGradeGroup(groupId, {
+    name: parsed.data.name,
+    target_weight: parsed.data.target_weight,
+    order_index: orderIndex,
+  });
+  if (!result.ok) return result;
+  revalidatePath(gradesPath(academicCourseId));
+  return { ok: true };
+}
+
+export async function deleteGradeGroupAction(
+  groupId: string,
+  academicCourseId: string
+): Promise<AuthResult> {
+  await requireUser();
+
+  const result = await deleteGradeGroup(groupId);
+  if (!result.ok) return result;
+  revalidatePath(gradesPath(academicCourseId));
+  return { ok: true };
+}
+
+// spec-059 D15
+export async function ensureSelfAssessmentGradeItemAction(
+  academicCourseId: string
+): Promise<AuthResult<{ id: string }>> {
+  await requireUser();
+
+  const result = await ensureSelfAssessmentGradeItem(academicCourseId);
+  if (!result.ok) return result;
+  revalidatePath(gradesPath(academicCourseId));
+  return { ok: true, data: result.data };
 }
