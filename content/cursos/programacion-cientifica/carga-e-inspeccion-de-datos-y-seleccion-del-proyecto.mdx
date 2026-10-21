@@ -58,7 +58,7 @@ activa              bool
 dtype: object
 ```
 
-A diferencia de un `ndarray`, que tiene un solo `dtype` para toda la tabla, un DataFrame tiene **un `dtype` por columna**. (En versiones anteriores de pandas, el texto aparece como `object` en lugar de `str`; es el mismo tipo de dato.) Para leer una columna completa, escribes su nombre entre corchetes:
+A diferencia de un `ndarray`, que tiene un solo `dtype` para toda la tabla, un DataFrame tiene **un `dtype` por columna**. (En versiones anteriores de pandas, el texto aparece como `object` en lugar de `str`; en ambos casos es texto. Por la misma razón, la primera línea de `info()` puede decir `pandas.core.frame.DataFrame` en lugar de `pandas.DataFrame`.) Para leer una columna completa, escribes su nombre entre corchetes:
 
 ```python
 print(lecturas["temperatura_c"])
@@ -164,7 +164,7 @@ dtypes: float64(2), str(4)
 memory usage: 2.9 KB
 ```
 
-Léelo como una radiografía. La columna `Non-Null Count` dice cuántas celdas tienen valor: `humedad_pct` tiene 35 de 36, así que falta una lectura. La columna `Dtype` dice cómo entendió pandas cada columna: `fecha` aparece como texto (`str`, o `object` en versiones anteriores), no como fecha, y `humedad_pct` es decimal aunque en el archivo parezca entera, porque una celda vacía obliga a la columna a ser decimal. Por ahora solo detectas esos detalles; arreglarlos es trabajo de la lección «Filtrado, agregación y limpieza de datos». El atributo `df.dtypes` te da solo la lista de tipos.
+Léelo como una radiografía. La columna `Non-Null Count` dice cuántas celdas tienen valor: `humedad_pct` tiene 35 de 36, así que falta una lectura. La columna `Dtype` dice cómo entendió pandas cada columna: `fecha` aparece como texto (`str`, o `object` en versiones anteriores), no como fecha, y `humedad_pct` es decimal aunque en el archivo parezca entera, porque una celda vacía obliga a la columna a ser decimal. Por ahora solo detectas esos detalles; arreglarlos es otro paso, que verás más adelante. El atributo `df.dtypes` te da solo la lista de tipos.
 
 ## Resumir las columnas: describe
 

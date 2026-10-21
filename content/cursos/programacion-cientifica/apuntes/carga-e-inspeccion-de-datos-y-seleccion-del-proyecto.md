@@ -171,7 +171,7 @@ Data columns (total 6 columns):
  4   humedad_pct    35 non-null     float64
  5   sensor         36 non-null     str    
 dtypes: float64(2), str(4)
-memory usage: 1.8 KB
+memory usage: 2.9 KB
 ```
 
 Punto a resaltar (dos hallazgos, que el grupo los encuentre antes de decirlos):

@@ -161,7 +161,7 @@ en la clase de la semana siguiente, así que esta ronda no los toca.
 | Lección teórica | `content/cursos/programacion-cientifica/carga-e-inspeccion-de-datos-y-seleccion-del-proyecto.mdx` | ⬜ |
 | Registro TS | `lib/courses/data/programacion-cientifica.ts` (`order: 9`, solo se agregó `summary`) | — |
 | Apunte de clase | `content/cursos/programacion-cientifica/apuntes/carga-e-inspeccion-de-datos-y-seleccion-del-proyecto.md` | Solo owner/admin |
-| Dataset de la demo | `estaciones.csv` (36 filas; fuera del repo, el docente lo comparte por Drive) | — |
+| Dataset de la demo | `estaciones.csv` (36 filas; fuera del repo; el docente lo genera y lo comparte por Drive) | — |
 
 ### Cuestionario de cierre
 
@@ -191,7 +191,7 @@ No aplica.
 - [x] Checklist de `lesson-authoring` §8 recorrido (sin H1/`###`/`$`/diagramas; apuntes sin entrada TS)
 - [x] `summary` presente en frontmatter **y** en registro TS
 - [x] Coherencia cruzada teoría ↔ apuntes ↔ cuestionario (las preguntas evitan los ejemplos de los apuntes)
-- [ ] `@reviewer`: pendiente
+- [x] `@reviewer`: APROBADO (sin bloqueantes; 3 correcciones menores aplicadas)
 
 ### Despliegue
 
@@ -210,6 +210,7 @@ No aplica.
 ### Pendientes
 
 - Ejecutar en Colab, antes de la clase: `california_housing_train.csv` (Paso 5 de los apuntes, sin salida pegada) y las diferencias pandas 2 frente a pandas 3 (`object` vs `str`, nombre de clase en `info()`).
-- Subir `estaciones.csv` a Drive y compartirlo con el grupo.
+- El docente genera `estaciones.csv` (36 filas, columnas `estacion`, `municipio`, `fecha`, `temperatura_c`, `humedad_pct`, `sensor`; un `-999` y una celda vacía en `humedad_pct`) y lo comparte por Drive. Las salidas de la lección y los apuntes dependen de ese archivo exacto.
+- Revisión (`@reviewer`, APROBADO): aplicadas 3 correcciones menores (`memory usage` igualado a 2.9 KB, nota `str`/`object` y primera línea de `info()`, sin nombrar la lección futura). La semana 13 debe partir sabiendo que `isna().sum()` ya se mostró.
 - Resolver la P3 del cuestionario si se prefiere mostrar la salida de pandas 2.
 - Hay una lección más de pandas pendiente (`filtrado-agregacion-y-limpieza-de-datos`, semana 13), hoy stub.
