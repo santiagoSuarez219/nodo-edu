@@ -1,3 +1,4 @@
+import { GradeBreakdown } from "./GradeBreakdown";
 import type { EnrollmentWithCourse } from "@/lib/enrollments/types";
 import type { EnrollmentWithGrades } from "@/lib/grades/types";
 
@@ -87,42 +88,12 @@ export function EnrollmentDetail({ enrollment, gradesData }: Props) {
             El docente aún no ha definido ítems de evaluación.
           </p>
         ) : (
-          <>
-            <div className="divide-y divide-gray-100 dark:divide-gray-700">
-              {gradesData.items.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex items-center justify-between py-3 gap-4"
-                >
-                  <span className="text-sm text-gray-700 dark:text-gray-300">
-                    {item.name}
-                  </span>
-                  <span className="font-mono text-sm font-semibold text-gray-900 dark:text-white shrink-0">
-                    {item.score !== null ? item.score.toFixed(2) : "—"}
-                  </span>
-                </div>
-              ))}
-            </div>
-
-            <div className="flex items-center justify-between pt-4 mt-1 border-t border-gray-200 dark:border-gray-700">
-              <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                Nota total
-              </span>
-              <span
-                className={`font-mono text-xl font-bold ${
-                  gradesData.total_grade !== null
-                    ? gradesData.total_grade >= 3
-                      ? "text-green-700 dark:text-green-400"
-                      : "text-red-600 dark:text-red-400"
-                    : "text-gray-400 dark:text-gray-500"
-                }`}
-              >
-                {gradesData.total_grade !== null
-                  ? gradesData.total_grade.toFixed(2)
-                  : "—"}
-              </span>
-            </div>
-          </>
+          <GradeBreakdown
+            items={gradesData.items}
+            groups={gradesData.groups}
+            summary={gradesData.grade_summary}
+            rowClassName="py-3"
+          />
         )}
       </div>
     </div>

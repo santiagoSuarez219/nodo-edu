@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { EnrollmentWithCourse } from "@/lib/enrollments/types";
+import type { EnrollmentWithCourseAndGrades } from "@/lib/enrollments/types";
 
 const DAY_LABELS: Record<string, string> = {
   lunes: "Lun",
@@ -11,7 +11,7 @@ const DAY_LABELS: Record<string, string> = {
 };
 
 interface Props {
-  enrollments: EnrollmentWithCourse[];
+  enrollments: EnrollmentWithCourseAndGrades[];
 }
 
 function formatTime(t: string) {
@@ -78,10 +78,19 @@ export function EnrolledCourseList({ enrollments }: Props) {
 
         const gradeInfo = (
           <div className="text-right">
-            <span className="text-xs text-gray-400 dark:text-gray-500 block">Nota</span>
-            <span className="text-lg font-bold font-mono text-gray-900 dark:text-white">
-              {enrollment.total_grade !== null ? enrollment.total_grade.toFixed(2) : "—"}
+            <span className="text-xs text-gray-400 dark:text-gray-500 block">
+              {enrollment.grade_summary.mode === "weighted" ? "Promedio" : "Promedio simple"}
             </span>
+            <span className="text-lg font-bold font-mono text-gray-900 dark:text-white">
+              {enrollment.grade_summary.projected !== null
+                ? enrollment.grade_summary.projected.toFixed(2)
+                : "—"}
+            </span>
+            {enrollment.grade_summary.mode === "weighted" && (
+              <span className="text-xs text-gray-400 dark:text-gray-500 block">
+                Acumulado {enrollment.grade_summary.accumulated !== null ? enrollment.grade_summary.accumulated.toFixed(2) : "—"}
+              </span>
+            )}
           </div>
         );
 

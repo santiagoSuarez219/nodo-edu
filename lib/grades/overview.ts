@@ -1,19 +1,10 @@
 import { createServerSupabaseClient } from "@/lib/auth/server";
-import { getEnrollmentsByStudent } from "@/lib/enrollments/index";
+import { getEnrollmentsWithGradesByStudent } from "@/lib/enrollments/index";
+import { computeGradeSummary } from "./compute";
 import { getAssignmentScoresByEnrollments } from "@/lib/submissions/index";
 import { getSelfAssessmentCourseSummary } from "@/lib/self-assessment";
-import type { GradeItem, StudentGrade, GradeItemWithScore, CourseGradesSummary, WithdrawnCourseSummary, StudentGradesOverview } from "./types";
+import type { GradeItem, GradeGroup, StudentGrade, GradeItemWithScore, CourseGradesSummary, WithdrawnCourseSummary, StudentGradesOverview } from "./types";
 import type { AssignmentScoreRow } from "@/lib/submissions/types";
-
-// Copia deliberada de la misma fórmula que lib/grades/index.ts y
-// lib/enrollments/index.ts (D2 de spec-056): unificar las tres en un único
-// export ampliaría el scope de este spec tocando módulos que no cambian.
-function computeTotalGrade(scores: (number | null)[]): number | null {
-  const valid = scores.filter((s): s is number => s !== null);
-  if (valid.length === 0) return null;
-  const sum = valid.reduce((acc, s) => acc + s, 0);
-  return Math.round((sum / valid.length) * 100) / 100;
-}
 
 // spec-056 (D2, Fase 1): resuelve "Mis notas" para TODAS las matrículas del
 // estudiante en un número fijo de consultas en vez de 3N (una por matrícula,
@@ -21,19 +12,18 @@ function computeTotalGrade(scores: (number | null)[]): number | null {
 // getGradesByEnrollment ni EnrollmentDetail — el detalle por matrícula sigue
 // exactamente igual.
 export async function getStudentGradesOverview(): Promise<StudentGradesOverview> {
-  const enrollments = await getEnrollmentsByStudent();
+  const enrollments = await getEnrollmentsWithGradesByStudent();
   const activeEnrollments = enrollments.filter((e) => e.status === "active");
   const withdrawnEnrollments = enrollments.filter((e) => e.status === "withdrawn");
 
-  // D4: un curso retirado solo expone la nota total que ya calcula
-  // getEnrollmentsByStudent() (embed student_grades(score)) — sin desglose,
-  // porque la RLS bloquea grade_items y assignment_variant_groups para una
+  // D4: un curso retirado solo expone la nota a la fecha (spec-059 D8, vía
+  // el RPC acotado) — sin desglose, porque la RLS bloquea grade_items y assignment_variant_groups para una
   // matrícula `withdrawn`.
   const withdrawn: WithdrawnCourseSummary[] = withdrawnEnrollments.map((e) => ({
     enrollment_id: e.id,
     academic_course: e.academic_course,
     teacher_name: e.teacher_name,
-    total_grade: e.total_grade,
+    grade_summary: e.grade_summary,
     withdrawn_at: e.withdrawn_at,
   }));
 
@@ -45,10 +35,20 @@ export async function getStudentGradesOverview(): Promise<StudentGradesOverview>
   const courseIds = [...new Set(activeEnrollments.map((e) => e.academic_course_id))];
   const enrollmentIds = activeEnrollments.map((e) => e.id);
 
-  const [{ data: gradeItems }, { data: studentGrades }, assignmentsResult, selfAssessmentSummaries] =
-    await Promise.all([
+  const [
+    { data: gradeItems },
+    { data: gradeGroups },
+    { data: studentGrades },
+    assignmentsResult,
+    selfAssessmentSummaries,
+  ] = await Promise.all([
       supabase
         .from("grade_items")
+        .select("*")
+        .in("academic_course_id", courseIds)
+        .order("order_index", { ascending: true }),
+      supabase
+        .from("grade_groups")
         .select("*")
         .in("academic_course_id", courseIds)
         .order("order_index", { ascending: true }),
@@ -71,6 +71,13 @@ export async function getStudentGradesOverview(): Promise<StudentGradesOverview>
     const list = gradeItemsByCourse.get(item.academic_course_id) ?? [];
     list.push(item);
     gradeItemsByCourse.set(item.academic_course_id, list);
+  }
+
+  const groupsByCourse = new Map<string, GradeGroup[]>();
+  for (const group of (gradeGroups ?? []) as GradeGroup[]) {
+    const list = groupsByCourse.get(group.academic_course_id) ?? [];
+    list.push(group);
+    groupsByCourse.set(group.academic_course_id, list);
   }
 
   const scoresByEnrollment = new Map<string, Map<string, number | null>>();
@@ -97,12 +104,19 @@ export async function getStudentGradesOverview(): Promise<StudentGradesOverview>
       score: scoresByEnrollment.get(enrollment.id)?.get(item.id) ?? null,
     }));
 
+    const groups = groupsByCourse.get(enrollment.academic_course_id) ?? [];
+
     return {
       enrollment_id: enrollment.id,
       academic_course: enrollment.academic_course,
       teacher_name: enrollment.teacher_name,
       items,
-      total_grade: computeTotalGrade(items.map((i) => i.score)),
+      groups,
+      grade_summary: computeGradeSummary(
+        items,
+        groups,
+        Object.fromEntries(items.map((i) => [i.id, i.score]))
+      ),
       self_assessment: selfAssessmentSummaries[index],
       // D5: `null` marca "la consulta de evaluaciones falló" (unavailable),
       // distinto de "no tiene evaluaciones" ([]).

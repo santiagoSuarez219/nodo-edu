@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { requireAnyRole } from "@/lib/auth/session";
-import { getGradeItemsByCourse, getGradesByCourse } from "@/lib/grades/index";
+import { getGradeItemsByCourse, getGradeGroupsByCourse, getGradesByCourse } from "@/lib/grades/index";
 import { GradeItemsPanel } from "@/components/admin/GradeItemsPanel";
 import { GradesTable } from "@/components/admin/GradesTable";
 import { RecalculateSelfAssessmentButton } from "@/components/admin/RecalculateSelfAssessmentButton";
@@ -15,8 +15,9 @@ export default async function GradesPage({ params }: Props) {
   const { academicCourseId } = await params;
   await requireAnyRole(["teacher", "admin"]);
 
-  const [gradeItems, courseGrades] = await Promise.all([
+  const [gradeItems, gradeGroups, courseGrades] = await Promise.all([
     getGradeItemsByCourse(academicCourseId),
+    getGradeGroupsByCourse(academicCourseId),
     getGradesByCourse(academicCourseId),
   ]);
 
@@ -27,6 +28,7 @@ export default async function GradesPage({ params }: Props) {
       <GradeItemsPanel
         academicCourseId={academicCourseId}
         initialItems={gradeItems}
+        initialGroups={gradeGroups}
       />
 
       <RecalculateSelfAssessmentButton academicCourseId={academicCourseId} />
@@ -34,6 +36,7 @@ export default async function GradesPage({ params }: Props) {
       <GradesTable
         academicCourseId={academicCourseId}
         gradeItems={gradeItems}
+        groups={gradeGroups}
         rows={activeRows}
       />
     </div>

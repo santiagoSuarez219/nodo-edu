@@ -68,9 +68,20 @@ export function GradesOverview({ overview }: Props) {
                       {summary.teacher_name && <> · {summary.teacher_name}</>}
                     </p>
                   </div>
-                  <span className="font-mono text-lg font-bold text-gray-500 dark:text-gray-400 shrink-0">
-                    {gradeDisplay(summary.total_grade)}
-                  </span>
+                  <div className="text-right shrink-0">
+                    <span className="font-mono text-lg font-bold text-gray-500 dark:text-gray-400 block">
+                      {gradeDisplay(summary.grade_summary.projected)}
+                    </span>
+                    {summary.grade_summary.mode === "weighted" ? (
+                      <span className="text-xs text-gray-400 dark:text-gray-500">
+                        Acumulado {gradeDisplay(summary.grade_summary.accumulated)} de 5.00
+                      </span>
+                    ) : (
+                      <span className="text-xs text-gray-400 dark:text-gray-500">
+                        Promedio simple (sin ponderar)
+                      </span>
+                    )}
+                  </div>
                 </div>
                 <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
                   Fuiste retirado de este curso — el desglose de calificaciones no está disponible.

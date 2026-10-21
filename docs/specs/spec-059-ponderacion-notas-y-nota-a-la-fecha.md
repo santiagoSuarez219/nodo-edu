@@ -1,4 +1,4 @@
-# spec-059 — [NOT STARTED] Ponderación de notas, cortes institucionales y nota a la fecha
+# spec-059 — [IN PROGRESS] Ponderación de notas, cortes institucionales y nota a la fecha
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.
 
@@ -713,8 +713,8 @@ grant execute on function public.ensure_self_assessment_grade_item(uuid) to auth
 ## Fases de implementación
 
 ### Fase 1 — Esquema
-- [ ] Verificar la versión de Postgres en `nodo-dev` y producción (D12).
-- [ ] Crear las migraciones `20261021000000`–`20261021000004`.
+- [ ] Verificar la versión de Postgres en `nodo-dev` y producción (D12). *(pendiente: se hará al aplicar)*
+- [x] Crear las migraciones `20261021000000`–`20261021000004`.
 - [ ] `supabase db push --db-url "$DEV_DB_URL" --dry-run`, mostrar la salida al
       usuario y, con su visto bueno, aplicar en `nodo-dev` (**nunca** `--linked`).
 - [ ] Verificar en `nodo-dev`: el trigger de ítems rechaza `0.6 + 0.5`; el de
@@ -723,37 +723,37 @@ grant execute on function public.ensure_self_assessment_grade_item(uuid) to auth
       dos veces devuelve el mismo id; RLS y `GRANT`s de `grade_groups`.
 
 ### Fase 2 — Módulo puro de cálculo
-- [ ] `lib/grades/compute.ts`: `computeGradeSummary` (D6, D7) y
+- [x] `lib/grades/compute.ts`: `computeGradeSummary` (D6, D7) y
       `formatInstitutionalGrade` (D14), con aritmética entera y cociente exacto.
-- [ ] Modo `unweighted` (D4); `weight_mismatch` por corte (D12).
-- [ ] Sin imports de servidor (lo consume `GradesTable`).
+- [x] Modo `unweighted` (D4); `weight_mismatch` por corte (D12).
+- [x] Sin imports de servidor (lo consume `GradesTable`).
 
 ### Fase 3 — Capa de datos y acciones
-- [ ] Tipos: `weight`, `group_id`, `GradeGroup` (con `target_weight`),
+- [x] Tipos: `weight`, `group_id`, `GradeGroup` (con `target_weight`),
       `grade_summary` en lugar de `total_grade` (D7), `EnrollmentWithCourseAndGrades` (D9).
-- [ ] `lib/grades/index.ts`, `schemas.ts`, `actions.ts`: pesos, cortes,
+- [x] `lib/grades/index.ts`, `schemas.ts`, `actions.ts`: pesos, cortes,
       validación doble y traducción de errores (D3), D13,
       `ensureSelfAssessmentGradeItemAction` (D15).
-- [ ] `lib/enrollments/index.ts` y `lib/grades/overview.ts`: borrar copias,
+- [x] `lib/enrollments/index.ts` y `lib/grades/overview.ts`: borrar copias,
       separar lecturas (D9), RPC de retirados (D8).
 
 ### Fase 4 — UI docente
-- [ ] Leer `DESIGN.md`; tokens semánticos; Flowbite primero.
-- [ ] `GradeItemsPanel`: peso, corte, resumen, "Sin ponderar", sección
+- [x] Leer `DESIGN.md`; tokens semánticos; Flowbite primero.
+- [x] `GradeItemsPanel`: peso, corte, resumen, "Sin ponderar", sección
       "Cortes" con `target_weight` y aviso de desajuste, botón "Crear ítem de
       autoevaluaciones".
-- [ ] `GradesTable`: `compute.ts`, vistas "Por ítem"/"Por corte", formato
+- [x] `GradesTable`: `compute.ts`, vistas "Por ítem"/"Por corte", formato
       institucional y "Copiar columna" (D14), Acumulado/Promedio, ayuda de D5,
       orden según D16.
-- [ ] `grades/page.tsx` y `EnrollmentTable` (cifras).
+- [x] `grades/page.tsx` y `EnrollmentTable` (cifras).
 
 ### Fase 5 — UI del estudiante
-- [ ] `GradeSummaryBlock` (D4, D10, D11: 2 decimales).
-- [ ] `CourseGradesCard`, `EnrollmentDetail`: ítems por corte con peso, nota
+- [x] `GradeSummaryBlock` (D4, D10, D11: 2 decimales).
+- [x] `CourseGradesCard`, `EnrollmentDetail`: ítems por corte con peso, nota
       de corte en formato institucional con "incompleto" (D11, D14).
-- [ ] `EnrolledCourseList` + `app/cuenta/cursos/page.tsx`; `GradesOverview`
+- [x] `EnrolledCourseList` + `app/cuenta/cursos/page.tsx`; `GradesOverview`
       (retirados).
-- [ ] `npm run lint` y `npm run build` limpios (fases 3–5 se cierran juntas
+- [x] `npm run lint` y `npm run build` limpios (fases 3–5 se cierran juntas
       por el renombre de D7).
 
 ### Fase 6 — Pruebas
@@ -857,5 +857,5 @@ grant execute on function public.ensure_self_assessment_grade_item(uuid) to auth
 
 ## Aprobación de implementación
 > Claude no escribe código de implementación hasta que esta sección esté marcada.
-- [ ] Paquete (spec + pruebas) aprobado por el usuario
-- **Fecha de aprobación:** {{fecha}}
+- [x] Paquete (spec + pruebas) aprobado por el usuario ("Implementa el spec59")
+- **Fecha de aprobación:** 2026-10-21
