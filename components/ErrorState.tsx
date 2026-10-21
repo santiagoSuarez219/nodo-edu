@@ -6,7 +6,7 @@ interface ErrorStateProps {
   digest?: string;
 }
 
-// spec-054 (D-D): distingue "no pudimos contactar el servidor, tu sesión
+// spec-061 (D-D): distingue "no pudimos contactar el servidor, tu sesión
 // sigue abierta" (infraestructura — un timeout de red, recuperable sin
 // acción del usuario) de "algo salió mal" (genérico). Un consumidor decide
 // cuál copy usar inspeccionando el error que atrapó su boundary — ver

@@ -1,5 +1,238 @@
 ---
 title: "Carga e inspección de datos y selección del proyecto"
-summary: ""
-updatedAt: 2026-07-18
+course: "Programación Científica"
+course_code: "PC"
+level: "Primeros semestres"
+type: "Apuntes teóricos"
+language: "Python 3 (Google Colab)"
+difficulty: "Básico"
+estimated_time: "Lectura previa de 12 minutos (Semana 12)"
+presentation: true
+slides_hint: "Cada sección ## es una diapositiva. Presentación sincrona."
+date: "2026-10-21"
+author: "Asistente de Docencia"
+summary: "Abre un archivo CSV de lecturas de estaciones que nunca has visto y aprende a leerlo con pandas: Series y DataFrame, carga desde CSV, Excel, JSON y datos abiertos, y la inspección inicial con head, info, dtypes y describe, hasta decidir si un dataset sirve para un proyecto."
+updatedAt: "2026-10-21"
 ---
+
+> 📖 Lectura previa a la clase — unos 12 minutos. Al final, responde la autoevaluación.
+
+## El problema: un archivo que no conoces
+
+Hasta ahora trabajaste con la tabla `temps` de 4 estaciones por 7 días: la escribiste tú, sabías qué era cada celda y todo eran números. En la vida real alguien te manda un archivo, `estaciones.csv`, y lo único que sabes es el nombre. Al abrirlo en un editor de texto ves algo así:
+
+```text
+estacion,municipio,fecha,temperatura_c,humedad_pct,sensor
+EST-01,Medellín,2026-10-01,24.5,68,DHT22
+EST-01,Medellín,2026-10-02,25.1,66,DHT22
+```
+
+Hay texto (`EST-01`, `Medellín`), fechas y números en la misma tabla, y cada fila es una lectura, no una estación. Un arreglo de NumPy no sirve aquí: guarda un solo tipo de dato. Y antes de calcular nada, necesitas saber cuántas filas hay, qué trae cada columna y si algo se ve raro.
+
+> **Dataset (conjunto de datos):** tabla en la que cada fila es una observación (aquí, una lectura de una estación) y cada columna es una variable que se mide o se describe de ella.
+
+## Una tabla con nombres: Series y DataFrame
+
+Piensa en una hoja de cálculo bien hecha: la primera fila tiene los nombres de las columnas, y cada columna puede tener su propio formato (texto, número, fecha). **pandas** es la librería de Python para trabajar con esas hojas. En Colab ya viene instalada, y se importa con el alias estándar `pd`.
+
+```python
+import pandas as pd
+
+lecturas = pd.DataFrame({
+    "estacion": ["EST-01", "EST-02", "EST-03"],
+    "temperatura_c": [24.5, 29.4, 14.2],
+    "activa": [True, True, False],
+})
+print(lecturas)
+print(lecturas.dtypes)
+```
+
+```text
+  estacion  temperatura_c  activa
+0   EST-01           24.5    True
+1   EST-02           29.4    True
+2   EST-03           14.2   False
+estacion          str
+temperatura_c    float64
+activa              bool
+dtype: object
+```
+
+A diferencia de un `ndarray`, que tiene un solo `dtype` para toda la tabla, un DataFrame tiene **un `dtype` por columna**. (En versiones anteriores de pandas, el texto aparece como `object` en lugar de `str`; en ambos casos es texto. Por la misma razón, la primera línea de `info()` puede decir `pandas.core.frame.DataFrame` en lugar de `pandas.DataFrame`.) Para leer una columna completa, escribes su nombre entre corchetes:
+
+```python
+print(lecturas["temperatura_c"])
+```
+
+```text
+0    24.5
+1    29.4
+2    14.2
+Name: temperatura_c, dtype: float64
+```
+
+> **DataFrame:** tabla de pandas con filas numeradas y columnas con nombre; cada columna tiene su propio tipo de dato. **Series:** una sola columna de un DataFrame, con su nombre y sus valores.
+
+## Cargar un CSV: pd.read_csv
+
+Un **CSV** es un archivo de texto donde cada línea es una fila y los valores van separados por comas. `pd.read_csv` lo convierte en un DataFrame con una sola línea. En Colab, primero subes el archivo desde el panel de archivos (el ícono de carpeta a la izquierda); queda junto a tu cuaderno y lo lees por su nombre:
+
+```python
+df = pd.read_csv("estaciones.csv")
+```
+
+Si el archivo está en otra carpeta, pasas la ruta completa; los archivos de ejemplo que trae Colab viven en `/content/sample_data/`, por ejemplo `pd.read_csv("/content/sample_data/california_housing_train.csv")`. Casi siempre basta ese único argumento. Dos parámetros resuelven la mayoría de los archivos "difíciles":
+
+- `sep`: el separador. Los CSV exportados desde Excel en español suelen usar punto y coma, así que escribes `pd.read_csv("datos.csv", sep=";")`. Si lo omites, pandas junta todo en una sola columna.
+- `encoding`: cómo se guardaron las letras con tilde y la `ñ`. Si ves un error como el siguiente, prueba `encoding="latin-1"`:
+
+```text
+UnicodeDecodeError: 'utf-8' codec can't decode byte 0xe9 in position 31: invalid continuation byte
+```
+
+El nombre del archivo es sensible a mayúsculas y al lugar donde esté: si Colab responde `FileNotFoundError`, casi siempre el archivo no se subió al panel o el nombre está mal escrito.
+
+## Otras fuentes: Excel, JSON y datos abiertos
+
+El CSV es el formato más común, pero no el único. Cada formato tiene su función de lectura, y todas devuelven un DataFrame:
+
+| Formato | Función | Cuándo aparece |
+|---|---|---|
+| CSV | `pd.read_csv(...)` | Exportaciones de bases de datos y portales de datos |
+| Excel | `pd.read_excel(...)` | Hojas de cálculo; con `sheet_name` eliges la hoja |
+| JSON | `pd.read_json(...)` | Respuestas de una API web |
+
+Las tres aceptan también una URL en lugar de un nombre de archivo, siempre que apunte directamente a los datos. Así llegan los **datos abiertos**: portales de gobiernos e instituciones que publican sus tablas para que cualquiera las descargue, y APIs que las entregan por internet. Algunas librerías traen colecciones listas para practicar; `seaborn`, por ejemplo, descarga datasets de ejemplo con una sola función:
+
+```python
+import seaborn as sns
+
+pinguinos = sns.load_dataset("penguins")
+print(pinguinos.shape)
+print(pinguinos["species"].value_counts())
+```
+
+```text
+(344, 7)
+species
+Adelie       152
+Gentoo       124
+Chinstrap     68
+Name: count, dtype: int64
+```
+
+Sin importar el origen, el resultado es el mismo objeto: un DataFrame. Por eso lo que sigue sirve para cualquier fuente.
+
+## Leer el dataset: head, shape, info y dtypes
+
+Con el DataFrame cargado, lo primero es mirarlo antes de calcular nada. Cuatro herramientas responden las primeras preguntas:
+
+```python
+print(df.head())
+print(df.shape)
+```
+
+```text
+  estacion municipio       fecha  temperatura_c  humedad_pct sensor
+0   EST-01  Medellín  2026-10-01           24.5         68.0  DHT22
+1   EST-01  Medellín  2026-10-02           25.1         66.0  DHT22
+2   EST-01  Medellín  2026-10-03           26.3         64.0  DHT22
+3   EST-01  Medellín  2026-10-04           27.0         62.0  DHT22
+4   EST-01  Medellín  2026-10-05           25.8         65.0  DHT22
+(36, 6)
+```
+
+`head()` muestra las primeras 5 filas (puedes pedir otra cantidad: `head(10)`), `tail()` las últimas y `sample()` filas al azar; `shape` dice cuántas filas y columnas hay. Después viene `info()`, que resume columna por columna:
+
+```python
+df.info()
+```
+
+```text
+<class 'pandas.DataFrame'>
+RangeIndex: 36 entries, 0 to 35
+Data columns (total 6 columns):
+ #   Column         Non-Null Count  Dtype  
+---  ------         --------------  -----  
+ 0   estacion       36 non-null     str    
+ 1   municipio      36 non-null     str    
+ 2   fecha          36 non-null     str    
+ 3   temperatura_c  36 non-null     float64
+ 4   humedad_pct    35 non-null     float64
+ 5   sensor         36 non-null     str    
+dtypes: float64(2), str(4)
+memory usage: 2.9 KB
+```
+
+Léelo como una radiografía. La columna `Non-Null Count` dice cuántas celdas tienen valor: `humedad_pct` tiene 35 de 36, así que falta una lectura. La columna `Dtype` dice cómo entendió pandas cada columna: `fecha` aparece como texto (`str`, o `object` en versiones anteriores), no como fecha, y `humedad_pct` es decimal aunque en el archivo parezca entera, porque una celda vacía obliga a la columna a ser decimal. Por ahora solo detectas esos detalles; arreglarlos es otro paso, que verás más adelante. El atributo `df.dtypes` te da solo la lista de tipos.
+
+## Resumir las columnas: describe
+
+`describe()` calcula, para cada columna numérica, las estadísticas que ya conoces de la lección «Operaciones vectorizadas y álgebra lineal básica»: cantidad, promedio, desviación, mínimo, máximo y los cuartiles. Es `mean`, `std`, `min` y `max` de golpe y por columna:
+
+```python
+print(df.describe())
+```
+
+```text
+       temperatura_c  humedad_pct
+count      36.000000    35.000000
+mean       26.122222    37.542857
+std         7.442930   180.763632
+min        13.500000  -999.000000
+25%        22.225000    56.000000
+50%        28.200000    68.000000
+75%        31.950000    74.500000
+max        35.100000    88.000000
+```
+
+Solo aparecen las columnas numéricas. Y aquí hay una alarma: una humedad no puede valer `-999`, y por eso el promedio sale en 37.5 y la desviación en 180, cuando la mediana (68) cuenta otra historia. Muchos archivos usan valores como `-999` para decir "no se pudo medir". El mínimo y el máximo son la primera defensa: si no tienen sentido físico, algo anda mal. Para una columna de texto, la pregunta no es el promedio sino cuántas categorías hay y con qué frecuencia:
+
+```python
+print(df["sensor"].value_counts())
+```
+
+```text
+sensor
+DHT22     18
+BME280    18
+Name: count, dtype: int64
+```
+
+> ⚡ **Para ir más lejos:** `df["municipio"].nunique()` cuenta las categorías distintas de una columna (aquí, 4) y `df.memory_usage(deep=True)` mide cuánta memoria ocupa cada columna, útil cuando el archivo tiene millones de filas.
+
+## Las preguntas que hace la inspección
+
+Cada herramienta contesta una pregunta, y cada pregunta tiene una señal de alerta. Esta tabla es el recorrido que haces con cualquier archivo nuevo:
+
+| Pregunta | Herramienta | Señal de alerta |
+|---|---|---|
+| ¿Cómo se ve? | `df.head()`, `df.tail()` | Encabezados desplazados, columnas pegadas en una sola |
+| ¿Qué tan grande es? | `df.shape` | Muy pocas filas para sacar conclusiones, o tantas que Colab se traba |
+| ¿Qué tipo tiene cada columna? | `df.dtypes`, `df.info()` | Un número o una fecha leída como texto |
+| ¿Falta algo? | `Non-Null Count` en `df.info()` | Una columna con menos valores que el total de filas |
+| ¿Los valores tienen sentido? | `df.describe()` | Un mínimo o máximo imposible, como `-999` |
+| ¿Qué categorías hay? | `value_counts()` | Una categoría escrita de dos maneras |
+
+## Cómo evaluar un dataset para un proyecto
+
+Un proyecto integrador parte de un dataset, y no todos sirven. La inspección que acabas de aprender es también la forma de evaluarlo: antes de comprometerte con uno, lo cargas y le haces cinco preguntas. Aplicadas a `estaciones.csv`:
+
+- **Tamaño manejable.** `df.shape` dice 36 filas: cabe en Colab de sobra, pero es tan pequeño que sirve para aprender, no para sacar conclusiones. Un dataset útil para un proyecto tiene cientos o miles de filas, y no tantas que el cuaderno tarde minutos en cargarlo.
+- **Columnas variadas.** `df.info()` muestra texto, números y fechas: hay variables para comparar y resumir. Si todas las columnas fueran del mismo tipo, habría poco que explorar.
+- **Una pregunta formulable.** Con estas columnas puedes preguntar "¿qué estación es la más calurosa?" o "¿cambia la humedad según el sensor?". Si después de leer las columnas no se te ocurre ninguna pregunta, el dataset no te sirve.
+- **Licencia y fuente claras.** Ningún comando de pandas lo responde: lo revisas en la página de donde viene. Debe decir quién lo publica, qué significan las columnas y si puedes usarlo.
+- **Carga sin sorpresas.** `read_csv` abrió el archivo con el separador y la codificación por defecto, sin errores. Un dataset que exige tres parámetros raros para abrirse ya te advierte cuánto trabajo viene después.
+
+Un `-999` o una celda vacía no descartan un dataset: casi todos los datos reales los traen. Lo que importa es que los hayas visto antes de elegirlo.
+
+## Síntesis
+
+- **El problema:** un archivo desconocido mezcla texto, fechas y números; un dataset es una tabla de observaciones (filas) y variables (columnas).
+- **Series y DataFrame:** un DataFrame tiene un `dtype` por columna, y `df["col"]` lee una columna como Series.
+- **Cargar un CSV:** `pd.read_csv("archivo.csv")`; `sep` y `encoding` resuelven los casos difíciles.
+- **Otras fuentes:** `read_excel`, `read_json` y datos abiertos producen el mismo DataFrame.
+- **Leer el dataset:** `head`, `shape`, `info` y `dtypes` dicen cuántos datos hay, de qué tipo y cuáles faltan.
+- **Resumir las columnas:** `describe` por columna numérica y `value_counts` por categórica; un mínimo o máximo imposible delata un `-999`.
+- **Las preguntas de la inspección:** cada herramienta responde una pregunta y tiene su señal de alerta.
+- **Evaluar un dataset:** tamaño manejable, columnas variadas, pregunta formulable, licencia y fuente claras, y carga sin sorpresas.

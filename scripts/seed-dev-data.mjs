@@ -40,7 +40,7 @@ const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 // revisión de código, 2026-08-29):
 //
 //   1. La URL debe ser local. Necesario pero **no suficiente**: un
-//      `localhost:54331` puede ser el proxy de latencia de spec-054
+//      `localhost:54331` puede ser el proxy de latencia de spec-061
 //      (`scripts/latency-proxy.mjs`) reenviando a producción, o un túnel SSH
 //      mal apuntado. Es decir, el propio procedimiento de prueba de este spec
 //      basta para burlar una guarda que solo mire la URL.

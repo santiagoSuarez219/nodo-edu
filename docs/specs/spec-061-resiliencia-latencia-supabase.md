@@ -1,4 +1,5 @@
-# spec-054 — [DONE] Resiliencia del camino de request ante latencia de Supabase
+# spec-061 — [DONE] Resiliencia del camino de request ante latencia de Supabase
+> Renumerado el 2026-10-20: se redactó como `spec-054`, número que ya usaba `spec-054-planilla-asistencia`. Los commits anteriores a esa fecha lo citan como spec-054.
 
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.
@@ -205,7 +206,7 @@ Fase 2 sí toca `lib/auth/service.ts`, del que dependen los 10 módulos que sirv
 `/api/*`. El timeout **sí** llega a la capa de datos de los MCPs, aunque el gate
 no. Eso no es exponer nada nuevo a un agente: es un cambio de comportamiento en
 su capa de datos, y se cubre con la decisión **D-C** y con los casos
-`TC-MCP-054-001/002`, no con una fase de MCP.
+`TC-MCP-061-001/002`, no con una fase de MCP.
 
 ## Fases de implementación
 
@@ -484,7 +485,7 @@ cumple (no hay 500 crudo, ni página en blanco, ni cuelgue), pero la positiva
 —que el usuario lea un mensaje honesto de infraestructura— no. Registrado como
 [[DEBT-074]]; requiere propagar la señal desde el servidor, no adivinarla por
 el mensaje. Atenuante: hoy ningún camino de datos de lección propaga la
-excepción hasta el boundary (ver `TC-054-007`), así que la ruta rara vez se
+excepción hasta el boundary (ver `TC-061-007`), así que la ruta rara vez se
 alcanza.
 
 **Delta de exposición de E1, no explicitado antes.** `/` no era pública antes
@@ -509,8 +510,8 @@ para que el **mensaje** también sea correcto en todos los caminos.
 
 > Creadas junto con el spec (ver CLAUDE.md → "Artefactos que acompañan al spec").
 
-- **Manuales:** `docs/testing/test-054-resiliencia-latencia-supabase.md` — casos
-  `TC-054-001` … `TC-054-014` y `TC-MCP-054-001/002`.
+- **Manuales:** `docs/testing/test-061-resiliencia-latencia-supabase.md` — casos
+  `TC-061-001` … `TC-061-014` y `TC-MCP-061-001/002`.
 - **Automáticas (e2e/unit):** pendientes de que exista framework de testing (ver
   CLAUDE.md → "Testing"). Los criterios de aceptación 1-2 y 5-6 son los mejores
   candidatos a prueba automatizada contra el proxy de la Fase 0.
@@ -585,7 +586,7 @@ Tres desviaciones respecto al plan original, todas documentadas en el código:
 ### Ronda de pruebas manuales completada (2026-08-29)
 
 19/19 aprobados (17 casos de UI/temporización + 2 de MCP), ver
-`docs/testing/test-054-resiliencia-latencia-supabase.md`. La ronda encontró y
+`docs/testing/test-061-resiliencia-latencia-supabase.md`. La ronda encontró y
 corrigió **tres bugs reales** en la implementación, cada uno con commit
 propio:
 
@@ -600,7 +601,7 @@ propio:
    veces) y el banner de D-F no cubría el caso "sesión válida, perfil sin
    cargar".
 
-Dos observaciones que no requirieron cambio de código: `TC-054-007` reveló
+Dos observaciones que no requirieron cambio de código: `TC-061-007` reveló
 que el código de progreso de lección ya degrada en silencio ante un fallo de
 consulta, sin propagar ninguna excepción — el copy de `INFRA_ERROR_COPY`
 queda como cobertura defensiva, no verificada en ejecución real con el
@@ -610,4 +611,4 @@ código actual. Y `mirp-lab` apareció sin ningún dato de dominio
 
 Pendiente, no bloqueante para `[DONE]` (según lo definido en la sección "Qué
 es verificable dónde"): la ventana de observación de 7 días en producción
-tras el despliegue, descrita en `docs/testing/test-054-*.md`.
+tras el despliegue, descrita en `docs/testing/test-061-*.md`.

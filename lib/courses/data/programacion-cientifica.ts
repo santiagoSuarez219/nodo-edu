@@ -187,6 +187,8 @@ export const programacionCientifica: Course = {
       articleSlug: "carga-e-inspeccion-de-datos-y-seleccion-del-proyecto",
       order: 9,
       title: "Carga e inspección de datos y selección del proyecto",
+      summary:
+        "Abre un archivo CSV de lecturas de estaciones que nunca has visto y aprende a leerlo con pandas: Series y DataFrame, carga desde CSV, Excel, JSON y datos abiertos, y la inspección inicial con head, info, dtypes y describe, hasta decidir si un dataset sirve para un proyecto.",
       topics: [
         { title: "Estructuras Series y DataFrame" },
         { title: "Carga de datos desde archivos (CSV, Excel), APIs o repositorios de datos abiertos" },

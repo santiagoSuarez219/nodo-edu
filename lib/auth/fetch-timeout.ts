@@ -1,10 +1,10 @@
-// spec-054 — fábrica única del `fetch` con presupuesto de tiempo, para que el
+// spec-061 — fábrica única del `fetch` con presupuesto de tiempo, para que el
 // middleware y los clientes Supabase de datos compartan una sola
 // implementación en vez de tres copias del mismo timeout manual (el estado
 // previo a este spec: solo `lib/auth/middleware.ts` tenía uno).
 
 // Arma un `AbortController` propio en vez de usar `AbortSignal.timeout()`.
-// TC-054-005 (ronda de pruebas, 2026-08-29) encontró que esa diferencia
+// TC-061-005 (ronda de pruebas, 2026-08-29) encontró que esa diferencia
 // importa de verdad: `AbortSignal.timeout(ms)` produce un `DOMException` con
 // `name: "TimeoutError"`, mientras que `controller.abort()` produce
 // `name: "AbortError"` — y `@supabase/postgrest-js` solo trata como
@@ -57,7 +57,7 @@ function createArmedController(
 // respuesta que ya empezó a llegar bien — y todas las respuestas de este
 // proyecto son JSON pequeño que `postgrest-js`/`auth-js` consumen de
 // inmediato, así que el riesgo de cortar una lectura legítima es mayor que
-// el de un body lento. El modo de fallo del incidente que motivó spec-054
+// el de un body lento. El modo de fallo del incidente que motivó spec-061
 // (gateway que no responde en absoluto) queda cubierto igual: ahí no llegan
 // ni las cabeceras.
 function withDisarm(promise: Promise<Response>, disarm: () => void): Promise<Response> {

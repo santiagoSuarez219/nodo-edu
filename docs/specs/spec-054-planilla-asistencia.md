@@ -612,7 +612,7 @@ nadie pidió.
       (reconciliación de `overrides` locales en `AttendanceSheet` ante cambios
       de otra pestaña/sesión, con su `// DEBT:` en el código). Renumerados
       desde 070-074 a 078-082 al mergear a `development`, por colisión con
-      los DEBT-070..074 ya existentes ahí (de spec-054-resiliencia-latencia).
+      los DEBT-070..074 ya existentes ahí (de spec-061-resiliencia-latencia).
 - [x] Aplicar las migraciones a producción **solo** con confirmación explícita del
       usuario, en el despliegue (CLAUDE.md → "Despliegue"). Aplicadas el
       2026-09-06 con `supabase db push --linked` (precedido de `--dry-run`),
