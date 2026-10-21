@@ -5,7 +5,7 @@ export const tools: Tool[] = [
   {
     name: "list_students",
     description:
-      "Lista estudiantes registrados, opcionalmente filtrados por curso o por texto (nombre/correo). No incluye enrollment_code ni contraseñas.",
+      "Lista estudiantes registrados, opcionalmente filtrados por curso, por texto (nombre/correo) o por nombres pendientes de revisión. Ordenada por apellido (con tildes junto a su letra base). Cada estudiante trae first_name (nombres), last_name (apellidos), full_name y name_needs_review. No incluye enrollment_code ni contraseñas.",
     inputSchema: {
       type: "object",
       properties: {
@@ -16,6 +16,11 @@ export const tools: Tool[] = [
         q: {
           type: "string",
           description: "Búsqueda de texto en nombre o correo",
+        },
+        name_review_pending: {
+          type: "boolean",
+          description:
+            "Si es true, solo lista estudiantes cuya separación de nombres/apellidos es una propuesta automática aún no confirmada (name_needs_review)",
         },
         limit: {
           type: "integer",
@@ -34,7 +39,7 @@ export const tools: Tool[] = [
   {
     name: "get_student",
     description:
-      "Obtiene el detalle de un estudiante: perfil, datos académicos y todas sus matrículas.",
+      "Obtiene el detalle de un estudiante: perfil (first_name = nombres, last_name = apellidos, full_name y name_needs_review), datos académicos y todas sus matrículas.",
     inputSchema: {
       type: "object",
       properties: {
@@ -46,11 +51,12 @@ export const tools: Tool[] = [
   {
     name: "create_student",
     description:
-      "Crea manualmente un estudiante (para quien no pudo registrarse en clase). La contraseña la decide el docente y se le entrega directamente al estudiante; esta herramienta nunca la devuelve. Opcionalmente matricula al curso indicado.",
+      "Crea manualmente un estudiante (para quien no pudo registrarse en clase). Nombres y apellidos van por separado (first_name y last_name); nunca adivines dónde termina el nombre y empieza el apellido — si el docente da un nombre completo ambiguo, pregúntale. La contraseña la decide el docente y se le entrega directamente al estudiante; esta herramienta nunca la devuelve. Opcionalmente matricula al curso indicado.",
     inputSchema: {
       type: "object",
       properties: {
-        full_name: { type: "string", description: "Nombre completo" },
+        first_name: { type: "string", description: "Nombres (2–60 caracteres), p. ej. \"Ana María\"" },
+        last_name: { type: "string", description: "Apellidos (2–60 caracteres), p. ej. \"Álvarez Gómez\"" },
         email: { type: "string", description: "Correo electrónico" },
         password: {
           type: "string",
@@ -72,18 +78,19 @@ export const tools: Tool[] = [
           description: "UUID del curso a matricular (alternativa a enrollment_code)",
         },
       },
-      required: ["full_name", "email", "password"],
+      required: ["first_name", "last_name", "email", "password"],
     },
   },
   {
     name: "update_student",
     description:
-      "Corrige nombre, correo, carrera, semestre o usuario de GitHub de un estudiante existente. Nota: para borrar el usuario de GitHub ya guardado, esta herramienta no admite enviar null — usa la API directamente con {\"github_username\": null} si hace falta limpiarlo.",
+      "Corrige nombres, apellidos, correo, carrera, semestre o usuario de GitHub de un estudiante existente. first_name y last_name se envían siempre juntos; al guardarlos se confirma la separación (name_needs_review pasa a false). Nota: para borrar el usuario de GitHub ya guardado, esta herramienta no admite enviar null — usa la API directamente con {\"github_username\": null} si hace falta limpiarlo.",
     inputSchema: {
       type: "object",
       properties: {
         id: { type: "string", description: "UUID del estudiante" },
-        full_name: { type: "string" },
+        first_name: { type: "string", description: "Nombres (enviar junto con last_name)" },
+        last_name: { type: "string", description: "Apellidos (enviar junto con first_name)" },
         email: { type: "string" },
         career: { type: "string" },
         semester: { type: "integer", minimum: 1, maximum: 20 },
@@ -180,6 +187,7 @@ export async function processToolCall(
       if (toolInput.academic_course_id)
         params.append("academic_course_id", String(toolInput.academic_course_id));
       if (toolInput.q) params.append("q", String(toolInput.q));
+      if (toolInput.name_review_pending === true) params.append("name_review_pending", "true");
       if (toolInput.limit) params.append("limit", String(toolInput.limit));
       if (toolInput.offset !== undefined) params.append("offset", String(toolInput.offset));
       return await callStudentsApi("GET", `?${params}`);

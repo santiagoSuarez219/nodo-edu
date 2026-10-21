@@ -43,7 +43,7 @@ export const tools: Tool[] = [
   {
     name: "get_session_attendance",
     description:
-      "Obtiene el roster de asistencia completo de una sesión específica con nombres de estudiantes y horas de marcado.",
+      "Obtiene el roster de asistencia completo de una sesión específica con nombres de estudiantes (student_name, first_name = nombres, last_name = apellidos) y horas de marcado. Viene en orden de llegada (marked_at), no por apellido: si el docente quiere el listado por apellido, reordénalo tú y preséntalo como \"Apellidos, Nombres\".",
     inputSchema: {
       type: "object",
       properties: {
@@ -58,7 +58,7 @@ export const tools: Tool[] = [
   {
     name: "get_course_attendance_summary",
     description:
-      "Obtiene un resumen de asistencia por estudiante para un curso con porcentajes de asistencia y sesiones asistidas.",
+      "Obtiene un resumen de asistencia por estudiante para un curso con porcentajes de asistencia y sesiones asistidas. Ordenado por apellido; cada estudiante trae student_name (orden natural), first_name (nombres) y last_name (apellidos).",
     inputSchema: {
       type: "object",
       properties: {
