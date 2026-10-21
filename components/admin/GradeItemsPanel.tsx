@@ -189,6 +189,8 @@ export function GradeItemsPanel({ academicCourseId, initialItems, initialGroups 
     try {
       const result = await fn();
       if (!result.ok) return result.error ?? "No se pudo completar la acción.";
+      setPanelError(null);
+      setGroupError(null);
       router.refresh();
       return null;
     } catch (err) {
