@@ -1,6 +1,8 @@
 # test-060 — Nota de autoevaluaciones calculada sobre las lecciones dictadas por el docente
 
 > Spec: `docs/specs/spec-060-autoevaluacion-por-lecciones-dictadas.md`.
+> El paso nuevo de `class-material-prep` (D16) no tiene caso propio: es
+> documentación de la skill y usa las mismas herramientas que TC-MCP-060-03/08.
 > Casos manuales de flujos con UI (`TC-060-NN`) y de las herramientas MCP
 > nuevas o modificadas (`TC-MCP-060-NN`). Los casos de RPC/SQL (A1–A13) están
 > en el spec, sección "Pruebas asociadas".
@@ -267,45 +269,49 @@ Con el `course_slug` que no corresponde al grupo → `404`.
 **Estado:** ⬜ Pendiente
 **Hallazgos:**
 
-### TC-MCP-060-03 — `set_lesson_taught` marca y recalcula
-**Herramienta probada:** `set_lesson_taught` en `courses-mcp`
+### TC-MCP-060-03 — `set_lessons_taught` con una sola lección marca y recalcula
+**Herramienta probada:** `set_lessons_taught` en `courses-mcp`
 **Precondición:** L2 no marcada en B.
-**Input de prueba:** `{ "course_slug": "estructuras-de-datos", "academic_course_id": "{{B}}", "lesson_slug": "github-flujo-de-trabajo-con-ramas", "taught": true }`
-**Output esperado:** lección con `is_taught: true`; `meta.changed: true`,
-`meta.recalculated_count: 2`. En la UI, la libreta de B refleja el nuevo
-denominador.
+**Input de prueba:** `{ "course_slug": "estructuras-de-datos", "academic_course_id": "{{B}}", "lesson_slugs": ["github-flujo-de-trabajo-con-ramas"], "taught": true }`
+**Output esperado:** `data.lessons` con L2 `is_taught: true`;
+`meta.changed_slugs: ["github-flujo-de-trabajo-con-ramas"]`,
+`unchanged_slugs: []`, `recalculated_count: 2`, `warnings: []`. En la UI, la
+libreta de B refleja el nuevo denominador.
 **Estado:** ⬜ Pendiente
 **Hallazgos:**
 
-### TC-MCP-060-04 — `set_lesson_taught` es idempotente y reversible
-**Herramienta probada:** `set_lesson_taught` en `courses-mcp`
-**Input de prueba:** repetir el input de TC-MCP-060-03; luego con
+### TC-MCP-060-04 — `set_lessons_taught` es idempotente y reversible
+**Herramienta probada:** `set_lessons_taught` en `courses-mcp`
+**Input de prueba:** repetir el input de TC-MCP-060-03; luego el mismo con
 `"taught": false`.
-**Output esperado:** primera repetición `meta.changed: false`, `taught_at`
-igual al anterior, `recalculated_count: 0`. Con `false`: `changed: true`,
+**Output esperado:** la repetición devuelve `changed_slugs: []`,
+`unchanged_slugs: ["github-flujo-de-trabajo-con-ramas"]`, `taught_at` igual
+al anterior y `recalculated_count: 0`. Con `false`: L2 en `changed_slugs`,
 `is_taught: false`.
 **Estado:** ⬜ Pendiente
 **Hallazgos:**
 
-### TC-MCP-060-05 — `set_lesson_taught` rechaza entradas inválidas
-**Herramienta probada:** `set_lesson_taught` en `courses-mcp`
-**Input de prueba:** (a) `lesson_slug: "ejercicios-sintaxis-de-java"` (guía);
-(b) `lesson_slug: "no-existe"` con `taught: true`; (c) sin `taught`;
-(d) `academic_course_id` del Grupo C con `course_slug: "estructuras-de-datos"`.
-**Output esperado:** (a) `422`; (b) `404`; (c) `422`; (d) `404`. Ningún caso
-crea filas (`list_taught_lessons` sin cambios).
+### TC-MCP-060-05 — `set_lessons_taught` rechaza entradas inválidas
+**Herramienta probada:** `set_lessons_taught` en `courses-mcp`
+**Input de prueba:** (a) sin `taught`; (b) `lesson_slugs: []`;
+(c) `lesson_slugs` con un slug repetido; (d) `academic_course_id` del Grupo C
+con `course_slug: "estructuras-de-datos"`.
+**Output esperado:** (a), (b) y (c) → `422`; (d) → `404`. Ningún caso crea
+filas (`list_taught_lessons` sin cambios).
 **Estado:** ⬜ Pendiente
 **Hallazgos:**
 
-### TC-MCP-060-06 — Lección cerrada: `warning` y recálculo al abrir/cerrar
-**Herramientas probadas:** `set_lesson_availability` y `set_lesson_taught` en `courses-mcp`
-**Precondición:** L3 marcada en A, abierta.
+### TC-MCP-060-06 — Lección cerrada: `warnings` y recálculo al abrir/cerrar
+**Herramientas probadas:** `set_lesson_availability` y `set_lessons_taught` en `courses-mcp`
+**Precondición:** L3 marcada en A, abierta; no marcada en B.
 **Input de prueba:** `set_lesson_availability { course_slug: "estructuras-de-datos", lesson_slug: "sintaxis-de-java", enabled: false }`;
-luego `set_lesson_taught` sobre L3 en B con `taught: true`; finalmente reabrir L3.
+luego `set_lessons_taught` en B con `lesson_slugs: ["sintaxis-de-java"]`,
+`taught: true`; finalmente reabrir L3.
 **Output esperado:** el cierre devuelve `meta.recalculated_groups` ≥ 1 y la
 nota de A baja (L3 fuera); el marcado en B devuelve
-`meta.warning: "lesson_disabled"` y `counts_for_grade: false`; al reabrir,
-las notas de A y B incluyen L3 sin recálculo manual.
+`meta.warnings: [{ lesson_slug: "sintaxis-de-java", code: "lesson_disabled" }]`
+y `counts_for_grade: false`; al reabrir, las notas de A y B incluyen L3 sin
+recálculo manual.
 **Estado:** ⬜ Pendiente
 **Hallazgos:**
 
@@ -321,8 +327,37 @@ con lecciones dictadas del grupo; (c) `409` con la lista de los dos grupos;
 **Estado:** ⬜ Pendiente
 **Hallazgos:**
 
+### TC-MCP-060-08 — Lote de varias lecciones: un solo recálculo y reporte de cambios
+**Herramienta probada:** `set_lessons_taught` en `courses-mcp`
+**Precondición:** en B, dejar marcada **solo** L1: los casos previos dejan L1
+sin marcar (TC-060-12) y L3 marcada (TC-MCP-060-06), así que antes
+desmarcar L3 y marcar L1 con `set_lessons_taught` y confirmar con
+`list_taught_lessons`. Anotar la nota actual de E2 y E4 en B.
+**Input de prueba:** `{ "course_slug": "estructuras-de-datos", "academic_course_id": "{{B}}", "lesson_slugs": ["fundamentos-control-de-versiones", "github-flujo-de-trabajo-con-ramas", "repaso-de-clases-y-objetos"], "taught": true }`
+**Output esperado:** `changed_slugs` = L2 y L4; `unchanged_slugs` = L1;
+`recalculated_count: 2` (las 2 matrículas activas de B, **una** pasada, no una
+por lección). En la libreta de B el denominador pasa a 15 de una vez: E2 =
+1.67 (`5/15`, si respondió L1 con 5/5 en TC-060-11), E4 = 0.00. En
+Contenido de B, L1, L2 y L4 aparecen marcadas.
+**Estado:** ⬜ Pendiente
+**Hallazgos:**
+
+### TC-MCP-060-09 — Lote atómico: un slug inválido no marca ninguno
+**Herramienta probada:** `set_lessons_taught` en `courses-mcp`
+**Precondición:** en A, L1–L4 marcadas; elegir dos lecciones de
+`estructuras-de-datos` sin marcar en A (`{{slug_X}}`, `{{slug_Y}}`, con
+`list_taught_lessons`).
+**Input de prueba:** (a) `lesson_slugs: ["{{slug_X}}", "no-existe", "{{slug_Y}}"]`, `taught: true`;
+(b) `lesson_slugs: ["{{slug_X}}", "ejercicios-sintaxis-de-java"]`, `taught: true`.
+**Output esperado:** (a) `422` con `errors.invalid_slugs: [{ lesson_slug: "no-existe", reason: "not_found" }]`;
+(b) `422` con `invalid_slugs: [{ lesson_slug: "ejercicios-sintaxis-de-java", reason: "is_guide" }]`.
+En ambos, `list_taught_lessons` de A muestra `{{slug_X}}` y `{{slug_Y}}`
+**sin marcar** y las notas de A no cambian.
+**Estado:** ⬜ Pendiente
+**Hallazgos:**
+
 ## Resumen de la ronda
-- Aprobados: 0 — Fallidos: 0 — Pendientes: 21
+- Aprobados: 0 — Fallidos: 0 — Pendientes: 23
 - Hallazgos escalados a `docs/specs/backlog.md`: {{lista o "ninguno"}}
 - Limpieza de datos de prueba: ⬜ Pendiente — orden inverso: marcas de
   `taught_lessons` (desmarcar vía `courses-mcp`), preguntas de L1–L4

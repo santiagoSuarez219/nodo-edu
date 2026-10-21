@@ -74,11 +74,16 @@ Decisiones ya tomadas por el usuario (no se re-discuten en este spec):
    `/cuenta/cursos/[enrollmentId]` muestra solo las lecciones dictadas del
    grupo, con las no respondidas como "Sin responder — 0/N" y un aviso de que
    aún puede responderlas.
-9. **Fase MCP**: `courses-mcp` gana herramientas por grupo para listar y
-   marcar/desmarcar lecciones dictadas; `students-mcp` ajusta
+9. **Fase MCP**: `courses-mcp` gana herramientas por grupo para listar grupos,
+   listar lecciones dictadas y marcar/desmarcar **en lote** (una o varias
+   lecciones, atómico, un solo recálculo, D14); `students-mcp` ajusta
    `get_student_self_assessment_summary` al cálculo por grupo.
 10. **Plan de despliegue** con el paso operativo de marcar las lecciones ya
-    dictadas en cada grupo antes de que la nota se vuelva a mostrar.
+    dictadas en cada grupo antes de que la nota se vuelva a mostrar (manual,
+    desde la UI o vía `courses-mcp`; sin backfill automático, D13).
+11. **Skill `class-material-prep`**: nuevo paso "marcar la lección como vista
+    en clase en cada grupo", vía `courses-mcp`, con confirmación del docente
+    (D16).
 
 ### No incluye
 
@@ -102,10 +107,12 @@ Decisiones ya tomadas por el usuario (no se re-discuten en este spec):
 - Cambiar `lesson_progress` o el progreso/completado de lecciones: la tabla
   sigue existiendo y alimentando la barra de progreso; solo deja de alimentar
   la nota.
-- Marcado automático a partir del cronograma del microdiseño (ver "Preguntas
-  abiertas", P1).
-- Escritura en lote ("marcar las semanas 1 a 6") en una sola llamada de API o
-  MCP (ver P3).
+- Marcado automático o sugerido a partir del cronograma del microdiseño
+  (decisión del usuario, D13).
+- Avisos nuevos en la autoevaluación de la lección (`SelfAssessmentSection`)
+  sobre si la lección cuenta o no para la nota (decisión del usuario, D15).
+- Marcado en lote desde la UI docente: la pestaña Contenido marca lección por
+  lección; el lote es una capacidad de la API/MCP (D14).
 
 ## Relación con otros specs y deuda
 
@@ -148,8 +155,8 @@ dependencia de orden de merge:
 | `recalculate_self_assessment_grade(text)` | Firma intacta (la usa `submitSelfAssessment`); internamente llama a la nueva `apply` |
 | `recalculate_course_self_assessment_grades(uuid)` | Firma intacta; delega en una variante interna para que la API de servicio pueda reutilizarla (D8) |
 | `recalculate_course_self_assessment_grades_internal(uuid)` | **Nueva**, solo `service_role` |
-| `set_lesson_taught(uuid, text, boolean)` | **Nueva** RPC `security definer` para la sesión del docente: valida dueño/admin, marca/desmarca y recalcula el grupo en la misma transacción |
-| `set_lesson_taught_internal(uuid, text, boolean, uuid)` | **Nueva**, solo `service_role` (la usa `/api/courses/*`) |
+| `set_lessons_taught(uuid, text[], boolean)` | **Nueva** RPC `security definer` para la sesión del docente: valida dueño/admin, marca/desmarca **una o varias** lecciones y recalcula el grupo **una sola vez**, en la misma transacción (D8, D14) |
+| `set_lessons_taught_internal(uuid, text[], boolean, uuid)` | **Nueva**, solo `service_role` (la usa `/api/courses/*`) |
 
 ### Backend
 
@@ -158,8 +165,8 @@ dependencia de orden de merge:
 | `lib/progress/index.ts` | `markLessonViewed`: **eliminar** la llamada a `recalculate_self_assessment_grade` (se conserva el `upsert` con `ignoreDuplicates`) |
 | `lib/self-assessment/index.ts` | `getSelfAssessmentCourseSummary` pasa a recibir el **`enrollmentId`** (resuelve `academic_course_id` y `course_slug` de la matrícula propia); `getSelfAssessmentBreakdownForEnrollment` llama a la nueva firma con el `academicCourseId` que ya recibe; `submitSelfAssessment` sin cambios |
 | `lib/self-assessment/types.ts` | `SelfAssessmentCourseSummary` gana `taughtLessonCount` (lecciones dictadas que cuentan) para la UI del estudiante; comentario de D4 actualizado |
-| `lib/courses/taught-lessons.ts` | **Nuevo** módulo: lectura del listado del grupo (catálogo × `taught_lessons` × `disabled_lessons` × conteo de `lesson_questions`) y Server Action `setLessonTaught(academicCourseId, lessonSlug, taught)` que valida el slug contra el catálogo y llama a `set_lesson_taught` |
-| `lib/courses/service.ts` | Funciones de servicio para `/api/courses/[courseSlug]/groups/*` (listado de grupos, listado de lecciones dictadas, escritura vía `set_lesson_taught_internal`) |
+| `lib/courses/taught-lessons.ts` | **Nuevo** módulo: lectura del listado del grupo (catálogo × `taught_lessons` × `disabled_lessons` × conteo de `lesson_questions`) y Server Action `setLessonTaught(academicCourseId, lessonSlug, taught)` que valida el slug contra el catálogo y llama a `set_lessons_taught` con un arreglo de un elemento (la UI marca lección por lección) |
+| `lib/courses/service.ts` | Funciones de servicio para `/api/courses/[courseSlug]/groups/*` (listado de grupos, listado de lecciones dictadas, escritura vía `set_lessons_taught_internal`) |
 | `lib/students/service.ts` | `getServiceStudentSelfAssessmentSummary` pasa a recibir `academicCourseId`; resolución desde `course_slug` solo si es inequívoca (D10) |
 | `lib/grades/overview.ts` | Llamar al resumen por matrícula, no por `course_slug` |
 | `lib/grades/actions.ts` | Sin cambios de firma; la acción sigue llamando al RPC público |
@@ -170,7 +177,7 @@ dependencia de orden de merge:
 |---|---|
 | `GET /api/courses/[courseSlug]/groups` | **Nueva** — grupos (cursos académicos) de ese `course_slug` |
 | `GET /api/courses/[courseSlug]/groups/[academicCourseId]/taught-lessons` | **Nueva** — catálogo de lecciones del grupo con estado dictada/abierta y preguntas |
-| `PATCH /api/courses/[courseSlug]/groups/[academicCourseId]/taught-lessons/[lessonSlug]` | **Nueva** — marcar/desmarcar `{ taught: boolean }` |
+| `PATCH /api/courses/[courseSlug]/groups/[academicCourseId]/taught-lessons` | **Nueva** — marcar/desmarcar en lote `{ lesson_slugs: string[], taught: boolean }` (1–50 slugs), atómico, un recálculo (D14) |
 | `GET /api/students/[studentId]/self-assessment` | Acepta `academic_course_id` (preferido); `course_slug` solo como atajo inequívoco (D10) |
 
 Todas las rutas nuevas de `/api/courses/*` autentican con
@@ -187,7 +194,6 @@ la variable → `500 configuration_error`, nunca `401`).
 | `components/account/SelfAssessmentSummaryCard.tsx` | Copia de la regla nueva, estado "Sin responder — 0/N", aviso "aún puedes responderla", estado vacío "tu docente aún no ha marcado lecciones" |
 | `app/cuenta/cursos/[enrollmentId]/page.tsx` | Pasar `enrollmentId` al resumen |
 | `components/admin/RecalculateSelfAssessmentButton.tsx` | Texto de ayuda: "según las lecciones marcadas como vistas en clase" en vez de "que ya vio" |
-| `components/courses/SelfAssessmentSection.tsx` | Sin cambio funcional. Copia opcional (ver D11) |
 
 ### MCP
 
@@ -198,6 +204,13 @@ la variable → `500 configuration_error`, nunca `401`).
 | `docs/mcps/courses-agent.system-prompt.md` | Nuevas capacidades y restricciones (alcance por grupo, efecto en la nota) |
 | `docs/mcps/students-agent.system-prompt.md` | Regla de cálculo nueva: "lecciones dictadas del grupo", no "que abrió" |
 | `docs/mcps/README.md` | Entradas de `courses-mcp` y `students-mcp` |
+
+### Skills
+
+| Archivo | Cambio |
+|---|---|
+| `.claude/skills/class-material-prep/SKILL.md` | Nuevo paso **D7 — Marcar como vista en clase** en la Parte 2 (después de la sesión, por grupo, vía `courses-mcp`, con confirmación); diagrama, tabla "qué viaja a producción", frontmatter `description` y restricciones (D16) |
+| `CLAUDE.md` (tabla de skills) | **Sin cambios**: la fila de `class-material-prep` ("Producir el material de clase de **un** curso, etapa por etapa, y desplegarlo") sigue siendo exacta; no se agrega ni renombra ninguna skill |
 
 ## Decisiones de diseño
 
@@ -239,7 +252,7 @@ dueño/admin"):
 | Operación | Quién | Por qué |
 |---|---|---|
 | `select` | docente dueño del grupo, admin, **estudiante con matrícula activa en ese grupo** | El estudiante debe poder saber qué lecciones cuentan para su nota; además `self_assessment_breakdown` es `security invoker` y lo invoca la sesión del estudiante en su tarjeta |
-| `insert` / `delete` | **nadie** vía RLS; solo las RPC `security definer` | Marcar sin recalcular dejaría la nota del grupo desactualizada. Obligar a escribir por `set_lesson_taught` garantiza que marca y recálculo ocurren en la **misma transacción**. Un `insert` directo por PostgREST con el JWT del docente simplemente se rechaza |
+| `insert` / `delete` | **nadie** vía RLS; solo las RPC `security definer` | Marcar sin recalcular dejaría la nota del grupo desactualizada. Obligar a escribir por `set_lessons_taught` garantiza que marca y recálculo ocurren en la **misma transacción**. Un `insert` directo por PostgREST con el JWT del docente simplemente se rechaza |
 | `update` | nadie | El estado es presencia/ausencia de fila |
 
 ### D2 — Nueva regla de cálculo
@@ -374,16 +387,16 @@ No se acoplan:
   por ejemplo, se dio en clase y se cerró por un error de contenido). D5 la
   excluye y la UI lo advierte.
 - El flujo `class-material-prep` abre lecciones cada semana con
-  `set_lesson_availability`; marcar como dictada es un paso **distinto y
-  posterior** (después de la clase). Se documenta en el system prompt de
-  `courses-mcp` y se propone añadirlo a la skill como paso opcional (P4).
+  `set_lesson_availability` **antes** de la clase (lectura previa); marcar
+  como dictada es un paso **distinto y posterior** (después de la clase). Se
+  documenta en el system prompt de `courses-mcp` y en la skill (D16).
 
 ### D7 — Disparadores del recálculo
 
 | Evento | Efecto | Dónde |
 |---|---|---|
-| Marcar una lección como dictada | Sube el denominador de **todo el grupo** (y el numerador de quien ya la respondió) | `set_lesson_taught` / `set_lesson_taught_internal` → recálculo del grupo, misma transacción |
-| Desmarcar una lección | Baja numerador y denominador del grupo | ídem |
+| Marcar una o varias lecciones como dictadas | Sube el denominador de **todo el grupo** (y el numerador de quien ya las respondió) | `set_lessons_taught` / `set_lessons_taught_internal` → **un** recálculo del grupo al final, misma transacción |
+| Desmarcar una o varias lecciones | Baja numerador y denominador del grupo | ídem |
 | Enviar un intento | Sube el numerador (y el denominador si la lección ya estaba marcada) | `submitSelfAssessment` → `recalculate_self_assessment_grade` (sin cambios); recalcula cada matrícula activa del estudiante con ese `course_slug`, cada una contra su grupo |
 | Abrir/cerrar una lección (spec-039) | Cambia el denominador de los grupos que la tengan marcada | Nuevo: recálculo de todos los grupos del `course_slug` (D5) |
 | Publicar/despublicar/montar preguntas | Cambia el conteo vivo de las lecciones no respondidas | Recálculo masivo manual (botón de spec-040), sin cambios |
@@ -394,8 +407,9 @@ siendo correcto no pisar `viewed_at` en cada render, aunque ya no haya
 recálculo detrás.
 
 Marcar es **idempotente**: marcar una lección ya marcada no cambia
-`marked_at` ni dispara recálculo (`changed: false`), igual que la semántica de
-`meta.changed` de spec-039.
+`marked_at` ni dispara recálculo (queda en `unchanged_slugs`), igual que la
+semántica de `meta.changed` de spec-039. Si **ninguna** lección del lote
+cambió, no hay recálculo (`recalculated_count: 0`).
 
 ### D8 — RPC de escritura en dos capas (sesión del docente y servicio)
 
@@ -405,14 +419,14 @@ Marcar es **idempotente**: marcar una lección ya marcada no cambia
 función **devolvería 0 sin recalcular nada**. Por eso:
 
 ```
-set_lesson_taught(p_academic_course_id, p_lesson_slug, p_taught)       ← authenticated
-   valida dueño/admin con auth.uid()  →  set_lesson_taught_internal(..., auth.uid())
+set_lessons_taught(p_academic_course_id, p_lesson_slugs text[], p_taught)   ← authenticated
+   valida dueño/admin con auth.uid()  →  set_lessons_taught_internal(..., auth.uid())
 
-set_lesson_taught_internal(p_academic_course_id, p_lesson_slug,
-                           p_taught, p_actor uuid)                    ← solo service_role
-   insert ... on conflict do nothing  /  delete
-   si hubo cambio → recalculate_course_self_assessment_grades_internal(p_academic_course_id)
-   devuelve (changed boolean, recalculated_count int)
+set_lessons_taught_internal(p_academic_course_id, p_lesson_slugs text[],
+                            p_taught, p_actor uuid)                    ← solo service_role
+   insert ... on conflict do nothing  /  delete   (todas las del arreglo)
+   si cambió al menos una → UN recalculate_course_self_assessment_grades_internal(p_academic_course_id)
+   devuelve (changed_slugs text[], unchanged_slugs text[], recalculated_count int)
 
 recalculate_course_self_assessment_grades(p_academic_course_id)       ← authenticated (sin cambios de firma)
    valida dueño/admin  →  recalculate_course_self_assessment_grades_internal(...)
@@ -477,12 +491,9 @@ Tarjeta "Autoevaluaciones" (`SelfAssessmentSummaryCard`):
   marcado lecciones como vistas en clase. Tu nota de autoevaluaciones
   aparecerá cuando lo haga."* — nota mostrada como "Sin nota", nunca 0.00.
 
-`SelfAssessmentSection` (encabezado de la autoevaluación en la lección): el
-aviso "hace parte de tu nota del curso" sigue siendo cierto. Se propone
-añadir, solo si la lección **no** está marcada en ninguno de los grupos activos
-del estudiante, una línea sutil: *"Contará para tu nota cuando tu docente
-marque esta lección como vista en clase."* Es opcional y de bajo costo; si
-complica la carga de la lección se omite (no afecta la regla).
+`SelfAssessmentSection` (encabezado de la autoevaluación en la lección) **no
+cambia**: el aviso "hace parte de tu nota del curso" sigue siendo cierto y no
+se añade ningún aviso sobre si la lección ya fue marcada (D15).
 
 ### D12 — UI docente: pestaña "Contenido"
 
@@ -516,6 +527,95 @@ existente (`requireAnyRole(["teacher","admin"])` + `getAcademicCourseById`):
 - Sección de marcas huérfanas (D9) solo si existen.
 - Ayuda bajo la tabla: "Marcar una lección no la abre a los estudiantes;
   ábrela o ciérrala desde courses-mcp" (spec-039 no tiene UI propia).
+- La UI marca **lección por lección** (sin selección múltiple); el lote es
+  capacidad de la API/MCP (D14).
+
+### D13 — Sin backfill desde el cronograma (decisión del usuario)
+
+No se sugiere ni se automatiza el marcado a partir de
+`microdiseno/cronograma-dia-a-dia.md`. El marcado es siempre una acción
+explícita del docente, desde la pestaña Contenido o vía `courses-mcp`. El paso
+de despliegue (Fase 7) queda como marcado manual de las lecciones ya
+dictadas de cada grupo.
+
+- **Por qué**: el cronograma es Markdown sin formato de fecha estable y a
+  menudo no refleja festivos, clases suspendidas ni corrimientos; una
+  sugerencia automática equivocada movería notas reales.
+
+### D14 — Marcado en lote: `set_lessons_taught` reemplaza a la herramienta individual (decisión del usuario)
+
+`courses-mcp` expone **una sola** herramienta de escritura,
+`set_lessons_taught(course_slug, academic_course_id, lesson_slugs[], taught)`,
+que cubre tanto una lección como varias. **No** se conserva una
+`set_lesson_taught` individual.
+
+- **Por qué reemplazar y no conservar las dos**: una lista de un elemento
+  *es* el caso individual, con el mismo contrato y la misma respuesta. Dos
+  herramientas de escritura para la misma acción duplican validación,
+  pruebas y descripción en el system prompt, y obligan al agente a elegir
+  entre ambas sin ganancia. Un único camino de escritura también significa una
+  única RPC (`set_lessons_taught_internal`, que ya recibe un arreglo), que es
+  la que usa la Server Action de la UI con un arreglo de un elemento.
+- **Atómica — todo o nada**: antes de tocar Supabase, la ruta valida **todos**
+  los slugs contra el catálogo del `course_slug`. Con `taught: true`, cada slug
+  debe existir y ser `kind: "lesson"`. Con `taught: false`, cada slug debe
+  existir como lección del catálogo **o** ser una marca huérfana del grupo
+  (D9). Si alguno falla, responde `422` con `errors.invalid_slugs[]` (slug +
+  motivo: `not_found` / `is_guide`) y **no escribe nada**. La RPC además
+  corre en una sola transacción.
+- **Un solo recálculo** del grupo al final, solo si cambió al menos una
+  lección.
+- **Validaciones del cuerpo**: `lesson_slugs` no vacío, máximo 50 (el
+  catálogo más largo tiene menos), sin duplicados (`422`: un duplicado indica
+  un error del agente al armar la lista, mejor saberlo); `taught` booleano
+  explícito, **sin default** (mismo criterio que `enabled` en spec-039).
+- **Respuesta**: `data.lessons[]` con el estado resultante de cada slug
+  pedido (misma forma que `list_taught_lessons`); `meta`:
+  `{ changed_slugs[], unchanged_slugs[], recalculated_count, warnings[] }`,
+  con `warnings` = `{ lesson_slug, code: "lesson_disabled" }` por cada
+  lección que quedó marcada pero está cerrada.
+- **Ruta**: `PATCH /api/courses/[courseSlug]/groups/[academicCourseId]/taught-lessons`
+  (la colección), sin segmento por lección.
+
+### D15 — Sin aviso nuevo en la autoevaluación de la lección (decisión del usuario)
+
+`SelfAssessmentSection` no se modifica. El estudiante consulta qué lecciones
+cuentan en su tarjeta "Autoevaluaciones" (D11).
+
+### D16 — `class-material-prep` gana el paso "marcar como vista en clase" (decisión del usuario)
+
+Se añade a `.claude/skills/class-material-prep/SKILL.md` un paso nuevo en la
+**Parte 2** (la que toca producción), **D7 — Marcar la lección como vista en
+clase**, posterior a D6 "Cierre" del despliegue e invocable por sí solo (los
+pasos D0–D6 no se renumeran):
+
+- **Cuándo**: **después** de la sesión en que se dictó la lección, no al
+  desplegarla ni al abrirla (D4 de la skill). En el aula invertida la lección
+  se abre antes de la clase como lectura previa; si se marcara al abrir,
+  contaría como 0 para quien todavía no la leyó, antes de que se dictara.
+  Es invocable por sí solo ("marca como vista la clase del martes de
+  estructuras-de-datos"), igual que el despliegue.
+- **Por grupo**: `list_course_groups` → elegir el grupo (o grupos) donde se
+  dictó → `list_taught_lessons` para confirmar slugs y estado →
+  `set_lessons_taught` con `taught: true`. Un curso con varios grupos se
+  marca grupo por grupo, porque pueden ir a ritmos distintos.
+- **Confirmación**: ⛔ requiere confirmación explícita del docente en esa
+  misma sesión, nombrando grupo, lecciones y dirección, y advirtiendo que
+  **cambia de inmediato la nota de autoevaluaciones del grupo**. En
+  producción con `courses-mcp-prod`.
+- **Verificación**: reportar `changed_slugs`, `recalculated_count` y cualquier
+  `warning: lesson_disabled` (lección marcada pero cerrada: no cuenta hasta
+  abrirla).
+- **Otros puntos de la skill a actualizar**: el diagrama de etapas, la tabla
+  "Tres cosas viajan a producción" (añadir "Lecciones dictadas por grupo →
+  `courses-mcp-prod` → `set_lessons_taught`, después de la clase"), el
+  `description` del frontmatter (añadir el disparador "marca la clase como
+  vista") y las Restricciones (no marcar al abrir; no marcar sin
+  confirmación; no marcar en grupos que no dictaron la sesión). La bitácora
+  de la semana (`docs/preparacion-semanal/semana-NN.md`) registra qué se
+  marcó, en qué grupo y cuándo.
+- **Tabla de skills de `CLAUDE.md`**: verificada, no cambia (ver "Impacto →
+  Skills").
 
 ## Evaluación MCP
 
@@ -527,7 +627,7 @@ existente (`requireAnyRole(["teacher","admin"])` + `getAcademicCourseById`):
 | Pregunta | Respuesta |
 |---|---|
 | ¿Expone datos que un agente podría consultar? | **Sí.** "¿Qué lecciones lleva marcadas el grupo 2?", "¿cuántas cuentan para la nota?" |
-| ¿Permite acciones que un agente debería ejecutar? | **Sí.** Marcar/desmarcar lecciones dictadas: el flujo `class-material-prep` ya opera semana a semana con `courses-mcp`, y el paso de despliegue de este spec exige marcar en bloque las lecciones ya dictadas de cada grupo |
+| ¿Permite acciones que un agente debería ejecutar? | **Sí.** Marcar/desmarcar lecciones dictadas: el flujo `class-material-prep` operará este paso semana a semana con `courses-mcp` (D16), y el paso de despliegue de este spec exige marcar en lote las lecciones ya dictadas de cada grupo (D14) |
 | ¿Existe un MCP de dominio relacionado? | **Sí, `courses-mcp`** (catálogo y disponibilidad de lecciones, `COURSES_ADMIN_API_KEY`). Se extiende; no se crea uno nuevo. Y **`students-mcp`**, cuya lectura `get_student_self_assessment_summary` cambia de regla |
 | ¿Hay un agente que se beneficie? | **Sí**: `courses-agent.system-prompt.md` (nuevas capacidades) y `students-agent.system-prompt.md` (la regla que describe deja de ser cierta) |
 
@@ -540,14 +640,15 @@ existente (`requireAnyRole(["teacher","admin"])` + `getAcademicCourseById`):
 |---|---|---|---|
 | `list_course_groups` | lectura | `course_slug` (string, requerido) | `data.groups[]`: `{ academic_course_id, name, code, is_active, active_student_count }`; `404` si el curso no está en el catálogo |
 | `list_taught_lessons` | lectura | `course_slug`, `academic_course_id` (uuid) — ambos requeridos | `data.lessons[]` (solo `kind: "lesson"`): `{ lesson_slug, title, order, is_taught, taught_at, is_disabled, question_count, counts_for_grade }`; `meta`: `{ taught_count, counted_count, orphan_taught_slugs[] }`. `404` si el grupo no existe o su `course_slug` no coincide |
-| `set_lesson_taught` | escritura | `course_slug`, `academic_course_id`, `lesson_slug`, `taught` (boolean, **sin default**) | la lección con su estado resultante; `meta`: `{ changed, recalculated_count, warning? }` (`warning: "lesson_disabled"` si quedó marcada pero cerrada). `404` slug inexistente al marcar; `422` si es guía o `taught` falta/no es booleano |
+| `set_lessons_taught` | escritura (lote, atómica) | `course_slug`, `academic_course_id`, `lesson_slugs` (array de string, 1–50, sin duplicados), `taught` (boolean, **sin default**) | `data.lessons[]` con el estado resultante; `meta`: `{ changed_slugs[], unchanged_slugs[], recalculated_count, warnings[] }`. `422` con `errors.invalid_slugs[]` (`not_found` / `is_guide`) si algún slug no es válido — **no escribe nada**; `422` si `taught` falta o el arreglo está vacío/duplicado; `404` si el grupo no existe o no pertenece al `course_slug` (D14) |
 
 Rutas API (todas con `COURSES_ADMIN_API_KEY`, cliente `service_role`):
 
 - `GET /api/courses/[courseSlug]/groups`
 - `GET /api/courses/[courseSlug]/groups/[academicCourseId]/taught-lessons`
-- `PATCH /api/courses/[courseSlug]/groups/[academicCourseId]/taught-lessons/[lessonSlug]`
-  con cuerpo `{ "taught": boolean }` → `set_lesson_taught_internal(..., p_actor = null)`
+- `PATCH /api/courses/[courseSlug]/groups/[academicCourseId]/taught-lessons`
+  con cuerpo `{ "lesson_slugs": string[], "taught": boolean }` →
+  `set_lessons_taught_internal(..., p_actor = null)`
 
 Por qué se piden `course_slug` **y** `academic_course_id`: el agente razona en
 slugs (es como habla el docente y como trabaja `class-material-prep`) y el
@@ -575,12 +676,16 @@ gana `meta.recalculated_groups` por el recálculo de D5.
     autoevaluaciones de todo el grupo**; confirmar con el docente nombrando
     grupo, lección y dirección, igual que con la disponibilidad.
   - Contraste explícito de alcances: `set_lesson_availability` = todos los
-    grupos del curso; `set_lesson_taught` = un solo grupo.
+    grupos del curso; `set_lessons_taught` = un solo grupo.
   - Marcar no abre la lección; advertir si `meta.warning = "lesson_disabled"`.
   - Llamar a `list_course_groups` y `list_taught_lessons` antes de escribir;
     no inventar `academic_course_id`.
-  - Flujo de despliegue de spec-060 (marcar en bloque las lecciones ya
-    dictadas, repasando la lista con el docente ítem por ítem).
+  - Flujo de despliegue de spec-060 (marcar en lote las lecciones ya
+    dictadas de cada grupo, repasando la lista con el docente antes de la
+    única llamada) y paso semanal de `class-material-prep` (marcar después
+    de la clase, no al abrir).
+  - El lote es todo o nada: ante un `422` con `invalid_slugs`, corregir la
+    lista con el docente y reintentar; nada quedó escrito.
 - `docs/mcps/students-agent.system-prompt.md`: la capacidad "incluyendo qué
   lecciones abrió y no respondió" pasa a "qué lecciones dictadas en su grupo no
   ha respondido"; instrucción de preferir `academic_course_id` y de preguntar
@@ -589,7 +694,7 @@ gana `meta.recalculated_groups` por el recálculo de D5.
 
 ### Para `@tester`
 
-Casos `TC-MCP-060-01` a `TC-MCP-060-07` en
+Casos `TC-MCP-060-01` a `TC-MCP-060-09` en
 `docs/testing/test-060-autoevaluacion-por-lecciones-dictadas.md`.
 
 ## Fases de implementación
@@ -601,7 +706,6 @@ Casos `TC-MCP-060-01` a `TC-MCP-060-07` en
       antes/después del paso de despliegue.
 - [ ] Inventariar los grupos activos y sus `course_slug` (lista con la que el
       docente marcará lecciones en la Fase 7).
-- [ ] Confirmar con el usuario las respuestas a P1–P4.
 
 ### Fase 1 — Esquema
 - [ ] Migración `..._init_taught_lessons.sql` (tabla, comentario) — timestamp
@@ -616,7 +720,7 @@ Casos `TC-MCP-060-01` a `TC-MCP-060-07` en
         `recalculate_course_self_assessment_grades(uuid)` redefinidas sobre la
         nueva `apply`
       - nuevas `recalculate_course_self_assessment_grades_internal`,
-        `set_lesson_taught`, `set_lesson_taught_internal` (D8)
+        `set_lessons_taught`, `set_lessons_taught_internal` (D8)
       - `revoke`/`grant` explícitos
       - **sin** tocar `self_assessment_breakdown(uuid, text)` (D3)
 - [ ] `supabase db push --db-url "$DEV_DB_URL" --dry-run` → mostrar salida al
@@ -645,20 +749,20 @@ Casos `TC-MCP-060-01` a `TC-MCP-060-07` en
 ### Fase 4 — UI del estudiante
 - [ ] `SelfAssessmentSummaryCard`: regla, "Sin responder — 0/N", enlace
       "Responder", estado vacío (D11)
-- [ ] (Opcional) línea en `SelfAssessmentSection` para lecciones no marcadas
 
 ### Fase 5 — API
 - [ ] `GET /api/courses/[courseSlug]/groups`
-- [ ] `GET` y `PATCH` de `taught-lessons` (D8, D9)
+- [ ] `GET` y `PATCH` (lote) de `taught-lessons` (D8, D9, D14)
 - [ ] `GET /api/students/[studentId]/self-assessment` con `academic_course_id`
       y atajo `course_slug` (D10)
 - [ ] Verificación por HTTP: `401` sin clave, `500` sin variable, `404` grupo
-      ajeno al curso, `422` guía, `409` ambigüedad
+      ajeno al curso, `422` guía / slug inexistente en el lote sin escritura
+      parcial, `409` ambigüedad
 
 ### Fase 6 — MCP: actualizar `courses-mcp` y `students-mcp`
-- [ ] Agregar `list_course_groups`, `list_taught_lessons`, `set_lesson_taught`
-      a `mcp-servers/courses-mcp/src/tools.ts` (`taught` reenviado sin
-      default, como `enabled`)
+- [ ] Agregar `list_course_groups`, `list_taught_lessons` y
+      `set_lessons_taught` (lote) a `mcp-servers/courses-mcp/src/tools.ts`
+      (`taught` y `lesson_slugs` reenviados sin default, como `enabled`)
 - [ ] Ajustar `get_student_self_assessment_summary` en
       `mcp-servers/students-mcp/src/tools.ts`
 - [ ] Actualizar `docs/mcps/README.md`
@@ -679,15 +783,26 @@ Casos `TC-MCP-060-01` a `TC-MCP-060-07` en
       contar como 0)
 - [ ] Migraciones en producción (dry-run + confirmación explícita del usuario)
 - [ ] Deploy del código
-- [ ] Por cada grupo activo: el docente (vía `courses-mcp-prod` o la pestaña
-      Contenido) marca las lecciones ya dictadas, repasando la lista ítem por
-      ítem; cada marca recalcula el grupo
+- [ ] Por cada grupo activo: el docente marca las lecciones ya dictadas
+      (manual, sin backfill, D13) — preferentemente con **una** llamada a
+      `set_lessons_taught` de `courses-mcp-prod` por grupo, tras repasar la
+      lista con él (un solo recálculo por grupo), o desde la pestaña
+      Contenido
 - [ ] Revisar las notas de un grupo contra el diagnóstico de la Fase 0 antes
       de seguir con el resto
 - [ ] Tras confirmar el deploy: migración de limpieza de DEBT-097 (en otro
       ciclo)
 
-### Fase 8 — Pruebas
+### Fase 8 — Skill `class-material-prep` (D16)
+- [ ] Leer completa `.claude/skills/class-material-prep/SKILL.md` y añadir
+      el paso "Marcar la lección como vista en clase" en la Parte 2, con
+      parada ⛔ de confirmación, alcance por grupo y uso de `courses-mcp`
+- [ ] Actualizar diagrama, tabla de "qué viaja a producción",
+      `description` del frontmatter y Restricciones
+- [ ] Confirmar que la tabla de skills de `CLAUDE.md` no requiere cambios
+      (solo cambia el contenido de una skill existente)
+
+### Fase 9 — Pruebas
 - [ ] Ejecutar `docs/testing/test-060-autoevaluacion-por-lecciones-dictadas.md`
       con el usuario
 - [ ] Invocar `@tester` para las pruebas automáticas (cuando exista framework)
@@ -715,7 +830,7 @@ Casos `TC-MCP-060-01` a `TC-MCP-060-07` en
 10. Publicar una pregunta nueva en una lección marcada y ya respondida no
     cambia la nota de quien la respondió (D6 de spec-040 preservado).
 11. Un docente que no es dueño del grupo no puede marcar ni desmarcar
-    (`set_lesson_taught` lo rechaza) y no ve sus marcas; un `insert` directo
+    (`set_lessons_taught` lo rechaza) y no ve sus marcas; un `insert` directo
     en `taught_lessons` por PostgREST se rechaza para cualquier usuario.
 12. Un estudiante ve las marcas solo de los grupos donde está matriculado
     activo.
@@ -725,14 +840,20 @@ Casos `TC-MCP-060-01` a `TC-MCP-060-07` en
     las no respondidas como "Sin responder — 0/N" con aviso de que aún puede
     responderlas, y un estado vacío si no hay ninguna.
 15. (MCP) El agente puede listar los grupos de un curso, listar las lecciones
-    dictadas de un grupo y marcar/desmarcar una lección, obteniendo
-    `meta.changed` y `meta.recalculated_count`.
-16. (MCP) `get_student_self_assessment_summary` con `academic_course_id`
+    dictadas de un grupo y marcar/desmarcar una o varias lecciones en una
+    sola llamada, obteniendo `changed_slugs`, `unchanged_slugs` y
+    `recalculated_count`; el lote produce **un** recálculo del grupo.
+16. (MCP) Un lote con algún slug inexistente o de guía responde `422` con
+    `invalid_slugs` y no marca **ninguna** lección.
+17. (MCP) `get_student_self_assessment_summary` con `academic_course_id`
     devuelve el desglose de ese grupo; con un `course_slug` ambiguo responde
     `409` con la lista de grupos.
-17. Las funciones internas (`apply_self_assessment_grade`,
+18. Las funciones internas (`apply_self_assessment_grade`,
     `recalculate_course_self_assessment_grades_internal`,
-    `set_lesson_taught_internal`) no son ejecutables por `authenticated`.
+    `set_lessons_taught_internal`) no son ejecutables por `authenticated`.
+19. La skill `class-material-prep` describe el paso de marcar la lección como
+    vista en clase, después de la sesión, por grupo, vía `courses-mcp` y con
+    confirmación del docente.
 
 ## Riesgos y deuda derivada
 
@@ -744,7 +865,8 @@ Casos `TC-MCP-060-01` a `TC-MCP-060-07` en
   marcado inmediato tras el deploy, fuera de horario de clase.
 - **Olvido del docente.** Si no marca una lección dictada, no cuenta. Es
   visible (cabecera "N marcadas" en Contenido y la tarjeta del estudiante),
-  pero no hay recordatorio automático (ver P1).
+  pero no hay recordatorio automático; el paso de `class-material-prep`
+  (D16) es el recordatorio de facto en las rondas semanales.
 - **Costo del recálculo.** Cada marca recalcula el grupo entero, y abrir/cerrar
   una lección recalcula todos los grupos del curso. Con los tamaños actuales
   (decenas de estudiantes) es despreciable; si crece, reevaluar.
@@ -755,27 +877,13 @@ Casos `TC-MCP-060-01` a `TC-MCP-060-07` en
 
 ## Preguntas abiertas para el usuario
 
-- **P1 — Backfill sugerido.** ¿Conviene que la pestaña Contenido (o
-  `list_taught_lessons`) **sugiera** marcar las lecciones abiertas cuya fecha
-  en el cronograma del microdiseño ya pasó? El cronograma vive en
-  `content/cursos/<curso>/microdiseno/` como Markdown sin formato de fecha
-  estable, así que parsearlo es frágil. Propuesta: **no** en este spec;
-  marcado manual vía MCP en la Fase 7.
-- **P2 — Copia opcional en la lección (D11).** ¿Mostrar en la autoevaluación
-  de una lección no marcada "Contará para tu nota cuando tu docente marque
-  esta lección como vista en clase"?
-- **P3 — Marcado en lote.** ¿Hace falta una herramienta
-  `set_lessons_taught` (lista de slugs, un solo recálculo) para el marcado
-  inicial, o basta con llamadas sucesivas a `set_lesson_taught` (un recálculo
-  por llamada)? Propuesta: llamadas sucesivas; el volumen es bajo.
-- **P4 — `class-material-prep`.** ¿Añadir a la skill un paso opcional
-  "marcar como vista en clase" tras la sesión? Implica editar
-  `.claude/skills/class-material-prep/SKILL.md`, fuera del alcance actual.
+Ninguna. P1–P4 se resolvieron con el usuario el 2026-10-20 y quedaron como
+D13–D16.
 
 ## Pruebas asociadas
 
 - **Manuales:** `docs/testing/test-060-autoevaluacion-por-lecciones-dictadas.md`
-  — casos `TC-060-01` a `TC-060-14` y `TC-MCP-060-01` a `TC-MCP-060-07`.
+  — casos `TC-060-01` a `TC-060-14` y `TC-MCP-060-01` a `TC-MCP-060-09`.
 - **Automáticas (e2e/unit):**
   `{{ubicación e2e por definir}}/e2e-060-autoevaluacion-por-lecciones-dictadas.spec.ts`
   — se crea cuando exista framework (ver `CLAUDE.md` → "Testing"). Hasta
@@ -792,10 +900,12 @@ Casos `TC-MCP-060-01` a `TC-MCP-060-07` en
 | A6 | Marcar en grupo A | `student_grades` de las matrículas del grupo B sin cambios |
 | A7 | Estudiante en A y B, lección marcada solo en A | nota en A la incluye; en B no |
 | A8 | Pregunta publicada después del intento (D6) | `question_count` congelado para quien respondió; vivo para quien no |
-| A9 | `set_lesson_taught` invocado por docente no dueño | error/0 cambios; `taught_lessons` intacta |
+| A9 | `set_lessons_taught` invocado por docente no dueño | error/0 cambios; `taught_lessons` intacta |
 | A10 | `insert` directo en `taught_lessons` con JWT de docente dueño | rechazado por RLS |
 | A11 | `has_function_privilege('authenticated', <interna>, 'execute')` | `false` para las tres |
-| A12 | Marcar dos veces la misma lección | segunda llamada `changed=false`, `marked_at` intacto, sin recálculo |
+| A12 | Marcar dos veces la misma lección | segunda llamada: slug en `unchanged_slugs`, `marked_at` intacto, sin recálculo |
+| A14 | Lote de 3 slugs con 1 ya marcado | `changed_slugs` = 2, `unchanged_slugs` = 1, un solo recálculo (contar ejecuciones de la interna) |
+| A15 | Lote con un slug que falla a mitad de la transacción (forzado) | rollback completo: ninguna fila nueva en `taught_lessons`, notas sin cambios |
 | A13 | `select` en `taught_lessons` como estudiante de otro grupo | 0 filas |
 
 ## Aprobación de implementación
