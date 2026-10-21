@@ -259,8 +259,8 @@ botón no debe verse: anotarlo y saltar a los pasos 4–5). Cambiar "Final" a
 4. Rechazo con el mensaje de spec-040.
 5. La nota de Dev Uno aparece en **ese** ítem (no se crea un segundo
    "Autoevaluaciones") y entra en su acumulado y promedio.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** Aprobado por el usuario (2026-10-21) en los pasos 1 a 3. Doble clic → un solo ítem; ponderable; "Nota 3: los ítems suman 0.30 de 0.20". Paso 4: la interfaz no ofrece botón de eliminar ("No se puede eliminar"), el mensaje de spec-040 no es alcanzable desde la UI. Paso 5 sin ejecutar (requiere sesión de estudiante y lección con autoevaluación publicada).
 
 ### TC-059-16 — Ítem manual con el nombre "Autoevaluaciones"
 **Precondición:** DEVADA2026 sin ítem automático de autoevaluaciones.
@@ -272,8 +272,8 @@ botón no debe verse: anotarlo y saltar a los pasos 4–5). Cambiar "Final" a
 **Resultado esperado:** 2. Mensaje "Ya existe un ítem manual llamado
 'Autoevaluaciones'; renómbralo para crear el automático." y no se crea nada.
 3. Se elimina sin problema.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** Aprobado por el usuario (2026-10-21). Mensaje "Ya existe un ítem manual llamado 'Autoevaluaciones'; renómbralo para crear el automático." y no se creó nada; el usuario eliminó el ítem manual sin problema.
 
 ### TC-059-17 — Modo claro/oscuro y ancho móvil
 **Precondición:** TC-059-08 y TC-059-11 aprobados.
