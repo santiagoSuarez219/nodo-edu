@@ -713,14 +713,19 @@ grant execute on function public.ensure_self_assessment_grade_item(uuid) to auth
 ## Fases de implementación
 
 ### Fase 1 — Esquema
-- [ ] Verificar la versión de Postgres en `nodo-dev` y producción (D12). *(pendiente: se hará al aplicar)*
+- [x] Verificar la versión de Postgres en `nodo-dev` (17.11, D12). *(La de producción se confirma en la Fase 7, antes de aplicar allí.)*
 - [x] Crear las migraciones `20261021000000`–`20261021000004`.
-- [ ] `supabase db push --db-url "$DEV_DB_URL" --dry-run`, mostrar la salida al
+- [x] `supabase db push --db-url "$DEV_DB_URL" --dry-run`, mostrar la salida al
       usuario y, con su visto bueno, aplicar en `nodo-dev` (**nunca** `--linked`).
-- [ ] Verificar en `nodo-dev`: el trigger de ítems rechaza `0.6 + 0.5`; el de
+- [x] Verificar en `nodo-dev` (2026-10-21): el trigger de ítems rechaza `0.6 + 0.5`; el de
       cortes rechaza `0.8 + 0.3`; FK compuesta rechaza un corte de otro curso;
       borrar un corte deja `group_id` en `null`; `ensure_self_assessment_grade_item`
       dos veces devuelve el mismo id; RLS y `GRANT`s de `grade_groups`.
+      *(`grade_groups` tiene los mismos `GRANT`s por defecto de Supabase que
+      `grade_items`, RLS activo y políticas de escritura solo docente/admin;
+      un estudiante que llama a `ensure_self_assessment_grade_item` recibe `42501`
+      y no crea nada; `get_own_enrollment_grade_lines` y `ensure_…` no son
+      ejecutables por `anon`.)*
 
 ### Fase 2 — Módulo puro de cálculo
 - [x] `lib/grades/compute.ts`: `computeGradeSummary` (D6, D7) y
