@@ -11,7 +11,7 @@ import { clearMustChangePasswordFlag } from "./service";
 import { isAuthErrorLike } from "./errors";
 import { createTimeoutFetch } from "./fetch-timeout";
 
-// spec-054 (D-C) — mismo presupuesto que lib/auth/server.ts: es una llamada
+// spec-061 (D-C) — mismo presupuesto que lib/auth/server.ts: es una llamada
 // de datos de página (verificar una contraseña), no el gate del middleware.
 const DATA_TIMEOUT_MS = 6000;
 import type { AuthResult } from "./types";
@@ -229,7 +229,7 @@ async function verifyCurrentPassword(
 
   const throwaway = createClient(supabaseUrl, supabaseKey, {
     auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
-    // spec-054 (DEBT-070): este cliente no pasaba por lib/auth/server.ts, así
+    // spec-061 (DEBT-070): este cliente no pasaba por lib/auth/server.ts, así
     // que quedaba fuera del timeout que el resto de este archivo hereda de
     // createServerSupabaseClient() — sin timeout propio hasta ahora.
     global: { fetch: createTimeoutFetch(DATA_TIMEOUT_MS) },

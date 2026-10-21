@@ -11,7 +11,7 @@ const PUBLIC_PREFIXES = [
 ];
 const CHANGE_PASSWORD_PATH = "/cambiar-contrasena"; // spec-051 — mismo motivo: debe quedar exento o entra en bucle
 
-// spec-054 (DEBT-069, decisión D-E = E1): rutas que no necesitan Auth para
+// spec-061 (DEBT-069, decisión D-E = E1): rutas que no necesitan Auth para
 // renderizar (ambas leen MDX/son estáticas) y que por tanto pueden dejarse
 // pasar en modo degradado — SOLO cuando el fallo es transitorio. Coincidencia
 // EXACTA a propósito, no prefijo: un prefijo "/"' matchearía todo el sitio, y
@@ -21,11 +21,11 @@ const CHANGE_PASSWORD_PATH = "/cambiar-contrasena"; // spec-051 — mismo motivo
 // La excepción es de NAVEGACIÓN, no de AUTORIZACIÓN: las rutas de curso y
 // lección siguen exigiendo sesión y matrícula (requireCourseAccess,
 // lib/enrollments/access.ts) sin ninguna excepción — D4 de spec-046 queda
-// intacto. Ver "Hallazgo 3" de docs/specs/spec-054-resiliencia-latencia-supabase.md:
+// intacto. Ver "Hallazgo 3" de docs/specs/spec-061-resiliencia-latencia-supabase.md:
 // hoy no existe contenido público más allá de estas dos rutas.
 const DEGRADABLE_OPEN_ROUTES = new Set(["/", "/grupo-investigacion"]);
 
-// reason que spec-054 considera transitorio — un episodio de latencia o de
+// reason que spec-061 considera transitorio — un episodio de latencia o de
 // caída puntual del proveedor, del tipo que la excepción de arriba busca no
 // amplificar. `misconfigured` y `unknown` NUNCA activan la excepción: son
 // fallos permanentes (env var ausente, algo no anticipado) donde fallar
@@ -59,7 +59,7 @@ export async function middleware(request: NextRequest) {
       `[auth] servicio no disponible (${auth.reason}, ${authDurationMs}ms) — ${pathname}`
     );
 
-    // spec-054 (DEBT-069, D-E = E1): un fallo TRANSITORIO no tumba las dos
+    // spec-061 (DEBT-069, D-E = E1): un fallo TRANSITORIO no tumba las dos
     // rutas que no dependen de Auth para renderizar. La excepción nunca
     // aplica a `misconfigured`/`unknown` (fallos permanentes) ni a ninguna
     // ruta fuera de DEGRADABLE_OPEN_ROUTES — en particular, nunca a una
@@ -76,7 +76,7 @@ export async function middleware(request: NextRequest) {
     // `is_server_action` distingue el caso benigno (una navegación normal
     // que ve la página de servicio no disponible, como se diseñó) del caso
     // que motivó spec-053 (un Server Action que esperaba RSC y recibió este
-    // mismo 503 — issue NODO-EDU-4 de Sentry). spec-054 añade `duration_ms`
+    // mismo 503 — issue NODO-EDU-4 de Sentry). spec-061 añade `duration_ms`
     // y `deadline_exceeded` (para medir en producción si GLOBAL_DEADLINE_MS
     // sigue siendo suficiente) y `degraded_route_exception` (para medir
     // cuánto tráfico salva realmente la excepción de E1).

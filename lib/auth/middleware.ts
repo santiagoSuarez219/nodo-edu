@@ -13,7 +13,7 @@ import type { AuthCheckResult } from "./auth-check";
 // getAuthCheck() está cache()-ada por request).
 const RETRY_DELAY_MS = 250;
 
-// spec-054 (D-A) — presupuesto GLOBAL de todo el gate de autenticación del
+// spec-061 (D-A) — presupuesto GLOBAL de todo el gate de autenticación del
 // middleware, compartido por getUser, el ping de salud y sus reintentos.
 // Vercel corta la invocación del middleware a los 25s; 8s deja ~3× de
 // holgura para construir y devolver el HTML del 503, y sigue estando ~20×
@@ -53,7 +53,7 @@ const REQUEST_TIMEOUT_MS = 2000;
 //    necesite refrescar el token puede consumir **~26.6s**, ya por encima de
 //    los 25s de Vercel — y `checkAuth()` la reintenta una vez más, hasta
 //    ~53s de peor caso. Esto explica sin hipótesis residual los 504
-//    `MIDDLEWARE_INVOCATION_TIMEOUT` del incidente (docs/specs/spec-054).
+//    `MIDDLEWARE_INVOCATION_TIMEOUT` del incidente (docs/specs/spec-061).
 //
 //    Corolario contraintuitivo: **bajar** REQUEST_TIMEOUT_MS empeora este
 //    problema, porque caben más iteraciones dentro de la ventana de 30s del
@@ -76,7 +76,7 @@ export interface UpdateSupabaseSessionResult {
   supabaseResponse: NextResponse;
   auth: AuthCheckResult;
   supabase: SupabaseClient | null;
-  // spec-054 — para los tags de Sentry en middleware.ts (raíz): cuánto tardó
+  // spec-061 — para los tags de Sentry en middleware.ts (raíz): cuánto tardó
   // el gate y si terminó por el deadline global o por una clasificación
   // normal (network/server/misconfigured/...).
   authDurationMs: number;
@@ -111,7 +111,7 @@ export async function updateSupabaseSession(
     };
   }
 
-  // spec-054 (D-B) — un `AbortController` por request, compartido por TODAS
+  // spec-061 (D-B) — un `AbortController` por request, compartido por TODAS
   // las llamadas de red de este gate (getUser, sus reintentos, el ping de
   // salud). Al agotarse GLOBAL_DEADLINE_MS, aborta: cualquier fetch en curso
   // rechaza de inmediato, y cualquier fetch NUEVO que el bucle interno del
@@ -164,7 +164,7 @@ export async function updateSupabaseSession(
     // servidor de desarrollo persistente puede seguir viva unos instantes
     // más, ver el `.catch` de abajo).
     //
-    // TC-054-001 (ronda de pruebas, 2026-08-29): esa promesa perdedora sigue
+    // TC-061-001 (ronda de pruebas, 2026-08-29): esa promesa perdedora sigue
     // corriendo en segundo plano después del deadline, y sus fetches en
     // curso rechazan por el mismo `AbortController` — visto en los logs de
     // desarrollo como un rechazo no manejado. `checkAuth()` nunca debería
@@ -263,7 +263,7 @@ async function tryGetUser(
 // hallazgo 🔴-1 de la revisión de código de spec-046, 2026-08-13): sin la
 // key, cualquier visitante anónimo en producción recibía 503 con Auth
 // perfectamente sano. `healthFetch` ya trae el timeout por intento y el
-// deadline global inyectados (spec-054) — el reintento ante fallo lo aporta
+// deadline global inyectados (spec-061) — el reintento ante fallo lo aporta
 // gratis checkAuth() de más arriba.
 async function checkAuthHealth(
   supabaseUrl: string,
@@ -309,7 +309,7 @@ async function checkAuthHealth(
       : { status: "unavailable", reason: "unknown" };
   } catch {
     // `fetch` rechaza ante fallo de red, el cap por intento o el deadline
-    // global compartido (spec-054) — mismo criterio que
+    // global compartido (spec-061) — mismo criterio que
     // `AuthRetryableFetchError` con `status: 0` en errors.ts. El caso en que
     // el deadline global ya se agotó queda cubierto aparte por el
     // `Promise.race` de `updateSupabaseSession`, que resuelve

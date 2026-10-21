@@ -13,7 +13,7 @@ export default function AdminError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
-  // spec-054 (D-D): mismo criterio que app/(cursos)/[courseSlug]/[lessonSlug]/error.tsx.
+  // spec-061 (D-D): mismo criterio que app/(cursos)/[courseSlug]/[lessonSlug]/error.tsx.
   const infra = isInfraError(error);
 
   useEffect(() => {

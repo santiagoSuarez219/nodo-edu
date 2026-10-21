@@ -7,7 +7,7 @@ import { createTimeoutFetch } from "./fetch-timeout";
 // .insert()/.update() como `never` en vez de `any`.
 let serviceClient: SupabaseClient | null = null;
 
-// spec-054 (D-C) — 10s, más holgado que los 6s de server.ts/actions.ts: este
+// spec-061 (D-C) — 10s, más holgado que los 6s de server.ts/actions.ts: este
 // singleton alimenta los 10 módulos de servicio que sirven /api/* y, por
 // tanto, los 5 MCPs del proyecto (docs/mcps/README.md), donde hay
 // operaciones legítimamente más largas que una consulta de página (altas

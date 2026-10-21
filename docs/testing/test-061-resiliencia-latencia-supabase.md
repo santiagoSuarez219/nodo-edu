@@ -1,6 +1,6 @@
-# test-054 — Resiliencia del camino de request ante latencia de Supabase
+# test-061 — Resiliencia del camino de request ante latencia de Supabase
 
-> Pruebas manuales de `docs/specs/spec-054-resiliencia-latencia-supabase.md`
+> Pruebas manuales de `docs/specs/spec-061-resiliencia-latencia-supabase.md`
 > (cierra DEBT-069, DEBT-070 y DEBT-071). Escritas junto con el spec, **antes**
 > de la implementación: hoy los casos con latencia inyectada **fallan** — ese es
 > el estado esperado hasta que la implementación los ponga en verde.
@@ -19,12 +19,12 @@
 | Recurso | Cómo se monta | Identificador | Revertido |
 |---|---|---|---|
 | Docente de desarrollo (ya sembrado, **no** crear ni borrar) | `npm run seed:teacher` | `dev@nodo.local` / `DevLocal2026!` | n/a |
-| ~~Estudiante de prueba matriculado (reutilizado de `test-053`)~~ | — | ~~`test-spec053@nodo.local`~~ | 🔴 **Ya no existe** — hallazgo de esta ronda: `mirp-lab` no tenía ningún `academic_course` ni estudiante al momento de ejecutar (ver Hallazgos de `TC-054-008`) |
+| ~~Estudiante de prueba matriculado (reutilizado de `test-053`)~~ | — | ~~`test-spec053@nodo.local`~~ | 🔴 **Ya no existe** — hallazgo de esta ronda: `mirp-lab` no tenía ningún `academic_course` ni estudiante al momento de ejecutar (ver Hallazgos de `TC-061-008`) |
 | Curso académico de prueba (creado vía REST + service role — no existe MCP para esto, ver `DEBT-060`) | `POST /rest/v1/academic_courses` | `TEST054 — Estructuras de Datos`, `37292155-ad61-4517-ba3f-1dc7e8f4adb0` | 🟡 No eliminado — decisión del usuario (2026-08-29): queda en desarrollo |
 | Estudiante de prueba matriculado en `TEST054` | `create_student` (`students-mcp`) | `d67a80e5-17c4-42a1-bb1c-68e1666fe5c1` (`test-spec054@nodo.local` / `TestSpec054!`), matrícula `f133aa51-48bc-4cfd-a3bb-b48bbed4eb08` | 🟡 No eliminado — misma decisión |
 | Proxy de latencia local | `node scripts/latency-proxy.mjs --port=54331 …` | proceso local, puerto 54331 | ✅ (apagado al cierre de la ronda) |
 | `NEXT_PUBLIC_SUPABASE_URL` de `.env.local` apuntando al proxy | edición manual (valor original: `http://localhost:54321`) | — | ✅ (restaurado) |
-| `jwt_expiry` en `supabase/config.toml` de `mirp-lab` bajado de `3600` a `60` | edición + reinicio del stack en `mirp-lab` | — | ✅ (revertido tras `TC-054-001`) |
+| `jwt_expiry` en `supabase/config.toml` de `mirp-lab` bajado de `3600` a `60` | edición + reinicio del stack en `mirp-lab` | — | ✅ (revertido tras `TC-061-001`) |
 
 **Entorno de pruebas:** desarrollo — instancia Supabase local en `mirp-lab` vía
 túnel SSH (ver CLAUDE.md → "Base de datos"). **Nunca ejecutar esta ronda contra
@@ -36,7 +36,7 @@ producción:** los casos consisten en degradar deliberadamente el servicio.
 > contenido HTTP, no de apariencia visual — se ejecutan vía `curl` (con una
 > sesión real obtenida a través de la propia librería `@supabase/ssr`, no
 > reconstruida a mano) en vez de a través del navegador, por instrucción
-> explícita del usuario ("Ejecuta esta prueba" en TC-054-001). Los casos que
+> explícita del usuario ("Ejecuta esta prueba" en TC-061-001). Los casos que
 > sí exigen observar la UI (copy, navbar, banner) se marcan aparte.
 
 ### Montaje del escenario
@@ -68,7 +68,7 @@ reiniciar `npm run dev`.
 
 ## Casos de prueba
 
-### TC-054-001 — Sesión caducada con `/auth/v1/token` lento: 503 diseñado, nunca 504
+### TC-061-001 — Sesión caducada con `/auth/v1/token` lento: 503 diseñado, nunca 504
 **Cubre:** CA 1 (DEBT-071) — el caso que produjo la pantalla de error que vio el usuario.
 **Precondición:** `jwt_expiry=60` en `mirp-lab`; proxy con `--path='^/auth/v1/token' --delay=8000`; sesión iniciada como `dev@nodo.local` y **esperar >60 s** para que el access token caduque.
 **Pasos:**
@@ -99,13 +99,13 @@ deadline sin nadie escuchando — inofensivo en producción (la invocación
 serverless muere antes), pero ruidoso en un servidor de desarrollo
 persistente. Repetido dos veces más tras cada corrección para confirmar.
 
-### TC-054-002 — Auth colgado por completo: el gate responde dentro del presupuesto
+### TC-061-002 — Auth colgado por completo: el gate responde dentro del presupuesto
 **Cubre:** CA 2 (DEBT-071).
 **Precondición:** proxy con `--path='^/auth/v1' --hang`.
 **Pasos:**
 1. En una ventana anónima, navegar a `/login` (**no** `/`: tras la decisión
    E1 de la Fase 4, `/` es una ruta degradable — ese comportamiento tiene su
-   propio caso, `TC-054-011`. `/login` nunca es degradable, así que aísla el
+   propio caso, `TC-061-011`. `/login` nunca es degradable, así que aísla el
    mecanismo del deadline global sin la excepción de E1 de por medio).
 2. Cronometrar.
 **Resultado esperado:** 503 con la página de `spec-046` en ≤ presupuesto de D-A.
@@ -113,14 +113,14 @@ persistente. Repetido dos veces más tras cada corrección para confirmar.
 **Hallazgos:** Ajustado de `/` a `/login` (decisión del usuario, 2026-08-29):
 el caso original escrito antes de la decisión E1 esperaba 503 en `/`, pero
 tras E1 `/` responde `200` en modo degradado — comportamiento correcto, no un
-fallo (ver `TC-054-011`). Verificado primero el síntoma en `/` vía `curl`
+fallo (ver `TC-061-011`). Verificado primero el síntoma en `/` vía `curl`
 (`200`, `8.555121s`, log confirma `reason: timeout` pero la excepción de ruta
 abierta aplicó), luego contra `/login`: `503` en `8.009460s`, copy correcto
 de `spec-046`. El deadline global funciona correctamente; solo la ruta de
 prueba original quedó desactualizada por un cambio de scope posterior a la
 redacción del test.
 
-### TC-054-003 — Sin regresión con Supabase sano
+### TC-061-003 — Sin regresión con Supabase sano
 **Cubre:** CA 4 — que el fix no cueste rendimiento en el caso normal.
 **Precondición:** proxy **sin** retardo (`--delay=0`), o `.env.local` apuntando directo a 54321.
 **Pasos:**
@@ -138,7 +138,7 @@ autenticado: 1,07s. Todos los tiempos consistentes con navegación normal, sin
 indicio de regresión atribuible al timeout (muy por debajo de los
 presupuestos de 6-10s).
 
-### TC-054-004 — El ping de salud no puede exceder el deadline global
+### TC-061-004 — El ping de salud no puede exceder el deadline global
 **Cubre:** CA 2 y el paso de la Fase 1 sobre `HEALTH_TIMEOUT_MS`.
 **Precondición:** proxy con `--path='^/auth/v1/health' --delay=20000` (health lento, resto sano) — la asimetría exacta del incidente del 2026-08-29.
 **Pasos:**
@@ -147,12 +147,12 @@ presupuestos de 6-10s).
 **Resultado esperado:** respuesta dentro del presupuesto de D-A. El peor caso viejo (`2 × 5 s + 250 ms`) ya no aplica: el ping está subordinado al deadline global.
 **Estado:** ✅ Aprobado
 **Hallazgos:** Probado contra `/login` (no `/`, mismo criterio que
-`TC-054-002`, para aislar el mecanismo de la excepción de E1). `503` en
+`TC-061-002`, para aislar el mecanismo de la excepción de E1). `503` en
 `8.007033s` — dentro del presupuesto de D-A, muy por debajo de los ~10,25s+
 del peor caso que tenía el ping de salud antes de subordinarlo al deadline
 global.
 
-### TC-054-005 — Página de curso con Supabase colgado: acotada, no 300 s
+### TC-061-005 — Página de curso con Supabase colgado: acotada, no 300 s
 **Cubre:** CA 5 (DEBT-070) — los 10 cuelgues de 300 s en `/[courseSlug]`.
 **Precondición:** sesión iniciada; proxy con `--hang` en `^/rest/v1`.
 **Pasos:**
@@ -180,22 +180,22 @@ Con ambos fixes: `/estructuras-de-datos/fundamentos-control-de-versiones`
 resuelve en `6.45s` (antes: 40s+ sin resolver, con la misma consulta
 repitiéndose indefinidamente en el log del proxy).
 
-### TC-054-006 — Ninguna ruta con Server Components supera el presupuesto
+### TC-061-006 — Ninguna ruta con Server Components supera el presupuesto
 **Cubre:** CA 6 (DEBT-070).
-**Precondición:** igual que TC-054-005.
+**Precondición:** igual que TC-061-005.
 **Pasos:** repetir la medición en `/`, `/[courseSlug]`, `/[courseSlug]/[lessonSlug]`, `/cuenta/cursos` y `/admin`.
 **Resultado esperado:** las cinco resuelven en ≤ presupuesto de D-C.
 **Estado:** ✅ Aprobado
-**Hallazgos:** Con los dos fixes de `TC-054-005` ya aplicados: `/` → `200` en
-`6.23s` (degradado, ver `TC-054-009`); `/cuenta/cursos` → `200` en `6.23s`;
+**Hallazgos:** Con los dos fixes de `TC-061-005` ya aplicados: `/` → `200` en
+`6.23s` (degradado, ver `TC-061-009`); `/cuenta/cursos` → `200` en `6.23s`;
 `/admin/courses` → `307` en `2.13s` (más rápido: pasa por el cliente del
 *middleware*, no por `server.ts` — su cap por intento es 2s, no 6s, tal como
-se diseñó). `/[courseSlug]/[lessonSlug]` cubierta por `TC-054-005`. Ningún
+se diseñó). `/[courseSlug]/[lessonSlug]` cubierta por `TC-061-005`. Ningún
 caso superó su presupuesto correspondiente.
 
-### TC-054-007 — Mensaje honesto al abortar una consulta de datos
+### TC-061-007 — Mensaje honesto al abortar una consulta de datos
 **Cubre:** CA 7 (DEBT-070) y la decisión D-D.
-**Precondición:** igual que TC-054-005.
+**Precondición:** igual que TC-061-005.
 **Pasos:**
 1. Navegar a una lección.
 2. Leer el mensaje mostrado.
@@ -220,7 +220,7 @@ excepción capturable por el boundary — el copy de `INFRA_ERROR_COPY` queda
 como cobertura defensiva para el día en que algo sí lance, no como algo
 verificado en ejecución real.
 
-### TC-054-008 — Un estudiante matriculado no recibe "sin acceso" por un timeout
+### TC-061-008 — Un estudiante matriculado no recibe "sin acceso" por un timeout
 **Cubre:** CA 8 (DEBT-070) — evita repetir la mentira que `spec-046` eliminó.
 **Precondición:** sesión del estudiante de prueba, **matriculado**; proxy con `--hang` en `^/rest/v1`.
 **Pasos:**
@@ -230,14 +230,14 @@ verificado en ejecución real.
 **Hallazgos:** Precondición bloqueada al inicio: el estudiante de `test-053`
 ya no existía y `mirp-lab` no tenía ningún `academic_course` — hallazgo
 inesperado, ajeno a este spec (no causado por el `stop`/`start` del stack de
-`TC-054-001`, que preserva datos). Creado un curso y un estudiante de prueba
+`TC-061-001`, que preserva datos). Creado un curso y un estudiante de prueba
 nuevos (ver "Datos de prueba"), con decisión explícita del usuario de crear
 estos recursos vía REST directo (no existe MCP para crear
 `academic_courses`, `DEBT-060`). Con el estudiante matriculado navegando a
 una lección de su curso bajo `--hang` en `/rest/v1`: redirect a
 `/servicio-no-disponible?from=...`. **Nunca** `sinAcceso=`.
 
-### TC-054-009 — El root layout no rompe el documento entero
+### TC-061-009 — El root layout no rompe el documento entero
 **Cubre:** Fase 3 y la decisión D-F.
 **Precondición:** proxy con `--hang` en `^/rest/v1` (afecta `getCurrentProfile`/`getCurrentRoles` del root layout).
 **Pasos:**
@@ -257,7 +257,7 @@ la consulta a `profiles` falló con sesión válida. Reconstruido y
 reverificado: el banner ("Estamos con problemas de conexión...") aparece
 correctamente, en `6.39s`.
 
-### TC-054-010 — Un usuario con sesión no cree que lo desconectaron
+### TC-061-010 — Un usuario con sesión no cree que lo desconectaron
 **Cubre:** D-F — la deuda DEBT-042 que `spec-046` cerró y que E1 podría reabrir.
 **Precondición:** sesión válida como `dev@nodo.local`; proxy en modo degradado (`--path='^/auth/v1' --hang`).
 **Pasos:**
@@ -277,7 +277,7 @@ sus 8s (muy por debajo de los 25s de Vercel) y el render respeta los suyos.
 Pero conviene tenerlo presente: en modo degradado el peor caso percibido por
 el usuario ronda los 14s, no los 8s del gate.
 
-### TC-054-011 — Rutas abiertas siguen en pie ante fallo transitorio *(solo si D-E = E1)*
+### TC-061-011 — Rutas abiertas siguen en pie ante fallo transitorio *(solo si D-E = E1)*
 **Cubre:** CA 10 (DEBT-069).
 **Precondición:** proxy con `--path='^/auth/v1' --hang` (produce `reason` transitorio); ventana anónima.
 **Pasos:**
@@ -293,9 +293,9 @@ valor que fija `middleware.ts`); contra un build de producción real
 `no-store, must-revalidate` como se diseñó. Descubrimiento que motivó cambiar
 a `next start` para el resto de la ronda.
 
-### TC-054-012 — El contenido restringido sigue cerrado *(el caso de seguridad)*
+### TC-061-012 — El contenido restringido sigue cerrado *(el caso de seguridad)*
 **Cubre:** CA 11 (DEBT-069) — que la excepción sea de navegación y no de autorización.
-**Precondición:** igual que TC-054-011, ventana anónima.
+**Precondición:** igual que TC-061-011, ventana anónima.
 **Pasos:**
 1. Intentar cargar `/estructuras-de-datos/polimorfismo` directamente por URL.
 **Resultado esperado:** 503 o el redirect de acceso. **Bajo ninguna circunstancia** se muestra contenido de la lección.
@@ -305,7 +305,7 @@ de la lección — el único lugar donde aparece el string "polimorfismo" en la
 respuesta es el `href` del botón de reintentar). La excepción de E1 no
 alcanza esta ruta, tal como se diseñó.
 
-### TC-054-013 — D4 de spec-046 intacto ante `misconfigured`
+### TC-061-013 — D4 de spec-046 intacto ante `misconfigured`
 **Cubre:** CA 12 (DEBT-069).
 **Precondición:** vaciar `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` en `.env.local` y reiniciar `npm run dev` (reproduce `reason: "misconfigured"`).
 **Pasos:**
@@ -317,7 +317,7 @@ alcanza esta ruta, tal como se diseñó.
 `/estructuras-de-datos/polimorfismo` respondieron `503` las tres. Clave
 restaurada en `.env.local` inmediatamente después de la verificación.
 
-### TC-054-014 — Navegación normal tras restaurar el servicio
+### TC-061-014 — Navegación normal tras restaurar el servicio
 **Cubre:** recuperación — que el degradado no deje estado pegado (la caché `healthyUntil` es por instancia).
 **Precondición:** venir de cualquier caso con proxy degradado.
 **Pasos:**
@@ -332,7 +332,7 @@ esperar ningún TTL.
 
 ---
 
-### TC-MCP-054-001 — Los MCPs siguen intactos con Supabase sano
+### TC-MCP-061-001 — Los MCPs siguen intactos con Supabase sano
 **Herramienta probada:** `list_course_lessons` (`courses-mcp`) y `list_questions` (`question-bank-mcp`)
 **Cubre:** CA 13 — que `/api` siga exento del gate (D3 de `spec-046`) tras tocar `service.ts`.
 **Precondición:** proxy sin retardo; `npm run dev` corriendo.
@@ -340,13 +340,13 @@ esperar ningún TTL.
 **Output esperado:** el catálogo completo, sin error.
 **Estado:** ✅ Aprobado
 **Hallazgos:** Ejecutado incluso con Auth completamente colgado (proxy
-`--path='^/auth/v1' --hang`, escenario de `TC-054-002`) — prueba más fuerte
+`--path='^/auth/v1' --hang`, escenario de `TC-061-002`) — prueba más fuerte
 que la especificada. `list_course_lessons(course_slug: "estructuras-de-datos")`
 devolvió las 39 lecciones sin error. Confirma D3 de `spec-046`: la ruta
 `/api/courses/*` nunca llama a `updateSupabaseSession()`.
 
-### TC-MCP-054-002 — Los MCPs fallan acotado, no colgados
-**Herramienta probada:** la misma de TC-MCP-054-001
+### TC-MCP-061-002 — Los MCPs fallan acotado, no colgados
+**Herramienta probada:** la misma de TC-MCP-061-001
 **Cubre:** CA 9 (DEBT-070) — el efecto del presupuesto de `service.ts` sobre los MCPs, que es el radio de acción más amplio de la Fase 2.
 **Precondición:** proxy con `--hang` en `^/rest/v1`.
 **Input de prueba:** `list_course_lessons(course_slug: "estructuras-de-datos")`
@@ -394,7 +394,7 @@ E1 no se está aplicando, que es lo correcto con Auth sano.
 
 > Tomada de los runtime errors de Vercel con ventana de 24 h, para que la
 > comparación posterior sea contra números y no contra impresiones. Todas
-> estas ocurrencias son del código **anterior** a spec-054.
+> estas ocurrencias son del código **anterior** a spec-061.
 
 | Señal | Ocurrencias (24 h) | Última vez |
 |---|---|---|
@@ -419,21 +419,21 @@ y eso no invalida el fix.
 - **Tres bugs reales encontrados y corregidos durante la ronda**, cada uno con commit propio:
   1. `AbortSignal.any()` no soportado en el Edge Runtime de Next.js — el
      mecanismo primario de DEBT-071 fallaba en silencio, solo el
-     `Promise.race` de respaldo salvaba el resultado (`TC-054-001`).
+     `Promise.race` de respaldo salvaba el resultado (`TC-061-001`).
   2. `AbortSignal.timeout()` produce `name: "TimeoutError"`, y
      `postgrest-js` solo trata `"AbortError"` como "no reintentable" — el
      timeout de datos (DEBT-070) prometía 6s y tardaba ~31s reales
-     (`TC-054-005`).
+     (`TC-061-005`).
   3. `app/layout.tsx` encadenaba sus llamadas en serie (12s en vez de 6s) y
      el banner de D-F no cubría el caso "sesión válida, perfil sin cargar"
-     (`TC-054-005`/`TC-054-009`).
+     (`TC-061-005`/`TC-061-009`).
 - Dos hallazgos de entorno ajenos al spec: la base de `mirp-lab` no tenía
   ningún estudiante ni curso académico al momento de esta ronda
-  (`TC-054-008`) — causa investigada y resuelta después en
+  (`TC-061-008`) — causa investigada y resuelta después en
   [[DEBT-072]]/[[DEBT-073]]; y el código de progreso de lección ya degrada
-  en silencio sin propagar excepciones, por lo que `TC-054-007` no pudo
+  en silencio sin propagar excepciones, por lo que `TC-061-007` no pudo
   reproducir el escenario tal como estaba redactado (ver sus Hallazgos).
-- Observación de experiencia de usuario (`TC-054-010`, no bloqueante): en
+- Observación de experiencia de usuario (`TC-061-010`, no bloqueante): en
   modo degradado el tiempo percibido es la suma del deadline del gate (8s) y
   el del render (6s) — hasta ~14s en el peor caso, no los 8s del gate.
   Candidato a afinar si alguna vez molesta en producción.
