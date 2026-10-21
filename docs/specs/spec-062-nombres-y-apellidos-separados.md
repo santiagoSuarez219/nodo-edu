@@ -1,4 +1,4 @@
-# spec-062 — [TESTING] Nombres y apellidos separados, orden por apellido en el panel docente
+# spec-062 — [DONE] Nombres y apellidos separados, orden por apellido en el panel docente
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.
 
