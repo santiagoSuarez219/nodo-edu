@@ -77,7 +77,8 @@ export async function updateAccountAction(
   if (!user) return { ok: false, error: "No autenticado." };
 
   const parsed = UpdateProfileSchema.safeParse({
-    full_name: formData.get("full_name"),
+    first_name: formData.get("first_name"),
+    last_name: formData.get("last_name"),
     career: formData.get("career") || undefined,
     semester: formData.get("semester") || undefined,
     github_username: formData.get("github_username") || undefined,
@@ -96,7 +97,10 @@ export async function updateAccountAction(
   const { error: profileError } = await supabase
     .from("profiles")
     .update({
-      full_name: parsed.data.full_name,
+      first_name: parsed.data.first_name,
+      last_name: parsed.data.last_name,
+      // El estudiante revisó sus propios nombres: ya no hay nada por revisar.
+      name_needs_review: false,
       github_username: parsed.data.github_username,
     })
     .eq("id", user.id);
@@ -143,14 +147,15 @@ export async function resetStudentPasswordAction(
   return { ok: true, data: result.result };
 }
 
-// spec-057: edita el nombre de un estudiante inline desde EnrollmentTable.
-// Exige matrícula ACTIVA (`requireActive: true`): un estudiante retirado es
-// registro histórico y no se edita desde aquí (ver D4 del spec).
+// spec-057 / spec-062 D5: edita (o confirma) nombres y apellidos de un
+// estudiante inline desde EnrollmentTable. Exige matrícula ACTIVA
+// (`requireActive: true`): un estudiante retirado es registro histórico y no
+// se edita desde aquí (ver D4 de spec-057).
 export async function updateStudentNameAction(
   studentId: string,
   academicCourseId: string,
-  fullName: string
-): Promise<AuthResult<{ full_name: string }>> {
+  name: { first_name: string; last_name: string }
+): Promise<AuthResult<{ first_name: string; last_name: string; full_name: string }>> {
   await requireUser();
 
   const gate = await assertTeacherOwnsEnrolledStudent(studentId, academicCourseId, {
@@ -158,17 +163,26 @@ export async function updateStudentNameAction(
   });
   if (!gate.ok) return { ok: false, error: gate.error };
 
-  const parsed = EditStudentNameSchema.safeParse(fullName);
+  const parsed = EditStudentNameSchema.safeParse(name);
   if (!parsed.success) {
-    return { ok: false, error: parsed.error.issues[0]?.message ?? "Nombre inválido." };
+    const issue = parsed.error.issues[0];
+    const label = issue?.path[0] === "last_name" ? "Apellidos" : "Nombres";
+    return { ok: false, error: issue ? `${label}: ${issue.message}` : "Nombre inválido." };
   }
 
-  const updated = await updateServiceStudent(studentId, { full_name: parsed.data });
+  const updated = await updateServiceStudent(studentId, parsed.data);
   if (!updated) {
     return { ok: false, error: "Estudiante no encontrado." };
   }
 
   revalidatePath(`/admin/courses/${academicCourseId}`, "layout");
   revalidatePath("/admin/courses");
-  return { ok: true, data: { full_name: updated.full_name } };
+  return {
+    ok: true,
+    data: {
+      first_name: updated.first_name,
+      last_name: updated.last_name,
+      full_name: updated.full_name,
+    },
+  };
 }

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { updateStudentNameAction } from "@/lib/students/actions";
+import { formatStudentListName } from "@/lib/students/names";
 import { isServerActionTransportError } from "@/lib/errors/server-action";
 import { reportTransportError } from "@/lib/observability/report-transport-error";
 
@@ -10,46 +11,72 @@ type Status = "idle" | "editing" | "saving" | "error";
 interface Props {
   studentId: string;
   academicCourseId: string;
-  initialName: string;
+  firstName: string;
+  lastName: string;
+  fullName: string;
+  needsReview: boolean;
 }
 
-// spec-057: edición inline del nombre del estudiante. A diferencia de
-// GradeInputCell (input siempre montado, guarda al blur — apto para notas que
-// se editan en lote), un nombre se corrige una vez: la celda arranca en modo
-// lectura y solo se convierte en input al activarla, con Guardar/Cancelar
-// explícitos. `blur` sin cambios cierra la edición; `blur` CON cambios la
-// deja abierta (a diferencia de GradeInputCell) — con un botón Cancelar
-// visible, guardar al hacer clic fuera sería sorpresivo.
-export function StudentNameCell({ studentId, academicCourseId, initialName }: Props) {
-  const [name, setName] = useState(initialName);
-  const [draft, setDraft] = useState(initialName);
+const INPUT_BASE =
+  "w-full rounded border px-2 py-1 text-sm focus:outline-none focus:ring-2 disabled:opacity-60";
+const INPUT_OK =
+  "border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-blue-200 dark:focus:ring-blue-700 focus:border-blue-700";
+const INPUT_ERROR =
+  "border-red-400 dark:border-red-500 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 focus:ring-red-200 dark:focus:ring-red-800";
+
+// spec-057 / spec-062 D5: edición inline de nombres y apellidos. A diferencia
+// de GradeInputCell (input siempre montado, guarda al blur — apto para notas
+// que se editan en lote), un nombre se corrige una vez: la celda arranca en
+// modo lectura y solo se convierte en inputs al activarla, con
+// Guardar/Cancelar explícitos. `blur` sin cambios cierra la edición; `blur`
+// CON cambios la deja abierta — con un botón Cancelar visible, guardar al
+// hacer clic fuera sería sorpresivo.
+//
+// Una fila "por revisar" (propuesta automática de la migración) permite
+// guardar SIN cambios: es el gesto de "la propuesta es correcta".
+export function StudentNameCell({
+  studentId,
+  academicCourseId,
+  firstName,
+  lastName,
+  fullName,
+  needsReview,
+}: Props) {
+  const [names, setNames] = useState({ first: firstName, last: lastName, full: fullName });
+  const [pendingReview, setPendingReview] = useState(needsReview);
+  const [draft, setDraft] = useState({ first: firstName, last: lastName });
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const firstInputRef = useRef<HTMLInputElement>(null);
   const editButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    if (status === "editing") {
-      inputRef.current?.focus();
-      inputRef.current?.select();
+    if (status === "editing" && firstInputRef.current) {
+      firstInputRef.current.focus();
+      firstInputRef.current.select();
     }
-  }, [status]);
+    // Solo al entrar en edición; no en cada transición editing <-> error.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status === "idle"]);
+
+  const unchanged =
+    draft.first.trim() === names.first && draft.last.trim() === names.last;
 
   function startEditing() {
-    setDraft(name);
+    setDraft({ first: names.first, last: names.last });
     setError(null);
     setStatus("editing");
   }
 
   function cancel() {
-    setDraft(name);
+    setDraft({ first: names.first, last: names.last });
     setError(null);
     setStatus("idle");
     editButtonRef.current?.focus();
   }
 
   async function save() {
-    if (draft.trim() === name) {
+    if (unchanged && !pendingReview) {
       setStatus("idle");
       return;
     }
@@ -58,7 +85,10 @@ export function StudentNameCell({ studentId, academicCourseId, initialName }: Pr
     setError(null);
     let result;
     try {
-      result = await updateStudentNameAction(studentId, academicCourseId, draft);
+      result = await updateStudentNameAction(studentId, academicCourseId, {
+        first_name: draft.first,
+        last_name: draft.last,
+      });
     } catch (err) {
       // spec-053: ver LoginForm.tsx para el motivo.
       if (!isServerActionTransportError(err)) throw err;
@@ -73,8 +103,13 @@ export function StudentNameCell({ studentId, academicCourseId, initialName }: Pr
       return;
     }
 
-    setName(result.data.full_name);
-    setDraft(result.data.full_name);
+    setNames({
+      first: result.data.first_name,
+      last: result.data.last_name,
+      full: result.data.full_name,
+    });
+    setDraft({ first: result.data.first_name, last: result.data.last_name });
+    setPendingReview(false);
     setStatus("idle");
   }
 
@@ -88,21 +123,38 @@ export function StudentNameCell({ studentId, academicCourseId, initialName }: Pr
     }
   }
 
-  function handleBlur() {
-    if (draft.trim() === name) {
+  function handleBlur(e: React.FocusEvent<HTMLDivElement>) {
+    if (e.currentTarget.contains(e.relatedTarget as Node | null)) return;
+    if (unchanged && !pendingReview) {
       setStatus("idle");
     }
+  }
+
+  function handleChange(field: "first" | "last", value: string) {
+    setDraft((d) => ({ ...d, [field]: value }));
+    if (status === "error") setStatus("editing");
   }
 
   if (status === "idle") {
     return (
       <div className="flex min-w-[14rem] items-center gap-2">
-        <span className="font-medium text-gray-900 dark:text-white">{name}</span>
+        <span className="font-medium text-gray-900 dark:text-white">
+          {formatStudentListName({
+            first_name: names.first,
+            last_name: names.last,
+            full_name: names.full,
+          })}
+        </span>
+        {pendingReview && (
+          <span className="shrink-0 rounded bg-yellow-100 px-1.5 py-0.5 text-xs font-semibold text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300">
+            Revisar
+          </span>
+        )}
         <button
           type="button"
           onClick={startEditing}
           ref={editButtonRef}
-          aria-label={`Editar nombre de ${name}`}
+          aria-label={`Editar nombre de ${names.full}`}
           className="shrink-0 rounded p-1 text-gray-400 hover:text-gray-700 dark:text-gray-500 dark:hover:text-gray-200 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300 dark:focus-visible:ring-blue-700"
         >
           <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -121,23 +173,30 @@ export function StudentNameCell({ studentId, academicCourseId, initialName }: Pr
   // editing | saving | error: la edición permanece abierta con lo tecleado
   // (D6) — un error nunca revierte silenciosamente al modo lectura.
   return (
-    <div className="flex min-w-[14rem] flex-col gap-1">
+    <div className="flex min-w-[14rem] flex-col gap-1" onBlur={handleBlur}>
       <div className="flex items-center gap-1.5">
         <input
-          ref={inputRef}
+          ref={firstInputRef}
           type="text"
-          value={draft}
+          value={draft.first}
           disabled={status === "saving"}
-          onChange={(e) => { setDraft(e.target.value); if (status === "error") setStatus("editing"); }}
+          onChange={(e) => handleChange("first", e.target.value)}
           onKeyDown={handleKeyDown}
-          onBlur={handleBlur}
-          aria-label={`Nombre de ${name}`}
+          aria-label={`Nombres de ${names.full}`}
           aria-invalid={status === "error"}
-          className={`w-full rounded border px-2 py-1 text-sm focus:outline-none focus:ring-2 disabled:opacity-60 ${
-            status === "error"
-              ? "border-red-400 dark:border-red-500 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 focus:ring-red-200 dark:focus:ring-red-800"
-              : "border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-blue-200 dark:focus:ring-blue-700 focus:border-blue-700"
-          }`}
+          placeholder="Nombres"
+          className={`${INPUT_BASE} ${status === "error" ? INPUT_ERROR : INPUT_OK}`}
+        />
+        <input
+          type="text"
+          value={draft.last}
+          disabled={status === "saving"}
+          onChange={(e) => handleChange("last", e.target.value)}
+          onKeyDown={handleKeyDown}
+          aria-label={`Apellidos de ${names.full}`}
+          aria-invalid={status === "error"}
+          placeholder="Apellidos"
+          className={`${INPUT_BASE} ${status === "error" ? INPUT_ERROR : INPUT_OK}`}
         />
         <span className="sr-only" aria-live="polite">
           {status === "saving" ? "Guardando" : status === "error" ? "Error al guardar" : ""}

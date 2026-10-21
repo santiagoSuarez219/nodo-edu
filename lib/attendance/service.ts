@@ -1,4 +1,5 @@
 import { createServiceSupabaseClient } from '@/lib/auth/service';
+import { compareStudentsBySurname } from '@/lib/students/names';
 import type { ClassSession } from './types';
 
 interface ListSessionsOptions {
@@ -20,9 +21,19 @@ interface SessionWithAttendance {
   created_at: string;
 }
 
+// spec-062 D11: `first_name`/`last_name` se suman a `student_name` (cambio
+// aditivo: no rompe a los consumidores existentes).
+interface ProfileNames {
+  full_name: string;
+  first_name: string;
+  last_name: string;
+}
+
 interface AttendanceRecord {
   student_id: string;
   student_name: string;
+  first_name: string;
+  last_name: string;
   marked_at: string;
 }
 
@@ -35,6 +46,8 @@ interface SessionAttendance {
 interface StudentAttendanceSummary {
   student_id: string;
   student_name: string;
+  first_name: string;
+  last_name: string;
   sessions_attended: number;
   attendance_pct: number;
 }
@@ -136,26 +149,33 @@ export async function getServiceSessionAttendance(
 
   // Obtener los nombres de los estudiantes desde perfiles (profiles.id = auth.users.id)
   const studentIds = (records || []).map((r: Record<string, unknown>) => r.student_id);
-  let students: Record<string, string> = {};
+  let students: Record<string, ProfileNames> = {};
 
   if (studentIds.length > 0) {
     const { data: profiles, error: profilesError } = await supabase
       .from('profiles')
-      .select('id, full_name')
+      .select('id, full_name, first_name, last_name')
       .in('id', studentIds);
 
     if (profilesError) throw profilesError;
 
     students = Object.fromEntries(
-      (profiles || []).map((p: Record<string, unknown>) => [p.id, p.full_name])
+      (profiles || []).map((p: Record<string, unknown>) => [p.id, p as unknown as ProfileNames])
     );
   }
 
-  const attendanceRecords = (records || []).map((r: Record<string, unknown>) => ({
-    student_id: r.student_id as string,
-    student_name: students[r.student_id as string] || 'Desconocido',
-    marked_at: r.marked_at as string,
-  }));
+  // D11: se conserva el orden de llegada (`marked_at`): este roster responde
+  // "quién marcó y a qué hora".
+  const attendanceRecords = (records || []).map((r: Record<string, unknown>) => {
+    const profile = students[r.student_id as string];
+    return {
+      student_id: r.student_id as string,
+      student_name: profile?.full_name || 'Desconocido',
+      first_name: profile?.first_name ?? '',
+      last_name: profile?.last_name ?? '',
+      marked_at: r.marked_at as string,
+    };
+  });
 
   return {
     session: {
@@ -234,34 +254,33 @@ export async function getServiceCourseAttendanceSummary(
   const uniqueStudentIds = Array.from(
     new Set((records || []).map((r: Record<string, unknown>) => r.student_id as string))
   );
-  let studentNames: Record<string, string> = {};
+  let studentNames: Record<string, ProfileNames> = {};
 
   if (uniqueStudentIds.length > 0) {
     const { data: profiles, error: profilesError } = await supabase
       .from('profiles')
-      .select('id, full_name')
+      .select('id, full_name, first_name, last_name')
       .in('id', uniqueStudentIds);
 
     if (profilesError) throw profilesError;
 
     studentNames = Object.fromEntries(
-      (profiles || []).map((p: Record<string, unknown>) => [p.id, p.full_name])
+      (profiles || []).map((p: Record<string, unknown>) => [p.id, p as unknown as ProfileNames])
     );
   }
 
   // Agrupar por estudiante y contar sesiones asistidas
   const studentStats: Record<
     string,
-    { name: string; sessionsAttended: Set<string> }
+    { profile: ProfileNames | undefined; sessionsAttended: Set<string> }
   > = {};
 
   (records || []).forEach((r: Record<string, unknown>) => {
     const studentId = r.student_id as string;
-    const studentName = studentNames[studentId] || 'Desconocido';
 
     if (!studentStats[studentId]) {
       studentStats[studentId] = {
-        name: studentName,
+        profile: studentNames[studentId],
         sessionsAttended: new Set(),
       };
     }
@@ -272,7 +291,9 @@ export async function getServiceCourseAttendanceSummary(
   const students: StudentAttendanceSummary[] = Object.entries(studentStats).map(
     ([studentId, stats]) => ({
       student_id: studentId,
-      student_name: stats.name,
+      student_name: stats.profile?.full_name || 'Desconocido',
+      first_name: stats.profile?.first_name ?? '',
+      last_name: stats.profile?.last_name ?? '',
       sessions_attended: stats.sessionsAttended.size,
       attendance_pct:
         totalSessions && totalSessions > 0
@@ -284,6 +305,12 @@ export async function getServiceCourseAttendanceSummary(
   return {
     course_id: courseId,
     total_sessions: totalSessions || 0,
-    students: students.sort((a, b) => a.student_name.localeCompare(b.student_name)),
+    // D11: por apellido (antes por `full_name`, es decir, por el primer nombre).
+    students: students.sort((a, b) =>
+      compareStudentsBySurname(
+        { first_name: a.first_name, last_name: a.last_name, full_name: a.student_name },
+        { first_name: b.first_name, last_name: b.last_name, full_name: b.student_name }
+      )
+    ),
   };
 }

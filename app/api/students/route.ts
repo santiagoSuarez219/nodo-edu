@@ -37,6 +37,7 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const academicCourseId = searchParams.get("academic_course_id") ?? undefined;
     const search = searchParams.get("q") ?? undefined;
+    const nameReviewPending = searchParams.get("name_review_pending") === "true";
     const limit = searchParams.get("limit")
       ? Math.min(parseInt(searchParams.get("limit")!, 10), 100)
       : 50;
@@ -47,6 +48,7 @@ export async function GET(req: NextRequest) {
     const students = await listServiceStudents({
       academicCourseId,
       search,
+      nameReviewPending,
       limit,
       offset,
     });

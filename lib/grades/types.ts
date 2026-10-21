@@ -38,6 +38,8 @@ export interface CourseGradesRow {
   enrollment_id: string;
   student_id: string;
   student_name: string;
+  student_first_name: string;
+  student_last_name: string;
   student_email: string;
   enrollment_status: "active" | "withdrawn";
   grades: Record<string, number | null>;

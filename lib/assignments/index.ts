@@ -2,6 +2,8 @@ import { cache } from "react";
 import { createServerSupabaseClient } from "@/lib/auth/server";
 import { createServiceSupabaseClient } from "@/lib/auth/service";
 import { getCurrentUser } from "@/lib/auth/session";
+import { fetchStudentProfilesPublic } from "@/lib/enrollments";
+import { compareStudentsBySurname } from "@/lib/students/names";
 import type {
   AssignmentVariantGroup,
   AssignmentGroupWithVariants,
@@ -553,17 +555,23 @@ export async function getOrAllocateVariant(
   return _getOrAllocateVariantForActor({ supabase, actorId: user.id }, enrollmentId, groupId);
 }
 
+// spec-062 D8: `student_name` es el nombre completo (orden natural); las
+// partes permiten mostrar "Apellidos, Nombres".
+export interface VariantAllocationRow {
+  enrollment_id: string;
+  assignment_id: string;
+  variant_label: string;
+  allocated_at: string;
+  student_name?: string;
+  student_first_name?: string;
+  student_last_name?: string;
+}
+
 async function _getAllocationsForActor(
   context: AssignmentContext,
   groupId: string
 ): Promise<
-  Array<{
-    enrollment_id: string;
-    assignment_id: string;
-    variant_label: string;
-    allocated_at: string;
-    student_name?: string;
-  }>
+  VariantAllocationRow[]
 > {
   const { supabase } = context;
 
@@ -589,24 +597,43 @@ async function _getAllocationsForActor(
     (variants || []).map((v) => [v.id, v.variant_label])
   );
 
+  // spec-062 D12: `enrollments.student_id` referencia auth.users, no
+  // `students`, así que el embed `student:students(...)` no tiene relación
+  // posible. Los nombres se resuelven con el RPC de perfiles públicos, como
+  // en el resto de listas.
   const { data: enrollments, error: enrollmentsError } = await supabase
     .from("enrollments")
-    .select("id, student:students(full_name)")
+    .select("id, student_id")
     .in("id", allocations.map((a) => a.enrollment_id));
 
   if (enrollmentsError) throw new Error(enrollmentsError.message);
 
-  const enrollmentMap = new Map(
-    (enrollments || []).map((e) => [e.id, (e.student as { full_name?: string })?.full_name || "Desconocido"])
+  const studentIdByEnrollment = new Map(
+    (enrollments || []).map((e) => [e.id as string, e.student_id as string])
   );
+  const profiles = await fetchStudentProfilesPublic(supabase, [
+    ...new Set(studentIdByEnrollment.values()),
+  ]);
 
-  return allocations.map((a) => ({
-    enrollment_id: a.enrollment_id,
-    assignment_id: a.assignment_id,
-    variant_label: variantMap.get(a.assignment_id) || "Unknown",
-    allocated_at: a.allocated_at,
-    student_name: enrollmentMap.get(a.enrollment_id),
-  }));
+  const rows: VariantAllocationRow[] = allocations.map((a) => {
+    const profile = profiles.get(studentIdByEnrollment.get(a.enrollment_id) ?? "");
+    return {
+      enrollment_id: a.enrollment_id,
+      assignment_id: a.assignment_id,
+      variant_label: variantMap.get(a.assignment_id) || "Unknown",
+      allocated_at: a.allocated_at,
+      student_name: profile?.full_name || "Desconocido",
+      student_first_name: profile?.first_name,
+      student_last_name: profile?.last_name,
+    };
+  });
+
+  return rows.sort((a, b) =>
+    compareStudentsBySurname(
+      { first_name: a.student_first_name, last_name: a.student_last_name, full_name: a.student_name },
+      { first_name: b.student_first_name, last_name: b.student_last_name, full_name: b.student_name }
+    )
+  );
 }
 
 export async function publishAssignmentGroup(
@@ -625,13 +652,7 @@ export async function publishAssignmentGroup(
 export async function getAllocations(
   groupId: string
 ): Promise<
-  Array<{
-    enrollment_id: string;
-    assignment_id: string;
-    variant_label: string;
-    allocated_at: string;
-    student_name?: string;
-  }>
+  VariantAllocationRow[]
 > {
   const supabase = await createServerSupabaseClient();
   const {

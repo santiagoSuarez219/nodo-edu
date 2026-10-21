@@ -1,5 +1,5 @@
 import type { AcademicCoursePublic } from "@/lib/academic-courses/types";
-import type { Profile } from "@/lib/students/types";
+import type { StudentProfilePublic } from "@/lib/students/types";
 
 export interface Enrollment {
   id: string;
@@ -17,6 +17,6 @@ export interface EnrollmentWithCourse extends Enrollment {
 }
 
 export interface EnrollmentWithStudent extends Enrollment {
-  profile: Pick<Profile, "id" | "full_name">;
+  profile: StudentProfilePublic;
   total_grade: number | null;
 }

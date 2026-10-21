@@ -13,6 +13,11 @@ interface Props {
 
 const GITHUB_USERNAME_HELP_ID = "github-username-help";
 
+const NAME_FIELDS = [
+  { name: "first_name", label: "Nombres", autoComplete: "given-name" },
+  { name: "last_name", label: "Apellidos", autoComplete: "family-name" },
+] as const;
+
 const initial: AuthResult = { ok: true };
 
 // spec-053: ver LoginForm.tsx para el motivo — mismo patrón en los cuatro
@@ -54,36 +59,33 @@ export function AccountForm({ profile, student }: Props) {
           </div>
         )}
 
-        <div className="flex flex-col gap-1.5">
-          <label
-            htmlFor="full_name"
-            className="text-sm font-semibold text-gray-700 dark:text-gray-300"
-          >
-            Nombre completo
-          </label>
-          <input
-            id="full_name"
-            name="full_name"
-            type="text"
-            autoComplete="name"
-            required
-            defaultValue={profile.full_name}
-            className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-700 focus:border-blue-700 dark:focus:border-blue-500 transition-colors"
-            aria-describedby={
-              !state.ok && state.fieldErrors?.full_name
-                ? "full-name-error"
-                : undefined
-            }
-          />
-          {!state.ok && state.fieldErrors?.full_name && (
-            <p
-              id="full-name-error"
-              className="text-xs text-red-600 dark:text-red-400"
+        {NAME_FIELDS.map((f) => (
+          <div key={f.name} className="flex flex-col gap-1.5">
+            <label
+              htmlFor={f.name}
+              className="text-sm font-semibold text-gray-700 dark:text-gray-300"
             >
-              {state.fieldErrors.full_name[0]}
-            </p>
-          )}
-        </div>
+              {f.label}
+            </label>
+            <input
+              id={f.name}
+              name={f.name}
+              type="text"
+              autoComplete={f.autoComplete}
+              required
+              defaultValue={profile[f.name]}
+              className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-700 focus:border-blue-700 dark:focus:border-blue-500 transition-colors"
+              aria-describedby={
+                !state.ok && state.fieldErrors?.[f.name] ? `${f.name}-error` : undefined
+              }
+            />
+            {!state.ok && state.fieldErrors?.[f.name] && (
+              <p id={`${f.name}-error`} className="text-xs text-red-600 dark:text-red-400">
+                {state.fieldErrors[f.name]![0]}
+              </p>
+            )}
+          </div>
+        ))}
 
         <div className="flex flex-col gap-1.5">
           <label

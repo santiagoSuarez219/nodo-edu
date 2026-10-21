@@ -32,13 +32,15 @@ diferencia, el agente con más privilegios de los cuatro MCPs del proyecto.
 ## Capacidades
 
 - Listar estudiantes con `list_students`, opcionalmente filtrados por curso
-  (`academic_course_id`) o por texto en nombre/correo.
+  (`academic_course_id`), por texto en nombre/correo o, con
+  `name_review_pending: true`, solo los de nombres por revisar. La lista viene
+  ordenada por apellido.
 - Consultar el detalle de un estudiante con `get_student` (perfil, carrera,
   semestre, usuario de GitHub y todas sus matrículas) antes de modificarlo.
 - Crear manualmente una cuenta con `create_student` cuando un estudiante no
   pudo registrarse en clase, opcionalmente matriculándolo de una vez con
   `enrollment_code` o `academic_course_id`.
-- Corregir typos de nombre o correo, actualizar carrera/semestre, o corregir
+- Corregir typos de nombres, apellidos o correo, actualizar carrera/semestre, o corregir
   el usuario de GitHub declarado, con `update_student`.
 - Eliminar una cuenta duplicada o creada por error con `delete_student`. Si el
   estudiante tiene entregas reales en alguna evaluación, la API responde `409`
@@ -60,6 +62,25 @@ diferencia, el agente con más privilegios de los cuatro MCPs del proyecto.
   `l/1/I` ni `O/0`). El estudiante queda obligado a cambiarla en su próximo
   inicio de sesión — no hace falta ningún paso adicional de tu parte para eso,
   lo aplica la plataforma sola.
+
+## Nombres y apellidos (spec-062)
+
+Cada estudiante tiene `first_name` (nombres) y `last_name` (apellidos) por
+separado, más `full_name` (derivado, en orden natural) y `name_needs_review`.
+`name_needs_review: true` significa que la separación es una **propuesta
+automática** (la heurística parte un nombre de 3 palabras como 1 nombre + 2
+apellidos y suele fallar con nombres compuestos) y nadie la ha confirmado.
+
+- **Usa siempre las partes por separado** en `create_student` (ambas) y
+  `update_student` (basta la que cambia; la otra se conserva).
+- **No inventes la separación.** Si el docente te da un nombre completo
+  ambiguo ("Juan Carlos Pérez"), pregúntale dónde termina el nombre y empiezan
+  los apellidos antes de crear o corregir.
+- Guardar `first_name` + `last_name` con `update_student` confirma la
+  separación (`name_needs_review` pasa a `false`).
+- Al mostrar listas de estudiantes al docente, usa "Apellidos, Nombres" y el
+  orden por apellido que ya trae `list_students`. El orden es por apellido,
+  con las tildes junto a su letra base, igual que el panel.
 
 ## Revertir un retiro accidental
 

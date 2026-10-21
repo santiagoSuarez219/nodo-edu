@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { GradeInputCell } from "./GradeInputCell";
 import { SelfAssessmentGradeCell } from "./SelfAssessmentGradeCell";
+import { formatStudentListName } from "@/lib/students/names";
 import type { GradeItem, CourseGradesRow } from "@/lib/grades/types";
 
 interface Props {
@@ -83,7 +84,11 @@ export function GradesTable({ academicCourseId, gradeItems, rows }: Props) {
               return (
                 <tr key={row.enrollment_id}>
                   <td className="px-5 py-3 font-medium text-gray-900 dark:text-white sticky left-0 bg-white dark:bg-gray-800">
-                    {row.student_name}
+                    {formatStudentListName({
+                      first_name: row.student_first_name,
+                      last_name: row.student_last_name,
+                      full_name: row.student_name,
+                    })}
                   </td>
                   {gradeItems.map((item) => (
                     <td key={item.id} className="px-4 py-2">
