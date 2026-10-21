@@ -314,7 +314,7 @@ No aplica — semana sin ★.
 ## Ronda 4 — `estructuras-de-datos`, lista doblemente enlazada y circular (2026-10-21)
 
 **Rama:** `feat/semana-10-estructuras-de-datos` (nueva, desde `development`, `a76a86b`)
-**Estado:** ✅ Contenido listo · ⬜ `@reviewer` · ⬜ Mergeada a `development` · ⬜ Desplegada en producción
+**Estado:** ✅ Contenido listo · ✅ `@reviewer` (aprobado; menores 3 y 4 corregidos en `63dd631`) · ✅ Mergeada a `development` (2026-10-21, `9f0e190`; rama borrada) · ✅ Desplegada en producción (2026-10-21, `5abc766`) · ✅ Abierta a estudiantes
 
 **Alcance confirmado por el usuario:** solo la lección «Lista doblemente enlazada y lista circular» (`order: 20`) del módulo diferido de listas (T del mar. 6 oct según el cronograma; **se dicta el 21 oct**, sin laboratorio). Excluidas: ordenamiento sobre listas (`order: 21`), síntesis del módulo (`order: 22`) y el laboratorio combinado del 8 oct.
 
@@ -349,7 +349,7 @@ No aplica — semana sin ★.
 | Lección | Entorno | IDs de preguntas | Publicadas | Montadas (`list_lesson_questions`) |
 |---|---|---|---|---|
 | `lista-doblemente-enlazada-y-lista-circular` | desarrollo | `d9a555b2-6894-4c86-977c-c8c76992164e`, `918f1be0-a611-412a-99de-e7873363ee3c`, `5217dd4c-a87f-4fe8-83b8-b3d1b2e32182`, `989bf4f4-e6ab-47be-b6eb-541b929e9046`, `f8993174-a539-409b-87ff-7361be8507fb`, `78b76d2c-b6d6-469c-813b-75ff58c0581e` | ✅ | ✅ (orden 0-5, dificultades 1, 2, 2, 3, 3, 4) |
-| `lista-doblemente-enlazada-y-lista-circular` | **producción** | — | ⬜ | ⬜ |
+| `lista-doblemente-enlazada-y-lista-circular` | **producción** | `22a414e0-aadb-4b2f-9bb0-081869a5761e`, `58e9c133-f47d-40db-8865-7c0adf0403a2`, `4401929a-f8d9-4329-b759-46bc73e6a350`, `2409f9d3-225b-4c70-8b3f-a0ebfb79600f`, `9ca23b9e-e238-413f-9df3-ef7fe5464f99`, `a1958490-f95b-4c4f-8372-1f0f863b3fd4` | ✅ | ✅ (orden 0-5, verificado con `list_lesson_questions`) |
 
 > Las preguntas **no viajan con el deploy**: se recrean en producción en D3.
 > No se crearon keywords nuevas: todas las preguntas usan `listas-enlazadas`, `nodos`, `complejidad`, `estructuras-de-datos`, `java` y `cierre`, que ya existen en desarrollo (verificar en producción antes de D3).
@@ -378,11 +378,23 @@ No aplica — semana sin ★.
 - [x] Código de los apuntes compilado y ejecutado con Java 17 (el curso usa 21; nada es específico de 21); la salida impresa coincide con la documentada
 - [x] Coherencia cruzada teoría ↔ apuntes ↔ cuestionario: revisada por mí; la votación de los apuntes no repite ninguna pregunta
 - [ ] Diagramas Mermaid renderizados: **no verificado** (no se abrió el navegador)
-- [ ] `@reviewer`: pendiente
+- [x] `@reviewer`: **APROBADO** (sin bloqueantes ni mayores). Cuatro menores: (1) faltan «Dónde se rompe la analogía» y la aplicación al proyecto, eliminadas por el usuario, desviación aceptada; (2) práctica externa sin verificar, sigue pendiente; (3) flechas con `null` de ida y vuelta en el primer diagrama, corregidas; (4) fragmentos de código de los apuntes sin ubicación clara dentro de `ListaDoble<T>`, aclarado con comentarios.
 
 ### Despliegue
 
-Pendiente. El slug `lista-doblemente-enlazada-y-lista-circular` ya existe en producción como stub (verificar con `list_course_lessons` si está cerrado). Recrear las 6 preguntas (D3) y decidir la apertura (D4). La sesión se dicta el 21 oct: la lección y su cuestionario deberían estar abiertos antes de la clase.
+| Paso | Estado | Fecha / detalle |
+|---|---|---|
+| D0 · Alcance y checklist pre-despliegue | ✅ | Sin cambios en `supabase/`; despliegue solo de código; 6 keywords ya existían en producción |
+| D1 · Lecciones nuevas cerradas por adelantado | ✅ No necesario | El slug ya existía cerrado desde 2026-08-03 |
+| D2 · Merge a `main` y deploy en Vercel | ✅ | 2026-10-21, `5abc766` (rama `deploy/semana-10`); build `READY`; viajaron también los commits de spec-062 |
+| D3 · Banco de preguntas replicado a producción | ✅ | 6 preguntas creadas, publicadas y montadas; sin keywords nuevas |
+| D4 · Lecciones abiertas a los estudiantes | ✅ | `estructuras-de-datos` → `lista-doblemente-enlazada-y-lista-circular` |
+| D5 · Verificación end-to-end en producción | ⬜ | Solo se verificó por API (catálogo y preguntas); sin revisar la página ni los diagramas Mermaid en el navegador |
+| D6 · Bitácora cerrada y rama `deploy/` borrada | ✅ | Rama local borrada; nunca se subió al remoto |
+
+- [x] Verificado que las lecciones de semanas futuras siguen **cerradas** (`estrategias-de-ordenamiento-sobre-listas-enlazadas`, `sintesis-del-modulo-de-listas`, `fundamentos-de-archivos`, `lectura-escritura-y-modificacion` y las de recursividad y árboles)
+
+La lección y su cuestionario se abrieron antes de la clase del 21 oct.
 
 ### Pendientes
 
