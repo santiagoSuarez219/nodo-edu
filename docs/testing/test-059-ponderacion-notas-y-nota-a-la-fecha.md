@@ -183,7 +183,7 @@ registra 0". La columna "Total" ya no existe.
    ítems 1.00; cortes 0.40; cifras de estudiantes sin cambios.
 2. "Nota 3" vuelve con "objetivo 0.20 · ítems 0.20".
 **Estado:** ✅ Aprobado
-**Hallazgos:** Aprobado por el usuario (2026-10-21). Al eliminar "Nota 3" (el usuario aceptó la confirmación) "Parcial 1" quedó sin corte con peso 0.2; al recrearla, "ítems 0.20" sin aviso.
+**Hallazgos:** Aprobado por el usuario (2026-10-21). Al eliminar "Nota 3" (el usuario aceptó la confirmación) "Parcial 1" quedó sin corte con peso 0.2; al recrearla, "ítems 0.20" sin aviso. Revisión de código (`@reviewer`, 2026-10-21) halló que con índices repetidos subir/bajar un corte no hacía nada (crear usaba `length`; reordenar solo intercambiaba dos valores). Corregido en `4f89f9e` (crear con `max+1`, reordenar renumera todo) y verificado en la UI con el usuario: se crearon A, B, C (0, 1, 2); el usuario borró A; D nació con índice 3 (antes habría repetido el de C); subir D dejó B0, D1, C2 y bajarlo B0, C1, D2.
 
 ### TC-059-11 — Vista del estudiante: cifras, pesos y corte incompleto visible
 **Precondición:** TC-059-10 aprobado.
