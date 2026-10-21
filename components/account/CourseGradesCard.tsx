@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { CourseGradesSummary } from "@/lib/grades/types";
+import { GradeBreakdown } from "./GradeBreakdown";
 import { AssignmentScoreList } from "./AssignmentScoreList";
 import { ErrorState, INFRA_ERROR_COPY } from "@/components/ErrorState";
 
@@ -33,33 +34,11 @@ export function CourseGradesCard({ summary }: Props) {
           El docente aún no ha definido ítems de evaluación.
         </p>
       ) : (
-        <>
-          <div className="divide-y divide-gray-100 dark:divide-gray-700">
-            {summary.items.map((item) => (
-              <div key={item.id} className="flex items-center justify-between py-2.5 gap-4">
-                <span className="text-sm text-gray-700 dark:text-gray-300">{item.name}</span>
-                <span className="font-mono text-sm font-semibold text-gray-900 dark:text-white shrink-0">
-                  {item.score !== null ? item.score.toFixed(2) : "—"}
-                </span>
-              </div>
-            ))}
-          </div>
-
-          <div className="flex items-center justify-between pt-3 mt-1 border-t border-gray-200 dark:border-gray-700">
-            <span className="text-sm font-semibold text-gray-900 dark:text-white">Nota total</span>
-            <span
-              className={`font-mono text-xl font-bold ${
-                summary.total_grade !== null
-                  ? summary.total_grade >= 3
-                    ? "text-green-700 dark:text-green-400"
-                    : "text-red-600 dark:text-red-400"
-                  : "text-gray-400 dark:text-gray-500"
-              }`}
-            >
-              {summary.total_grade !== null ? summary.total_grade.toFixed(2) : "—"}
-            </span>
-          </div>
-        </>
+        <GradeBreakdown
+          items={summary.items}
+          groups={summary.groups}
+          summary={summary.grade_summary}
+        />
       )}
 
       {summary.self_assessment && summary.self_assessment.lessons.length > 0 && (
