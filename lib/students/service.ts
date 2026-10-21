@@ -10,6 +10,7 @@ import type {
   DeleteStudentResult,
   ResetStudentPasswordResult,
 } from "./types";
+import { compareStudentsBySurname } from "./names";
 
 // spec-027 (hallazgo de la ronda de pruebas manuales, TC-027-003): el trigger
 // on_auth_user_created es un AFTER INSERT — si el correo ya existía en
@@ -29,13 +30,22 @@ import type {
 // fallback existe para corregir.
 export async function ensureStudentAccountBootstrap(
   userId: string,
-  fullName: string
+  name: { first_name: string; last_name: string }
 ): Promise<void> {
   const supabase = createServiceSupabaseClient();
 
+  // spec-062: el trigger sync_profile_names deriva `full_name` de las partes.
   const { error: profileError } = await supabase
     .from("profiles")
-    .upsert({ id: userId, full_name: fullName }, { onConflict: "id", ignoreDuplicates: true });
+    .upsert(
+      {
+        id: userId,
+        first_name: name.first_name,
+        last_name: name.last_name,
+        full_name: `${name.first_name} ${name.last_name}`.trim(),
+      },
+      { onConflict: "id", ignoreDuplicates: true }
+    );
   if (profileError) throw profileError;
 
   const { error: roleError } = await supabase
@@ -55,6 +65,7 @@ export async function ensureStudentAccountBootstrap(
 interface ListStudentsOptions {
   academicCourseId?: string;
   search?: string;
+  nameReviewPending?: boolean;
   limit?: number;
   offset?: number;
 }
@@ -127,10 +138,12 @@ export async function listServiceStudents(
 
   let query = supabase
     .from("profiles")
-    .select("id, full_name, github_username, students!inner(career, semester)")
-    .order("full_name", { ascending: true });
+    .select(
+      "id, full_name, first_name, last_name, name_needs_review, github_username, students!inner(career, semester)"
+    );
 
   if (studentIds) query = query.in("id", studentIds);
+  if (options.nameReviewPending) query = query.eq("name_needs_review", true);
 
   const { data: profiles, error: profilesError } = await query;
   if (profilesError) throw profilesError;
@@ -145,12 +158,19 @@ export async function listServiceStudents(
       return {
         id: p.id as string,
         full_name: p.full_name as string,
+        first_name: p.first_name as string,
+        last_name: p.last_name as string,
+        name_needs_review: p.name_needs_review as boolean,
         career: (studentRow?.career as string | null) ?? null,
         semester: (studentRow?.semester as number | null) ?? null,
         github_username: (p.github_username as string | null) ?? null,
         email: emails.get(p.id as string) ?? "",
       };
-    });
+    })
+    // spec-062 D7: el mismo criterio que las listas de la UI. Se ordena en
+    // memoria (la paginación de abajo ya lo es) en lugar de depender de la
+    // colación de la base.
+    .sort(compareStudentsBySurname);
 
   const search = options.search?.trim().toLowerCase();
   const filtered = search
@@ -176,7 +196,9 @@ export async function getServiceStudentById(
   // se exige el rol 'student' explícito vía fetchStudentRoleIds.
   const { data: profile } = await supabase
     .from("profiles")
-    .select("id, full_name, github_username, students!inner(career, semester)")
+    .select(
+      "id, full_name, first_name, last_name, name_needs_review, github_username, students!inner(career, semester)"
+    )
     .eq("id", studentId)
     .maybeSingle();
 
@@ -194,6 +216,9 @@ export async function getServiceStudentById(
   return {
     id: profile.id as string,
     full_name: profile.full_name as string,
+    first_name: profile.first_name as string,
+    last_name: profile.last_name as string,
+    name_needs_review: profile.name_needs_review as boolean,
     career: (studentRow?.career as string | null) ?? null,
     semester: (studentRow?.semester as number | null) ?? null,
     github_username: (profile.github_username as string | null) ?? null,
@@ -241,7 +266,16 @@ export async function createServiceStudent(
     email: input.email,
     password: input.password,
     email_confirm: true,
-    user_metadata: { full_name: input.full_name },
+    user_metadata:
+      input.first_name !== undefined && input.last_name !== undefined
+        ? {
+            first_name: input.first_name,
+            last_name: input.last_name,
+            full_name: `${input.first_name} ${input.last_name}`,
+          }
+        : // Sin partes, handle_new_user + sync_profile_names proponen la
+          // separación y marcan "por revisar" (spec-062 D2/D10).
+          { full_name: input.full_name },
   });
 
   if (error || !created.user) {
@@ -321,11 +355,18 @@ export async function updateServiceStudent(
     if (error) throw error;
   }
 
-  if (input.full_name !== undefined || input.github_username !== undefined) {
+  const namePatch =
+    input.first_name !== undefined && input.last_name !== undefined
+      ? { first_name: input.first_name, last_name: input.last_name, name_needs_review: false }
+      : input.full_name !== undefined
+        ? { full_name: input.full_name }
+        : {};
+
+  if (Object.keys(namePatch).length > 0 || input.github_username !== undefined) {
     const { error } = await supabase
       .from("profiles")
       .update({
-        ...(input.full_name !== undefined && { full_name: input.full_name }),
+        ...namePatch,
         ...(input.github_username !== undefined && {
           github_username: input.github_username,
         }),
