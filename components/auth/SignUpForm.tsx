@@ -9,12 +9,20 @@ const initial: AuthResult = { ok: true };
 
 const fields = [
   {
-    id: "full_name",
-    name: "full_name",
-    label: "Nombre completo",
+    id: "first_name",
+    name: "first_name",
+    label: "Nombres",
     type: "text",
-    autoComplete: "name",
-    placeholder: "Tu nombre",
+    autoComplete: "given-name",
+    placeholder: "Tus nombres",
+  },
+  {
+    id: "last_name",
+    name: "last_name",
+    label: "Apellidos",
+    type: "text",
+    autoComplete: "family-name",
+    placeholder: "Tus apellidos",
   },
   {
     id: "email",

@@ -127,9 +127,9 @@ const COURSES = [
 // contraseñas distintas solo entorpece las rondas de pruebas manuales.
 const STUDENT_PASSWORD = 'DevStudent2026!';
 const STUDENTS = [
-  { email: 'dev-estudiante1@nodo.local', full_name: 'Estudiante Dev Uno', courses: ['estructuras-de-datos', 'analisis-de-algoritmos'] },
-  { email: 'dev-estudiante2@nodo.local', full_name: 'Estudiante Dev Dos', courses: ['estructuras-de-datos'] },
-  { email: 'dev-estudiante3@nodo.local', full_name: 'Estudiante Dev Tres', courses: ['programacion-cientifica'] },
+  { email: 'dev-estudiante1@nodo.local', first_name: 'Estudiante Dev', last_name: 'Uno', courses: ['estructuras-de-datos', 'analisis-de-algoritmos'] },
+  { email: 'dev-estudiante2@nodo.local', first_name: 'Estudiante Dev', last_name: 'Dos', courses: ['estructuras-de-datos'] },
+  { email: 'dev-estudiante3@nodo.local', first_name: 'Estudiante Dev', last_name: 'Tres', courses: ['programacion-cientifica'] },
 ];
 
 async function findUserByEmail(email) {
@@ -191,7 +191,11 @@ async function ensureStudent(student) {
     email: student.email,
     password: STUDENT_PASSWORD,
     email_confirm: true,
-    user_metadata: { full_name: student.full_name },
+    user_metadata: {
+      first_name: student.first_name,
+      last_name: student.last_name,
+      full_name: `${student.first_name} ${student.last_name}`,
+    },
   });
   if (error) throw new Error(`creando ${student.email}: ${error.message}`);
 

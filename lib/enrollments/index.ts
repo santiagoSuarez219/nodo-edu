@@ -3,6 +3,8 @@ import { createServerSupabaseClient } from "@/lib/auth/server";
 import { createServiceSupabaseClient } from "@/lib/auth/service";
 import { getCurrentUser } from "@/lib/auth/session";
 import type { AcademicCoursePublic } from "@/lib/academic-courses/types";
+import { compareStudentsBySurname } from "@/lib/students/names";
+import type { StudentProfilePublic } from "@/lib/students/types";
 import type { Enrollment, EnrollmentWithCourse, EnrollmentWithStudent } from "./types";
 
 export { hasCourseAccess, requireCourseAccess } from "./access";
@@ -42,16 +44,16 @@ async function fetchAcademicCoursesPublic(
 // se resuelve como inner join implícito y descarta la matrícula completa
 // cuando el perfil no puede leerse. RPC security definer, sin email.
 export async function fetchStudentProfilesPublic(
-  supabase: Awaited<ReturnType<typeof createServerSupabaseClient>>,
+  supabase: SupabaseClient,
   studentIds: string[]
-): Promise<Map<string, { id: string; full_name: string }>> {
+): Promise<Map<string, StudentProfilePublic>> {
   if (studentIds.length === 0) return new Map();
 
   const { data } = await supabase.rpc("get_student_profiles_public", {
     p_ids: studentIds,
   });
 
-  return new Map((data ?? []).map((p: { id: string; full_name: string }) => [p.id, p]));
+  return new Map((data ?? []).map((p: StudentProfilePublic) => [p.id, p]));
 }
 
 async function resolveCourseByEnrollmentCode(
@@ -214,7 +216,7 @@ export async function getEnrollmentsByAcademicCourse(
   const studentIds = [...new Set(data.map((r) => r.student_id as string))];
   const profiles = await fetchStudentProfilesPublic(supabase, studentIds);
 
-  return data.map((row) => {
+  const rows = data.map((row) => {
     const scores = (row.student_grades as { score: number | null }[]).map(
       (g) => g.score
     );
@@ -225,10 +227,19 @@ export async function getEnrollmentsByAcademicCourse(
       status: row.status,
       enrolled_at: row.enrolled_at,
       withdrawn_at: row.withdrawn_at,
-      profile: profiles.get(row.student_id) ?? { id: row.student_id, full_name: "Estudiante" },
+      profile: profiles.get(row.student_id) ?? {
+        id: row.student_id,
+        full_name: "Estudiante",
+        first_name: "",
+        last_name: "",
+        name_needs_review: false,
+      },
       total_grade: computeTotalGrade(scores),
     } as EnrollmentWithStudent;
   });
+
+  // spec-062 D7/D8: por apellido, no por fecha de matrícula.
+  return rows.sort((a, b) => compareStudentsBySurname(a.profile, b.profile));
 }
 
 export async function withdrawStudent(

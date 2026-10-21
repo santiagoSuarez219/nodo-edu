@@ -3108,3 +3108,8 @@ Una vez configurado, ejecutar y aprobar TC-011, TC-012 y TC-014 en
 `docs/testing/test-002-student-auth-supabase.md`.
 
 ---
+
+## DEBT-NEW (spec-062) — La página de resolución de evaluación no valida que la matrícula sea del curso del grupo
+Detectado en `test-062` (TC-062-08): abrir `/cuenta/cursos/<enrollmentId>/evaluaciones/<groupId>` con la
+matrícula de OTRO curso inicia un intento y una asignación de variante bajo esa matrícula. Fuera del alcance
+de spec-062; asignar número DEBT al triarlo.

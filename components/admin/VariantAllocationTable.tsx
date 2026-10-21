@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getVariantAllocationsAction } from "@/lib/assignments/actions";
+import { compareStudentsBySurname, formatStudentListName } from "@/lib/students/names";
 
 interface AllocationRecord {
   enrollment_id: string;
@@ -9,6 +10,8 @@ interface AllocationRecord {
   variant_label: string;
   allocated_at: string;
   student_name?: string;
+  student_first_name?: string;
+  student_last_name?: string;
 }
 
 interface VariantAllocationTableProps {
@@ -79,11 +82,13 @@ export default function VariantAllocationTable({ groupId }: VariantAllocationTab
     {} as Record<string, number>
   );
 
-  const sortedAllocations = [...allocations].sort((a, b) => {
-    const dateA = new Date(a.allocated_at).getTime();
-    const dateB = new Date(b.allocated_at).getTime();
-    return dateB - dateA;
-  });
+  // spec-062 D8: por apellido, no por fecha de asignación.
+  const sortedAllocations = [...allocations].sort((a, b) =>
+    compareStudentsBySurname(
+      { first_name: a.student_first_name, last_name: a.student_last_name, full_name: a.student_name },
+      { first_name: b.student_first_name, last_name: b.student_last_name, full_name: b.student_name }
+    )
+  );
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
@@ -129,7 +134,11 @@ export default function VariantAllocationTable({ groupId }: VariantAllocationTab
             {sortedAllocations.map((allocation) => (
               <tr key={allocation.enrollment_id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                 <td className="px-6 py-4 text-sm text-gray-900 dark:text-white">
-                  {allocation.student_name || "Desconocido"}
+                  {formatStudentListName({
+                    first_name: allocation.student_first_name,
+                    last_name: allocation.student_last_name,
+                    full_name: allocation.student_name,
+                  }) || "Desconocido"}
                 </td>
                 <td className="px-6 py-4">
                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300">

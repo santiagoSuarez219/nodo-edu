@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { sanitizeGithubUsername } from "@/lib/students/github";
+import { NamePartSchema } from "@/lib/students/schemas";
 
 export const SignInSchema = z.object({
   email: z.string().email("Ingresa un correo válido"),
@@ -8,7 +9,8 @@ export const SignInSchema = z.object({
 
 export const SignUpSchema = z
   .object({
-    full_name: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
+    first_name: NamePartSchema,
+    last_name: NamePartSchema,
     email: z.string().email("Ingresa un correo válido"),
     password: z.string().min(8, "La contraseña debe tener al menos 8 caracteres"),
     password_confirmation: z.string().min(1, "Confirma tu contraseña"),
@@ -43,7 +45,8 @@ export const ChangePasswordSchema = z
   });
 
 export const UpdateProfileSchema = z.object({
-  full_name: z.string().min(2, "El nombre debe tener al menos 2 caracteres"),
+  first_name: NamePartSchema,
+  last_name: NamePartSchema,
   career: z.string().optional(),
   semester: z.coerce
     .number()

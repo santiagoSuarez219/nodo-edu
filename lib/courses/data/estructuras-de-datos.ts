@@ -298,6 +298,8 @@ export const estructurasDeDatos: Course = {
       articleSlug: "lista-doblemente-enlazada-y-lista-circular",
       order: 20,
       title: "Lista doblemente enlazada y lista circular",
+      summary:
+        "Cómo un nodo que conoce a su vecino de ambos lados permite recorrer una lista hacia atrás y eliminar sin volver a empezar, y qué cambia cuando el último nodo vuelve a enlazar con el primero.",
       topics: [
         { title: "Nodo doble: referencia prev y next" },
         { title: "Recorrido inverso como ventaja de la lista doble" },

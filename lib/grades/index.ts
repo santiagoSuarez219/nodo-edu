@@ -1,5 +1,6 @@
 import { createServerSupabaseClient } from "@/lib/auth/server";
 import { fetchStudentProfilesPublic } from "@/lib/enrollments/index";
+import { compareStudentsBySurname } from "@/lib/students/names";
 import type {
   GradeItem,
   StudentGrade,
@@ -163,7 +164,7 @@ export async function getGradesByCourse(
   const studentIds = [...new Set(enrollments.map((r) => r.student_id as string))];
   const profiles = await fetchStudentProfilesPublic(supabase, studentIds);
 
-  return enrollments.map((row) => {
+  const rows = enrollments.map((row) => {
     const gradeMap: Record<string, number | null> = {};
     for (const item of gradeItems as GradeItem[]) {
       gradeMap[item.id] = null;
@@ -179,12 +180,22 @@ export async function getGradesByCourse(
       enrollment_id: row.id,
       student_id: row.student_id,
       student_name: profile?.full_name ?? "",
+      student_first_name: profile?.first_name ?? "",
+      student_last_name: profile?.last_name ?? "",
       student_email: "",
       enrollment_status: row.status as "active" | "withdrawn",
       grades: gradeMap,
       total_grade: computeTotalGrade(scores),
     };
   });
+
+  // spec-062 D7/D8: por apellido, no por fecha de matrícula.
+  return rows.sort((a, b) =>
+    compareStudentsBySurname(
+      { first_name: a.student_first_name, last_name: a.student_last_name, full_name: a.student_name },
+      { first_name: b.student_first_name, last_name: b.student_last_name, full_name: b.student_name }
+    )
+  );
 }
 
 export async function upsertStudentGrade(
