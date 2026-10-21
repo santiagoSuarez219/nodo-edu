@@ -41,7 +41,7 @@ export const getCurrentUser = cache(async () => {
   return auth.status === "authenticated" ? auth.user : null;
 });
 
-// spec-054: consulta a `profiles` compartida por `getCurrentProfile()` (firma
+// spec-061: consulta a `profiles` compartida por `getCurrentProfile()` (firma
 // histórica, `Profile | null`, 16 call sites) y `getAuthDegradedReason()`
 // (necesita saber si la consulta *falló*, no solo si vino vacía). `cache()`
 // de React dedup: aunque ambas la llamen, solo hace una petición de red.
@@ -70,7 +70,7 @@ const getProfileResult = cache(
   }
 );
 
-// spec-054 (D-F): para que el root layout pueda mostrar un aviso discreto en
+// spec-061 (D-F): para que el root layout pueda mostrar un aviso discreto en
 // vez de dejar que una sesión válida parezca cerrada. `getCurrentUser()`
 // colapsa `unavailable` en `null` (DEBT-040, gap deliberado y documentado
 // arriba) — sin esta función, el layout no tiene forma de distinguir "eres
@@ -78,9 +78,9 @@ const getProfileResult = cache(
 // que es exactamente la mentira que spec-046 cerró un nivel más arriba
 // (DEBT-042). Devuelve el motivo solo cuando es transitorio: si llegó hasta
 // aquí con `misconfigured`/`unknown`, la ruta ya habría recibido el 503 total
-// del middleware (spec-054, DEBT-069) y este código nunca se ejecutaría.
+// del middleware (spec-061, DEBT-069) y este código nunca se ejecutaría.
 //
-// TC-054-009 (ronda de pruebas, 2026-08-29): el chequeo original solo miraba
+// TC-061-009 (ronda de pruebas, 2026-08-29): el chequeo original solo miraba
 // `auth.status === "unavailable"` — cubre "no pudimos verificar tu sesión",
 // pero no el caso, igual de real, en que Auth respondió bien (sesión válida)
 // y fue la consulta a `profiles` la que abortó por el timeout de datos

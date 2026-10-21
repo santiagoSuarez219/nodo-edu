@@ -34,7 +34,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // spec-054 (D-F, y hallazgo de TC-054-005): las tres llamadas comparten
+  // spec-061 (D-F, y hallazgo de TC-061-005): las tres llamadas comparten
   // `getAuthCheck()` (cache()-ada, se resuelve una sola vez), pero cada una
   // hace su propia consulta adicional a Postgres (`profiles`, `user_roles`)
   // — independientes entre sí. Antes iban en serie: con el timeout de datos

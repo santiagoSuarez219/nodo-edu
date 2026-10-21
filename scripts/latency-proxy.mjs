@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// spec-054, Fase 0 — proxy de reenvío que inyecta latencia hacia la instancia
+// spec-061, Fase 0 — proxy de reenvío que inyecta latencia hacia la instancia
 // Supabase de mirp-lab, para reproducir a voluntad la causa raíz del incidente
 // del 2026-08-27→29: el gateway de Supabase respondiendo minutos tarde
 // mientras GoTrue/Postgres, ya dentro del proyecto, seguían en milisegundos.
@@ -12,7 +12,7 @@
 //   node scripts/latency-proxy.mjs --port=54331 --target=http://localhost:54321 \
 //     [--delay=<ms>] [--hang] [--path=<regex>] [--fail-rate=<0..1>]
 //
-// Procedimiento completo (ver docs/testing/test-054-*.md):
+// Procedimiento completo (ver docs/testing/test-061-*.md):
 //   1. Túnel SSH a mirp-lab activo (ver CLAUDE.md → "Base de datos").
 //   2. Levantar este proxy con el escenario deseado.
 //   3. En .env.local, apuntar NEXT_PUBLIC_SUPABASE_URL a http://localhost:<port>.
@@ -20,14 +20,14 @@
 //   5. Al terminar: restaurar NEXT_PUBLIC_SUPABASE_URL a http://localhost:54321
 //      y reiniciar `npm run dev` de nuevo.
 //
-// Ejemplos de escenarios (los mismos que test-054 usa por caso):
-//   Sesión caducada con /token lento (TC-054-001):
+// Ejemplos de escenarios (los mismos que test-061 usa por caso):
+//   Sesión caducada con /token lento (TC-061-001):
 //     --path='^/auth/v1/token' --delay=8000
-//   Auth colgado por completo (TC-054-002):
+//   Auth colgado por completo (TC-061-002):
 //     --path='^/auth/v1' --hang
-//   Health lento, resto sano — la asimetría real del incidente (TC-054-004):
+//   Health lento, resto sano — la asimetría real del incidente (TC-061-004):
 //     --path='^/auth/v1/health' --delay=20000
-//   Datos colgados, Auth sano (TC-054-005/006):
+//   Datos colgados, Auth sano (TC-061-005/006):
 //     --path='^/rest/v1' --hang
 //   Intermitencia (patrón 503/200 alternado):
 //     --path='^/auth/v1' --delay=3000 --fail-rate=0.5
@@ -55,7 +55,7 @@ function parseArgs(argv) {
 const args = parseArgs(process.argv.slice(2));
 
 function shouldInject(path) {
-  // Sin --path, el retardo aplica a todo — útil para --hang total (TC-054-002).
+  // Sin --path, el retardo aplica a todo — útil para --hang total (TC-061-002).
   // Con --path, solo a las rutas que casen — indispensable para reproducir la
   // asimetría real: /auth/v1/token lento mientras /auth/v1/health respondía
   // sano (ver Hallazgo 1 del spec).

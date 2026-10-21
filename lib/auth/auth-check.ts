@@ -10,7 +10,7 @@ import type { User } from "@supabase/supabase-js";
 // ya existía con `AuthResult` (resultado de server actions), un tipo
 // homónimo pero no relacionado — mezclar ambos en el mismo módulo habría
 // confundido dos dominios distintos.
-// spec-054 (D-B): "timeout" es un motivo aparte de "network" — no es que la
+// spec-061 (D-B): "timeout" es un motivo aparte de "network" — no es que la
 // petición fallara, es que el presupuesto de tiempo del *gate* se agotó
 // mientras Supabase seguía intentando responder (posiblemente atrapado en el
 // bucle de reintentos interno de @supabase/auth-js, ver

@@ -213,7 +213,7 @@ evaluaciones.
 
 **Fallo:** ante `unavailable`, la tarjeta se muestra en versión **genérica, sin
 conteo**. Mismo razonamiento que el comentario de spec-039 en esa página ("esta
-pantalla es de lectura, no el gate real") y que spec-054: la excepción es de
+pantalla es de lectura, no el gate real") y que spec-061: la excepción es de
 **navegación**, no de **autorización**. Los controles reales siguen en las
 rutas y en la RLS.
 

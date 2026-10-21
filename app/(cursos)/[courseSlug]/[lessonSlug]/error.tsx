@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import * as Sentry from "@sentry/nextjs";
 import { ErrorState, INFRA_ERROR_COPY, isInfraError } from "@/components/ErrorState";
 
-// spec-054 (D-D): un timeout de red (lib/auth/fetch-timeout.ts) llega aquí
+// spec-061 (D-D): un timeout de red (lib/auth/fetch-timeout.ts) llega aquí
 // como un `AbortError`/`TimeoutError` — de la propia señal, o envuelto por
 // @supabase/auth-js en `AuthRetryableFetchError` (mensaje incluye "aborted
 // due to timeout", verificado en node_modules/@supabase/auth-js/dist/module/lib/fetch.js)
