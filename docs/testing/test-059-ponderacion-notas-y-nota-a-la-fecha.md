@@ -227,8 +227,8 @@ registra 0". La columna "Total" ya no existe.
 **Resultado esperado:** "DEV — Análisis de Algoritmos" en "Cursos retirados"
 con Acumulado **2.00** y Promedio **4.00**, sin desglose. Estructuras de
 Datos sigue en "Cursos activos" sin cambios.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** Confirmado por el usuario (2026-10-21) en el puerto 3003: "DEV — Análisis de Algoritmos" en "Cursos retirados" con el acumulado visible (4.00 de promedio). Nota: en el puerto 3002 (código de `main`) solo aparece 4.00 sin acumulado, como se espera del código anterior al spec.
 
 ### TC-059-14 — Panel de matrícula del docente
 **Precondición:** TC-059-07 aprobado.
