@@ -524,7 +524,7 @@ grant execute on function public.get_student_profiles_public(uuid[]) to authenti
 
 ### Fase 1 — Esquema
 - [x] Crear las tres migraciones del "DDL propuesto".
-- [x] **Antes de producción**, correr la heurística en modo lectura sobre los
+- [ ] **Antes de producción**, correr la heurística en modo lectura sobre los
       perfiles reales (`select p.full_name, s.* from profiles p,
       propose_name_split(p.full_name) s`, tras crear solo la función en una
       sesión de prueba o con una copia local) y mostrar la muestra al usuario.
@@ -577,7 +577,7 @@ grant execute on function public.get_student_profiles_public(uuid[]) to authenti
 - [ ] `git diff --stat origin/main..HEAD -- supabase/` lista solo las tres
       migraciones de este spec.
 - [ ] `supabase db push --linked --dry-run` (**obligatorio**), mostrar la
-      salida y aplicar solo si lista exactamente esas tres.
+      salida y aplicar solo si lista exactamente esas cuatro.
 - [ ] Verificar por REST que existe `profiles.first_name` (`42703` = no
       aplicada).
 - [ ] Registrar una cuenta de prueba en producción solo con confirmación
@@ -650,7 +650,15 @@ grant execute on function public.get_student_profiles_public(uuid[]) to authenti
 - La lista de asignación de variantes ordena por apellido (antes por fecha de
   asignación).
 - Fase 1, muestra sobre perfiles reales de producción: no se ejecutó (requiere leer
-  producción). Hacerla en la Fase 7 antes del `db push`.
+  producción). Es **requisito de la Fase 7**, antes del `db push`. En el despliegue,
+  `db push --linked` va **antes** del push a `main`.
+- **Apellido vacío (decisión de diseño):** `last_name` exige 2–60 caracteres en la edición,
+  `/cuenta` y el registro; un estudiante de una sola palabra queda "por revisar" hasta que
+  el docente o el estudiante complete el apellido (`TC-062-02` paso 5 lo espera así).
+  Si se quisiera permitir vacío, sería un cambio de scope a aprobar.
+- **Pruebas parciales:** `TC-062-03` (registro real, requiere desactivar "Confirm email" en
+  `nodo-dev`) y `TC-062-12` (modo claro y móvil) quedan por confirmar por el usuario, igual
+  que la ronda entera, que ejecutó Claude por delegación.
 
 ## Preguntas abiertas para el usuario
 

@@ -23,12 +23,12 @@
 | Recurso | Creación | Identificador | Eliminado |
 |---------|----------|---------------|-----------|
 | Cambio de nombres de Dev Uno a "Ana" / "Álvarez" | UI lista de matriculados (TC-062-02) | `dev-estudiante1@nodo.local` | ✅ (restaurar con `students-mcp update_student` → `first_name: "Estudiante Dev"`, `last_name: "Uno"`) |
-| Cuenta "Test Registro Sesentaydos" | Registro en `/registro` con código `DEVEDD2026` (TC-062-03) | `registro.test062@nodo.local` / {{id}} | ✅ (`students-mcp delete_student`) |
-| Estudiante "Mononimo" (una sola palabra) | `POST /api/students` con `full_name: "Mononimo"` + `enrollment_code: "DEVEDD2026"` (TC-062-11) | `mononimo.test062@nodo.local` / {{id}} | ✅ (`students-mcp delete_student`) |
-| Sesión manual de asistencia en DEVEDD2026, con Dev Uno y Dev Dos presentes | UI planilla de asistencia (TC-062-06) | {{session_id}} | ❌ permanente (dato de prueba; si no hay eliminación por UI, anotarlo como permanente) |
-| Evaluación publicada con envíos de Dev Uno y Dev Dos en DEVEDD2026 | `assignment-mcp create_assignment_group` + `publish_assignment_group`; envíos desde la UI del estudiante (TC-062-08, -09) | {{group_id}} | ❌ permanente (`delete_assignment_group` responde 409 con envíos: anotarlo como permanente, igual que en test-056) |
-| Retiro de Dev Uno de DEVADA2026 | `students-mcp unenroll_student` (TC-062-10) | {{enrollment_id}} | ✅ (revertir con `enroll_student`) |
-| Estudiante "Mcp Prueba Sesentaydos" | `students-mcp create_student` (TC-MCP-062-01) | `mcp.test062@nodo.local` / {{id}} | ✅ (`students-mcp delete_student`) |
+| Cuenta "Test Registro Sesentaydos" | `POST /api/students` con partes (el registro por UI no fue posible, ver TC-062-03) | `registro.test062@nodo.local` / `db0c818b-1a95-443f-a7f2-43e9c1e1b07b` | ✅ (`students-mcp delete_student`) |
+| Estudiante "Mononimo" (una sola palabra) | `POST /api/students` con `full_name: "Mononimo"` + `enrollment_code: "DEVEDD2026"` (TC-062-11) | `mononimo.test062@nodo.local` / `5956ee62-0973-44c3-abe3-925414bbece0` | ✅ (`students-mcp delete_student`) |
+| Sesión manual de asistencia en DEVEDD2026, con Dev Uno y Dev Dos presentes | UI planilla de asistencia (TC-062-06) | `c7273ff5-97db-4f41-be02-1015c93176d4` | ❌ permanente (dato de prueba; si no hay eliminación por UI, anotarlo como permanente) |
+| Evaluación publicada con envíos de Dev Uno y Dev Dos en DEVEDD2026 | `assignment-mcp create_assignment_group` + `publish_assignment_group`; envíos desde la UI del estudiante (TC-062-08, -09) | `4e00ed9b-c8b3-4ebc-93ad-d11e7de99449` | ❌ permanente (`delete_assignment_group` responde 409 con envíos: anotarlo como permanente, igual que en test-056) |
+| Retiro de Dev Uno de DEVADA2026 | `students-mcp unenroll_student` (TC-062-10) | `9d945a68-0067-468e-8cfe-98e25bdcc141` | ✅ (revertir con `enroll_student`) |
+| Estudiante "Mcp Prueba Sesentaydos" | `students-mcp create_student` (TC-MCP-062-01) | `mcp.test062@nodo.local` / `004897f8-13cc-411f-bedb-185855e7674d` | ✅ (`students-mcp delete_student`) |
 
 **Limpieza (orden inverso):** borrar los estudiantes temporales → reactivar a
 Dev Uno en DEVADA2026 → restaurar los nombres de Dev Uno → anotar los datos
@@ -249,5 +249,5 @@ y `marked_at`, en orden de llegada (D11), no por apellido.
 
 ## Resumen de la ronda
 - Aprobados: 16 — Fallidos: 0 — Parciales: 2 (TC-062-03, TC-062-12) — Pendientes: 0
-- Hallazgos escalados a `docs/specs/backlog.md`: {{lista o "ninguno"}}
+- Hallazgos escalados a `docs/specs/backlog.md`: ninguno nuevo (la matrícula cruzada de TC-062-08 se anota abajo)
 - Limpieza de datos de prueba: ⚠️ Casi completa. Eliminados: estudiantes registro/mcp/mononimo; Ana reactivada en DEVADA y con sus nombres restaurados; Dev Dos con nombres confirmados. **Permanentes:** evaluación "Quiz test-062" (`4e00ed9b-c8b3-4ebc-93ad-d11e7de99449`, 409 con envíos), sesión de asistencia manual del 19/10 en DEVEDD2026 y el ítem de calificación "Parcial test-062" (el navegador se bloqueó con un diálogo de confirmación al eliminarlo: borrarlo desde la UI).

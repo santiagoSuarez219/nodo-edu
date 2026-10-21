@@ -79,9 +79,8 @@ apellidos y suele fallar con nombres compuestos) y nadie la ha confirmado.
 - Guardar `first_name` + `last_name` con `update_student` confirma la
   separación (`name_needs_review` pasa a `false`).
 - Al mostrar listas de estudiantes al docente, usa "Apellidos, Nombres" y el
-  orden por apellido que ya trae `list_students`. La colación del orden la
-  decide la base de datos y puede diferir de la del panel con tildes; no lo
-  presentes como un orden alfabético exacto.
+  orden por apellido que ya trae `list_students`. El orden es por apellido,
+  con las tildes junto a su letra base, igual que el panel.
 
 ## Revertir un retiro accidental
 
