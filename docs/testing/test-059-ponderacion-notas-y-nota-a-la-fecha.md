@@ -118,8 +118,8 @@ superaría 1.00 — disponible 0.40"; nada cambia.
 1. "Nota 1" muestra el aviso "los ítems suman 0.10 de 0.20" (advertencia, no error).
 2. "Nota 1" sin aviso; "Nota 3" muestra "los ítems suman 0.60 de 0.20".
 3. Sin avisos. En ningún paso se bloquea el guardado.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** Aprobado por el usuario (2026-10-21). Avisos de desajuste correctos en los tres pasos; el guardado nunca se bloquea. Se corrigió además un error viejo que no se limpiaba tras un guardado correcto.
 
 ### TC-059-07 — Acumulado y promedio en la planilla
 **Precondición:** TC-059-06 aprobado; Dev Uno y Dev Dos activos en DEVEDD2026.
@@ -135,8 +135,8 @@ superaría 1.00 — disponible 0.40"; nada cambia.
 3. Dev Uno sin cambios (Bonus sin ponderar).
 Se ve la ayuda "Celda vacía: sin calificar… Si el estudiante no entregó,
 registra 0". La columna "Total" ya no existe.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** Aprobado por el usuario (2026-10-21). Dev Uno 1.65 / 4.13, Dev Dos 0.95 / 3.16, actualizados sin recargar. Bonus sin efecto.
 
 ### TC-059-08 — Vista "Por corte": orden, 1 decimal con coma y copia
 **Precondición:** TC-059-07 aprobado.
@@ -157,8 +157,8 @@ registra 0". La columna "Total" ya no existe.
    centésimas con la definitiva institucional. No se puede editar.
 2. Dos líneas: `2,0` y `3,8`, en ese orden. Junto al botón: "1 fila incompleta".
 3. Dos líneas vacías (ninguno tiene nota en Nota 3), sin desalinear.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** Aprobado por el usuario (2026-10-21). Vista y avisos correctos (Dev Dos primero; 2,0 incompleto; 3,7; 3,8; 4,5; "1 fila incompleta").
 
 ### TC-059-09 — Celda vacía vs. 0 explícito
 **Precondición:** TC-059-07 aprobado.
@@ -169,8 +169,8 @@ registra 0". La columna "Total" ya no existe.
 **Resultado esperado:**
 1. Dev Dos: Acumulado **0.95**, Promedio **2.37**; en "Por corte", Nota 1 = **1,0** sin "incompleto".
 2. Vuelve a Promedio 3.16 y Nota 1 = 2,0 "incompleto".
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** Aprobado por el usuario (2026-10-21). Con 0: 0.95 / 2.37 y Nota 1 = 1,0; al vaciar, vuelve a 3.16 y 2,0 incompleto.
 
 ### TC-059-10 — Eliminar un corte no borra pesos ni notas
 **Precondición:** TC-059-07 aprobado.
