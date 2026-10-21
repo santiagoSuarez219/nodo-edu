@@ -524,7 +524,7 @@ grant execute on function public.get_student_profiles_public(uuid[]) to authenti
 
 ### Fase 1 — Esquema
 - [x] Crear las tres migraciones del "DDL propuesto".
-- [ ] **Antes de producción**, correr la heurística en modo lectura sobre los
+- [x] **Antes de producción**, correr la heurística en modo lectura sobre los
       perfiles reales (`select p.full_name, s.* from profiles p,
       propose_name_split(p.full_name) s`, tras crear solo la función en una
       sesión de prueba o con una copia local) y mostrar la muestra al usuario.
@@ -573,18 +573,28 @@ grant execute on function public.get_student_profiles_public(uuid[]) to authenti
 - [ ] Cuando exista framework, implementar los casos de "Pruebas asociadas".
 
 ### Fase 7 — Despliegue (solo con confirmación explícita del usuario)
-- [ ] Desplegar **antes** que spec-059 (D13).
-- [ ] `git diff --stat origin/main..HEAD -- supabase/` lista solo las tres
+- [x] Desplegar **antes** que spec-059 (D13).
+- [x] `git diff --stat origin/main..HEAD -- supabase/` lista solo las tres
       migraciones de este spec.
-- [ ] `supabase db push --linked --dry-run` (**obligatorio**), mostrar la
+- [x] `supabase db push --linked --dry-run` (**obligatorio**), mostrar la
       salida y aplicar solo si lista exactamente esas cuatro.
-- [ ] Verificar por REST que existe `profiles.first_name` (`42703` = no
+- [x] Verificar por REST que existe `profiles.first_name` (`42703` = no
       aplicada).
 - [ ] Registrar una cuenta de prueba en producción solo con confirmación
       explícita del usuario (CLAUDE.md: no crear datos de prueba en
       producción sin confirmación) y borrarla; alternativa: verificar con el
       primer registro real.
 - [ ] Avisar al docente de que todos los perfiles quedan "por revisar".
+
+> **Despliegue 2026-10-21.** Muestra de la heurística sobre los 157 perfiles de
+> producción (lectura REST + port local de `propose_name_split`): 2 de una palabra
+> (apellido vacío), 12 de dos, 62 de tres, 80 de cuatro, 1 de cinco ("de" bien
+> agrupado); error conocido: nombres compuestos de tres palabras ("juan jose
+> torres" → 1 nombre + 2 apellidos), se corrigen en la revisión. `db push
+> --linked` aplicó las cuatro migraciones (dry-run idéntico); REST: 157 perfiles
+> con `name_needs_review = true`, 2 con `last_name` vacío. Merge `c774ecf` a
+> `main`, deployment Vercel `dpl_58zs4V6tB4BMUQ1iYggsYznkqUVx` READY. Pendiente:
+> verificar con el primer registro real y avisar al docente.
 
 ## Criterios de aceptación
 
