@@ -1,5 +1,6 @@
 import type { AcademicCoursePublic } from "@/lib/academic-courses/types";
-import type { Profile } from "@/lib/students/types";
+import type { StudentProfilePublic } from "@/lib/students/types";
+import type { GradeSummary } from "@/lib/grades/types";
 
 export interface Enrollment {
   id: string;
@@ -13,10 +14,14 @@ export interface Enrollment {
 export interface EnrollmentWithCourse extends Enrollment {
   academic_course: AcademicCoursePublic;
   teacher_name: string | null;
-  total_grade: number | null;
+}
+
+// spec-059 D9: con la nota a la fecha; solo para las vistas que la muestran.
+export interface EnrollmentWithCourseAndGrades extends EnrollmentWithCourse {
+  grade_summary: GradeSummary;
 }
 
 export interface EnrollmentWithStudent extends Enrollment {
-  profile: Pick<Profile, "id" | "full_name">;
-  total_grade: number | null;
+  profile: StudentProfilePublic;
+  grade_summary: GradeSummary;
 }

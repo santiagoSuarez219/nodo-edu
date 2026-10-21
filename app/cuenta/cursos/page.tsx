@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { requireUser } from "@/lib/auth/session";
-import { getEnrollmentsByStudent } from "@/lib/enrollments/index";
+import { getEnrollmentsWithGradesByStudent } from "@/lib/enrollments/index";
 import { EnrollmentForm } from "@/components/account/EnrollmentForm";
 import { EnrolledCourseList } from "@/components/account/EnrolledCourseList";
 
@@ -13,7 +13,7 @@ interface MisCursosPageProps {
 
 export default async function MisCursosPage({ searchParams }: MisCursosPageProps) {
   await requireUser("/cuenta/cursos");
-  const enrollments = await getEnrollmentsByStudent();
+  const enrollments = await getEnrollmentsWithGradesByStudent();
   const params = await searchParams;
   const noAccessCourse = params.sinAcceso;
 

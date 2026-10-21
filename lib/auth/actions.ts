@@ -11,7 +11,7 @@ import { clearMustChangePasswordFlag } from "./service";
 import { isAuthErrorLike } from "./errors";
 import { createTimeoutFetch } from "./fetch-timeout";
 
-// spec-054 (D-C) — mismo presupuesto que lib/auth/server.ts: es una llamada
+// spec-061 (D-C) — mismo presupuesto que lib/auth/server.ts: es una llamada
 // de datos de página (verificar una contraseña), no el gate del middleware.
 const DATA_TIMEOUT_MS = 6000;
 import type { AuthResult } from "./types";
@@ -76,7 +76,8 @@ export async function signUp(
   formData: FormData
 ): Promise<AuthResult> {
   const parsed = SignUpSchema.safeParse({
-    full_name: formData.get("full_name"),
+    first_name: formData.get("first_name"),
+    last_name: formData.get("last_name"),
     email: formData.get("email"),
     password: formData.get("password"),
     password_confirmation: formData.get("password_confirmation"),
@@ -129,7 +130,12 @@ export async function signUp(
     email: parsed.data.email,
     password: parsed.data.password,
     options: {
-      data: { full_name: parsed.data.full_name },
+      data: {
+        first_name: parsed.data.first_name,
+        last_name: parsed.data.last_name,
+        // Derivado, para que auth.users siga mostrando un nombre en el dashboard.
+        full_name: `${parsed.data.first_name} ${parsed.data.last_name}`,
+      },
     },
   });
 
@@ -156,7 +162,10 @@ export async function signUp(
   // profiles/user_roles/students. Sin esto, el insert de matrícula de abajo
   // fallaría contra RLS (el estudiante no tendría el rol 'student').
   try {
-    await ensureStudentAccountBootstrap(signUpData.user.id, parsed.data.full_name);
+    await ensureStudentAccountBootstrap(signUpData.user.id, {
+      first_name: parsed.data.first_name,
+      last_name: parsed.data.last_name,
+    });
   } catch (bootstrapError) {
     console.error(
       `signUp: no se pudo inicializar perfil/rol para ${signUpData.user.id}:`,
@@ -220,7 +229,7 @@ async function verifyCurrentPassword(
 
   const throwaway = createClient(supabaseUrl, supabaseKey, {
     auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
-    // spec-054 (DEBT-070): este cliente no pasaba por lib/auth/server.ts, así
+    // spec-061 (DEBT-070): este cliente no pasaba por lib/auth/server.ts, así
     // que quedaba fuera del timeout que el resto de este archivo hereda de
     // createServerSupabaseClient() — sin timeout propio hasta ahora.
     global: { fetch: createTimeoutFetch(DATA_TIMEOUT_MS) },

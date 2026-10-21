@@ -124,3 +124,93 @@ Desarrollo (`nodo-dev`): sin progreso ni intentos; solo las 5 preguntas montadas
 - Preguntas de cierre en producción: 5 montadas en `pilas-colas-y-listas`, en orden.
 - Limpieza hecha (2026-10-14): las 4 preguntas de selección (`680dce63…`, `8b53d196…`, `a025501c…`, `a649e776…`) y la lista doble (`53640acd…`) se desmontaron del slug viejo con `unmount_question_from_lesson`. Verificado: 0 montajes en `medianas-seleccion-y-estructuras-elementales` y 5 en `pilas-colas-y-listas`. Las 4 preguntas de selección siguen publicadas en el banco, sin montar; la lista doble sigue montada en el slug nuevo.
 - **Pendientes:** ninguno de datos. Falta solo que el docente confirme visualmente en `www.nod0.dev` que la lección carga y que la autoevaluación aparece al final.
+
+---
+
+## Ronda — `programacion-cientifica` (2026-10-21)
+
+**Rama:** `feat/semana-12-programacion-cientifica`
+**Estado:** ✅ Material y cuestionario listos en desarrollo / ✅ Mergeada a `development` / ✅ Desplegada y abierta (2026-10-21)
+
+**Alcance confirmado por el usuario:** sesión única del jueves 22 de octubre
+(Pandas: carga e inspección). **Excluida:** la semana 13 (`filtrado-agregacion-y-limpieza-de-datos`).
+La sesión es una **demo en vivo del docente**; el proyecto integrador y sus datasets se definen
+en la clase de la semana siguiente, así que esta ronda no los toca.
+
+### Sesiones cubiertas
+
+| Sesión | Fecha | Tema | ★/◇ |
+|---|---|---|---|
+| Única | jue 22 oct | Pandas: carga e inspección (el cronograma agrega "arranque del proyecto", pospuesto por decisión del docente) | ◇ |
+
+### Etapas y aprobaciones
+
+| Etapa | Resultado | Aprobada por el usuario |
+|---|---|---|
+| E2 · Plan de lección | Aprobado con 6 decisiones (CSV por Drive, sin lista curada, penguins y `sample_data`, Flujo B solo en clase, nulos solo detectados, sección 8 solo con criterios) | ✅ |
+| E3 · Lección `.mdx` + registro TS | `carga-e-inspeccion-de-datos-y-seleccion-del-proyecto` (order 9) | ✅ (se pidió continuar con los apuntes) |
+| E4 · Apuntes del docente | Sí, a pedido; alcance: solo pandas con `estaciones.csv`, sin proyecto ni Git | ✅ (se pidió continuar con el cuestionario) |
+| E5 · Cuestionario de cierre | Propuestas 5 preguntas → aprobadas 5 | ✅ |
+| E6 · Guía del estudiante | No — sesión en vivo | ✅ |
+| E6 · Quiz A/B/C | No aplica — semana sin ★ | ✅ |
+
+### Artefactos producidos
+
+| Artefacto | Ruta | Publicado |
+|---|---|---|
+| Lección teórica | `content/cursos/programacion-cientifica/carga-e-inspeccion-de-datos-y-seleccion-del-proyecto.mdx` | ⬜ |
+| Registro TS | `lib/courses/data/programacion-cientifica.ts` (`order: 9`, solo se agregó `summary`) | — |
+| Apunte de clase | `content/cursos/programacion-cientifica/apuntes/carga-e-inspeccion-de-datos-y-seleccion-del-proyecto.md` | Solo owner/admin |
+| Dataset de la demo | `estaciones.csv` (36 filas; fuera del repo; el docente lo genera y lo comparte por Drive) | — |
+
+### Cuestionario de cierre
+
+| Lección | Entorno | IDs de preguntas | Publicadas | Montadas (`list_lesson_questions`) |
+|---|---|---|---|---|
+| `carga-e-inspeccion-de-datos-y-seleccion-del-proyecto` | desarrollo | `8b1efdf4-f58a-4a9a-a451-6508fe02e814`, `5e86f98c-366c-4ad2-934b-241283ead252`, `0b0c4fa6-f764-4485-8ff4-2e9ff6bfe791`, `12423990-858f-4130-bfab-b7a5222c1a14`, `69b362b8-dc7e-4272-816f-05443abd3432` | ✅ | ✅ (5) |
+| `carga-e-inspeccion-de-datos-y-seleccion-del-proyecto` | **producción** | `eb0cef96-b7a4-4a25-9ae6-8631d0ee3168`, `876f3539-b84e-494f-93e9-f693b94cbadc`, `fd199091-3035-44eb-9d95-364acbbd030a`, `bf7f1e0b-276f-42a1-bff0-6992a811a76e`, `bcedff6f-2e61-45c6-8df9-6ea939435a0f` | ✅ | ✅ (5) |
+
+> Las preguntas **no viajan con el deploy**: se recrean en producción en D3.
+> Keywords creadas en desarrollo: `pandas`, `dataframe` (kind `tema`). Keywords creadas en producción (2026-10-21): `pandas`, `dataframe`, `csv` (kind `tema`; `csv` ya existía en desarrollo).
+
+### Quiz calificable A/B/C
+
+No aplica.
+
+### Decisiones tomadas por Claude en nombre del docente
+
+- Municipios de `estaciones.csv` (Medellín, Barranquilla, Rionegro, Valledupar) — **motivo:** el microdiseño no los fijaba; se eligieron para que el clima cuadre con cada estación.
+- `describe(include="object")` reemplazado por `value_counts` en la lección — **motivo:** emite advertencia de deprecación en pandas 3.
+- Los apuntes cuentan el `-999` con una comparación booleana — **motivo:** no hay otra forma de contarlo; no filtra ni limpia, y se aclara que eso es la semana 13.
+- P3 del cuestionario muestra `str` y `pandas.DataFrame` — **motivo:** coincide con la lección (pandas 3); en Colab con pandas 2 saldría `object` y `pandas.core.frame.DataFrame`. Sin resolver.
+
+### Verificación (E7)
+
+- [x] `npm run build` en verde
+- [x] `npm run lint` en verde (0 errores, 7 advertencias previas en archivos ajenos a esta ronda)
+- [x] Checklist de `lesson-authoring` §8 recorrido (sin H1/`###`/`$`/diagramas; apuntes sin entrada TS)
+- [x] `summary` presente en frontmatter **y** en registro TS
+- [x] Coherencia cruzada teoría ↔ apuntes ↔ cuestionario (las preguntas evitan los ejemplos de los apuntes)
+- [x] `@reviewer`: APROBADO (sin bloqueantes; 3 correcciones menores aplicadas)
+
+### Despliegue
+
+| Paso | Estado | Fecha / detalle |
+|---|---|---|
+| D0 · Alcance y checklist pre-despliegue | ✅ | 2026-10-21 — sin cambios de esquema; el deploy incluyó también el renombre de comentarios `spec-054` → `spec-061` (16 archivos, solo comentarios) |
+| D1 · Lecciones nuevas cerradas por adelantado | ✅ | 2026-10-21 — no hizo falta: la lección ya estaba cerrada en `disabled_lessons` desde el 2026-08-04; sin filas huérfanas |
+| D2 · Merge a `main` y deploy en Vercel | ✅ | 2026-10-21 — rama `deploy/semana-12-pc`, `main` en `f0d7e78`, despliegue `READY`; `development` empujado a `origin` (`9fa8eef`) |
+| D3 · Banco de preguntas replicado a producción | ✅ | 2026-10-21 — keywords `pandas`, `dataframe`, `csv` + 5 preguntas publicadas y montadas |
+| D4 · Lecciones abiertas a los estudiantes | ✅ | 2026-10-21 — `carga-e-inspeccion-de-datos-y-seleccion-del-proyecto` abierta |
+| D5 · Verificación end-to-end en producción | ⬜ | Pendiente: el docente comprueba en `www.nod0.dev` que la lección carga y que la autoevaluación aparece al final |
+| D6 · Bitácora cerrada y rama `deploy/` borrada | ✅ | 2026-10-21 — `deploy/semana-12-pc` solo existía en local y se borró |
+
+- [x] Verificado que las lecciones de semanas futuras siguen **cerradas** (`filtrado-agregacion-y-limpieza-de-datos` y `matplotlib-y-seaborn`; `list_course_lessons`: 2 cerradas, 0 huérfanas)
+
+### Pendientes
+
+- Ejecutar en Colab, antes de la clase: `california_housing_train.csv` (Paso 5 de los apuntes, sin salida pegada) y las diferencias pandas 2 frente a pandas 3 (`object` vs `str`, nombre de clase en `info()`).
+- El docente genera `estaciones.csv` (36 filas, columnas `estacion`, `municipio`, `fecha`, `temperatura_c`, `humedad_pct`, `sensor`; un `-999` y una celda vacía en `humedad_pct`) y lo comparte por Drive. Las salidas de la lección y los apuntes dependen de ese archivo exacto.
+- Revisión (`@reviewer`, APROBADO): aplicadas 3 correcciones menores (`memory usage` igualado a 2.9 KB, nota `str`/`object` y primera línea de `info()`, sin nombrar la lección futura). La semana 13 debe partir sabiendo que `isna().sum()` ya se mostró.
+- Resolver la P3 del cuestionario si se prefiere mostrar la salida de pandas 2.
+- Hay una lección más de pandas pendiente (`filtrado-agregacion-y-limpieza-de-datos`, semana 13), hoy stub.

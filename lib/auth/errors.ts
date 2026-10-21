@@ -36,7 +36,7 @@ type AuthErrorClassification =
 // trata como `unavailable`, no como `anonymous`, para no abrir el gate ante
 // un fallo de infraestructura que no anticipamos.
 export function classifyAuthError(error: unknown): AuthErrorClassification {
-  // spec-054: en la práctica esta rama no se alcanza desde
+  // spec-061: en la práctica esta rama no se alcanza desde
   // `supabase.auth.getUser()` — verificado en
   // node_modules/@supabase/auth-js/dist/module/lib/fetch.js
   // (`_handleRequest`): el SDK ya envuelve cualquier rechazo de `fetch`

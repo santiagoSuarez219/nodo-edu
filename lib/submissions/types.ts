@@ -47,6 +47,8 @@ export interface Answer {
 export interface SubmissionWithAnswers extends Submission {
   answers: Answer[];
   student_name?: string;
+  student_first_name?: string;
+  student_last_name?: string;
 }
 
 // Devuelto por la RPC `get_variant_question_details` (ver migración

@@ -48,6 +48,8 @@ export type AttendanceSheetCell = {
 export type AttendanceSheetRow = {
   student_id: string;
   student_name: string;
+  student_first_name: string;
+  student_last_name: string;
   // Una entrada por sesión del curso, en el mismo orden que `sessions`. El %
   // de asistencia no vive aquí: `AttendanceSheet.computePct()` lo calcula en
   // cliente a partir de estas celdas, porque necesita incorporar el estado

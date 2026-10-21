@@ -1,12 +1,21 @@
 export interface Profile {
   id: string;
   full_name: string;
+  first_name: string;
+  last_name: string;
+  name_needs_review: boolean;
   avatar_url: string | null;
   github_username: string | null;
   last_seen_at: string | null;
   created_at: string;
   updated_at: string;
 }
+
+// Lo que expone el RPC get_student_profiles_public al docente (sin email).
+export type StudentProfilePublic = Pick<
+  Profile,
+  "id" | "full_name" | "first_name" | "last_name" | "name_needs_review"
+>;
 
 export interface Student {
   profile_id: string;
@@ -34,6 +43,9 @@ export interface AdminStudentSummary {
   id: string;
   email: string;
   full_name: string;
+  first_name: string;
+  last_name: string;
+  name_needs_review: boolean;
   career: string | null;
   semester: number | null;
   github_username: string | null;
@@ -43,8 +55,12 @@ export interface AdminStudentDetail extends AdminStudentSummary {
   enrollments: AdminEnrollmentSummary[];
 }
 
+// spec-062 D10: `first_name` + `last_name`, o `full_name` por compatibilidad
+// (se separa automáticamente y queda por revisar).
 export interface CreateStudentInput {
-  full_name: string;
+  first_name?: string;
+  last_name?: string;
+  full_name?: string;
   email: string;
   password: string;
   career?: string;
@@ -55,6 +71,8 @@ export interface CreateStudentInput {
 }
 
 export interface UpdateStudentInput {
+  first_name?: string;
+  last_name?: string;
   full_name?: string;
   email?: string;
   career?: string | null;

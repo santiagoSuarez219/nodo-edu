@@ -2,7 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { createTimeoutFetch } from "./fetch-timeout";
 
-// spec-054 (D-C) — 6s: las consultas normales de este cliente están en
+// spec-061 (D-C) — 6s: las consultas normales de este cliente están en
 // decenas de ms (auth_logs, incidente 2026-08-29: 7-31ms), así que 6s es
 // ~100× el caso normal y ~50× mejor que los 300s de hoy (DEBT-070: 10
 // ejecuciones de /[courseSlug] muertas por el límite de 300s de Vercel
@@ -16,7 +16,7 @@ export async function createServerSupabaseClient() {
   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
   if (!supabaseUrl || !supabaseKey) {
-    // spec-054: antes esto lanzaba dentro de createServerClient() vía
+    // spec-061: antes esto lanzaba dentro de createServerClient() vía
     // non-null assertion (`!`), una excepción cruda — exactamente el fallo
     // que spec-046 corrigió en lib/auth/middleware.ts y que aquí quedó vivo.
     // Este cliente no tiene el equivalente al `AuthCheckResult` del

@@ -1,6 +1,7 @@
 import { withdrawStudentAction, reactivateStudentAction } from "@/lib/enrollments/actions";
 import { ResetPasswordButton } from "./ResetPasswordButton";
 import { StudentNameCell } from "./StudentNameCell";
+import { formatStudentListName } from "@/lib/students/names";
 import type { EnrollmentWithStudent } from "@/lib/enrollments/types";
 
 interface Props {
@@ -24,6 +25,7 @@ function gradeDisplay(grade: number | null) {
 export function EnrollmentTable({ enrollments, academicCourseId }: Props) {
   const active = enrollments.filter((e) => e.status === "active");
   const withdrawn = enrollments.filter((e) => e.status === "withdrawn");
+  const toReview = active.filter((e) => e.profile.name_needs_review).length;
 
   if (enrollments.length === 0) {
     return (
@@ -50,6 +52,14 @@ export function EnrollmentTable({ enrollments, academicCourseId }: Props) {
             {active.length} {active.length === 1 ? "estudiante" : "estudiantes"}
           </span>
         </div>
+        {toReview > 0 && (
+          <p
+            role="status"
+            className="px-5 py-3 text-sm text-yellow-800 dark:text-yellow-300 bg-yellow-50 dark:bg-yellow-900/20 border-b border-yellow-200 dark:border-yellow-800"
+          >
+            {toReview} {toReview === 1 ? "estudiante con nombres por revisar" : "estudiantes con nombres por revisar"}
+          </p>
+        )}
         {active.length === 0 ? (
           <p className="px-5 py-6 text-sm text-gray-500 dark:text-gray-400 text-center">
             No hay estudiantes activos.
@@ -61,7 +71,8 @@ export function EnrollmentTable({ enrollments, academicCourseId }: Props) {
                 <tr>
                   <th className="px-5 py-3">Nombre</th>
                   <th className="px-5 py-3">Fecha matrícula</th>
-                  <th className="px-5 py-3 text-right">Nota total</th>
+                  <th className="px-5 py-3 text-right">Acumulado</th>
+                  <th className="px-5 py-3 text-right">Promedio</th>
                   <th className="px-5 py-3 text-right">Acción</th>
                 </tr>
               </thead>
@@ -78,14 +89,20 @@ export function EnrollmentTable({ enrollments, academicCourseId }: Props) {
                         <StudentNameCell
                           studentId={enrollment.student_id}
                           academicCourseId={academicCourseId}
-                          initialName={enrollment.profile.full_name}
+                          firstName={enrollment.profile.first_name}
+                          lastName={enrollment.profile.last_name}
+                          fullName={enrollment.profile.full_name}
+                          needsReview={enrollment.profile.name_needs_review}
                         />
                       </td>
                       <td className="px-5 py-4 text-gray-500 dark:text-gray-400">
                         {formatDate(enrollment.enrolled_at)}
                       </td>
                       <td className="px-5 py-4 text-right font-mono text-gray-700 dark:text-gray-300">
-                        {gradeDisplay(enrollment.total_grade)}
+                        {gradeDisplay(enrollment.grade_summary.accumulated)}
+                      </td>
+                      <td className="px-5 py-4 text-right font-mono text-gray-700 dark:text-gray-300">
+                        {gradeDisplay(enrollment.grade_summary.projected)}
                       </td>
                       <td className="px-5 py-4 text-right">
                         <div className="flex items-center justify-end gap-4">
@@ -131,7 +148,8 @@ export function EnrollmentTable({ enrollments, academicCourseId }: Props) {
                   <th className="px-5 py-3">Nombre</th>
                   <th className="px-5 py-3">Fecha matrícula</th>
                   <th className="px-5 py-3">Fecha retiro</th>
-                  <th className="px-5 py-3 text-right">Nota total</th>
+                  <th className="px-5 py-3 text-right">Acumulado</th>
+                  <th className="px-5 py-3 text-right">Promedio</th>
                   <th className="px-5 py-3 text-right">Acción</th>
                 </tr>
               </thead>
@@ -145,7 +163,7 @@ export function EnrollmentTable({ enrollments, academicCourseId }: Props) {
                   return (
                     <tr key={enrollment.id}>
                       <td className="px-5 py-4 text-gray-700 dark:text-gray-300 opacity-60">
-                        {enrollment.profile.full_name}
+                        {formatStudentListName(enrollment.profile)}
                       </td>
                       <td className="px-5 py-4 text-gray-500 dark:text-gray-400 opacity-60">
                         {formatDate(enrollment.enrolled_at)}
@@ -154,7 +172,10 @@ export function EnrollmentTable({ enrollments, academicCourseId }: Props) {
                         {enrollment.withdrawn_at ? formatDate(enrollment.withdrawn_at) : "—"}
                       </td>
                       <td className="px-5 py-4 text-right font-mono text-gray-500 dark:text-gray-400 opacity-60">
-                        {gradeDisplay(enrollment.total_grade)}
+                        {gradeDisplay(enrollment.grade_summary.accumulated)}
+                      </td>
+                      <td className="px-5 py-4 text-right font-mono text-gray-500 dark:text-gray-400 opacity-60">
+                        {gradeDisplay(enrollment.grade_summary.projected)}
                       </td>
                       <td className="px-5 py-4 text-right">
                         <form action={reactivateAction}>

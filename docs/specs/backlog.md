@@ -42,6 +42,36 @@ puede pedir la clave de respuestas de su propia variante mientras el quiz está
 
 ---
 
+## DEBT-099 — Hallazgos menores de la revisión de spec-059 (notas ponderadas)
+
+**Origen:** `@reviewer` sobre `feat/grade-weights` (2026-10-21).
+**Prioridad:** Baja — ninguno afecta cifras ni seguridad; se pospusieron para
+no ampliar el alcance de spec-059.
+
+- **"Mis notas" consulta de más:** `lib/grades/overview.ts` llama a
+  `getEnrollmentsWithGradesByStudent`, que pide al RPC las líneas de todas las
+  matrículas, también las activas, cuyo `grade_summary` se vuelve a calcular
+  por RLS. Bastaría pedir el RPC solo para las retiradas.
+- **Un fallo del RPC se ve como dato válido:** `lib/enrollments/index.ts`
+  (`getEnrollmentsWithGradesByStudent`) usa `data ?? []` sin aviso; el
+  estudiante ve "Promedio simple —", igual que un curso sin pesos.
+- **Colores de paleta cruda:** `GradeBreakdown`, `GradeSummaryBlock`,
+  `GradesTable` y `GradeItemsPanel` usan `text-amber-700`, `bg-blue-700`,
+  `text-gray-*` en vez de los tokens de `DESIGN.md`. Es el patrón dominante del
+  repo; conviene migrarlo en bloque, no por archivo.
+- **Advertencia de pesos duplicada:** `GradesTable` recalcula a mano lo que ya
+  devuelve `summary.groups[].weight_mismatch`.
+- **Copiar columna sin aviso de error:** `GradesTable` descarta el rechazo del
+  portapapeles sin mostrar mensaje.
+- **Triggers de suma:** `enforce_grade_items_weight_sum` y
+  `enforce_grade_groups_target_sum` se disparan solo con `update of weight` /
+  `update of target_weight`; añadir `academic_course_id` cerraría la invariante
+  si algún día una ruta mueve un ítem de curso.
+- **Vista "Por corte" sin cortes:** muestra solo Estudiante, Acumulado y
+  Promedio; falta un mensaje de estado vacío.
+
+---
+
 ## DEBT-094 — `get_variant_question_details` no verifica que la matrícula pertenezca al usuario
 
 **Origen:** revisión de código al redactar spec-058 (2026-10-19).
@@ -165,7 +195,7 @@ por los `variant_group_id` visibles, seleccionando solo
 ## DEBT-088 — Los envoltorios de sesión de `lib/assignments/index.ts` no usan la caché de Auth
 
 **Origen:** análisis de `@architect` para spec-055 (2026-09-10), verificado en código.
-**Prioridad:** Baja — latencia, no corrección. Relacionado con spec-054
+**Prioridad:** Baja — latencia, no corrección. Relacionado con spec-061
 (resiliencia ante latencia de Supabase).
 
 Los **siete** envoltorios públicos de `lib/assignments/index.ts` llaman
@@ -343,13 +373,13 @@ resolver esta deuda antes o junto con el despliegue de spec-055.
 
 ## DEBT-074 — El copy de error de infraestructura nunca se muestra en producción: Next redacta el mensaje del error
 
-**Origen:** revisión de código de spec-054 (hallazgo 🟠-1, 2026-08-30).
+**Origen:** revisión de código de spec-061 (hallazgo 🟠-1, 2026-08-30).
 **Prioridad:** Media — no rompe nada, pero el criterio de aceptación 7 de
-spec-054 y su decisión D-D quedan cumplidos solo a medias, y el spec los daba
+spec-061 y su decisión D-D quedan cumplidos solo a medias, y el spec los daba
 por completos.
 
 `components/ErrorState.tsx` exporta `isInfraError()`, que decide entre el copy
-genérico ("Algo salió mal") y el honesto de spec-054 ("No pudimos contactar el
+genérico ("Algo salió mal") y el honesto de spec-061 ("No pudimos contactar el
 servidor, tu sesión sigue activa") inspeccionando `error.message` en busca de
 `abort`/`timeout`. Lo consumen los tres error boundaries del proyecto
 (lección, admin, raíz).
@@ -367,7 +397,7 @@ Sentry siempre será `false` en producción; y el usuario real sigue viendo
 "Algo salió mal" ante un fallo de infraestructura.
 
 Atenuante: en la práctica, hoy **ningún** camino de datos de lección propaga
-la excepción hasta el boundary (verificado en `TC-054-007`: `lib/progress`
+la excepción hasta el boundary (verificado en `TC-061-007`: `lib/progress`
 degrada en silencio), así que el boundary rara vez se alcanza por esta vía.
 Eso hace que el defecto sea de baja frecuencia, no que deje de existir.
 
@@ -380,14 +410,14 @@ sí ve el error real. Registrar también qué hacer con el tag de Sentry.
 
 ## DEBT-072 — El procedimiento documentado para probar migraciones (`db reset`) destruye todos los datos de desarrollo, sin advertirlo — ✅ Mitigado (2026-08-29)
 
-**Origen:** ronda de pruebas manuales de spec-054 (2026-08-29), investigación
+**Origen:** ronda de pruebas manuales de spec-061 (2026-08-29), investigación
 posterior a petición del usuario. **Prioridad:** Media-alta — el
 procedimiento se seguirá ejecutando cada vez que alguien agregue una
 migración, y cada ejecución vuelve a vaciar el entorno de desarrollo.
 
 ### Síntoma
 
-Al preparar `TC-054-008` se encontró que la instancia Supabase de `mirp-lab`
+Al preparar `TC-061-008` se encontró que la instancia Supabase de `mirp-lab`
 no tenía **ningún** `academic_course` (`list_academic_courses` devolvió `[]`),
 ni el estudiante de la ronda de `test-053` (`test-spec053@nodo.local`,
 matriculado ese mismo día), ni una sola fila en `questions` (banco de
@@ -418,7 +448,7 @@ siguen en `mirp-lab` y no en `development`/`main`.
 destruye todos los datos de desarrollo y no lo advierte en ninguna parte.**
 
 Descartado explícitamente: los dos `supabase stop && supabase start` de la
-ronda de spec-054 **no** causaron la pérdida — recrean los contenedores pero
+ronda de spec-061 **no** causaron la pérdida — recrean los contenedores pero
 preservan el volumen (el `CreatedAt` del volumen es anterior a ambos, y los
 datos sembrados a las 20:47 sobrevivieron a los dos ciclos).
 
@@ -441,7 +471,7 @@ conjunto representativo y no bloquea ninguna ronda de pruebas conocida.
 Mientras tanto, el entorno quedó con un curso de prueba
 (`TEST054 — Estructuras de Datos`, `37292155-ad61-4517-ba3f-1dc7e8f4adb0`) y
 un estudiante matriculado (`test-spec054@nodo.local`, ver
-`docs/testing/test-054-resiliencia-latencia-supabase.md` → "Datos de
+`docs/testing/test-061-resiliencia-latencia-supabase.md` → "Datos de
 prueba"), dejados en desarrollo por decisión del usuario.
 
 ---
@@ -523,7 +553,7 @@ sincronizada con `main` y que nada no revisado se ha filtrado.
 
 ---
 
-## DEBT-070 — Clientes Supabase server-side sin timeout: una conexión colgada retiene la función hasta los 300s de Vercel — ✅ Resuelto (spec-054, 2026-08-29)
+## DEBT-070 — Clientes Supabase server-side sin timeout: una conexión colgada retiene la función hasta los 300s de Vercel — ✅ Resuelto (spec-061, 2026-08-29)
 
 **Origen:** incidente de plataforma de Supabase del 2026-08-27→29
 ("Increased response times for requests", deploy defectuoso de PostgREST 14.5
@@ -562,7 +592,7 @@ residuo declarado: `getCurrentUser()` sigue colapsando `unavailable` en
 
 ---
 
-## DEBT-071 — El middleware puede agotar los 25s de Vercel pese a sus presupuestos de timeout — ✅ Resuelto (spec-054, 2026-08-29)
+## DEBT-071 — El middleware puede agotar los 25s de Vercel pese a sus presupuestos de timeout — ✅ Resuelto (spec-061, 2026-08-29)
 
 **Origen:** mismo incidente del 2026-08-27→29. Los runtime logs de Vercel
 registran 35 × `Your function was stopped as it did not return an initial
@@ -1045,7 +1075,7 @@ resuelto — y pidió backlog para el resto).
 
 ---
 
-## DEBT-069 — El gate de Auth tumba también las rutas públicas ante un fallo transitorio — ✅ Resuelto (spec-054, 2026-08-29)
+## DEBT-069 — El gate de Auth tumba también las rutas públicas ante un fallo transitorio — ✅ Resuelto (spec-061, 2026-08-29)
 
 **Origen:** incidente de producción del 2026-08-29 (issues NODO-EDU-3/4/5 y la
 investigación posterior con los logs de Supabase)
@@ -1073,7 +1103,7 @@ exige sesión. Requiere decidir qué es "ruta pública" de forma explícita y no
 debilitar el criterio de fallo cerrado de spec-046 (D4) para el contenido
 restringido.
 
-**Resolución:** la premisa original no se sostenía — al diseñar spec-054 se
+**Resolución:** la premisa original no se sostenía — al diseñar spec-061 se
 verificó que **hoy no existe contenido público**: el middleware exige sesión
 para todo salvo `/login`/`/registro`/`/servicio-no-disponible`, y las
 lecciones exigen además matrícula vía `requireCourseAccess`. Decisión del
@@ -3108,3 +3138,8 @@ Una vez configurado, ejecutar y aprobar TC-011, TC-012 y TC-014 en
 `docs/testing/test-002-student-auth-supabase.md`.
 
 ---
+
+## DEBT-NEW (spec-062) — La página de resolución de evaluación no valida que la matrícula sea del curso del grupo
+Detectado en `test-062` (TC-062-08): abrir `/cuenta/cursos/<enrollmentId>/evaluaciones/<groupId>` con la
+matrícula de OTRO curso inicia un intento y una asignación de variante bajo esa matrícula. Fuera del alcance
+de spec-062; asignar número DEBT al triarlo.
