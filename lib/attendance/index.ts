@@ -5,6 +5,7 @@ import { z } from 'zod';
 
 import { createServerSupabaseClient } from '@/lib/auth/server';
 import { fetchStudentProfilesPublic } from '@/lib/enrollments/index';
+import { compareStudentsBySurname } from '@/lib/students/names';
 import type {
   AttendanceCountResult,
   AttendanceSheetCell,
@@ -568,9 +569,19 @@ export async function getAttendanceSheet(
       return {
         student_id: studentId,
         student_name: profiles.get(studentId)?.full_name ?? 'Estudiante',
+        student_first_name: profiles.get(studentId)?.first_name ?? '',
+        student_last_name: profiles.get(studentId)?.last_name ?? '',
         cells,
       };
     });
+
+    // spec-062 D7/D8: por apellido, no por fecha de matrícula.
+    rows.sort((a, b) =>
+      compareStudentsBySurname(
+        { first_name: a.student_first_name, last_name: a.student_last_name, full_name: a.student_name },
+        { first_name: b.student_first_name, last_name: b.student_last_name, full_name: b.student_name }
+      )
+    );
 
     return { status: 'ok', sessions: sheetSessions, rows };
   } catch (err) {

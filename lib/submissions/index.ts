@@ -1,6 +1,8 @@
 import { createServerSupabaseClient } from "@/lib/auth/server";
 import { seededShuffle } from "@/lib/shuffle";
 import { fetchStudentProfilesPublic } from "@/lib/enrollments";
+import { compareStudentsBySurname } from "@/lib/students/names";
+import type { StudentProfilePublic } from "@/lib/students/types";
 import type {
   Answer,
   AnswerForReview,
@@ -550,14 +552,28 @@ export async function getSubmissionsByGroup(
     .filter((id): id is string => Boolean(id));
   const profiles = await fetchStudentProfilesPublic(supabase, studentIds);
 
-  return rows.map((row) => {
+  const result = rows.map((row) => {
     const enrollment = row.enrollment as unknown as { student_id: string } | null;
+    const profile = enrollment ? profiles.get(enrollment.student_id) : undefined;
     return {
       ...(row as unknown as Submission),
       answers: (row.answers as Answer[]) ?? [],
-      student_name: enrollment ? profiles.get(enrollment.student_id)?.full_name : undefined,
+      student_name: profile?.full_name,
+      student_first_name: profile?.first_name,
+      student_last_name: profile?.last_name,
     };
   });
+
+  // spec-062 D8: por apellido y, dentro del mismo estudiante, el intento más
+  // reciente primero. `Array.sort` es estable, así que el `started_at desc`
+  // de la consulta se conserva como desempate final.
+  return result.sort(
+    (a, b) =>
+      compareStudentsBySurname(
+        { first_name: a.student_first_name, last_name: a.student_last_name, full_name: a.student_name },
+        { first_name: b.student_first_name, last_name: b.student_last_name, full_name: b.student_name }
+      ) || b.started_at.localeCompare(a.started_at)
+  );
 }
 
 // Carga el contenido de cada pregunta de la asignación del envío (incluida la
@@ -604,7 +620,7 @@ export async function getSubmissionForReview(
   const enrollment = submission.enrollment as unknown as { student_id: string } | null;
   const profiles = enrollment
     ? await fetchStudentProfilesPublic(supabase, [enrollment.student_id])
-    : new Map<string, { id: string; full_name: string }>();
+    : new Map<string, StudentProfilePublic>();
   const studentName = enrollment ? (profiles.get(enrollment.student_id)?.full_name ?? "") : "";
 
   // Fuera del endurecimiento de spec-050 (esta función no está en su

@@ -8,6 +8,7 @@ import {
 } from "@/lib/errors/server-action";
 import { reportTransportError } from "@/lib/observability/report-transport-error";
 import { formatSessionDateLong, formatSessionDateShort } from "@/lib/attendance/date-format";
+import { formatStudentListName } from "@/lib/students/names";
 import { AttendanceCell } from "./AttendanceCell";
 import { AttendanceSessionActions } from "./AttendanceSessionActions";
 import { CreateManualSessionForm } from "./CreateManualSessionForm";
@@ -254,7 +255,11 @@ export function AttendanceSheet({ academicCourseId, sheet }: Props) {
                         scope="row"
                         className="px-5 py-3 text-left font-medium text-gray-900 dark:text-white sticky left-0 bg-white dark:bg-gray-800 z-10"
                       >
-                        {row.student_name}
+                        {formatStudentListName({
+                          first_name: row.student_first_name,
+                          last_name: row.student_last_name,
+                          full_name: row.student_name,
+                        })}
                       </th>
                       {sessions.map((session) => {
                         const cell = getCell(row.student_id, session.id);

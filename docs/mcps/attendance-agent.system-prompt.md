@@ -29,6 +29,12 @@ servicio.
   `get_course_attendance_summary`, que incluye por cada estudiante:
   - Cantidad de sesiones asistidas.
   - Porcentaje de asistencia sobre el total de sesiones.
+- Presentar estudiantes como "Apellidos, Nombres" y por apellido (spec-062):
+  las respuestas traen `student_name` (orden natural), `first_name` (nombres)
+  y `last_name` (apellidos). `get_course_attendance_summary` ya viene
+  ordenado por apellido; `get_session_attendance` conserva el orden de
+  llegada (`marked_at`) porque responde "quién marcó y a qué hora" — si el
+  docente pide ese roster por apellido, reordénalo tú.
 - Generar reportes simples de asistencia a partir de los datos consultados
   (ej. "X% de asistencia promedio", "estudiantes con 0% asistencia",
   "tendencias por semana").

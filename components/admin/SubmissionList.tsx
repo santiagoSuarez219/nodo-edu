@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { formatStudentListName } from "@/lib/students/names";
 import type { SubmissionWithAnswers } from "@/lib/submissions/types";
 
 interface SubmissionListProps {
@@ -70,7 +71,11 @@ function SubmissionTable({
               className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
             >
               <td className="px-6 py-4 text-sm text-gray-900 dark:text-white">
-                {submission.student_name || "Desconocido"}
+                {formatStudentListName({
+                  first_name: submission.student_first_name,
+                  last_name: submission.student_last_name,
+                  full_name: submission.student_name,
+                }) || "Desconocido"}
               </td>
               <td className="px-6 py-4">
                 <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300">

@@ -36,7 +36,7 @@ export async function getProfileWithStudent(userId: string): Promise<ProfileWith
 
 export async function updateProfile(
   userId: string,
-  fields: Partial<Pick<Profile, "full_name" | "avatar_url" | "github_username">>
+  fields: Partial<Pick<Profile, "first_name" | "last_name" | "name_needs_review" | "avatar_url" | "github_username">>
 ): Promise<Profile | null> {
   const supabase = await createServerSupabaseClient();
   const { data } = await supabase
