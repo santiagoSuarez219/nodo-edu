@@ -1,4 +1,4 @@
-# spec-062 — [NOT STARTED] Nombres y apellidos separados, orden por apellido en el panel docente
+# spec-062 — [IN PROGRESS] Nombres y apellidos separados, orden por apellido en el panel docente
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.
 
@@ -662,5 +662,5 @@ Ninguna. Resueltas por el usuario el 2026-10-20:
 
 ## Aprobación de implementación
 > Claude no escribe código de implementación hasta que esta sección esté marcada.
-- [ ] Paquete (spec + pruebas) aprobado por el usuario
-- **Fecha de aprobación:** {{fecha}}
+- [x] Paquete (spec + pruebas) aprobado por el usuario
+- **Fecha de aprobación:** 2026-10-20 (instrucción explícita: "Implementa el spec 062, con sus pruebas…")
