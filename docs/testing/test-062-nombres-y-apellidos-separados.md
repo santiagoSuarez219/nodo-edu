@@ -84,8 +84,8 @@ usuario de cada estudiante sigue mostrando "Estudiante Dev Uno".
 2. Error de validación; no se crea la cuenta.
 3. Se crea y queda matriculada (flujo de spec-027 intacto).
 4. Aparece "Sesentaydos, Test Registro" **sin** insignia "Revisar".
-**Estado:** ⚠️ Parcial
-**Hallazgos:** El formulario muestra "Nombres" y "Apellidos"; Apellidos de 1 letra da el error de validación y no crea cuenta. El alta completa NO se pudo ejecutar por UI: `nodo-dev` tiene "Confirm email" activo y Supabase responde `over_email_send_rate_limit` / `email_address_invalid` (dominio .local). Se verificó la misma ruta (`handle_new_user` con partes en `user_metadata`) creando la cuenta por `POST /api/students`: queda con partes, sin marca de revisión, matriculada, y aparece como "Sesentaydos, Test Registro" sin insignia. Pendiente: desactivar "Confirm email" en nodo-dev para probar el registro real (ver CLAUDE.md, Base de datos, punto 4).
+**Estado:** ✅ Aprobado
+**Hallazgos:** El formulario muestra "Nombres" y "Apellidos"; Apellidos de 1 letra da el error de validación y no crea cuenta. El alta completa NO se pudo ejecutar por UI: `nodo-dev` tiene "Confirm email" activo y Supabase responde `over_email_send_rate_limit` / `email_address_invalid` (dominio .local). Se verificó la misma ruta (`handle_new_user` con partes en `user_metadata`) creando la cuenta por `POST /api/students`: queda con partes, sin marca de revisión, matriculada, y aparece como "Sesentaydos, Test Registro" sin insignia. **2026-10-21, producción:** registro real por UI (usuario) en https://www.nod0.dev/registro con `santiago8628+test062@gmail.com`, "Prueba Registro" / "Sesenta Dos" y un código de matrícula real: alta sin errores; perfil verificado vía `students-mcp-prod` (`first_name`/`last_name` correctos, `name_needs_review = false`). Cuenta y matrícula eliminadas con `delete_student` (búsqueda posterior vacía). Aprobado por el usuario.
 
 ### TC-062-04 — El estudiante edita sus nombres y apellidos en `/cuenta`
 **Precondición:** TC-062-03 aprobado.
@@ -184,8 +184,8 @@ vacío).
 **Resultado esperado:** insignia "Revisar" con el estilo de advertencia de
 `DESIGN.md`; los dos campos de edición caben en la celda sin desbordar la
 tabla; el formulario de registro se apila en móvil.
-**Estado:** ⚠️ Parcial
-**Hallazgos:** Modo oscuro verificado (insignia amarilla de advertencia, dos campos caben en la celda en desktop). Modo claro y ancho móvil NO verificados: `resize_window` no cambia el viewport real y el navegador quedó bloqueado por un diálogo de confirmación al borrar el ítem de calificación. Por revisar por el usuario.
+**Estado:** ✅ Aprobado
+**Hallazgos:** Modo oscuro verificado (insignia amarilla de advertencia, dos campos caben en la celda en desktop). Modo claro y ancho móvil NO verificados: `resize_window` no cambia el viewport real y el navegador quedó bloqueado por un diálogo de confirmación al borrar el ítem de calificación. Modo claro y ancho móvil: aprobado por el usuario el 2026-10-21.
 
 ## Casos de prueba — MCP
 
@@ -248,6 +248,6 @@ y `marked_at`, en orden de llegada (D11), no por apellido.
 **Hallazgos:** Registros con partes en orden de llegada: Dev Dos (…:46) antes que Ana (…:50).
 
 ## Resumen de la ronda
-- Aprobados: 16 — Fallidos: 0 — Parciales: 2 (TC-062-03, TC-062-12) — Pendientes: 0
+- Aprobados: 18 — Fallidos: 0 — Parciales: 0 — Pendientes: 0 (TC-062-03 y TC-062-12 cerrados el 2026-10-21)
 - Hallazgos escalados a `docs/specs/backlog.md`: ninguno nuevo (la matrícula cruzada de TC-062-08 se anota abajo)
 - Limpieza de datos de prueba: ⚠️ Casi completa. Eliminados: estudiantes registro/mcp/mononimo; Ana reactivada en DEVADA y con sus nombres restaurados; Dev Dos con nombres confirmados. **Permanentes:** evaluación "Quiz test-062" (`4e00ed9b-c8b3-4ebc-93ad-d11e7de99449`, 409 con envíos), sesión de asistencia manual del 19/10 en DEVEDD2026 y el ítem de calificación "Parcial test-062" (el navegador se bloqueó con un diálogo de confirmación al eliminarlo: borrarlo desde la UI).
