@@ -1,4 +1,4 @@
-# spec-059 — [TESTING] Ponderación de notas, cortes institucionales y nota a la fecha
+# spec-059 — [DONE] Ponderación de notas, cortes institucionales y nota a la fecha
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.
 
