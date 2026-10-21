@@ -24,14 +24,14 @@
 
 | Recurso | Creación | Identificador | Eliminado |
 |---------|----------|---------------|-----------|
-| Cortes "Nota 1", "Nota 2", "Nota 3" (objetivo 0.20 c/u) en DEVEDD2026 | UI planilla (TC-059-04) | {{ids}} | ⬜ |
-| Ítems "Quiz 1" (0.1, Nota 1), "Taller 1" (0.1, Nota 1), "Quiz 2" (0.2, Nota 2), "Parcial 1" (0.2, Nota 3), "Final" (0.4 → 0.3), "Bonus" (sin peso) en DEVEDD2026 | UI planilla (TC-059-01 a -04, -15) | {{ids}} | ⬜ |
-| Ítem "Autoevaluaciones" (`kind='self_assessment'`) en DEVEDD2026 | Botón "Crear ítem de autoevaluaciones" (TC-059-15) | {{id}} | ❌ No eliminable por diseño (spec-040 D5): queda como dato permanente de desarrollo |
-| Notas de Dev Uno y Dev Dos en DEVEDD2026 | UI planilla (TC-059-07, -09) | — | ⬜ |
-| Ítem manual "Autoevaluaciones" en DEVADA2026 | UI planilla (TC-059-16) | {{id}} | ⬜ (se elimina en el mismo caso) |
-| Ítem "Taller ADA" (0.5) + nota 4.0 de Dev Uno en DEVADA2026 | UI planilla (TC-059-13) | {{id}} | ⬜ |
-| Ítems "Taller PC" y "Quiz PC" (sin peso) + notas 3.0 y 4.0 de Dev Tres en DEVPC2026 | UI planilla (TC-059-12) | {{ids}} | ⬜ |
-| Retiro de Dev Uno de DEVADA2026 | `students-mcp unenroll_student` (TC-059-13) | {{enrollment_id}} | ⬜ (revertir con `enroll_student`, que reactiva — spec-056) |
+| Cortes "Nota 1", "Nota 2", "Nota 3" (objetivo 0.20 c/u) en DEVEDD2026 | UI planilla (TC-059-04) | `95ad0ca2-ba72-4b1e-9606-21f890cd20c6`, `f487cc35-cffe-4105-bf26-64533bb24cdf`, `b407f442-38ac-4dd5-a612-80f43741e220` | ✅ (SQL acotado por id, autorizado por el usuario) |
+| Ítems "Quiz 1" (0.1, Nota 1), "Taller 1" (0.1, Nota 1), "Quiz 2" (0.2, Nota 2), "Parcial 1" (0.2, Nota 3), "Final" (0.4 → 0.3), "Bonus" (sin peso) en DEVEDD2026 | UI planilla (TC-059-01 a -04, -15) | `d67d555d-483a-4eb6-b139-30fac129031b`, `1bfbc314-8e8e-45cd-a144-5f1f3d815bee`, `2d3ccb50-fb33-4228-8390-1fad5981f312`, `6c444c71-7d3f-476e-a575-4b61c0d4cf86`, `04d9f6af-9585-485f-ad7e-59bfc1b3b5da`, `1859ba4b-a625-4e4e-bb91-09dce3143aa5` | ✅ (SQL acotado por id) |
+| Ítem "Autoevaluaciones" (`kind='self_assessment'`) en DEVEDD2026 | Botón "Crear ítem de autoevaluaciones" (TC-059-15) | `c887ccb9-24e4-4235-95c3-0ed3dafbc6e8` | ❌ No eliminable por diseño (spec-040 D5): queda como dato permanente de desarrollo |
+| Notas de Dev Uno y Dev Dos en DEVEDD2026 | UI planilla (TC-059-07, -09) | — | ✅ (SQL; 10 notas en total en la ronda, incluidas las de ADA y PC) |
+| Ítem manual "Autoevaluaciones" en DEVADA2026 | UI planilla (TC-059-16) | — | ✅ (eliminado por el usuario en el mismo caso) |
+| Ítem "Taller ADA" (0.5) + nota 4.0 de Dev Uno en DEVADA2026 | UI planilla (TC-059-13) | `d1806f41-41eb-4a6c-bf03-2ae584821a56` | ✅ (SQL acotado por id) |
+| Ítems "Taller PC" y "Quiz PC" (sin peso) + notas 3.0 y 4.0 de Dev Tres en DEVPC2026 | UI planilla (TC-059-12) | `4db4ccc2-0d32-48eb-8505-4a53a28017ce`, `32fae601-0035-4a82-a0f0-e1045c075678` | ✅ (SQL acotado por id) |
+| Retiro de Dev Uno de DEVADA2026 | `students-mcp unenroll_student` (TC-059-13) | `9d945a68-0067-468e-8cfe-98e25bdcc141` | ✅ Reactivado con `enroll_student` (`reactivated: true`) (revertir con `enroll_student`, que reactiva — spec-056) |
 
 **Limpieza (orden inverso):** reactivar a Dev Uno en DEVADA2026 →
 vaciar las notas registradas (dejar cada celda vacía; `deleteGradeItem`
@@ -290,6 +290,6 @@ página y la columna del estudiante queda fija.
 **Hallazgos:** Aprobado por el usuario (2026-10-21). Claude verificó en el puerto 3002, a 537 px de ancho, en claro y oscuro: "Mis notas" de Dev Tres, y como docente el panel de ítems y cortes y la planilla en "Por ítem" y "Por corte" (insignias "Sin ponderar" y "Automático", avisos de ítems sin corte y de desajuste de Nota 3 en la familia de advertencia, columna del estudiante fija, tabla con desplazamiento horizontal dentro de su tarjeta). El modo claro se simuló quitando la clase `dark` de `<html>` (la app sigue el tema del sistema, sin selector). La vista ponderada del estudiante (Dev Uno) en claro/oscuro y el ancho móvil real los revisó el usuario. Pendiente de confirmar por el usuario: en el ancho de 537 px el título y las tarjetas de "Mis notas" aparecían pegados al borde izquierdo (sin margen lateral); no se verificó si es propio del ancho de la ventana de automatización.
 
 ## Resumen de la ronda
-- Aprobados: 0 — Fallidos: 0 — Pendientes: 17
+- Aprobados: 17 — Fallidos: 0 — Pendientes: 0
 - Hallazgos escalados a `docs/specs/backlog.md`: {{lista o "ninguno"}}
-- Limpieza de datos de prueba: ⬜ Pendiente
+- Limpieza de datos de prueba: ✅ Completada (2026-10-21). Como no existe endpoint para borrar ítems ni cortes y los diálogos `confirm()` bloquean la automatización, el usuario autorizó explícitamente un `DELETE` por SQL en `nodo-dev`, acotado por id (10 notas, 9 ítems, 3 cortes). Verificado por consulta: solo queda el ítem automático "Autoevaluaciones" de DEVEDD2026 (permanente por diseño, sin corte ni notas), 0 notas y las 4 matrículas activas.
