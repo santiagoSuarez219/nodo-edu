@@ -636,12 +636,14 @@ grant execute on function public.get_student_profiles_public(uuid[]) to authenti
 
 ## Preguntas abiertas para el usuario
 
-- **P1 — Roster de una sesión de asistencia vía MCP.** `get_session_attendance`
-  conserva el orden de llegada (`marked_at`, D11). ¿Lo quieres también por
-  apellido?
-- **P2 — Lista de envíos.** Propongo ordenar por apellido y, dentro del mismo
-  estudiante, por intento más reciente (D8), en vez del orden cronológico
-  actual. ¿Te sirve, o prefieres conservar el cronológico ahí?
+Ninguna. Resueltas por el usuario el 2026-10-20:
+
+- **P1 — Roster de una sesión de asistencia.** Se conserva el orden de llegada
+  (`marked_at`, D11) en la vista y en `get_session_attendance`: en una sesión
+  en curso sirve ver quién acaba de marcar. La planilla y el resumen del curso
+  sí van por apellido.
+- **P2 — Lista de envíos.** Por apellido y, dentro del mismo estudiante, el
+  intento más reciente primero (D8).
 
 ## Riesgos
 
