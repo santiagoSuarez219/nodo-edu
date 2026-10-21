@@ -5,7 +5,7 @@
 > calificación, cortes y notas **no tienen endpoint de API** (no existe
 > `/api/grades/*` ni herramienta MCP que los cree): se crean desde la UI de la
 > planilla **como parte de los propios casos**, que son justamente lo que se
-> prueba. Los estudiantes y nombres sí se gestionan vía `students-mcp`.
+> prueba. Los retiros/reactivaciones se hacen vía `students-mcp`.
 > Todo se registra abajo para limpiarlo al cerrar la ronda.
 
 **Recursos base (de `seed:dev`, no se crean ni se eliminan):**
@@ -32,12 +32,8 @@
 | Ítem "Taller ADA" (0.5) + nota 4.0 de Dev Uno en DEVADA2026 | UI planilla (TC-059-13) | {{id}} | ⬜ |
 | Ítems "Taller PC" y "Quiz PC" (sin peso) + notas 3.0 y 4.0 de Dev Tres en DEVPC2026 | UI planilla (TC-059-12) | {{ids}} | ⬜ |
 | Retiro de Dev Uno de DEVADA2026 | `students-mcp unenroll_student` (TC-059-13) | {{enrollment_id}} | ⬜ (revertir con `enroll_student`, que reactiva — spec-056) |
-| Cambio de nombres de Dev Uno a "Ana" / "Álvarez" | UI lista de matriculados (TC-059-24) | `dev-estudiante1@nodo.local` | ⬜ (restaurar con `students-mcp update_student` → `first_name: "Estudiante Dev"`, `last_name: "Uno"`) |
-| Cuenta "Test Registro Cincuentaynueve" | Registro en `/registro` con código `DEVEDD2026` (TC-059-22) | `registro.test059@nodo.local` / {{id}} | ⬜ (`students-mcp delete_student`) |
-| Estudiante "Mcp Prueba Cincuentaynueve" | `students-mcp create_student` (TC-MCP-059-01) | `mcp.test059@nodo.local` / {{id}} | ⬜ (`students-mcp delete_student`) |
 
-**Limpieza (orden inverso):** borrar los dos estudiantes temporales →
-restaurar los nombres de Dev Uno → reactivar a Dev Uno en DEVADA2026 →
+**Limpieza (orden inverso):** reactivar a Dev Uno en DEVADA2026 →
 vaciar las notas registradas (dejar cada celda vacía; `deleteGradeItem`
 rechaza ítems con notas) → eliminar ítems (excepto "Autoevaluaciones"
 automático) → eliminar cortes.
@@ -45,7 +41,7 @@ automático) → eliminar cortes.
 **Entorno de pruebas:** desarrollo (`nodo-dev`, `npm run dev` en el puerto 3002)
 **Fecha de la ronda:** {{fecha}}
 
-## Casos de prueba — Parte A (notas)
+## Casos de prueba
 
 ### TC-059-01 — Definir pesos y ver el resumen de ponderación
 **Precondición:** DEVEDD2026 sin ítems de calificación.
@@ -142,7 +138,7 @@ registra 0". La columna "Total" ya no existe.
 **Estado:** ⬜ Pendiente
 **Hallazgos:**
 
-### TC-059-08 — Vista "Por corte": orden por apellido, 1 decimal con coma y copia
+### TC-059-08 — Vista "Por corte": orden, 1 decimal con coma y copia
 **Precondición:** TC-059-07 aprobado.
 **Datos de prueba usados:** `dev@nodo.local`
 **Pasos:**
@@ -150,8 +146,11 @@ registra 0". La columna "Total" ya no existe.
 2. "Copiar columna" en "Nota 1" y pegar en un editor de texto.
 3. "Copiar columna" en "Nota 3" y pegar.
 **Resultado esperado:**
-1. Filas ordenadas por apellido y nombres ("Estudiante Dev **Dos**" antes que
-   "Estudiante Dev **Uno**"). Dev Dos: Nota 1 = **2,0** "incompleto", Nota 2 =
+1. Filas en el orden de spec-062 D16: si spec-062 está desplegado, por
+   apellido con "Apellidos, Nombres" ("Dev Dos, Estudiante" antes que "Dev Uno,
+   Estudiante"); si no, por nombre completo ("Estudiante Dev Dos" antes que
+   "Estudiante Dev Uno") con el aviso "Orden por nombre completo…". En ambos
+   casos Dev Dos va primero. Dev Dos: Nota 1 = **2,0** "incompleto", Nota 2 =
    **3,7** (3.74 → 3,7). Dev Uno: Nota 1 = **3,8** (3.75 → 3,8), Nota 2 = **4,5**,
    Nota 3 = vacío. Acumulado y Promedio en 2 decimales con punto, iguales a
    TC-059-07. Avisos: "Final" y "Bonus" sin corte; posible diferencia de
@@ -194,14 +193,16 @@ registra 0". La columna "Total" ya no existe.
    matrícula de Estructuras de Datos y la lista `/cuenta/cursos`.
 2. Como Dev Dos, abrir "Mis notas".
 **Resultado esperado:**
-1. Ítems agrupados por corte con su peso ("10 %"); Nota 1 = 3.75, Nota 2 =
-   4.50, Nota 3 = "—"; "Bonus" marcado "sin ponderar — no cuenta". Bloque de
+1. Ítems agrupados por corte con su peso ("10 %") y nota de ítem con 2
+   decimales; nota de corte en formato institucional: Nota 1 = **3,8**, Nota 2 =
+   **4,5**, Nota 3 = "—"; "Bonus" marcado "sin ponderar — no cuenta". Bloque de
    nota a la fecha: "Llevas **1.65** de 5.00" y "Promedio en lo evaluado
    **4.13**", cada una con su explicación (lo calificado equivale al 40 % del
    curso). Promedio en verde, acumulado neutro. El detalle muestra lo mismo;
    la lista muestra 4.13 como cifra principal y 1.65 secundaria.
-2. Nota 1 = **2.00** con la marca "incompleto" y "faltan notas en este
-   corte"; Promedio **3.16** en verde; Acumulado 0.95 neutro.
+2. Nota 1 = **2,0** con la marca "incompleto" y "faltan notas en este
+   corte"; Nota 2 = **3,7**; Promedio **3.16** en verde; Acumulado 0.95 neutro
+   (nota total con 2 decimales y punto, D11).
 **Estado:** ⬜ Pendiente
 **Hallazgos:**
 
@@ -278,143 +279,17 @@ botón no debe verse: anotarlo y saltar a los pasos 4–5). Cambiar "Final" a
 **Precondición:** TC-059-08 y TC-059-11 aprobados.
 **Datos de prueba usados:** `dev@nodo.local`; `dev-estudiante1@nodo.local`
 **Pasos:**
-1. Revisar la planilla (ambas vistas), el panel de ítems y cortes, "Mis notas"
-   y la lista de matriculados (edición de nombres) en modo claro y oscuro.
+1. Revisar la planilla (ambas vistas), el panel de ítems y cortes y "Mis notas"
+   en modo claro y oscuro.
 2. Revisar "Mis notas" y "Por corte" a ancho de móvil.
 **Resultado esperado:** colores según `DESIGN.md` (insignias de advertencia
-para "Sin ponderar", "incompleto", desajuste y "Revisar"; verde/rojo solo en
+para "Sin ponderar", "incompleto" y desajuste; verde/rojo solo en
 el promedio). En móvil la tabla se desplaza horizontalmente sin desbordar la
 página y la columna del estudiante queda fija.
 **Estado:** ⬜ Pendiente
 **Hallazgos:**
 
-## Casos de prueba — Parte B (nombres y apellidos)
-
-### TC-059-20 — Propuesta automática tras la migración
-**Precondición:** migraciones de la Parte B aplicadas en `nodo-dev` **sin**
-volver a correr `seed:dev`.
-**Datos de prueba usados:** `dev@nodo.local`
-**Pasos:**
-1. Abrir la lista de matriculados de "DEV — Estructuras de Datos".
-**Resultado esperado:** aviso "2 estudiantes con nombres por revisar". Dev
-Uno y Dev Dos muestran la insignia "Revisar". El nombre visible no cambió
-("Estudiante Dev Uno").
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
-
-### TC-059-21 — Revisar y confirmar nombres desde la lista de matriculados
-**Precondición:** TC-059-20 aprobado.
-**Datos de prueba usados:** `dev@nodo.local`
-**Pasos:**
-1. Activar la edición del nombre de Dev Dos.
-2. Sin cambiar nada, pulsar ✓.
-3. Activar la edición de Dev Uno, poner Nombres = `Estudiante Dev`,
-   Apellidos = `Uno`, pulsar Enter.
-4. Activar la edición de nuevo, borrar Apellidos y pulsar Escape.
-**Resultado esperado:**
-1. Aparecen dos campos con la propuesta ("Estudiante" | "Dev Dos").
-2. Se guarda; la insignia "Revisar" desaparece; el aviso pasa a "1 estudiante".
-3. Se guarda tras el spinner (sin actualización optimista); el nombre visible
-   es "Estudiante Dev Uno"; sin insignia; sin aviso.
-4. Se cancela sin guardar; el nombre sigue igual.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
-
-### TC-059-22 — Registro con nombres y apellidos separados
-**Precondición:** sesión cerrada.
-**Datos de prueba usados:** correo `registro.test059@nodo.local`, contraseña de prueba, código `DEVEDD2026`
-**Pasos:**
-1. Abrir el registro y observar el formulario.
-2. Intentar registrarse con Apellidos vacío.
-3. Registrarse con Nombres `Test Registro` y Apellidos `Cincuentaynueve`.
-4. Como docente, abrir la lista de matriculados de DEVEDD2026.
-**Resultado esperado:**
-1. Campos "Nombres" y "Apellidos" en lugar de "Nombre completo".
-2. Error de validación en Apellidos; no se crea la cuenta.
-3. Se crea la cuenta y queda matriculada (flujo de spec-027 intacto).
-4. Aparece "Test Registro Cincuentaynueve" **sin** insignia "Revisar".
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
-
-### TC-059-23 — El estudiante edita sus nombres y apellidos en `/cuenta`
-**Precondición:** TC-059-22 aprobado.
-**Datos de prueba usados:** `registro.test059@nodo.local`
-**Pasos:**
-1. Iniciar sesión con la cuenta nueva y abrir `/cuenta`.
-2. Cambiar Apellidos a `Cincuenta Nueve` y guardar.
-3. Observar el menú de usuario.
-**Resultado esperado:** dos campos con los valores del registro; se guarda;
-el menú muestra "Test Registro Cincuenta Nueve".
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
-
-### TC-059-24 — Orden por apellido en la planilla tras corregir nombres
-**Precondición:** TC-059-08 y TC-059-21 aprobados.
-**Datos de prueba usados:** `dev@nodo.local`
-**Pasos:**
-1. En la lista de matriculados, cambiar Dev Uno a Nombres `Ana`, Apellidos `Álvarez`.
-2. Abrir la planilla, vista "Por corte".
-**Resultado esperado:** "Ana Álvarez" aparece **primero** (la tilde no la
-manda al final), luego "Test Registro Cincuenta Nueve" (apellido
-"Cincuenta…"), luego "Estudiante Dev Dos" (apellido "Dev Dos"). "Copiar columna" respeta ese orden.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
-
-### TC-059-25 — Retirados no editables y conteo de pendientes
-**Precondición:** TC-059-13 aplicado (Dev Uno retirado de DEVADA2026).
-**Datos de prueba usados:** `dev@nodo.local`
-**Pasos:**
-1. Abrir la lista de matriculados de DEVADA2026.
-**Resultado esperado:** Dev Uno aparece en "Retirados" sin botón de edición de
-nombre (spec-057 D4) y no cuenta en el aviso de nombres por revisar.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
-
-## Casos de prueba — MCP (`students-mcp`)
-
-### TC-MCP-059-01 — `create_student` con nombres y apellidos
-**Herramienta probada:** `create_student` en `students-mcp`
-**Precondición:** `npm run dev` corriendo; `students-mcp` apuntando a `nodo-dev`.
-**Input de prueba:** `{ first_name: "Mcp Prueba", last_name: "Cincuentaynueve", email: "mcp.test059@nodo.local", password: "<de prueba>", enrollment_code: "DEVEDD2026" }`; luego el mismo pero sin `last_name`.
-**Output esperado:** el primero crea al estudiante y la respuesta trae
-`first_name`, `last_name`, `full_name = "Mcp Prueba Cincuentaynueve"`,
-`name_needs_review: false` (sin contraseña en la respuesta). El segundo es
-rechazado por validación (falta `last_name`).
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
-
-### TC-MCP-059-02 — `update_student` con nombres y apellidos
-**Herramienta probada:** `update_student` en `students-mcp`
-**Precondición:** TC-MCP-059-01 aprobado.
-**Input de prueba:** `{ id: "<id del estudiante MCP>", last_name: "Cincuenta Nueve" }`.
-**Output esperado:** `last_name` actualizado, `first_name` intacto,
-`full_name = "Mcp Prueba Cincuenta Nueve"`, `name_needs_review: false`. El
-esquema del tool ya no ofrece `full_name`.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
-
-### TC-MCP-059-03 — `list_students` ordenado por apellido y filtro de revisión
-**Herramienta probada:** `list_students` en `students-mcp`
-**Precondición:** TC-059-24 aplicado; al menos un perfil con `name_needs_review = true` (p. ej. Dev Tres, nunca revisado).
-**Input de prueba:** `{ academic_course_id: "<DEVEDD2026>" }`; luego `{ name_review_pending: true }`.
-**Output esperado:** la primera lista viene ordenada por apellido ("Álvarez"
-primero) e incluye `first_name`, `last_name`, `name_needs_review` en cada
-fila. La segunda devuelve solo perfiles por revisar (incluye a Dev Tres, no a
-"Ana Álvarez").
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
-
-### TC-MCP-059-04 — `get_student` devuelve las partes del nombre
-**Herramienta probada:** `get_student` en `students-mcp`
-**Precondición:** TC-MCP-059-02 aprobado.
-**Input de prueba:** `{ id: "<id del estudiante MCP>" }`.
-**Output esperado:** detalle con `first_name: "Mcp Prueba"`,
-`last_name: "Cincuenta Nueve"`, `full_name`, `name_needs_review: false` y sus
-matrículas.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
-
 ## Resumen de la ronda
-- Aprobados: 0 — Fallidos: 0 — Pendientes: 27
+- Aprobados: 0 — Fallidos: 0 — Pendientes: 17
 - Hallazgos escalados a `docs/specs/backlog.md`: {{lista o "ninguno"}}
 - Limpieza de datos de prueba: ⬜ Pendiente
