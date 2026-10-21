@@ -182,8 +182,8 @@ registra 0". La columna "Total" ya no existe.
 1. Pide confirmación. "Parcial 1" queda sin corte con peso 0.2; suma de
    ítems 1.00; cortes 0.40; cifras de estudiantes sin cambios.
 2. "Nota 3" vuelve con "objetivo 0.20 · ítems 0.20".
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** Aprobado por el usuario (2026-10-21). Al eliminar "Nota 3" (el usuario aceptó la confirmación) "Parcial 1" quedó sin corte con peso 0.2; al recrearla, "ítems 0.20" sin aviso.
 
 ### TC-059-11 — Vista del estudiante: cifras, pesos y corte incompleto visible
 **Precondición:** TC-059-10 aprobado.
@@ -236,8 +236,8 @@ Datos sigue en "Cursos activos" sin cambios.
 **Pasos:**
 1. Abrir la página principal del curso "DEV — Estructuras de Datos" en el panel docente.
 **Resultado esperado:** Dev Uno "1.65 · 4.13"; Dev Dos "0.95 · 3.16", coherentes con la planilla.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** Aprobado por el usuario (2026-10-21). Columnas Acumulado y Promedio: Dev Dos 0.95 / 3.16, Dev Uno 1.65 / 4.13.
 
 ### TC-059-15 — Botón "Crear ítem de autoevaluaciones"
 **Precondición:** DEVEDD2026 **sin** ítem de autoevaluaciones (si ya existe, el
