@@ -69,7 +69,7 @@ disponible 0.40". Sin aviso de ítems sin ponderar.
 3. Rechazo (disponible 0.00); "Quiz 1" conserva `0.1`.
 4. Ambos rechazados por rango (mayor que 0, máximo 1).
 **Estado:** ✅ Aprobado
-**Hallazgos:** Aprobado por el usuario (2026-10-21). Paso 3: el mensaje dice "Disponible: 0.10" (descuenta el peso propio del ítem) en vez de 0.00; el rechazo es correcto y Quiz 1 conserva 0.1.
+**Hallazgos:** Aprobado por el usuario (2026-10-21). Paso 3: la ronda mostró "Disponible: 0.10" (descontaba el peso propio); se corrigió después para mostrar lo libre del curso (0.00, como el spec). Quiz 1 conserva 0.1.
 
 ### TC-059-03 — Ítem sin ponderar advertido
 **Precondición:** TC-059-02 aprobado.
@@ -78,8 +78,8 @@ disponible 0.40". Sin aviso de ítems sin ponderar.
 1. Crear "Bonus" con el peso vacío.
 **Resultado esperado:** insignia "Sin ponderar" y aviso "Hay 1 ítem sin
 ponderar: no cuenta en la nota a la fecha". La suma sigue en 1.00.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** Aprobado por el usuario (2026-10-21). Insignia "Sin ponderar" y aviso visibles; suma en 1.00.
 
 ### TC-059-04 — Crear cortes con peso objetivo y asignar ítems
 **Precondición:** TC-059-03 aprobado.
@@ -93,8 +93,8 @@ ponderar: no cuenta en la nota a la fecha". La suma sigue en 1.00.
    "Por ítem" los encabezados se agrupan por corte, con "Final" y "Bonus" al
    final. Resumen de cortes "0.60 / 1.00".
 3. Rechazo por nombre duplicado.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** Aprobado por el usuario (2026-10-21). Cortes con "ítems 0.20", encabezados agrupados, duplicado rechazado ("Ya existe un registro con ese nombre en el curso.").
 
 ### TC-059-05 — Rechazo cuando los pesos objetivo de los cortes superan 1.00
 **Precondición:** TC-059-04 aprobado (cortes suman 0.60).
@@ -104,8 +104,8 @@ ponderar: no cuenta en la nota a la fecha". La suma sigue en 1.00.
 2. Editar "Nota 1" a objetivo `0.7`.
 **Resultado esperado:** ambos se rechazan con "la suma de pesos de cortes
 superaría 1.00 — disponible 0.40"; nada cambia.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** Aprobado por el usuario (2026-10-21). Hallazgos corregidos durante la prueba: el campo del corte conservaba el valor rechazado, y "Disponible" descontaba el peso propio (ahora muestra lo libre del curso: 0.40).
 
 ### TC-059-06 — Aviso de desajuste entre ítems y objetivo del corte
 **Precondición:** TC-059-04 aprobado.
