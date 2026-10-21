@@ -291,5 +291,5 @@ página y la columna del estudiante queda fija.
 
 ## Resumen de la ronda
 - Aprobados: 17 — Fallidos: 0 — Pendientes: 0
-- Hallazgos escalados a `docs/specs/backlog.md`: {{lista o "ninguno"}}
+- Hallazgos escalados a `docs/specs/backlog.md`: ninguno (queda por confirmar en móvil real el margen lateral de «Mis notas»; ver TC-059-17)
 - Limpieza de datos de prueba: ✅ Completada (2026-10-21). Como no existe endpoint para borrar ítems ni cortes y los diálogos `confirm()` bloquean la automatización, el usuario autorizó explícitamente un `DELETE` por SQL en `nodo-dev`, acotado por id (10 notas, 9 ítems, 3 cortes). Verificado por consulta: solo queda el ítem automático "Autoevaluaciones" de DEVEDD2026 (permanente por diseño, sin corte ni notas), 0 notas y las 4 matrículas activas.
