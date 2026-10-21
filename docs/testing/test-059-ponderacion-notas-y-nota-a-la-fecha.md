@@ -203,8 +203,8 @@ registra 0". La columna "Total" ya no existe.
 2. Nota 1 = **2,0** con la marca "incompleto" y "faltan notas en este
    corte"; Nota 2 = **3,7**; Promedio **3.16** en verde; Acumulado 0.95 neutro
    (nota total con 2 decimales y punto, D11).
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** Aprobado por el usuario (2026-10-21), en el puerto 3002 con el código de la rama. Dev Uno: Nota 1 = 3,8, Nota 2 = 4,5, Nota 3 = "—", Bonus "sin ponderar — no cuenta", promedio 4.13, acumulado 1.65, "Llevas evaluado el 40 % del curso"; `/cuenta/cursos` muestra 4.13 y "Acumulado 1.65". Dev Dos: Nota 1 = 2,0 + "Incompleto — faltan notas en este corte.", Nota 2 = 3,7, promedio 3.16, acumulado 0.95, 30 % evaluado. Cifras leídas del texto de la página; el color (verde/neutro) lo confirmó el usuario a ojo. El detalle de la matrícula no se abrió por separado. Nota 3 de Dev EDD tiene objetivo 0.20 y ítems 0.30 (desajuste intencional del escenario, solo visible para el docente).
 
 ### TC-059-12 — Curso sin ponderar: promedio simple rotulado
 **Precondición:** DEVPC2026 con "Taller PC" y "Quiz PC" **sin peso** (creados por el docente) y notas 3.0 y 4.0 de Dev Tres.
@@ -216,8 +216,8 @@ registra 0". La columna "Total" ya no existe.
 1. Aviso de curso sin ponderaciones; promedio **3.50** rotulado "Promedio simple (sin ponderar)".
 2. "Promedio simple (sin ponderar) **3.50**" con "tu docente aún no ha
    definido el peso de cada nota"; no aparece "Llevas X de 5".
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** Aprobado por el usuario (2026-10-21). Paso 2 verificado en el puerto 3002 como Dev Tres: Taller PC 3.00, Quiz PC 4.00, "Promedio simple (sin ponderar) 3.50", "Tu docente aún no ha definido el peso de cada nota.", sin "Llevas…". El paso 1 (aviso en la planilla del docente) se verificó antes en TC-059-08.
 
 ### TC-059-13 — Estudiante retirado ve su nota ponderada
 **Precondición:** en DEVADA2026, "Taller ADA" (0.5) con 4.0 para Dev Uno; luego retirar a Dev Uno con `students-mcp unenroll_student`.
@@ -286,8 +286,8 @@ botón no debe verse: anotarlo y saltar a los pasos 4–5). Cambiar "Final" a
 para "Sin ponderar", "incompleto" y desajuste; verde/rojo solo en
 el promedio). En móvil la tabla se desplaza horizontalmente sin desbordar la
 página y la columna del estudiante queda fija.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** Aprobado por el usuario (2026-10-21). Claude verificó en el puerto 3002, a 537 px de ancho, en claro y oscuro: "Mis notas" de Dev Tres, y como docente el panel de ítems y cortes y la planilla en "Por ítem" y "Por corte" (insignias "Sin ponderar" y "Automático", avisos de ítems sin corte y de desajuste de Nota 3 en la familia de advertencia, columna del estudiante fija, tabla con desplazamiento horizontal dentro de su tarjeta). El modo claro se simuló quitando la clase `dark` de `<html>` (la app sigue el tema del sistema, sin selector). La vista ponderada del estudiante (Dev Uno) en claro/oscuro y el ancho móvil real los revisó el usuario. Pendiente de confirmar por el usuario: en el ancho de 537 px el título y las tarjetas de "Mis notas" aparecían pegados al borde izquierdo (sin margen lateral); no se verificó si es propio del ancho de la ventana de automatización.
 
 ## Resumen de la ronda
 - Aprobados: 0 — Fallidos: 0 — Pendientes: 17
