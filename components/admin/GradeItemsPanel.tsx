@@ -111,6 +111,9 @@ function ItemRow({
             aria-label={`Peso de ${item.name}`}
             className={`${inputClass} w-20 text-right font-mono`}
           />
+          {item.weight !== null && (
+            <span className="font-mono">· {+(item.weight * 100).toFixed(1)} %</span>
+          )}
         </label>
         <select
           value={groupId}
@@ -166,6 +169,8 @@ export function GradeItemsPanel({ academicCourseId, initialItems, initialGroups 
   const [groupName, setGroupName] = useState("");
   const [groupWeight, setGroupWeight] = useState("");
   const [groupError, setGroupError] = useState<string | null>(null);
+  // Remonta las filas de corte para descartar una edición rechazada.
+  const [groupResetNonce, setGroupResetNonce] = useState(0);
 
   const weightDefined = initialItems.reduce(
     (acc, i) => acc + (i.weight !== null ? toMillis(i.weight) : 0),
@@ -290,7 +295,10 @@ export function GradeItemsPanel({ academicCourseId, initialItems, initialGroups 
       const error = await run("updateGradeGroupAction", () =>
         updateGradeGroupAction(group.id, academicCourseId, name.trim(), weight, group.order_index)
       );
-      if (error) setGroupError(error);
+      if (error) {
+        setGroupError(error);
+        setGroupResetNonce((n) => n + 1);
+      }
     });
   }
 
@@ -372,8 +380,8 @@ export function GradeItemsPanel({ academicCourseId, initialItems, initialGroups 
           {unweightedCount > 0 && (
             <p className="text-amber-700 dark:text-amber-400">
               {unweightedCount === 1
-                ? "1 ítem sin ponderar: no cuenta en la nota ponderada."
-                : `${unweightedCount} ítems sin ponderar: no cuentan en la nota ponderada.`}
+                ? "Hay 1 ítem sin ponderar: no cuenta en la nota a la fecha."
+                : `Hay ${unweightedCount} ítems sin ponderar: no cuentan en la nota a la fecha.`}
               {weightDefined === 0 && " Mientras ninguno tenga peso, los estudiantes ven un promedio simple."}
             </p>
           )}
@@ -498,7 +506,7 @@ export function GradeItemsPanel({ academicCourseId, initialItems, initialGroups 
           const mismatch = itemsWeight !== toMillis(group.target_weight);
           return (
             <GroupRow
-              key={`${group.id}-${group.name}-${group.target_weight}`}
+              key={`${group.id}-${group.name}-${group.target_weight}-${groupResetNonce}`}
               group={group}
               itemsWeight={itemsWeight}
               mismatch={mismatch}

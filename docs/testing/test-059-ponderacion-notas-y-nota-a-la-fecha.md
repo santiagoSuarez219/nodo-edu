@@ -39,7 +39,7 @@ rechaza ítems con notas) → eliminar ítems (excepto "Autoevaluaciones"
 automático) → eliminar cortes.
 
 **Entorno de pruebas:** desarrollo (`nodo-dev`, `npm run dev` en el puerto 3002)
-**Fecha de la ronda:** {{fecha}}
+**Fecha de la ronda:** 2026-10-21 (servidor de la rama en el puerto 3003; DEV-EDD id `9f423f49-dbe5-4d73-89f8-9f27ac5fe068`)
 
 ## Casos de prueba
 
@@ -52,8 +52,8 @@ automático) → eliminar cortes.
 **Resultado esperado:** cada ítem muestra su peso como fracción y porcentaje
 ("0.10 · 10 %"). El resumen dice "Ponderación definida 0.60 / 1.00 —
 disponible 0.40". Sin aviso de ítems sin ponderar.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** Aprobado por el usuario (2026-10-21). Observación: el botón "Eliminar" de cada fila se ve recortado en el borde derecho del panel.
 
 ### TC-059-02 — Rechazo cuando los pesos de ítems superan 1.00
 **Precondición:** TC-059-01 aprobado.
@@ -68,8 +68,8 @@ disponible 0.40". Sin aviso de ítems sin ponderar.
 2. Se crea; resumen "1.00 / 1.00 — disponible 0.00".
 3. Rechazo (disponible 0.00); "Quiz 1" conserva `0.1`.
 4. Ambos rechazados por rango (mayor que 0, máximo 1).
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** Aprobado por el usuario (2026-10-21). Paso 3: el mensaje dice "Disponible: 0.10" (descuenta el peso propio del ítem) en vez de 0.00; el rechazo es correcto y Quiz 1 conserva 0.1.
 
 ### TC-059-03 — Ítem sin ponderar advertido
 **Precondición:** TC-059-02 aprobado.

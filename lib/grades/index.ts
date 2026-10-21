@@ -65,13 +65,19 @@ async function checkWeightAvailable(
     .select(`id, ${column}`)
     .eq("academic_course_id", academicCourseId);
 
-  const others = ((data ?? []) as unknown as Array<Record<string, unknown>>)
-    .filter((r) => r.id !== excludeId && r[column] !== null)
+  const rows = ((data ?? []) as unknown as Array<Record<string, unknown>>).filter(
+    (r) => r[column] !== null
+  );
+  const others = rows
+    .filter((r) => r.id !== excludeId)
     .reduce((acc, r) => acc + toMillis(Number(r[column])), 0);
 
   if (others + toMillis(newWeight) <= 1000) return null;
+  // "Disponible" = lo que queda sin asignar en todo el curso (incluido el peso
+  // actual del propio registro), que es la cifra que ve el docente en el panel.
+  const total = rows.reduce((acc, r) => acc + toMillis(Number(r[column])), 0);
   const what = table === "grade_items" ? "ponderaciones del curso" : "pesos de cortes";
-  return `La suma de ${what} superaría 1.00. Disponible: ${formatWeight(Math.max(1000 - others, 0))}.`;
+  return `La suma de ${what} superaría 1.00. Disponible: ${formatWeight(Math.max(1000 - total, 0))}.`;
 }
 
 export async function createGradeItem(

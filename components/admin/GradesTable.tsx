@@ -118,6 +118,13 @@ export function GradesTable({ academicCourseId, gradeItems, groups, rows }: Prop
         </p>
       </div>
 
+      {gradeItems.every((i) => i.weight === null) && (
+        <p className="text-xs text-amber-700 dark:text-amber-400">
+          Este curso no tiene ponderaciones: el Promedio es un promedio simple (sin ponderar) de las
+          notas registradas y no hay Acumulado.
+        </p>
+      )}
+
       {view === "group" && (
         <div className="text-xs flex flex-col gap-1">
           {ungroupedCount > 0 && (

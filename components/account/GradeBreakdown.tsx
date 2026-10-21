@@ -9,15 +9,29 @@ interface Props {
   rowClassName?: string;
 }
 
-function ItemRow({ item, className }: { item: GradeItemWithScore; className: string }) {
+function ItemRow({
+  item,
+  className,
+  showUnweighted,
+}: {
+  item: GradeItemWithScore;
+  className: string;
+  showUnweighted: boolean;
+}) {
   return (
     <div className={`flex items-center justify-between gap-4 ${className}`}>
       <span className="text-sm text-gray-700 dark:text-gray-300">
         {item.name}
-        {item.weight !== null && (
+        {item.weight !== null ? (
           <span className="ml-2 text-xs text-gray-400 dark:text-gray-500">
             {formatWeightPercent(item.weight)}
           </span>
+        ) : (
+          showUnweighted && (
+            <span className="ml-2 text-xs text-amber-700 dark:text-amber-400">
+              sin ponderar — no cuenta
+            </span>
+          )
         )}
       </span>
       <span className="font-mono text-sm font-semibold text-gray-900 dark:text-white shrink-0">
@@ -57,7 +71,7 @@ export function GradeBreakdown({ items, groups, summary, rowClassName = "py-2.5"
               )}
               <div className="divide-y divide-gray-100 dark:divide-gray-700">
                 {groupItems.map((item) => (
-                  <ItemRow key={item.id} item={item} className={rowClassName} />
+                  <ItemRow key={item.id} item={item} className={rowClassName} showUnweighted={summary.mode === "weighted"} />
                 ))}
               </div>
             </section>
@@ -67,7 +81,7 @@ export function GradeBreakdown({ items, groups, summary, rowClassName = "py-2.5"
         {ungrouped.length > 0 && (
           <div className="divide-y divide-gray-100 dark:divide-gray-700">
             {ungrouped.map((item) => (
-              <ItemRow key={item.id} item={item} className={rowClassName} />
+              <ItemRow key={item.id} item={item} className={rowClassName} showUnweighted={summary.mode === "weighted"} />
             ))}
           </div>
         )}

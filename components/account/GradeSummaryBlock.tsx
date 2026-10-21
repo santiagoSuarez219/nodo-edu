@@ -63,7 +63,7 @@ export function GradeSummaryBlock({ summary }: Props) {
         </span>
       </div>
       <div className="flex items-center justify-between gap-4">
-        <span className="text-sm text-gray-700 dark:text-gray-300">Acumulado en el curso</span>
+        <span className="text-sm text-gray-700 dark:text-gray-300">Llevas acumulado</span>
         <span className="font-mono text-base font-semibold text-gray-900 dark:text-white">
           {fmt(summary.accumulated)} <span className="text-xs font-normal text-gray-500">de 5.00</span>
         </span>
