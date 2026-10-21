@@ -1,4 +1,4 @@
-# spec-059 — [IN PROGRESS] Ponderación de notas, cortes institucionales y nota a la fecha
+# spec-059 — [TESTING] Ponderación de notas, cortes institucionales y nota a la fecha
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.
 
@@ -762,7 +762,7 @@ grant execute on function public.ensure_self_assessment_grade_item(uuid) to auth
       por el renombre de D7).
 
 ### Fase 6 — Pruebas
-- [ ] Ejecutar con el usuario `docs/testing/test-059-ponderacion-notas-y-nota-a-la-fecha.md`.
+- [x] Ejecutar con el usuario `docs/testing/test-059-ponderacion-notas-y-nota-a-la-fecha.md` (17/17 aprobados, 2026-10-21; datos de prueba eliminados).
 - [ ] Cuando exista framework, implementar los casos de "Pruebas asociadas".
 
 ### Fase 7 — Despliegue (solo con confirmación explícita del usuario)
