@@ -210,10 +210,10 @@ abrieron empiezan a contar como 0. Borrador:
 |---|---|---|---|
 | Fase 0 (foto previa) | 2026-10-22 22:35 UTC | ✅ 4 grupos activos, 0 conflictos DEBT-098 | Foto en `~/diagnostico-spec060-antes.json` (fuera del repo). `medianas-seleccion-y-estructuras-elementales` tiene intentos sin progreso en ambos grupos de Análisis |
 | Comunicación a estudiantes | | | |
-| Dry-run | | | salida guardada: |
-| `db push` | | | |
-| Verificación del esquema | | | |
-| Merge y push a `main` | | | |
-| Build de Vercel | | | |
-| Marcado inicial (por grupo) | | | |
-| Comparación contra Fase 0 | | | |
+| Dry-run | 2026-10-22 | ✅ Solo las 3 migraciones esperadas | Proyecto enlazado `bgiimadnmqnoqmdbudpo`, CLI 2.107.0. Salida: `Would push these migrations: 20261022000000_init_taught_lessons.sql, 20261022000001_rls_taught_lessons.sql, 20261022000002_self_assessment_by_taught_lessons.sql` |
+| `db push` | 2026-10-22 | ✅ 3 migraciones aplicadas | `migration list --linked` las muestra en local y remoto. Aviso de Docker (caché del catálogo) sin efecto |
+| Verificación del esquema | 2026-10-22 | ✅ | `taught_lessons` → `200 []`. `anon` → `42501` en `set_lessons_taught_internal`, `apply_self_assessment_grade`, `recalculate_course_self_assessment_grades_internal` y `set_lessons_taught`. `anon` lee `taught_lessons` vacía (RLS sin política para `anon`) |
+| Merge y push a `main` | 2026-10-22 | ✅ `eb20d8e` (`f0d7e78..eb20d8e`) | |
+| Build de Vercel | 2026-10-22 | ✅ `dpl_CKocA4DTC6ZghAGcxvvDeSWHSGcP` READY (~33 s) | Alias `www.nod0.dev`, `nod0.dev`, `nodo-edu.vercel.app`. `/login` 200; `/` → login (307). `/api/courses/…/groups` y `/api/students/…/self-assessment` sin clave → `401` (no `500`: las claves están en Production). Sin runtime errors en los primeros 15 min. `courses-mcp-prod` responde |
+| Marcado inicial (por grupo) | 2026-10-22 23:11 UTC | ✅ 4 lotes, sin `warnings` | `courses-mcp-prod` `set_lessons_taught`. PC 8 lecciones (6 cuentan para la nota), `recalculated_count` 17 · ED 18 (15 cuentan), 36 · AA G3 12 (11 cuentan), 43 · AA G1 12 (11 cuentan), 44 |
+| Comparación contra Fase 0 | 2026-10-22 | ✅ 0 matrículas sin nota | Foto posterior en `~/diagnostico-spec060-despues.json`. Promedios antes → después: PC 2.68 → 2.59 (6 bajan, 5 suben) · ED 4.37 → 4.42 (11 bajan, 15 suben) · AA G3 4.07 → 3.52 (35 bajan, peor −2.38) · AA G1 4.69 → 4.25 (34 bajan, peor −1.23) |
