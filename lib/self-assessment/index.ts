@@ -737,17 +737,17 @@ async function buildCourseSummaryFromBreakdown(
         (lessonOrder.get(b.lessonSlug)?.order ?? 0)
     );
 
-  return { score, correctTotal, questionTotal, lessons };
+  return { score, correctTotal, questionTotal, lessons, taughtLessonCount: lessons.length };
 }
 
-// spec-040 D4/D7: nota acumulada del curso, leída del RPC canónico
+// spec-060: nota acumulada de UNA matrícula, leída del RPC canónico
 // `self_assessment_breakdown` (mismo cálculo que usa la propagación a la
-// libreta, para que estudiante y docente nunca vean números distintos).
-// Punto 8 (spec-042): el RPC en sí resuelve ahora vía lesson_questions — ver
-// supabase/migrations/20260806000006_self_assessment_breakdown_via_lesson_questions.sql.
-// Esta función y la de abajo no cambian: consumen el RPC por firma.
+// libreta, para que estudiante y docente nunca vean números distintos). Se
+// calcula sobre las lecciones que el docente marcó como vistas en clase en el
+// grupo de la matrícula. Recibe la matrícula, no el course_slug, porque dos
+// grupos del mismo curso pueden llevar lecciones distintas.
 export async function getSelfAssessmentCourseSummary(
-  courseSlug: string
+  enrollmentId: string
 ): Promise<SelfAssessmentCourseSummary | null> {
   const user = await getCurrentUser();
   if (!user) return null;
@@ -755,14 +755,31 @@ export async function getSelfAssessmentCourseSummary(
   try {
     const supabase = await createServerSupabaseClient();
 
+    // El estudiante no puede leer academic_courses por RLS: se valida la
+    // propiedad de la matrícula con su sesión y el slug se lee con service_role.
+    const { data: enrollment } = await supabase
+      .from('enrollments')
+      .select('academic_course_id')
+      .eq('id', enrollmentId)
+      .eq('student_id', user.id)
+      .maybeSingle();
+    if (!enrollment) return null;
+
+    const { data: academicCourse } = await createServiceSupabaseClient()
+      .from('academic_courses')
+      .select('course_slug')
+      .eq('id', enrollment.academic_course_id)
+      .maybeSingle();
+    if (!academicCourse?.course_slug) return null;
+
     const { data: rows, error } = await supabase.rpc('self_assessment_breakdown', {
       p_user_id: user.id,
-      p_course_slug: courseSlug,
+      p_academic_course_id: enrollment.academic_course_id,
     });
     if (error) throw error;
 
     return await buildCourseSummaryFromBreakdown(
-      courseSlug,
+      academicCourse.course_slug,
       rows as SelfAssessmentBreakdownRow[] | null
     );
   } catch (error) {
@@ -772,13 +789,12 @@ export async function getSelfAssessmentCourseSummary(
 }
 
 // spec-040 Fase 5 (D7): desglose por estudiante para el docente ("¿por qué
-// tengo 3.2?"), accesible desde la libreta. `self_assessment_breakdown` no
-// es security definer, así que hereda RLS del rol que la invoca — y
-// `lesson_progress`/`self_assessment_attempts` solo permiten leer las
-// propias filas o con rol admin (ver RLS de esas tablas). Un docente
-// (no-admin) no tiene ese permiso, así que esta función valida la propiedad
-// del curso académico en la sesión del usuario y luego lee con
-// `service_role`, igual que las rutas de servicio del proyecto.
+// tengo 3.2?"), accesible desde la libreta. `self_assessment_breakdown(uuid,
+// uuid)` es security definer (spec-060) y su guarda admite al propio
+// estudiante, al docente dueño del grupo, a un admin o a una llamada sin
+// usuario (`service_role`). Esta función valida la propiedad del curso
+// académico en la sesión del usuario y luego lee con `service_role`, igual
+// que las rutas de servicio del proyecto.
 export async function getSelfAssessmentBreakdownForEnrollment(
   enrollmentId: string,
   academicCourseId: string
@@ -817,7 +833,7 @@ export async function getSelfAssessmentBreakdownForEnrollment(
     const serviceSupabase = createServiceSupabaseClient();
     const { data: rows, error } = await serviceSupabase.rpc('self_assessment_breakdown', {
       p_user_id: enrollment.student_id,
-      p_course_slug: academicCourse.course_slug,
+      p_academic_course_id: academicCourseId,
     });
     if (error) throw error;
 

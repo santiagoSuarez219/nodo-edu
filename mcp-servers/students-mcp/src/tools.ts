@@ -162,17 +162,22 @@ export const tools: Tool[] = [
   {
     name: "get_student_self_assessment_summary",
     description:
-      "Consulta la nota de autoevaluaciones de un estudiante en un curso: nota 0-5 (null si aún no hay preguntas evaluables, nunca 0.00), acumulado de preguntas correctas sobre el total y desglose por lección (respondida o no, correctas/total). Sirve para explicar de dónde sale la nota. Es una herramienta de SOLO LECTURA: la nota se calcula automáticamente a partir de las lecciones vistas y respondidas, y no se puede modificar desde aquí.",
+      "Consulta la nota de autoevaluaciones de un estudiante en un grupo, calculada sobre las lecciones que el docente marcó como vistas en clase en ESE grupo: nota 0-5 (null si aún no hay lecciones evaluables, nunca 0.00), acumulado de preguntas correctas sobre el total y desglose por lección dictada (respondida o no; sin responder cuenta 0/N). Indica `academic_course_id` (preferido) o `course_slug` (solo si el estudiante tiene un único grupo activo en ese curso; si tiene varios responde 409 con la lista de grupos para que preguntes cuál). Es una herramienta de SOLO LECTURA: la nota se calcula sola y no se puede modificar desde aquí.",
     inputSchema: {
       type: "object",
       properties: {
         student_id: { type: "string", description: "UUID del estudiante" },
+        academic_course_id: {
+          type: "string",
+          description: "UUID del grupo (curso académico). Preferido.",
+        },
         course_slug: {
           type: "string",
-          description: "Slug del curso publicado (ej. 'estructura-de-datos')",
+          description:
+            "Slug del curso publicado (ej. 'estructuras-de-datos'). Alternativa a academic_course_id; indica exactamente uno de los dos.",
         },
       },
-      required: ["student_id", "course_slug"],
+      required: ["student_id"],
     },
   },
 ];
@@ -228,9 +233,11 @@ export async function processToolCall(
     }
 
     case "get_student_self_assessment_summary": {
-      const params = new URLSearchParams({
-        course_slug: String(toolInput.course_slug),
-      });
+      const params = new URLSearchParams();
+      if (toolInput.academic_course_id)
+        params.append("academic_course_id", String(toolInput.academic_course_id));
+      if (toolInput.course_slug)
+        params.append("course_slug", String(toolInput.course_slug));
       return await callStudentsApi(
         "GET",
         `/${toolInput.student_id}/self-assessment?${params}`

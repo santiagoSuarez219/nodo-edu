@@ -130,7 +130,7 @@ Desarrollo (`nodo-dev`): sin progreso ni intentos; solo las 5 preguntas montadas
 ## Ronda — `programacion-cientifica` (2026-10-21)
 
 **Rama:** `feat/semana-12-programacion-cientifica`
-**Estado:** ✅ Material y cuestionario listos en desarrollo / ⬜ Mergeada a `development` / ⬜ Desplegada y abierta
+**Estado:** ✅ Material y cuestionario listos en desarrollo / ✅ Mergeada a `development` / ✅ Desplegada y abierta (2026-10-21)
 
 **Alcance confirmado por el usuario:** sesión única del jueves 22 de octubre
 (Pandas: carga e inspección). **Excluida:** la semana 13 (`filtrado-agregacion-y-limpieza-de-datos`).
@@ -168,10 +168,10 @@ en la clase de la semana siguiente, así que esta ronda no los toca.
 | Lección | Entorno | IDs de preguntas | Publicadas | Montadas (`list_lesson_questions`) |
 |---|---|---|---|---|
 | `carga-e-inspeccion-de-datos-y-seleccion-del-proyecto` | desarrollo | `8b1efdf4-f58a-4a9a-a451-6508fe02e814`, `5e86f98c-366c-4ad2-934b-241283ead252`, `0b0c4fa6-f764-4485-8ff4-2e9ff6bfe791`, `12423990-858f-4130-bfab-b7a5222c1a14`, `69b362b8-dc7e-4272-816f-05443abd3432` | ✅ | ✅ (5) |
-| `carga-e-inspeccion-de-datos-y-seleccion-del-proyecto` | **producción** | — | ⬜ | ⬜ |
+| `carga-e-inspeccion-de-datos-y-seleccion-del-proyecto` | **producción** | `eb0cef96-b7a4-4a25-9ae6-8631d0ee3168`, `876f3539-b84e-494f-93e9-f693b94cbadc`, `fd199091-3035-44eb-9d95-364acbbd030a`, `bf7f1e0b-276f-42a1-bff0-6992a811a76e`, `bcedff6f-2e61-45c6-8df9-6ea939435a0f` | ✅ | ✅ (5) |
 
 > Las preguntas **no viajan con el deploy**: se recrean en producción en D3.
-> Keywords nuevas creadas en desarrollo (hay que crearlas también en producción): `pandas`, `dataframe` (kind `tema`).
+> Keywords creadas en desarrollo: `pandas`, `dataframe` (kind `tema`). Keywords creadas en producción (2026-10-21): `pandas`, `dataframe`, `csv` (kind `tema`; `csv` ya existía en desarrollo).
 
 ### Quiz calificable A/B/C
 
@@ -197,15 +197,15 @@ No aplica.
 
 | Paso | Estado | Fecha / detalle |
 |---|---|---|
-| D0 · Alcance y checklist pre-despliegue | ⬜ | |
-| D1 · Lecciones nuevas cerradas por adelantado | ⬜ | la lección ya existía como stub; revisar si hay fila en `disabled_lessons` |
-| D2 · Merge a `main` y deploy en Vercel | ⬜ | |
-| D3 · Banco de preguntas replicado a producción | ⬜ | crear keywords `pandas` y `dataframe` primero |
-| D4 · Lecciones abiertas a los estudiantes | ⬜ | |
-| D5 · Verificación end-to-end en producción | ⬜ | |
-| D6 · Bitácora cerrada y rama `deploy/` borrada | ⬜ | |
+| D0 · Alcance y checklist pre-despliegue | ✅ | 2026-10-21 — sin cambios de esquema; el deploy incluyó también el renombre de comentarios `spec-054` → `spec-061` (16 archivos, solo comentarios) |
+| D1 · Lecciones nuevas cerradas por adelantado | ✅ | 2026-10-21 — no hizo falta: la lección ya estaba cerrada en `disabled_lessons` desde el 2026-08-04; sin filas huérfanas |
+| D2 · Merge a `main` y deploy en Vercel | ✅ | 2026-10-21 — rama `deploy/semana-12-pc`, `main` en `f0d7e78`, despliegue `READY`; `development` empujado a `origin` (`9fa8eef`) |
+| D3 · Banco de preguntas replicado a producción | ✅ | 2026-10-21 — keywords `pandas`, `dataframe`, `csv` + 5 preguntas publicadas y montadas |
+| D4 · Lecciones abiertas a los estudiantes | ✅ | 2026-10-21 — `carga-e-inspeccion-de-datos-y-seleccion-del-proyecto` abierta |
+| D5 · Verificación end-to-end en producción | ⬜ | Pendiente: el docente comprueba en `www.nod0.dev` que la lección carga y que la autoevaluación aparece al final |
+| D6 · Bitácora cerrada y rama `deploy/` borrada | ✅ | 2026-10-21 — `deploy/semana-12-pc` solo existía en local y se borró |
 
-- [ ] Verificado que las lecciones de semanas futuras siguen **cerradas**
+- [x] Verificado que las lecciones de semanas futuras siguen **cerradas** (`filtrado-agregacion-y-limpieza-de-datos` y `matplotlib-y-seaborn`; `list_course_lessons`: 2 cerradas, 0 huérfanas)
 
 ### Pendientes
 

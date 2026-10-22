@@ -50,10 +50,23 @@ export async function GET(
       });
     }
 
-    const courseSlug = new URL(req.url).searchParams.get("course_slug");
-    if (!courseSlug) {
+    // D10: exactamente uno de los dos.
+    const searchParams = new URL(req.url).searchParams;
+    const courseSlug = searchParams.get("course_slug");
+    const academicCourseId = searchParams.get("academic_course_id");
+    if (!courseSlug === !academicCourseId) {
       return NextResponse.json(
-        validationError({ course_slug: ["course_slug es requerido"] }),
+        validationError({
+          academic_course_id: [
+            "Indica exactamente uno: academic_course_id (preferido) o course_slug",
+          ],
+        }),
+        { status: 422 }
+      );
+    }
+    if (academicCourseId && !UUID_RE.test(academicCourseId)) {
+      return NextResponse.json(
+        validationError({ academic_course_id: ["academic_course_id inválido"] }),
         { status: 422 }
       );
     }
@@ -67,9 +80,20 @@ export async function GET(
 
     const result = await getServiceStudentSelfAssessmentSummary(
       studentId,
-      courseSlug
+      academicCourseId
+        ? { academicCourseId }
+        : { courseSlug: courseSlug as string }
     );
     if (!result.ok) {
+      if (result.kind === "not_found") {
+        return NextResponse.json(notFoundError(result.error), { status: 404 });
+      }
+      if (result.kind === "ambiguous") {
+        return NextResponse.json(
+          apiError("conflict", result.error, { groups: result.groups }),
+          { status: 409 }
+        );
+      }
       return NextResponse.json(apiError("internal_error", result.error), {
         status: 500,
       });

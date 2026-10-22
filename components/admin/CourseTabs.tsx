@@ -64,6 +64,17 @@ export function CourseTabs({ academicCourseId }: Props) {
       >
         Asistencia
       </Link>
+      <Link
+        href={`/admin/courses/${academicCourseId}/contenido`}
+        aria-current={isActive("contenido") ? "page" : undefined}
+        className={`px-4 py-2 text-sm font-medium transition-colors ${
+          isActive("contenido")
+            ? "text-blue-700 dark:text-blue-400 border-b-2 border-blue-700 dark:border-blue-400 font-semibold"
+            : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+        }`}
+      >
+        Contenido
+      </Link>
     </div>
   );
 }

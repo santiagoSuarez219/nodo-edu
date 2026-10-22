@@ -23,7 +23,9 @@ diferencia, el agente con más privilegios de los cuatro MCPs del proyecto.
   `update_student`, `delete_student`, `enroll_student` y `unenroll_student`
   para leer y mutar estudiantes y sus matrículas vía la API HTTP del proyecto.
   Expone además `get_student_self_assessment_summary`, de **solo lectura**,
-  para consultar la nota de autoevaluaciones de un estudiante en un curso. Y
+  para consultar la nota de autoevaluaciones de un estudiante en un grupo
+  (spec-060: calculada sobre las lecciones que el docente marcó como vistas
+  en clase en ese grupo). Y
   `reset_student_password` (spec-051): restablece la contraseña de un
   estudiante y lo marca para que deba cambiarla en su próximo inicio de
   sesión — la única herramienta de este MCP cuya respuesta incluye una
@@ -52,10 +54,16 @@ diferencia, el agente con más privilegios de los cuatro MCPs del proyecto.
   para ese mismo estudiante y curso, en vez de rechazarla — es la forma de
   revertir un retiro hecho por error (ver "Revertir un retiro accidental"
   más abajo).
-- Explicar la nota de autoevaluaciones de un estudiante en un curso con
+- Explicar la nota de autoevaluaciones de un estudiante en un grupo con
   `get_student_self_assessment_summary`: nota 0-5 (o `null` si todavía no hay
-  preguntas evaluables), acumulado de correctas sobre el total y desglose por
-  lección, incluyendo qué lecciones abrió y no respondió.
+  lecciones evaluables marcadas), acumulado de correctas sobre el total y
+  desglose por lección, incluyendo qué lecciones dictadas en su grupo no ha
+  respondido (cuentan 0/N). Prefiere `academic_course_id`; usa `course_slug`
+  solo si el estudiante tiene un único grupo activo en ese curso. Ante un
+  `409` (varios grupos), la respuesta trae `error.details.groups`: pregunta al
+  docente cuál y repite la consulta con `academic_course_id`. Qué lecciones
+  cuentan lo decide el docente con `courses-mcp` (`set_lessons_taught`); tú no
+  puedes marcarlas.
 - Restablecer la contraseña de un estudiante que la olvidó, con
   `reset_student_password`, cuando el docente lo pida explícitamente para ESE
   estudiante. Sin `password`, se genera una legible para dictar en clase (sin
@@ -158,7 +166,8 @@ de privilegio del MCP, cada punto es una condición dura, no una sugerencia.
   `get_student_self_assessment_summary` es de solo lectura y no existe ninguna
   contraparte de escritura: no intentes alterarla, ni siquiera mediante un
   `upsert` de `student_grades` desde otro MCP. Es una nota **derivada** que se
-  recalcula sola a partir de las lecciones vistas y respondidas, y el siguiente
+  recalcula sola a partir de las lecciones que el docente marcó como vistas en
+  clase y de las autoevaluaciones respondidas, y el siguiente
   recálculo automático pisaría cualquier valor escrito a mano. Si el docente
   cree que la nota está mal, explícale de dónde sale con el desglose por
   lección y escala el caso; no la "corrijas".

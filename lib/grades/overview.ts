@@ -60,7 +60,7 @@ export async function getStudentGradesOverview(): Promise<StudentGradesOverview>
       Promise.all(
         activeEnrollments.map((e) =>
           e.academic_course.course_slug
-            ? getSelfAssessmentCourseSummary(e.academic_course.course_slug)
+            ? getSelfAssessmentCourseSummary(e.id)
             : Promise.resolve(null)
         )
       ),

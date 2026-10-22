@@ -67,7 +67,7 @@ export default async function EnrollmentDetailPage({ params }: Props) {
   const totalCount = progressibleLessons.length;
 
   const selfAssessmentSummary = course
-    ? await getSelfAssessmentCourseSummary(enrollment.academic_course.course_slug!)
+    ? await getSelfAssessmentCourseSummary(enrollmentId)
     : null;
 
   // spec-055 (D4): ante un fallo de la consulta, la tarjeta se muestra igual,
@@ -108,7 +108,10 @@ export default async function EnrollmentDetailPage({ params }: Props) {
       <EnrollmentDetail enrollment={enrollment} gradesData={gradesData} />
 
       {selfAssessmentSummary && (
-        <SelfAssessmentSummaryCard summary={selfAssessmentSummary} />
+        <SelfAssessmentSummaryCard
+          summary={selfAssessmentSummary}
+          courseSlug={enrollment.academic_course.course_slug!}
+        />
       )}
     </main>
   );

@@ -620,9 +620,9 @@ export async function resetServiceStudentPassword(
 // para el agente docente (students-mcp). Solo lectura: la nota es derivada y
 // se recalcula sola, así que no existe contraparte de escritura.
 //
-// `self_assessment_breakdown` no es security definer (hereda RLS del rol que
-// la invoca) y este camino ya está detrás de STUDENTS_ADMIN_API_KEY, así que
-// se invoca con el cliente de servicio, igual que el resto de este módulo.
+// spec-060: el cálculo es por grupo (curso académico) y cuenta las lecciones
+// que el docente marcó como vistas en clase. Este camino ya está detrás de
+// STUDENTS_ADMIN_API_KEY, así que se invoca con el cliente de servicio.
 //
 // A diferencia del camino de UI (lib/self-assessment), aquí no se resuelven
 // títulos de lección desde el catálogo MDX: el agente solo necesita el slug.
@@ -634,6 +634,7 @@ type ServiceSelfAssessmentBreakdownRow = {
 };
 
 export interface ServiceSelfAssessmentSummary {
+  academic_course_id: string;
   course_slug: string;
   score: number | null;
   correct_total: number;
@@ -646,22 +647,109 @@ export interface ServiceSelfAssessmentSummary {
   }>;
 }
 
+// D10: resuelve el grupo. `academic_course_id` se usa tal cual (404 si el
+// estudiante no tiene matrícula en él); `course_slug` solo si el estudiante
+// tiene exactamente una matrícula activa con ese slug.
+export type ServiceSelfAssessmentTarget =
+  | { academicCourseId: string }
+  | { courseSlug: string };
+
+export type ServiceSelfAssessmentResult =
+  | { ok: true; summary: ServiceSelfAssessmentSummary }
+  | { ok: false; kind: "not_found"; error: string }
+  | {
+      ok: false;
+      kind: "ambiguous";
+      error: string;
+      groups: Array<{ academic_course_id: string; name: string }>;
+    }
+  | { ok: false; kind: "internal"; error: string };
+
 export async function getServiceStudentSelfAssessmentSummary(
   studentId: string,
-  courseSlug: string
-): Promise<
-  { ok: true; summary: ServiceSelfAssessmentSummary } | { ok: false; error: string }
-> {
+  target: ServiceSelfAssessmentTarget
+): Promise<ServiceSelfAssessmentResult> {
   const supabase = createServiceSupabaseClient();
+
+  let academicCourseId: string;
+  let courseSlug: string;
+
+  if ("academicCourseId" in target) {
+    const { data: enrollment, error: enrollmentError } = await supabase
+      .from("enrollments")
+      .select("academic_course:academic_courses(id, course_slug)")
+      .eq("student_id", studentId)
+      .eq("academic_course_id", target.academicCourseId)
+      .maybeSingle();
+    if (enrollmentError) {
+      console.error("self-assessment enrollment lookup error:", enrollmentError);
+      return { ok: false, kind: "internal", error: "No se pudo resolver el grupo." };
+    }
+    const course = (enrollment as unknown as {
+      academic_course: { id: string; course_slug: string | null } | null;
+    } | null)?.academic_course;
+    if (!course) {
+      return {
+        ok: false,
+        kind: "not_found",
+        error: "El estudiante no tiene matrícula en ese curso académico.",
+      };
+    }
+    if (!course.course_slug) {
+      return {
+        ok: false,
+        kind: "not_found",
+        error: "Ese curso académico no tiene contenido asociado.",
+      };
+    }
+    academicCourseId = course.id;
+    courseSlug = course.course_slug;
+  } else {
+    const { data: rows, error: rowsError } = await supabase
+      .from("enrollments")
+      .select("academic_course:academic_courses!inner(id, name, course_slug)")
+      .eq("student_id", studentId)
+      .eq("status", "active")
+      .eq("academic_course.course_slug", target.courseSlug);
+    if (rowsError) {
+      console.error("self-assessment enrollments lookup error:", rowsError);
+      return { ok: false, kind: "internal", error: "No se pudo resolver el grupo." };
+    }
+    const groups = ((rows ?? []) as unknown as Array<{
+      academic_course: { id: string; name: string; course_slug: string };
+    }>).map((r) => r.academic_course);
+    if (groups.length === 0) {
+      return {
+        ok: false,
+        kind: "not_found",
+        error: "El estudiante no tiene matrícula activa en ese curso.",
+      };
+    }
+    if (groups.length > 1) {
+      return {
+        ok: false,
+        kind: "ambiguous",
+        error:
+          "El estudiante está en varios grupos de ese curso; indica academic_course_id.",
+        groups: groups.map((g) => ({ academic_course_id: g.id, name: g.name })),
+      };
+    }
+    academicCourseId = groups[0].id;
+    courseSlug = groups[0].course_slug;
+  }
 
   const { data, error } = await supabase.rpc("self_assessment_breakdown", {
     p_user_id: studentId,
-    p_course_slug: courseSlug,
+    p_academic_course_id: academicCourseId,
   });
 
   if (error) {
     console.error("self_assessment_breakdown error:", error);
-    return { ok: false, error: "No se pudo calcular la nota de autoevaluaciones." };
+    return {
+      ok: false,
+      kind: "internal",
+      error: "No se pudo calcular la nota de autoevaluaciones.",
+    };
   }
 
   const rows = (data ?? []) as ServiceSelfAssessmentBreakdownRow[];
@@ -676,6 +764,7 @@ export async function getServiceStudentSelfAssessmentSummary(
   return {
     ok: true,
     summary: {
+      academic_course_id: academicCourseId,
       course_slug: courseSlug,
       score,
       correct_total: correctTotal,
