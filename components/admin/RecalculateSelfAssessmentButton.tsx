@@ -11,9 +11,9 @@ interface Props {
 }
 
 // spec-040 Fase 5: recálculo masivo, disparado por el docente. El
-// estudiante ya recalcula la suya al enviar un intento o ver una lección
-// nueva; este botón cubre lo que el estudiante no dispara: habilitar o
-// deshabilitar lecciones, o publicar/despublicar preguntas.
+// estudiante ya recalcula la suya al enviar un intento y marcar una lección
+// recalcula el grupo; este botón cubre lo demás: publicar/despublicar
+// preguntas.
 //
 // Confirmación en línea, no `window.confirm` (mismo criterio que D3 para el
 // estudiante: no es estilizable, no respeta el modo oscuro y su
@@ -75,7 +75,7 @@ export function RecalculateSelfAssessmentButton({ academicCourseId }: Props) {
         <div className="flex flex-col sm:flex-row sm:items-center gap-2 rounded-lg border border-yellow-300 dark:border-yellow-700 bg-yellow-50 dark:bg-yellow-900/20 px-3 py-2">
           <p className="text-xs text-yellow-800 dark:text-yellow-300 flex-1">
             ¿Recalcular la nota de autoevaluaciones de todo el curso? Se actualizará la nota
-            de cada estudiante matriculado según las lecciones que ya vio y respondió.
+            de cada estudiante matriculado según las lecciones marcadas como vistas en clase.
           </p>
           <div className="flex gap-2 shrink-0">
             <button
@@ -94,10 +94,10 @@ export function RecalculateSelfAssessmentButton({ academicCourseId }: Props) {
         </div>
       )}
       <p className="text-xs text-gray-500 dark:text-gray-400">
-        La nota de autoevaluaciones se calcula sobre las lecciones que cada estudiante ya
-        vio: <code className="text-[0.7rem]">correctas / preguntas × 5</code>. Ver una
-        lección nueva sin responderla baja la nota; publicar preguntas en una lección ya
-        respondida no cambia la nota de quien ya la respondió.
+        La nota de autoevaluaciones se calcula sobre las lecciones marcadas como vistas
+        en clase: <code className="text-[0.7rem]">correctas / preguntas × 5</code>. Una
+        lección marcada y sin responder cuenta como 0; publicar preguntas en una
+        lección ya respondida no cambia la nota de quien ya la respondió.
       </p>
     </div>
   );
