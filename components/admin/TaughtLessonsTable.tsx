@@ -218,18 +218,44 @@ export function TaughtLessonsTable({
           </p>
           <ul className="flex flex-col gap-2">
             {orphanTaughtSlugs.map((slug) => (
-              <li key={slug} className="flex items-center justify-between gap-3">
-                <span className="font-mono text-xs text-yellow-900 dark:text-yellow-200">
-                  {slug}
-                </span>
-                <button
-                  type="button"
-                  disabled={isPending}
-                  onClick={() => change(slug, false)}
-                  className="px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-60 rounded-lg transition-colors"
-                >
-                  Desmarcar
-                </button>
+              <li key={slug} className="flex flex-col gap-2">
+                <div className="flex items-center justify-between gap-3">
+                  <span className="font-mono text-xs text-yellow-900 dark:text-yellow-200">
+                    {slug}
+                  </span>
+                  <button
+                    type="button"
+                    disabled={isPending}
+                    onClick={() => setConfirmSlug(slug)}
+                    className="px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-60 rounded-lg transition-colors"
+                  >
+                    Desmarcar
+                  </button>
+                </div>
+                {confirmSlug === slug && (
+                  <div className="flex flex-col gap-2 rounded-lg border border-yellow-300 dark:border-yellow-700 bg-yellow-50 dark:bg-yellow-900/20 px-3 py-2">
+                    <p className="text-xs text-yellow-800 dark:text-yellow-300">
+                      Al desmarcarla, deja de contar para la nota de los{" "}
+                      {activeStudentCount} estudiantes del grupo.
+                    </p>
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setConfirmSlug(null)}
+                        className="px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 rounded-lg transition-colors"
+                      >
+                        Cancelar
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => change(slug, false)}
+                        className="px-3 py-1.5 text-xs font-medium text-white bg-brand hover:bg-brand-strong rounded-lg transition-colors"
+                      >
+                        Sí, desmarcar
+                      </button>
+                    </div>
+                  </div>
+                )}
               </li>
             ))}
           </ul>

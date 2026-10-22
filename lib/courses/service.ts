@@ -478,7 +478,7 @@ export async function listServiceTaughtLessons(
 }
 
 export type InvalidTaughtSlug = {
-  slug: string;
+  lesson_slug: string;
   reason: "not_found" | "is_guide";
 };
 
@@ -510,9 +510,10 @@ export async function findInvalidTaughtSlugs(
   for (const slug of slugs) {
     const lesson = bySlug.get(slug);
     if (!lesson) {
-      if (!(orphanMarks.has(slug))) invalid.push({ slug, reason: "not_found" });
+      if (!(orphanMarks.has(slug)))
+        invalid.push({ lesson_slug: slug, reason: "not_found" });
     } else if (isGuide(lesson)) {
-      invalid.push({ slug, reason: "is_guide" });
+      invalid.push({ lesson_slug: slug, reason: "is_guide" });
     }
   }
   return invalid;

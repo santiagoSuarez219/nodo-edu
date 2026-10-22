@@ -789,13 +789,12 @@ export async function getSelfAssessmentCourseSummary(
 }
 
 // spec-040 Fase 5 (D7): desglose por estudiante para el docente ("¿por qué
-// tengo 3.2?"), accesible desde la libreta. `self_assessment_breakdown` no
-// es security definer, así que hereda RLS del rol que la invoca — y
-// `lesson_progress`/`self_assessment_attempts` solo permiten leer las
-// propias filas o con rol admin (ver RLS de esas tablas). Un docente
-// (no-admin) no tiene ese permiso, así que esta función valida la propiedad
-// del curso académico en la sesión del usuario y luego lee con
-// `service_role`, igual que las rutas de servicio del proyecto.
+// tengo 3.2?"), accesible desde la libreta. `self_assessment_breakdown(uuid,
+// uuid)` es security definer (spec-060) y su guarda admite al propio
+// estudiante, al docente dueño del grupo, a un admin o a una llamada sin
+// usuario (`service_role`). Esta función valida la propiedad del curso
+// académico en la sesión del usuario y luego lee con `service_role`, igual
+// que las rutas de servicio del proyecto.
 export async function getSelfAssessmentBreakdownForEnrollment(
   enrollmentId: string,
   academicCourseId: string

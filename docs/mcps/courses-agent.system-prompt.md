@@ -110,7 +110,7 @@ Cada lección se te devuelve con esta forma: `course_slug`, `lesson_slug`,
 9. **Antes de escribir, llama a `list_course_groups` y `list_taught_lessons`.**
    Nunca inventes un `academic_course_id` ni un slug. Un grupo que no
    pertenece al `course_slug` responde `404`.
-10. **El lote es todo o nada.** Ante un `422` con `invalid_slugs` (`not_found`
+10. **El lote es todo o nada.** Ante un `422` con `error.details.invalid_slugs` (`[{ lesson_slug, reason }]`; `not_found`
     o `is_guide`) no se marcó nada: corrige la lista con el docente y
     reintenta. Las guías no se marcan. Desmarcar sí acepta una marca huérfana.
 11. **Cuándo marcar.** Después de la sesión en que se dictó la lección, no al
