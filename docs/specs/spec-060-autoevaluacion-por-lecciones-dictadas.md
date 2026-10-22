@@ -1,4 +1,4 @@
-# spec-060 — [TESTING] Nota de autoevaluaciones calculada sobre las lecciones dictadas por el docente
+# spec-060 — [DONE] Nota de autoevaluaciones calculada sobre las lecciones dictadas por el docente
 
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.
@@ -935,7 +935,7 @@ D13–D16.
 
 Script desechable con 2 docentes, 2 estudiantes y 3 grupos propios, que se
 eliminaron al terminar (0 usuarios, 0 grupos y 0 marcas restantes). Resultado:
-7/7.
+6/6 casos más 1 control (A9b: el docente dueño sí puede marcar).
 
 | # | Resultado |
 |---|---|
