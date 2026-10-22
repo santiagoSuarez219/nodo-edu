@@ -49,9 +49,31 @@ Guardar la foto **fuera del repo** (tiene ids y notas). Qué revisar:
 Sin backfill automático. Completar antes de la ventana, para que el marcado sea
 **una llamada por grupo**:
 
+> **Confirmada por el docente el 2026-10-22.** Armada con la foto de la Fase 0
+> (lecciones del registro `lib/courses/data/`, sin guías, con actividad del
+> grupo), en el orden del curso. Las lecciones sin preguntas `multiple_choice`
+> publicadas no mueven la nota (quedan fuera del cálculo); se incluyen igual
+> para que "Contenido" refleje lo dictado.
+
 | Grupo | `academic_course_id` | Lecciones dictadas (slugs) | Confirmada por el docente |
 |---|---|---|---|
-| | | | ⬜ |
+| Programación científica (INFOCIE02-2) | `e2ed5a1e-5ab1-44e4-a9bc-31cf252ea399` | `configuracion-del-entorno-de-trabajo-y-diagnostico`, `variables-tipos-de-datos-y-operadores`, `condicionales-y-bucles`, `estructuras-de-datos-nativas`, `funciones`, `clases-y-objetos-en-python`, `arreglos-y-dimensiones-numpy`, `operaciones-vectorizadas-y-algebra-lineal-basica` (8 lecciones) | ✅ |
+| Estructuras de datos (580506004-20) | `7bd3f233-c8e0-4e9e-bf2e-634b0a883756` | `fundamentos-control-de-versiones`, `github-flujo-de-trabajo-con-ramas`, `sintaxis-de-java`, `repaso-de-clases-y-objetos`, `practica-clases-y-objetos-proyecto-de-aula`, `encapsulamiento`, `metodos-avanzados-y-clases-de-utilidad`, `introduccion-al-uml`, `herencia`, `polimorfismo`, `asociacion-agregacion-y-composicion`, `diseno-con-tad-y-orientacion-a-objetos`, `notacion-big-o-y-analisis-de-complejidad`, `nodos-y-memoria-dinamica-en-java`, `operaciones-sobre-la-lista-simple`, `eliminacion-en-lista-simple-y-comparacion-con-arreglos`, `implementacion-de-pilas-en-java`, `implementacion-de-colas-en-java` (18 lecciones) | ✅ |
+| Análisis de Algoritmos (190304006-3) | `4b0ed2a9-1633-4ec0-afc0-6be7be809c52` | `fundamentos-control-de-versiones-y-flujo-de-trabajo`, `sintaxis-de-python`, `buenas-practicas-y-entornos-python`, `algoritmos-como-tecnologia`, `analisis-de-algoritmos-y-divide-y-venceras`, `notacion-o-theta-y-omega`, `como-resolver-recurrencias`, `subarreglo-maximo-y-strassen`, `sintesis-del-paradigma-de-divide-y-venceras`, `pilas-colas-y-listas`, `tablas-hash`, `arboles-de-busqueda-binarios` (12 lecciones) | ✅ |
+| Análisis de Algoritmos (190304006-1) | `76191ae2-7969-4956-a9c9-a873f059ad70` | Las mismas 12 lecciones del grupo 3 | ✅ |
+
+Excluidas a propósito (decisión del docente, 2026-10-22):
+- Programación científica: `carga-e-inspeccion-de-datos-y-seleccion-del-proyecto`
+  todavía no se dicta.
+- Estructuras de datos: `lista-doblemente-enlazada-y-lista-circular` y las de
+  orden 21–24 (`estrategias-de-ordenamiento-sobre-listas-enlazadas`,
+  `sintesis-del-modulo-de-listas`, `fundamentos-de-archivos`,
+  `lectura-escritura-y-modificacion`) todavía no se dictan, aunque pilas y
+  colas (orden 26 y 28) sí.
+- `medianas-seleccion-y-estructuras-elementales` (Análisis) se **retiró** del
+  curso: sus respuestas (4 en G3, 20 en G1) no cuentan. Lo mismo
+  `fundamentos-de-control-de-versiones-colab-y-diagnostico` (Programación
+  científica). Ninguna está en el registro: el API las rechazaría.
 
 Cada lista se valida con `list_taught_lessons` (slugs exactos, que no sean
 guías).
@@ -70,9 +92,10 @@ abrieron empiezan a contar como 0. Borrador:
 ### 2.4 Checklist pre-despliegue (CLAUDE.md)
 
 - [x] Spec afectado en `[DONE]` y mergeado a `development` (`6180cc1`).
-- [ ] `git diff --stat origin/main..HEAD -- supabase/` no vacío → **hay esquema** (3 migraciones, confirmado).
+- [x] `git diff --stat origin/main..HEAD -- supabase/` no vacío → **hay esquema** (3 migraciones, confirmado).
 - [ ] Variables de Vercel → Production verificadas (ver tabla de arriba).
-- [ ] `npm run build` y `npm run lint` locales sin errores (tsc y lint ya pasaron en la revisión; el **build no se ha corrido**).
+- [x] `npm run build` y `npm run lint` locales sin errores (2026-10-22: build OK; lint 0 errores, 7 advertencias preexistentes).
+- [x] Fase 0 en producción y listas de lecciones dictadas confirmadas (2.1, 2.2).
 - [ ] Datos de prueba de las rondas manuales eliminados (en `nodo-dev` hecho; producción nunca se tocó).
 - [ ] Ventana elegida **fuera del horario de clase** de todos los grupos (los horarios están en `academic_courses.class_days` / `class_time_*`).
 - [ ] Reconexión de los MCP `-prod` prevista tras el deploy.
@@ -185,7 +208,7 @@ abrieron empiezan a contar como 0. Borrador:
 
 | Paso | Fecha y hora | Resultado | Notas |
 |---|---|---|---|
-| Fase 0 (foto previa) | | | |
+| Fase 0 (foto previa) | 2026-10-22 22:35 UTC | ✅ 4 grupos activos, 0 conflictos DEBT-098 | Foto en `~/diagnostico-spec060-antes.json` (fuera del repo). `medianas-seleccion-y-estructuras-elementales` tiene intentos sin progreso en ambos grupos de Análisis |
 | Comunicación a estudiantes | | | |
 | Dry-run | | | salida guardada: |
 | `db push` | | | |
