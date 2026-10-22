@@ -560,7 +560,7 @@ que cubre tanto una lección como varias. **No** se conserva una
   los slugs contra el catálogo del `course_slug`. Con `taught: true`, cada slug
   debe existir y ser `kind: "lesson"`. Con `taught: false`, cada slug debe
   existir como lección del catálogo **o** ser una marca huérfana del grupo
-  (D9). Si alguno falla, responde `422` con `errors.invalid_slugs[]` (slug +
+  (D9). Si alguno falla, responde `422` con `error.details.invalid_slugs[]` (`lesson_slug` +
   motivo: `not_found` / `is_guide`) y **no escribe nada**. La RPC además
   corre en una sola transacción.
 - **Un solo recálculo** del grupo al final, solo si cambió al menos una
@@ -640,7 +640,7 @@ pasos D0–D6 no se renumeran):
 |---|---|---|---|
 | `list_course_groups` | lectura | `course_slug` (string, requerido) | `data.groups[]`: `{ academic_course_id, name, code, is_active, active_student_count }`; `404` si el curso no está en el catálogo |
 | `list_taught_lessons` | lectura | `course_slug`, `academic_course_id` (uuid) — ambos requeridos | `data.lessons[]` (solo `kind: "lesson"`): `{ lesson_slug, title, order, is_taught, taught_at, is_disabled, question_count, counts_for_grade }`; `meta`: `{ taught_count, counted_count, orphan_taught_slugs[] }`. `404` si el grupo no existe o su `course_slug` no coincide |
-| `set_lessons_taught` | escritura (lote, atómica) | `course_slug`, `academic_course_id`, `lesson_slugs` (array de string, 1–50, sin duplicados), `taught` (boolean, **sin default**) | `data.lessons[]` con el estado resultante; `meta`: `{ changed_slugs[], unchanged_slugs[], recalculated_count, warnings[] }`. `422` con `errors.invalid_slugs[]` (`not_found` / `is_guide`) si algún slug no es válido — **no escribe nada**; `422` si `taught` falta o el arreglo está vacío/duplicado; `404` si el grupo no existe o no pertenece al `course_slug` (D14) |
+| `set_lessons_taught` | escritura (lote, atómica) | `course_slug`, `academic_course_id`, `lesson_slugs` (array de string, 1–50, sin duplicados), `taught` (boolean, **sin default**) | `data.lessons[]` con el estado resultante; `meta`: `{ changed_slugs[], unchanged_slugs[], recalculated_count, warnings[] }`. `422` con `error.details.invalid_slugs[]` (`{ lesson_slug, reason }`, con `reason` `not_found` / `is_guide`) si algún slug no es válido — **no escribe nada**; `422` si `taught` falta o el arreglo está vacío/duplicado; `404` si el grupo no existe o no pertenece al `course_slug` (D14) |
 
 Rutas API (todas con `COURSES_ADMIN_API_KEY`, cliente `service_role`):
 
@@ -723,11 +723,19 @@ Casos `TC-MCP-060-01` a `TC-MCP-060-09` en
         `set_lessons_taught`, `set_lessons_taught_internal` (D8)
       - `revoke`/`grant` explícitos
       - **sin** tocar `self_assessment_breakdown(uuid, text)` (D3)
-- [ ] `supabase db push --db-url "$DEV_DB_URL" --dry-run` → mostrar salida al
-      usuario → aplicar en `nodo-dev`
-- [ ] Verificar `has_function_privilege` de las tres funciones internas (D8)
-- [ ] Verificar los casos SQL de "Pruebas automáticas" con datos desechables
-      en `nodo-dev`
+- [x] Migraciones aplicadas en `nodo-dev` (evidencia: las funciones nuevas
+      responden en los casos A8–A15 y en la ronda manual). **No quedó registrado
+      el `--dry-run` previo** (no se guardó su salida): sigue pendiente para
+      producción, donde sí es obligatorio (Fase 7).
+- [x] Privilegios de las tres funciones internas (D8), verificados por
+      comportamiento el 2026-10-22: `authenticated` y `anon` reciben `42501`
+      al invocar `apply_self_assessment_grade(uuid, uuid)`,
+      `recalculate_course_self_assessment_grades_internal(uuid)` y
+      `set_lessons_taught_internal(uuid, text[], boolean, uuid)`; `service_role`
+      sí ejecuta. Nota: no se consultó `has_function_privilege` literalmente (no
+      hay acceso SQL directo desde la sesión); repetirlo en producción tras el
+      `db push`.
+- [x] Casos SQL de "Pruebas asociadas" (ver "Evidencia de los casos SQL")
 
 ### Fase 2 — Backend
 - [x] `markLessonViewed`: quitar el recálculo
@@ -755,9 +763,11 @@ Casos `TC-MCP-060-01` a `TC-MCP-060-09` en
 - [x] `GET` y `PATCH` (lote) de `taught-lessons` (D8, D9, D14)
 - [x] `GET /api/students/[studentId]/self-assessment` con `academic_course_id`
       y atajo `course_slug` (D10)
-- [ ] (pendiente: requiere migración aplicada) Verificación por HTTP: `401` sin clave, `500` sin variable, `404` grupo
-      ajeno al curso, `422` guía / slug inexistente en el lote sin escritura
-      parcial, `409` ambigüedad
+- [x] Verificación por HTTP (2026-10-22, `nodo-dev`): `401` sin clave o con clave
+      incorrecta, `404` grupo ajeno al curso, `422` guía / slug inexistente /
+      duplicados / lista vacía / `taught` ausente en el lote sin escritura
+      parcial, `409` ambigüedad. **Sin evidencia:** `500` sin variable de
+      entorno (no se probó apagando `COURSES_ADMIN_API_KEY`)
 
 ### Fase 6 — MCP: actualizar `courses-mcp` y `students-mcp`
 - [x] Agregar `list_course_groups`, `list_taught_lessons` y
@@ -773,6 +783,9 @@ Casos `TC-MCP-060-01` a `TC-MCP-060-09` en
       `students-mcp`)
 
 ### Fase 7 — Despliegue y marcado inicial (operativo)
+> Entre el `db push` y el deploy, abrir una lección ya puede poner en `null` la
+> nota de ese estudiante (ver "Riesgos → Ventana migración → deploy"): hacer
+> los tres pasos seguidos.
 > Al desplegar, **ninguna lección está marcada en ningún grupo**. Las notas
 > existentes en `student_grades` no cambian solas (la migración no recalcula),
 > pero el primer envío de autoevaluación de cada estudiante la pasaría a
@@ -803,8 +816,9 @@ Casos `TC-MCP-060-01` a `TC-MCP-060-09` en
       (solo cambia el contenido de una skill existente)
 
 ### Fase 9 — Pruebas
-- [ ] Ejecutar `docs/testing/test-060-autoevaluacion-por-lecciones-dictadas.md`
-      con el usuario
+- [x] Ejecutar `docs/testing/test-060-autoevaluacion-por-lecciones-dictadas.md`
+      con el usuario (2026-10-22: 23/23 aprobados, casos adaptados al
+      catálogo de `nodo-dev`)
 - [ ] Invocar `@tester` para las pruebas automáticas (cuando exista framework)
 
 ## Criterios de aceptación
@@ -863,6 +877,15 @@ Casos `TC-MCP-060-01` a `TC-MCP-060-09` en
 - **Ventana de despliegue.** Entre el deploy y el marcado inicial, un envío de
   autoevaluación pone la nota de ese estudiante en `null`. Mitigación:
   marcado inmediato tras el deploy, fuera de horario de clase.
+- **Ventana migración → deploy.** Las migraciones se aplican en producción
+  **antes** del deploy de Vercel. En ese intervalo el código viejo sigue
+  llamando a `recalculate_self_assessment_grade` no solo al enviar una
+  autoevaluación sino también desde `markLessonViewed`, es decir, cada vez que
+  un estudiante abre una lección por primera vez. Con `taught_lessons` vacía,
+  la nueva `apply_self_assessment_grade` pone esa nota en `null` (D4). La nota
+  se recupera sola con el marcado inicial de la Fase 7. Mitigación: hacer el
+  `db push`, el deploy y el marcado inicial seguidos y fuera de horario de
+  clase.
 - **Olvido del docente.** Si no marca una lección dictada, no cuenta. Es
   visible (cabecera "N marcadas" en Contenido y la tarjeta del estudiante),
   pero no hay recordatorio automático; el paso de `class-material-prep`
@@ -907,6 +930,22 @@ D13–D16.
 | A14 | Lote de 3 slugs con 1 ya marcado | `changed_slugs` = 2, `unchanged_slugs` = 1, un solo recálculo (contar ejecuciones de la interna) |
 | A15 | Lote con un slug que falla a mitad de la transacción (forzado) | rollback completo: ninguna fila nueva en `taught_lessons`, notas sin cambios |
 | A13 | `select` en `taught_lessons` como estudiante de otro grupo | 0 filas |
+
+### Evidencia de los casos SQL (2026-10-22, `nodo-dev`)
+
+Script desechable con 2 docentes, 2 estudiantes y 3 grupos propios, que se
+eliminaron al terminar (0 usuarios, 0 grupos y 0 marcas restantes). Resultado:
+7/7.
+
+| # | Resultado |
+|---|---|
+| A1–A7, A12, A14 | Cubiertos por la ronda manual: A1/A2 por TC-060-04 y 06; A3 por TC-060-07; A4 por TC-060-09 y TC-MCP-060-06; A5 por TC-060-08; A6/A7 por TC-060-10 y 11; A12/A14 por TC-MCP-060-04 y 08 |
+| A8 | Con intento: 4/5 (`question_count` congelado en 5); sin intento: 0/6 (conteo vivo) |
+| A9 | Docente no dueño: `42501 not_allowed`; `taught_lessons` intacta. Control: el docente dueño sí marca |
+| A10 | `insert` directo por PostgREST rechazado (`42501`) para docente dueño, docente no dueño y estudiante; `delete` y `update` afectan 0 filas |
+| A11 | Las tres internas: `42501` para `authenticated` y `anon`; `service_role` ejecuta |
+| A13 | `select` en `taught_lessons`: estudiante matriculado 1 fila, estudiante de otro grupo 0, docente dueño 1, docente no dueño 0 |
+| A15 | Fallo forzado en el recálculo (ítem manual "Autoevaluaciones" preexistente, DEBT-098): `23502 grade_item_id` nulo, rollback completo; las marcas quedaron igual que antes |
 
 ## Aprobación de implementación
 

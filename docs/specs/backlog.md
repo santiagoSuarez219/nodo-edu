@@ -5,6 +5,75 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+## DEBT-098 — `apply_self_assessment_grade` falla si el curso ya tiene un ítem manual llamado "Autoevaluaciones"
+
+**Origen:** redacción de spec-059 (2026-10-20), al diseñar D15 (botón "Crear ítem de autoevaluaciones").
+**Prioridad:** Media — rompe el envío de autoevaluaciones de todo el curso, pero requiere que el docente haya creado a mano un ítem con ese nombre exacto.
+
+En `supabase/migrations/20260802000004_self_assessment_grade_rpcs.sql`, la creación perezosa del ítem
+`kind = 'self_assessment'` hace `insert ... on conflict do nothing` con el nombre fijo `'Autoevaluaciones'`.
+Si el curso ya tiene un ítem `manual` con ese nombre, el insert choca con `grade_items_course_name_unique`
+y no inserta. La relectura posterior por `kind = 'self_assessment'` devuelve `null`, y el `insert` en
+`student_grades` falla con `grade_item_id` nulo. Spec-059 hace que su RPC
+`ensure_self_assessment_grade_item` devuelva un error claro en ese caso, pero no corrige el camino de
+`apply_self_assessment_grade`.
+
+**Alcance ampliado por spec-060 (revisión @reviewer, 2026-10-22):** la nueva
+`apply_self_assessment_grade(uuid, uuid)` conserva el bug, y ahora también la
+llaman `set_lessons_taught` / `set_lessons_taught_internal` y el recálculo de
+los grupos tras abrir o cerrar una lección. Con un ítem manual llamado
+"Autoevaluaciones" en el curso: (1) marcar o desmarcar lecciones revierte toda
+la transacción y el docente ve un error genérico ("No se pudo actualizar la
+lección"); (2) `recalculateGroupsOfCourse` falla en silencio, solo con
+`console.error`. Prioridad: Media-Alta si algún curso real ya tiene ese ítem;
+verificar en producción antes del despliegue de spec-060.
+
+**Arreglo sugerido:** si después del insert no hay ítem por `kind`, no escribir en la libreta y registrar
+el motivo, o crear el ítem con un nombre alternativo ("Autoevaluaciones (auto)").
+
+---
+
+## DEBT-097 — Eliminar la firma vieja `self_assessment_breakdown(uuid, text)` tras desplegar spec-060
+
+**Origen:** redacción de spec-060 (2026-10-20), decisión D3.
+**Prioridad:** Baja — limpieza; no tiene efecto funcional mientras exista.
+
+spec-060 crea `self_assessment_breakdown(p_user_id uuid, p_academic_course_id uuid)`
+y migra a ella todos los callers (SQL y TypeScript). La firma vieja
+`(p_user_id uuid, p_course_slug text)`, basada en `lesson_progress`, **se
+conserva a propósito** en la migración de spec-060: las migraciones se aplican
+en producción antes del deploy de Vercel, y durante esa ventana el código
+viejo sigue llamándola.
+
+**Acción:** una vez desplegado spec-060 en producción y verificado que ningún
+caller la usa (`grep -rn "p_course_slug" lib app` sobre llamadas a
+`self_assessment_breakdown`), migración nueva con
+`drop function public.self_assessment_breakdown(uuid, text);`.
+
+---
+
+## DEBT-096 — Candidato MCP: lectura de notas por corte (acumulado / promedio) de un curso
+
+**Origen:** redacción de spec-059 (2026-10-20), sección "Evaluación MCP".
+**Prioridad:** Baja — no hay hoy un agente que lo necesite.
+
+spec-059 introduce ponderación de ítems, cortes institucionales
+(`grade_groups`) y la nota a la fecha (acumulado y promedio en lo evaluado),
+calculadas en `lib/grades/compute.ts`. No se expone a agentes porque no existe
+API REST de notas (`app/api/` no tiene `/api/grades/*`) y la necesidad del
+docente (subir notas a la plataforma institucional) se cubre con la vista
+"Por corte" de la planilla.
+
+Si algún agente docente llega a necesitar consultar el estado de notas de un
+curso, el candidato es una herramienta de **solo lectura**
+`get_course_grade_summary(academic_course_id)` que devuelva, por estudiante
+activo, la nota de cada corte, su marca "incompleto", el acumulado y el
+promedio — reutilizando `computeGradeSummary`, sin duplicar la fórmula. Dominio
+natural: `students-mcp` o `assignment-mcp` (evaluar al diseñarlo); requeriría
+primero una ruta `/api/...` con su clave de servicio.
+
+---
+
 ## DEBT-095 — `get_variant_answer_key` expone las respuestas correctas a cualquier estudiante durante el quiz
 
 **Origen:** revisión de código al redactar spec-058 (2026-10-19).
@@ -89,6 +158,42 @@ opciones y, si esa entrega ya reveló feedback, `is_correct`).
 **Acción:** añadir a la condición `allowed` la verificación de que
 `p_enrollment_id` pertenece a `auth.uid()` (join con la matrícula), con una
 migración. Conviene resolverla junto con DEBT-095, en la misma migración.
+
+---
+
+## DEBT-093 — Renombrar el slug de una lección deja huérfanos `lesson_questions` y `lesson_progress`
+
+**Origen:** incidente en producción, curso `programacion-cientifica` (2026-10-14).
+**Prioridad:** Media — distorsiona la nota de autoevaluaciones de todo un curso
+sin ningún aviso.
+
+El commit `0446ab1` (2026-08-08) renombró la lección de la semana 1 de
+`fundamentos-de-control-de-versiones-colab-y-diagnostico` a
+`configuracion-del-entorno-de-trabajo-y-diagnostico` (solo archivos MDX y
+registro en `lib/courses/data/`). Las filas de BD que referencian el slug no
+se migraron:
+
+- `lesson_questions` siguió apuntando al slug viejo (6 preguntas publicadas).
+- `lesson_progress` conservó las filas de los estudiantes que habían abierto
+  la lección con el slug viejo.
+
+Como esa lección ya no se puede abrir, nadie pudo enviar su autoevaluación, y
+`self_assessment_breakdown` (`supabase/migrations/20260806000006_...sql`) la
+siguió contando con conteo "vivo": 0 correctas de 6 para cada estudiante.
+
+**Mitigación aplicada (2026-10-14):** se desmontaron las 6 preguntas del slug
+viejo con `unmount_question_from_lesson` (siguen en el banco) y hay que
+recalcular las notas del curso desde la libreta. No se corrigieron las filas
+de `lesson_progress`, que siguen bajo el slug viejo.
+
+**Acción:** al menos una de estas, a decidir en un spec propio:
+- Un procedimiento documentado (o script) de renombre de slug que migre
+  `lesson_questions` y `lesson_progress` junto con el MDX.
+- Que `self_assessment_breakdown` ignore las lecciones cuyo slug ya no existe
+  en el contenido (hoy solo tiene el filtro de lecciones deshabilitadas
+  comentado, `BLOQUE 039`, y ese tampoco cubre este caso).
+- Un aviso en el panel docente cuando `lesson_questions` apunte a un slug
+  inexistente.
 
 ---
 

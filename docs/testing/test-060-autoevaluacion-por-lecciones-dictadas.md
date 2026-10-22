@@ -23,14 +23,14 @@
 | Lección **L4** (la "no marcada" de TC-060-02 / TC-060-06) | contenido existente | `repaso-de-clases-y-objetos` | N/A |
 | Guía **G1** (no debe aparecer ni poder marcarse) | contenido existente | `ejercicios-sintaxis-de-java` (`kind: "guide"`) | N/A |
 | Grupo **A** | ya existe — `npm run seed:dev` | curso `DEV — Estructuras de Datos`, código `DEVEDD2026`, `{{academic_course_id_A}}` | N/A (dato base) |
-| Grupo **B** (mismo `course_slug`, mismo docente) | **UI** `/admin/courses/new` (spec-036) como `dev@nodo.local`: nombre `Test-060 Grupo B`, código `T060-B`, `course_slug = estructuras-de-datos`, código de matrícula `T060B2026`. No existe endpoint de API para crear cursos académicos; si el usuario prefiere no usar la UI, inserción vía `service_role` **solo con su autorización explícita** | `{{academic_course_id_B}}` | ⬜ |
-| Grupo **C** sin `course_slug` (estado vacío de TC-060-13) | UI `/admin/courses/new`, sin contenido asociado, código de matrícula `T060C2026` | `{{academic_course_id_C}}` | ⬜ |
+| Grupo **B** (mismo `course_slug`, mismo docente) | **UI** `/admin/courses/new` (spec-036) como `dev@nodo.local`: nombre `Test-060 Grupo B`, código `T060-B`, `course_slug = estructuras-de-datos`, código de matrícula `T60B2026`. No existe endpoint de API para crear cursos académicos; si el usuario prefiere no usar la UI, inserción vía `service_role` **solo con su autorización explícita** | `{{academic_course_id_B}}` | ✅ Creado por script con `service_role` y eliminado (2026-10-22) |
+| Grupo **C** sin `course_slug` (estado vacío de TC-060-13) | UI `/admin/courses/new`, sin contenido asociado, código de matrícula `T60C2026` | `{{academic_course_id_C}}` | ✅ Creado por script con `service_role` y eliminado (2026-10-22) |
 | Estudiante **E1** | ya existe — `seed:dev`: `dev-estudiante1@nodo.local` / `DevStudent2026!` — activo en Grupo A | `{{student_id_E1}}`, matrícula `{{enrollment_E1_A}}` | N/A |
-| Estudiante **E2** (en A **y** en B) | ya existe en A (`dev-estudiante2@nodo.local` / `DevStudent2026!`); `students-mcp` → `enroll_student` con `enrollment_code: T060B2026` | `{{student_id_E2}}`, matrículas `{{enrollment_E2_A}}`, `{{enrollment_E2_B}}` | ⬜ (desmatricular de B) |
-| Estudiante **E4** (solo en B) | `students-mcp` → `create_student` (`test060-e4@nodo.local` / `Test060E4!`) + `enroll_student` (`T060B2026`) | `{{student_id_E4}}` | ⬜ |
-| Preguntas `multiple_choice` publicadas: **5 por lección en L1, L2, L3 y L4 (20)** | `question-bank-mcp` → `create_question` + `publish_question` + `mount_question_in_lesson`. Antes, `list_lesson_questions` en L1–L4: si ya tienen preguntas montadas en `nodo-dev`, anotar el número real y ajustar los valores esperados | ver tabla "Preguntas creadas" | ⬜ |
-| Marcas de `taught_lessons` | se crean y borran en los propios casos (UI / `courses-mcp`) | — | ⬜ (verificar 0 filas al final) |
-| Docente secundario **D2** (solo TC-060-14, opcional) | Admin API vía `service_role` (no hay endpoint de alta de docentes, DEBT-076) — **requiere autorización explícita del usuario** | `{{teacher_id_D2}}` | ⬜ |
+| Estudiante **E2** (en A **y** en B) | ya existe en A (`dev-estudiante2@nodo.local` / `DevStudent2026!`); `students-mcp` → `enroll_student` con `enrollment_code: T60B2026` | `{{student_id_E2}}`, matrículas `{{enrollment_E2_A}}`, `{{enrollment_E2_B}}` | ✅ Matrícula en B eliminada (2026-10-22) |
+| Estudiante **E4** (solo en B) | `students-mcp` → `create_student` (`test060-e4@nodo.local` / `Test060E4!`) + `enroll_student` (`T60B2026`) | `{{student_id_E4}}` | ✅ Eliminado (2026-10-22) |
+| Preguntas `multiple_choice` publicadas: **5 por lección en L1, L2, L3 y L4 (20)** | `question-bank-mcp` → `create_question` + `publish_question` + `mount_question_in_lesson`. Antes, `list_lesson_questions` en L1–L4: si ya tienen preguntas montadas en `nodo-dev`, anotar el número real y ajustar los valores esperados | ver tabla "Preguntas creadas" | N/A (se usaron las preguntas existentes de `nodo-dev`; no se crearon) |
+| Marcas de `taught_lessons` | se crean y borran en los propios casos (UI / `courses-mcp`) | — | ✅ 0 filas verificadas (2026-10-22) |
+| Docente secundario **D2** (solo TC-060-14) | Admin API vía `service_role` (no hay endpoint de alta de docentes, DEBT-076), autorizado por el usuario 2026-10-22 | `ceefd873-d9a6-4a10-b077-45b9d403225e` — `docente2.test060@nodo.local` / `Test060Docente2!` | ✅ Eliminado con la Admin API (2026-10-22) |
 
 ### Preguntas creadas
 
@@ -41,6 +41,21 @@
 | L3 | `{{q_L3_1..5}}` | `{{...}}` |
 | L4 | `{{q_L4_1..5}}` | `{{...}}` |
 
+### Recursos creados en la ronda del 2026-10-22
+
+> Grupos B y C creados por inserción con `service_role` (script desechable), por autorización del usuario; destino verificado: `nodo-dev` (`amkghsjjrmfjjvxuzadm`).
+
+| Recurso | Identificador | Eliminado |
+|---|---|---|
+| Grupo A (dato base) | `9f423f49-dbe5-4d73-89f8-9f27ac5fe068` | N/A |
+| Grupo B `Test-060 Grupo B` (`T060-B`, matrícula `T60B2026` — se cambió desde `T060B2026`, que tiene 9 caracteres; `estructuras-de-datos`) | `34fd7612-5017-4afd-aed8-e445228f188f` | ✅ Eliminado (2026-10-22) |
+| Grupo C `Test-060 Grupo C` (`T060-C`, `T060C2026`, sin slug) | `f27189d8-06ac-4756-9f6c-9a2a0c43b5f7` | ✅ Eliminado (2026-10-22) |
+| E1 `dev-estudiante1@nodo.local` | `88db2cf9-792b-49eb-b5e0-2abf53ba465d` | N/A |
+| E2 `dev-estudiante2@nodo.local` (en A) | `65c0a5b7-7723-4a2e-9fb3-dd6762095e6b` | N/A |
+| Matrícula de E2 en B | `cfd1eceb-67f0-44c5-a7ef-8419476f4dab` | ✅ Eliminada con `service_role` (2026-10-22, por instrucción del usuario) |
+| E4 `test060-e4@nodo.local` / `Test060E4!` (solo en B) | `4bb7edda-4b0e-4d41-821d-6c4ce10e3626`, matrícula `6c25534d-7612-4aa4-aac2-69261572628e` | ✅ Eliminado con `delete_student` (2026-10-22) |
+| Marcas en A: #20, #23, #24 | `lista-doblemente-enlazada-y-lista-circular`, `fundamentos-de-archivos`, `lectura-escritura-y-modificacion` | ✅ Desmarcadas por `courses-mcp` (0 filas en `taught_lessons`) |
+
 **Estado inicial común:** ninguna lección marcada en ningún grupo; L1–L4
 abiertas (`courses-mcp` → `list_course_lessons` sin `is_disabled`); ningún
 estudiante con intentos en L1–L4.
@@ -48,7 +63,7 @@ estudiante con intentos en L1–L4.
 **Entorno de pruebas:** desarrollo — Supabase cloud `nodo-dev`, `npm run dev`
 en el puerto **3002**, `courses-mcp` / `students-mcp` / `question-bank-mcp` en
 su variante **local**. Ningún caso se ejecuta contra producción.
-**Fecha de la ronda:** {{fecha}}
+**Fecha de la ronda:** 2026-10-21 y 2026-10-22
 
 ## Casos de prueba
 
@@ -124,8 +139,8 @@ nota se actualizará."
 2. Volver a `/cuenta/cursos/{{enrollment_E1_A}}`.
 **Resultado esperado:** nota **3.00** (`9/15 × 5`), L2 "Respondida 4/5". La
 libreta del docente muestra el mismo 3.00.
-**Estado:** ⚠️ Parcial
-**Hallazgos:** El flujo por UI funciona (Responder → enviar → confirmación definitiva → intento registrado, fila deja de ser "Sin responder"), pero se eligió la primera opción en todo y dio 0/6, así que la nota no subió. No se demostró una subida de nota por la UI (queda cubierto por la corrida API: 1.18).
+**Estado:** ✅ Aprobado (adaptado; confirmado por el usuario 2026-10-22)
+**Hallazgos:** 2026-10-22, navegador autorizado por el usuario, `nodo-dev`. Adaptado: E1 respondió #20 con 5/6 (una incorrecta a propósito). Antes 0/17; después **1.47** (5/17 × 5) en "Mis cursos" y en la tarjeta, sin acción del docente. #23 y #24 aparecen "Sin responder — 0/N" con enlace Responder. No se revisó la libreta del docente (sesión de docente no abierta en el navegador).
 
 
 ### TC-060-06 — Lección respondida pero no marcada no cuenta hasta marcarla
@@ -138,8 +153,8 @@ libreta del docente muestra el mismo 3.00.
 **Resultado esperado:** tras el paso 1 la nota sigue en 3.00 y L4 no aparece.
 Tras el paso 3: nota **3.50** (`14/20 × 5`), L4 "Respondida 5/5"; E2 = 0.00
 (`0/20`).
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado (adaptado; confirmado por el usuario 2026-10-22)
+**Hallazgos:** 2026-10-22. Adaptado: #24 hace de L4; se desmarcó en A por `courses-mcp` (el marcado por UI ya está probado en TC-060-03). E1 respondió #24 con 5/5: la nota quedó en **2.08** (5/12) y #24 no aparece en la tarjeta (si contara sería 10/12 = 4.17). Tras marcarla por `courses-mcp`: **2.94** (10/17), #24 "5/5". No se revisó la libreta del docente ni se marcó desde la pestaña Contenido.
 
 ### TC-060-07 — Desmarcar pide confirmación y baja el denominador
 **Precondición:** TC-060-06 (L1–L4 marcadas en A).
@@ -198,8 +213,8 @@ en A, ninguna en B.
 no se ven). Antes del paso 3, E2 y E4 en B: "sin nota". Tras marcar L1 en B:
 E2 y E4 en B = 0.00 (`0/5`); las notas del Grupo A **no cambian** (E1 = 3.50,
 E2 = 0.00 sobre 20).
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado (adaptado; confirmado por el usuario 2026-10-22)
+**Hallazgos:** 2026-10-22 (adaptado: #20, #23, #24). Con A marcada (3) y B marcada (3), se desmarcaron #23 y #24 en B desde la pestaña Contenido, con confirmación inline ("deja de contar para la nota de los 2 estudiantes del grupo"): B pasó a "1 lección marcada · 1 cuenta". Libreta de B: E2 = 5.00, E4 = 0.00. Libreta de A sin cambios (E2 = 1.76, E1 = 2.94; acumulados 0.18 y 0.29 con peso 10 %). Las marcas de A no aparecen en B. Salvedad: B no partió sin marcas (ya tenía las del lote de TC-MCP-060-08).
 
 ### TC-060-11 — Mismo estudiante, dos grupos, notas distintas
 **Precondición:** TC-060-10.
@@ -211,8 +226,8 @@ E2 = 0.00 sobre 20).
 **Resultado esperado:** Grupo A: **1.25** (`5/20`), desglose con L1–L4. Grupo
 B: **5.00** (`5/5`), desglose solo con L1. "Mis notas" muestra cada nota en
 su curso, sin cruzarlas.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado (adaptado; confirmado por el usuario 2026-10-22)
+**Hallazgos:** 2026-10-22, sesión de E2 en el navegador. Adaptado: en B solo #20 marcada; en A, #20, #23 y #24. E2 respondió #20 con 6/6. Grupo A: **1.76** (6/17), #20 "6/6", #23 y #24 "Sin responder". Grupo B: **5.00** (6/6), solo #20. "Mis notas" muestra cada nota en su curso sin cruzarlas. Un único intento cuenta en ambos grupos, como indica D2.
 
 ### TC-060-12 — Marcas huérfanas al cambiar el `course_slug` del grupo
 **Precondición:** TC-060-11 (L1 marcada en B).
@@ -227,8 +242,8 @@ su curso, sin cruzarlas.
 `analisis-de-algoritmos` sin marcas y aparece la sección de advertencia con el
 slug huérfano. Tras desmarcar, la sección desaparece. Tras el paso 4, L1 ya no
 figura marcada en B.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado (adaptado; confirmado por el usuario 2026-10-22)
+**Hallazgos:** 2026-10-22 (adaptado: la marca huérfana es `lista-doblemente-enlazada-y-lista-circular`). Al asociar B a `analisis-de-algoritmos`, Contenido lista ese catálogo sin marcas y muestra "Marcas sin lección en el catálogo" con el slug y botón Desmarcar. Tras desmarcar, la sección desaparece. Al reasociar a `estructuras-de-datos`, #20 ya no figura marcada ("0 lecciones marcadas"). **Hallazgo:** el primer intento de guardar falló con "El código de matrícula debe tener 8 caracteres": el código de B del guion, `T060B2026`, tiene 9. Se cambió a `T60B2026` desde el propio formulario. El guion tiene el mismo error en el Grupo C (`T060C2026`).
 
 ### TC-060-13 — Grupo sin contenido asociado y texto de ayuda de la libreta
 **Precondición:** Grupo C sin `course_slug`.
@@ -252,8 +267,8 @@ docente para E1 coincide con la tarjeta del estudiante.
 **Resultado esperado:** no ve el grupo (404 / sin acceso) o, si la página
 carga, cualquier intento de marcar falla con un mensaje de permiso y ninguna
 nota del Grupo A cambia.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado (adaptado; confirmado por el usuario 2026-10-22)
+**Hallazgos:** 2026-10-22. D2 (`docente2.test060@nodo.local`, rol `teacher` sin `admin`, creado con `service_role` por autorización del usuario) abrió `/admin/courses/{A}/contenido` y recibió **404** "This page could not be found". Las marcas de A no cambiaron (3). No se probó marcar por RPC con el JWT de D2 (casos A9/A10 del spec, por SQL).
 
 ### TC-MCP-060-01 — `list_course_groups`
 **Herramienta probada:** `list_course_groups` en `courses-mcp`
@@ -263,8 +278,8 @@ nota del Grupo A cambia.
 **Output esperado:** A y B con `academic_course_id`, `name`, `code`,
 `is_active` y `active_student_count` (A = matrículas activas sembradas, B = 2).
 El slug inexistente → `404`. El Grupo C (sin slug) no aparece.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado (adaptado; confirmado por el usuario 2026-10-22)
+**Hallazgos:** 2026-10-22, `nodo-dev`. Con A y B creados, `list_course_groups` devuelve ambos con `active_student_count` 2 (B: E2 y E4); C (sin slug) no aparece. `no-existe` → `404`. Observación: el guion espera "A = matrículas sembradas"; en `nodo-dev` A tiene 2.
 
 ### TC-MCP-060-02 — `list_taught_lessons`
 **Herramienta probada:** `list_taught_lessons` en `courses-mcp`
@@ -275,8 +290,8 @@ luego con `course_slug: "analisis-de-algoritmos"` y el mismo id.
 `is_taught: true`, `taught_at`, `question_count: 5`, `counts_for_grade: true`;
 `meta.taught_count: 4`, `meta.counted_count: 4`, `orphan_taught_slugs: []`.
 Con el `course_slug` que no corresponde al grupo → `404`.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado (adaptado; confirmado por el usuario 2026-10-22)
+**Hallazgos:** 2026-10-22 (adaptado: #20, #23 y #24 en lugar de L1–L4). Con las 3 marcadas en A: `taught_count 3`, `counted_count 3`, `orphan_taught_slugs []` (por HTTP). Sin marcas, las 3 salían `counts_for_grade: false`. Solo `kind: "lesson"` (sin guías). `course_slug` que no corresponde al grupo → `404`.
 
 ### TC-MCP-060-03 — `set_lessons_taught` con una sola lección marca y recalcula
 **Herramienta probada:** `set_lessons_taught` en `courses-mcp`
@@ -286,8 +301,8 @@ Con el `course_slug` que no corresponde al grupo → `404`.
 `meta.changed_slugs: ["github-flujo-de-trabajo-con-ramas"]`,
 `unchanged_slugs: []`, `recalculated_count: 2`, `warnings: []`. En la UI, la
 libreta de B refleja el nuevo denominador.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado (adaptado; confirmado por el usuario 2026-10-22)
+**Hallazgos:** 2026-10-22 (adaptado: #23 en B en lugar de L2). `changed_slugs [#23]`, `unchanged_slugs []`, `recalculated_count 2`, `warnings []`, `is_taught true`.
 
 ### TC-MCP-060-04 — `set_lessons_taught` es idempotente y reversible
 **Herramienta probada:** `set_lessons_taught` en `courses-mcp`
@@ -297,8 +312,8 @@ libreta de B refleja el nuevo denominador.
 `unchanged_slugs: ["github-flujo-de-trabajo-con-ramas"]`, `taught_at` igual
 al anterior y `recalculated_count: 0`. Con `false`: L2 en `changed_slugs`,
 `is_taught: false`.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado (adaptado; confirmado por el usuario 2026-10-22)
+**Hallazgos:** 2026-10-22 (adaptado: #23 en B). Repetir → `changed_slugs []`, `unchanged_slugs [#23]`, `taught_at` idéntico, `recalculated_count 0`. Con `taught: false` → `changed_slugs [#23]`, `is_taught false`, `taught_at null`, `recalculated_count 2`.
 
 ### TC-MCP-060-05 — `set_lessons_taught` rechaza entradas inválidas
 **Herramienta probada:** `set_lessons_taught` en `courses-mcp`
@@ -307,8 +322,8 @@ al anterior y `recalculated_count: 0`. Con `false`: L2 en `changed_slugs`,
 con `course_slug: "estructuras-de-datos"`.
 **Output esperado:** (a), (b) y (c) → `422`; (d) → `404`. Ningún caso crea
 filas (`list_taught_lessons` sin cambios).
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado (adaptado; confirmado por el usuario 2026-10-22)
+**Hallazgos:** 2026-10-22. (a) sin `taught` y (b) `lesson_slugs: []` → `422` (verificados por HTTP: el esquema del MCP los bloquea antes de enviar). (c) slug repetido → `422` "no admite duplicados". (d) `academic_course_id` del Grupo C con `estructuras-de-datos` → `404`. Clave incorrecta → `401`. Ningún caso dejó filas (A siguió con 3 marcadas).
 
 ### TC-MCP-060-06 — Lección cerrada: `warnings` y recálculo al abrir/cerrar
 **Herramientas probadas:** `set_lesson_availability` y `set_lessons_taught` en `courses-mcp`
@@ -321,8 +336,8 @@ nota de A baja (L3 fuera); el marcado en B devuelve
 `meta.warnings: [{ lesson_slug: "sintaxis-de-java", code: "lesson_disabled" }]`
 y `counts_for_grade: false`; al reabrir, las notas de A y B incluyen L3 sin
 recálculo manual.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado (adaptado; confirmado por el usuario 2026-10-22)
+**Hallazgos:** 2026-10-22 (adaptado: #20 como L3). Cerrar #20 → `recalculated_groups 2` (A y B). Marcarla en B cerrada → `warnings [{lesson_slug, code: "lesson_disabled"}]`, `counts_for_grade false`. Mientras estuvo cerrada, E2 en B pasó a 6 preguntas y en A a 11 (la lección fuera de ambas). Reabrir → `recalculated_groups 2`; ambos grupos vuelven a 17 sin recalcular a mano.
 
 ### TC-MCP-060-07 — `get_student_self_assessment_summary` por grupo
 **Herramienta probada:** `get_student_self_assessment_summary` en `students-mcp`
@@ -333,8 +348,8 @@ recálculo manual.
 **Output esperado:** (a) y (b) devuelven notas y desgloses distintos, solo
 con lecciones dictadas del grupo; (c) `409` con la lista de los dos grupos;
 (d) se resuelve al Grupo A (única matrícula activa) y devuelve su resumen.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado (adaptado; confirmado por el usuario 2026-10-22)
+**Hallazgos:** 2026-10-22, por HTTP (el esquema cacheado de la herramienta en la sesión de Claude no ofrecía `academic_course_id`; el `dist/` sí). (a)/(b): E2 en A → **1.76** (6/17, #20 respondida, #23 y #24 sin responder); E2 en B → **5.00** (6/6, solo #20): notas y desgloses distintos. (c) `course_slug` con E2 en A y B → `409` con los dos grupos. (d) E1 con `course_slug` → se resuelve a A. Ambos parámetros o ninguno → `422`.
 
 ### TC-MCP-060-08 — Lote de varias lecciones: un solo recálculo y reporte de cambios
 **Herramienta probada:** `set_lessons_taught` en `courses-mcp`
@@ -348,8 +363,8 @@ desmarcar L3 y marcar L1 con `set_lessons_taught` y confirmar con
 por lección). En la libreta de B el denominador pasa a 15 de una vez: E2 =
 1.67 (`5/15`, si respondió L1 con 5/5 en TC-060-11), E4 = 0.00. En
 Contenido de B, L1, L2 y L4 aparecen marcadas.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado (adaptado; confirmado por el usuario 2026-10-22)
+**Hallazgos:** 2026-10-22 (adaptado: lote de #20, #23, #24 en B). Con solo #20 marcada en B, el lote devolvió `changed_slugs [#23, #24]`, `unchanged_slugs [#20]`, `recalculated_count 2` (una pasada, 2 matrículas), `warnings []`. Libreta de B tras el lote: E2 = 1.76 (6/17), E4 = 0.00: el denominador pasó a 17 de una vez.
 
 ### TC-MCP-060-09 — Lote atómico: un slug inválido no marca ninguno
 **Herramienta probada:** `set_lessons_taught` en `courses-mcp`
@@ -358,14 +373,16 @@ Contenido de B, L1, L2 y L4 aparecen marcadas.
 `list_taught_lessons`).
 **Input de prueba:** (a) `lesson_slugs: ["{{slug_X}}", "no-existe", "{{slug_Y}}"]`, `taught: true`;
 (b) `lesson_slugs: ["{{slug_X}}", "ejercicios-sintaxis-de-java"]`, `taught: true`.
-**Output esperado:** (a) `422` con `errors.invalid_slugs: [{ lesson_slug: "no-existe", reason: "not_found" }]`;
+**Output esperado:** (a) `422` con `error.details.invalid_slugs: [{ lesson_slug: "no-existe", reason: "not_found" }]`;
 (b) `422` con `invalid_slugs: [{ lesson_slug: "ejercicios-sintaxis-de-java", reason: "is_guide" }]`.
 En ambos, `list_taught_lessons` de A muestra `{{slug_X}}` y `{{slug_Y}}`
 **sin marcar** y las notas de A no cambian.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado (adaptado; confirmado por el usuario 2026-10-22)
+**Hallazgos:** 2026-10-22 en A. Decisión del usuario: el campo es `lesson_slug`. Se corrigió `findInvalidTaughtSlugs` (`lib/courses/service.ts`), el spec (D14) y el system prompt de courses-agent. Verificado por HTTP tras el cambio: (a) `[herencia, no-existe, polimorfismo]` → `422`, `invalid_slugs: [{lesson_slug: "no-existe", reason: "not_found"}]`; (b) `[herencia, ejercicios-sintaxis-de-java]` → `422`, `reason: "is_guide"`. En ambos A sigue con 3 marcadas (herencia y polimorfismo sin marcar). `tsc --noEmit` sin errores.
 
 ## Resumen de la ronda
-- Aprobados: 8 (5 adaptados al catálogo de `nodo-dev`) — Fallidos: 0 — Parciales: 1 (TC-060-05) — Pendientes: 14 (TC-060-06, 10, 11, 12, 14 y TC-MCP-060-01..09)
-- Hallazgos menores (sin escalar al backlog): columnas de la tabla Contenido cambian de ancho al aparecer una advertencia; el enlace "Responder" lleva al inicio de la lección, no a la autoevaluación; solo se revisó el modo oscuro.
-- Limpieza de datos de prueba: ✅ Completada (2026-10-22) — marcas de `taught_lessons` desmarcadas por API, grupo temporal eliminado, y los dos intentos de E1 (`54e7f912-cf93-490c-ba81-13cbc36948b8`, `bd64cf18-1c8f-4cbb-9902-2122f27a3a2f`) borrados con la clave de servicio por instrucción expresa del usuario.
+- Aprobados: 23 de 23 (la mayoría adaptados al catálogo de `nodo-dev`: #20, #23, #24 en lugar de L1–L4) — Fallidos: 0 — Pendientes: 0
+- Decisión del usuario (2026-10-22): `error.details.invalid_slugs[]` usa `lesson_slug`. Se corrigió el código (`lib/courses/service.ts`), el spec (D14) y el system prompt de courses-agent.
+- Hallazgos menores (sin escalar al backlog): columnas de la tabla Contenido cambian de ancho al aparecer una advertencia; el enlace "Responder" lleva al inicio de la lección, no a la autoevaluación.
+- Hallazgo del guion: los códigos de matrícula `T060B2026` y `T060C2026` tienen 9 caracteres y el formulario de edición exige 8 (B se cambió a `T60B2026`). Guion corregido a `T60B2026` y `T60C2026`.
+- Limpieza de datos de prueba: ✅ Completada (2026-10-22). Marcas de A desmarcadas (0 filas en `taught_lessons`), E4 eliminado por `delete_student`, los 3 intentos de esta ronda (E1: #20 y #24; E2: #20) borrados con `service_role`, y por instrucción expresa del usuario la matrícula retirada de E2 en B, los Grupos B y C y el docente D2 (verificado: 0 grupos, 0 matrículas, 0 marcas, D2 sin roles ni usuario). Quedan 3 filas de `lesson_progress` de E1/E2 por haber abierto lecciones (no se tocaron; no afectan a la nota).
