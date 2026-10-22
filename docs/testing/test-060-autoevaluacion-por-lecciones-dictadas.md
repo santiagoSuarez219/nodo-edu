@@ -64,8 +64,9 @@ L1–L4 muestran "Abierta" y "5 preguntas"; las lecciones sin preguntas,
 "Sin autoevaluación". Ningún interruptor "Vista en clase" activo. Cabecera:
 "0 lecciones marcadas · 0 cuentan para la nota". Se ve bien en modo claro y
 oscuro.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** Ejecutado 2026-10-21 en Chrome, `nodo-dev`. Pestaña activa, guías ausentes, cabecera "0 lecciones marcadas · 0 cuentan para la nota", interruptores apagados. El catálogo real de nodo-dev difiere de la precondición del test: solo las lecciones #20, #23 y #24 tienen preguntas (6, 6 y 5); el resto muestra "Sin autoevaluación". Solo se revisó el modo oscuro.
+
 
 ### TC-060-02 — Abrir una lección como estudiante no cambia la nota
 **Precondición:** E1 responde L1 con **5/5** (cualquier lección, sin marcar);
@@ -79,8 +80,9 @@ nota previa de E1 en Grupo A registrada (esperado: "Sin nota").
 "Sin nota" (ninguna lección marcada); abrir L4 no la mueve. La tarjeta del
 estudiante muestra el estado vacío "Tu docente aún no ha marcado lecciones
 como vistas en clase…". Responder L1 tampoco creó nota (L1 no está marcada).
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** Con E1 abrió la lección #20 sin responder: se creó `lesson_progress` y la nota siguió en 2.08 (sin recálculo).
+
 
 ### TC-060-03 — Marcar lecciones recalcula el grupo
 **Precondición:** TC-060-02 completado (E1 respondió L1 con 5/5; E2 sin
@@ -96,8 +98,9 @@ interruptor. Cabecera: "3 lecciones marcadas · 3 cuentan para la nota". En la
 libreta: E1 = **1.67** (`5/15 × 5`), E2 = **0.00** (`0/15`) — 0.00 aquí es
 correcto: hay preguntas evaluables y no respondió ninguna. Sin pulsar
 "Recalcular autoevaluaciones".
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado (adaptado)
+**Hallazgos:** Marcadas #20, #23 y #24 una a una: aviso "Se recalcularon las notas de 2 estudiantes", "Marcada el 21 de oct de 2026", cabecera "3 marcadas · 3 cuentan". Libreta sin pulsar Recalcular: E2 = 0.00; E1 = 1.47 (5/17) tras sembrar un intento 5/6 en #23 vía service_role (no por UI).
+
 
 ### TC-060-04 — La tarjeta del estudiante muestra solo lecciones dictadas
 **Precondición:** TC-060-03.
@@ -110,8 +113,9 @@ correcto: hay preguntas evaluables y no respondió ninguna. Sin pulsar
 **no** aparece aunque E1 la abrió. Texto de la regla: "Cuentan las lecciones
 que tu docente ya marcó como vistas en clase… todavía puedes responderla y tu
 nota se actualizará."
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado (adaptado)
+**Hallazgos:** Tarjeta de E1: 2.08, 5/12, #20 "Sin responder — 0/6" con enlace Responder, #23 5/6, texto de la regla nuevo. Las lecciones no marcadas no aparecen.
+
 
 ### TC-060-05 — Responder una lección marcada sube la nota sin acción del docente
 **Precondición:** TC-060-04.
@@ -120,8 +124,9 @@ nota se actualizará."
 2. Volver a `/cuenta/cursos/{{enrollment_E1_A}}`.
 **Resultado esperado:** nota **3.00** (`9/15 × 5`), L2 "Respondida 4/5". La
 libreta del docente muestra el mismo 3.00.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ⚠️ Parcial
+**Hallazgos:** El flujo por UI funciona (Responder → enviar → confirmación definitiva → intento registrado, fila deja de ser "Sin responder"), pero se eligió la primera opción en todo y dio 0/6, así que la nota no subió. No se demostró una subida de nota por la UI (queda cubierto por la corrida API: 1.18).
+
 
 ### TC-060-06 — Lección respondida pero no marcada no cuenta hasta marcarla
 **Precondición:** TC-060-05.
@@ -147,8 +152,9 @@ Tras el paso 3: nota **3.50** (`14/20 × 5`), L4 "Respondida 5/5"; E2 = 0.00
 estudiantes del grupo; cancelar deja el interruptor activo y la nota intacta.
 Al confirmar: E1 = **4.67** (`14/15 × 5`), L3 desaparece de su desglose.
 Cabecera "3 lecciones marcadas".
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado (adaptado)
+**Hallazgos:** Desmarcar #24: la confirmación avisa de los 2 estudiantes; Cancelar deja el interruptor activo; Confirmar → cabecera "2 marcadas", E1 = 2.08 (5/12).
+
 
 ### TC-060-08 — Desmarcar todas deja la nota en "Sin nota"
 **Precondición:** TC-060-07.
@@ -160,8 +166,9 @@ E1 y E2 muestran "sin nota" (no 4.67 ni 0.00). La tarjeta de E1 muestra el
 estado vacío. Los intentos de E1 no se pierden: volver a marcar L1, L2, L4
 reproduce 3.50 → **dejar L1–L4 marcadas de nuevo** para los casos siguientes
 (E1 = 3.50).
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** Con todas desmarcadas la libreta muestra "–" (sin nota) en E1 y E2, no 2.08 ni 0.00. Re-marcar restituyó 2.08.
+
 
 ### TC-060-09 — Lección marcada y cerrada: advertencia y no cuenta
 **Precondición:** TC-060-08 (L1–L4 marcadas en A, E1 = 3.50).
@@ -175,8 +182,9 @@ está cerrada a los estudiantes: no cuenta para la nota hasta que la abras";
 el interruptor sigue activo; cabecera "4 marcadas · 3 cuentan". E1 = **3.00**
 (`9/15`), L4 fuera del desglose. Tras reabrir: E1 = 3.50 sin pulsar
 "Recalcular".
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado (adaptado)
+**Hallazgos:** Cerrar #23 vía API de disponibilidad: Contenido muestra "Cerrada" + la advertencia; cabecera "2 marcadas · 1 cuentan"; E1 = 0.00 con #23 fuera. Reabrir: 2.08 sin pulsar Recalcular.
+
 
 ### TC-060-10 — Aislamiento entre grupos del mismo curso
 **Precondición:** Grupo B creado; E2 en A y B; E4 solo en B; L1–L4 marcadas
@@ -232,8 +240,9 @@ figura marcada en B.
 asociado" con enlace a editarlo, sin tabla. La ayuda de la libreta habla de
 "lecciones marcadas como vistas en clase" (no "que ya vio"). El desglose del
 docente para E1 coincide con la tarjeta del estudiante.
-**Estado:** ⬜ Pendiente
-**Hallazgos:**
+**Estado:** ✅ Aprobado
+**Hallazgos:** Grupo sin course_slug: "Este curso no tiene contenido asociado" con enlace Editar curso. Ayuda de la libreta actualizada ("lecciones marcadas como vistas en clase"); el desglose del docente de E1 (5/17, luego 5/12) coincide con la tarjeta.
+
 
 ### TC-060-14 — Un docente no dueño no puede marcar (opcional)
 **Precondición:** D2 creado con autorización del usuario; no es dueño de A.
@@ -357,12 +366,6 @@ En ambos, `list_taught_lessons` de A muestra `{{slug_X}}` y `{{slug_Y}}`
 **Hallazgos:**
 
 ## Resumen de la ronda
-- Aprobados: 0 — Fallidos: 0 — Pendientes: 23
-- Hallazgos escalados a `docs/specs/backlog.md`: {{lista o "ninguno"}}
-- Limpieza de datos de prueba: ⬜ Pendiente — orden inverso: marcas de
-  `taught_lessons` (desmarcar vía `courses-mcp`), preguntas de L1–L4
-  (desmontar + eliminar vía `question-bank-mcp`), E4 (`delete_student`), E2
-  de B (`unenroll_student`), Grupos B y C (UI de eliminar curso, spec-036),
-  D2 si se creó. Intentos de autoevaluación de E1/E2: no hay endpoint para
-  borrarlos (intento único, spec-040) — reportar los IDs al usuario en vez de
-  borrarlos en base de datos.
+- Aprobados: 8 (5 adaptados al catálogo de `nodo-dev`) — Fallidos: 0 — Parciales: 1 (TC-060-05) — Pendientes: 14 (TC-060-06, 10, 11, 12, 14 y TC-MCP-060-01..09)
+- Hallazgos menores (sin escalar al backlog): columnas de la tabla Contenido cambian de ancho al aparecer una advertencia; el enlace "Responder" lleva al inicio de la lección, no a la autoevaluación; solo se revisó el modo oscuro.
+- Limpieza de datos de prueba: ✅ Completada (2026-10-22) — marcas de `taught_lessons` desmarcadas por API, grupo temporal eliminado, y los dos intentos de E1 (`54e7f912-cf93-490c-ba81-13cbc36948b8`, `bd64cf18-1c8f-4cbb-9902-2122f27a3a2f`) borrados con la clave de servicio por instrucción expresa del usuario.

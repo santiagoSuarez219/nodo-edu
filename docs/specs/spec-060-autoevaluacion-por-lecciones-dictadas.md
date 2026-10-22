@@ -1,4 +1,4 @@
-# spec-060 — [NOT STARTED] Nota de autoevaluaciones calculada sobre las lecciones dictadas por el docente
+# spec-060 — [TESTING] Nota de autoevaluaciones calculada sobre las lecciones dictadas por el docente
 
 > Estado inicial obligatorio: `[NOT STARTED]`.
 > Actualizar a `[IN PROGRESS]`, `[TESTING]` o `[DONE]` según avance.
@@ -708,11 +708,11 @@ Casos `TC-MCP-060-01` a `TC-MCP-060-09` en
       docente marcará lecciones en la Fase 7).
 
 ### Fase 1 — Esquema
-- [ ] Migración `..._init_taught_lessons.sql` (tabla, comentario) — timestamp
+- [x] Migración `..._init_taught_lessons.sql` (tabla, comentario) — timestamp
       `20261020*` o posterior; ajustar si colisiona con spec-059
-- [ ] Migración `..._rls_taught_lessons.sql`: RLS habilitado, solo política de
+- [x] Migración `..._rls_taught_lessons.sql`: RLS habilitado, solo política de
       `select` (D1)
-- [ ] Migración `..._self_assessment_by_taught_lessons.sql`:
+- [x] Migración `..._self_assessment_by_taught_lessons.sql`:
       - nueva `self_assessment_breakdown(uuid, uuid)` (D2, D5)
       - `drop` de `apply_self_assessment_grade(uuid, uuid, text)` y nueva
         `apply_self_assessment_grade(uuid, uuid)` con la regla de D4
@@ -730,45 +730,45 @@ Casos `TC-MCP-060-01` a `TC-MCP-060-09` en
       en `nodo-dev`
 
 ### Fase 2 — Backend
-- [ ] `markLessonViewed`: quitar el recálculo
-- [ ] `lib/courses/taught-lessons.ts`: listado del grupo + Server Action
+- [x] `markLessonViewed`: quitar el recálculo
+- [x] `lib/courses/taught-lessons.ts`: listado del grupo + Server Action
       `setLessonTaught` (validación de catálogo, `kind: "lesson"`,
       `revalidatePath` de contenido, libreta y `/cuenta/cursos`)
-- [ ] `getSelfAssessmentCourseSummary(enrollmentId)` y
+- [x] `getSelfAssessmentCourseSummary(enrollmentId)` y
       `getSelfAssessmentBreakdownForEnrollment` sobre la nueva firma
-- [ ] `lib/grades/overview.ts` y `app/cuenta/cursos/[enrollmentId]/page.tsx`
+- [x] `lib/grades/overview.ts` y `app/cuenta/cursos/[enrollmentId]/page.tsx`
       por matrícula
-- [ ] Recálculo de grupos del `course_slug` tras `setServiceLessonAvailability`
+- [x] Recálculo de grupos del `course_slug` tras `setServiceLessonAvailability`
       (D5)
 
 ### Fase 3 — UI docente
-- [ ] Pestaña "Contenido" en `CourseTabs`
-- [ ] Página de contenido + `TaughtLessonsTable` (D12)
-- [ ] Texto de ayuda de `RecalculateSelfAssessmentButton`
+- [x] Pestaña "Contenido" en `CourseTabs`
+- [x] Página de contenido + `TaughtLessonsTable` (D12)
+- [x] Texto de ayuda de `RecalculateSelfAssessmentButton`
 
 ### Fase 4 — UI del estudiante
-- [ ] `SelfAssessmentSummaryCard`: regla, "Sin responder — 0/N", enlace
+- [x] `SelfAssessmentSummaryCard`: regla, "Sin responder — 0/N", enlace
       "Responder", estado vacío (D11)
 
 ### Fase 5 — API
-- [ ] `GET /api/courses/[courseSlug]/groups`
-- [ ] `GET` y `PATCH` (lote) de `taught-lessons` (D8, D9, D14)
-- [ ] `GET /api/students/[studentId]/self-assessment` con `academic_course_id`
+- [x] `GET /api/courses/[courseSlug]/groups`
+- [x] `GET` y `PATCH` (lote) de `taught-lessons` (D8, D9, D14)
+- [x] `GET /api/students/[studentId]/self-assessment` con `academic_course_id`
       y atajo `course_slug` (D10)
-- [ ] Verificación por HTTP: `401` sin clave, `500` sin variable, `404` grupo
+- [ ] (pendiente: requiere migración aplicada) Verificación por HTTP: `401` sin clave, `500` sin variable, `404` grupo
       ajeno al curso, `422` guía / slug inexistente en el lote sin escritura
       parcial, `409` ambigüedad
 
 ### Fase 6 — MCP: actualizar `courses-mcp` y `students-mcp`
-- [ ] Agregar `list_course_groups`, `list_taught_lessons` y
+- [x] Agregar `list_course_groups`, `list_taught_lessons` y
       `set_lessons_taught` (lote) a `mcp-servers/courses-mcp/src/tools.ts`
       (`taught` y `lesson_slugs` reenviados sin default, como `enabled`)
-- [ ] Ajustar `get_student_self_assessment_summary` en
+- [x] Ajustar `get_student_self_assessment_summary` en
       `mcp-servers/students-mcp/src/tools.ts`
-- [ ] Actualizar `docs/mcps/README.md`
-- [ ] Actualizar `docs/mcps/courses-agent.system-prompt.md` y
+- [x] Actualizar `docs/mcps/README.md`
+- [x] Actualizar `docs/mcps/courses-agent.system-prompt.md` y
       `docs/mcps/students-agent.system-prompt.md`
-- [ ] Compilar y verificar de forma aislada
+- [x] Compilar y verificar de forma aislada
       (`./mcp-servers/run-local-mcp.sh courses-mcp </dev/null`, ídem
       `students-mcp`)
 
@@ -794,12 +794,12 @@ Casos `TC-MCP-060-01` a `TC-MCP-060-09` en
       ciclo)
 
 ### Fase 8 — Skill `class-material-prep` (D16)
-- [ ] Leer completa `.claude/skills/class-material-prep/SKILL.md` y añadir
+- [x] Leer completa `.claude/skills/class-material-prep/SKILL.md` y añadir
       el paso "Marcar la lección como vista en clase" en la Parte 2, con
       parada ⛔ de confirmación, alcance por grupo y uso de `courses-mcp`
-- [ ] Actualizar diagrama, tabla de "qué viaja a producción",
+- [x] Actualizar diagrama, tabla de "qué viaja a producción",
       `description` del frontmatter y Restricciones
-- [ ] Confirmar que la tabla de skills de `CLAUDE.md` no requiere cambios
+- [x] Confirmar que la tabla de skills de `CLAUDE.md` no requiere cambios
       (solo cambia el contenido de una skill existente)
 
 ### Fase 9 — Pruebas
@@ -911,5 +911,5 @@ D13–D16.
 ## Aprobación de implementación
 
 > Claude no escribe código de implementación hasta que esta sección esté marcada.
-- [ ] Paquete (spec + pruebas) aprobado por el usuario
-- **Fecha de aprobación:** {{fecha}}
+- [x] Paquete (spec + pruebas) aprobado por el usuario
+- **Fecha de aprobación:** 2026-10-21 ("Implementa el spec60")

@@ -116,8 +116,9 @@ export type AttemptReview = {
   answers: AttemptReviewQuestion[];
 };
 
-// spec-040 D4/D7: desglose por lección de la nota acumulada de un curso, tal
-// como lo calcula el RPC `self_assessment_breakdown`.
+// spec-040 D4/D7 + spec-060 D2: desglose por lección de la nota acumulada de
+// un grupo, tal como lo calcula el RPC `self_assessment_breakdown` (solo
+// lecciones que el docente marcó como vistas en clase).
 export type SelfAssessmentLessonRow = {
   lessonSlug: string;
   lessonTitle: string;
@@ -132,4 +133,7 @@ export type SelfAssessmentCourseSummary = {
   correctTotal: number;
   questionTotal: number;
   lessons: SelfAssessmentLessonRow[];
+  // spec-060 D11: lecciones dictadas que cuentan (con preguntas). 0 => el
+  // docente aún no marcó ninguna evaluable.
+  taughtLessonCount: number;
 };

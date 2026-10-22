@@ -1,14 +1,16 @@
+import Link from "next/link";
 import type { SelfAssessmentCourseSummary } from "@/lib/self-assessment/types";
 
 interface Props {
   summary: SelfAssessmentCourseSummary;
+  courseSlug: string;
 }
 
-// spec-040 D7: trazabilidad visible del estudiante — nota, acumulado crudo y
-// desglose por lección, marcando explícitamente las no respondidas para que
-// la penalización sea visible y explicable, no un descuento invisible.
-export function SelfAssessmentSummaryCard({ summary }: Props) {
-  if (summary.lessons.length === 0) return null;
+// spec-040 D7 + spec-060 D11: trazabilidad visible del estudiante — nota,
+// acumulado crudo y desglose por lección dictada, marcando explícitamente las
+// no respondidas para que la penalización sea visible y explicable, y
+// recordando que aún puede responderlas.
+export function SelfAssessmentSummaryCard({ summary, courseSlug }: Props) {
 
   return (
     <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-[var(--radius-base)] px-6 py-5">
@@ -29,9 +31,16 @@ export function SelfAssessmentSummaryCard({ summary }: Props) {
         </span>
       </div>
 
-      <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-        {summary.correctTotal}/{summary.questionTotal} preguntas correctas
-      </p>
+      {summary.taughtLessonCount === 0 ? (
+        <p className="text-sm text-gray-600 dark:text-gray-400">
+          Tu docente aún no ha marcado lecciones como vistas en clase. Tu nota de
+          autoevaluaciones aparecerá cuando lo haga.
+        </p>
+      ) : (
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+          {summary.correctTotal}/{summary.questionTotal} preguntas correctas
+        </p>
+      )}
 
       <div className="divide-y divide-gray-100 dark:divide-gray-700">
         {summary.lessons.map((lesson) => (
@@ -44,7 +53,15 @@ export function SelfAssessmentSummaryCard({ summary }: Props) {
                 {lesson.lessonTitle}
               </p>
               {!lesson.answered && (
-                <p className="text-xs text-danger dark:text-red-400">Sin responder</p>
+                <p className="text-xs text-danger dark:text-red-400">
+                  Sin responder — 0/{lesson.questionCount}{" "}
+                  <Link
+                    href={`/${courseSlug}/${lesson.lessonSlug}`}
+                    className="underline underline-offset-2"
+                  >
+                    Responder
+                  </Link>
+                </p>
               )}
             </div>
             <span className="font-mono text-sm font-medium text-gray-700 dark:text-gray-300 shrink-0">
@@ -54,10 +71,13 @@ export function SelfAssessmentSummaryCard({ summary }: Props) {
         ))}
       </div>
 
-      <p className="mt-4 text-xs text-gray-500 dark:text-gray-400">
-        Se cuentan las lecciones que ya abriste. Las autoevaluaciones sin responder
-        cuentan como incorrectas.
-      </p>
+      {summary.taughtLessonCount > 0 && (
+        <p className="mt-4 text-xs text-gray-500 dark:text-gray-400">
+          Cuentan las lecciones que tu docente ya marcó como vistas en clase. Si aún
+          no respondiste la autoevaluación de una de ellas, cuenta como 0, pero
+          todavía puedes responderla y tu nota se actualizará.
+        </p>
+      )}
     </div>
   );
 }

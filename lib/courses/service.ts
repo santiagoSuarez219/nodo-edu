@@ -166,6 +166,40 @@ export interface SetLessonAvailabilityInput {
 export interface SetLessonAvailabilityResult {
   availability: LessonAvailability;
   changed: boolean;
+  /** spec-060 D5: grupos recalculados tras el cambio (0 si no hubo cambio). */
+  recalculatedGroups: number;
+}
+
+/**
+ * spec-060 D5: abrir o cerrar una lección cambia el denominador de todos los
+ * grupos que la tengan marcada, así que se recalculan los grupos del curso.
+ * Un fallo se registra pero no revierte el cambio de disponibilidad: el
+ * docente puede corregirlo con "Recalcular".
+ */
+async function recalculateGroupsOfCourse(courseSlug: string): Promise<number> {
+  const supabase = createServiceSupabaseClient();
+  const { data: groups, error } = await supabase
+    .from("academic_courses")
+    .select("id")
+    .eq("course_slug", courseSlug);
+  if (error) {
+    console.error("recalculateGroupsOfCourse groups error:", error);
+    return 0;
+  }
+
+  let recalculated = 0;
+  for (const group of groups ?? []) {
+    const { error: rpcError } = await supabase.rpc(
+      "recalculate_course_self_assessment_grades_internal",
+      { p_academic_course_id: group.id }
+    );
+    if (rpcError) {
+      console.error("recalculateGroupsOfCourse rpc error:", rpcError);
+      continue;
+    }
+    recalculated += 1;
+  }
+  return recalculated;
 }
 
 /**
@@ -179,6 +213,20 @@ export async function setServiceLessonAvailability(
   lesson: Lesson,
   input: SetLessonAvailabilityInput
 ): Promise<SetLessonAvailabilityResult> {
+  const result = await writeLessonAvailability(course, lesson, input);
+  // Un cambio de `reason` no altera el denominador, pero recalcular es
+  // idempotente y barato; se evita solo cuando no hubo cambio.
+  const recalculatedGroups = result.changed
+    ? await recalculateGroupsOfCourse(course.slug)
+    : 0;
+  return { ...result, recalculatedGroups };
+}
+
+async function writeLessonAvailability(
+  course: Course,
+  lesson: Lesson,
+  input: SetLessonAvailabilityInput
+): Promise<Omit<SetLessonAvailabilityResult, "recalculatedGroups">> {
   const supabase = createServiceSupabaseClient();
   const existing = await fetchDisabledRow(course.slug, lesson.slug);
 
@@ -255,5 +303,271 @@ export async function setServiceLessonAvailability(
   return {
     availability: toAvailability(course.slug, lesson, data as DisabledLessonRow),
     changed: true,
+  };
+}
+
+
+// ─── spec-060: lecciones dictadas por grupo ────────────────────────────────
+
+export interface CourseGroup {
+  academic_course_id: string;
+  name: string;
+  code: string | null;
+  is_active: boolean;
+  active_student_count: number;
+}
+
+export interface TaughtLesson {
+  lesson_slug: string;
+  title: string;
+  order: number;
+  is_taught: boolean;
+  taught_at: string | null;
+  is_disabled: boolean;
+  question_count: number;
+  counts_for_grade: boolean;
+}
+
+export interface TaughtLessonsListing {
+  lessons: TaughtLesson[];
+  meta: {
+    taught_count: number;
+    counted_count: number;
+    orphan_taught_slugs: string[];
+  };
+}
+
+export interface GroupRef {
+  id: string;
+  name: string;
+  course_slug: string | null;
+}
+
+/** `GET /api/courses/[courseSlug]/groups`. */
+export async function listServiceCourseGroups(
+  courseSlug: string
+): Promise<CourseGroup[]> {
+  const supabase = createServiceSupabaseClient();
+  const { data: groups, error } = await supabase
+    .from("academic_courses")
+    .select("id, name, code, is_active")
+    .eq("course_slug", courseSlug)
+    .order("name", { ascending: true });
+  if (error) throw error;
+  if (!groups || groups.length === 0) return [];
+
+  const { data: enrollments, error: enrollmentsError } = await supabase
+    .from("enrollments")
+    .select("academic_course_id")
+    .in(
+      "academic_course_id",
+      groups.map((g) => g.id)
+    )
+    .eq("status", "active");
+  if (enrollmentsError) throw enrollmentsError;
+
+  const counts = new Map<string, number>();
+  for (const e of enrollments ?? []) {
+    counts.set(e.academic_course_id, (counts.get(e.academic_course_id) ?? 0) + 1);
+  }
+
+  return groups.map((g) => ({
+    academic_course_id: g.id,
+    name: g.name,
+    code: g.code ?? null,
+    is_active: g.is_active ?? true,
+    active_student_count: counts.get(g.id) ?? 0,
+  }));
+}
+
+/** Grupo por id, o `null`. La ruta compara `course_slug` para el 404 por discrepancia. */
+export async function getServiceGroup(
+  academicCourseId: string
+): Promise<GroupRef | null> {
+  const supabase = createServiceSupabaseClient();
+  const { data, error } = await supabase
+    .from("academic_courses")
+    .select("id, name, course_slug")
+    .eq("id", academicCourseId)
+    .maybeSingle();
+  if (error) throw error;
+  return (data as GroupRef | null) ?? null;
+}
+
+/** Conteo vivo de preguntas multiple_choice publicadas montadas, por lección. */
+async function fetchLiveQuestionCounts(
+  courseSlug: string
+): Promise<Map<string, number>> {
+  const supabase = createServiceSupabaseClient();
+  const { data, error } = await supabase
+    .from("lesson_questions")
+    .select("lesson_slug, questions!inner(type, is_published)")
+    .eq("course_slug", courseSlug)
+    .eq("questions.type", "multiple_choice")
+    .eq("questions.is_published", true);
+  if (error) throw error;
+
+  const counts = new Map<string, number>();
+  for (const row of data ?? []) {
+    counts.set(row.lesson_slug, (counts.get(row.lesson_slug) ?? 0) + 1);
+  }
+  return counts;
+}
+
+/**
+ * Catálogo (solo `kind: "lesson"`) × `taught_lessons` × `disabled_lessons` ×
+ * conteo vivo de preguntas, para un grupo. Lo usan la ruta API y la pestaña
+ * Contenido; la autorización la hace quien llama.
+ */
+export async function listServiceTaughtLessons(
+  course: Course,
+  academicCourseId: string
+): Promise<TaughtLessonsListing> {
+  const supabase = createServiceSupabaseClient();
+  const [taughtResult, disabledRows, questionCounts] = await Promise.all([
+    supabase
+      .from("taught_lessons")
+      .select("lesson_slug, marked_at")
+      .eq("academic_course_id", academicCourseId),
+    fetchDisabledRows(course.slug),
+    fetchLiveQuestionCounts(course.slug),
+  ]);
+  if (taughtResult.error) throw taughtResult.error;
+
+  const taughtBySlug = new Map(
+    (taughtResult.data ?? []).map((row) => [row.lesson_slug, row.marked_at as string])
+  );
+  const disabledSlugs = new Set(disabledRows.map((row) => row.lesson_slug));
+
+  const ordered = [...course.lessons]
+    .filter((lesson) => !isGuide(lesson))
+    .sort((a, b) => a.order - b.order);
+
+  const lessons: TaughtLesson[] = ordered.map((lesson) => {
+    const markedAt = taughtBySlug.get(lesson.slug);
+    const isTaught = markedAt !== undefined;
+    const isDisabled = disabledSlugs.has(lesson.slug);
+    const questionCount = questionCounts.get(lesson.slug) ?? 0;
+    return {
+      lesson_slug: lesson.slug,
+      title: lesson.title,
+      order: lesson.order,
+      is_taught: isTaught,
+      taught_at: isTaught ? new Date(markedAt).toISOString() : null,
+      is_disabled: isDisabled,
+      question_count: questionCount,
+      counts_for_grade: isTaught && !isDisabled && questionCount > 0,
+    };
+  });
+
+  // D9: marcas cuyo slug ya no está en el catálogo (renombre / cambio de
+  // course_slug del grupo). No se filtran en SQL: se reportan.
+  const catalogSlugs = new Set(course.lessons.map((lesson) => lesson.slug));
+  const orphanTaughtSlugs = [...taughtBySlug.keys()]
+    .filter((slug) => !catalogSlugs.has(slug))
+    .sort();
+
+  return {
+    lessons,
+    meta: {
+      taught_count: lessons.filter((l) => l.is_taught).length,
+      counted_count: lessons.filter((l) => l.counts_for_grade).length,
+      orphan_taught_slugs: orphanTaughtSlugs,
+    },
+  };
+}
+
+export type InvalidTaughtSlug = {
+  slug: string;
+  reason: "not_found" | "is_guide";
+};
+
+/**
+ * D14: valida TODOS los slugs antes de escribir. Con `taught: true` cada slug
+ * debe ser una lección del catálogo; con `taught: false` también se acepta una
+ * marca huérfana del grupo (D9).
+ */
+export async function findInvalidTaughtSlugs(
+  course: Course,
+  academicCourseId: string,
+  slugs: string[],
+  taught: boolean
+): Promise<InvalidTaughtSlug[]> {
+  const bySlug = new Map(course.lessons.map((l) => [l.slug, l]));
+
+  let orphanMarks = new Set<string>();
+  if (!taught) {
+    const { data, error } = await createServiceSupabaseClient()
+      .from("taught_lessons")
+      .select("lesson_slug")
+      .eq("academic_course_id", academicCourseId)
+      .in("lesson_slug", slugs);
+    if (error) throw error;
+    orphanMarks = new Set((data ?? []).map((row) => row.lesson_slug));
+  }
+
+  const invalid: InvalidTaughtSlug[] = [];
+  for (const slug of slugs) {
+    const lesson = bySlug.get(slug);
+    if (!lesson) {
+      if (!(orphanMarks.has(slug))) invalid.push({ slug, reason: "not_found" });
+    } else if (isGuide(lesson)) {
+      invalid.push({ slug, reason: "is_guide" });
+    }
+  }
+  return invalid;
+}
+
+export interface SetLessonsTaughtResult {
+  lessons: TaughtLesson[];
+  meta: {
+    changed_slugs: string[];
+    unchanged_slugs: string[];
+    recalculated_count: number;
+    warnings: Array<{ lesson_slug: string; code: "lesson_disabled" }>;
+  };
+}
+
+/**
+ * `PATCH .../taught-lessons`: una sola transacción en la RPC (todo o nada) y
+ * un único recálculo del grupo. La validación de slugs ya ocurrió en la ruta.
+ */
+export async function setServiceLessonsTaught(
+  course: Course,
+  academicCourseId: string,
+  slugs: string[],
+  taught: boolean
+): Promise<SetLessonsTaughtResult> {
+  const supabase = createServiceSupabaseClient();
+  const { data, error } = await supabase.rpc("set_lessons_taught_internal", {
+    p_academic_course_id: academicCourseId,
+    p_lesson_slugs: slugs,
+    p_taught: taught,
+    p_actor: null,
+  });
+  if (error) throw error;
+
+  const row = (Array.isArray(data) ? data[0] : data) as {
+    changed_slugs: string[];
+    unchanged_slugs: string[];
+    recalculated_count: number;
+  };
+
+  const listing = await listServiceTaughtLessons(course, academicCourseId);
+  const requested = new Set(slugs);
+  const lessons = listing.lessons.filter((l) => requested.has(l.lesson_slug));
+
+  return {
+    lessons,
+    meta: {
+      changed_slugs: row.changed_slugs,
+      unchanged_slugs: row.unchanged_slugs,
+      recalculated_count: row.recalculated_count,
+      warnings: taught
+        ? lessons
+            .filter((l) => l.is_taught && l.is_disabled)
+            .map((l) => ({ lesson_slug: l.lesson_slug, code: "lesson_disabled" as const }))
+        : [],
+    },
   };
 }

@@ -166,7 +166,13 @@ export async function PATCH(
     );
 
     return NextResponse.json(
-      { data: result.availability, meta: { changed: result.changed } },
+      {
+        data: result.availability,
+        meta: {
+          changed: result.changed,
+          recalculated_groups: result.recalculatedGroups,
+        },
+      },
       { status: 200 }
     );
   } catch (err) {
