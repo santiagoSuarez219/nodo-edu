@@ -210,9 +210,9 @@ abrieron empiezan a contar como 0. Borrador:
 |---|---|---|---|
 | Fase 0 (foto previa) | 2026-10-22 22:35 UTC | ✅ 4 grupos activos, 0 conflictos DEBT-098 | Foto en `~/diagnostico-spec060-antes.json` (fuera del repo). `medianas-seleccion-y-estructuras-elementales` tiene intentos sin progreso en ambos grupos de Análisis |
 | Comunicación a estudiantes | | | |
-| Dry-run | | | salida guardada: |
-| `db push` | | | |
-| Verificación del esquema | | | |
+| Dry-run | 2026-10-22 | ✅ Solo las 3 migraciones esperadas | Proyecto enlazado `bgiimadnmqnoqmdbudpo`, CLI 2.107.0. Salida: `Would push these migrations: 20261022000000_init_taught_lessons.sql, 20261022000001_rls_taught_lessons.sql, 20261022000002_self_assessment_by_taught_lessons.sql` |
+| `db push` | 2026-10-22 | ✅ 3 migraciones aplicadas | `migration list --linked` las muestra en local y remoto. Aviso de Docker (caché del catálogo) sin efecto |
+| Verificación del esquema | 2026-10-22 | ✅ | `taught_lessons` → `200 []`. `anon` → `42501` en `set_lessons_taught_internal`, `apply_self_assessment_grade`, `recalculate_course_self_assessment_grades_internal` y `set_lessons_taught`. `anon` lee `taught_lessons` vacía (RLS sin política para `anon`) |
 | Merge y push a `main` | | | |
 | Build de Vercel | | | |
 | Marcado inicial (por grupo) | | | |
