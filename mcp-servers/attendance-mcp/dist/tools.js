@@ -73,6 +73,24 @@ export const tools = [
             required: ["course_id"],
         },
     },
+    {
+        name: "get_monthly_absence_summary",
+        description: "Inasistencias por estudiante y mes calendario, en horas y en clases, solo de matrículas activas. No cuenta las sesiones anteriores a la matrícula de cada estudiante ni la sesión en curso. Úsala para reportar a la institución; para el % de asistencia usa get_course_attendance_summary. Un mes con sessions_counted = 0 significa 'no aplica' (el estudiante aún no estaba matriculado), distinto de 0 inasistencias. Ordenado por apellido. Con `month` no se devuelve `total` (solo el mes pedido).",
+        inputSchema: {
+            type: "object",
+            properties: {
+                course_id: {
+                    type: "string",
+                    description: "UUID del curso (requerido)",
+                },
+                month: {
+                    type: "string",
+                    description: "Restringe a un mes (YYYY-MM). Si se omite, todos los meses con clases cerradas.",
+                },
+            },
+            required: ["course_id"],
+        },
+    },
 ];
 export async function processToolCall(toolName, toolInput) {
     switch (toolName) {
@@ -92,6 +110,8 @@ export async function processToolCall(toolName, toolInput) {
                 ...(toolInput.from_date ? { fromDate: String(toolInput.from_date) } : {}),
                 ...(toolInput.to_date ? { toDate: String(toolInput.to_date) } : {}),
             });
+        case "get_monthly_absence_summary":
+            return await callAttendanceApi("GET", `/attendance/courses/${toolInput.course_id}/monthly-absences`, toolInput.month ? { month: String(toolInput.month) } : undefined);
         default:
             throw new Error(`Herramienta desconocida: ${toolName}`);
     }

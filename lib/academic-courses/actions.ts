@@ -115,6 +115,7 @@ export async function updateCourseAction(
 
   revalidatePath(`/admin/courses/${courseId}`);
   revalidatePath(`/admin/courses/${courseId}/edit`);
+  revalidatePath(`/admin/courses/${courseId}/asistencia`);
   revalidatePath("/admin/courses");
   return { ok: true };
 }

@@ -815,6 +815,33 @@ aborda aquí por ser el mismo alcance que `GradesTable` dejó pendiente.
 
 ---
 
+## DEBT-100 — `get_course_attendance_summary` es incoherente con el resumen mensual
+
+**Origen:** spec-063 (Evaluación MCP)
+**Prioridad:** Baja — declarado en el system prompt para que el agente no mezcle cifras
+
+El resumen por curso del MCP (`getServiceCourseAttendanceSummary`) omite a los
+estudiantes con 0 asistencias, incluye retirados que tengan registros y no
+excluye las sesiones anteriores a la matrícula. `get_monthly_absence_summary`
+(spec-063) cubre matrículas activas y sí las excluye. Unificarlos cambia el
+contrato del agente; queda para un spec aparte (junto con DEBT-079).
+
+---
+
+## DEBT-101 — La rematrícula no guarda el historial de retiros
+
+**Origen:** spec-063 (D5)
+**Prioridad:** Baja
+
+`reactivateEnrollment` y `enrollServiceStudent` hacen
+`update({ status: 'active', withdrawn_at: null })` sobre la misma fila:
+`enrolled_at` conserva la primera matrícula y el intervalo retirado no queda
+registrado. Consecuencia: en el resumen mensual, las clases del periodo en que
+un estudiante estuvo retirado cuentan como inasistencias al reactivarlo. Hacerlo
+bien exige una tabla de historial de matrícula que nadie ha pedido.
+
+---
+
 ## DEBT-082 — Planilla de asistencia: marcado masivo por columna
 
 **Origen:** spec-054, "No incluye" — descartado explícitamente por alcance
@@ -861,6 +888,12 @@ contra `session_date`. Un estudiante matriculado en la sesión 10 de 30
 aparece con 9 ausencias que no pudo evitar, y su % sale penalizado. Corregirlo
 exige decidir una semántica (¿el denominador es "sesiones desde que se
 matriculó"?) que nadie ha pedido todavía.
+
+**Actualización (spec-063, D6):** el criterio ya existe como función pura
+(`isSessionApplicable` / `toBogotaDate` en `lib/attendance/monthly-summary.ts`)
+y lo usa el resumen mensual. El % de la planilla y `get_course_attendance_summary`
+siguen con el criterio viejo; llevarlos al nuevo es un cambio acotado para un
+spec futuro.
 
 ---
 
