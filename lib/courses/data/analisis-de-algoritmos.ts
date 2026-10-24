@@ -215,6 +215,15 @@ export const analisisDeAlgoritmos: Course = {
       ],
     },
     {
+      id: "lab-evaluativo-03-estructuras-de-datos",
+      slug: "lab-evaluativo-03-estructuras-de-datos",
+      articleSlug: "lab-evaluativo-03-estructuras-de-datos",
+      kind: "guide",
+      order: 13.75,
+      title: "Laboratorio evaluativo 03 — Estructuras de datos",
+      topics: [],
+    },
+    {
       id: "arboles-de-busqueda-binarios",
       slug: "arboles-de-busqueda-binarios",
       articleSlug: "arboles-de-busqueda-binarios",
