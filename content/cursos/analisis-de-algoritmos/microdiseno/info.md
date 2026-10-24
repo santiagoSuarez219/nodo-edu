@@ -12,7 +12,7 @@
 | -------------------------------------------------------------------------------------- | ---------- | ---------- |
 | **Laboratorio 1:** Fundamentos, complejidad y recurrencias                            | 15%        | Semana 6   |
 | **Laboratorio 2:** Dividir y vencer                                                    | 15%        | Entrega el domingo 11 oct |
-| **Laboratorio 3:** Estructuras de datos                                                | 15%        | Lunes 26 oct (Semana 13) |
+| **Laboratorio 3:** Estructuras de datos                                                | 15%        | Entrega el sábado 31 oct (sesión guiada el lunes 26 oct) |
 | **Laboratorio 4:** Programación dinámica y algoritmos voraces                          | 15%        | Entrega hasta el 22 nov |
 | **Proyecto final:** por definir                                                         | 20%        | Por definir |
 | **Seguimiento:** evaluación continua (quices cortos, participación, consistencia de commits, ejercicios de clase) | 20%        | Durante todo el semestre |
@@ -276,12 +276,11 @@ curso-analisis-algoritmos/
 - Factor de carga y costo esperado Θ(1 + α)
 - Árboles de búsqueda binarios: propiedad, búsqueda e inserción, recorrido en orden, altura y degeneración (el borrado no se desarrolla)
 
-**P ★ — Laboratorio evaluativo 3: Estructuras de datos**
-- Preguntas de selección múltiple sobre operaciones y complejidades de pilas, colas, listas enlazadas, tablas hash y árboles de búsqueda binarios
-- Preguntas abiertas: justificar la elección de una estructura de datos para un escenario dado (incluye cuándo conviene un árbol de búsqueda por orden o rango frente a una tabla hash)
-- Explicación de un tema: el estudiante explica el manejo de colisiones (encadenamiento o direccionamiento abierto) en tablas hash, o la altura y la degeneración de un árbol de búsqueda binario
-- Parte práctica: partir de una solución basada en listas enlazadas con tiempos de respuesta deficientes y rediseñarla con una tabla hash propia; graficar y comparar los tiempos de búsqueda antes y después de la optimización
-- Informe de laboratorio en GitHub (`lab3-estructuras-datos/`) con rúbrica socializada previamente — **cierre de la evaluación Laboratorio 3 (15%)**
+**P ★ — Laboratorio evaluativo 3: Estructuras de datos** *(reajuste 2026-10-24: solo laboratorio, sin selección múltiple; la sesión del lunes es guiada)*
+- Caso "Rutas del Caribe": reemplazar una lista enlazada lenta por una tabla hash propia (encadenamiento), con pruebas de colisión forzada y verificación contra la lista
+- Medir y graficar tiempo de búsqueda vs. tamaño (lista vs. tabla) y vs. factor de carga α
+- Análisis en el `README.md`: costo `Θ(n)` vs. `Θ(1 + α)`, lo medido contra lo esperado, explicación de colisiones (encadenamiento vs. direccionamiento abierto), tabla hash vs. árbol de búsqueda binario (rangos, altura y degeneración) y concepto técnico final
+- Informe de laboratorio en GitHub (`lab3-estructuras-datos/`) con rúbrica de 5 criterios socializada previamente; entrega el sábado 31 de octubre — **cierre de la evaluación Laboratorio 3 (15%)**
 
 ---
 

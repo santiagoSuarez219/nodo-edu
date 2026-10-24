@@ -19,7 +19,7 @@
 | 23 – 29 nov                     | Exámenes finales institucionales                                    | No aplica — el curso ya terminó |
 | 23 – 29 nov                     | Fecha límite de registro del 100% evaluado                          | Sí — registrar Laboratorio 4, Proyecto final y Seguimiento en esta ventana |
 
-**Nota sobre el 60% evaluado (plazo: 1 de noviembre):** con el calendario de abajo, para esa fecha estarán calificados el Laboratorio 1 (15%), Laboratorio 2 (15%) y Laboratorio 3 (15%, entrega el lunes 26 oct) = 45% formal, más el avance de Seguimiento. El Laboratorio 3 deja solo cinco días para calificar antes del plazo: programa esa calificación de inmediato. Si tu programa exige el 60% *numéricamente* registrado, conviene tener una nota parcial de Seguimiento calculada a esa altura.
+**Nota sobre el 60% evaluado (plazo: 1 de noviembre):** con el calendario de abajo, para esa fecha estarán calificados el Laboratorio 1 (15%), Laboratorio 2 (15%) y Laboratorio 3 (15%, entrega el sábado 31 oct) = 45% formal, más el avance de Seguimiento. El Laboratorio 3 deja solo un día para calificar antes del plazo (entrega sábado 31 oct, plazo SIA 1 nov): programa esa calificación de inmediato. Si tu programa exige el 60% *numéricamente* registrado, conviene tener una nota parcial de Seguimiento calculada a esa altura.
 
 ---
 
@@ -92,7 +92,8 @@
 **Módulo 7: Estructuras de datos (Cormen Cap. 11-12)**
 - **Sesión 1 (T):** Tablas hash — funciones hash, encadenamiento, direccionamiento abierto; árboles de búsqueda binarios (propiedad, búsqueda, inserción, recorrido en orden, altura y degeneración)
 - **Sesión 2 (P ★):** **Laboratorio evaluativo 3 — Estructuras de datos (15%)** *(antes Laboratorio 4)*
-  - Entrega: informe en GitHub (`lab3-estructuras-datos/`)
+  - Sesión guiada el lunes; entrega: informe en GitHub (`lab3-estructuras-datos/`), sábado 31 oct
+  - Sin quiz: es solo el laboratorio (caso Rutas del Caribe: lista enlazada → tabla hash)
   - ⚠️ Registrar en el SIA el acumulado de Laboratorios 1-3 (y el avance de Seguimiento) antes del 1 de noviembre
 
 ### Semana 14 — lunes 2 de noviembre
@@ -119,7 +120,7 @@
 | ------ | ---------------------- | ----------------------------------------------------------- | ---- |
 | 6      | 7 – 13 sep             | Laboratorio 1: Fundamentos, complejidad y recurrencias       | 15%  |
 | 10     | entrega dom. 11 oct    | Laboratorio 2: Dividir y vencer                              | 15%  |
-| 13     | lunes 26 oct           | Laboratorio 3: Estructuras de datos                          | 15%  |
+| 13     | entrega sáb. 31 oct    | Laboratorio 3: Estructuras de datos                          | 15%  |
 | 16     | hasta el 22 nov        | Laboratorio 4: Programación dinámica y algoritmos voraces    | 15%  |
 | —      | Por definir            | Proyecto final                                               | 20%  |
 | —      | Todo el semestre       | Seguimiento                                                  | 20%  |
