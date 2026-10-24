@@ -86,7 +86,7 @@ flowchart TB
   class D2,A2 repetido
 ```
 
-Son 16 llamadas para `n = 4`. Fíjate en los nodos resaltados: `cortar(2)` se resuelve dos veces desde cero, `cortar(1)` cuatro y `cortar(0)` ocho. Cada repetición recalcula exactamente la misma respuesta.
+Son 16 llamadas para `n = 4`. Fíjate en los dos nodos resaltados: `cortar(2)` se resuelve dos veces desde cero. Lo mismo ocurre con `cortar(1)`, que aparece cuatro veces, y con `cortar(0)`, ocho. Cada repetición recalcula exactamente la misma respuesta.
 
 ## Subproblemas traslapados: anotar lo ya resuelto
 

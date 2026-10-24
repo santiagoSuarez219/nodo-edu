@@ -395,7 +395,7 @@ if precios[i] + r[j - i] >= r[j]:  # antes: >
 ```
 
 El valor `r[7]` sigue siendo 18. Pero, con el nuevo `s`, ¿qué devuelve
-`reconstruir_cortes(s, 7)`? Recuerde que la lectura dice que 7 m tiene
+`reconstruir_cortes(s, 7)`? Recuerda que la lectura dice que 7 m tiene
 varias formas de ganar 18.
 
 - (a) `[1, 6]`, igual que antes.
