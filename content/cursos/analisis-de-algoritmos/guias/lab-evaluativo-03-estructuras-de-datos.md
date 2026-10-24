@@ -14,7 +14,7 @@ Rediseñar un sistema de consulta que se volvió lento, reemplazando una lista e
 Competencias esperadas:
 - Implementar una lista enlazada y una tabla hash con encadenamiento, resolviendo correctamente las colisiones.
 - Verificar que ambas estructuras responden lo mismo ante los mismos datos, incluidos los casos en que la clave no existe.
-- Medir y graficar con `matplotlib` el tiempo de búsqueda frente al tamaño de la colección y frente al factor de carga.
+- Medir y graficar con `matplotlib` el tiempo de búsqueda frente al número de guías (`n`) y frente al factor de carga.
 - Contrastar lo medido con la complejidad teórica `Θ(n)` y `Θ(1 + α)`, y explicar el supuesto que sostiene la segunda.
 - Explicar el manejo de colisiones y decidir, con argumentos, cuándo conviene una tabla hash y cuándo un árbol de búsqueda binario.
 
@@ -160,7 +160,6 @@ class TablaHash:
 
 **Requisitos:**
 - Las guías son enteros. Se asume que no se repiten; no hace falta manejar actualización de una guía existente.
-- `ListaEnlazada.buscar` es **iterativa**: una versión recursiva falla con `RecursionError` en listas de miles de nodos.
 - `TablaHash` **reutiliza** `ListaEnlazada` para cada casilla (encadenamiento); no use `dict`, `set` ni la función `hash()` de Python.
 - Ninguna operación se resuelve recorriendo toda la colección salvo `ListaEnlazada.buscar`.
 - Escriba en `pruebas.py` un script con `assert` que verifique, como mínimo:
@@ -191,31 +190,61 @@ assert tabla.factor_carga() == 3 / 7
 
 Implemente en `medicion.py` los dos experimentos y sus gráficas.
 
-**Experimento A — Lista frente a tabla.** Mida el tiempo de **búsqueda** en ambas estructuras para al menos **seis tamaños de colección**, que incluyan al menos dos menores de 1.000 y uno de 20.000 o más (por ejemplo: 100, 500, 1000, 5000, 20000, 50000). Para cada tamaño, la tabla usa `m` primo cercano a `n / 2`, de modo que `α` quede alrededor de 2.
+**Experimento A — Lista frente a tabla.** Mida el tiempo de **búsqueda** en ambas estructuras para al menos **seis valores del número de guías (`n`)**, que incluyan al menos dos menores de 1.000 y uno de 20.000 o más (por ejemplo: 100, 500, 1000, 5000, 20000, 50000). Para cada valor de `n`, la tabla usa `m` primo cercano a `n / 2`, de modo que `α` quede alrededor de 2.
 
-- En cada tamaño ejecute **200 búsquedas de guías que no existen** y calcule el tiempo medio por búsqueda: es el caso que más duele a los operadores.
+- Para cada valor de `n` ejecute **200 búsquedas de guías que no existen** y calcule el tiempo medio por búsqueda: es el caso que más duele a los operadores.
+
+Genere esas guías inexistentes con la función siguiente, que ya está resuelta: puede copiarla a `medicion.py` tal cual. Usa una semilla fija y garantiza que ninguna guía esté en la colección.
+
+```python
+import random
+
+
+def generar_guias_inexistentes(
+    existentes: set[int], cantidad: int, semilla: int = 7
+) -> list[int]:
+    """Genera guias de diez digitos que no estan en la coleccion.
+
+    Args:
+        existentes: guias almacenadas en las estructuras.
+        cantidad: cuantas guias inexistentes generar.
+        semilla: semilla del generador, para reproducir la medicion.
+
+    Returns:
+        Una lista con `cantidad` guias que no pertenecen a `existentes`.
+    """
+    azar = random.Random(semilla)
+    inexistentes: list[int] = []
+    while len(inexistentes) < cantidad:
+        guia = azar.randint(10**9, 10**10 - 1)
+        if guia not in existentes:
+            inexistentes.append(guia)
+    return inexistentes
+```
+
+Aquí `set` es solo una ayuda del experimento; la prohibición de `dict`, `set` y `hash()` aplica a las estructuras de `estructuras.py`.
 - Produzca la gráfica `graficas/lista_vs_tabla.png`: tiempo medio por búsqueda frente a `n`, **ambas curvas en los mismos ejes**, con título, etiquetas en ambos ejes con sus unidades y leyenda.
 
-**Experimento B — Efecto del factor de carga.** Con `n` fijo (por ejemplo, 20.000 guías), construya varias tablas con distinto `m` para que `α` tome al menos **cinco valores** entre 0,25 y 10, y mida el tiempo medio de búsqueda de guías inexistentes en cada una.
+**Experimento B — Efecto del factor de carga.** Con `n` fijo (por ejemplo, 20.000 guías), construya varias tablas con distinto `m` para que `α` tome al menos **cuatro valores** entre 0,25 y 10 (por ejemplo: 0,5; 1; 4 y 10), y mida el tiempo medio de búsqueda de guías inexistentes en cada una.
 
 - Produzca la gráfica `graficas/tiempo_vs_alfa.png`: tiempo medio por búsqueda frente a `α`, con título, ejes rotulados con unidades y leyenda si hay más de una serie.
 
 **Requisitos:**
-- Genere las guías con una **semilla fija** (enteros distintos de diez dígitos), de modo que el docente pueda reproducir sus mediciones. Use la misma colección para ambas estructuras en cada tamaño.
+- Genere las guías con una **semilla fija** (enteros distintos de diez dígitos), de modo que el docente pueda reproducir sus mediciones. Use las mismas guías para ambas estructuras en cada valor de `n`.
 - Cronometre únicamente las búsquedas, con `time.perf_counter()`, nunca la construcción de las estructuras ni la generación de los datos.
 - Verifique dentro del propio experimento que, para una muestra de guías existentes, la lista y la tabla devuelven el mismo estado.
 - Una gráfica sin ejes rotulados no se califica.
 
 **Restricciones:**
-- No use tamaños tan grandes que la lista tarde más de un par de minutos en una medición; el objetivo es ver la forma de las curvas.
+- No use valores de `n` tan grandes que la lista tarde más de un par de minutos en una medición; el objetivo es ver la forma de las curvas.
 - No concluya con la teoría: lo que diga en la Parte 3 debe poder leerse en sus propias gráficas.
 
 ### Parte 3 — Análisis en el `README.md`
 
-Responda, con sus palabras, las cinco preguntas siguientes. Entre todas, no pase de **700 palabras**.
+Responda, con sus palabras, las cinco preguntas siguientes. Entre todas, no pase de **900 palabras**.
 
 1. **Costo teórico.** Justifique por qué buscar en la lista enlazada cuesta `Θ(n)` para una guía inexistente, y por qué buscar en la tabla con encadenamiento cuesta en promedio `Θ(1 + α)`. Diga qué supuesto sobre la función hash sostiene ese resultado y qué le pasaría a la tabla si todas las guías cayeran en la misma casilla.
-2. **Lo medido contra lo esperado.** A partir de su primera gráfica, tome dos tamaños consecutivos en los que `n` crezca y calcule cuánto se multiplicó el tiempo de cada estructura; diga si coincide con `Θ(n)` y con `Θ(1)`. Con su segunda gráfica, describa cómo cambia el tiempo cuando `α` crece y si es coherente con `Θ(1 + α)`.
+2. **Lo medido contra lo esperado.** A partir de su primera gráfica, tome dos valores consecutivos de `n` y calcule cuánto se multiplicó el tiempo de cada estructura; diga si coincide con `Θ(n)` y con `Θ(1)`. Con su segunda gráfica, describa cómo cambia el tiempo cuando `α` crece y si es coherente con `Θ(1 + α)`.
 3. **Explique las colisiones.** Explique qué es una colisión y por qué ocurre aunque la tabla tenga más casillas que guías. Describa cómo la resuelven el encadenamiento y el direccionamiento abierto, y diga qué ventaja y qué costo tiene cada uno. Use la colisión de las guías `10`, `24` y `17` con `m = 7` como ejemplo.
 4. **Tabla hash o árbol de búsqueda.** Para el monitoreo por rango ("guías entre X y Y"), ¿sirve la tabla hash? Justifique. Explique qué ofrece un árbol de búsqueda binario para esa consulta, y qué pasaría si las 400.000 guías llegaran ya ordenadas y se insertaran una a una: estime la altura resultante y el número aproximado de comparaciones, y compare con el caso de un árbol equilibrado.
 5. **Concepto para la jefa de operaciones.** Recomiende una estructura (o una combinación) para cubrir las dos necesidades. Estime, a partir de su medición, cuánto tardaría una búsqueda de una guía inexistente en cada estructura con **5.000.000** de envíos. Declare que es una **estimación** y explique el razonamiento (no use una regla de tres sin justificar la forma de la curva).
@@ -238,7 +267,7 @@ El `README.md` es el informe completo y **el único documento que se califica co
 
 1. Su nombre completo y las instrucciones para reproducir el experimento (cómo activar el entorno y qué comando ejecutar para las pruebas y para la medición).
 2. **Parte 1** — breve descripción de cómo verificó las estructuras y qué casos cubrió.
-3. **Parte 2** — las dos gráficas incrustadas y una nota sobre cómo midió (por ejemplo, cuántas repeticiones hizo y qué `m` usó en cada tamaño).
+3. **Parte 2** — las dos gráficas incrustadas y una nota sobre cómo midió (por ejemplo, cuántas repeticiones hizo y qué `m` usó en cada valor de `n`).
 4. **Parte 3** — las cinco respuestas del análisis.
 
 **Cada parte práctica debe enlazar su código**: al inicio de la Parte 1 incluya un enlace en Markdown a `estructuras.py` y a `pruebas.py`, y al inicio de la Parte 2 un enlace a `medicion.py`, apuntando a los archivos dentro del repositorio. Un informe que describe resultados sin enlazar el código que los produjo pierde el criterio de documentación.
@@ -254,7 +283,7 @@ Haga `push` a su repositorio en la rama `main` antes del cierre del plazo (sába
 | **Corrección conceptual** | 20 | Las preguntas 3, 4 y 5 de la Parte 3 responden lo que se pregunta: explican la colisión y comparan encadenamiento con direccionamiento abierto, justifican por qué la tabla no sirve para rangos y estiman la altura y las comparaciones del árbol degenerado frente al equilibrado, y recomiendan una estructura con una estimación a 5.000.000 de envíos declarada como estimación. |
 | **Calidad de la explicación teórica** | 20 | La pregunta 1 justifica el `Θ(n)` de la lista y el `Θ(1 + α)` de la tabla, nombra el supuesto de hash uniforme y explica qué ocurre si todas las claves caen en una casilla. |
 | **Corrección de la implementación** | 25 | Las dos estructuras devuelven el estado correcto en búsquedas exitosas e infructuosas; la colisión forzada con `m = 7` funciona; `factor_carga` es correcto; lista y tabla coinciden en al menos veinte colecciones aleatorias; la tabla reutiliza la lista sin usar `dict`, `set` ni `hash()`; el código cumple PEP 8, con *type hints* y *docstring* Google-style. |
-| **Calidad del análisis de las gráficas** | 25 | Ambas gráficas existen, con título, ejes rotulados con unidades y leyenda; la primera cubre al menos seis tamaños con ambas curvas en los mismos ejes y la segunda al menos cinco valores de `α`; la pregunta 2 calcula factores de crecimiento y los contrasta con `Θ(n)`, `Θ(1)` y `Θ(1 + α)`; las afirmaciones de desempeño se apoyan en valores leídos de las gráficas. |
+| **Calidad del análisis de las gráficas** | 25 | Ambas gráficas existen, con título, ejes rotulados con unidades y leyenda; la primera cubre al menos seis valores de `n` con ambas curvas en los mismos ejes y la segunda al menos cuatro valores de `α`; la pregunta 2 calcula factores de crecimiento y los contrasta con `Θ(n)`, `Θ(1)` y `Θ(1 + α)`; las afirmaciones de desempeño se apoyan en valores leídos de las gráficas. |
 | **Documentación y organización del informe** | 10 | El repositorio tiene la estructura de carpetas exacta del entregable, el `README.md` sigue el orden pedido con las gráficas visibles en GitHub, cada parte práctica enlaza su código, hay instrucciones de reproducción y existen al menos tres commits descriptivos. |
 | **TOTAL** | **100** | |
 
