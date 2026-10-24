@@ -272,10 +272,11 @@ export const analisisDeAlgoritmos: Course = {
       articleSlug: "estrategia-voraz",
       order: 16,
       title: "Estrategia voraz",
+      summary:
+        "Cómo escoger a ciegas y acertar: en la selección de actividades basta elegir siempre la que termina primero, y la propiedad de elección voraz junto con la subestructura óptima explican por qué otras reglas fallan y por qué esto cuesta Θ(n log n) y no el O(n³) de la programación dinámica.",
       topics: [
         { title: "El problema de selección de actividades" },
         { title: "Elementos de la estrategia voraz: elección voraz y subestructura óptima" },
-        { title: "Códigos de Huffman: construcción del árbol y compresión" },
       ],
     },
     {

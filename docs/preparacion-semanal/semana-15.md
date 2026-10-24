@@ -8,14 +8,14 @@
 ## Ronda — `analisis-de-algoritmos` (2026-10-24)
 
 **Alcance confirmado por el usuario:** solo la Sesión 1 (T) del lunes 9 de
-noviembre. **Excluida:** la Sesión 2 (P, estrategia voraz).
+noviembre. **Excluida en esta primera ronda:** la Sesión 2 (P, estrategia voraz), cubierta en la Ronda 2.
 
 ### Sesiones cubiertas
 
 | Sesión | Fecha | Tema | ★/◇ |
 |---|---|---|---|
 | T | lun 9 nov | Fundamentos de programación dinámica (corte de varillas) | |
-| P | lun 9 nov | Estrategia voraz (**no cubierta en esta ronda**) | |
+| P | lun 9 nov | Estrategia voraz (cubierta en la Ronda 2) | |
 
 ### Etapas y aprobaciones
 
@@ -77,7 +77,71 @@ No aplica.
 - [x] Sin `# H1` ni `###` en el `.mdx`; sin placeholders fuera de backticks en los apuntes
 - [x] `summary` presente en frontmatter **y** en registro TS
 - [x] Coherencia cruzada lección ↔ apuntes ↔ cuestionario (las votaciones no repiten el cuestionario)
-- [ ] `@reviewer`
+- [x] `@reviewer`: APROBADO (2 menores corregidos antes del merge)
+
+---
+
+## Ronda 2 — `analisis-de-algoritmos`, Sesión 2 (P) (2026-10-24)
+
+**Alcance confirmado por el usuario:** solo la Sesión 2 (P) del lunes 9 de
+noviembre: *Estrategia voraz*. **Huffman** se quitó de los `topics` del registro
+por decisión del usuario (el cronograma lo manda a lectura autónoma).
+
+### Etapas y aprobaciones
+
+| Etapa | Resultado | Aprobada por el usuario |
+|---|---|---|
+| E2 · Plan de lección | Aprobado con 4 decisiones (sala de estudio; "menos conflictos" en una frase y reto; Huffman en una frase en la Síntesis; costo de PD como O(n³)) | ✅ |
+| E3 · Lección `.mdx` + registro TS | `estrategia-voraz` (order 16, 133 líneas) | ✅ (implícita al pedir los apuntes) |
+| E4 · Apuntes del docente | Sí, pedidos por el usuario | ✅ |
+| E5 · Cuestionario de cierre | Propuestas 5 preguntas → 5 aprobadas (P4 (c) corregida) | ✅ |
+| E6 · Guía del estudiante | No (decisión del usuario) | ✅ |
+| E6 · Quiz A/B/C | No (decisión del usuario) | ✅ |
+
+### Artefactos producidos
+
+| Artefacto | Ruta | Publicado |
+|---|---|---|
+| Lección teórica | `content/cursos/analisis-de-algoritmos/estrategia-voraz.mdx` | ⬜ |
+| Registro TS | `lib/courses/data/analisis-de-algoritmos.ts` (`order: 16`; `summary` añadido, Huffman quitado de `topics`) | — |
+| Apunte de clase | `content/cursos/analisis-de-algoritmos/apuntes/estrategia-voraz.md` | Solo owner/admin |
+
+### Cuestionario de cierre
+
+| Lección | Entorno | IDs de preguntas | Publicadas | Montadas (`list_lesson_questions`) |
+|---|---|---|---|---|
+| `estrategia-voraz` | desarrollo | P1 `a585f7f4-c712-4448-bc5b-0c12b5d9488d` · P2 `16ac5ba5-4e9f-46c9-8a6e-237afe98d6d2` · P3 `17d88a10-9407-44d1-8fa0-98fff22e2a97` · P4 `10bd5e29-5632-4a2d-899a-16dfdd80f011` · P5 `445d9e68-5c62-422a-8ea2-9918312e467f` | ✅ | ✅ (orden P1–P5) |
+| `estrategia-voraz` | **producción** | — | ⬜ | ⬜ |
+
+Keyword creada en desarrollo: `algoritmos-voraces` (tema); verificarla/crearla en
+producción en D3. Las explicaciones no se guardaron (sin campo de feedback).
+
+### Decisiones tomadas por Claude en nombre del docente
+
+- Quitar Huffman de los `topics` sin sustituirlo por otro tópico (el "implementar
+  y contrastar con PD" de `info.md` vive en los apuntes) — **motivo:** el usuario
+  pidió quitarlo.
+- El redactor reemplazó "elegir al azar da 2–3 turnos" (no verificado) por
+  "empezar por el grupo 3 deja solo 3 turnos".
+- La PD de Cormen aparece en la lección solo como idea y costo O(n³); el 286 de
+  la recurrencia son *pruebas* (C(13,3)) y 78 *evaluaciones*, ambos declarados
+  en los apuntes.
+- La keyword `algoritmos-voraces` se creó al aprobar las preguntas, sin una
+  respuesta explícita aparte; las opciones se dejaron sin ajustar de longitud (la
+  correcta es la más larga en P2–P5).
+- Los apuntes mueven la votación y el error planeado 2 antes de la tabla
+  comparativa para no revelarlos.
+- En los apuntes, la práctica externa (LeetCode 435, 452, 253) está sin enlaces y
+  "por verificar".
+
+### Verificación (E7)
+
+- [x] `npm run build` en verde
+- [x] `npm run lint` sin errores (7 warnings preexistentes)
+- [x] Sin `# H1` ni `###` en el `.mdx`; sin placeholders fuera de backticks en los apuntes
+- [x] `summary` presente en frontmatter **y** en registro TS
+- [x] Coherencia cruzada lección ↔ apuntes ↔ cuestionario
+- [x] `@reviewer`: APROBADO (4 hallazgos mayores y 1 menor corregidos antes del merge)
 
 ---
 
@@ -89,7 +153,7 @@ No aplica.
 | D1 · Lecciones nuevas cerradas por adelantado | ⬜ | |
 | D2 · Merge a `main` y deploy en Vercel | ⬜ | rama `deploy/semana-15` |
 | D3 · Banco de preguntas replicado a producción | ⬜ | |
-| D4 · Lecciones abiertas a los estudiantes | ⬜ | `analisis-de-algoritmos` → `fundamentos-de-programacion-dinamica` |
+| D4 · Lecciones abiertas a los estudiantes | ⬜ | `analisis-de-algoritmos` → `fundamentos-de-programacion-dinamica`, `estrategia-voraz` |
 | D5 · Verificación end-to-end en producción | ⬜ | |
 | D6 · Bitácora cerrada y rama `deploy/` borrada | ⬜ | |
 
@@ -98,5 +162,5 @@ No aplica.
 ## Pendientes
 
 - La lección debe estar desplegada y abierta **antes del lunes 9 de nov** (aula invertida).
-- Sesión P (estrategia voraz) y guía del Lab 4: fuera de esta ronda.
+- Guía del Lab 4: fuera de esta ronda.
 - Tras la clase: D7, marcar la lección como vista por grupo.
