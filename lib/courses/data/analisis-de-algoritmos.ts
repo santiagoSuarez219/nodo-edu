@@ -246,9 +246,11 @@ export const analisisDeAlgoritmos: Course = {
       articleSlug: "fundamentos-de-programacion-dinamica",
       order: 14,
       title: "Fundamentos de programación dinámica",
+      summary:
+        "Cómo dejar de resolver el mismo subproblema una y otra vez: el corte de varillas pasa de Θ(2ⁿ) a Θ(n²) con memoización o tabulación, y un arreglo auxiliar permite recuperar dónde cortar, no solo cuánto se gana.",
       topics: [
         { title: "Corte de varillas: solución recursiva ingenua vs. memoización vs. tabulación" },
-        { title: "Multiplicación de cadenas de matrices: planteamiento y recurrencia" },
+        { title: "Subestructura óptima y subproblemas traslapados" },
         { title: "Reconstrucción de la solución óptima" },
       ],
     },
