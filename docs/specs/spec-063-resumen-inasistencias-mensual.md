@@ -562,7 +562,7 @@ pasa por las acciones existentes.
       en `nodo-dev`.
 - [x] Actualizar [[DEBT-079]] en `docs/specs/backlog.md` (D6) y registrar la
       deuda de historial de rematrícula (D5).
-- [ ] Aplicar la migración a producción **solo** con confirmación explícita
+- [x] Aplicar la migración a producción **solo** con confirmación explícita
       del usuario, en el despliegue (`--dry-run` primero).
 
 ## Criterios de aceptación

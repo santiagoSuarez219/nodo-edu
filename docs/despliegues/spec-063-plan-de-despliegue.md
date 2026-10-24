@@ -143,7 +143,7 @@ Análisis**. Según `class_time_start`/`class_time_end` en producción:
 | Dry-run | 2026-10-24 | ✅ Solo la migración esperada | Proyecto enlazado `bgiimadnmqnoqmdbudpo`, CLI 2.107.0. Salida: `Would push these migrations: 20261024000000_academic_courses_hours_per_session.sql` |
 | `db push` | 2026-10-24 | ✅ Migración aplicada | Ejecutado por el usuario (el modo automático bloqueó el comando a Claude). Aviso de Docker (caché del catálogo) sin efecto, igual que en spec-060 |
 | Verificación del esquema | 2026-10-24 | ✅ `200` | `academic_courses?select=id,name,hours_per_session` → los 4 grupos en `2.00` |
-| Merge y push a `main` | | | |
-| Build de Vercel | | | |
+| Merge y push a `main` | 2026-10-24 | ✅ `2b44e30` (`eb20d8e..2b44e30`) | Push ejecutado por el usuario (el modo automático lo bloqueó a Claude) |
+| Build de Vercel | 2026-10-24 | ✅ `dpl_95NC1FdPdTBEzxxsA1CWRL55tYQm` READY (~34 s) | Alias `www.nod0.dev`, `nod0.dev`, `nodo-edu.vercel.app`. `/login` 200; `/` → login (307). `/api/attendance/courses/…/monthly-absences` sin clave → `401 unauthorized` (no `500`). Sin runtime errors en los últimos 15 min |
 | Horas por sesión ajustadas | | | |
-| `attendance-mcp-prod` reconectado | | | |
+| `attendance-mcp-prod` reconectado | 2026-10-24 | ✅ `get_monthly_absence_summary` responde | Estructuras de datos, `month=2026-10`: 36 estudiantes activos ordenados por apellido, `hours_per_session` 2, 6 sesiones contables, horas = clases × 2 |
