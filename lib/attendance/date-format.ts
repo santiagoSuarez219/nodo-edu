@@ -25,3 +25,18 @@ export function formatSessionDateShort(dateStr: string): { day: string; month: s
     month: date.toLocaleDateString("es-CO", { month: "short" }).replace(".", ""),
   };
 }
+
+// spec-063 D8: "2026-09" -> "septiembre de 2026" / "sep 2026". El Date se
+// construye con componentes explícitos, igual que parseDateOnly.
+export function formatMonthLong(monthKey: string): string {
+  return parseDateOnly(`${monthKey}-01`).toLocaleDateString("es-CO", {
+    month: "long",
+    year: "numeric",
+  });
+}
+
+export function formatMonthShort(monthKey: string): string {
+  const date = parseDateOnly(`${monthKey}-01`);
+  const month = date.toLocaleDateString("es-CO", { month: "short" }).replace(".", "");
+  return `${month} ${date.getFullYear()}`;
+}

@@ -50,6 +50,9 @@ export type AttendanceSheetRow = {
   student_name: string;
   student_first_name: string;
   student_last_name: string;
+  // spec-063 D5: fecha de matrícula en hora de Bogotá (YYYY-MM-DD). La
+  // planilla la ignora; el resumen mensual la usa para no contar clases previas.
+  enrolled_on: string;
   // Una entrada por sesión del curso, en el mismo orden que `sessions`. El %
   // de asistencia no vive aquí: `AttendanceSheet.computePct()` lo calcula en
   // cliente a partir de estas celdas, porque necesita incorporar el estado
@@ -62,6 +65,33 @@ export type AttendanceSheetRow = {
 // un fallo — `status: 'unavailable'` está reservado a fallos de lectura.
 export type AttendanceSheetResult =
   | { status: 'ok'; sessions: AttendanceSheetSession[]; rows: AttendanceSheetRow[] }
+  | { status: 'unavailable' };
+
+// spec-063: resumen mensual de inasistencias en horas.
+export type MonthlyAbsenceCell =
+  | { kind: 'not_applicable' }
+  | { kind: 'counted'; absences: number; hours: number; applicable_sessions: number };
+
+export type MonthlyAbsenceMonth = { key: string; session_count: number };
+
+export type MonthlyAbsenceRow = {
+  student_id: string;
+  student_name: string;
+  student_first_name: string;
+  student_last_name: string;
+  enrolled_on: string;
+  months: Record<string, MonthlyAbsenceCell>;
+  total: MonthlyAbsenceCell;
+};
+
+export type MonthlyAbsenceSummaryResult =
+  | {
+      status: 'ok';
+      hours_per_session: number;
+      months: MonthlyAbsenceMonth[];
+      rows: MonthlyAbsenceRow[];
+      open_session_date: string | null;
+    }
   | { status: 'unavailable' };
 
 export type OpenSessionSummary = {

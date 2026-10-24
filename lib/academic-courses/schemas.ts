@@ -24,6 +24,15 @@ export const AcademicCourseSchema = z
     class_time_end: z
       .string()
       .regex(timeRegex, "Formato HH:mm requerido"),
+    // spec-063 D3: numeric(4,2) en la base; más de 2 decimales se redondearía
+    // en silencio, así que se rechaza aquí.
+    hours_per_session: z
+      .number({ error: "Indica las horas por sesión" })
+      .positive("Debe ser mayor que 0")
+      .max(12, "Máximo 12 horas")
+      .refine((n) => Math.abs(n * 100 - Math.round(n * 100)) < 1e-9, {
+        message: "Máximo 2 decimales",
+      }),
     enrollment_code: z
       .string()
       .length(8, "El código de matrícula debe tener 8 caracteres")

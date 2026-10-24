@@ -6,6 +6,7 @@ export interface AcademicCourse {
   class_days: string[];
   class_time_start: string;
   class_time_end: string;
+  hours_per_session: number;
   enrollment_code: string;
   course_slug: string | null;
   is_active: boolean;
@@ -20,6 +21,7 @@ export type AcademicCourseInput = Pick<
   | "class_days"
   | "class_time_start"
   | "class_time_end"
+  | "hours_per_session"
   | "enrollment_code"
   | "course_slug"
 >;
