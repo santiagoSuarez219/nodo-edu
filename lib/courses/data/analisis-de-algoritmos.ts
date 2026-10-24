@@ -255,18 +255,6 @@ export const analisisDeAlgoritmos: Course = {
       ],
     },
     {
-      id: "elementos-de-la-pd-y-lcs",
-      slug: "elementos-de-la-pd-y-lcs",
-      articleSlug: "elementos-de-la-pd-y-lcs",
-      order: 15,
-      title: "Elementos de la programación dinámica y subsecuencia común más larga",
-      topics: [
-        { title: "Subestructura óptima y subproblemas traslapados: cómo reconocerlos" },
-        { title: "Subsecuencia común más larga (LCS): planteamiento, tabla y reconstrucción" },
-        { title: "Cuándo memoización, cuándo tabulación: consideraciones prácticas" },
-      ],
-    },
-    {
       id: "estrategia-voraz",
       slug: "estrategia-voraz",
       articleSlug: "estrategia-voraz",
@@ -280,18 +268,12 @@ export const analisisDeAlgoritmos: Course = {
       ],
     },
     {
-      id: "sintesis-del-semestre",
-      slug: "sintesis-del-semestre",
-      articleSlug: "sintesis-del-semestre",
+      id: "proyecto-final",
+      slug: "proyecto-final",
+      articleSlug: "proyecto-final",
       order: 17,
-      title: "Síntesis del semestre",
-      topics: [
-        {
-          title:
-            "Repaso integrador: recurrencias, divide y vencerás, estructuras de datos, programación dinámica, voraces",
-        },
-        { title: "Retroalimentación general sobre los informes de laboratorio" },
-      ],
+      title: "Proyecto final",
+      topics: [],
     },
   ],
 };
