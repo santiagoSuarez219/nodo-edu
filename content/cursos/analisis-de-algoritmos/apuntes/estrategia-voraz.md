@@ -397,9 +397,9 @@ factor y de conteo son las que se comentan en clase):
  320    0.0214    644.58      1.8    8.1  5512640 5418068
 ```
 
-Punto a resaltar: cada vez que `n` se duplica, el voraz **multiplica por algo
-más de 2** su tiempo (lo que se espera de `n log n`: 2 por el doble de
-elementos, más un poquito por el logaritmo) y la PD lo multiplica por **cerca
+Punto a resaltar: cada vez que `n` se duplica, el voraz **multiplica por cerca
+de 2** su tiempo (lo que se espera de `n log n`: 2 por el doble de elementos,
+más un poquito por el logaritmo, que el ruido tapa con `n` pequeños) y la PD lo multiplica por **cerca
 de 8** (el cubo de 2), con algo de ruido en los `n` pequeños. Las `pruebas`
 son exactamente `C(n + 2, 3)`: 220, 1.540, 11.480... ; las `evaluaciones`
 se les parecen pero no coinciden, porque dependen de los datos. En `n = 320`
@@ -562,7 +562,6 @@ CASOS: dict[str, tuple[list[int], list[int]]] = {
     "A,B,C": ([0, 5, 6], [6, 7, 12]),
     "(0,10),(1,2),(3,4)": ([0, 1, 3], [10, 2, 4]),
     "Cormen (11)": (S, F),
-    "8 actividades": ([9, 0, 0, 0, 7, 2, 6, 4], [10, 1, 4, 3, 11, 5, 9, 7]),
 }
 ```
 
@@ -638,7 +637,7 @@ Cormen es demasiado «amable»**; hay que buscar el que no lo es.
 
 ## Tabla comparativa de las cuatro reglas
 
-Se ejecuta ahora la comparación completa sobre cuatro casos.
+Se ejecuta ahora la comparación completa sobre tres casos.
 
 
 ```python
@@ -659,16 +658,15 @@ caso                 óptimo      termina primero       menor duración  inicio 
 A,B,C                     2                    2                    1                    2                    2
 (0,10),(1,2),(3,4)        2                    2                    2                    1                    2
 Cormen (11)               4                    4                    4                    3                    4
-8 actividades             4                    4                    4                    4                    3
 ```
 
 Punto a resaltar: la columna «termina primero» **nunca baja** del óptimo;
 cada una de las otras tiene un renglón donde pierde. Y lean la fila de
 Cormen: «menor duración» da 4 y «menos conflictos» da 4. **Pasar los 11
 turnos de Cormen no prueba nada**: un solo contraejemplo basta para descartar
-una regla, pero un solo ejemplo donde acierta no basta para aceptarla. El
-renglón de 8 actividades se deja para el reto en parejas; no lo comenten
-todavía.
+una regla, pero un solo ejemplo donde acierta no basta para aceptarla. Para
+«menos conflictos» todavía no hay contraejemplo en la tabla: encontrarlo es el
+reto en parejas, así que no lo adelanten.
 
 Detalle de la fila de Cormen para «menos conflictos» (confirma la votación):
 
@@ -780,8 +778,8 @@ cinta**. La diferencia es la propiedad de elección voraz: en la sala,
 reemplazar la primera actividad de cualquier óptimo por la que termina primero
 nunca empeora la solución; en la cinta, tomar el tramo de mejor precio por
 metro sí puede empeorarla. Cuando esa propiedad no está garantizada, se
-prueban todas las opciones y se comparan: es la programación dinámica del
-lunes anterior.
+prueban todas las opciones y se comparan: es la programación dinámica de
+la sesión T de hoy.
 
 ## 👥 Reto en parejas — la regla de «menos conflictos» tiene un contraejemplo
 
@@ -847,7 +845,7 @@ Punto a resaltar: el contraejemplo es **sensible al desempate**. Con
 desempate por índice (el orden en que están escritos) la misma regla da 4,
 y por eso el enunciado exige declararlo. Si una pareja propone un conjunto
 distinto, se verifica con las mismas funciones y su propio desempate, no se
-descarta por no coincidir con este. Si alguna pregunta cuál es un
+descarta por no coincidir con este. Si alguien pregunta cuál es un
 contraejemplo que no dependa del desempate, existe (con 11 actividades);
 ver la última pregunta socrática.
 

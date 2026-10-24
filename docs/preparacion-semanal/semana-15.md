@@ -77,7 +77,7 @@ No aplica.
 - [x] Sin `# H1` ni `###` en el `.mdx`; sin placeholders fuera de backticks en los apuntes
 - [x] `summary` presente en frontmatter **y** en registro TS
 - [x] Coherencia cruzada lección ↔ apuntes ↔ cuestionario (las votaciones no repiten el cuestionario)
-- [ ] `@reviewer`
+- [x] `@reviewer`: APROBADO (2 menores corregidos antes del merge)
 
 ---
 
@@ -141,7 +141,7 @@ producción en D3. Las explicaciones no se guardaron (sin campo de feedback).
 - [x] Sin `# H1` ni `###` en el `.mdx`; sin placeholders fuera de backticks en los apuntes
 - [x] `summary` presente en frontmatter **y** en registro TS
 - [x] Coherencia cruzada lección ↔ apuntes ↔ cuestionario
-- [ ] `@reviewer`
+- [x] `@reviewer`: APROBADO (4 hallazgos mayores y 1 menor corregidos antes del merge)
 
 ---
 
