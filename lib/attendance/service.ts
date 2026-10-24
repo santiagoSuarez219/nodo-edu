@@ -1,6 +1,12 @@
 import { createServiceSupabaseClient } from '@/lib/auth/service';
 import { compareStudentsBySurname } from '@/lib/students/names';
-import type { ClassSession } from './types';
+import { buildMonthlyAbsenceSummary, toBogotaDate } from './monthly-summary';
+import type {
+  AttendanceSheetCell,
+  AttendanceSheetResult,
+  ClassSession,
+  MonthlyAbsenceCell,
+} from './types';
 
 interface ListSessionsOptions {
   courseId: string;
@@ -312,5 +318,162 @@ export async function getServiceCourseAttendanceSummary(
         { first_name: b.first_name, last_name: b.last_name, full_name: b.student_name }
       )
     ),
+  };
+}
+
+// spec-063: salida del MCP. `sessions_counted` distingue "no aplica" (0) de
+// "0 faltas" (D5).
+interface MonthlyAbsenceStudent {
+  student_id: string;
+  student_name: string;
+  first_name: string;
+  last_name: string;
+  by_month: Record<
+    string,
+    { absent_classes: number; absent_hours: number; sessions_counted: number }
+  >;
+  // Ausente cuando se pide un solo mes (`month`).
+  total?: { absent_classes: number; absent_hours: number; sessions_counted: number };
+}
+
+export interface MonthlyAbsenceSummaryOutput {
+  course_id: string;
+  hours_per_session: number;
+  months: string[];
+  students: MonthlyAbsenceStudent[];
+}
+
+function toOutputCell(cell: MonthlyAbsenceCell) {
+  return cell.kind === 'counted'
+    ? {
+        absent_classes: cell.absences,
+        absent_hours: cell.hours,
+        sessions_counted: cell.applicable_sessions,
+      }
+    : { absent_classes: 0, absent_hours: 0, sessions_counted: 0 };
+}
+
+// spec-063 Fase 5: mismo cálculo que el panel (buildMonthlyAbsenceSummary);
+// aquí solo cambia el cliente (service_role, tras la API key) y la obtención
+// de insumos. Devuelve null si el curso no existe.
+export async function getServiceMonthlyAbsenceSummary(
+  courseId: string,
+  options?: { month?: string }
+): Promise<MonthlyAbsenceSummaryOutput | null> {
+  const supabase = createServiceSupabaseClient();
+
+  const { data: course, error: courseError } = await supabase
+    .from('academic_courses')
+    .select('hours_per_session')
+    .eq('id', courseId)
+    .maybeSingle();
+  if (courseError) throw courseError;
+  if (!course) return null;
+
+  const [{ data: sessions, error: sessionsError }, { data: enrollments, error: enrollmentsError }] =
+    await Promise.all([
+      supabase
+        .from('class_sessions')
+        .select('id, session_date, attendance_code, is_open')
+        .eq('academic_course_id', courseId)
+        .order('session_date', { ascending: true })
+        .order('created_at', { ascending: true }),
+      supabase
+        .from('enrollments')
+        .select('student_id, enrolled_at')
+        .eq('academic_course_id', courseId)
+        .eq('status', 'active')
+        .order('enrolled_at', { ascending: true }),
+    ]);
+  if (sessionsError) throw sessionsError;
+  if (enrollmentsError) throw enrollmentsError;
+
+  const sessionIds = (sessions ?? []).map((s) => s.id as string);
+  const studentIds = (enrollments ?? []).map((e) => e.student_id as string);
+
+  // Paginado contra max_rows, igual que getAttendanceSheet.
+  const PAGE_SIZE = 500;
+  const records: Array<{ session_id: string; student_id: string }> = [];
+  if (sessionIds.length > 0) {
+    for (let from = 0; ; from += PAGE_SIZE) {
+      const { data: page, error } = await supabase
+        .from('attendance_records')
+        .select('session_id, student_id')
+        .in('session_id', sessionIds)
+        .order('session_id', { ascending: true })
+        .order('student_id', { ascending: true })
+        .range(from, from + PAGE_SIZE - 1);
+      if (error) throw error;
+      records.push(...((page ?? []) as typeof records));
+      if (!page || page.length < PAGE_SIZE) break;
+    }
+  }
+
+  const profiles = new Map<string, ProfileNames>();
+  if (studentIds.length > 0) {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('id, full_name, first_name, last_name')
+      .in('id', studentIds);
+    if (error) throw error;
+    for (const p of data ?? []) profiles.set(p.id as string, p as unknown as ProfileNames);
+  }
+
+  const present = new Set(records.map((r) => `${r.session_id}:${r.student_id}`));
+  const sheet: Extract<AttendanceSheetResult, { status: 'ok' }> = {
+    status: 'ok',
+    sessions: (sessions ?? []).map((s) => ({
+      id: s.id as string,
+      session_date: s.session_date as string,
+      has_code: s.attendance_code !== null,
+      is_open: s.is_open as boolean,
+      attendee_count: 0,
+    })),
+    rows: (enrollments ?? []).map((e) => {
+      const id = e.student_id as string;
+      const cells: Record<string, AttendanceSheetCell> = {};
+      for (const sid of sessionIds) {
+        cells[sid] = {
+          present: present.has(`${sid}:${id}`),
+          marked_at: null,
+          marked_manually: false,
+        };
+      }
+      return {
+        student_id: id,
+        student_name: profiles.get(id)?.full_name ?? 'Estudiante',
+        student_first_name: profiles.get(id)?.first_name ?? '',
+        student_last_name: profiles.get(id)?.last_name ?? '',
+        enrolled_on: toBogotaDate(e.enrolled_at as string),
+        cells,
+      };
+    }),
+  };
+
+  sheet.rows.sort((a, b) =>
+    compareStudentsBySurname(
+      { first_name: a.student_first_name, last_name: a.student_last_name, full_name: a.student_name },
+      { first_name: b.student_first_name, last_name: b.student_last_name, full_name: b.student_name }
+    )
+  );
+
+  const summary = buildMonthlyAbsenceSummary(sheet, Number(course.hours_per_session));
+  const monthKeys = options?.month
+    ? summary.months.map((m) => m.key).filter((k) => k === options.month)
+    : summary.months.map((m) => m.key);
+
+  return {
+    course_id: courseId,
+    hours_per_session: summary.hours_per_session,
+    months: monthKeys,
+    students: summary.rows.map((r) => ({
+      student_id: r.student_id,
+      student_name: r.student_name,
+      first_name: r.student_first_name,
+      last_name: r.student_last_name,
+      by_month: Object.fromEntries(monthKeys.map((k) => [k, toOutputCell(r.months[k])])),
+      // Con `month`, el total de todo el curso se confundiría con el del mes.
+      ...(options?.month ? {} : { total: toOutputCell(r.total) }),
+    })),
   };
 }

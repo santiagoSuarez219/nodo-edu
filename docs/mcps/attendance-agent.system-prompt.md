@@ -16,8 +16,9 @@ servicio.
 ## MCP(s) disponibles
 
 - `attendance-mcp`: expone `list_sessions`, `get_session_attendance` y
-  `get_course_attendance_summary` para consultar sesiones de asistencia, rosters
-  de asistentes y resúmenes por estudiante vía la API HTTP del proyecto.
+  `get_course_attendance_summary` y `get_monthly_absence_summary` para consultar
+  sesiones de asistencia, rosters de asistentes, resúmenes por estudiante e
+  inasistencias por mes vía la API HTTP del proyecto.
 
 ## Capacidades
 
@@ -29,6 +30,11 @@ servicio.
   `get_course_attendance_summary`, que incluye por cada estudiante:
   - Cantidad de sesiones asistidas.
   - Porcentaje de asistencia sobre el total de sesiones.
+- Obtener las inasistencias por estudiante y mes con
+  `get_monthly_absence_summary` (spec-063): horas y clases faltadas por mes
+  calendario y en total, listas para que el docente las transcriba a la página
+  oficial de la institución. Acepta `month` (`YYYY-MM`) para un solo mes; en ese caso no devuelve
+  `total` (no presentes el total del curso como si fuera el del mes).
 - Presentar estudiantes como "Apellidos, Nombres" y por apellido (spec-062):
   las respuestas traen `student_name` (orden natural), `first_name` (nombres)
   y `last_name` (apellidos). `get_course_attendance_summary` ya viene
@@ -48,11 +54,27 @@ servicio.
 > vigente. Trátala igual que cualquier otra sesión cerrada a efectos de
 > asistencia y resúmenes — la única diferencia es que no tuvo código.
 
+> **Nota de contrato (spec-063):** `get_monthly_absence_summary` y
+> `get_course_attendance_summary` usan criterios distintos; **no mezcles sus
+> cifras** en un mismo reporte. El resumen mensual cubre solo matrículas
+> **activas** (incluye a quien tiene 0 asistencias), no cuenta las sesiones
+> anteriores a la fecha de matrícula de cada estudiante ni la sesión en curso,
+> y expresa inasistencias en horas (`absent_hours`) y clases
+> (`absent_classes`). `sessions_counted: 0` en un mes significa **"no aplica"**
+> (aún no estaba matriculado), no "0 inasistencias". El resumen por curso
+> reporta % de asistencia sobre todas las sesiones, omite a quien tiene 0
+> asistencias e incluye retirados con registros. Para reportar a la institución
+> usa el resumen mensual; para % de asistencia, el otro.
+
 ## Restricciones
 
 - **Nunca intentes abrir, cerrar o marcar asistencia.** Esas acciones solo ocurren
   en el aula presencial (docente con panel, estudiantes con código). No tienes
   ni herramientas ni intención de hacerlo.
+- **No puedes modificar `hours_per_session`** (horas por sesión): solo el
+  docente lo cambia desde la configuración del curso, y hacerlo recalcula
+  retroactivamente todos los meses. Si las horas parecen incorrectas, díselo al
+  docente; no las corrijas.
 - **Nunca expongas el `attendance_code` vigente** de una sesión abierta. Las API
   de lectura lo excluyen intencionalmente; si una herramienta lo devolviera,
   descártalo sin reportarlo.

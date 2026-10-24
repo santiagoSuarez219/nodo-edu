@@ -48,6 +48,7 @@ export function AcademicCourseForm({ course, availableCourses }: Props) {
       class_days: (course?.class_days as AcademicCourseSchemaInput["class_days"]) ?? [],
       class_time_start: course?.class_time_start?.slice(0, 5) ?? "",
       class_time_end: course?.class_time_end?.slice(0, 5) ?? "",
+      hours_per_session: course?.hours_per_session ?? 2,
       enrollment_code: course?.enrollment_code ?? "",
       course_slug: course?.course_slug ?? "",
     },
@@ -195,6 +196,35 @@ export function AcademicCourseForm({ course, availableCourses }: Props) {
               <p className={errorClass}>{errors.class_time_end.message}</p>
             )}
           </div>
+        </div>
+
+        {/* Horas por sesión (spec-063) */}
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="hours_per_session" className={labelClass}>
+            Horas por sesión
+          </label>
+          <input
+            id="hours_per_session"
+            type="number"
+            min="0.5"
+            max="12"
+            step="0.5"
+            inputMode="decimal"
+            aria-describedby="hours_per_session_help"
+            className={inputClass}
+            {...register("hours_per_session", { valueAsNumber: true })}
+          />
+          <p
+            id="hours_per_session_help"
+            className="text-xs text-gray-400 dark:text-gray-500"
+          >
+            Se usa para convertir las inasistencias a horas. Cambiarlo
+            recalcula el resumen de todos los meses, incluidos los ya
+            reportados.
+          </p>
+          {errors.hours_per_session && (
+            <p className={errorClass}>{errors.hours_per_session.message}</p>
+          )}
         </div>
 
         {/* Código de matrícula */}

@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { createServerSupabaseClient } from '@/lib/auth/server';
 import { fetchStudentProfilesPublic } from '@/lib/enrollments/index';
 import { compareStudentsBySurname } from '@/lib/students/names';
+import { buildMonthlyAbsenceSummary, toBogotaDate } from './monthly-summary';
 import type {
   AttendanceCountResult,
   AttendanceSheetCell,
@@ -14,6 +15,7 @@ import type {
   AttendanceSheetSession,
   ClassSession,
   MarkAttendanceResult,
+  MonthlyAbsenceSummaryResult,
   OpenSessionResult,
   OpenSessionSummary,
   RefreshCodeResult,
@@ -459,7 +461,7 @@ export async function getAttendanceSheet(
           .order('created_at', { ascending: true }),
         supabase
           .from('enrollments')
-          .select('student_id')
+          .select('student_id, enrolled_at')
           .eq('academic_course_id', academicCourseId)
           .eq('status', 'active')
           .order('enrolled_at', { ascending: true }),
@@ -534,6 +536,9 @@ export async function getAttendanceSheet(
     }));
 
     const studentIds = (enrollments ?? []).map((e) => e.student_id as string);
+    const enrolledOnByStudent = new Map(
+      (enrollments ?? []).map((e) => [e.student_id as string, toBogotaDate(e.enrolled_at as string)])
+    );
 
     if (studentIds.length === 0) {
       return { status: 'ok', sessions: sheetSessions, rows: [] };
@@ -571,6 +576,7 @@ export async function getAttendanceSheet(
         student_name: profiles.get(studentId)?.full_name ?? 'Estudiante',
         student_first_name: profiles.get(studentId)?.first_name ?? '',
         student_last_name: profiles.get(studentId)?.last_name ?? '',
+        enrolled_on: enrolledOnByStudent.get(studentId) ?? '',
         cells,
       };
     });
@@ -586,6 +592,42 @@ export async function getAttendanceSheet(
     return { status: 'ok', sessions: sheetSessions, rows };
   } catch (err) {
     console.error('Error getting attendance sheet:', err);
+    return { status: 'unavailable' };
+  }
+}
+
+// spec-063: resumen mensual de inasistencias en horas. Reutiliza la lectura de
+// la planilla (misma paginación y RLS) y solo agrega las horas por sesión; la
+// aritmética vive en la función pura de monthly-summary.ts (D4). Nunca
+// service_role: RLS autoriza.
+export async function getAttendanceMonthlySummary(
+  academicCourseId: string
+): Promise<MonthlyAbsenceSummaryResult> {
+  try {
+    const supabase = await createServerSupabaseClient();
+    const [sheet, { data: course, error: courseError }] = await Promise.all([
+      getAttendanceSheet(academicCourseId),
+      supabase
+        .from('academic_courses')
+        .select('hours_per_session')
+        .eq('id', academicCourseId)
+        .maybeSingle(),
+    ]);
+
+    if (courseError || !course || sheet.status !== 'ok') {
+      if (courseError) console.error('Error getting hours per session:', courseError);
+      return { status: 'unavailable' };
+    }
+
+    // PostgREST puede devolver `numeric` como string; se normaliza una vez.
+    const hoursPerSession = Number(course.hours_per_session);
+    if (!Number.isFinite(hoursPerSession) || hoursPerSession <= 0) {
+      return { status: 'unavailable' };
+    }
+
+    return buildMonthlyAbsenceSummary(sheet, hoursPerSession);
+  } catch (err) {
+    console.error('Error getting attendance monthly summary:', err);
     return { status: 'unavailable' };
   }
 }
