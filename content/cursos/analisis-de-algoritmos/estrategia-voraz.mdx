@@ -1,5 +1,133 @@
 ---
 title: "Estrategia voraz"
-summary: ""
-updatedAt: 2026-07-18
+course: "Análisis de Algoritmos"
+course_code: "AA"
+level: "Ultimos semestres"
+type: "Apuntes teóricos"
+language: "Python 3"
+difficulty: "Avanzado"
+estimated_time: "12 minutos de lectura previa (Semana 15)"
+presentation: true
+slides_hint: "Cada sección ## es una diapositiva. Lectura previa a la clase."
+date: "2026-10-24"
+author: "Asistente de Docencia"
+summary: "Cómo escoger a ciegas y acertar: en la selección de actividades basta elegir siempre la que termina primero, y la propiedad de elección voraz junto con la subestructura óptima explican por qué otras reglas fallan y por qué esto cuesta Θ(n log n) y no el O(n³) de la programación dinámica."
+updatedAt: "2026-10-24"
 ---
+
+> 📖 Lectura previa a la clase — unos 12 minutos. Al final, responde la autoevaluación.
+
+## La sala de estudio de la biblioteca
+
+La biblioteca tiene una sola sala de estudio y 11 grupos piden turno para hoy. Cada grupo indica a qué hora empieza y a qué hora termina; la sala no puede tener dos grupos a la vez. ¿A cuántos grupos puedes atender?
+
+| Grupo `i` | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| Inicio `s_i` | 1 | 3 | 0 | 5 | 3 | 5 | 6 | 8 | 8 | 2 | 12 |
+| Fin `f_i` | 4 | 5 | 6 | 7 | 9 | 9 | 10 | 11 | 12 | 14 | 16 |
+
+Cada turno ocupa el intervalo $[s_i, f_i)$: si un grupo termina a las 4 y otro empieza a las 4, caben seguidos. Prueba a mano: si empiezas por el grupo 3, que pide desde las 0, solo logras 3 turnos. Probar combinaciones a ojo no escala, y quieres una regla que decida sin probar todo.
+
+## Del reglamento al problema
+
+Este es el problema de la **selección de actividades** (Cormen et al., 16.1). Modelado:
+
+- **Entrada:** `n` actividades con inicio $s_i$ y fin $f_i$, tales que $s_i < f_i$.
+- **Salida:** un subconjunto $A$ con el mayor número posible de actividades.
+- **Restricción:** las actividades de $A$ no se solapan; $i$ y $j$ son **compatibles** si $s_j \ge f_i$ o $s_i \ge f_j$.
+
+> **Selección de actividades:** dado un conjunto de actividades, hallar un subconjunto compatible de tamaño máximo.
+
+## Qué regla elegir: tres que fallan
+
+Una regla voraz toma una decisión y no la revisa. Tres candidatas razonables a primera vista:
+
+- **Menor duración primero.** En la tabla de arriba da 4 grupos, así que ahí no falla. Pero con $A = (0,6)$, $B = (5,7)$, $C = (6,12)$, elige $B$, que choca con las otras dos: obtienes 1 turno, cuando $A$ y $C$ caben juntas (2).
+- **Inicio más temprano primero.** En la tabla elige el grupo 3, $(0,6)$, y termina con 3 turnos frente a 4. Con $(0,10)$, $(1,2)$, $(3,4)$ elige el primero y obtiene 1, cuando los otros dos suman 2.
+- **Menos conflictos primero:** también tiene contraejemplo, pero encontrarlo queda para ti como reto.
+
+Un contraejemplo basta para descartar una regla. La que sí funciona es otra.
+
+## Terminación más temprana
+
+La regla: ordena por hora de fin y recorre; toma una actividad si empieza cuando o después de que termina la última elegida. En la sala: liberas lo antes posible, y eso deja más tiempo para los demás.
+
+Traza sobre los 11 grupos, ordenados por fin: toma el 1 (1,4); los grupos 2 y 3 empiezan antes de las 4 y se descartan; el 4 (5,7) cabe y se toma; después de las 7, el 5, 6 y 7 empiezan demasiado pronto y el 8 (8,11) cabe; los grupos 9 y 10 empiezan antes de las 11 y el 11 (12,16) cabe. Resultado, en numeración base 1: grupos **1, 4, 8, 11** — es decir (1,4), (5,7), (8,11), (12,16).
+
+```python
+def seleccionar_actividades(s: list[int], f: list[int]) -> list[int]:
+    """Elige un máximo de actividades compatibles por terminación más temprana.
+
+    Args:
+        s: Hora de inicio de cada actividad.
+        f: Hora de fin de cada actividad (misma longitud que s).
+
+    Returns:
+        Los índices (base 0) de las actividades elegidas, en orden de fin.
+    """
+    orden = sorted(range(len(s)), key=lambda i: f[i])
+    elegidas: list[int] = []
+    ultimo_fin = 0
+    for i in orden:
+        if s[i] >= ultimo_fin:
+            elegidas.append(i)
+            ultimo_fin = f[i]
+    return elegidas
+```
+
+Con los datos de la tabla devuelve `[0, 3, 7, 10]`: los grupos 1, 4, 8 y 11 del texto, porque el código cuenta desde 0 y el texto desde 1.
+
+## Por qué funciona: la elección voraz
+
+Que acierte en un ejemplo no demuestra nada. El argumento es de intercambio: toma cualquier solución óptima $A$ y sea $k$ su primera actividad. Si $k$ no es la que termina primero (llámala $m$), reemplaza $k$ por $m$. Como $f_m \le f_k$, $m$ no choca con las demás actividades de $A$, así que el nuevo conjunto es factible y tiene el mismo tamaño. Existe entonces un óptimo que empieza con la elección voraz.
+
+> **Propiedad de elección voraz:** se puede llegar a una solución óptima global haciendo una elección localmente óptima, sin considerar las que vendrán.
+
+## Elección voraz y subestructura óptima
+
+Tras elegir $m$, lo que queda son las actividades que empiezan en $f_m$ o después: **el mismo problema, más pequeño**. Y una solución óptima contiene una óptima de ese resto, por el mismo argumento de cortar y pegar de la lección Fundamentos de programación dinámica.
+
+> **Subestructura óptima:** una solución óptima contiene soluciones óptimas de los subproblemas que quedan.
+
+Las dos propiedades se complementan, pero la estrategia es distinta. La programación dinámica prueba todas las opciones de primer paso y compara; la voraz se compromete con una y no vuelve atrás. Comprometerse solo es válido si se cumple la elección voraz. En el corte de varillas con `n = 4`, elegir el tramo de mejor precio por metro (3 m) da 8 + 1 = 9, frente al óptimo 10: ahí no se cumple.
+
+## Voraz frente a programación dinámica
+
+Costo de la solución voraz: ordenar es $\Theta(n \log n)$ y el barrido es $\Theta(n)$, así que domina el orden: $\Theta(n \log n)$. Cormen plantea también la versión dinámica, con $c[i,j] = \max_k \{ c[i,k] + c[k,j] + 1 \}$ sobre pares $(i,j)$ y $k$ intermedio: $O(n^3)$. Su idea es probar todos los $k$; su costo, ver la tabla.
+
+| n | $n^3$ | $n \log_2 n$ |
+|---|---|---|
+| 11 | 1.331 | 38 |
+| 100 | 10⁶ | 664 |
+| 1.000 | 10⁹ | 9.966 |
+| 10⁵ | 10¹⁵ | ≈ 1,66·10⁶ |
+
+Con un **supuesto** de 10⁷ operaciones por segundo (no es una medición), $10^{15}$ operaciones son ≈ 10⁸ s, más de 3 años; las 1,66·10⁶ del voraz, ≈ 0,17 s.
+
+## Dónde se rompe la analogía
+
+- **La sala real tiene prioridades y personas:** un examen de mañana pesa más que un club de lectura. La regla maximiza el número de turnos, no su importancia.
+- **"Más grupos" no es "mejor uso":** la regla cuenta turnos, no horas de sala ocupadas ni cuánto necesitaba cada grupo.
+- **Una regla voraz que funciona en un problema falla en otro:** vimos que la misma intuición, elegir lo mejor ahora, falla en la cinta de la mercería.
+
+## ¿Dónde aparece en la práctica?
+
+En la consolidación de lecturas de telemedición (contexto narrativo del curso: las cifras son órdenes de magnitud, no mediciones; el caso **no** usa estrategia voraz ni programación dinámica y no es trabajo calificable) lo que ilustra la selección de actividades es **ordenar antes de decidir**. Para $n = 10^6$ registros, ordenar cuesta ≈ $n \log_2 n \approx 2 \cdot 10^7$ comparaciones; una recurrencia cúbica costaría $n^3 = 10^{18}$, que a 10⁷ op/s (supuesto) serían ≈ 10¹¹ s, más de 3.000 años.
+
+La ética también tiene cifra: con 11 grupos, atender 4 deja a 7 sin turno, ≈ 64 %. Que el algoritmo sea óptimo en el número de grupos no lo vuelve justo: optimizar ese número es una decisión de política, no de algoritmo, y quien la toma debe saber quiénes quedan fuera.
+
+## Síntesis
+
+- **Sala de estudio:** 11 turnos y una sola sala; probar a ojo no escala.
+- **Modelado:** entrada $s, f$; salida, subconjunto compatible máximo.
+- **Reglas que fallan:** menor duración e inicio más temprano tienen contraejemplos de 3 actividades.
+- **Terminación más temprana:** ordenar por fin y recorrer; da [1, 4, 8, 11].
+- **Elección voraz:** un intercambio muestra que hay un óptimo que empieza con la que termina primero.
+- **Subestructura:** el resto es el mismo problema más pequeño; voraz se compromete, PD compara.
+- **Costo:** $\Theta(n \log n)$ frente a $O(n^3)$.
+- **Límites de la analogía:** prioridades humanas y reglas que no se transfieren.
+- **Práctica:** ordenar antes de decidir; el número óptimo de grupos es una decisión de política.
+
+Para seguir por tu cuenta: los códigos de Huffman (Cormen 16.3) son otra aplicación de la misma estrategia.
+
+Lecturas: Cormen et al., _Introduction to Algorithms_, 3.ª ed., cap. 16 (16.1 y 16.2).
