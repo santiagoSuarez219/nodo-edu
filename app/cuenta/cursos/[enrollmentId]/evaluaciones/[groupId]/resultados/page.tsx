@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth/session";
 import { getEnrollmentById } from "@/lib/enrollments/index";
-import { getStudentAssignment } from "@/lib/assignments";
+import { getStudentAssignmentForResults } from "@/lib/assignments";
 import { getSubmissionByStudent, getVariantQuestionDetails } from "@/lib/submissions";
 import { startNewAttemptAction } from "@/lib/submissions/actions";
 import { SubmissionResult } from "@/components/student/SubmissionResult";
@@ -25,18 +25,30 @@ export default async function EvaluacionResultadosPage({ params }: Props) {
     notFound();
   }
 
-  const assignment = await getStudentAssignment(groupId, enrollmentId);
+  // spec-064: no verifica la ventana — el estudiante puede repasar su intento
+  // entregado después del cierre. El jugador sí sigue limitado a la ventana.
+  const assignment = await getStudentAssignmentForResults(groupId, enrollmentId);
   if (!assignment) notFound();
 
-  const submission = await getSubmissionByStudent(groupId, enrollmentId);
-  if (!submission) notFound();
+  const latest = await getSubmissionByStudent(groupId, enrollmentId);
+  if (!latest) notFound();
 
-  if (submission.status === "in_progress") {
-    redirect(`/cuenta/cursos/${enrollmentId}/evaluaciones/${groupId}`);
+  const isClosed =
+    assignment.group.closes_at !== null && new Date(assignment.group.closes_at) <= new Date();
+
+  let submission = latest;
+  if (latest.status === "in_progress") {
+    // Con la ventana abierta, el intento en curso se continúa en el jugador.
+    if (!isClosed) redirect(`/cuenta/cursos/${enrollmentId}/evaluaciones/${groupId}`);
+    // Cerrada, ese intento ya no se puede continuar: se muestra el último
+    // entregado (si no hay ninguno, no hay nada que repasar).
+    const delivered = await getSubmissionByStudent(groupId, enrollmentId, { delivered: true });
+    if (!delivered) notFound();
+    submission = delivered;
   }
 
   const questions = await getVariantQuestionDetails(assignment.variant.id, enrollmentId, groupId);
-  const canRetry = submission.attempt_number < assignment.group.max_attempts;
+  const canRetry = !isClosed && submission.attempt_number < assignment.group.max_attempts;
 
   return (
     <main className="flex-1 pt-6 pb-14 flex flex-col gap-6">

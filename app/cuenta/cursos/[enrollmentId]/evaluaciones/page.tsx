@@ -4,7 +4,10 @@ import { notFound } from "next/navigation";
 import { requireUser } from "@/lib/auth/session";
 import { getEnrollmentById } from "@/lib/enrollments/index";
 import { getSubmissionByStudent } from "@/lib/submissions";
-import { getOpenAssignmentGroupsForStudent } from "@/lib/assignments";
+import {
+  getClosedAssignmentGroupsWithSubmissions,
+  getOpenAssignmentGroupsForStudent,
+} from "@/lib/assignments";
 import { ErrorState, INFRA_ERROR_COPY } from "@/components/ErrorState";
 import { SUBMISSION_STATUS_LABELS } from "@/components/account/submissionStatusLabels";
 
@@ -31,7 +34,10 @@ export default async function EvaluacionesPage({ params }: Props) {
   // ya permite esta lectura por matrícula activa, sin necesidad de allocation.
   // spec-055: consulta compartida con la tarjeta de acceso del detalle de
   // matrícula — mismo criterio, sin poder divergir.
-  const openGroups = await getOpenAssignmentGroupsForStudent(enrollment.academic_course_id);
+  const [openGroups, closedGroups] = await Promise.all([
+    getOpenAssignmentGroupsForStudent(enrollment.academic_course_id),
+    getClosedAssignmentGroupsWithSubmissions(enrollment.academic_course_id, enrollmentId),
+  ]);
 
   const header = (
     <div>
@@ -66,13 +72,27 @@ export default async function EvaluacionesPage({ params }: Props) {
     }))
   );
 
+  // spec-064: si la consulta de cerradas falla, la sección se omite sin tumbar
+  // el listado de abiertas.
+  const closedWithStatus =
+    closedGroups.status === "ok"
+      ? await Promise.all(
+          closedGroups.groups.map(async (group) => ({
+            group,
+            lastSubmission: await getSubmissionByStudent(group.id, enrollmentId, { delivered: true }),
+          }))
+        )
+      : [];
+
   return (
     <main className="flex-1 pt-6 pb-14 flex flex-col gap-6">
       {header}
 
       {withStatus.length === 0 ? (
         <p className="text-sm text-gray-500 dark:text-gray-400">
-          No hay evaluaciones disponibles por ahora.
+          {closedWithStatus.length === 0
+            ? "No hay evaluaciones disponibles por ahora."
+            : "No hay evaluaciones abiertas por ahora."}
         </p>
       ) : (
         <ul className="flex flex-col gap-3">
@@ -106,6 +126,53 @@ export default async function EvaluacionesPage({ params }: Props) {
             );
           })}
         </ul>
+      )}
+
+      {closedWithStatus.length > 0 && (
+        <section className="flex flex-col gap-3" aria-labelledby="evaluaciones-cerradas">
+          <h2
+            id="evaluaciones-cerradas"
+            className="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider"
+          >
+            Cerradas
+          </h2>
+          <ul className="flex flex-col gap-3">
+            {closedWithStatus.map(({ group, lastSubmission }) => {
+              const status = lastSubmission ? SUBMISSION_STATUS_LABELS[lastSubmission.status] : null;
+              return (
+                <li key={group.id}>
+                  <Link
+                    href={`/cuenta/cursos/${enrollmentId}/evaluaciones/${group.id}/resultados`}
+                    className="block bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-[var(--radius-base)] px-5 py-4 hover:border-gray-300 dark:hover:border-gray-600 transition-colors"
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <div>
+                        <p className="font-medium text-gray-900 dark:text-white">{group.title}</p>
+                        {group.closes_at && (
+                          <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+                            Cerró el{" "}
+                            {new Date(group.closes_at).toLocaleDateString("es-CO", {
+                              day: "numeric",
+                              month: "long",
+                              year: "numeric",
+                            })}
+                          </p>
+                        )}
+                      </div>
+                      <span
+                        className={`shrink-0 text-xs font-medium px-2.5 py-1 rounded-full ${
+                          status?.className ?? "bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400"
+                        }`}
+                      >
+                        {status?.label ?? "Sin intentos"}
+                      </span>
+                    </div>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
       )}
     </main>
   );
