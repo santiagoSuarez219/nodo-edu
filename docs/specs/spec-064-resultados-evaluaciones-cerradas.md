@@ -6,10 +6,9 @@
 > **Cierre (2026-10-26):** ronda manual en `nodo-dev` con 11 casos aprobados
 > (`test-064-resultados-evaluaciones-cerradas.md`; TC-064-007 parcial por no
 > haber un estudiante retirado en el entorno). Marcado `[DONE]` por decisión
-> explícita del usuario. Quedan dos puntos conocidos y aceptados: (1) el
-> fixture `[TEST-064] G-limite` de TC-064-011 sigue en `nodo-dev`, pendiente de
-> limpieza; (2) la limitación de revelado de la RPC descrita en "Limitaciones
-> conocidas".
+> explícita del usuario. Datos de prueba eliminados de `nodo-dev`. Queda un punto
+> conocido y aceptado: la limitación de revelado de la RPC descrita en
+> "Limitaciones conocidas".
 >
 > Resuelve **[[DEBT-085]]** y el hallazgo de `code_snippet` en `SubmissionResult`
 > (2026-10-24). Rama: `feat/resultados-evaluaciones-cerradas`.

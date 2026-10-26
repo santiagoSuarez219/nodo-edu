@@ -13,7 +13,7 @@
 | Grupo G-close (`close`, 1 intento, 2 MC) | ídem | `a872ea06-e990-4ad0-a12f-e3a7336ede11` | ✅ |
 | Grupo G-never (`never`, 1 intento, 2 MC) | ídem | `9aa4c434-1ab6-41cb-93b6-cb5e6defb19f` | ✅ |
 | Grupo G-sinenvio (`submit`, 1 intento, 2 MC; estudiante 1 nunca lo abre, estudiante 2 lo deja `in_progress`) | ídem | `c79c5cc8-f264-4833-97ba-8a53f3647966` | ✅ |
-| Grupo G-limite (`submit`, 2 intentos, 2 MC; añadido para TC-064-011; envíos: intento 1 entregado + intento 2 `in_progress`) | `assignment-mcp` → `create_assignment_group` + `publish_assignment_group` | `e2d9dd3e-0456-4619-a61e-70791a89570e` | ⬜ |
+| Grupo G-limite (`submit`, 2 intentos, 2 MC; añadido para TC-064-011; envíos: intento 1 entregado + intento 2 `in_progress`) | `assignment-mcp` → `create_assignment_group` + `publish_assignment_group` | `e2d9dd3e-0456-4619-a61e-70791a89570e` | ✅ |
 | Estudiantes `dev-estudiante1/2@nodo.local` (sembrados, matriculados en DEV-EDD; `seed:dev`) | — (preexistentes, no se borran) | `88db2cf9-…` / `65c0a5b7-…` | n/a (no se borran) |
 | Envíos y respuestas de los estudiantes | UI del estudiante / revisión docente | — | ✅ |
 
@@ -114,4 +114,4 @@
 ## Resumen de la ronda
 - Aprobados: 11 (007 parcial; 010 confirmado por el usuario) — Fallidos: 0 — Pendientes: 0 (TC-064-011 aprobado, a confirmar por el usuario)
 - Hallazgos escalados a `docs/specs/backlog.md`: —
-- Limpieza de datos de prueba: ⬜ Parcial — la ronda principal se limpió (2026-10-26); G-limite (TC-064-011) sigue en `nodo-dev` pendiente de limpieza. Detalle de la primera limpieza: La API no permite borrar evaluaciones con envíos (409), así que, con autorización explícita del usuario, se borraron directo en `nodo-dev` (SQL, filtrando por `title like '[TEST-064]%'` / `stem like '[TEST-064]%'`, en una transacción y en orden inverso de dependencias): 7 respuestas, 4 envíos, 4 repartos, 18 preguntas montadas, 8 variantes, 4 evaluaciones y 2 preguntas. Verificado: 0 filas `[TEST-064]`, 0 variantes huérfanas, preguntas reutilizadas intactas.
+- Limpieza de datos de prueba: ✅ Completada (2026-10-26). G-limite (TC-064-011) también se borró por SQL con autorización del usuario (1 evaluación, 2 variantes, 4 preguntas montadas, 1 reparto, 2 envíos, 2 respuestas; verificado: 0 filas `[TEST-064]`, 0 variantes huérfanas, preguntas reutilizadas intactas). Detalle de la primera limpieza: La API no permite borrar evaluaciones con envíos (409), así que, con autorización explícita del usuario, se borraron directo en `nodo-dev` (SQL, filtrando por `title like '[TEST-064]%'` / `stem like '[TEST-064]%'`, en una transacción y en orden inverso de dependencias): 7 respuestas, 4 envíos, 4 repartos, 18 preguntas montadas, 8 variantes, 4 evaluaciones y 2 preguntas. Verificado: 0 filas `[TEST-064]`, 0 variantes huérfanas, preguntas reutilizadas intactas.
