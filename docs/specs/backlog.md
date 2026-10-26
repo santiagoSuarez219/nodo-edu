@@ -5,6 +5,38 @@ resolverse antes de salir a producción o en una iteración posterior.
 
 ---
 
+## DEBT-102 — La RPC `get_variant_question_details` no revela las opciones correctas si el último intento está `in_progress`, aunque se muestre un intento entregado
+
+**Origen:** ronda manual de spec-064 (TC-064-011, 2026-10-26).
+**Prioridad:** Baja — caso poco frecuente y sin pérdida de datos ni de notas.
+
+La RPC `get_variant_question_details(p_assignment_id, p_enrollment_id)`
+(`supabase/migrations/20260724000002_variant_question_content_rpcs.sql`) decide
+`should_reveal` mirando solo el estado del **último** intento del estudiante
+(`order by attempt_number desc limit 1`). Si ese intento es `in_progress`, no
+revela las opciones correctas (`is_correct = null`), sin importar
+`show_feedback_on`. Esa regla protege al jugador: mientras alguien responde, no
+debe recibir las correctas del intento anterior.
+
+**Caso afectado:** el estudiante entrega el intento 1, inicia el intento 2 y lo
+deja a medias, y la ventana cierra. Desde spec-064, `resultados` muestra el
+último intento **entregado** (nota, respuestas y notas del docente), pero la RPC
+sigue viendo el intento 2 `in_progress` y no marca las opciones correctas, aunque
+`show_feedback_on` sea `submit`, o `close` ya vencido.
+
+**Acción (requiere migración de la RPC):**
+- **Opción A:** que la RPC reciba el intento que se está mostrando (o su estado)
+  y evalúe el revelado con ese.
+- **Opción B:** que ignore intentos `in_progress` cuando la ventana del grupo ya
+  cerró (`closes_at <= now()`), ya que no se pueden continuar.
+
+La opción B no cambia la firma de la RPC, pero depende de la ventana; la A es más
+explícita. Tras corregirlo, quitar "Limitaciones conocidas" de spec-064 y añadir
+un caso a `docs/testing/test-064-resultados-evaluaciones-cerradas.md` (TC-064-011
+verifica hoy la limitación como comportamiento esperado).
+
+---
+
 ## DEBT-098 — `apply_self_assessment_grade` falla si el curso ya tiene un ítem manual llamado "Autoevaluaciones"
 
 **Origen:** redacción de spec-059 (2026-10-20), al diseñar D15 (botón "Crear ítem de autoevaluaciones").
@@ -218,7 +250,12 @@ dentro de spec-057 para no ampliar su scope.
 
 ---
 
-## DEBT-085 — Los resultados de una evaluación son inaccesibles una vez cerrada su ventana
+## DEBT-085 — Los resultados de una evaluación son inaccesibles una vez cerrada su ventana — ✅ Resuelto (spec-064, 2026-10-26)
+
+> **Resuelto por spec-064 (2026-10-26):** `resultados` abre con la ventana cerrada
+> y el listado añade la sección "Cerradas" (por `closes_at` descendente).
+> Decisión D5: la tarjeta de acceso de spec-055 **no** cuenta las evaluaciones
+> cerradas. Limitación residual en [[DEBT-102]].
 
 **Origen:** análisis de `@architect` para spec-055 (2026-09-10), verificado en código.
 **Prioridad:** Media-alta — afecta a todo estudiante de toda evaluación en cuanto

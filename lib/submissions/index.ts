@@ -2,6 +2,7 @@ import { createServerSupabaseClient } from "@/lib/auth/server";
 import { seededShuffle } from "@/lib/shuffle";
 import { fetchStudentProfilesPublic } from "@/lib/enrollments";
 import { compareStudentsBySurname } from "@/lib/students/names";
+import { isOpenQuestionType } from "./question-types";
 import type { StudentProfilePublic } from "@/lib/students/types";
 import type {
   Answer,
@@ -14,14 +15,6 @@ import type {
   SubmissionForReview,
   SubmissionWithAnswers,
 } from "./types";
-
-// Cualquier tipo distinto de multiple_choice es "abierto" para efectos de
-// calificación manual — mismo criterio que submitSubmission ya usa para
-// auto_score (ausencia en get_variant_answer_key, que solo cubre
-// multiple_choice). code_snippet no estaba en la lista original de
-// spec-020 (ajuste de scope aprobado tras encontrar el caso real en G2,
-// fixture de test-019).
-const OPEN_QUESTION_TYPES = new Set(["open_text", "code_snippet", "code_write", "coding_challenge"]);
 
 type ReviewContextRow = {
   assignment_question_id: string;
@@ -411,16 +404,23 @@ export async function getAnswersBySubmission(submissionId: string): Promise<Answ
   return (data as Answer[]) ?? [];
 }
 
+// `delivered: true` (spec-064) devuelve el último intento ENTREGADO
+// (`submitted`/`graded`), ignorando un intento `in_progress` posterior: tras el
+// cierre ese intento ya no se puede continuar, y el estudiante debe seguir
+// viendo el último que sí entregó.
 export async function getSubmissionByStudent(
   variantGroupId: string,
-  enrollmentId: string
+  enrollmentId: string,
+  options: { delivered?: boolean } = {}
 ): Promise<SubmissionWithAnswers | null> {
   const supabase = await createServerSupabaseClient();
-  const { data } = await supabase
+  let query = supabase
     .from("submissions")
     .select("*, answers(*)")
     .eq("variant_group_id", variantGroupId)
-    .eq("enrollment_id", enrollmentId)
+    .eq("enrollment_id", enrollmentId);
+  if (options.delivered) query = query.in("status", ["submitted", "graded"]);
+  const { data } = await query
     .order("attempt_number", { ascending: false })
     .limit(1)
     .maybeSingle();
@@ -743,7 +743,7 @@ export async function finalizeGrading(
   let finalScore = 0;
   for (const answer of answers) {
     const type = contextByAssignmentQuestionId.get(answer.assignment_question_id)?.type ?? "";
-    finalScore += OPEN_QUESTION_TYPES.has(type)
+    finalScore += isOpenQuestionType(type)
       ? (answer.manual_score ?? 0)
       : (answer.auto_score ?? 0);
   }

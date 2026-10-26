@@ -1,5 +1,6 @@
 import { QuestionRenderer } from "./QuestionRenderer";
 import type { QuestionDetail, SubmissionWithAnswers } from "@/lib/submissions/types";
+import { isOpenQuestionType } from "@/lib/submissions/question-types";
 import { QuestionText } from "@/components/questions/QuestionText";
 
 interface Props {
@@ -54,7 +55,7 @@ export function SubmissionResult({ submission, questions, totalPoints }: Props) 
           {questions.map((q, idx) => {
             const answer = submission.answers.find((a) => a.question_id === q.question_id);
             const earned = answer?.auto_score ?? answer?.manual_score ?? null;
-            const needsManual = ["open_text", "code_write", "coding_challenge"].includes(q.type);
+            const needsManual = isOpenQuestionType(q.type);
 
             return (
               <div

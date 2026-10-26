@@ -246,22 +246,12 @@ export const analisisDeAlgoritmos: Course = {
       articleSlug: "fundamentos-de-programacion-dinamica",
       order: 14,
       title: "Fundamentos de programación dinámica",
+      summary:
+        "Cómo dejar de resolver el mismo subproblema una y otra vez: el corte de varillas pasa de Θ(2ⁿ) a Θ(n²) con memoización o tabulación, y un arreglo auxiliar permite recuperar dónde cortar, no solo cuánto se gana.",
       topics: [
         { title: "Corte de varillas: solución recursiva ingenua vs. memoización vs. tabulación" },
-        { title: "Multiplicación de cadenas de matrices: planteamiento y recurrencia" },
+        { title: "Subestructura óptima y subproblemas traslapados" },
         { title: "Reconstrucción de la solución óptima" },
-      ],
-    },
-    {
-      id: "elementos-de-la-pd-y-lcs",
-      slug: "elementos-de-la-pd-y-lcs",
-      articleSlug: "elementos-de-la-pd-y-lcs",
-      order: 15,
-      title: "Elementos de la programación dinámica y subsecuencia común más larga",
-      topics: [
-        { title: "Subestructura óptima y subproblemas traslapados: cómo reconocerlos" },
-        { title: "Subsecuencia común más larga (LCS): planteamiento, tabla y reconstrucción" },
-        { title: "Cuándo memoización, cuándo tabulación: consideraciones prácticas" },
       ],
     },
     {
@@ -270,25 +260,20 @@ export const analisisDeAlgoritmos: Course = {
       articleSlug: "estrategia-voraz",
       order: 16,
       title: "Estrategia voraz",
+      summary:
+        "Cómo escoger a ciegas y acertar: en la selección de actividades basta elegir siempre la que termina primero, y la propiedad de elección voraz junto con la subestructura óptima explican por qué otras reglas fallan y por qué esto cuesta Θ(n log n) y no el O(n³) de la programación dinámica.",
       topics: [
         { title: "El problema de selección de actividades" },
         { title: "Elementos de la estrategia voraz: elección voraz y subestructura óptima" },
-        { title: "Códigos de Huffman: construcción del árbol y compresión" },
       ],
     },
     {
-      id: "sintesis-del-semestre",
-      slug: "sintesis-del-semestre",
-      articleSlug: "sintesis-del-semestre",
+      id: "proyecto-final",
+      slug: "proyecto-final",
+      articleSlug: "proyecto-final",
       order: 17,
-      title: "Síntesis del semestre",
-      topics: [
-        {
-          title:
-            "Repaso integrador: recurrencias, divide y vencerás, estructuras de datos, programación dinámica, voraces",
-        },
-        { title: "Retroalimentación general sobre los informes de laboratorio" },
-      ],
+      title: "Proyecto final",
+      topics: [],
     },
   ],
 };

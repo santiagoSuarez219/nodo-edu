@@ -175,7 +175,8 @@ async function _getActiveAssignmentsByEnrollmentForActor(
 async function _getStudentAssignmentForActor(
   context: AssignmentContext,
   groupId: string,
-  enrollmentId: string
+  enrollmentId: string,
+  options: { ignoreWindow?: boolean } = {}
 ): Promise<StudentAssignment | null> {
   const { supabase } = context;
 
@@ -187,9 +188,13 @@ async function _getStudentAssignmentForActor(
 
   if (!group || !group.is_published) return null;
 
-  const now = new Date().toISOString();
-  if (group.opens_at && new Date(group.opens_at) > new Date(now)) return null;
-  if (group.closes_at && new Date(group.closes_at) <= new Date(now)) return null;
+  // spec-064: la página de resultados debe poder leer un intento entregado
+  // después del cierre; el jugador sigue limitado a la ventana abierta.
+  if (!options.ignoreWindow) {
+    const now = new Date().toISOString();
+    if (group.opens_at && new Date(group.opens_at) > new Date(now)) return null;
+    if (group.closes_at && new Date(group.closes_at) <= new Date(now)) return null;
+  }
 
   const { data: allocation } = await supabase
     .from("assignment_variant_allocations")
@@ -539,6 +544,70 @@ export async function getStudentAssignment(
   if (!user) return null;
 
   return _getStudentAssignmentForActor({ supabase, actorId: user.id }, groupId, enrollmentId);
+}
+
+// spec-064 (DEBT-085): variante de getStudentAssignment para la página de
+// resultados — no verifica la ventana, porque el estudiante debe poder repasar
+// su intento entregado tras el cierre. Exige grupo publicado y reparto
+// existente; la matrícula y el envío entregado los valida el llamador.
+export async function getStudentAssignmentForResults(
+  groupId: string,
+  enrollmentId: string
+): Promise<StudentAssignment | null> {
+  const supabase = await createServerSupabaseClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return null;
+
+  return _getStudentAssignmentForActor({ supabase, actorId: user.id }, groupId, enrollmentId, {
+    ignoreWindow: true,
+  });
+}
+
+// spec-064 (D1, D6): grupos publicados cuya ventana ya cerró y donde la
+// matrícula tiene al menos un envío entregado (`submitted` o `graded`), del
+// que cerró más recientemente al más antiguo. Nunca lanza: `unavailable` es la
+// señal para que el consumidor degrade sin tumbar el listado de abiertas.
+export async function getClosedAssignmentGroupsWithSubmissions(
+  academicCourseId: string,
+  enrollmentId: string
+): Promise<OpenAssignmentGroupsResult> {
+  try {
+    const supabase = await createServerSupabaseClient();
+    const nowIso = new Date().toISOString();
+
+    const { data: groups, error: groupsError } = await supabase
+      .from("assignment_variant_groups")
+      .select("*")
+      .eq("academic_course_id", academicCourseId)
+      .eq("is_published", true)
+      .not("closes_at", "is", null)
+      .lte("closes_at", nowIso)
+      .order("closes_at", { ascending: false });
+
+    if (groupsError) throw new Error(groupsError.message);
+    if (!groups || groups.length === 0) return { status: "ok", groups: [] };
+
+    const { data: submissions, error: submissionsError } = await supabase
+      .from("submissions")
+      .select("variant_group_id")
+      .eq("enrollment_id", enrollmentId)
+      .in("status", ["submitted", "graded"])
+      .in(
+        "variant_group_id",
+        groups.map((g) => g.id)
+      );
+
+    if (submissionsError) throw new Error(submissionsError.message);
+
+    const submitted = new Set((submissions ?? []).map((s) => s.variant_group_id));
+    return { status: "ok", groups: groups.filter((g) => submitted.has(g.id)) };
+  } catch (error) {
+    console.error("Error getting closed assignment groups:", error);
+    return { status: "unavailable" };
+  }
 }
 
 export async function getOrAllocateVariant(
