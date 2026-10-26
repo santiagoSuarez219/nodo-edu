@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { finalizeGradingAction, gradeAnswerAction } from "@/lib/submissions/actions";
+import { isOpenQuestionType } from "@/lib/submissions/question-types";
 import type { AnswerForReview, SubmissionForReview } from "@/lib/submissions/types";
 import { QuestionText } from "@/components/questions/QuestionText";
 import { isServerActionTransportError, SERVER_ACTION_TRANSPORT_ERROR_MESSAGE } from "@/lib/errors/server-action";
@@ -22,9 +23,6 @@ const TYPE_LABELS: Record<string, string> = {
   coding_challenge: "Challenge",
 };
 
-// Cualquier tipo distinto de multiple_choice se califica manualmente — ver
-// lib/submissions/index.ts (OPEN_QUESTION_TYPES) para el mismo criterio.
-const OPEN_TYPES = new Set(["open_text", "code_snippet", "code_write", "coding_challenge"]);
 const PROSE_RESPONSE_TYPES = new Set(["open_text", "code_snippet"]);
 
 interface AnswerDraft {
@@ -45,7 +43,7 @@ function AnswerCard({
   groupId: string;
   readOnly: boolean;
 }) {
-  const isOpen = OPEN_TYPES.has(answer.question_type);
+  const isOpen = isOpenQuestionType(answer.question_type);
   const [draft, setDraft] = useState<AnswerDraft>({
     score: answer.manual_score !== null ? String(answer.manual_score) : "",
     notes: answer.reviewer_notes ?? "",
