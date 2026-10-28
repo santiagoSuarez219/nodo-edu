@@ -1,6 +1,6 @@
 # Semana 15 — 9–15 de noviembre
 
-**Rama:** `feat/semana-15-analisis-de-algoritmos`
+**Rama:** `feat/semana-15-analisis-de-algoritmos` (AA) · `feat/semana-15-programacion-cientifica` (PC)
 **Estado:** ✅ Material y cuestionario listos en desarrollo / ⬜ Mergeada a `development` / ⬜ Desplegada y abierta
 
 ---
@@ -145,6 +145,61 @@ producción en D3. Las explicaciones no se guardaron (sin campo de feedback).
 
 ---
 
+## Ronda — `programacion-cientifica` (2026-10-28)
+
+**Alcance:** jueves 12 de noviembre, sesión única: *Matplotlib y Seaborn*
+(`order: 11`). El usuario estaba ausente y pidió preparar de una vez lección,
+apuntes del docente y cuestionario de cierre; **no hubo paradas de aprobación
+por etapa** — todo queda pendiente de su revisión en Nodo.
+
+### Etapas
+
+| Etapa | Resultado | Aprobada por el usuario |
+|---|---|---|
+| E2 · Plan de lección | Producido por `@lesson-designer`, resuelto con valores predeterminados | ⬜ (pre-autorizada, por revisar) |
+| E3 · Lección `.mdx` + registro TS | `matplotlib-y-seaborn` (243 líneas, 8 secciones, 4 PNG) | ⬜ por revisar |
+| E4 · Apuntes del docente | `apuntes/matplotlib-y-seaborn.md` (7 pasos, 2 errores planeados, 2 votaciones, reto en parejas, práctica externa) | ⬜ por revisar |
+| E5 · Cuestionario de cierre | 6 preguntas creadas, publicadas y montadas en **desarrollo** | ⬜ por revisar |
+| E6 · Guía del estudiante | No (sesión en vivo; el proyecto ya tiene su guía) | — |
+| E6 · Quiz A/B/C | No aplica (semana sin ★) | — |
+
+### Artefactos producidos
+
+| Artefacto | Ruta | Publicado |
+|---|---|---|
+| Lección teórica | `content/cursos/programacion-cientifica/matplotlib-y-seaborn.mdx` | ⬜ |
+| Imágenes | `public/documentos/programacion-cientifica/lecciones/matplotlib-y-seaborn/` (4 PNG) | ⬜ |
+| Registro TS | `lib/courses/data/programacion-cientifica.ts` (`summary` añadido) | — |
+| Apunte de clase | `content/cursos/programacion-cientifica/apuntes/matplotlib-y-seaborn.md` | Solo owner/admin |
+| Proyecto integrador | `guias/proyecto-integrador-analisis-de-datos.md` (order 11.5, rúbricas E1 y E2) + datasets en `public/documentos/programacion-cientifica/datasets/` | ⬜ |
+
+### Cuestionario de cierre
+
+| Lección | Entorno | IDs de preguntas | Publicadas | Montadas |
+|---|---|---|---|---|
+| `matplotlib-y-seaborn` | desarrollo | P1 `f7e68922-ba5d-4aa0-b0d1-bf76a7206611` · P2 `6363c629-605e-4006-a525-02e30c3008d6` · P3 `16648dce-6057-40e3-a44c-634910078fcd` · P4 `2f13d949-e23c-4d2b-ab35-24c2a658362d` · P5 `5d1c876e-37e8-41dc-b410-986845310443` · P6 `6a1bec38-7b26-4d15-ae42-f0161ed1a696` | ✅ | ✅ (orden P1–P6) |
+| `matplotlib-y-seaborn` | **producción** | — | ⬜ | ⬜ |
+
+Keywords creadas en desarrollo: `visualizacion`, `matplotlib`, `seaborn`
+(verificarlas/crearlas en producción en D3).
+
+### Decisiones tomadas por Claude en nombre del docente
+
+- La lección no menciona fechas ni porcentajes del proyecto: `info.md` y el
+  cronograma (Momento 4 el 5 nov, Momento 5 el 19 nov) chocan con la guía
+  (E1 19 nov, E2 26 nov). **Pendiente del docente reconciliarlos.**
+- 4 PNG (sin imagen para barras ni pairplot). Es la primera lección con
+  imágenes: **verificar el render en Nodo**.
+- Serie de líneas con 7 valores inventados, rotulada como ejemplo.
+- Votación 2 de los apuntes cambiada a la correlación -0.10 de dengue, para no
+  repetir la pregunta 5 del cuestionario.
+- Práctica externa de Kaggle Learn marcada "por verificar".
+- Distractor "87 %" de la P5 no sale de la lección (mala lectura habitual).
+- No se ejecutó `npm run build` en esta ronda para no interferir con el servidor
+  de desarrollo; sí `tsc`, `eslint` y compilación MDX.
+
+---
+
 ## Despliegue
 
 | Paso | Estado | Fecha / detalle |
@@ -161,6 +216,6 @@ producción en D3. Las explicaciones no se guardaron (sin campo de feedback).
 
 ## Pendientes
 
-- La lección debe estar desplegada y abierta **antes del lunes 9 de nov** (aula invertida).
+- La lección de AA debe estar desplegada y abierta **antes del lunes 9 de nov** (aula invertida); la de PC, antes del **jueves 12 de nov**.
 - Guía del Lab 4: fuera de esta ronda.
 - Tras la clase: D7, marcar la lección como vista por grupo.

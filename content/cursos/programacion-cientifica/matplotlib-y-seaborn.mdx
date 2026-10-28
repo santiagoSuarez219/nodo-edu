@@ -1,5 +1,243 @@
 ---
 title: "Matplotlib y Seaborn"
-summary: ""
-updatedAt: 2026-07-18
+course: "Programación Científica"
+course_code: "PC"
+level: "Primeros semestres"
+type: "Apuntes teóricos"
+language: "Python 3 (Google Colab)"
+difficulty: "Básico"
+estimated_time: "Lectura previa de 13 minutos (Semana 15)"
+presentation: true
+slides_hint: "Cada sección ## es una diapositiva. Presentación sincrona."
+date: "2026-10-28"
+author: "Asistente de Docencia"
+summary: "Descubre con el dataset de pingüinos por qué un número puede mentir y un gráfico bien elegido no: elige el tipo de gráfico según la variable, constrúyelo con Matplotlib y Seaborn, y aprende a leerlo e interpretarlo."
+updatedAt: "2026-10-28"
 ---
+
+> 📖 Lectura previa a la clase — unos 13 minutos. Al final, responde la autoevaluación.
+
+## El problema: un número que miente
+
+Un estudiante tiene dos notas: 5.0 en un examen que vale poco y 1.0 en uno que vale mucho. Su promedio simple es 3.0 y parece "regular". Pero ese número esconde que le fue perfecto en una cosa y fatal en otra. El resumen no está mal calculado: está incompleto.
+
+Con los pingüinos pasa algo parecido. Quieres saber si los picos más largos son también más profundos, y le pides a pandas un solo número, la correlación:
+
+```python
+import pandas as pd
+import seaborn as sns
+
+pinguinos = sns.load_dataset("penguins")
+print(round(pinguinos["bill_length_mm"].corr(pinguinos["bill_depth_mm"]), 2))
+```
+
+```text
+-0.24
+```
+
+Un valor negativo: a más largo, menos profundo. Parece una ley de la biología, y no lo es. Un número comprime 342 pares de medidas en uno solo y no te dice si el patrón es real. Un gráfico bien elegido sí. Esa es la idea de la lección: **un número resume, un gráfico dice si el resumen miente**. Al final de la lección volverás a este -0.24 con otros ojos.
+
+## Antes de graficar: ¿qué tipo de variable tengo?
+
+El gráfico correcto no se elige por gusto: lo decide el tipo de dato. Pregúntate primero qué es cada columna, categórica (especie, isla) o numérica (masa, largo del pico), y qué quieres mostrar.
+
+| Quiero mostrar… | Variables | Gráfico | Matplotlib | Seaborn |
+|---|---|---|---|---|
+| Cómo se distribuye una cantidad | 1 numérica | histograma | `ax.hist` | `histplot` |
+| Cuántos hay de cada categoría | 1 categórica | barras | `ax.bar` | `countplot` |
+| Cómo se comparan grupos | 1 numérica + 1 categórica | boxplot | `ax.boxplot` | `boxplot` |
+| Si dos cantidades se relacionan | 2 numéricas | dispersión | `ax.scatter` | `scatterplot` |
+| Cómo cambia algo en una secuencia ordenada | 1 numérica + orden | líneas | `ax.plot` | `lineplot` |
+
+Hay tres gráficos que casi siempre estorban. El **pastel** con más de cuatro porciones: el ojo no compara ángulos y termina leyendo las etiquetas. Las **líneas sin orden**: unir con una línea categorías como "Biscoe, Dream, Torgersen" sugiere una continuidad que no existe. Y el **3D** en datos que caben en dos dimensiones: la perspectiva distorsiona lo que mides.
+
+> **Elección del gráfico:** decisión que parte del tipo de variable y de la pregunta, no de qué gráfico se ve más vistoso.
+
+## Matplotlib: la figura y los ejes
+
+Matplotlib es la librería base: casi todo lo demás en Python la usa por debajo. Su idea central son dos objetos. La **figura** (`fig`) es el lienzo completo; los **ejes** (`ax`) son el área donde se dibuja, con su título, sus ejes y su leyenda.
+
+```mermaid
+flowchart TB
+  F["Figure (fig)\nel lienzo completo"] --> A["Axes (ax)\nel área del gráfico"]
+  A --> T["Título"]
+  A --> X["Eje x y eje y\ncon unidad"]
+  A --> L["Leyenda"]
+```
+
+Se crean juntos con `plt.subplots()` y todo lo demás se pide sobre `ax`. Un histograma de la masa corporal:
+
+```python
+import matplotlib.pyplot as plt
+
+fig, ax = plt.subplots(figsize=(8, 4.5))
+ax.hist(pinguinos["body_mass_g"], bins=20)
+ax.set_title("Distribución de la masa corporal de los pingüinos")
+ax.set_xlabel("Masa corporal (g)")
+ax.set_ylabel("Número de pingüinos")
+fig.savefig("histograma-masa.png", dpi=150, bbox_inches="tight")
+plt.show()
+```
+
+![Histograma de la masa corporal: dos grupos de pingüinos, uno alrededor de 3700 g y otro alrededor de 5000 g](/documentos/programacion-cientifica/lecciones/matplotlib-y-seaborn/histograma-masa.png)
+
+`figsize` fija el tamaño en pulgadas, `bins` cuántas columnas tiene el histograma, y `savefig` guarda la imagen: `dpi=150` da nitidez y `bbox_inches="tight"` evita que se recorten los títulos. Fíjate en la forma: no hay una campana, hay dos jorobas. Un promedio de 4202 g describiría a muy pocos pingüinos, porque la tabla mezcla especies chicas y grandes.
+
+Una advertencia que ya conoces de la lección Filtrado, agregación y limpieza de datos: la columna tiene 2 nulos y Matplotlib los ignora **en silencio**. Dibuja 342 pingüinos, no 344, y no te avisa. Si el número importa, cuéntalo tú con `isna().sum()`.
+
+> **Figure y Axes:** la figura es el lienzo; los ejes son el gráfico dentro de él. Título, etiquetas y leyenda se configuran sobre los ejes.
+
+## Matplotlib: barras, dispersión y líneas
+
+Para comparar categorías, las **barras** muestran una cantidad por grupo. Primero resumes con `groupby` y luego dibujas:
+
+```python
+medias = pinguinos.groupby("species")["body_mass_g"].mean()
+
+fig, ax = plt.subplots(figsize=(8, 4.5))
+ax.bar(medias.index, medias.values)
+ax.set_title("Masa corporal promedio por especie")
+ax.set_xlabel("Especie")
+ax.set_ylabel("Masa corporal promedio (g)")
+plt.show()
+```
+
+Las medias son 3701 g, 3733 g y 5076 g. Las barras **empiezan en 0**: su altura representa la cantidad, así que cortar el eje miente: si lo cortas en 3500 g, las barras de 3701 g y 5076 g miden 201 y 1576, y la segunda parece ocho veces la primera cuando es apenas 1.4 veces. Para dos variables numéricas, la **dispersión** pone un punto por pingüino:
+
+```python
+fig, ax = plt.subplots(figsize=(8, 4.5))
+ax.scatter(pinguinos["flipper_length_mm"], pinguinos["body_mass_g"])
+ax.set_title("Longitud de la aleta y masa corporal")
+ax.set_xlabel("Longitud de la aleta (mm)")
+ax.set_ylabel("Masa corporal (g)")
+plt.show()
+```
+
+La nube sube de izquierda a derecha: a mayor aleta, mayor masa, con una correlación de 0.87. Aquí el número y el gráfico cuentan la misma historia. Para una secuencia con orden, como el tiempo, usas **líneas**. El dataset no tiene fechas, así que este ejemplo usa siete pesajes inventados de un solo pingüino, solo para ver la forma de la llamada:
+
+```python
+pesajes = [3750, 3800, 3880, 3950, 4020, 4090, 4150]
+
+fig, ax = plt.subplots(figsize=(8, 4.5))
+ax.plot(range(1, 8), pesajes, marker="o")
+ax.set_title("Masa de un pingüino en siete pesajes (datos de ejemplo)")
+ax.set_xlabel("Número de pesaje")
+ax.set_ylabel("Masa corporal (g)")
+ax.tick_params(axis="x", labelrotation=45)
+fig.tight_layout()
+plt.show()
+```
+
+`tick_params` gira o ajusta las marcas de los ejes cuando las etiquetas se pisan, y `tight_layout()` reacomoda los márgenes para que nada quede cortado.
+
+> **Barras, dispersión y líneas:** barras comparan una cantidad entre categorías y parten de 0; dispersión muestra la relación entre dos numéricas; líneas siguen una cantidad a lo largo de un orden.
+
+## Seaborn: la misma gráfica en una línea
+
+Seaborn se construye sobre Matplotlib y entiende los DataFrames: le dices qué columna va en cada eje y se encarga del resto. Se activa un tema una sola vez, con una paleta que distingue colores incluso para quienes tienen daltonismo:
+
+```python
+sns.set_theme(palette="colorblind")
+
+sns.histplot(data=pinguinos, x="body_mass_g")
+sns.countplot(data=pinguinos, x="species")
+ax = sns.boxplot(data=pinguinos, x="species", y="body_mass_g")
+sns.scatterplot(data=pinguinos, x="bill_length_mm", y="bill_depth_mm", hue="species")
+```
+
+Cada línea reemplaza un bloque entero de Matplotlib: `countplot` cuenta las filas por especie (152 Adelie, 124 Gentoo, 68 Chinstrap) sin que hagas el `groupby`, y `hue="species"` pinta cada especie de un color. Como Seaborn devuelve un `ax` de Matplotlib, todo lo que aprendiste sigue valiendo: `ax.set_title(...)`, `ax.set_xlabel(...)` y `fig.savefig(...)` funcionan igual.
+
+El **boxplot** compara grupos, y se lee así: la línea del centro es la mediana, la caja va del cuartil 1 al cuartil 3 (el rango intercuartílico, IQR, que usaste en la lección Filtrado, agregación y limpieza de datos), los bigotes llegan hasta 1.5 IQR, y los puntos sueltos son atípicos.
+
+![Boxplot de la masa corporal por especie: Gentoo claramente por encima de Adelie y Chinstrap](/documentos/programacion-cientifica/lecciones/matplotlib-y-seaborn/boxplot-masa-especie.png)
+
+La mediana de Gentoo es 5000 g, con una caja de 4700 g a 5500 g; la de Adelie es 3700 g, con una caja de 3350 g a 4000 g. Las cajas casi no se tocan: Gentoo es otro grupo. Adelie y Chinstrap, en cambio, tienen la misma mediana (3700 g) y cajas que se traslapan.
+
+> **Boxplot:** gráfico que resume la distribución de una numérica por grupo con su mediana, su IQR y los valores atípicos.
+
+## Mapa de calor y pairplot: resolver el problema inicial
+
+Para ver muchas relaciones a la vez, el **mapa de calor** pinta la matriz de correlaciones con colores. `numeric_only=True` descarta las columnas de texto, que no tienen correlación:
+
+```python
+corr = pinguinos.corr(numeric_only=True)
+sns.heatmap(corr, annot=True, fmt=".2f", cmap="vlag", vmin=-1, vmax=1)
+```
+
+![Mapa de calor de correlaciones: aleta y masa en 0.87, largo y profundidad del pico en menos 0.24](/documentos/programacion-cientifica/lecciones/matplotlib-y-seaborn/mapa-calor-correlacion.png)
+
+Ahí está de nuevo el -0.24 entre largo y profundidad del pico. Pero el mapa de calor, como la correlación, solo muestra el resumen global. Para ver los datos detrás, `pairplot` dibuja todas las parejas de variables en una cuadrícula, y con `hue` separa las especies:
+
+```python
+sns.pairplot(pinguinos, hue="species")
+```
+
+Y la dispersión de largo contra profundidad, coloreada por especie, es la que desmonta el número:
+
+![Dispersión de largo y profundidad del pico con tres nubes, una por especie, cada una con tendencia creciente](/documentos/programacion-cientifica/lecciones/matplotlib-y-seaborn/dispersion-pico-especie.png)
+
+Hay tres nubes separadas: Adelie arriba a la izquierda, Chinstrap arriba a la derecha y Gentoo abajo a la derecha. Dentro de cada una, la tendencia sube. Calcúlalo por especie:
+
+```python
+for especie, grupo in pinguinos.groupby("species"):
+    print(especie, round(grupo["bill_length_mm"].corr(grupo["bill_depth_mm"]), 2))
+```
+
+```text
+Adelie 0.39
+Chinstrap 0.65
+Gentoo 0.64
+```
+
+Las tres correlaciones son positivas, y la global era -0.24. Ese fenómeno se llama **paradoja de Simpson**: una tendencia que aparece en el total puede invertirse dentro de cada grupo. Aquí, Gentoo tiene picos más largos y menos profundos que Adelie; al mezclar las especies, esa diferencia entre grupos tapa la relación que hay dentro de cada una. El -0.24 estaba bien calculado y respondía mal a tu pregunta.
+
+Una advertencia más: incluso con el gráfico bien hecho, **correlación no es causa**. Que la aleta y la masa suban juntas (0.87) no prueba que alargar la aleta engorde al pingüino; ambas dependen del tamaño del animal.
+
+> **Paradoja de Simpson:** una relación entre dos variables cambia de signo, o desaparece, cuando se separa por una tercera variable que define grupos.
+
+## Un gráfico que no se lee no sirve
+
+Un gráfico tiene un trabajo: que alguien entienda algo sin preguntarte nada. Para eso cumple un estándar mínimo: **título** que diga qué se ve, **ejes con nombre y unidad** (masa en g, largo en mm), **leyenda** si hay más de un color, y **colores** que se distingan entre sí.
+
+Pero un gráfico bonito aún no es un resultado. Una buena interpretación tiene tres partes: **qué pregunta** respondes, **qué se observa** (con cifras) y **qué implica**. Con la dispersión por especie sería: "¿Los picos más largos son más profundos? Dentro de cada especie sí: la correlación es de 0.39 en Adelie, 0.65 en Chinstrap y 0.64 en Gentoo, aunque la global sea -0.24. Implica que no se puede comparar el pico de especies distintas como si fueran un solo grupo". Sin cifras ni conclusión, es una descripción del dibujo.
+
+Tres errores frecuentes al producir gráficos:
+
+- **Barras con el eje y que no empieza en 0:** exagera diferencias pequeñas.
+- **`savefig` después de `plt.show()`, o en otra celda:** al mostrar, la figura se cierra y el archivo guarda un PNG en blanco. Guarda **antes** de mostrar.
+- **Guardar en una carpeta que no existe:** `fig.savefig("visualizaciones/grafico.png")` lanza `FileNotFoundError` si `visualizaciones/` no se creó.
+
+```python
+import os
+
+os.makedirs("visualizaciones", exist_ok=True)
+fig.savefig("visualizaciones/histograma-masa.png", dpi=150, bbox_inches="tight")
+plt.show()
+```
+
+`exist_ok=True` evita el error si la carpeta ya existe, y el `savefig` va antes del `show`. Antes de entregar cualquier gráfico del conjunto de datos de tu proyecto, haz tú mismo estas tres comprobaciones: estándar mínimo, interpretación de tres partes y archivo guardado con contenido.
+
+> **Estándar mínimo de un gráfico:** título, ejes con unidad, leyenda si hay varias series y colores distinguibles, más una interpretación con qué pregunta, qué se observa y qué implica.
+
+## Síntesis
+
+Cada pregunta tiene su gráfico y su señal de alerta:
+
+| Pregunta | Gráfico | Matplotlib / Seaborn | Señal de alerta |
+|---|---|---|---|
+| ¿Cómo se distribuye una cantidad? | histograma | `ax.hist` / `histplot` | Dos jorobas: el promedio describe a pocos |
+| ¿Cuántos hay de cada categoría? | barras | `ax.bar` / `countplot` | Eje y que no empieza en 0 |
+| ¿Cómo se comparan grupos? | boxplot | `ax.boxplot` / `boxplot` | Cajas que se traslapan: no hay diferencia clara |
+| ¿Se relacionan dos cantidades? | dispersión | `ax.scatter` / `scatterplot` con `hue` | Un solo número global sin mirar los grupos |
+| ¿Cómo cambia algo en el tiempo? | líneas | `ax.plot` / `lineplot` | Unir categorías sin orden |
+| ¿Qué relaciones hay entre muchas variables? | mapa de calor y pairplot | `sns.heatmap`, `sns.pairplot` | Confundir correlación con causa |
+
+Y por sección:
+
+- **El problema:** un número resume y puede mentir; el -0.24 no decía lo que parecía.
+- **Antes de graficar:** el tipo de variable y la pregunta eligen el gráfico; evita pastel con muchas porciones, líneas sin orden y 3D.
+- **La figura y los ejes:** `fig, ax = plt.subplots()`, título y ejes con unidad, `savefig` con `dpi=150`; los nulos se ignoran en silencio.
+- **Barras, dispersión y líneas:** barras desde 0, dispersión para dos numéricas, líneas solo con orden.
+- **Seaborn:** una línea por gráfico, `hue` para separar grupos, y devuelve un `ax` de Matplotlib; el boxplot se lee con mediana, IQR y atípicos.
+- **Mapa de calor y pairplot:** la correlación global puede invertirse dentro de los grupos (Simpson); correlación no es causa.
+- **Un gráfico que se lee:** estándar mínimo, interpretación en tres partes, y guardar antes de mostrar en una carpeta que exista.
