@@ -1,5 +1,326 @@
 ---
 title: "Filtrado, agregación y limpieza de datos"
-summary: ""
-updatedAt: 2026-07-18
+course: "Programación Científica"
+course_code: "PC"
+level: "Primeros semestres"
+type: "Apuntes teóricos"
+language: "Python 3 (Google Colab)"
+difficulty: "Básico"
+estimated_time: "Lectura previa de 14 minutos (Semana 13)"
+presentation: true
+slides_hint: "Cada sección ## es una diapositiva. Presentación sincrona."
+date: "2026-10-28"
+author: "Asistente de Docencia"
+summary: "Haz con el dataset de pingüinos las preguntas que de verdad se hacen a una tabla: selecciona columnas y filas, filtra, ordena y resume por grupos, y descubre cómo los nulos y los valores atípicos cambian las respuestas, para decidir con criterio si eliminar o imputar."
+updatedAt: "2026-10-28"
 ---
+
+> 📖 Lectura previa a la clase — unos 14 minutos. Al final, responde la autoevaluación.
+
+## El problema: dos respuestas para la misma pregunta
+
+Cargaste el dataset de pingüinos (344 filas) y lo inspeccionaste. Ahora quieres contestar algo sencillo: ¿qué proporción de los pingüinos son hembras? Lo calculas de dos maneras que parecen equivalentes:
+
+```python
+import pandas as pd
+import seaborn as sns
+
+pinguinos = sns.load_dataset("penguins")
+
+print(round((pinguinos["sex"] == "Female").mean(), 3))
+print(round(pinguinos["sex"].value_counts(normalize=True)["Female"], 3))
+```
+
+```text
+0.48
+0.495
+```
+
+Dos códigos, dos respuestas: 48 % y 49.5 %. Ninguno tiene un error de sintaxis. La diferencia está en una columna que ya conoces de la inspección: `sex` tiene celdas vacías.
+
+```python
+print(pinguinos["sex"].isna().sum())
+```
+
+```text
+11
+```
+
+La primera fórmula divide entre las 344 filas; la segunda entre las 333 que sí tienen sexo. Las dos hacen exactamente lo que escribiste, y ninguna te avisa. Este es el hilo de la lección: para preguntarle algo a una tabla necesitas **seleccionar, filtrar y resumir**, y antes de confiar en la respuesta necesitas saber **qué hay de raro en los datos** y qué hiciste con ello.
+
+## Elegir lo que importa: columnas, loc e iloc
+
+Casi nunca necesitas toda la tabla. Para quedarte con algunas columnas, pasas una lista de nombres entre corchetes:
+
+```python
+print(pinguinos[["species", "body_mass_g"]].head(3))
+```
+
+```text
+  species  body_mass_g
+0  Adelie       3750.0
+1  Adelie       3800.0
+2  Adelie       3250.0
+```
+
+Para elegir filas y columnas a la vez usas `loc`, que trabaja con **etiquetas**: el nombre de la fila (su índice) y el nombre de la columna. Se escribe `df.loc[filas, columnas]`:
+
+```python
+print(pinguinos.loc[pinguinos["island"] == "Dream", ["species", "body_mass_g"]].head(3))
+```
+
+```text
+   species  body_mass_g
+30  Adelie       3250.0
+31  Adelie       3900.0
+32  Adelie       3300.0
+```
+
+Las filas conservan su número original (30, 31, 32): el índice es una etiqueta, no una posición. Cuando lo que tienes es una posición, `iloc` cuenta como una lista de Python, desde 0 y sin incluir el final:
+
+```python
+print(pinguinos.iloc[0:3, [0, 5]])
+```
+
+```text
+  species  body_mass_g
+0  Adelie       3750.0
+1  Adelie       3800.0
+2  Adelie       3250.0
+```
+
+| Quieres… | Usa | Ejemplo |
+|---|---|---|
+| Una o varias columnas | corchetes | `df[["species", "sex"]]` |
+| Filas y columnas por nombre o condición | `loc` | `df.loc[df["island"] == "Dream", ["species"]]` |
+| Filas y columnas por posición | `iloc` | `df.iloc[0:3, [0, 5]]` |
+
+> **loc:** selecciona por etiquetas (nombres de fila y de columna) o por una condición. **iloc:** selecciona por posición entera, empezando en 0.
+
+## Filtrado booleano: quedarte con las filas que cumplen
+
+Una pregunta como "¿cuáles pesan más de 5500 g?" se responde en dos pasos. Primero una **máscara**: una Series de `True` y `False`, una por fila, que dice si esa fila cumple la condición. Después usas la máscara como filtro:
+
+```python
+pesados = pinguinos["body_mass_g"] > 5500
+print(pesados.head(5))
+print(pesados.sum())
+print(pinguinos[pesados].shape)
+```
+
+```text
+0    False
+1    False
+2    False
+3    False
+4    False
+Name: body_mass_g, dtype: bool
+28
+(28, 7)
+```
+
+Como `True` vale 1, `pesados.sum()` cuenta cuántas filas cumplen: 28. Para combinar condiciones usas `&` (y), `|` (o) y **siempre un paréntesis por condición**, porque estos operadores se evalúan antes que las comparaciones:
+
+```python
+biscoe_pesados = (pinguinos["island"] == "Biscoe") & (pinguinos["body_mass_g"] > 5500)
+dream_o_torgersen = (pinguinos["island"] == "Dream") | (pinguinos["island"] == "Torgersen")
+print(pinguinos[biscoe_pesados].shape)
+print(pinguinos[dream_o_torgersen].shape)
+```
+
+```text
+(28, 7)
+(176, 7)
+```
+
+El error típico es escribir `and` en lugar de `&`: Python intenta decidir si una Series entera es verdadera y pandas se niega.
+
+```text
+ValueError: The truth value of a Series is ambiguous. Use a.empty, a.bool(), a.item(), a.any() or a.all().
+```
+
+Hay una trampa que conecta con el problema de entrada: una celda vacía **no cumple** ni `==` ni `<` ni `>`. `pinguinos["sex"] == "Male"` y `pinguinos["sex"] == "Female"` suman 333 filas, no 344: las 11 filas sin sexo no caen en ninguno de los dos grupos.
+
+> **Máscara booleana:** Series de `True` y `False`, con una posición por fila, que se usa dentro de corchetes o de `loc` para conservar solo las filas verdaderas.
+
+## Ordenar con sort_values
+
+Para saber cuál es el pingüino más pesado no hace falta filtrar: ordenas y miras el comienzo. `sort_values` ordena por una columna, de menor a mayor por defecto; con `ascending=False` lo inviertes.
+
+```python
+mas_pesados = pinguinos.sort_values("body_mass_g", ascending=False)
+print(mas_pesados[["species", "island", "body_mass_g"]].head(3))
+```
+
+```text
+    species  island  body_mass_g
+237  Gentoo  Biscoe       6300.0
+253  Gentoo  Biscoe       6050.0
+297  Gentoo  Biscoe       6000.0
+```
+
+`sort_values` devuelve una tabla nueva; la original no cambia. Por defecto, los nulos quedan al final, en cualquier orden que pidas.
+
+## Resumir por grupos: groupby y agregación
+
+Hasta aquí respondiste preguntas sobre filas. Una pregunta más común es sobre grupos: "¿cuánto pesa en promedio cada especie?". La receta tiene tres piezas: **separas** la tabla por una columna, **eliges** qué columna resumir y **aplicas** una o varias estadísticas.
+
+```python
+resumen = pinguinos.groupby("species")["body_mass_g"].agg(["count", "mean", "min", "max"])
+print(resumen.round(1))
+```
+
+```text
+           count    mean     min     max
+species                                 
+Adelie       151  3700.7  2850.0  4775.0
+Chinstrap     68  3733.1  2700.0  4800.0
+Gentoo       123  5076.0  3950.0  6300.0
+```
+
+Cada fila es un grupo y cada columna una estadística. Mira `count`: Adelie tiene 151 y Gentoo 123, pero en la tabla hay 152 y 124 pingüinos de esas especies. `count` y `mean` **ignoran las celdas vacías**; solo `count` te lo dice. Un promedio sin su `count` al lado es un número sin contexto.
+
+> **Agregación:** operación que resume muchos valores en uno (`mean`, `min`, `max`, `count`). **groupby:** divide la tabla en grupos según los valores de una columna para aplicar una agregación a cada uno.
+
+## Nulos: cuántos hay y dónde están
+
+Ya viste en la inspección que `info()` muestra `Non-Null Count`. Para obtener esa información como número por columna, `isna()` marca cada celda vacía con `True`, y `sum()` las cuenta:
+
+```python
+print(pinguinos.isna().sum())
+```
+
+```text
+species               0
+island                0
+bill_length_mm        2
+bill_depth_mm         2
+flipper_length_mm     2
+body_mass_g           2
+sex                  11
+dtype: int64
+```
+
+Saber cuántos no basta: importa **cuáles filas**. Si usas `isna()` como máscara, ves las filas con el peso vacío:
+
+```python
+print(pinguinos[pinguinos["body_mass_g"].isna()][["species", "island", "body_mass_g", "sex"]])
+```
+
+```text
+    species     island  body_mass_g  sex
+3    Adelie  Torgersen          NaN  NaN
+339  Gentoo     Biscoe          NaN  NaN
+```
+
+Las dos filas con peso vacío son también las que no tienen medidas del pico ni de la aleta: son observaciones casi sin datos. En cambio, de los 11 sexos vacíos, 9 son de pingüinos que sí tienen todas sus medidas. Ese es el patrón de los nulos reales: no caen al azar, y cada columna tiene su propia historia. En total hay 11 filas con al menos un nulo (`pinguinos.isna().any(axis=1).sum()`), el 3.2 % de la tabla.
+
+> **Valor nulo (`NaN`):** celda sin dato. pandas lo ignora al calcular `mean`, `min`, `max` o `count`, y no cumple `==`, `<` ni `>`; en cambio, `!=` sí lo deja pasar.
+
+## Datos atípicos: señalar sin borrar
+
+Un **atípico** es un valor muy distinto del resto. No es lo mismo que un nulo: está ahí, pero puede ser un error de captura o un caso real y raro. La regla es **señalar para investigar, no borrar de oficio**. Dos criterios sirven para señalar.
+
+**Rango de dominio.** Defines, con conocimiento de lo que mides, qué valores son imposibles. Primero miras el mínimo y el máximo:
+
+```python
+columnas = ["bill_length_mm", "flipper_length_mm", "body_mass_g"]
+print(pinguinos[columnas].describe().round(1).loc[["min", "max"]])
+```
+
+```text
+     bill_length_mm  flipper_length_mm  body_mass_g
+min            32.1              172.0       2700.0
+max            59.6              231.0       6300.0
+```
+
+Un pingüino de 2700 g a 6300 g es plausible, y 59.6 mm de pico también. Si decides que un pingüino adulto nunca pesa menos de 2000 g ni más de 7000 g, la máscara es `(pinguinos["body_mass_g"] < 2000) | (pinguinos["body_mass_g"] > 7000)` y cuenta 0 filas.
+
+**Rango intercuartílico (IQR).** Cuando no sabes qué es imposible, dejas que los datos lo digan: tomas el primer y tercer cuartil (`quantile`), calculas su distancia (el IQR) y consideras sospechoso lo que queda más de 1.5 IQR por fuera de ese rango.
+
+```python
+q1 = pinguinos["body_mass_g"].quantile(0.25)
+q3 = pinguinos["body_mass_g"].quantile(0.75)
+iqr = q3 - q1
+limite_inf = q1 - 1.5 * iqr
+limite_sup = q3 + 1.5 * iqr
+print(q1, q3, iqr, limite_inf, limite_sup)
+```
+
+```text
+3550.0 4750.0 1200.0 1750.0 6550.0
+```
+
+Con límites de 1750 g y 6550 g, el máximo de 6300 g queda dentro: ningún pingüino se señala. Encontrar cero atípicos también es un resultado. Pero el criterio depende de **con quién compares**: repetido solo para Chinstrap, los límites son 2793.75 g y 4643.75 g y salen dos filas:
+
+```text
+     species  body_mass_g
+189  Chinstrap       4800.0
+190  Chinstrap       2700.0
+```
+
+Son el Chinstrap más pesado y el más liviano de la tabla. Son 4800 g y 2700 g, perfectamente posibles para un pingüino: señales para mirar con atención, no para eliminar sin más.
+
+> **IQR (rango intercuartílico):** distancia entre el cuartil 3 y el cuartil 1. Un valor fuera de [Q1 − 1.5·IQR, Q3 + 1.5·IQR] se marca como atípico.
+
+## Decidir: eliminar o imputar
+
+Ya sabes qué falta y qué es raro. Ahora decides qué hacer, y cada opción tiene un costo que puedes medir.
+
+**Eliminar** con `dropna` descarta filas. Sin argumentos, descarta toda fila con *cualquier* nulo; con `subset`, solo mira las columnas que te importan para tu pregunta:
+
+```python
+sin_nulos = pinguinos.dropna()
+sin_peso_nulo = pinguinos.dropna(subset=["body_mass_g"])
+print(pinguinos.shape, sin_nulos.shape, sin_peso_nulo.shape)
+```
+
+```text
+(344, 7) (333, 7) (342, 7)
+```
+
+Si tu pregunta es sobre el peso, `subset` pierde 2 filas (0.6 %); `dropna()` a secas pierde 11 (3.2 %), y 9 de ellas tenían un peso perfectamente bueno. El costo de eliminar es **cuántas filas pierdes**.
+
+**Imputar** con `fillna` rellena el hueco con un valor. Para una columna numérica, lo habitual es la **mediana** y no el promedio, porque un valor extremo arrastra el promedio y la mediana no se mueve. El patrón de pandas 3 asigna el resultado de vuelta a la columna:
+
+```python
+mediana = pinguinos["body_mass_g"].median()
+imputado = pinguinos.copy()
+imputado["body_mass_g"] = imputado["body_mass_g"].fillna(mediana)
+print(mediana, imputado["body_mass_g"].isna().sum())
+```
+
+```text
+4050.0 0
+```
+
+No uses `inplace=True` sobre una columna ni encadenes asignaciones como `df["col"].fillna(..., inplace=True)`: en pandas 3 eso no modifica tu tabla: solo recibes una advertencia y los nulos siguen ahí. El costo de imputar es **cuánto inventas**: aquí 2 valores de 344 (0.6 %). Y el relleno puede ser injusto: la fila 339 es un Gentoo, una especie con mediana de 5000 g, y recibió 4050 g. Con dos filas casi vacías, eliminar era la decisión más honesta; con muchos huecos en una columna que sí necesitas, imputar tendría más sentido. Para `sex` no hay mediana que valga: o filtras las filas sin sexo cuando la pregunta lo requiere, o las dejas fuera de ese cálculo y lo dices.
+
+Una práctica de trabajo evita confusiones: **anota cada decisión de limpieza** — qué columna, cuántas filas afectó y por qué elegiste eliminar o imputar. Por ejemplo: "body_mass_g: 2 nulos (filas 3 y 339), eliminadas con dropna(subset); 344 a 342 filas; eran filas sin ninguna medida corporal". Con esa nota, quien lea tu resultado sabe de dónde salió el 342.
+
+> ⚡ **Para ir más lejos:** `isin` filtra por una lista de valores (`df["island"].isin(["Dream", "Torgersen"])`), `between` por un intervalo (`df["body_mass_g"].between(3000, 4000)`) y `query` escribe el filtro como texto (`df.query("species == 'Gentoo' and body_mass_g > 5500")`).
+
+## Síntesis
+
+Cada pregunta que le haces a una tabla tiene su herramienta y su señal de alerta:
+
+| Pregunta | Herramienta | Señal de alerta |
+|---|---|---|
+| ¿Qué columnas o filas necesito? | `df[[...]]`, `loc`, `iloc` | Confundir etiqueta con posición |
+| ¿Cuáles filas cumplen una condición? | máscara con `&` y `\|` | Usar `and`, o olvidar los paréntesis |
+| ¿Cuál es el mayor o el menor? | `sort_values` | Los nulos van al final y no aparecen |
+| ¿Cómo es cada grupo? | `groupby` + `mean`, `count`, `min`, `max` | Un promedio con un `count` menor que las filas del grupo |
+| ¿Cuánto falta y dónde? | `isna()`, `isna().sum()` | Nulos concentrados en unas pocas filas o columnas |
+| ¿Hay valores atípicos? | rango de dominio, IQR con `quantile` | Borrarlos sin investigar |
+| ¿Elimino o imputo? | `dropna(subset=...)`, `fillna(mediana)` | No medir las filas perdidas o los valores inventados |
+
+Y por sección:
+
+- **El problema:** dos cálculos válidos dieron 48 % y 49.5 % por 11 celdas vacías; los resultados dependen de cómo tratas los nulos.
+- **Elegir lo que importa:** corchetes para columnas, `loc` por etiqueta o condición, `iloc` por posición.
+- **Filtrado booleano:** una máscara de `True` y `False`; `&` y `|` con paréntesis, nunca `and`; un nulo no cumple `==`, `<` ni `>`, pero `!=` sí lo deja pasar.
+- **Ordenar:** `sort_values` devuelve una tabla nueva y deja los nulos al final.
+- **Resumir por grupos:** `groupby` separa, la agregación resume, y `count` revela cuántos datos entraron.
+- **Nulos:** `isna().sum()` dice cuántos y la máscara dice cuáles filas.
+- **Atípicos:** rango de dominio e IQR señalan; investigar viene antes de borrar.
+- **Eliminar o imputar:** `dropna(subset=...)` cuesta filas, `fillna(mediana)` cuesta valores inventados; mide el costo y anota la decisión.

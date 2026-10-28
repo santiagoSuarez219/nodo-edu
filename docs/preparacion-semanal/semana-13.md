@@ -1,7 +1,7 @@
 # Semana 13 — 26 de octubre – 1 de noviembre
 
-**Rama:** `feat/semana-13-analisis-de-algoritmos`
-**Estado:** ⬜ En preparación / ⬜ Material y cuestionarios listos en desarrollo / ⬜ Mergeada a `development` / ✅ Desplegada y abierta (2026-10-04)
+**Rama:** `feat/semana-13-analisis-de-algoritmos` (AA) · `feat/semana-13-programacion-cientifica` (PC)
+**Estado:** AA: ✅ Desplegada y abierta (2026-10-04) · PC: ✅ Material y cuestionario listos en desarrollo / ⬜ Mergeada a `development` / ⬜ Desplegada y abierta
 
 ---
 
@@ -99,3 +99,101 @@ No aplica.
 - Guía del Laboratorio evaluativo 3 con rúbrica (BST evaluable).
 - Abrir en el navegador los enlaces de LeetCode de los apuntes antes de compartirlos (dan 403 a herramientas automáticas).
 - Textos para estudiantes que aún dicen "cinco laboratorios".
+
+---
+
+## Ronda — `programacion-cientifica` (2026-10-28)
+
+**Rama:** `feat/semana-13-programacion-cientifica`
+**Estado:** ✅ Material y cuestionario listos en desarrollo / ⬜ Mergeada a `development` / ⬜ Desplegada y abierta
+
+**Alcance confirmado por el usuario:** sesión única del jueves 29 de octubre
+(Pandas: filtrado, agregación y limpieza). La sesión es una **demo en vivo del
+docente**. Al inicio de la clase el docente presenta datasets recomendados para
+el proyecto final (en parejas, un dataset distinto por pareja); ese bloque queda
+**fuera** de la lección y de los apuntes.
+
+### Sesiones cubiertas
+
+| Sesión | Fecha | Tema | ★/◇ |
+|---|---|---|---|
+| Única | jue 29 oct | Pandas: filtrado, agregación y limpieza de datos | ◇ |
+
+### Etapas y aprobaciones
+
+| Etapa | Resultado | Aprobada por el usuario |
+|---|---|---|
+| E2 · Plan de lección | Aprobado con 4 cambios: dataset de pingüinos en lugar de `estaciones.csv`, sin `pd.to_datetime`, proyecto fuera de la lección, lección abierta antes de la clase | ✅ |
+| E3 · Lección `.mdx` + registro TS | `filtrado-agregacion-y-limpieza-de-datos` (order 10) | ✅ (se pidió continuar con los apuntes) |
+| E4 · Apuntes del docente | Sí, sin reto `merge`/`concat` | ✅ (se pidió continuar con el cuestionario) |
+| E5 · Cuestionario de cierre | Propuestas 5 preguntas → aprobadas 5 | ✅ |
+| E6 · Guía del estudiante | No — sesión en vivo | ✅ |
+| E6 · Quiz A/B/C | No aplica — semana sin ★ | ✅ |
+
+### Artefactos producidos
+
+| Artefacto | Ruta | Publicado |
+|---|---|---|
+| Lección teórica | `content/cursos/programacion-cientifica/filtrado-agregacion-y-limpieza-de-datos.mdx` | ⬜ |
+| Registro TS | `lib/courses/data/programacion-cientifica.ts` (`order: 10`, solo se agregó `summary`) | — |
+| Apunte de clase | `content/cursos/programacion-cientifica/apuntes/filtrado-agregacion-y-limpieza-de-datos.md` | Solo owner/admin |
+
+### Cuestionario de cierre
+
+| Lección | Entorno | IDs de preguntas | Publicadas | Montadas (`list_lesson_questions`) |
+|---|---|---|---|---|
+| `filtrado-agregacion-y-limpieza-de-datos` | desarrollo | `3bdecd28-9bee-4bda-a146-dc464f44cc7a`, `545d4416-b49a-462f-92c3-350640faaece`, `7f55aa91-c428-4d48-b2bf-642891f7c6b3`, `a721ed09-6ef2-4347-b930-3ba8ae907f4c`, `c329e000-f6b7-453f-bd45-67622613e180` | ✅ | ✅ (5) |
+| `filtrado-agregacion-y-limpieza-de-datos` | **producción** | — | ⬜ | ⬜ |
+
+> Las preguntas **no viajan con el deploy**: se recrean en producción en D3.
+> Mientras la fila de producción esté vacía, la autoevaluación no existe para
+> el estudiante aunque la lección esté abierta. Keywords usadas (ya existen en
+> desarrollo): `pandas`, `dataframe`, `python`, `cierre`, `estadistica-descriptiva`;
+> confirmar en producción antes de recrear.
+
+### Quiz calificable A/B/C
+
+No aplica.
+
+### Decisiones tomadas por Claude en nombre del docente
+
+- Salidas verificadas con pandas 3.0.2, con aviso de diferencias frente a pandas 2 — **motivo:** es la referencia de la semana 12; asumido sin que el usuario lo confirmara.
+- El umbral de dominio de 2000–7000 g para el peso del pingüino lo fijó el redactor como ejemplo — **motivo:** no sale de la ficha del dataset.
+- La lección salió en 326 líneas (objetivo 180–220); unas 130 son código y salidas — **motivo:** el dataset real exige mostrar las salidas; recorte fácil: el segundo ejemplo de IQR (Chinstrap).
+- En pingüinos no hay atípicos globales (ni por dominio ni por IQR); el IQR se repite dentro de Chinstrap (4800 g y 2700 g, plausibles) — **motivo:** mostrar "señalar sin borrar" con datos reales.
+- La imputación por grupo y `ffill`/`bfill`/`interpolate`, `pivot_table`, múltiples claves, boxplot y z-score quedaron fuera — **motivo:** carga cognitiva del grupo heterogéneo.
+- Keywords nuevas (`agregacion`, `limpieza-de-datos`, `valores-nulos`, `filtrado`) no se crearon — **motivo:** el usuario no respondió esa parte de la propuesta; se usaron solo las existentes.
+- La pregunta 4 del cuestionario se creó con "un Adelie macho grande puede pesar cerca de 4900 g", pero el máximo de Adelie en la lección es 4775 g; a pedido del usuario se reescribió a "puede ser bastante más pesado que la mayoría" (2026-10-28, solo el enunciado; opciones, keywords y montaje intactos).
+- Los apuntes y la lección no cubren el bloque inicial de datasets del proyecto — **motivo:** el docente lo presenta por su cuenta.
+
+### Verificación (E7)
+
+- [x] `npm run build` en verde
+- [x] `npm run lint` en verde (0 errores, 7 advertencias previas en archivos ajenos a esta ronda)
+- [x] Checklist de `lesson-authoring` §8 recorrido (sin H1/`###`/`$`/diagramas; apuntes sin entrada TS; sin guía)
+- [x] `summary` presente en frontmatter **y** en registro TS
+- [x] Coherencia cruzada teoría ↔ apuntes ↔ cuestionario (cifras coinciden; el cuestionario usa tablas nuevas; solapa solo en concepto con dos preguntas socráticas)
+- [x] `@reviewer`: CAMBIOS REQUERIDOS → corregidos (la lección decía que un nulo "no cumple ninguna comparación", pero `!=` lo deja pasar: limitado a `==`, `<` y `>` en la definición y en la síntesis; "siempre al final" cambiado a "por defecto al final" en lección y apuntes). Sin repetir lint; build en verde tras la corrección. Menores sin aplicar: cabecera desalineada de la salida de Chinstrap en la lección (`.mdx:256-259`), "la mediana no se mueve" (simplificación aceptable), longitud de la lección y el distractor autocontradictorio de la pregunta 3 del cuestionario
+
+---
+
+## Despliegue (PC)
+
+| Paso | Estado | Fecha / detalle |
+|---|---|---|
+| D0 · Alcance y checklist pre-despliegue | ⬜ | |
+| D1 · Lecciones nuevas cerradas por adelantado | ⬜ | |
+| D2 · Merge a `main` y deploy en Vercel | ⬜ | rama `deploy/semana-13-pc` |
+| D3 · Banco de preguntas replicado a producción | ⬜ | |
+| D4 · Lecciones abiertas a los estudiantes | ⬜ | programacion-cientifica → `filtrado-agregacion-y-limpieza-de-datos` |
+| D5 · Verificación end-to-end en producción | ⬜ | |
+| D6 · Bitácora cerrada y rama `deploy/` borrada | ⬜ | |
+
+- [ ] Verificado que las lecciones de semanas futuras siguen **cerradas** (`matplotlib-y-seaborn`)
+
+### Pendientes (PC)
+
+- La clase es el jueves 29 de octubre: la lección y su cuestionario deben estar desplegados y abiertos antes de la sesión, porque los apuntes parten de que el estudiante ya los hizo.
+- Al recrear el cuestionario en producción (D3), usar el enunciado corregido de la pregunta 4 (sin la cifra de 4900 g como peso de un Adelie real).
+- Probar en Colab (pandas 2): el comportamiento de `inplace=True` sobre una columna, que los apuntes explican pero no ejecutan en vivo.
+- Revisión visual en el navegador: render de la lección y de la tabla de la síntesis (usa `\|` dentro de backticks).
