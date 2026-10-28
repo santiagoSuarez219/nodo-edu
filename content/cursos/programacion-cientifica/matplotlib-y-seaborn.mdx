@@ -139,10 +139,20 @@ Seaborn se construye sobre Matplotlib y entiende los DataFrames: le dices qué c
 ```python
 sns.set_theme(palette="colorblind")
 
+# Cada gráfico va en su propia celda; si los pegas juntos, se dibujan sobre los mismos ejes
 sns.histplot(data=pinguinos, x="body_mass_g")
+plt.show()
+
 sns.countplot(data=pinguinos, x="species")
+plt.show()
+
 ax = sns.boxplot(data=pinguinos, x="species", y="body_mass_g")
-sns.scatterplot(data=pinguinos, x="bill_length_mm", y="bill_depth_mm", hue="species")
+ax.set_title("Masa corporal por especie")
+plt.show()
+
+ax = sns.scatterplot(data=pinguinos, x="bill_length_mm", y="bill_depth_mm", hue="species")
+ax.set_title("Largo y profundidad del pico")
+plt.show()
 ```
 
 Cada línea reemplaza un bloque entero de Matplotlib: `countplot` cuenta las filas por especie (152 Adelie, 124 Gentoo, 68 Chinstrap) sin que hagas el `groupby`, y `hue="species"` pinta cada especie de un color. Como Seaborn devuelve un `ax` de Matplotlib, todo lo que aprendiste sigue valiendo: `ax.set_title(...)`, `ax.set_xlabel(...)` y `fig.savefig(...)` funcionan igual.
@@ -161,7 +171,9 @@ Para ver muchas relaciones a la vez, el **mapa de calor** pinta la matriz de cor
 
 ```python
 corr = pinguinos.corr(numeric_only=True)
-sns.heatmap(corr, annot=True, fmt=".2f", cmap="vlag", vmin=-1, vmax=1)
+ax = sns.heatmap(corr, annot=True, fmt=".2f", cmap="vlag", vmin=-1, vmax=1)
+ax.set_title("Correlación entre las medidas numéricas")
+plt.show()
 ```
 
 ![Mapa de calor de correlaciones: aleta y masa en 0.87, largo y profundidad del pico en menos 0.24](/documentos/programacion-cientifica/lecciones/matplotlib-y-seaborn/mapa-calor-correlacion.png)
