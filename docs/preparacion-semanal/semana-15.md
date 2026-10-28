@@ -185,9 +185,12 @@ Keywords creadas en desarrollo: `visualizacion`, `matplotlib`, `seaborn`
 
 ### Decisiones tomadas por Claude en nombre del docente
 
-- La lección no menciona fechas ni porcentajes del proyecto: `info.md` y el
-  cronograma (Momento 4 el 5 nov, Momento 5 el 19 nov) chocan con la guía
-  (E1 19 nov, E2 26 nov). **Pendiente del docente reconciliarlos.**
+- Fechas de la guía del proyecto ajustadas por el usuario a las del microdiseño:
+  E1 jueves 5 nov (23:59), E2 + exposición jueves 19 nov. `info.md` y el
+  cronograma no se modificaron. La lección y los apuntes no mencionan fechas.
+- Flujo B no estaba en el material publicado: se añadió a la guía del proyecto
+  el paso a paso (token como Secreto de Colab, `!git clone`, `!git config`) y al
+  Paso 7 de los apuntes.
 - 4 PNG (sin imagen para barras ni pairplot). Es la primera lección con
   imágenes: **verificar el render en Nodo**.
 - Serie de líneas con 7 valores inventados, rotulada como ejemplo.

@@ -407,8 +407,11 @@ menos de 30 %, vuelves a explicar qué mide la correlación antes de discutir.
 ## Paso 7 — Guardar el gráfico y subirlo al repositorio
 
 Situación: un gráfico que solo vive en el cuaderno no se entrega. Se guarda como
-imagen en `visualizaciones/` y se sube con Git, igual que hicieron con los datos
-(sin repasar el flujo: el que ya lo hizo, lo repite).
+imagen en `visualizaciones/` y se sube con Git. Los comandos `!git` no se han
+visto en el curso, así que aquí se hace en vivo, con el repositorio de la
+pareja: la guía del proyecto trae el paso a paso (token como Secreto de Colab
+llamado `GITHUB_TOKEN`, `!git clone`, `!git config`). Si alguna pareja aún no
+tiene repositorio, que clone el de cualquiera de las dos y practique el flujo.
 
 **🐞 Error planeado:** dibujar el histograma en una celda y escribir en la
 **siguiente** `plt.savefig("visualizaciones/histograma-masa.png")`.
@@ -442,6 +445,13 @@ carpeta del repositorio, con comandos de shell (el signo de exclamación los
 manda a la terminal de Colab):
 
 ```python
+# Una sola vez por sesión, si aún no clonó (ver la guía del proyecto):
+# from google.colab import userdata
+# token = userdata.get("GITHUB_TOKEN")
+# !git clone https://USUARIO:{token}@github.com/USUARIO/REPO.git
+# %cd REPO
+
+!git pull
 !git add visualizaciones/
 !git commit -m "Agrega histograma de masa corporal de pingüinos"
 !git push

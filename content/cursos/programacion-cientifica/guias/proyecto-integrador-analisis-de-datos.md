@@ -6,9 +6,9 @@ updatedAt: "2026-10-28"
 # Proyecto integrador — Análisis de datos con pandas, Matplotlib y Seaborn
 
 > **El proyecto integrador vale el 35 % de la nota final del curso** y se
-> entrega en dos partes: el **Entregable 1 (pandas, 15 %)** el jueves 19 de
+> entrega en dos partes: el **Entregable 1 (pandas, 15 %)** el jueves 5 de
 > noviembre y el **Entregable 2 (Matplotlib, Seaborn y exposición, 20 %)** el
-> jueves 26 de noviembre de 2026. Se desarrolla **en parejas**, y cada pareja
+> jueves 19 de noviembre de 2026. Se desarrolla **en parejas**, y cada pareja
 > trabaja sobre un conjunto de datos asignado por el docente.
 
 ## Objetivo
@@ -80,10 +80,41 @@ crea otros nuevos.
    el repositorio es privado y el docente no puede verlo, se califica como no
    entregado.
 4. Ambos integrantes trabajan en Colab clonando el repositorio con su propio
-   token, como en el Flujo B (`!git clone`, `!git add`, `!git commit`,
-   `!git push`). **El historial debe mostrar commits de los dos integrantes**,
+   token, con comandos en celdas de Colab (`!git clone`, `!git add`,
+   `!git commit`, `!git push`; el paso a paso está más abajo).
+   **El historial debe mostrar commits de los dos integrantes**,
    con mensajes que describan el cambio ("Imputa plaquetas con la mediana por
    clasificación", no "cambios" ni "final").
+
+Cómo trabajar el repositorio desde Colab (una sola vez por integrante):
+
+1. En GitHub cree un token personal (`Settings → Developer settings → Personal
+   access tokens`) con permiso de escritura sobre repositorios.
+2. En Colab abra el icono de la llave (Secretos), cree un secreto llamado
+   `GITHUB_TOKEN`, pegue allí el token y active "Acceso desde el cuaderno".
+   Así el token nunca queda escrito en el cuaderno.
+3. En la primera celda del cuaderno clone el repositorio y configure su
+   identidad:
+
+```python
+from google.colab import userdata
+
+token = userdata.get("GITHUB_TOKEN")
+usuario = "su-usuario-de-github"        # cambie por su usuario
+repo = "proyecto-integrador-pc-grupo-1" # cambie por el nombre de su repositorio
+
+!git clone https://{usuario}:{token}@github.com/{usuario}/{repo}.git
+%cd {repo}
+!git config user.name "Su Nombre"
+!git config user.email "su-correo@ejemplo.com"
+```
+
+   Si el repositorio pertenece a su compañero o compañera, `usuario` debe ser el
+   dueño del repositorio, pero el token es el suyo.
+4. Antes de subir, traiga los cambios del otro integrante con `!git pull`.
+   Para subir: `!git add .`, `!git commit -m "mensaje claro"` y `!git push`.
+5. No imprima el token ni lo escriba en una celda: si lo hace, bórrelo del
+   cuaderno y genere uno nuevo.
 
 Estructura esperada del repositorio al final del proyecto:
 
@@ -102,7 +133,7 @@ proyecto-integrador-pc-grupo-N/
 
 ## Entregable 1 — Análisis con pandas (15 %)
 
-**Plazo:** jueves 19 de noviembre de 2026, 23:59. Se califica el último commit
+**Plazo:** jueves 5 de noviembre de 2026, 23:59. Se califica el último commit
 de la rama `main` hasta esa hora.
 
 ### Qué debe contener el notebook `notebooks/analisis.ipynb`
@@ -171,7 +202,7 @@ las celdas en desorden se califica como si no se ejecutara.
 
 ## Entregable 2 — Visualización con Matplotlib y Seaborn, y exposición (20 %)
 
-**Plazo:** jueves 26 de noviembre de 2026, al inicio de la clase. Ese día cada
+**Plazo:** jueves 19 de noviembre de 2026, al inicio de la clase. Ese día cada
 pareja expone en clase. Se califica el último commit de la rama `main` antes
 del inicio de la clase.
 
@@ -342,6 +373,6 @@ todo el análisis.
 - **Asesorías:** use las sesiones de clase previas a cada entrega para resolver
   dudas del proyecto con el docente.
 
-**Plazos de entrega:** Entregable 1, jueves 19 de noviembre de 2026 a las
-23:59. Entregable 2 y exposición, jueves 26 de noviembre de 2026, al inicio de
+**Plazos de entrega:** Entregable 1, jueves 5 de noviembre de 2026 a las
+23:59. Entregable 2 y exposición, jueves 19 de noviembre de 2026, al inicio de
 la clase.
