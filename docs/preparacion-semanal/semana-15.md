@@ -223,6 +223,6 @@ Keywords creadas en desarrollo: `visualizacion`, `matplotlib`, `seaborn`
 
 ## Pendientes
 
-- Despliegue de AA (`fundamentos-de-programacion-dinamica`, `estrategia-voraz`): no incluido en esta entrega.
+- AA (`fundamentos-de-programacion-dinamica`, `estrategia-voraz`): sus archivos ya estaban en `main`; en esta entrega no se tocaron sus preguntas ni su apertura en producción (estado no verificado).
 - Tras la clase del 12 de nov: D7, marcar `matplotlib-y-seaborn` como vista por grupo.
 - Revisar en producción, con sesión, el render de la lección y de la guía.
