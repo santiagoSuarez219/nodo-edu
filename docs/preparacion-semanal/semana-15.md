@@ -41,7 +41,7 @@ noviembre. **Excluida en esta primera ronda:** la Sesión 2 (P, estrategia voraz
 | Lección | Entorno | IDs de preguntas | Publicadas | Montadas (`list_lesson_questions`) |
 |---|---|---|---|---|
 | `fundamentos-de-programacion-dinamica` | desarrollo | P1 `9fa5b324-49be-4a6a-803b-44aa54cbbce8` · P2 `c0a9467e-6943-4f19-92bc-c48f4a535258` · P3 `073d885e-29f4-466f-afca-28915c4d20d9` · P4 `f681dd3a-73ed-41e6-a552-54c8038a5460` · P5 `6017d880-ea31-4fc1-8436-49f2e5a80fe4` | ✅ | ✅ (orden P1–P5) |
-| `fundamentos-de-programacion-dinamica` | **producción** | — | ⬜ | ⬜ |
+| `fundamentos-de-programacion-dinamica` | **producción** (2026-10-28) | P1 `e38e5259-742d-4dd0-b54b-4b5d6cba6523` · P2 `c5c4b904-8d4e-49c3-931c-f9459ce865e9` · P3 `258c424a-9719-442e-9737-e6665bdcbd7a` · P4 `0a3e81b6-3ac0-4c97-bd4c-1d07276005e3` · P5 `799f35dd-a4bf-4bb4-9534-250bf47dfc06` | ✅ | ✅ (orden P1–P5) |
 
 Keywords creadas en desarrollo: `programacion-dinamica`, `memoizacion`,
 `tabulacion`, `recursion` (hay que verificarlas/crearlas en producción en D3).
@@ -111,7 +111,7 @@ por decisión del usuario (el cronograma lo manda a lectura autónoma).
 | Lección | Entorno | IDs de preguntas | Publicadas | Montadas (`list_lesson_questions`) |
 |---|---|---|---|---|
 | `estrategia-voraz` | desarrollo | P1 `a585f7f4-c712-4448-bc5b-0c12b5d9488d` · P2 `16ac5ba5-4e9f-46c9-8a6e-237afe98d6d2` · P3 `17d88a10-9407-44d1-8fa0-98fff22e2a97` · P4 `10bd5e29-5632-4a2d-899a-16dfdd80f011` · P5 `445d9e68-5c62-422a-8ea2-9918312e467f` | ✅ | ✅ (orden P1–P5) |
-| `estrategia-voraz` | **producción** | — | ⬜ | ⬜ |
+| `estrategia-voraz` | **producción** (2026-10-28) | P1 `7a57ecff-6f8f-4f1f-8e77-28a60dc300f3` · P2 `64560a2a-eb86-4eaf-91dd-af8303f1c275` · P3 `2f15d00e-2f9e-48b1-9a6e-a7b0be7665eb` · P4 `ff07cc80-83b4-4340-9db3-bad125eedba5` · P5 `bb798ca4-d651-40cb-aea8-d9d20e490182` | ✅ | ✅ (orden P1–P5) |
 
 Keyword creada en desarrollo: `algoritmos-voraces` (tema); verificarla/crearla en
 producción en D3. Las explicaciones no se guardaron (sin campo de feedback).
@@ -223,6 +223,6 @@ Keywords creadas en desarrollo: `visualizacion`, `matplotlib`, `seaborn`
 
 ## Pendientes
 
-- AA (`fundamentos-de-programacion-dinamica`, `estrategia-voraz`): sus archivos ya estaban en `main`; en esta entrega no se tocaron sus preguntas ni su apertura en producción (estado no verificado).
+- AA (`fundamentos-de-programacion-dinamica`, `estrategia-voraz`): el 2026-10-28 se recrearon en producción sus 10 preguntas (y las keywords `programacion-dinamica`, `memoizacion`, `tabulacion`, `algoritmos-voraces`) y se abrieron las dos lecciones; el 12 de nov (PC) y el 9 de nov (AA) quedan solo los D7.
 - Tras la clase del 12 de nov: D7, marcar `matplotlib-y-seaborn` como vista por grupo.
 - Revisar en producción, con sesión, el render de la lección y de la guía.
