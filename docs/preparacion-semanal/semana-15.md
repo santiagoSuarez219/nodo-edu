@@ -1,7 +1,7 @@
 # Semana 15 — 9–15 de noviembre
 
 **Rama:** `feat/semana-15-analisis-de-algoritmos` (AA) · `feat/semana-15-programacion-cientifica` (PC)
-**Estado:** ✅ Material y cuestionario listos en desarrollo / ⬜ Mergeada a `development` / ⬜ Desplegada y abierta
+**Estado:** AA: ✅ Material y cuestionarios listos en desarrollo / ⬜ Desplegada · PC: ✅ **Desplegada y abierta en producción (2026-10-28)**
 
 ---
 
@@ -178,7 +178,7 @@ por etapa** — todo queda pendiente de su revisión en Nodo.
 | Lección | Entorno | IDs de preguntas | Publicadas | Montadas |
 |---|---|---|---|---|
 | `matplotlib-y-seaborn` | desarrollo | P1 `f7e68922-ba5d-4aa0-b0d1-bf76a7206611` · P2 `6363c629-605e-4006-a525-02e30c3008d6` · P3 `16648dce-6057-40e3-a44c-634910078fcd` · P4 `2f13d949-e23c-4d2b-ab35-24c2a658362d` · P5 `5d1c876e-37e8-41dc-b410-986845310443` · P6 `6a1bec38-7b26-4d15-ae42-f0161ed1a696` | ✅ | ✅ (orden P1–P6) |
-| `matplotlib-y-seaborn` | **producción** | — | ⬜ | ⬜ |
+| `matplotlib-y-seaborn` | **producción** (2026-10-28) | P1 `0905d8f0-d259-4cca-a1c2-7c0bcc23b38a` · P2 `9b32c1bf-fd7f-4257-bc1e-cc7dbd806290` · P3 `26cc01a8-0e52-4121-bc42-7f151addaa5d` · P4 `560056d1-ec19-4269-9943-478c14d35840` · P5 `9343b44e-6ccd-44c7-9a2d-7e4ee82b39b1` · P6 `c0abcb08-f12b-4f64-ab33-939278b97136` | ✅ | ✅ (orden P1–P6) |
 
 Keywords creadas en desarrollo: `visualizacion`, `matplotlib`, `seaborn`
 (verificarlas/crearlas en producción en D3).
@@ -207,22 +207,22 @@ Keywords creadas en desarrollo: `visualizacion`, `matplotlib`, `seaborn`
 
 ---
 
-## Despliegue
+## Despliegue — `programacion-cientifica` (2026-10-28)
 
 | Paso | Estado | Fecha / detalle |
 |---|---|---|
-| D0 · Alcance y checklist pre-despliegue | ⬜ | |
-| D1 · Lecciones nuevas cerradas por adelantado | ⬜ | |
-| D2 · Merge a `main` y deploy en Vercel | ⬜ | rama `deploy/semana-15` |
-| D3 · Banco de preguntas replicado a producción | ⬜ | |
-| D4 · Lecciones abiertas a los estudiantes | ⬜ | `analisis-de-algoritmos` → `fundamentos-de-programacion-dinamica`, `estrategia-voraz` |
-| D5 · Verificación end-to-end en producción | ⬜ | |
-| D6 · Bitácora cerrada y rama `deploy/` borrada | ⬜ | |
+| D0 · Alcance y checklist pre-despliegue | ✅ | Solo PC; sin cambios de esquema; lint sin errores |
+| D1 · Lecciones nuevas cerradas por adelantado | ⚠️ | No fue posible: producción respondió 404 para la guía nueva (el catálogo sale del código desplegado). El usuario decidió abrirla igualmente |
+| D2 · Merge a `main` y deploy en Vercel | ✅ | `a01e532` (`deploy/semana-15-pc`, borrada); deployment `dpl_FVAePzuW2zPtuxUWmPjVsxpiYds9` READY |
+| D3 · Banco de preguntas replicado a producción | ✅ | 3 keywords (`visualizacion`, `matplotlib`, `seaborn`) y 6 preguntas, publicadas y montadas |
+| D4 · Lecciones abiertas a los estudiantes | ✅ | `matplotlib-y-seaborn` abierta; `proyecto-integrador-analisis-de-datos` abierta; no hay lecciones futuras cerradas pendientes |
+| D5 · Verificación end-to-end en producción | ◐ | 6 imágenes responden 200 en `www.nod0.dev`; la página exige sesión (no se probó el render logueado en producción) |
+| D6 · Bitácora cerrada y rama `deploy/` borrada | ✅ | Rama local borrada (no se subió al remoto) |
 
-- [ ] Verificado que las lecciones de semanas futuras siguen **cerradas**
+- [x] Verificado que no quedan lecciones futuras cerradas por error (el curso no tiene más lecciones después del proyecto).
 
 ## Pendientes
 
-- La lección de AA debe estar desplegada y abierta **antes del lunes 9 de nov** (aula invertida); la de PC, antes del **jueves 12 de nov**.
-- Guía del Lab 4: fuera de esta ronda.
-- Tras la clase: D7, marcar la lección como vista por grupo.
+- Despliegue de AA (`fundamentos-de-programacion-dinamica`, `estrategia-voraz`): no incluido en esta entrega.
+- Tras la clase del 12 de nov: D7, marcar `matplotlib-y-seaborn` como vista por grupo.
+- Revisar en producción, con sesión, el render de la lección y de la guía.
