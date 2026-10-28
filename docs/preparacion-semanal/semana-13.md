@@ -163,7 +163,7 @@ No aplica.
 - En pingüinos no hay atípicos globales (ni por dominio ni por IQR); el IQR se repite dentro de Chinstrap (4800 g y 2700 g, plausibles) — **motivo:** mostrar "señalar sin borrar" con datos reales.
 - La imputación por grupo y `ffill`/`bfill`/`interpolate`, `pivot_table`, múltiples claves, boxplot y z-score quedaron fuera — **motivo:** carga cognitiva del grupo heterogéneo.
 - Keywords nuevas (`agregacion`, `limpieza-de-datos`, `valores-nulos`, `filtrado`) no se crearon — **motivo:** el usuario no respondió esa parte de la propuesta; se usaron solo las existentes.
-- La pregunta 4 del cuestionario se creó tal como se aprobó, con "un Adelie macho grande puede pesar cerca de 4900 g", aunque el máximo de Adelie en la lección es 4775 g — **motivo:** es un dato hipotético del enunciado; queda como pendiente.
+- La pregunta 4 del cuestionario se creó con "un Adelie macho grande puede pesar cerca de 4900 g", pero el máximo de Adelie en la lección es 4775 g; a pedido del usuario se reescribió a "puede ser bastante más pesado que la mayoría" (2026-10-28, solo el enunciado; opciones, keywords y montaje intactos).
 - Los apuntes y la lección no cubren el bloque inicial de datasets del proyecto — **motivo:** el docente lo presenta por su cuenta.
 
 ### Verificación (E7)
@@ -194,6 +194,6 @@ No aplica.
 ### Pendientes (PC)
 
 - La clase es el jueves 29 de octubre: la lección y su cuestionario deben estar desplegados y abiertos antes de la sesión, porque los apuntes parten de que el estudiante ya los hizo.
-- Corregir o confirmar la pregunta 4 (4900 g frente al máximo de 4775 g de Adelie) antes de recrearla en producción.
+- Al recrear el cuestionario en producción (D3), usar el enunciado corregido de la pregunta 4 (sin la cifra de 4900 g como peso de un Adelie real).
 - Probar en Colab (pandas 2): el comportamiento de `inplace=True` sobre una columna, que los apuntes explican pero no ejecutan en vivo.
 - Revisión visual en el navegador: render de la lección y de la tabla de la síntesis (usa `\|` dentro de backticks).
