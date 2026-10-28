@@ -48,8 +48,14 @@ El gráfico correcto no se elige por gusto: lo decide el tipo de dato. Pregúnta
 | Cómo se comparan grupos | 1 numérica + 1 categórica | boxplot | `ax.boxplot` | `boxplot` |
 | Si dos cantidades se relacionan | 2 numéricas | dispersión | `ax.scatter` | `scatterplot` |
 | Cómo cambia algo en una secuencia ordenada | 1 numérica + orden | líneas | `ax.plot` | `lineplot` |
+| Qué parte del total es cada categoría (3 o 4 partes) | 1 categórica | torta | `ax.pie` | no tiene |
+| La forma suave de una distribución | 1 numérica | histograma con KDE, KDE | `ax.hist` | `histplot(kde=True)`, `kdeplot` |
+| Una relación con su recta de ajuste | 2 numéricas | regresión | `np.polyfit` | `regplot`, `lmplot` |
+| Una relación y la distribución de cada eje | 2 numéricas | jointplot | no tiene | `jointplot` |
+| Una tercera numérica en la dispersión | 3 numéricas | burbujas | `ax.scatter(s=...)` | `scatterplot(size=...)` |
+| Qué términos se repiten más | 1 categórica de texto | nube de palabras | `WordCloud` (librería `wordcloud`) | no tiene |
 
-Hay tres gráficos que casi siempre estorban. El **pastel** con más de cuatro porciones: el ojo no compara ángulos y termina leyendo las etiquetas. Las **líneas sin orden**: unir con una línea categorías como "Biscoe, Dream, Torgersen" sugiere una continuidad que no existe. Y el **3D** en datos que caben en dos dimensiones: la perspectiva distorsiona lo que mides.
+Hay tres gráficos que casi siempre estorban. El **pastel** con más de cuatro porciones (con tres o cuatro partes de un total sí sirve): el ojo no compara ángulos y termina leyendo las etiquetas. Las **líneas sin orden**: unir con una línea categorías como "Biscoe, Dream, Torgersen" sugiere una continuidad que no existe. Y el **3D** en datos que caben en dos dimensiones: la perspectiva distorsiona lo que mides.
 
 > **Elección del gráfico:** decisión que parte del tipo de variable y de la pregunta, no de qué gráfico se ve más vistoso.
 
@@ -207,6 +213,69 @@ Una advertencia más: incluso con el gráfico bien hecho, **correlación no es c
 
 > **Paradoja de Simpson:** una relación entre dos variables cambia de signo, o desaparece, cuando se separa por una tercera variable que define grupos.
 
+## Más allá de lo básico: un catálogo rápido
+
+Los gráficos de la tabla cubren casi todo, pero hay variantes que conviene conocer. Cada una va en su propia celda; el código es el mínimo, y en tus gráficos se completan título y ejes con unidad como siempre.
+
+La **torta** muestra partes de un todo y solo sirve con tres o cuatro porciones; con más, usa barras. El **histograma con KDE** agrega una curva suave que muestra la forma sin depender del número de columnas:
+
+```python
+cuentas = pinguinos["species"].value_counts()
+plt.pie(cuentas.values, labels=cuentas.index, autopct="%1.1f%%")   # Adelie 44.2 %, Gentoo 36.0 %, Chinstrap 19.8 %
+plt.show()
+
+sns.histplot(data=pinguinos, x="body_mass_g", kde=True)            # kdeplot dibuja solo la curva
+plt.show()
+```
+
+El **boxplot de una variable** resume una columna entera (solo `x` o solo `y`) y las **barras agrupadas** parten cada barra por una segunda categoría con `hue`:
+
+```python
+sns.boxplot(data=pinguinos, x="body_mass_g")                       # mediana 4050 g, sin atípicos
+plt.show()
+
+sns.countplot(data=pinguinos, x="island", hue="species")           # Gentoo solo en Biscoe, Chinstrap solo en Dream
+plt.show()
+```
+
+La **regresión** agrega la recta que mejor ajusta a la dispersión, y `jointplot` suma las distribuciones de cada eje:
+
+```python
+sns.regplot(data=pinguinos, x="flipper_length_mm", y="body_mass_g")                 # pendiente global: 49.7 g por mm
+plt.show()
+
+sns.jointplot(data=pinguinos, x="flipper_length_mm", y="body_mass_g", hue="species")   # también kind="reg" o "kde"
+plt.show()
+```
+
+La pendiente 49.7 se lee con cautela: es una asociación, solo vale dentro del rango observado, y dentro de cada especie es distinta (de 32.8 a 54.6 g por mm), la paradoja de Simpson otra vez. Con `sns.lmplot(..., hue="species")` ves una recta por especie. Para una **tercera variable numérica**, el tamaño del punto: `ax.scatter(x, y, s=...)` en Matplotlib o `size=` en Seaborn.
+
+```python
+fig, ax = plt.subplots(figsize=(8, 4.5))
+sns.scatterplot(data=pinguinos, x="bill_length_mm", y="bill_depth_mm", size="body_mass_g",
+                hue="species", sizes=(20, 300), alpha=0.6, ax=ax)
+plt.show()
+```
+
+![Burbujas del largo y la profundidad del pico por especie; el tamaño de cada punto es la masa corporal, y Gentoo concentra los más grandes](/documentos/programacion-cientifica/lecciones/matplotlib-y-seaborn/burbujas-pico-masa.png)
+
+Por último, la **nube de palabras** dibuja cada término con tamaño proporcional a su frecuencia. La librería `wordcloud` ya viene instalada en Colab y se alimenta con los conteos de una columna de texto, aquí el vector de entrada de los incidentes de ciberseguridad (1850 filas):
+
+```python
+from wordcloud import WordCloud
+
+ciber = pd.read_csv("ciberseguridad_incidentes_colombia_2023_2025.csv")
+frecuencias = ciber["vector_entrada"].value_counts().to_dict()
+nube = WordCloud(width=1200, height=675, background_color="white").generate_from_frequencies(frecuencias)
+plt.imshow(nube)
+plt.axis("off")                     # una nube no tiene ejes
+plt.show()
+```
+
+![Nube de palabras de los vectores de entrada: Correo electrónico domina, seguido de Vulnerabilidad sin parche y Credenciales robadas](/documentos/programacion-cientifica/lecciones/matplotlib-y-seaborn/nube-vectores-entrada.png)
+
+El correo electrónico entra en 674 de los 1850 incidentes. La nube sirve para explorar o ilustrar, pero no lleva escala: para comparar 164 contra 159 usa barras.
+
 ## Un gráfico que no se lee no sirve
 
 Un gráfico tiene un trabajo: que alguien entienda algo sin preguntarte nada. Para eso cumple un estándar mínimo: **título** que diga qué se ve, **ejes con nombre y unidad** (masa en g, largo en mm), **leyenda** si hay más de un color, y **colores** que se distingan entre sí.
@@ -243,6 +312,11 @@ Cada pregunta tiene su gráfico y su señal de alerta:
 | ¿Se relacionan dos cantidades? | dispersión | `ax.scatter` / `scatterplot` con `hue` | Un solo número global sin mirar los grupos |
 | ¿Cómo cambia algo en el tiempo? | líneas | `ax.plot` / `lineplot` | Unir categorías sin orden |
 | ¿Qué relaciones hay entre muchas variables? | mapa de calor y pairplot | `sns.heatmap`, `sns.pairplot` | Confundir correlación con causa |
+| ¿Qué parte del total es cada una? | torta | `ax.pie` | Más de cuatro porciones |
+| ¿Qué forma tiene la distribución? | histograma con KDE, KDE | `histplot(kde=True)`, `kdeplot` | Curva suave con pocos datos |
+| ¿Cuánto cambia y por unidad de x? | regresión, jointplot | `regplot`, `lmplot`, `jointplot` | Leer la pendiente como causa o fuera del rango |
+| ¿Y una tercera numérica? | burbujas | `ax.scatter(s=...)`, `scatterplot(size=...)` | Burbujas que se tapan: bajar `alpha` |
+| ¿Qué términos dominan? | nube de palabras | `WordCloud` | No hay escala para comparar |
 
 Y por sección:
 
@@ -252,4 +326,5 @@ Y por sección:
 - **Barras, dispersión y líneas:** barras desde 0, dispersión para dos numéricas, líneas solo con orden.
 - **Seaborn:** una línea por gráfico, `hue` para separar grupos, y devuelve un `ax` de Matplotlib; el boxplot se lee con mediana, IQR y atípicos.
 - **Mapa de calor y pairplot:** la correlación global puede invertirse dentro de los grupos (Simpson); correlación no es causa.
+- **Catálogo rápido:** torta, KDE, boxplot de una variable, barras agrupadas con `hue`, regresión, `jointplot`, burbujas y nube de palabras, cada uno con su señal de alerta.
 - **Un gráfico que se lee:** estándar mínimo, interpretación en tres partes, y guardar antes de mostrar en una carpeta que exista.

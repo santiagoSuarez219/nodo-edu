@@ -12,7 +12,9 @@
 > **Alcance de hoy:** elegir el gráfico según el tipo de variable, construirlo
 > con Matplotlib (figura y ejes) y con Seaborn, leer un boxplot, un mapa de calor
 > y un `pairplot`, resolver la pregunta inicial (paradoja de Simpson), guardar el
-> gráfico en `visualizaciones/` y subirlo al repositorio. La entrega y la
+> gráfico en `visualizaciones/` y subirlo al repositorio, más un catálogo de consulta
+> con los demás tipos de gráfico (torta, KDE, regresión, `jointplot`, burbujas, nube
+> de palabras, barras agrupadas y boxplot de una variable). La entrega y la
 > evaluación del proyecto **no se tratan en estos apuntes**.
 >
 > **Antes de clase:** abrir un cuaderno nuevo de Colab y pegar la primera celda
@@ -20,10 +22,13 @@
 > `sns.load_dataset` descarga el dataset. Las salidas de estos apuntes se
 > verificaron con pandas 3.0.2, matplotlib 3.10.8 y seaborn 0.13.2 en una
 > ejecución local de todo el guion de corrido (con el backend sin pantalla, así
-> que las imágenes no se vieron en pantalla: se comprobaron las cifras). Colab
+> que las imágenes no se vieron en pantalla: se comprobaron las cifras). Las
+> celdas del Paso 7 que usan `wordcloud` y el CSV de ciberseguridad se ejecutaron con
+> wordcloud 1.9.6; ese CSV se sube al panel de archivos de Colab antes de la clase
+> (está en `public/documentos/programacion-cientifica/datasets/`). Colab
 > puede traer otras versiones: se espera que las cifras coincidan, y si algún
 > `dtype` dice `object` donde estos apuntes dirían `str`, es lo mismo: texto. El
-> Paso 7 usa `!git` y se comprobó solo la sintaxis, no se ejecutó contra un
+> Paso 8 usa `!git` y se comprobó solo la sintaxis, no se ejecutó contra un
 > repositorio real.
 
 ## Paso 1 — La pregunta del pico
@@ -34,7 +39,7 @@ columnas, y una respuesta con un solo número. Los imports van todos en esta
 primera celda y no se repiten más adelante:
 
 ```python
-import os                                        # para crear la carpeta de gráficos en el Paso 7
+import os                                        # para crear la carpeta de gráficos en el Paso 8
 import pandas as pd                              # alias estándar: pd
 import seaborn as sns                            # alias estándar: sns; también descarga el dataset
 import matplotlib.pyplot as plt                  # alias estándar: plt; la base de todos los gráficos
@@ -404,7 +409,325 @@ Dinámica: votan solos → si hay entre 30 % y 70 % de aciertos, discuten en par
 2 min y vuelven a votar; si hay más de 70 %, explicas rápido y sigues; si hay
 menos de 30 %, vuelves a explicar qué mide la correlación antes de discutir.
 
-## Paso 7 — Guardar el gráfico y subirlo al repositorio
+## Paso 7 — Catálogo ampliado de gráficos
+
+Situación: hasta aquí hay cinco gráficos básicos más el mapa de calor y el `pairplot`. Faltan los que se ven en todo informe de datos. Este paso es un **catálogo de consulta**: cada gráfico va en su celda, con una nota de interpretación y un "cuándo sí / cuándo no". No hace falta correrlos todos en vivo; elegir los que el grupo pida o los que su dataset necesite, y dejar el resto como material de apoyo. Todas las celdas usan `pinguinos` (ya cargado) salvo dos, que usan el CSV de ciberseguridad: se sube desde el panel de archivos de Colab, igual que en la sesión de carga de datos, y se lee por su nombre.
+
+**Torta o pastel (`ax.pie`).** Una variable categórica, la proporción de cada parte sobre un total:
+
+```python
+cuentas = pinguinos["species"].value_counts()          # conteo por especie: Adelie 152, Gentoo 124, Chinstrap 68
+
+fig, ax = plt.subplots(figsize=(8, 4.5))
+# autopct="%1.1f%%" escribe el porcentaje en cada porción con un decimal; startangle=90 arranca arriba
+ax.pie(cuentas.values, labels=cuentas.index, autopct="%1.1f%%", startangle=90)
+ax.set_title("Proporción de pingüinos por especie (n = 344)")   # la torta no tiene ejes: las etiquetas son la leyenda
+plt.show()
+```
+
+Salida: Adelie 44.2 %, Gentoo 36.0 % y Chinstrap 19.8 %. Interpretación: casi la mitad de la colonia es Adelie y solo uno de cada cinco es Chinstrap. **Cuándo sí:** pocas porciones (tres a cuatro) y una sola pregunta, "qué parte del todo es cada una"; las partes suman 100 %. **Cuándo no:** más de cuatro porciones, porciones parecidas (el ojo no distingue 22 % de 25 %) o cuando importa comparar valores exactos: ahí, barras.
+
+**Histograma con KDE (`histplot(kde=True)`).** Una numérica; la curva **KDE** (estimación de densidad) es una versión suavizada del histograma:
+
+```python
+fig, ax = plt.subplots(figsize=(8, 4.5))
+# kde=True añade la curva suave sobre las columnas; bins=20 como en el Paso 3
+sns.histplot(data=pinguinos, x="body_mass_g", bins=20, kde=True, ax=ax)
+ax.set_title("Masa corporal: histograma con curva KDE")
+ax.set_xlabel("Masa corporal (g)")
+ax.set_ylabel("Número de pingüinos")
+plt.show()
+```
+
+Interpretación: la curva sube hasta cerca de 3600 g y tiene un hombro entre 4800 g y 5500 g: la forma de dos grupos se ve **sin depender de dónde caen las columnas**. **Cuándo sí:** para ver la forma de una distribución. **Cuándo no:** con pocos datos (menos de unas 30 filas) la curva inventa suavidad que los datos no tienen.
+
+**KDE solo (`kdeplot`).** Cuando se quiere comparar la forma de varios grupos, las curvas se superponen mejor que las columnas:
+
+```python
+fig, ax = plt.subplots(figsize=(8, 4.5))
+# hue separa por especie; fill=True rellena; common_norm=False escala cada curva por separado
+# (si no, la especie con más pingüinos se vería más alta solo por ser más numerosa)
+sns.kdeplot(data=pinguinos, x="body_mass_g", hue="species", fill=True, common_norm=False, ax=ax)
+ax.set_title("Densidad de la masa corporal por especie")
+ax.set_xlabel("Masa corporal (g)")
+ax.set_ylabel("Densidad")      # no es un conteo: el área bajo cada curva suma 1
+plt.show()
+```
+
+Interpretación: Adelie y Chinstrap se montan casi por completo (medianas de 3700 g las dos) y Gentoo (mediana de 5000 g) forma su propia joroba. Es la misma conclusión del boxplot, con la forma a la vista. **Cuándo no:** el eje y es una densidad, no un conteo; no se lee "cuántos pingüinos".
+
+**Boxplot de una sola variable.** Sin categoría: se pasa solo `x` (caja horizontal) o solo `y` (vertical):
+
+```python
+print(pinguinos["body_mass_g"].describe().round(1))      # los números que dibuja la caja
+
+fig, ax = plt.subplots(figsize=(8, 4.5))
+sns.boxplot(data=pinguinos, x="body_mass_g", ax=ax)      # solo x: una caja horizontal para toda la columna
+ax.set_title("Masa corporal de todos los pingüinos")
+ax.set_xlabel("Masa corporal (g)")
+plt.show()
+```
+
+```text
+count     342.0
+mean     4201.8
+std       802.0
+min      2700.0
+25%      3550.0
+50%      4050.0
+75%      4750.0
+max      6300.0
+Name: body_mass_g, dtype: float64
+```
+
+Interpretación: mediana de 4050 g, caja de 3550 g a 4750 g (IQR de 1200 g) y **ningún atípico** (los límites son 1750 g y 6550 g, y los datos van de 2700 g a 6300 g). **Cuándo sí:** para resumir una variable y detectar atípicos rápido. **Cuándo no:** esconde las dos jorobas que el histograma sí mostró; una caja limpia no garantiza una distribución de un solo grupo.
+
+**Boxplot de dos variables, y de tres con `hue`.** `x` categórica, `y` numérica (ya hecho en el Paso 5); con `hue` se agrega una segunda categoría:
+
+```python
+fig, ax = plt.subplots(figsize=(8, 4.5))
+# x = categoría principal; y = numérica; hue = segunda categoría, una caja de cada color dentro de cada x
+sns.boxplot(data=pinguinos, x="species", y="body_mass_g", hue="sex", ax=ax)
+ax.set_title("Masa corporal por especie y sexo")
+ax.set_xlabel("Especie")
+ax.set_ylabel("Masa corporal (g)")
+ax.legend(title="Sexo")
+plt.show()
+
+print(pinguinos.groupby(["species", "sex"])["body_mass_g"].median())
+print(pinguinos["sex"].isna().sum())           # los pingüinos sin sexo no entran en el gráfico
+```
+
+```text
+species    sex   
+Adelie     Female    3400.0
+           Male      4000.0
+Chinstrap  Female    3550.0
+           Male      3950.0
+Gentoo     Female    4700.0
+           Male      5500.0
+Name: body_mass_g, dtype: float64
+11
+```
+
+Interpretación: en las tres especies el macho pesa más (Gentoo: 5500 g contra 4700 g), y la hembra Gentoo (4700 g) supera al macho Adelie (4000 g). Parte de la dispersión que se veía por especie era sexo. Se dibujan 333 pingüinos: 11 no tienen sexo. **Cuándo no:** con muchas categorías en `hue` las cajas quedan angostas e ilegibles.
+
+**Barras de una variable (`countplot`).** Una categórica, cuántos hay de cada valor (como el `value_counts` del Paso 4, en una línea):
+
+```python
+fig, ax = plt.subplots(figsize=(8, 4.5))
+# order ordena las barras de mayor a menor; countplot cuenta las filas por sí solo
+sns.countplot(data=pinguinos, x="island", order=pinguinos["island"].value_counts().index, ax=ax)
+ax.set_title("Pingüinos por isla")
+ax.set_xlabel("Isla")
+ax.set_ylabel("Número de pingüinos")
+plt.show()
+```
+
+Salida: Biscoe 168, Dream 124 y Torgersen 52. Interpretación: Biscoe tiene más del triple de pingüinos que Torgersen (168 sobre 52). **Cuándo no:** si la categoría tiene decenas de valores, mejor barras horizontales (`y="island"`) y ordenadas.
+
+**Barras de dos variables: agrupadas.** Tres rutas para la misma pregunta, "cuántos de cada especie hay en cada isla":
+
+```python
+fig, ax = plt.subplots(figsize=(8, 4.5))
+# hue parte cada barra de isla en una barra por especie; order fija el orden de las islas
+sns.countplot(data=pinguinos, x="island", hue="species", order=["Biscoe", "Dream", "Torgersen"], ax=ax)
+ax.set_title("Pingüinos por isla y especie")
+ax.set_xlabel("Isla")
+ax.set_ylabel("Número de pingüinos")
+ax.legend(title="Especie")
+plt.show()
+
+tabla = pd.crosstab(pinguinos["island"], pinguinos["species"])   # la misma cuenta, como tabla
+print(tabla)
+```
+
+```text
+species    Adelie  Chinstrap  Gentoo
+island                              
+Biscoe         44          0     124
+Dream          56         68       0
+Torgersen      52          0       0
+```
+
+Interpretación: la tabla explica el gráfico: Adelie vive en las tres islas, Gentoo solo en Biscoe (124) y Chinstrap solo en Dream (68). Donde la combinación no existe (un cero) queda un hueco en el gráfico. La segunda ruta es graficar esa tabla con pandas, apiladas:
+
+```python
+fig, ax = plt.subplots(figsize=(8, 4.5))
+tabla.plot(kind="bar", stacked=True, ax=ax)     # stacked=True apila las especies dentro de cada isla
+ax.set_title("Pingüinos por isla y especie (apiladas)")
+ax.set_xlabel("Isla")
+ax.set_ylabel("Número de pingüinos")
+ax.tick_params(axis="x", labelrotation=0)       # pandas gira las etiquetas por defecto: se dejan horizontales
+ax.legend(title="Especie")
+plt.show()
+```
+
+La tercera es `barplot` con `hue`, que no cuenta sino que **promedia una numérica**:
+
+```python
+fig, ax = plt.subplots(figsize=(8, 4.5))
+# errorbar=None quita las barras de error para no complicar la lectura; las barras parten de 0
+sns.barplot(data=pinguinos, x="island", y="body_mass_g", hue="species", errorbar=None, ax=ax)
+ax.set_title("Masa corporal promedio por isla y especie")
+ax.set_xlabel("Isla")
+ax.set_ylabel("Masa corporal promedio (g)")
+ax.legend(title="Especie")
+plt.show()
+```
+
+Interpretación: Adelie pesa lo mismo en las tres islas (3710 g, 3688 g y 3706 g): la diferencia que parecía de la isla es de la especie (Gentoo, 5076 g, solo está en Biscoe). **Cuándo sí:** agrupadas para comparar valores entre grupos; apiladas para ver el total y su composición. **Cuándo no:** apiladas con muchas categorías, porque solo la de abajo se compara bien.
+
+**Regresión (`regplot` y `lmplot`).** Dispersión más la recta que mejor ajusta; `regplot` dibuja sobre un `ax`, `lmplot` crea su propia figura y admite `hue`:
+
+```python
+datos = pinguinos.dropna(subset=["flipper_length_mm", "body_mass_g"])   # quita los 2 pingüinos sin medidas
+fig, ax = plt.subplots(figsize=(8, 4.5))
+# scatter_kws pasa opciones a los puntos (alpha = transparencia); la banda es el intervalo de confianza de la recta
+sns.regplot(data=datos, x="flipper_length_mm", y="body_mass_g", scatter_kws={"alpha": 0.5}, ax=ax)
+ax.set_title("Aleta y masa corporal con recta de regresión")
+ax.set_xlabel("Longitud de la aleta (mm)")
+ax.set_ylabel("Masa corporal (g)")
+plt.show()
+
+import numpy as np
+pendiente, intercepto = np.polyfit(datos["flipper_length_mm"], datos["body_mass_g"], 1)   # la misma recta, en números
+print(round(pendiente, 1), round(intercepto), len(datos))
+```
+
+```text
+49.7 -5781 342
+```
+
+Interpretación: la **pendiente** es 49.7: por cada milímetro más de aleta, la recta predice unos 50 g más de masa. Con cautela: es una asociación, no una causa; el intercepto (-5781 g) no tiene sentido físico (aleta de 0 mm), así que la recta solo vale dentro del rango observado (172 mm a 231 mm), y la pendiente global mezcla especies. Con `lmplot` y `hue` se ve:
+
+```python
+# lmplot crea su propia figura (devuelve un FacetGrid): height = alto; aspect = ancho/alto
+g = sns.lmplot(data=datos, x="flipper_length_mm", y="body_mass_g", hue="species", height=4.5, aspect=1.6)
+g.set_axis_labels("Longitud de la aleta (mm)", "Masa corporal (g)")     # no es un ax: otro método
+g.figure.suptitle("Una recta por especie", y=1.02)                     # título de la figura completa
+plt.show()
+
+for especie, grupo in datos.groupby("species"):                         # la pendiente de cada especie
+    p, _ = np.polyfit(grupo["flipper_length_mm"], grupo["body_mass_g"], 1)
+    print(especie, round(p, 1))
+```
+
+```text
+Adelie 32.8
+Chinstrap 34.6
+Gentoo 54.6
+```
+
+Interpretación: dentro de cada especie la pendiente va de 32.8 a 54.6 g por mm, distinta de la global (49.7). Otra vez el hilo del Simpson: mirar por grupo antes de generalizar. **Cuándo no:** si la nube es curva o tiene atípicos fuertes, la recta engaña; `lmplot` no acepta `ax=`.
+
+**`jointplot`: dispersión con histogramas marginales.** Cada eje muestra además su propia distribución. Se pide con `kind`; la figura es cuadrada, por eso se usa `height` en vez de `figsize`:
+
+```python
+# kind="scatter": puntos y, arriba y a la derecha, la distribución de cada variable
+g = sns.jointplot(data=datos, x="flipper_length_mm", y="body_mass_g", hue="species", kind="scatter", height=6)
+g.set_axis_labels("Longitud de la aleta (mm)", "Masa corporal (g)")
+g.figure.suptitle("Aleta y masa: dispersión con distribuciones marginales", y=1.02)
+plt.show()
+```
+
+Y las otras dos variantes, cada una en su celda:
+
+```python
+# kind="reg": añade la recta de regresión (no admite hue)
+g = sns.jointplot(data=datos, x="flipper_length_mm", y="body_mass_g", kind="reg", height=6)
+g.set_axis_labels("Longitud de la aleta (mm)", "Masa corporal (g)")
+plt.show()
+
+# kind="kde": curvas de nivel de densidad en vez de puntos; sirve cuando los puntos se amontonan
+g = sns.jointplot(data=datos, x="flipper_length_mm", y="body_mass_g", hue="species", kind="kde", height=6)
+g.set_axis_labels("Longitud de la aleta (mm)", "Masa corporal (g)")
+plt.show()
+```
+
+Interpretación: con `hue`, el borde superior muestra lo que el boxplot y el KDE ya dijeron: la aleta de Adelie y Chinstrap se traslapa y la de Gentoo va aparte, mientras que a la derecha la masa tiene una cola hacia los 6000 g que corresponde a Gentoo. **Cuándo sí:** una relación de dos numéricas y su forma a la vez. **Cuándo no:** con más de dos o tres grupos queda recargado; no se puede poner en una subfigura de `plt.subplots`.
+
+**Dispersión con burbujas.** Una tercera variable numérica se codifica en el **tamaño** del punto. En Matplotlib, `s=` es el área en puntos cuadrados:
+
+```python
+datos = pinguinos.dropna(subset=["flipper_length_mm", "body_mass_g", "bill_length_mm"])
+fig, ax = plt.subplots(figsize=(8, 4.5))
+# s = tamaño de cada punto (aquí el largo del pico por 4, para que se note); alpha = transparencia para ver los solapes
+burbujas = ax.scatter(datos["flipper_length_mm"], datos["body_mass_g"], s=datos["bill_length_mm"] * 4, alpha=0.5)
+ax.set_title("Aleta y masa; el tamaño es el largo del pico")
+ax.set_xlabel("Longitud de la aleta (mm)")
+ax.set_ylabel("Masa corporal (g)")
+# legend_elements arma una leyenda de tamaños; func deshace el "por 4" para mostrar milímetros
+handles, etiquetas = burbujas.legend_elements(prop="sizes", num=4, func=lambda s: s / 4)
+ax.legend(handles, etiquetas, title="Largo del pico (mm)", loc="upper left")
+plt.show()
+```
+
+Interpretación: las burbujas grandes (picos largos, hasta 59.6 mm) se concentran arriba a la derecha: los pingüinos de aleta larga y más pesados tienen también el pico más largo. Con Seaborn el tamaño se pide con `size=` y la leyenda sale sola. Ejemplo con datos reales: una fila por tipo de ataque, con la mediana de horas hasta detectar, la mediana de pérdida y el número de incidentes:
+
+```python
+ciber = pd.read_csv("ciberseguridad_incidentes_colombia_2023_2025.csv")     # el CSV subido al panel de archivos de Colab
+resumen = ciber.groupby("tipo_ataque").agg(
+    incidentes=("id_incidente", "count"),                                   # cuántos incidentes de cada tipo
+    deteccion_mediana=("horas_deteccion", "median"),                        # mediana de horas hasta detectar
+    perdida_mediana=("perdida_estimada_millones_cop", "median"),            # mediana de pérdida, ignora los vacíos
+).reset_index()
+print(resumen.round(1))
+
+fig, ax = plt.subplots(figsize=(8, 4.5))
+# size = tercera variable; sizes = (mínimo, máximo) del tamaño; alpha = transparencia
+sns.scatterplot(data=resumen, x="deteccion_mediana", y="perdida_mediana", size="incidentes",
+                sizes=(100, 1000), alpha=0.6, legend=False, ax=ax)
+for _, fila in resumen.iterrows():                                          # etiqueta cada burbuja con su tipo de ataque
+    ax.annotate(fila["tipo_ataque"], (fila["deteccion_mediana"], fila["perdida_mediana"]),
+                ha="center", va="bottom", xytext=(0, 14), textcoords="offset points", fontsize=9)
+ax.set_title("Detección, pérdida e incidentes por tipo de ataque")
+ax.set_xlabel("Mediana de horas hasta detectar (h)")
+ax.set_ylabel("Mediana de pérdida (millones COP)")
+ax.set_ylim(0, 420)                                                         # margen para que no se corten las etiquetas
+plt.show()
+```
+
+```text
+            tipo_ataque  incidentes  deteccion_mediana  perdida_mediana
+0  Acceso no autorizado         207               52.3             63.4
+1                 DDoS         159               31.4             82.7
+2         Fuga de datos         260               47.5            124.8
+3               Malware         349               44.8             86.2
+4              Phishing         456               41.2             55.2
+5            Ransomware         419               40.1            356.6
+```
+
+Interpretación: el ransomware pierde una mediana de 356.6 millones de pesos, casi tres veces la de la fuga de datos (124.8) y más de seis veces la del phishing (55.2), con una detección de 40.1 horas, similar a las demás: no es más lento de detectar, es más caro. **Cuándo no:** el ojo compara mal áreas; si el tamaño es lo central, una barra comunica mejor. Con muchas burbujas, bajar `alpha` y el tamaño máximo.
+
+**Nube de palabras (`wordcloud`).** Cada término se dibuja con un tamaño proporcional a su frecuencia. La librería ya viene instalada en Colab; si no, `!pip install wordcloud`. Se alimenta con un diccionario de conteos, así que sirve con cualquier columna categórica de texto:
+
+```python
+from wordcloud import WordCloud
+
+frecuencias = ciber["vector_entrada"].value_counts().to_dict()     # {"Correo electrónico": 674, ...}
+print(frecuencias)
+
+# width/height: tamaño de la imagen en píxeles (relación 16:9); random_state fija la disposición para que sea repetible
+nube = WordCloud(width=1200, height=675, background_color="white", colormap="viridis",
+                 random_state=42).generate_from_frequencies(frecuencias)
+
+fig, ax = plt.subplots(figsize=(8, 4.5))
+ax.imshow(nube, interpolation="bilinear")      # la nube es una imagen: se muestra con imshow
+ax.axis("off")                                 # sin ejes: no hay escala numérica que leer
+ax.set_title("Vectores de entrada de los incidentes (tamaño = frecuencia)")
+plt.show()
+```
+
+```text
+{'Correo electrónico': 674, 'Vulnerabilidad sin parche': 262, 'Credenciales robadas': 164, 'Red de bots': 159, 'Descarga web': 153, 'Proveedor tercero': 117, 'Mensajería': 95, 'Dispositivo USB': 92, 'Empleado interno': 74, 'Configuración en la nube': 60}
+```
+
+Interpretación: el correo electrónico domina (674 de 1850 incidentes, 36 %), seguido de las vulnerabilidades sin parche (262). **Cuándo sí:** una mirada rápida a texto, para portadas o para explorar. **Cuándo no:** no tiene eje ni escala, así que no permite comparar valores con precisión (¿164 o 159?) ni lleva unidad: para un informe, las mismas diez cifras en barras horizontales se leen mejor. Y los nombres largos se ven más grandes que los cortos de igual frecuencia.
+
+Punto a resaltar: pedir al grupo que elija, para su propio dataset, **un** gráfico de este catálogo que no hayan usado y lo reproduzca con el estándar mínimo (título, ejes con unidad, leyenda). Lo más útil del catálogo no es memorizar las llamadas sino la pregunta: ¿cuántas variables y de qué tipo hay, y qué parte quiero mostrar?
+
+## Paso 8 — Guardar el gráfico y subirlo al repositorio
 
 Situación: un gráfico que solo vive en el cuaderno no se entrega. Se guarda como
 imagen en `visualizaciones/` y se sube con Git. Los comandos `!git` no se han
