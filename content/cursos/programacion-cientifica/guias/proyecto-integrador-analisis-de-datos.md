@@ -33,7 +33,7 @@ Competencias esperadas:
 - Construir gráficas univariadas y multivariadas pertinentes, claras y bien
   interpretadas con Matplotlib y Seaborn.
 - Comunicar los hallazgos por escrito (README) y oralmente (exposición), y
-  trabajar en equipo con Git y GitHub.
+  trabajar en equipo y publicar el proyecto en un repositorio de GitHub.
 
 ---
 
@@ -68,55 +68,45 @@ lugar del archivo.
 
 ## Repositorio del proyecto
 
-Cada pareja crea **un único repositorio** en GitHub, que se usa para los dos
-entregables: el Entregable 2 completa los mismos archivos del Entregable 1, no
-crea otros nuevos.
+GitHub es el lugar donde su pareja guarda y entrega el proyecto. **Úselo como
+usaría una carpeta compartida de Google Drive:** crea carpetas, sube archivos
+arrastrándolos desde el navegador y los abre para leerlos. **No necesita
+comandos, terminal ni conocimientos de Git.** Cada pareja crea **un único
+repositorio** (la "carpeta" del proyecto) que se usa para los dos entregables:
+el Entregable 2 completa los mismos archivos del Entregable 1, no crea otros
+nuevos.
 
-1. Uno de los integrantes crea el repositorio con el nombre
-   `proyecto-integrador-pc-grupo-N` (cambie `N` por el número de su grupo).
-2. Agrega a su compañero o compañera como colaborador
-   (`Settings → Collaborators and teams → Add people`).
-3. Agrega también al docente, cuenta `santiagoSuarez219`, como colaborador. Si
-   el repositorio es privado y el docente no puede verlo, se califica como no
-   entregado.
-4. Ambos integrantes trabajan en Colab clonando el repositorio con su propio
-   token, con comandos en celdas de Colab (`!git clone`, `!git add`,
-   `!git commit`, `!git push`; el paso a paso está más abajo).
-   **El historial debe mostrar commits de los dos integrantes**,
-   con mensajes que describan el cambio ("Imputa plaquetas con la mediana por
-   clasificación", no "cambios" ni "final").
+### Paso 1. Cree el repositorio (un solo integrante)
 
-Cómo trabajar el repositorio desde Colab (una sola vez por integrante):
+1. Entre a [github.com](https://github.com) con su cuenta. Si no tiene, cree una
+   con su correo (es gratis) y confírmela desde el correo que le llega.
+2. Arriba a la derecha pulse el botón **`+`** y elija **`New repository`**.
+3. En **`Repository name`** escriba `proyecto-integrador-pc-grupo-N`, cambiando
+   `N` por el número de su grupo (por ejemplo `proyecto-integrador-pc-grupo-3`).
+4. En **`Description`** puede escribir el tema de su dataset (opcional).
+5. Elija **`Private`** (solo lo ven quienes usted invite).
+6. Marque la casilla **`Add a README file`**: así el repositorio ya nace con su
+   `README.md`.
+7. Pulse el botón verde **`Create repository`**.
 
-1. En GitHub cree un token personal (`Settings → Developer settings → Personal
-   access tokens`) con permiso de escritura sobre repositorios.
-2. En Colab abra el icono de la llave (Secretos), cree un secreto llamado
-   `GITHUB_TOKEN`, pegue allí el token y active "Acceso desde el cuaderno".
-   Así el token nunca queda escrito en el cuaderno.
-3. En la primera celda del cuaderno clone el repositorio y configure su
-   identidad:
+### Paso 2. Invite a su compañero o compañera y al docente
 
-```python
-from google.colab import userdata
+1. Dentro del repositorio, pulse **`Settings`** (pestaña de arriba, a la derecha).
+2. En el menú de la izquierda elija **`Collaborators`**. GitHub puede pedirle su
+   contraseña otra vez: es normal.
+3. Pulse **`Add people`**, escriba el usuario de GitHub de su compañero o
+   compañera y selecciónelo en la lista.
+4. Repita el paso 3 con el usuario del docente: **`santiagoSuarez219`**.
+5. Cada invitado recibe un correo de GitHub con un botón **`Accept invitation`**;
+   debe aceptarlo para poder entrar al repositorio.
 
-token = userdata.get("GITHUB_TOKEN")
-usuario = "su-usuario-de-github"        # cambie por su usuario
-repo = "proyecto-integrador-pc-grupo-1" # cambie por el nombre de su repositorio
+> Si el docente no puede ver su repositorio al calificar, el entregable se
+> califica con 0. Revise que la invitación quedó enviada (aparece como
+> `Pending invite` hasta que se acepta).
 
-!git clone https://{usuario}:{token}@github.com/{usuario}/{repo}.git
-%cd {repo}
-!git config user.name "Su Nombre"
-!git config user.email "su-correo@ejemplo.com"
-```
+### Paso 3. Cree las carpetas y suba los archivos
 
-   Si el repositorio pertenece a su compañero o compañera, `usuario` debe ser el
-   dueño del repositorio, pero el token es el suyo.
-4. Antes de subir, traiga los cambios del otro integrante con `!git pull`.
-   Para subir: `!git add .`, `!git commit -m "mensaje claro"` y `!git push`.
-5. No imprima el token ni lo escriba en una celda: si lo hace, bórrelo del
-   cuaderno y genere uno nuevo.
-
-Estructura esperada del repositorio al final del proyecto:
+El repositorio debe quedar con esta estructura:
 
 ```
 proyecto-integrador-pc-grupo-N/
@@ -129,12 +119,154 @@ proyecto-integrador-pc-grupo-N/
 └── README.md                   ← Entregable 1 + Entregable 2
 ```
 
+**Cómo crear una carpeta.** GitHub no permite crear carpetas vacías: se crean
+junto con su primer archivo.
+
+1. En la página principal del repositorio pulse **`Add file`** y luego
+   **`Create new file`**.
+2. En la casilla de nombre escriba `data/LEEME.md`. Al escribir la barra `/`,
+   GitHub convierte `data` en una carpeta.
+3. En el cuadro grande escriba una línea cualquiera, por ejemplo
+   `Datos del proyecto`.
+4. Pulse **`Commit changes...`** (botón verde arriba a la derecha) y luego
+   **`Commit changes`** en la ventana que aparece. Dejar el mensaje que GitHub
+   propone está bien.
+5. Repita para `notebooks/LEEME.md` y `visualizaciones/LEEME.md`. Esos archivos
+   `LEEME.md` solo sirven para crear la carpeta; puede dejarlos.
+
+**Cómo subir el CSV a `data/`:**
+
+1. Descargue el CSV de su grupo (enlace en la tabla de grupos) a su computador.
+2. En el repositorio, entre a la carpeta `data` (haga clic en su nombre).
+3. Pulse **`Add file`** y luego **`Upload files`**.
+4. Arrastre el CSV a la zona punteada (o pulse `choose your files`), espere a
+   que termine la barra de carga y pulse **`Commit changes`**.
+
+Así sube cualquier archivo a cualquier carpeta: **primero entre a la carpeta,
+luego `Add file` → `Upload files`.** Si sube un archivo con el mismo nombre que
+uno que ya existe, lo reemplaza.
+
+**Cómo ver, cambiar o borrar un archivo:** haga clic en el archivo. Arriba a la
+derecha aparece el lápiz (`Edit this file`) para editar texto y el menú `...`
+con la opción `Delete file`.
+
+### Paso 4. Lleve el notebook de Colab al repositorio
+
+Trabajen el análisis en **un solo cuaderno de Colab**, como lo harían en un
+documento de Google Docs:
+
+1. Uno de los dos crea el cuaderno en Colab y lo **comparte** con el otro desde
+   el botón **`Compartir`** (arriba a la derecha), con permiso de
+   **`Editor`**. Así los dos trabajan sobre el mismo cuaderno.
+2. Para leer el CSV en Colab, súbalo al panel de archivos (icono de carpeta a
+   la izquierda, botón de subir) y léalo con
+   `pd.read_csv("nombre-del-archivo.csv")`. Al reiniciar el entorno de
+   Colab los archivos subidos se borran: súbalo de nuevo cuando lo necesite.
+3. Para guardar el cuaderno en GitHub use el menú de Colab
+   **`Archivo` → `Guardar una copia en GitHub`**. La primera vez, Colab pide
+   permiso para conectarse con su cuenta de GitHub: acéptelo.
+4. En la ventana que aparece elija su repositorio
+   (`proyecto-integrador-pc-grupo-N`), la rama **`main`**, y en
+   **`Nombre del archivo`** escriba `notebooks/analisis.ipynb`. Deje marcada la
+   casilla **`Incluir un enlace a Colab`**. Pulse **`Aceptar`**.
+5. Guardar de nuevo con **el mismo nombre de archivo** reemplaza la versión
+   anterior. Haga esto **al terminar cada sesión de trabajo** y, sobre todo,
+   **antes del plazo de cada entregable**.
+
+> Si el repositorio es del compañero o la compañera, Colab solo le mostrará el
+> repositorio al integrante dueño o a quien haya aceptado la invitación como
+> colaborador. Acuerden **quién guarda en GitHub**; basta con que lo haga uno.
+
+**Alternativa si `Guardar una copia en GitHub` le da problemas:** en Colab elija
+`Archivo` → `Descargar` → `Descargar .ipynb`, entre a la carpeta `notebooks`
+del repositorio y súbalo con `Add file` → `Upload files`.
+
+### Paso 5. Suba las gráficas (Entregable 2)
+
+1. En el cuaderno, guarde cada gráfica con `plt.savefig(...)` (ver el
+   Entregable 2) y descárguela a su computador con esta celda:
+
+```python
+from google.colab import files
+
+files.download("visualizaciones/casos-por-semana-y-lluvia.png")
+```
+
+   (cambie el nombre por el de su gráfica; si usó otra ruta en `savefig`, use la misma aquí).
+2. En el repositorio, entre a la carpeta `visualizaciones`, pulse
+   **`Add file` → `Upload files`**, arrastre todas las imágenes juntas y pulse
+   **`Commit changes`**.
+
+### Paso 6. Escriba el README
+
+El `README.md` es la página de presentación de su proyecto: GitHub la muestra
+automáticamente al entrar al repositorio. Se escribe en **Markdown**, un texto
+sencillo con unos pocos símbolos.
+
+**Cómo editarlo:**
+
+1. En la página principal del repositorio haga clic en `README.md`.
+2. Pulse el icono del lápiz (`Edit this file`).
+3. Escriba o pegue su texto. Con la pestaña **`Preview`** (arriba del cuadro) ve
+   cómo va a quedar, sin guardar todavía.
+4. Pulse **`Commit changes...`** y luego **`Commit changes`**.
+
+Si prefieren, pueden redactarlo primero en un documento de Google Docs o en
+las celdas de texto de Colab y pegarlo después; Markdown se pega tal cual.
+
+**Los símbolos de Markdown que necesita:**
+
+| Quiere escribir | Escriba | Resultado |
+|---|---|---|
+| Un título grande | `# Título` | Título de primer nivel |
+| Un subtítulo | `## Subtítulo` | Título de sección |
+| Negrita | `**texto**` | **texto** |
+| Una lista | `- primer punto` (una línea por punto) | Lista con viñetas |
+| Una lista numerada | `1. primer punto` | Lista numerada |
+| Código | una línea con tres tildes invertidas antes y otra después del código | Bloque de código |
+| Una imagen | `![descripción](visualizaciones/mi-grafica.png)` | La imagen insertada |
+| Un enlace | `[texto](https://enlace)` | Enlace |
+
+**Una tabla** se escribe con barras verticales; la segunda línea separa el
+encabezado:
+
+```markdown
+| Columna | Problema | % afectado | Decisión |
+|---|---|---|---|
+| plaquetas | Faltantes | 8 % | Mediana por clasificación |
+```
+
+**Una imagen en el README:** suba primero el PNG a `visualizaciones/` (Paso 5) y
+escriba la ruta **exactamente igual que el nombre del archivo**, con minúsculas
+y sin espacios.
+
+**Deje una línea en blanco** entre un párrafo, una lista o una tabla y lo que
+sigue; si no, GitHub los mezcla.
+
+En el Entregable 1 y en el Entregable 2 encontrará qué secciones debe tener el
+README y una plantilla para copiar.
+
+### Reglas para trabajar en pareja sin pisarse
+
+- No hay que hacer "commits" a mano ni escribir mensajes: cada vez que pulsa
+  `Commit changes` GitHub guarda los cambios. **No se exige que ambos suban
+  archivos ni que los mensajes sean descriptivos.**
+- Acuerden **quién edita cada archivo y cuándo**, igual que con un Google Doc.
+  Si los dos editan el mismo notebook o el mismo README a la vez, GitHub avisa
+  que el archivo cambió y uno de los dos puede perder su trabajo.
+- Antes de editar un archivo en GitHub, recargue la página para ver la
+  última versión.
+- Revise el resultado: abra la dirección del repositorio en una ventana de
+  incógnito o pídale a su compañero que lo abra, y confirme que se ven las tres
+  carpetas, el `README.md` y el notebook.
+
+
 ---
 
 ## Entregable 1 — Análisis con pandas (15 %)
 
-**Plazo:** jueves 5 de noviembre de 2026, 23:59. Se califica el último commit
-de la rama `main` hasta esa hora.
+**Plazo:** jueves 5 de noviembre de 2026, 23:59. Se califica el contenido del
+repositorio hasta esa hora.
 
 ### Qué debe contener el notebook `notebooks/analisis.ipynb`
 
@@ -203,7 +335,7 @@ las celdas en desorden se califica como si no se ejecutara.
 ## Entregable 2 — Visualización con Matplotlib y Seaborn, y exposición (20 %)
 
 **Plazo:** jueves 19 de noviembre de 2026, al inicio de la clase. Ese día cada
-pareja expone en clase. Se califica el último commit de la rama `main` antes
+pareja expone en clase. Se califica el contenido del repositorio antes
 del inicio de la clase.
 
 ### Qué debe agregar al notebook
@@ -266,7 +398,7 @@ convierte después a la escala institucional de 0 a 5.
 
 | Criterio | Puntos | Descripción |
 |---|---|---|
-| **Repositorio y trabajo en pareja** | 10 | El repositorio se llama `proyecto-integrador-pc-grupo-N`, el docente es colaborador y puede verlo, sigue la estructura pedida (`data/`, `notebooks/`, `README.md`), y el historial tiene commits de los dos integrantes con mensajes que describen el cambio. |
+| **Repositorio y organización** | 10 | El repositorio se llama `proyecto-integrador-pc-grupo-N`, el docente es colaborador y puede verlo, tiene las carpetas pedidas (`data/`, `notebooks/`, `visualizaciones/` en el Entregable 2) con los archivos en su lugar, el `README.md` se ve en la página principal y el notebook se abre desde el repositorio. |
 | **Descripción del conjunto de datos (README)** | 10 | El README explica el contexto del dataset, aclara que es sintético, indica filas y columnas y qué representa cada fila, resume las columnas en una tabla (nombre, tipo, descripción) y enuncia la decisión que apoya y las preguntas de análisis numeradas. |
 | **Carga e inspección** | 10 | El CSV se carga con ruta relativa desde `data/`; se usan `shape`, `head`, `info`, `dtypes`, `describe` y `value_counts` de las categóricas principales, y cada salida se interpreta en una celda de texto. Los tipos incorrectos se corrigen y se explica por qué. |
 | **Diagnóstico de calidad** | 15 | Se reporta la cantidad y el porcentaje de faltantes por columna; se distinguen los faltantes reales de los que significan "no aplica"; se identifican con evidencia (salida de `describe`, filtros) los atípicos, valores imposibles, códigos centinela, filas repetidas o categorías inconsistentes que tenga el dataset. |
@@ -305,15 +437,14 @@ los 20 %.
 
 Los dos integrantes reciben la misma nota de la pareja, con un **ajuste
 individual**: el docente puede descontar hasta **1.0** (en la escala de 0 a 5)
-a la nota de un integrante si en ese entregable no tiene commits propios en el
-repositorio, o si en la exposición o al preguntarle no logra explicar el código
-o las decisiones del proyecto. Repartan el trabajo de modo que ambos conozcan
-todo el análisis.
+a la nota de un integrante si, en la exposición o al preguntarle, no logra
+explicar el código o las decisiones del proyecto. Repartan el trabajo de modo
+que ambos conozcan todo el análisis.
 
 ### Entregas tardías y casos que no se califican
 
-- Los commits posteriores al plazo no se tienen en cuenta: se califica el
-  último commit en `main` antes del plazo.
+- Los cambios hechos en el repositorio después del plazo no se tienen en cuenta:
+  GitHub registra la fecha y hora de cada cambio.
 - Un repositorio que el docente no puede ver, o un notebook que analiza un
   dataset distinto al asignado, se califica con 0 en ese entregable.
 
@@ -343,16 +474,24 @@ todo el análisis.
   mayúsculas y minúsculas, tildes). Si no unifica, `groupby` las cuenta como
   grupos distintos.
 
-### "Mi compañero hizo push y ahora no puedo subir mis cambios"
-- Antes de empezar a trabajar ejecute `!git pull` y no editen el mismo notebook
-  al mismo tiempo: acuerden quién trabaja en cada momento o repártanse
-  secciones y turnos. Un notebook editado en paralelo por dos personas produce
-  conflictos difíciles de resolver.
+### "Mi compañero y yo cambiamos el mismo archivo y uno se perdió"
+- Acuerden quién edita cada archivo y cuándo, como con un Google Doc. En Colab
+  pueden trabajar a la vez en el mismo cuaderno compartido; en GitHub, el
+  cuaderno lo guarda **una sola persona** con `Guardar una copia en GitHub`, y
+  el README lo edita una persona a la vez.
+
+### "Guardé el cuaderno en GitHub y no aparece en `notebooks/`"
+- Revise que en `Nombre del archivo` escribió `notebooks/analisis.ipynb` (con la
+  carpeta), que eligió la rama `main` y el repositorio correcto. Si lo guardó en
+  otra ruta, entre a GitHub, abra el archivo y use `Delete file`, o súbalo de
+  nuevo a la carpeta correcta.
 
 ### "La imagen no aparece en el README"
-- Verifique que el archivo PNG está en `visualizaciones/`, que hizo commit y
-  push de esa carpeta, y que la ruta en el README es relativa:
+- Verifique que el archivo PNG está en la carpeta `visualizaciones/` del
+  repositorio y que la ruta del README coincide **letra por letra** con el
+  nombre del archivo (mayúsculas, guiones y extensión `.png`):
   `![Casos por semana](visualizaciones/casos-por-semana-y-lluvia.png)`.
+  Use la pestaña `Preview` antes de guardar.
 
 ### "El notebook funciona, pero al reiniciar el entorno falla"
 - Depende de variables que quedaron en memoria o de celdas ejecutadas en

@@ -188,9 +188,13 @@ Keywords creadas en desarrollo: `visualizacion`, `matplotlib`, `seaborn`
 - Fechas de la guía del proyecto ajustadas por el usuario a las del microdiseño:
   E1 jueves 5 nov (23:59), E2 + exposición jueves 19 nov. `info.md` y el
   cronograma no se modificaron. La lección y los apuntes no mencionan fechas.
-- Flujo B no estaba en el material publicado: se añadió a la guía del proyecto
-  el paso a paso (token como Secreto de Colab, `!git clone`, `!git config`) y al
-  Paso 7 de los apuntes.
+- GitHub se usa "como un Google Drive" (decisión del usuario): la guía del
+  proyecto ya no exige commits de ambos integrantes ni mensajes descriptivos, y
+  explica paso a paso crear el repositorio, invitar al docente, crear carpetas y
+  subir archivos desde la web, guardar el notebook con "Guardar una copia en
+  GitHub" y escribir el README (editor web + tabla de Markdown). El criterio de
+  repositorio de la rúbrica E1 pasó a "Repositorio y organización"; el ajuste
+  individual depende solo de la exposición. Sin `!git` en la guía ni en los apuntes.
 - 4 PNG (sin imagen para barras ni pairplot). Es la primera lección con
   imágenes: **verificar el render en Nodo**.
 - Serie de líneas con 7 valores inventados, rotulada como ejemplo.

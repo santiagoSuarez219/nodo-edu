@@ -28,8 +28,8 @@
 > que subir ningún archivo. Colab
 > puede traer otras versiones: se espera que las cifras coincidan, y si algún
 > `dtype` dice `object` donde estos apuntes dirían `str`, es lo mismo: texto. El
-> Paso 8 usa `!git` y se comprobó solo la sintaxis, no se ejecutó contra un
-> repositorio real.
+> Paso 8 sube el archivo a GitHub desde la web (sin comandos); esa parte se
+> describe pero no se ejecutó contra un repositorio real.
 
 ## Paso 1 — La pregunta del pico
 
@@ -720,11 +720,10 @@ Punto a resaltar: pedir al grupo que elija, para su propio dataset, **un** gráf
 ## Paso 8 — Guardar el gráfico y subirlo al repositorio
 
 Situación: un gráfico que solo vive en el cuaderno no se entrega. Se guarda como
-imagen en `visualizaciones/` y se sube con Git. Los comandos `!git` no se han
-visto en el curso, así que aquí se hace en vivo, con el repositorio de la
-pareja: la guía del proyecto trae el paso a paso (token como Secreto de Colab
-llamado `GITHUB_TOKEN`, `!git clone`, `!git config`). Si alguna pareja aún no
-tiene repositorio, que clone el de cualquiera de las dos y practique el flujo.
+imagen en `visualizaciones/` y se sube al repositorio de la pareja. En este
+curso GitHub se usa **como un Google Drive**, desde el navegador y sin comandos:
+la guía del proyecto trae el paso a paso completo (crear carpetas, subir
+archivos y escribir el README). Aquí solo se hace el recorrido de una imagen.
 
 **🐞 Error planeado:** dibujar el histograma en una celda y escribir en la
 **siguiente** `plt.savefig("visualizaciones/histograma-masa.png")`.
@@ -753,26 +752,24 @@ el PNG desde el panel de archivos de Colab. (Se comprobó localmente: en esa
 situación el archivo queda con todos los píxeles blancos.) Detalle para los
 curiosos: llamar a `fig.savefig` sobre el **objeto** `fig` aún funcionaría en otra
 celda, porque guarda esa figura y no la actual, pero la regla simple, guardar
-antes de mostrar y en la misma celda, evita la duda. Ahora subirlo, desde la
-carpeta del repositorio, con comandos de shell (el signo de exclamación los
-manda a la terminal de Colab):
+antes de mostrar y en la misma celda, evita la duda. Ahora llevarla al repositorio, sin
+comandos de Git: primero se descarga a su computador y luego se sube desde la
+página de GitHub.
 
 ```python
-# Una sola vez por sesión, si aún no clonó (ver la guía del proyecto):
-# from google.colab import userdata
-# token = userdata.get("GITHUB_TOKEN")
-# !git clone https://USUARIO:{token}@github.com/USUARIO/REPO.git
-# %cd REPO
+from google.colab import files
 
-!git pull
-!git add visualizaciones/
-!git commit -m "Agrega histograma de masa corporal de pingüinos"
-!git push
+files.download("visualizaciones/histograma-masa.png")   # descarga el PNG a su computador
 ```
 
-Punto a resaltar: no se comprobó localmente (no hay repositorio de Colab);
-confirmar en el momento, con `!git status`, que el PNG quedó dentro del commit y,
-en GitHub, que el archivo se abre con el dibujo y no en blanco.
+Recorrido para mostrar en vivo (o para que cada pareja repita con su
+repositorio): en GitHub, entrar a la carpeta `visualizaciones` → `Add file` →
+`Upload files` → arrastrar el PNG → `Commit changes`. Para insertarla en el
+README: `![Distribución de la masa corporal](visualizaciones/histograma-masa.png)`.
+
+Punto a resaltar: confirmar en GitHub que el archivo se abre con el dibujo y
+no en blanco. No se ejecutó contra un repositorio real; si alguna pareja aún no
+tiene repositorio o carpeta `visualizaciones`, se crea con el Paso 3 de la guía.
 
 ## 👥 Reto en parejas — Dos gráficos, una interpretación
 
