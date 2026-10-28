@@ -202,6 +202,7 @@ export const programacionCientifica: Course = {
       articleSlug: "filtrado-agregacion-y-limpieza-de-datos",
       order: 10,
       title: "Filtrado, agregación y limpieza de datos",
+      summary: "Haz con el dataset de pingüinos las preguntas que de verdad se hacen a una tabla: selecciona columnas y filas, filtra, ordena y resume por grupos, y descubre cómo los nulos y los valores atípicos cambian las respuestas, para decidir con criterio si eliminar o imputar.",
       topics: [
         { title: "Selección con loc/iloc, filtrado booleano, ordenamiento, agrupación y agregación" },
         { title: "Identificación de valores nulos y datos atípicos" },
