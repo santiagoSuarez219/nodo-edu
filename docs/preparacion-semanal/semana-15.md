@@ -156,10 +156,10 @@ por etapa** — todo queda pendiente de su revisión en Nodo.
 
 | Etapa | Resultado | Aprobada por el usuario |
 |---|---|---|
-| E2 · Plan de lección | Producido por `@lesson-designer`, resuelto con valores predeterminados | ⬜ (pre-autorizada, por revisar) |
-| E3 · Lección `.mdx` + registro TS | `matplotlib-y-seaborn` (243 líneas, 8 secciones, 4 PNG) | ⬜ por revisar |
-| E4 · Apuntes del docente | `apuntes/matplotlib-y-seaborn.md` (7 pasos, 2 errores planeados, 2 votaciones, reto en parejas, práctica externa) | ⬜ por revisar |
-| E5 · Cuestionario de cierre | 6 preguntas creadas, publicadas y montadas en **desarrollo** | ⬜ por revisar |
+| E2 · Plan de lección | Producido por `@lesson-designer`, resuelto con valores predeterminados | ✅ (material y guía aprobados por el usuario, 2026-10-28) |
+| E3 · Lección `.mdx` + registro TS | `matplotlib-y-seaborn` (243 líneas, 8 secciones, 4 PNG) | ✅ (material y guía aprobados por el usuario, 2026-10-28) |
+| E4 · Apuntes del docente | `apuntes/matplotlib-y-seaborn.md` (7 pasos, 2 errores planeados, 2 votaciones, reto en parejas, práctica externa) | ✅ (material y guía aprobados por el usuario, 2026-10-28) |
+| E5 · Cuestionario de cierre | 6 preguntas creadas, publicadas y montadas en **desarrollo** | ✅ (material y guía aprobados por el usuario, 2026-10-28) |
 | E6 · Guía del estudiante | No (sesión en vivo; el proyecto ya tiene su guía) | — |
 | E6 · Quiz A/B/C | No aplica (semana sin ★) | — |
 
