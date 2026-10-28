@@ -105,7 +105,7 @@ No aplica.
 ## Ronda — `programacion-cientifica` (2026-10-28)
 
 **Rama:** `feat/semana-13-programacion-cientifica`
-**Estado:** ✅ Material y cuestionario listos en desarrollo / ⬜ Mergeada a `development` / ⬜ Desplegada y abierta
+**Estado:** ✅ Material y cuestionario listos en desarrollo / ✅ Mergeada a `development` / ✅ Desplegada y abierta (2026-10-28)
 
 **Alcance confirmado por el usuario:** sesión única del jueves 29 de octubre
 (Pandas: filtrado, agregación y limpieza). La sesión es una **demo en vivo del
@@ -143,7 +143,7 @@ el proyecto final (en parejas, un dataset distinto por pareja); ese bloque queda
 | Lección | Entorno | IDs de preguntas | Publicadas | Montadas (`list_lesson_questions`) |
 |---|---|---|---|---|
 | `filtrado-agregacion-y-limpieza-de-datos` | desarrollo | `3bdecd28-9bee-4bda-a146-dc464f44cc7a`, `545d4416-b49a-462f-92c3-350640faaece`, `7f55aa91-c428-4d48-b2bf-642891f7c6b3`, `a721ed09-6ef2-4347-b930-3ba8ae907f4c`, `c329e000-f6b7-453f-bd45-67622613e180` | ✅ | ✅ (5) |
-| `filtrado-agregacion-y-limpieza-de-datos` | **producción** | — | ⬜ | ⬜ |
+| `filtrado-agregacion-y-limpieza-de-datos` | **producción** | `21025815-70b6-447a-aaf8-b0817a0c9aac`, `ca531989-f0a3-4afa-b9e7-ac6c6df0ee00`, `3fe97696-3a5b-476a-a358-3c62d9a98db9`, `f0d49d09-935e-49b1-90f0-93fa1b22e9a2`, `ab24cf2b-9b27-438c-9bf3-f5aef2b3833b` | ✅ | ✅ (5) |
 
 > Las preguntas **no viajan con el deploy**: se recrean en producción en D3.
 > Mientras la fila de producción esté vacía, la autoevaluación no existe para
@@ -163,6 +163,7 @@ No aplica.
 - En pingüinos no hay atípicos globales (ni por dominio ni por IQR); el IQR se repite dentro de Chinstrap (4800 g y 2700 g, plausibles) — **motivo:** mostrar "señalar sin borrar" con datos reales.
 - La imputación por grupo y `ffill`/`bfill`/`interpolate`, `pivot_table`, múltiples claves, boxplot y z-score quedaron fuera — **motivo:** carga cognitiva del grupo heterogéneo.
 - Keywords nuevas (`agregacion`, `limpieza-de-datos`, `valores-nulos`, `filtrado`) no se crearon — **motivo:** el usuario no respondió esa parte de la propuesta; se usaron solo las existentes.
+- El distractor de la opción 2 de la pregunta 3 se reescribió antes de replicar a producción (a pedido del usuario, 2026-10-28): de "pandas trató la celda vacía como un cero… daría 10.0" (se contradecía solo) a "pandas rellenó la celda vacía con el promedio de las otras dos filas (15.0)". Aplicado igual en desarrollo y en producción.
 - La pregunta 4 del cuestionario se creó con "un Adelie macho grande puede pesar cerca de 4900 g", pero el máximo de Adelie en la lección es 4775 g; a pedido del usuario se reescribió a "puede ser bastante más pesado que la mayoría" (2026-10-28, solo el enunciado; opciones, keywords y montaje intactos).
 - Los apuntes y la lección no cubren el bloque inicial de datasets del proyecto — **motivo:** el docente lo presenta por su cuenta.
 
@@ -181,19 +182,19 @@ No aplica.
 
 | Paso | Estado | Fecha / detalle |
 |---|---|---|
-| D0 · Alcance y checklist pre-despliegue | ⬜ | |
-| D1 · Lecciones nuevas cerradas por adelantado | ⬜ | |
-| D2 · Merge a `main` y deploy en Vercel | ⬜ | rama `deploy/semana-13-pc` |
-| D3 · Banco de preguntas replicado a producción | ⬜ | |
-| D4 · Lecciones abiertas a los estudiantes | ⬜ | programacion-cientifica → `filtrado-agregacion-y-limpieza-de-datos` |
-| D5 · Verificación end-to-end en producción | ⬜ | |
-| D6 · Bitácora cerrada y rama `deploy/` borrada | ⬜ | |
+| D0 · Alcance y checklist pre-despliegue | ✅ | 2026-10-28 — 4 commits, 5 archivos; sin cambios de esquema ni de variables de entorno |
+| D1 · Lecciones nuevas cerradas por adelantado | ✅ | 2026-10-28 — no hizo falta: la lección ya estaba cerrada desde el 2026-08-04; 0 filas huérfanas |
+| D2 · Merge a `main` y deploy en Vercel | ✅ | 2026-10-28 — rama `deploy/semana-13-pc`, `main` en `3177ff2`, despliegue `dpl_8xXskagVbNFyNqDFu7TNnEeerqYx` `READY`, `www.nod0.dev` asignado |
+| D3 · Banco de preguntas replicado a producción | ✅ | 2026-10-28 — 5 preguntas publicadas y montadas; las 5 keywords ya existían (`pandas`, `dataframe`, `python`, `cierre`, `estadistica-descriptiva`) |
+| D4 · Lecciones abiertas a los estudiantes | ✅ | 2026-10-28 — programacion-cientifica → `filtrado-agregacion-y-limpieza-de-datos` |
+| D5 · Verificación end-to-end en producción | ⬜ | Pendiente: el docente comprueba en `www.nod0.dev` que la lección carga y que la autoevaluación aparece al final |
+| D6 · Bitácora cerrada y rama `deploy/` borrada | ✅ | 2026-10-28 — `deploy/semana-13-pc` solo existía en local y se borró |
 
-- [ ] Verificado que las lecciones de semanas futuras siguen **cerradas** (`matplotlib-y-seaborn`)
+- [x] Verificado que las lecciones de semanas futuras siguen **cerradas** (`matplotlib-y-seaborn`; `list_course_lessons`: 1 cerrada, 0 huérfanas)
 
 ### Pendientes (PC)
 
-- La clase es el jueves 29 de octubre: la lección y su cuestionario deben estar desplegados y abiertos antes de la sesión, porque los apuntes parten de que el estudiante ya los hizo.
-- Al recrear el cuestionario en producción (D3), usar el enunciado corregido de la pregunta 4 (sin la cifra de 4900 g como peso de un Adelie real).
+- Falta solo que el docente confirme visualmente en `www.nod0.dev` que la lección carga y que la autoevaluación aparece al final (D5).
+- Marcar la lección como vista en clase (D7) **después** de la sesión del jueves 29 de octubre, por grupo, con confirmación explícita: cambia de inmediato la nota de autoevaluaciones.
 - Probar en Colab (pandas 2): el comportamiento de `inplace=True` sobre una columna, que los apuntes explican pero no ejecutan en vivo.
 - Revisión visual en el navegador: render de la lección y de la tabla de la síntesis (usa `\|` dentro de backticks).
