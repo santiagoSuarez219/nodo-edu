@@ -215,11 +215,24 @@ export const programacionCientifica: Course = {
       articleSlug: "matplotlib-y-seaborn",
       order: 11,
       title: "Matplotlib y Seaborn",
+      summary:
+        "Descubre con el dataset de pingüinos por qué un número puede mentir y un gráfico bien elegido no: elige el tipo de gráfico según la variable, constrúyelo con Matplotlib y Seaborn, y aprende a leerlo e interpretarlo.",
       topics: [
         { title: "Matplotlib: gráficos básicos (líneas, barras, dispersión, histogramas)" },
         { title: "Seaborn: gráficos estadísticos (boxplot, heatmap, pairplot)" },
         { title: "Buenas prácticas de visualización: elección del tipo de gráfico según el dato" },
       ],
+    },
+    {
+      id: "proyecto-integrador-analisis-de-datos",
+      slug: "proyecto-integrador-analisis-de-datos",
+      articleSlug: "proyecto-integrador-analisis-de-datos",
+      kind: "guide",
+      order: 11.5,
+      title: "Proyecto integrador — Análisis de datos con pandas, Matplotlib y Seaborn",
+      summary:
+        "Proyecto en parejas sobre uno de seis datasets asignados: Entregable 1 (15 %), análisis y limpieza con pandas documentados en un README; Entregable 2 (20 %), gráficas con Matplotlib y Seaborn, conclusiones y exposición final. Incluye los grupos, el repositorio y las rúbricas.",
+      topics: [],
     },
   ],
 };

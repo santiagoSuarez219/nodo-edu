@@ -11,7 +11,7 @@ las seis sesiones de los tres cursos en una sola pasada.
 
 | Semana | Rango de fechas | Rama | Estado |
 |---|---|---|---|
-| [15](./semana-15.md) | 9–15 nov (AA: lun. 9 nov, T y P) | `feat/semana-15-analisis-de-algoritmos` | AA (`fundamentos-de-programacion-dinamica`, order 14, mergeada a `development`; `estrategia-voraz`, order 16): material y cuestionarios listos en desarrollo |
+| [15](./semana-15.md) | 9–15 nov (AA: lun. 9 nov, T y P · PC: jue. 12 nov) | `feat/semana-15-analisis-de-algoritmos` · `feat/semana-15-programacion-cientifica` | AA (`fundamentos-de-programacion-dinamica`, order 14, mergeada a `development`; `estrategia-voraz`, order 16): material y cuestionarios listos en desarrollo · PC (`matplotlib-y-seaborn`, order 11 + proyecto integrador order 11.5): material y cuestionario listos en desarrollo, por revisar |
 | [13](./semana-13.md) | 26 oct – 1 nov (AA) · 29 oct (PC) | `feat/semana-13-analisis-de-algoritmos` (borrada) · `feat/semana-13-programacion-cientifica` | AA: **desplegada y abierta en producción** · PC (`filtrado-agregacion-y-limpieza-de-datos`, order 10): **desplegada y abierta en producción** |
 | [12](./semana-12.md) | 19–25 oct (AA) · 22 oct (PC) | `feat/semana-12-analisis-de-algoritmos` (borrada) · `feat/semana-12-programacion-cientifica` (borrada) | AA: **desplegada y abierta en producción** · PC (`carga-e-inspeccion-de-datos-y-seleccion-del-proyecto`, order 9): **desplegada y abierta en producción** |
 | [11](./semana-11.md) | 12–18 oct (PC: jue. 15 oct) | `feat/semana-11-programacion-cientifica` | PC (`taller-evaluativo-03-numpy`, order 8.5): **desplegada y abierta en producción** |
