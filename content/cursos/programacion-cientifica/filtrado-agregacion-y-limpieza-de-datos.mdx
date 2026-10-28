@@ -159,7 +159,7 @@ print(mas_pesados[["species", "island", "body_mass_g"]].head(3))
 297  Gentoo  Biscoe       6000.0
 ```
 
-`sort_values` devuelve una tabla nueva; la original no cambia. Los nulos quedan siempre al final, en cualquier orden que pidas.
+`sort_values` devuelve una tabla nueva; la original no cambia. Por defecto, los nulos quedan al final, en cualquier orden que pidas.
 
 ## Resumir por grupos: groupby y agregación
 
@@ -215,7 +215,7 @@ print(pinguinos[pinguinos["body_mass_g"].isna()][["species", "island", "body_mas
 
 Las dos filas con peso vacío son también las que no tienen medidas del pico ni de la aleta: son observaciones casi sin datos. En cambio, de los 11 sexos vacíos, 9 son de pingüinos que sí tienen todas sus medidas. Ese es el patrón de los nulos reales: no caen al azar, y cada columna tiene su propia historia. En total hay 11 filas con al menos un nulo (`pinguinos.isna().any(axis=1).sum()`), el 3.2 % de la tabla.
 
-> **Valor nulo (`NaN`):** celda sin dato. pandas lo ignora al calcular `mean`, `min`, `max` o `count`, y lo descarta de toda comparación.
+> **Valor nulo (`NaN`):** celda sin dato. pandas lo ignora al calcular `mean`, `min`, `max` o `count`, y no cumple `==`, `<` ni `>`; en cambio, `!=` sí lo deja pasar.
 
 ## Datos atípicos: señalar sin borrar
 
@@ -318,7 +318,7 @@ Y por sección:
 
 - **El problema:** dos cálculos válidos dieron 48 % y 49.5 % por 11 celdas vacías; los resultados dependen de cómo tratas los nulos.
 - **Elegir lo que importa:** corchetes para columnas, `loc` por etiqueta o condición, `iloc` por posición.
-- **Filtrado booleano:** una máscara de `True` y `False`; `&` y `|` con paréntesis, nunca `and`; un nulo no cumple ninguna comparación.
+- **Filtrado booleano:** una máscara de `True` y `False`; `&` y `|` con paréntesis, nunca `and`; un nulo no cumple `==`, `<` ni `>`, pero `!=` sí lo deja pasar.
 - **Ordenar:** `sort_values` devuelve una tabla nueva y deja los nulos al final.
 - **Resumir por grupos:** `groupby` separa, la agregación resume, y `count` revela cuántos datos entraron.
 - **Nulos:** `isna().sum()` dice cuántos y la máscara dice cuáles filas.

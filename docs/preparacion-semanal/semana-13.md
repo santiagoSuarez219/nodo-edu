@@ -173,7 +173,7 @@ No aplica.
 - [x] Checklist de `lesson-authoring` §8 recorrido (sin H1/`###`/`$`/diagramas; apuntes sin entrada TS; sin guía)
 - [x] `summary` presente en frontmatter **y** en registro TS
 - [x] Coherencia cruzada teoría ↔ apuntes ↔ cuestionario (cifras coinciden; el cuestionario usa tablas nuevas; solapa solo en concepto con dos preguntas socráticas)
-- [ ] `@reviewer`: pendiente (E9)
+- [x] `@reviewer`: CAMBIOS REQUERIDOS → corregidos (la lección decía que un nulo "no cumple ninguna comparación", pero `!=` lo deja pasar: limitado a `==`, `<` y `>` en la definición y en la síntesis; "siempre al final" cambiado a "por defecto al final" en lección y apuntes). Sin repetir lint; build en verde tras la corrección. Menores sin aplicar: cabecera desalineada de la salida de Chinstrap en la lección (`.mdx:256-259`), "la mediana no se mueve" (simplificación aceptable), longitud de la lección y el distractor autocontradictorio de la pregunta 3 del cuestionario
 
 ---
 

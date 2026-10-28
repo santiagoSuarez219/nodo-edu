@@ -247,7 +247,7 @@ Punto a resaltar: arriba están los Gentoo de Biscoe, y eso responde la pregunta
 que quedó en el aire en el Paso 3. `sort_values` **devuelve una tabla nueva**: la
 original sigue con el orden de siempre (la fila 0 vale 3750). Si se quiere
 conservar el resultado hay que asignarlo a un nombre, como `mas_pesados`.
-Dejar dicho también que los nulos quedan **siempre al final**, en cualquier
+Dejar dicho también que los nulos quedan **por defecto al final**, en cualquier
 orden que se pida, así que no aparecen entre los "más pesados" ni entre los "más
 livianos".
 
