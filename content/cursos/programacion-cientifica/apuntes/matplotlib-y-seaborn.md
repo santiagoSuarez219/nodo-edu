@@ -23,9 +23,9 @@
 > verificaron con pandas 3.0.2, matplotlib 3.10.8 y seaborn 0.13.2 en una
 > ejecución local de todo el guion de corrido (con el backend sin pantalla, así
 > que las imágenes no se vieron en pantalla: se comprobaron las cifras). Las
-> celdas del Paso 7 que usan `wordcloud` y el CSV de ciberseguridad se ejecutaron con
-> wordcloud 1.9.6; ese CSV se sube al panel de archivos de Colab antes de la clase
-> (está en `public/documentos/programacion-cientifica/datasets/`). Colab
+> celdas del Paso 7 que usan `wordcloud` y el dataset `planets` se ejecutaron con
+> wordcloud 1.9.6; `sns.load_dataset("planets")` también necesita internet, y no hay
+> que subir ningún archivo. Colab
 > puede traer otras versiones: se espera que las cifras coincidan, y si algún
 > `dtype` dice `object` donde estos apuntes dirían `str`, es lo mismo: texto. El
 > Paso 8 usa `!git` y se comprobó solo la sintaxis, no se ejecutó contra un
@@ -411,7 +411,7 @@ menos de 30 %, vuelves a explicar qué mide la correlación antes de discutir.
 
 ## Paso 7 — Catálogo ampliado de gráficos
 
-Situación: hasta aquí hay cinco gráficos básicos más el mapa de calor y el `pairplot`. Faltan los que se ven en todo informe de datos. Este paso es un **catálogo de consulta**: cada gráfico va en su celda, con una nota de interpretación y un "cuándo sí / cuándo no". No hace falta correrlos todos en vivo; elegir los que el grupo pida o los que su dataset necesite, y dejar el resto como material de apoyo. Todas las celdas usan `pinguinos` (ya cargado) salvo dos, que usan el CSV de ciberseguridad: se sube desde el panel de archivos de Colab, igual que en la sesión de carga de datos, y se lee por su nombre.
+Situación: hasta aquí hay cinco gráficos básicos más el mapa de calor y el `pairplot`. Faltan los que se ven en todo informe de datos. Este paso es un **catálogo de consulta**: cada gráfico va en su celda, con una nota de interpretación y un "cuándo sí / cuándo no". No hace falta correrlos todos en vivo; elegir los que el grupo pida o los que su dataset necesite, y dejar el resto como material de apoyo. Todas las celdas usan `pinguinos` (ya cargado) salvo dos, que usan el dataset integrado `planets` de Seaborn (`sns.load_dataset("planets")`): ninguno requiere subir archivos.
 
 **Torta o pastel (`ax.pie`).** Una variable categórica, la proporción de cada parte sobre un total:
 
@@ -663,49 +663,39 @@ ax.legend(handles, etiquetas, title="Largo del pico (mm)", loc="upper left")
 plt.show()
 ```
 
-Interpretación: las burbujas grandes (picos largos, hasta 59.6 mm) se concentran arriba a la derecha: los pingüinos de aleta larga y más pesados tienen también el pico más largo. Con Seaborn el tamaño se pide con `size=` y la leyenda sale sola. Ejemplo con datos reales: una fila por tipo de ataque, con la mediana de horas hasta detectar, la mediana de pérdida y el número de incidentes:
+Interpretación: las burbujas grandes (picos largos, hasta 59.6 mm) se concentran arriba a la derecha: los pingüinos de aleta larga y más pesados tienen también el pico más largo. Con Seaborn el tamaño se pide con `size=` y la leyenda sale sola. Ejemplo con otro dataset integrado de Seaborn, `planets`: un planeta por fila, con su distancia a la Tierra, su masa y el año de descubrimiento como tercera variable:
 
 ```python
-ciber = pd.read_csv("ciberseguridad_incidentes_colombia_2023_2025.csv")     # el CSV subido al panel de archivos de Colab
-resumen = ciber.groupby("tipo_ataque").agg(
-    incidentes=("id_incidente", "count"),                                   # cuántos incidentes de cada tipo
-    deteccion_mediana=("horas_deteccion", "median"),                        # mediana de horas hasta detectar
-    perdida_mediana=("perdida_estimada_millones_cop", "median"),            # mediana de pérdida, ignora los vacíos
-).reset_index()
-print(resumen.round(1))
+planetas = sns.load_dataset("planets")                                      # exoplanetas descubiertos hasta 2014; no requiere archivos
+datos = planetas.dropna(subset=["distance", "mass"])                        # distance y mass tienen vacíos: quedan 498 de 1035
+print(len(datos), datos["year"].min(), datos["year"].max())
 
 fig, ax = plt.subplots(figsize=(8, 4.5))
-# size = tercera variable; sizes = (mínimo, máximo) del tamaño; alpha = transparencia
-sns.scatterplot(data=resumen, x="deteccion_mediana", y="perdida_mediana", size="incidentes",
-                sizes=(100, 1000), alpha=0.6, legend=False, ax=ax)
-for _, fila in resumen.iterrows():                                          # etiqueta cada burbuja con su tipo de ataque
-    ax.annotate(fila["tipo_ataque"], (fila["deteccion_mediana"], fila["perdida_mediana"]),
-                ha="center", va="bottom", xytext=(0, 14), textcoords="offset points", fontsize=9)
-ax.set_title("Detección, pérdida e incidentes por tipo de ataque")
-ax.set_xlabel("Mediana de horas hasta detectar (h)")
-ax.set_ylabel("Mediana de pérdida (millones COP)")
-ax.set_ylim(0, 420)                                                         # margen para que no se corten las etiquetas
+# size = tercera variable (año de descubrimiento); sizes = (mínimo, máximo) del tamaño; alpha = transparencia
+sns.scatterplot(data=datos, x="distance", y="mass", size="year", sizes=(20, 300), alpha=0.6, ax=ax)
+ax.set_title("Distancia y masa de exoplanetas; el tamaño es el año de descubrimiento")
+ax.set_xlabel("Distancia a la Tierra (pc)")
+ax.set_ylabel("Masa (masas de Júpiter)")
+ax.legend(title="Año", loc="upper right")
 plt.show()
+
+# La cifra que sostiene la lectura: la masa mediana de lo descubierto antes y después de 2005
+print(datos[datos["year"] < 2005]["mass"].median(), datos[datos["year"] >= 2005]["mass"].median())
 ```
 
 ```text
-            tipo_ataque  incidentes  deteccion_mediana  perdida_mediana
-0  Acceso no autorizado         207               52.3             63.4
-1                 DDoS         159               31.4             82.7
-2         Fuga de datos         260               47.5            124.8
-3               Malware         349               44.8             86.2
-4              Phishing         456               41.2             55.2
-5            Ransomware         419               40.1            356.6
+498 1989 2014
+1.88 0.92
 ```
 
-Interpretación: el ransomware pierde una mediana de 356.6 millones de pesos, casi tres veces la de la fuga de datos (124.8) y más de seis veces la del phishing (55.2), con una detección de 40.1 horas, similar a las demás: no es más lento de detectar, es más caro. **Cuándo no:** el ojo compara mal áreas; si el tamaño es lo central, una barra comunica mejor. Con muchas burbujas, bajar `alpha` y el tamaño máximo.
+Interpretación: las burbujas grandes (descubrimientos recientes) abundan en las masas bajas. La mediana de masa baja de 1.88 masas de Júpiter (antes de 2005) a 0.92 (desde 2005): con el tiempo se detectan planetas más ligeros. Es una asociación con una explicación (mejores instrumentos), no una causa que se pueda leer de la gráfica. **Cuándo no:** el ojo compara mal áreas; si el tamaño es lo central, una barra comunica mejor. Con muchas burbujas, bajar `alpha` y el tamaño máximo.
 
-**Nube de palabras (`wordcloud`).** Cada término se dibuja con un tamaño proporcional a su frecuencia. La librería ya viene instalada en Colab; si no, `!pip install wordcloud`. Se alimenta con un diccionario de conteos, así que sirve con cualquier columna categórica de texto:
+**Nube de palabras (`wordcloud`).** Cada término se dibuja con un tamaño proporcional a su frecuencia. La librería ya viene instalada en Colab; si no, `!pip install wordcloud`. Se alimenta con un diccionario de conteos, así que sirve con cualquier columna categórica de texto; aquí, el método con que se descubrió cada exoplaneta:
 
 ```python
 from wordcloud import WordCloud
 
-frecuencias = ciber["vector_entrada"].value_counts().to_dict()     # {"Correo electrónico": 674, ...}
+frecuencias = planetas["method"].value_counts().to_dict()          # {"Radial Velocity": 553, ...}
 print(frecuencias)
 
 # width/height: tamaño de la imagen en píxeles (relación 16:9); random_state fija la disposición para que sea repetible
@@ -715,15 +705,15 @@ nube = WordCloud(width=1200, height=675, background_color="white", colormap="vir
 fig, ax = plt.subplots(figsize=(8, 4.5))
 ax.imshow(nube, interpolation="bilinear")      # la nube es una imagen: se muestra con imshow
 ax.axis("off")                                 # sin ejes: no hay escala numérica que leer
-ax.set_title("Vectores de entrada de los incidentes (tamaño = frecuencia)")
+ax.set_title("Métodos de descubrimiento de exoplanetas (tamaño = frecuencia)")
 plt.show()
 ```
 
 ```text
-{'Correo electrónico': 674, 'Vulnerabilidad sin parche': 262, 'Credenciales robadas': 164, 'Red de bots': 159, 'Descarga web': 153, 'Proveedor tercero': 117, 'Mensajería': 95, 'Dispositivo USB': 92, 'Empleado interno': 74, 'Configuración en la nube': 60}
+{'Radial Velocity': 553, 'Transit': 397, 'Imaging': 38, 'Microlensing': 23, 'Eclipse Timing Variations': 9, 'Pulsar Timing': 5, 'Transit Timing Variations': 4, 'Orbital Brightness Modulation': 3, 'Astrometry': 2, 'Pulsation Timing Variations': 1}
 ```
 
-Interpretación: el correo electrónico domina (674 de 1850 incidentes, 36 %), seguido de las vulnerabilidades sin parche (262). **Cuándo sí:** una mirada rápida a texto, para portadas o para explorar. **Cuándo no:** no tiene eje ni escala, así que no permite comparar valores con precisión (¿164 o 159?) ni lleva unidad: para un informe, las mismas diez cifras en barras horizontales se leen mejor. Y los nombres largos se ven más grandes que los cortos de igual frecuencia.
+Interpretación: la velocidad radial domina (553 de 1035 planetas, 53 %), seguida del tránsito (397, 38 %); los otros ocho métodos suman 85. **Cuándo sí:** una mirada rápida a texto, para portadas o para explorar. **Cuándo no:** no tiene eje ni escala, así que no permite comparar valores con precisión (¿23 o 38?) ni lleva unidad: para un informe, las mismas diez cifras en barras horizontales se leen mejor. Y los nombres largos se ven más grandes que los cortos de igual frecuencia.
 
 Punto a resaltar: pedir al grupo que elija, para su propio dataset, **un** gráfico de este catálogo que no hayan usado y lo reproduzca con el estándar mínimo (título, ejes con unidad, leyenda). Lo más útil del catálogo no es memorizar las llamadas sino la pregunta: ¿cuántas variables y de qué tipo hay, y qué parte quiero mostrar?
 

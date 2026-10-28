@@ -259,22 +259,22 @@ plt.show()
 
 ![Burbujas del largo y la profundidad del pico por especie; el tamaño de cada punto es la masa corporal, y Gentoo concentra los más grandes](/documentos/programacion-cientifica/lecciones/matplotlib-y-seaborn/burbujas-pico-masa.png)
 
-Por último, la **nube de palabras** dibuja cada término con tamaño proporcional a su frecuencia. La librería `wordcloud` ya viene instalada en Colab y se alimenta con los conteos de una columna de texto, aquí el vector de entrada de los incidentes de ciberseguridad (1850 filas):
+Por último, la **nube de palabras** dibuja cada término con tamaño proporcional a su frecuencia. La librería `wordcloud` ya viene instalada en Colab y se alimenta con los conteos de una columna de texto, aquí el método con que se descubrió cada exoplaneta, del dataset `planets` que trae Seaborn (1035 filas):
 
 ```python
 from wordcloud import WordCloud
 
-ciber = pd.read_csv("ciberseguridad_incidentes_colombia_2023_2025.csv")
-frecuencias = ciber["vector_entrada"].value_counts().to_dict()
+planetas = sns.load_dataset("planets")
+frecuencias = planetas["method"].value_counts().to_dict()
 nube = WordCloud(width=1200, height=675, background_color="white").generate_from_frequencies(frecuencias)
 plt.imshow(nube)
 plt.axis("off")                     # una nube no tiene ejes
 plt.show()
 ```
 
-![Nube de palabras de los vectores de entrada: Correo electrónico domina, seguido de Vulnerabilidad sin parche y Credenciales robadas](/documentos/programacion-cientifica/lecciones/matplotlib-y-seaborn/nube-vectores-entrada.png)
+![Nube de palabras de los métodos de descubrimiento de exoplanetas: Radial Velocity y Transit dominan, el resto casi no se ve](/documentos/programacion-cientifica/lecciones/matplotlib-y-seaborn/nube-metodos-exoplanetas.png)
 
-El correo electrónico entra en 674 de los 1850 incidentes. La nube sirve para explorar o ilustrar, pero no lleva escala: para comparar 164 contra 159 usa barras.
+La velocidad radial descubrió 553 de los 1035 planetas y el tránsito 397. La nube sirve para explorar o ilustrar, pero no lleva escala: para comparar 23 contra 38 usa barras.
 
 ## Un gráfico que no se lee no sirve
 
