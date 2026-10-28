@@ -377,15 +377,22 @@ trabaja sobre los datos **ya limpios** del Entregable 1:
 
 ### Exposición final
 
-- **10 minutos de exposición + 5 minutos de preguntas** del docente.
+- La exposición dura **15 minutos como máximo**, en total. Ensaye para no
+  pasarse: al cumplirse el tiempo el docente la detiene.
 - Hablan **los dos integrantes**, en partes equilibradas.
-- Contenido mínimo: el problema y la decisión que apoya el dataset, las
-  decisiones de limpieza más importantes, 3 a 5 gráficas con su
-  interpretación, y las conclusiones y recomendaciones.
+- Debe explicar cuatro cosas:
+  1. **El problema:** qué decisión apoya el conjunto de datos y qué preguntas
+     se quiso responder.
+  2. **Los datos:** qué representa cada fila, cuántas filas y columnas hay, qué
+     variables son categóricas y cuáles numéricas.
+  3. **La limpieza y el procesamiento:** qué problemas de calidad encontraron
+     y qué decidieron en cada caso (eliminar, imputar, excluir) y por qué.
+  4. **Las gráficas:** de 3 a 5 gráficas con su interpretación: qué se observa,
+     con cifras, y qué implica para la decisión.
 - Puede usar diapositivas, el README o el notebook. Tenga el notebook abierto:
-  el docente puede pedir que muestre y explique cualquier celda.
-- Las preguntas se dirigen a **cualquiera de los dos** integrantes, sobre
-  cualquier parte del proyecto.
+  el docente puede pedir que muestre y explique cualquier celda, y puede
+  hacerle preguntas a **cualquiera de los dos** integrantes durante la
+  exposición.
 
 ---
 
@@ -417,7 +424,7 @@ convierte después a la escala institucional de 0 a 5.
 | **Claridad y buenas prácticas** | 15 | Toda gráfica tiene título, ejes rotulados con unidad y leyenda cuando hay varios grupos; las etiquetas se leen sin superponerse; las categorías siguen un orden con sentido; las gráficas están exportadas en `visualizaciones/` en PNG con nombres descriptivos. |
 | **Interpretación** | 20 | Debajo de cada gráfica hay una celda de texto que dice qué pregunta responde, qué se observa con cifras concretas y qué implica para la decisión; no se afirman causas que la gráfica no demuestra. |
 | **README final** | 15 | El README tiene la sección `Visualizaciones` (mínimo cuatro imágenes desde `visualizaciones/` con su interpretación), `Conclusiones y recomendaciones` (respuesta a cada pregunta y al menos tres recomendaciones respaldadas por un hallazgo) y `Limitaciones`. |
-| **Exposición** | 15 | Dura 10 minutos (±2); exponen ambos integrantes; cubre problema, limpieza, gráficas con su interpretación y recomendaciones; ambos responden con acierto las preguntas sobre el código y las decisiones del proyecto. |
+| **Exposición** | 15 | Dura 15 minutos como máximo; exponen ambos integrantes; explica el problema, los datos, la limpieza y el procesamiento, y las gráficas con su interpretación; ambos explican con acierto el código y las decisiones del proyecto cuando el docente pregunta. |
 | **TOTAL** | **100** | |
 
 ### Cómo se convierte el puntaje a nota
