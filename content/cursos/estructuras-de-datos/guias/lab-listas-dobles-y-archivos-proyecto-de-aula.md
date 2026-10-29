@@ -383,9 +383,9 @@ public class CatalogoProductos {
 
 ### Parte 4 — Implemente la funcionalidad en el `Service`
 
-**Archivo existente:** el `Service` que ya gestiona los elementos de la lista
-(en el Sistema Bancario, `src/service/CuentaService.java`). Agregue un atributo
-con **una** instancia de la entidad dueña y los métodos de la funcionalidad. El
+**Archivo nuevo:** un `Service` propio para la funcionalidad (en el Sistema
+Bancario, `src/service/ProductoService.java`). Declare un atributo con **una**
+instancia de la entidad dueña y los métodos de la funcionalidad. El
 `Service` es el único que toca la lista: recibe datos simples de la `View` y
 devuelve datos simples o texto (nunca devuelve ni recibe `ListaDoble<T>` ni
 `NodoDoble<T>`).
@@ -400,7 +400,7 @@ devuelve datos simples o texto (nunca devuelve ni recibe `ListaDoble<T>` ni
 | `size` | `contarProductos` | `int` |
 
 ```java
-// Dentro de CuentaService (ajuste los nombres a su dominio)
+// Dentro de ProductoService (ajuste los nombres a su dominio)
 // Imports necesarios: model.domain.CatalogoProductos y model.domain.ProductoBancario
 
 // Un solo catálogo por Service: si se creara uno nuevo en cada método,
@@ -495,12 +495,13 @@ después de ella; si el identificador no aparece, la línea cuenta como
 corrupta. Si en el Sprint 4 su equipo ya definió estos archivos con otro
 formato, conserve el suyo siempre que cumpla los requisitos de abajo.
 
-**Cada `Service` implementa `guardar...()` y `cargar...()` para cada una de las
-dos estructuras.** Ambos métodos devuelven un `String` que la `View` solo
+**Cada `Service` implementa `guardar...()` y `cargar...()` de la estructura que
+gestiona:** el `Service` nuevo, los de la lista doble, y el que ya tiene, los de
+la segunda estructura. Ambos métodos devuelven un `String` que la `View` solo
 imprime: así el programa nunca se cae por un problema de archivo.
 
 ```java
-// Dentro de CuentaService
+// Dentro de ProductoService
 // Imports necesarios: java.io.BufferedReader, BufferedWriter, File, FileReader, FileWriter, IOException
 
 private static final String ARCHIVO_PRODUCTOS = "data/productos.txt";
@@ -572,8 +573,9 @@ public String cargarProductos() {
 }
 ```
 
-Haga lo mismo con la **segunda estructura** (en el Sistema Bancario,
-`guardarClientes()` y `cargarClientes()` sobre `data/clientes.txt`). Si ya la
+Haga lo mismo con la **segunda estructura**, en el `Service` que ya la gestiona
+(en el Sistema Bancario, `guardarClientes()` y `cargarClientes()` sobre
+`data/clientes.txt`, en el `Service` de clientes). Si ya la
 tiene del Sprint 4, ajústela para que cumpla estos mismos requisitos.
 
 **Requisitos:**
@@ -612,20 +614,23 @@ resultado. La `View` no importa `ListaDoble`, `NodoDoble`, la entidad dueña,
 ```java
 package view;
 
-import service.CuentaService;
+import service.ClienteService;
+import service.ProductoService;
 import utils.ConsoleUtils;
 
 public class MenuCatalogoView {
-    private final CuentaService cuentaService;
+    private final ProductoService productoService;
+    private final ClienteService clienteService;
 
-    public MenuCatalogoView(CuentaService cuentaService) {
-        this.cuentaService = cuentaService;
+    public MenuCatalogoView(ProductoService productoService, ClienteService clienteService) {
+        this.productoService = productoService;
+        this.clienteService = clienteService;
     }
 
     public void iniciar() {
         // Al abrir el menú se carga lo guardado la última vez (primero los clientes)
-        System.out.println(cuentaService.cargarClientes());
-        System.out.println(cuentaService.cargarProductos());
+        System.out.println(clienteService.cargarClientes());
+        System.out.println(productoService.cargarProductos());
 
         int opcion;
         do {
@@ -633,8 +638,8 @@ public class MenuCatalogoView {
             opcion = ConsoleUtils.leerEntero("Elija una opción: ");
             switch (opcion) {
                 case 1 -> registrar();
-                case 2 -> System.out.println(cuentaService.listarProductosEnOrden());
-                case 3 -> System.out.println(cuentaService.listarProductosEnOrdenInverso());
+                case 2 -> System.out.println(productoService.listarProductosEnOrden());
+                case 3 -> System.out.println(productoService.listarProductosEnOrdenInverso());
                 case 4 -> verAnterior();
                 case 5 -> verSiguiente();
                 case 6 -> retirar();
@@ -664,7 +669,7 @@ public class MenuCatalogoView {
     }
 
     private void guardarTodo() {
-        // TODO 2: llamar a guardarClientes y guardarProductos del Service e imprimir
+        // TODO 2: llamar a guardarClientes (clienteService) y guardarProductos (productoService) e imprimir
         //         el texto que devuelve cada uno
     }
 
@@ -672,8 +677,9 @@ public class MenuCatalogoView {
 }
 ```
 
-En `Main`, cree `MenuCatalogoView` con el **mismo** `Service` que ya usan los
-demás menús (otro `Service` tendría otro catálogo vacío) y ofrezca una opción
+En `Main`, cree **una sola** instancia de `ProductoService` (otra tendría otro
+catálogo vacío), pásela a `MenuCatalogoView` junto con el `Service` que ya usan
+los demás menús, y ofrezca una opción
 de `MenuPrincipal` para entrar a él.
 
 **Requisitos:**
@@ -727,13 +733,14 @@ proyecto-aula/
     <archivo de la lista doble>.txt     # nuevo: productos.txt, plan.txt, evoluciones.txt...
     <archivo de la segunda estructura>.txt   # clientes.txt, inventario.txt, pacientes.txt...
   src/
-    Main.java                   # cablea el menú nuevo con el mismo Service
+    Main.java                   # crea ProductoService una sola vez y cablea el menú nuevo
     utils/
       ConsoleUtils.java         # ya existe
     view/
       <Menú de la funcionalidad>View.java   # nuevo: sin archivos ni estructuras
     service/
-      <Service del elemento>.java   # funcionalidad nueva, guardar y cargar de dos estructuras
+      ProductoService.java      # nuevo (en su proyecto, el nombre de su Service): funcionalidad y guardar/cargar de la lista doble
+      <Service existente>.java  # agrega guardar y cargar de la segunda estructura
     model/
       domain/
         <Entidad dueña de la lista>.java   # nueva: CatalogoProductos, Agenda...
