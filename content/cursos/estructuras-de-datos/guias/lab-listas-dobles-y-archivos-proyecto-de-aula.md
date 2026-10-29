@@ -411,10 +411,8 @@ private final CatalogoProductos catalogo = new CatalogoProductos("Catálogo del 
 private int posicionActual = -1;
 
 public void registrarProducto(String codigo, String nombre, String tipo, double tasaAnual) {
-    // TODO 1: rechazar con IllegalArgumentException cualquier texto que contenga ";"
-    //         (el separador del archivo de la Parte 5)
-    // TODO 2: crear el ProductoBancario con sus cuatro campos
-    // TODO 3: insertarlo al final de la lista
+    // TODO 1: crear el ProductoBancario con sus cuatro campos
+    // TODO 2: insertarlo al final de la lista
 }
 
 public String listarProductosEnOrdenInverso() {
@@ -462,8 +460,6 @@ siguen el mismo patrón: complételos usted.
 - Si el elemento refiere a otra entidad (la `Evolucion` a un animal por su
   número de ficha, la `Materia` ya existe en su lista), valide con el buscador
   que su `Service` ya tiene que esa entidad existe antes de insertar.
-- Todo texto que luego se guarde en archivo y que contenga `;` se rechaza al
-  registrarlo con `IllegalArgumentException`.
 
 **Punto de control:** un `Main` temporal registra cuatro productos, lista en
 ambos sentidos (los dos listados son el inverso uno del otro), hojea dos veces
@@ -805,8 +801,7 @@ proyecto-aula/
 
 ### "Mi dirección tiene una coma y el archivo se rompió"
 - Por eso el separador es `;` y no `,`. Si un texto del usuario también
-  contiene `;` el archivo se desalinea: rechácelo al registrar con
-  `IllegalArgumentException`. Además, use `split(SEPARADOR, -1)` para que un
+  contiene `;` el archivo se desalinea: no use `;` en los datos de prueba. Además, use `split(SEPARADOR, -1)` para que un
   último campo vacío (observaciones sin texto) no desaparezca.
 
 ### "El programa se cae si borro el archivo, o si una línea está mal"
