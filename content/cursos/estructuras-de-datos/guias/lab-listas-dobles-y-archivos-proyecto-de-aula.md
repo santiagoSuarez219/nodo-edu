@@ -21,7 +21,7 @@ respetando las tres capas: las estructuras viven en `model/structures/`, el
 
 **Competencias esperadas:**
 - Implementar `NodoDoble<T>` con `anterior` y `siguiente` y una `ListaDoble<T>` con
-  `head`, `tail` y `tamano`, con inserción y eliminación en ambos extremos y
+  `head`, `tail` y `tamano`, con inserción en ambos extremos, eliminación de un nodo y
   recorrido hacia adelante y hacia atrás, sin usar `LinkedList`, `ArrayList`,
   `Deque` ni ninguna otra colección de `java.util`.
 - Reenlazar correctamente `anterior` y `siguiente` en los cuatro casos de eliminación
@@ -234,15 +234,12 @@ classDiagram
     -int tamano
     +insertarAlInicio(T elemento) void
     +insertarAlFinal(T elemento) void
-    +eliminarPrimero() T
-    +eliminarUltimo() T
     +eliminar(NodoDoble nodo) T
     +buscar(T dato) NodoDoble
     +get(int indice) T
     +getHead() NodoDoble
     +recorrerAdelante() String
     +recorrerAtras() String
-    +vaciar() void
     +isEmpty() boolean
     +size() int
   }
@@ -320,10 +317,8 @@ Complete usted el resto de operaciones de la clase con la misma disciplina:
 | Método | Qué hace | Condiciones |
 |---|---|---|
 | `insertarAlInicio` | Agrega un elemento antes de `head` | Simétrico a `insertarAlFinal`; null lanza `IllegalArgumentException` |
-| `eliminarPrimero` / `eliminarUltimo` | Quitan y devuelven el elemento de cada extremo | Lista vacía lanza `NoSuchElementException` con mensaje; reutilizan `eliminar(NodoDoble<T>)` |
 | `get(int indice)` | Devuelve el elemento de esa posición sin quitarlo | Índice fuera de `0..size()-1` lanza `IndexOutOfBoundsException`; parte de `head` si el índice está en la primera mitad y de `tail` si está en la segunda |
 | `recorrerAdelante()` | Devuelve un `String` con un elemento por línea, de `head` a `tail` | Una sola pasada, sin `get(i)`; lista vacía devuelve cadena vacía |
-| `vaciar()` | Deja la lista vacía | `head`, `tail` en `null` y `tamano` en 0 |
 | `isEmpty()` / `size()` | Consultas | Una línea cada una, sin recorrer |
 
 `getHead()` permite que el `Service` recorra los nodos por su cuenta (con
@@ -331,7 +326,7 @@ Complete usted el resto de operaciones de la clase con la misma disciplina:
 para guardar en un archivo.
 
 **Requisitos:**
-- Las inserciones y eliminaciones en los extremos cuestan **O(1)**: ningún
+- Las inserciones en los extremos y `eliminar(NodoDoble<T>)` cuestan **O(1)**: ningún
   `while` ni `for`. Solo `buscar(T)`, `get`, `recorrerAdelante` y
   `recorrerAtras` recorren la cadena.
 - Tras cualquier operación, recorrer hacia adelante y hacia atrás entrega los
@@ -542,7 +537,8 @@ public String cargarProductos() {
     // TODO 1: si el archivo no existe, devolver
     //         "No existe data/productos.txt; se inicia con el catálogo vacío" (sin error)
 
-    // TODO 2: dejar la lista vacía antes de leer (vaciar)
+    // TODO 2: dejar la lista vacía antes de leer: mientras getHead no sea null,
+    //         eliminar(getHead())
     //         -- sin esto, cargar dos veces duplica todos los productos
     posicionActual = -1;
 
@@ -756,7 +752,7 @@ proyecto-aula/
 
 | Criterio | Puntos | Descripción |
 |---|---|---|
-| **`ListaDoble<T>` correcta** | 30 | Las inserciones y eliminaciones en ambos extremos cuestan O(1) sin ciclos y mantienen `tamano`; los cuatro casos de eliminación (único, primero, último, medio) dejan `anterior` y `siguiente` coherentes y `head` y `tail` en `null` al vaciar; el recorrido hacia atrás entrega exactamente el inverso del recorrido hacia adelante; null en `insertar` lanza `IllegalArgumentException`, y eliminar o consultar en lista vacía o fuera de rango lanza `NoSuchElementException` o `IndexOutOfBoundsException` con mensaje; no usa ninguna colección de `java.util`. |
+| **`ListaDoble<T>` correcta** | 30 | Las inserciones en ambos extremos y `eliminar(nodo)` cuestan O(1) sin ciclos y mantienen `tamano`; los cuatro casos de eliminación (único, primero, último, medio) dejan `anterior` y `siguiente` coherentes y `head` y `tail` en `null` al quedar vacía; el recorrido hacia atrás entrega exactamente el inverso del recorrido hacia adelante; null en `insertar` lanza `IllegalArgumentException`, y eliminar o consultar en lista vacía o fuera de rango lanza `NoSuchElementException` o `IndexOutOfBoundsException` con mensaje; no usa ninguna colección de `java.util`. |
 | **Funcionalidad nueva** | 20 | La entidad dueña coincide con el diagrama de su proyecto (lista `private`, creada en el constructor, sin setter); el `Service` implementa el listado en ambos sentidos, la navegación anterior/siguiente y la anulación del medio; navegar más allá de un extremo y anular una posición inexistente lanzan la excepción esperada; anular no elimina el elemento de ninguna otra lista. |
 | **Archivos de texto** | 25 | Persisten dos estructuras distintas en archivos separados dentro de `data/`; `guardar` y `cargar` usan `BufferedWriter` / `BufferedReader` con `try-with-resources` y capturan `IOException`; un archivo inexistente arranca vacío sin error; una línea corrupta se informa con su número y las demás se cargan; `cargar` dos veces no duplica; el ciclo guardar → cerrar → cargar conserva el orden y `anterior` queda enlazado (el listado inverso de una lista recién cargada es correcto). |
 | **Integración en capas** | 15 | Las estructuras viven en `model/structures/`; `guardar`, `cargar` y toda la funcionalidad están en el `Service`; ninguna firma pública del `Service` recibe ni devuelve `ListaDoble<T>` o `NodoDoble<T>`; la `View` lee solo con `ConsoleUtils`, no usa `try` / `catch`, no importa `java.io` ni `model.structures`, y un problema de lista vacía, de extremo o de archivo no cierra el programa; `Main` comparte el mismo `Service`. |
@@ -793,7 +789,7 @@ proyecto-aula/
   escribe de `head` a `tail` y se lee insertando **al final**.
 
 ### "Cada vez que abro el menú, los elementos se duplican"
-- `cargar` agrega sobre lo que ya hay. Llame a `vaciar()` antes de leer y
+- `cargar` agrega sobre lo que ya hay. Vacíe la lista antes de leer (elimine `getHead()` mientras exista) y
   cargue una sola vez, al abrir el menú, no en cada opción.
 
 ### "Al cargar, el listado inverso falla pero el directo funciona"
