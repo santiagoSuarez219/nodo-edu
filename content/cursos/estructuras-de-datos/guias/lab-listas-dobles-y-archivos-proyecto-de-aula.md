@@ -21,7 +21,7 @@ respetando las tres capas: las estructuras viven en `model/structures/`, el
 
 **Competencias esperadas:**
 - Implementar `NodoDoble<T>` con `anterior` y `siguiente` y una `ListaDoble<T>` con
-  `cabeza`, `cola` y `tamano`, con inserción y eliminación en ambos extremos y
+  `head`, `tail` y `tamano`, con inserción y eliminación en ambos extremos y
   recorrido hacia adelante y hacia atrás, sin usar `LinkedList`, `ArrayList`,
   `Deque` ni ninguna otra colección de `java.util`.
 - Reenlazar correctamente `anterior` y `siguiente` en los cuatro casos de eliminación
@@ -81,7 +81,7 @@ fija, que puede vivir en una entidad que ya existe o en una nueva.
 
 | Proyecto | Lista | Dónde vive | Funcionalidad nueva | Por qué doble y no simple |
 |---|---|---|---|---|
-| Sistema Bancario | `ListaDoble<ProductoBancario>` | `CatalogoProductos` (nueva), junto con la clase nueva `ProductoBancario` (código, nombre, tipo, tasa anual) | Catálogo de productos del banco (cuenta de ahorros, CDT, tarjeta, crédito): hojearlo hacia adelante y hacia atrás, listarlo en orden inverso y retirar un producto descontinuado | Hojear "producto anterior" es un movimiento hacia atrás: en una lista simple habría que recorrerla desde la cabeza en cada paso |
+| Sistema Bancario | `ListaDoble<ProductoBancario>` | `CatalogoProductos` (nueva), junto con la clase nueva `ProductoBancario` (código, nombre, tipo, tasa anual) | Catálogo de productos del banco (cuenta de ahorros, CDT, tarjeta, crédito): hojearlo hacia adelante y hacia atrás, listarlo en orden inverso y retirar un producto descontinuado | Hojear "producto anterior" es un movimiento hacia atrás: en una lista simple habría que recorrerla desde la head en cada paso |
 | Papelería | `ListaDoble<Producto>` | `CatalogoNavegable` (nueva) | Catálogo que se hojea hacia adelante y hacia atrás, y permite retirar un producto del catálogo sin alterar el inventario | Hojear "página anterior" es un movimiento hacia atrás: con `siguiente` solamente habría que volver a empezar |
 | Consultorio Médico | `ListaDoble<Cita>` | `Agenda` (nueva) | Agenda del día: ver la cita anterior y la siguiente, listarla de la última a la primera y cancelar una cita del medio | Cancelar una cita del medio exige conocer a su anterior para reenlazar; con `anterior` no se recorre desde el inicio |
 | Clínica Veterinaria | `ListaDoble<Evolucion>` | `SeguimientoHospitalizados` (nueva), junto con la clase nueva `Evolucion` (número de ficha, fecha, temperatura, peso, observación) | Bitácora de evolución clínica de los animales hospitalizados: ver la evolución anterior o siguiente, listarla de la más reciente a la más antigua y anular un registro mal digitado | El veterinario consulta primero "cómo amaneció hoy" y luego retrocede; un registro erróneo del medio se quita sin recorrer todo |
@@ -229,8 +229,8 @@ classDiagram
     +setSiguiente(NodoDoble n) void
   }
   class ListaDoble {
-    -NodoDoble cabeza
-    -NodoDoble cola
+    -NodoDoble head
+    -NodoDoble tail
     -int tamano
     +insertarAlInicio(T elemento) void
     +insertarAlFinal(T elemento) void
@@ -248,7 +248,7 @@ classDiagram
 ```
 
 Recuerde la lección: cada nodo apunta en **dos** direcciones y la lista guarda
-**dos** extremos, `cabeza` y `cola`. Insertar o quitar un nodo exige reenlazar
+**dos** extremos, `head` y `tail`. Insertar o quitar un nodo exige reenlazar
 `anterior` **y** `siguiente` de sus vecinos; olvidar uno de los dos deja una lista que
 funciona hacia adelante y falla hacia atrás.
 
@@ -259,46 +259,47 @@ import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 
 public class ListaDoble<T> {
-    private NodoDoble<T> cabeza;   // primer nodo; null cuando la lista está vacía
-    private NodoDoble<T> cola;     // último nodo; null cuando la lista está vacía
+    private NodoDoble<T> head;     // primer nodo; null cuando la lista está vacía
+    private NodoDoble<T> tail;     // último nodo; null cuando la lista está vacía
     private int tamano;            // cuántos nodos hay, llevado al día en cada inserción y eliminación
 
     public ListaDoble() {
-        this.cabeza = null;
-        this.cola = null;
+        this.head = null;
+        this.tail = null;
         this.tamano = 0;
     }
 
     public void insertarAlFinal(T elemento) {
         // TODO 1: si elemento es null, lanzar IllegalArgumentException
         // TODO 2: crear el nodo nuevo con el elemento
-        // TODO 3: si la lista está vacía, el nodo nuevo es cabeza (y también será cola);
-        //         si no, enlazar en AMBOS sentidos: cola.setSiguiente(nuevo) y nuevo.setAnterior(cola)
+        // TODO 3: si la lista está vacía, el nodo nuevo es head (y también será tail);
+        //         si no, enlazar en AMBOS sentidos: tail.setSiguiente(nuevo) y nuevo.setAnterior(tail)
         //         -- si solo hace el primero, el recorrido inverso se corta en el nodo nuevo
-        // TODO 4: mover cola al nodo nuevo (en ambos casos)
+        // TODO 4: mover tail al nodo nuevo (en ambos casos)
         // TODO 5: incrementar tamano
     }
 
     public boolean eliminar(T elemento) {
-        // TODO 1: recorrer desde cabeza con equals hasta encontrar el nodo; si no aparece, devolver false
-        // TODO 2: llamar a desenlazar(nodo) y devolver true
+        // TODO 1: recorrer desde head con equals hasta encontrar el nodo; si no aparece, devolver false
+        // TODO 2: llamar a eliminar(nodo) y devolver true
         return false; // reemplazar
     }
 
     // Todas las eliminaciones (primero, último y del medio) pasan por aquí
-    private T desenlazar(NodoDoble<T> nodo) {
-        // TODO 1: guardar el dato del nodo en una variable local
-        // TODO 2: caso 1 -- el nodo es el único (anterior y siguiente son null): cabeza y cola quedan en null
-        // TODO 3: caso 2 -- el nodo es la cabeza: cabeza pasa a siguiente y el nuevo primero tiene anterior en null
-        // TODO 4: caso 3 -- el nodo es la cola: cola pasa a anterior y el nuevo último tiene siguiente en null
-        // TODO 5: caso 4 -- el nodo está en el medio: su anterior apunta ahora a su siguiente y viceversa
-        //         -- cada caso toca un conjunto distinto de referencias: no los fusione en uno solo
-        // TODO 6: decrementar tamano y devolver el dato guardado en el TODO 1
+    public T eliminar(NodoDoble<T> nodo) {
+        // TODO 1: guardar en dos variables locales los vecinos del nodo: antes (anterior) y despues (siguiente)
+        // TODO 2: lado de atrás -- si antes es null, el nodo era `head` y `head` pasa a despues;
+        //         si no, antes.setSiguiente(despues)
+        // TODO 3: lado de adelante -- si despues es null, el nodo era `tail` y `tail` pasa a antes;
+        //         si no, despues.setAnterior(antes)
+        //         -- los dos if son independientes: cubren juntos los cuatro casos (único, primero, último, medio)
+        // TODO 4: dejar en null el anterior y el siguiente del nodo retirado
+        // TODO 5: decrementar tamano y devolver el dato del nodo
         return null; // reemplazar
     }
 
     public void recorrerAtras(Consumer<T> accion) {
-        // TODO 1: empezar en cola y avanzar con getAnterior hasta salir de la lista
+        // TODO 1: empezar en tail y avanzar con getAnterior hasta salir de la lista
         // TODO 2: aplicar accion.accept(dato) a cada nodo visitado
         //         -- no use get(i) en un ciclo: cada get volvería a empezar desde un extremo
     }
@@ -309,11 +310,11 @@ Complete usted el resto de operaciones de la clase con la misma disciplina:
 
 | Método | Qué hace | Condiciones |
 |---|---|---|
-| `insertarAlInicio` | Agrega un elemento antes de la cabeza | Simétrico a `insertarAlFinal`; null lanza `IllegalArgumentException` |
-| `eliminarPrimero` / `eliminarUltimo` | Quitan y devuelven el elemento de cada extremo | Lista vacía lanza `NoSuchElementException` con mensaje; reutilizan `desenlazar` |
-| `get(int indice)` | Devuelve el elemento de esa posición sin quitarlo | Índice fuera de `0..size()-1` lanza `IndexOutOfBoundsException`; parte de `cabeza` si el índice está en la primera mitad y de `cola` si está en la segunda |
-| `recorrerAdelante(Consumer<T>)` | Aplica la acción de `cabeza` a `cola` | Una sola pasada, sin `get(i)` |
-| `vaciar()` | Deja la lista vacía | `cabeza`, `cola` en `null` y `tamano` en 0 |
+| `insertarAlInicio` | Agrega un elemento antes de `head` | Simétrico a `insertarAlFinal`; null lanza `IllegalArgumentException` |
+| `eliminarPrimero` / `eliminarUltimo` | Quitan y devuelven el elemento de cada extremo | Lista vacía lanza `NoSuchElementException` con mensaje; reutilizan `eliminar(NodoDoble<T>)` |
+| `get(int indice)` | Devuelve el elemento de esa posición sin quitarlo | Índice fuera de `0..size()-1` lanza `IndexOutOfBoundsException`; parte de `head` si el índice está en la primera mitad y de `tail` si está en la segunda |
+| `recorrerAdelante(Consumer<T>)` | Aplica la acción de `head` a `tail` | Una sola pasada, sin `get(i)` |
+| `vaciar()` | Deja la lista vacía | `head`, `tail` en `null` y `tamano` en 0 |
 | `isEmpty()` / `size()` | Consultas | Una línea cada una, sin recorrer |
 
 `Consumer<T>` es una interfaz funcional de `java.util.function`, no una
@@ -325,7 +326,7 @@ colección: está permitida. Se usa así: `lista.recorrerAtras(x -> System.out.p
   `recorrerAtras` recorren la cadena.
 - Tras cualquier operación, recorrer hacia adelante y hacia atrás entrega los
   mismos elementos en orden inverso.
-- Cuando se elimina el último nodo que queda, `cabeza` **y** `cola` quedan en
+- Cuando se elimina el último nodo que queda, `head` **y** `tail` quedan en
   `null`; el primer nodo siempre tiene `anterior` en `null` y el último siempre
   tiene `siguiente` en `null`.
 - `ListaDoble<T>` solo importa `java.util.NoSuchElementException` y
@@ -582,8 +583,8 @@ tiene del Sprint 4, ajústela para que cumpla estos mismos requisitos.
   línea) y se omite; las demás líneas se cargan igual.
 - `cargar` reemplaza el contenido: llamarlo dos veces seguidas deja la
   estructura con los mismos elementos, no con el doble.
-- **El orden se preserva:** lo que se guarda de la cabeza a la cola se carga de
-  la cabeza a la cola, y `anterior` queda bien enlazado (el recorrido inverso
+- **El orden se preserva:** lo que se guarda de `head` a `tail` se carga de
+  `head` a `tail`, y `anterior` queda bien enlazado (el recorrido inverso
   funciona sobre una lista recién cargada).
 - Un `IOException` nunca llega a la `View` ni cierra el programa.
 
@@ -746,7 +747,7 @@ proyecto-aula/
 
 | Criterio | Puntos | Descripción |
 |---|---|---|
-| **`ListaDoble<T>` correcta** | 30 | Las inserciones y eliminaciones en ambos extremos cuestan O(1) sin ciclos y mantienen `tamano`; los cuatro casos de eliminación (único, primero, último, medio) dejan `anterior` y `siguiente` coherentes y `cabeza` y `cola` en `null` al vaciar; el recorrido hacia atrás entrega exactamente el inverso del recorrido hacia adelante; null en `insertar` lanza `IllegalArgumentException`, y eliminar o consultar en lista vacía o fuera de rango lanza `NoSuchElementException` o `IndexOutOfBoundsException` con mensaje; no usa ninguna colección de `java.util`. |
+| **`ListaDoble<T>` correcta** | 30 | Las inserciones y eliminaciones en ambos extremos cuestan O(1) sin ciclos y mantienen `tamano`; los cuatro casos de eliminación (único, primero, último, medio) dejan `anterior` y `siguiente` coherentes y `head` y `tail` en `null` al vaciar; el recorrido hacia atrás entrega exactamente el inverso del recorrido hacia adelante; null en `insertar` lanza `IllegalArgumentException`, y eliminar o consultar en lista vacía o fuera de rango lanza `NoSuchElementException` o `IndexOutOfBoundsException` con mensaje; no usa ninguna colección de `java.util`. |
 | **Funcionalidad nueva** | 20 | La entidad dueña coincide con el diagrama de su proyecto (lista `private`, creada en el constructor, sin setter); el `Service` implementa el listado en ambos sentidos, la navegación anterior/siguiente y la anulación del medio; navegar más allá de un extremo y anular una posición inexistente lanzan la excepción esperada; anular no elimina el elemento de ninguna otra lista. |
 | **Archivos de texto** | 25 | Persisten dos estructuras distintas en archivos separados dentro de `data/`; `guardar` y `cargar` usan `BufferedWriter` / `BufferedReader` con `try-with-resources` y capturan `IOException`; un archivo inexistente arranca vacío sin error; una línea corrupta se informa con su número y las demás se cargan; `cargar` dos veces no duplica; el ciclo guardar → cerrar → cargar conserva el orden y `anterior` queda enlazado (el listado inverso de una lista recién cargada es correcto). |
 | **Integración en capas** | 15 | Las estructuras viven en `model/structures/`; `guardar`, `cargar` y toda la funcionalidad están en el `Service`; ninguna firma pública del `Service` recibe ni devuelve `ListaDoble<T>` o `NodoDoble<T>`; la `View` lee solo con `ConsoleUtils`, no usa `try` / `catch`, no importa `java.io` ni `model.structures`, y un problema de lista vacía, de extremo o de archivo no cierra el programa; `Main` comparte el mismo `Service`. |
@@ -759,17 +760,17 @@ proyecto-aula/
 
 ### "Recorro hacia adelante y funciona, pero hacia atrás se corta a la mitad"
 - Casi siempre es un `anterior` sin reenlazar. Al insertar al final hay que hacer
-  **dos** asignaciones: `cola.setSiguiente(nuevo)` y `nuevo.setAnterior(cola)`. Lo mismo
+  **dos** asignaciones: `tail.setSiguiente(nuevo)` y `nuevo.setAnterior(tail)`. Lo mismo
   al eliminar del medio: el anterior apunta al siguiente **y** el siguiente
   apunta al anterior.
 
 ### "Al eliminar el último nodo, la lista quedó con un nodo fantasma"
-- En el caso del único nodo, `cabeza` y `cola` deben quedar los dos en `null`.
+- En el caso del único nodo, `head` y `tail` deben quedar los dos en `null`.
   Si solo limpia uno, la lista parece vacía por un lado y con elementos por el
   otro.
 
 ### "Eliminé el primero y el nuevo primero sigue apuntando hacia atrás al nodo eliminado"
-- Al mover `cabeza` hay que poner `anterior` del nuevo primero en `null`; de lo
+- Al mover `head` hay que poner `anterior` del nuevo primero en `null`; de lo
   contrario el recorrido inverso se sale por detrás de la lista y puede dar un
   ciclo.
 
@@ -780,7 +781,7 @@ proyecto-aula/
 
 ### "Cargué y mis datos salieron al revés"
 - Cargó con `insertarAlInicio`, o guardó recorriendo hacia atrás. El archivo se
-  escribe de la cabeza a la cola y se lee insertando **al final**.
+  escribe de `head` a `tail` y se lee insertando **al final**.
 
 ### "Cada vez que abro el menú, los elementos se duplican"
 - `cargar` agrega sobre lo que ya hay. Llame a `vaciar()` antes de leer y
