@@ -5,7 +5,7 @@ updatedAt: "2026-10-29"
 
 # Laboratorio — Listas dobles y archivos en el proyecto de aula
 
-Este laboratorio vale el **5 % de la nota final** y se califica dentro del Seguimiento continuo del curso. Se trabaja en equipo sobre el repositorio de su proyecto de aula.
+Este laboratorio vale el **5 % de la nota final** y corresponde a la mitad del **Momento evaluativo 4 — Manejo de archivos (10 %)**. Se trabaja en equipo sobre el repositorio de su proyecto de aula.
 
 Repositorio de referencia del proyecto (Sistema Bancario): [github.com/santiagoSuarez219/estructura-de-datos-sistema-bancario](https://github.com/santiagoSuarez219/estructura-de-datos-sistema-bancario). Úselo como referencia para ver cómo encaja cada pieza; la implementación en su proyecto debe ser suya y adaptada a su dominio.
 
