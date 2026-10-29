@@ -17,7 +17,7 @@
 | **Momento evaluativo 3:** Pilas y colas — **examen institucional**         | 20%        | Semana 9 (2 de octubre)          |
 | **Momento evaluativo 4:** Manejo de archivos                              | 10%        | Semana 11 (20 de octubre)        |
 | **Momento evaluativo 5:** Proyecto final — árboles e integración          | 20%        | Semana de exámenes (24–27 nov)   |
-| **Seguimiento** (incluye lista doble/circular, ordenamiento, recursividad y actividades continuas) | 20%        | Durante todo el semestre          |
+| **Seguimiento** (incluye el laboratorio de listas dobles y archivos —5 puntos de este 20 %—, ordenamiento, recursividad y actividades continuas) | 20%        | Durante todo el semestre          |
 | **Total**                                                                 | **100%**   |                                  |
 
 > Cada momento evaluativo se cierra **después** de que su contenido se ha enseñado por completo, y su componente práctico es el laboratorio evaluativo (★) del tema correspondiente. No existe un sistema de evaluación paralelo: el laboratorio ★ *es* la parte práctica del momento. La recursividad (Semanas 12–13) no es un momento evaluativo independiente: su laboratorio se evalúa como parte del Seguimiento continuo.

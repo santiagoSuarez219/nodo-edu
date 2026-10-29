@@ -380,6 +380,15 @@ export const estructurasDeDatos: Course = {
       topics: [],
     },
     {
+      id: "lab-listas-dobles-y-archivos-proyecto-de-aula",
+      slug: "lab-listas-dobles-y-archivos-proyecto-de-aula",
+      articleSlug: "lab-listas-dobles-y-archivos-proyecto-de-aula",
+      kind: "guide",
+      order: 28.7,
+      title: "Laboratorio — Listas dobles y archivos en el proyecto de aula",
+      topics: [],
+    },
+    {
       id: "fundamentos-de-recursividad",
       slug: "fundamentos-de-recursividad",
       articleSlug: "fundamentos-de-recursividad",
