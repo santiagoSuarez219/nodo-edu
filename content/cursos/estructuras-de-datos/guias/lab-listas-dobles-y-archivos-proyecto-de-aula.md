@@ -236,7 +236,8 @@ classDiagram
     +insertarAlFinal(T elemento) void
     +eliminarPrimero() T
     +eliminarUltimo() T
-    +eliminar(T elemento) boolean
+    +eliminar(NodoDoble nodo) T
+    +buscar(T dato) NodoDoble
     +get(int indice) T
     +recorrerAdelante(Consumer accion) void
     +recorrerAtras(Consumer accion) void
@@ -279,10 +280,11 @@ public class ListaDoble<T> {
         // TODO 5: incrementar tamano
     }
 
-    public boolean eliminar(T elemento) {
-        // TODO 1: recorrer desde head con equals hasta encontrar el nodo; si no aparece, devolver false
-        // TODO 2: llamar a eliminar(nodo) y devolver true
-        return false; // reemplazar
+    public NodoDoble<T> buscar(T dato) {
+        // TODO 1: empezar en head y avanzar con getSiguiente mientras el nodo actual no sea null
+        // TODO 2: si el dato del nodo actual es igual al buscado (equals), devolver ese nodo
+        // TODO 3: si se recorrió toda la lista sin encontrarlo, devolver null (no lanzar excepción)
+        return null; // reemplazar
     }
 
     // Todas las eliminaciones (primero, último y del medio) pasan por aquí
@@ -322,7 +324,7 @@ colección: está permitida. Se usa así: `lista.recorrerAtras(x -> System.out.p
 
 **Requisitos:**
 - Las inserciones y eliminaciones en los extremos cuestan **O(1)**: ningún
-  `while` ni `for`. Solo `eliminar(T)`, `get`, `recorrerAdelante` y
+  `while` ni `for`. Solo `buscar(T)`, `get`, `recorrerAdelante` y
   `recorrerAtras` recorren la cadena.
 - Tras cualquier operación, recorrer hacia adelante y hacia atrás entrega los
   mismos elementos en orden inverso.
@@ -392,7 +394,7 @@ devuelve datos simples o texto (nunca devuelve ni recibe `ListaDoble<T>` ni
 | `recorrerAdelante` | `listarProductosEnOrden` | `String`, un producto por línea, del primero al último |
 | `recorrerAtras` | `listarProductosEnOrdenInverso` | `String`, del último al primero |
 | `get(posicion - 1)` | `verProductoAnterior` / `verProductoSiguiente` | el producto al que se mueve el cursor |
-| `eliminar` | `retirarProducto` | el producto retirado |
+| `buscar` y `eliminar(nodo)` | `retirarProducto` | el producto retirado |
 | `size` | `contarProductos` | `int` |
 
 ```java
@@ -433,7 +435,7 @@ public ProductoBancario verProductoAnterior() {
 public ProductoBancario retirarProducto(int posicion) {
     // TODO 1: obtener el producto de esa posición con get (una posición inválida
     //         deja salir IndexOutOfBoundsException: no la atrape aquí)
-    // TODO 2: quitarlo de la lista con eliminar
+    // TODO 2: ubicar su nodo con buscar y quitarlo de la lista con eliminar(nodo)
     // TODO 3: reiniciar posicionActual a -1: la posición guardada ya no es confiable
     // TODO 4: devolver el producto retirado
     return null; // reemplazar
