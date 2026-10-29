@@ -31,7 +31,7 @@ respetando las tres capas: las estructuras viven en `model/structures/`, el
 - Guardar y cargar estructuras en archivos de texto con `BufferedWriter`,
   `BufferedReader`, `try-with-resources` y manejo de `IOException`, preservando
   el orden de los elementos.
-- Tolerar un archivo inexistente y líneas corruptas sin tumbar el programa.
+- Tolerar un archivo inexistente y líneas con campos de más o de menos sin tumbar el programa.
 - Mantener la `View` libre de archivos y de estructuras.
 
 **Fuera de alcance:** las listas circulares y los algoritmos de ordenamiento
@@ -517,8 +517,8 @@ proyecto: la `ListaDoble<T>` nueva y una estructura que ya existe (un
 Fechas en formato `yyyy-MM-dd` (el que produce `LocalDate.toString()`). Los
 archivos que **refieren** a otra entidad por identificador (la agenda a un
 paciente, la evolución a una mascota, el plan a una materia, los resultados a un equipo) se cargan
-después de ella; si el identificador no aparece, la línea cuenta como
-corrupta. Si en el Sprint 4 su equipo ya definió estos archivos con otro
+después de ella; si el identificador no aparece, el
+elemento no se puede enlazar y la línea se omite. Si en el Sprint 4 su equipo ya definió estos archivos con otro
 formato, conserve el suyo siempre que cumpla los requisitos de abajo.
 
 **Cada `Service` implementa `guardar...()` y `cargar...()` de la estructura que
@@ -528,7 +528,7 @@ imprime: así el programa nunca se cae por un problema de archivo.
 
 ```java
 // Dentro de ProductoService
-// Imports necesarios: java.io.BufferedReader, BufferedWriter, File, FileReader, FileWriter, IOException
+// Imports necesarios: java.io.BufferedReader, BufferedWriter, File, FileNotFoundException, FileReader, FileWriter, IOException
 
 private static final String ARCHIVO_PRODUCTOS = "data/productos.txt";
 private static final String SEPARADOR = ";";
@@ -561,39 +561,29 @@ public String guardarProductos() {
 public String cargarProductos() {
     File archivo = new File(ARCHIVO_PRODUCTOS);
 
-    // TODO 1: si el archivo no existe, devolver
-    //         "No existe data/productos.txt; se inicia con el catálogo vacío" (sin error)
-
-    // TODO 2: dejar la lista vacía antes de leer: mientras getHead no sea null,
+    // TODO 1: dejar la lista vacía antes de leer: mientras getHead no sea null,
     //         eliminar(getHead())
     //         -- sin esto, cargar dos veces duplica todos los productos
-    int cargados = 0;
-    int omitidas = 0;
-    StringBuilder detalle = new StringBuilder();
 
     try (BufferedReader lector = new BufferedReader(new FileReader(archivo))) {
         String linea;
-        int numeroLinea = 0;
         while ((linea = lector.readLine()) != null) {
-            numeroLinea++;
-            // TODO 3: ignorar las líneas en blanco sin contarlas como corruptas
-            // TODO 4: separar con linea.split(SEPARADOR, -1); si no tiene exactamente 4 campos,
-            //         contarla como omitida, anotar "línea N" en detalle y pasar a la siguiente
-            //         (continue)
-            // TODO 5: convertir tasaAnual dentro de un try / catch de NumberFormatException;
-            //         si falla, tratarla igual que en el TODO 4
-            // TODO 6: crear el ProductoBancario con sus 4 campos e insertarlo con insertarAlFinal
+            // TODO 2: separar con linea.split(SEPARADOR); si no tiene exactamente 4 campos,
+            //         omitir la línea (continue)
+            // TODO 3: crear el ProductoBancario con sus 4 campos (convierta tasaAnual con
+            //         Double.parseDouble) e insertarlo con insertarAlFinal
             //         -- en el mismo orden del archivo; insertarAlInicio invertiría la lista
-            // TODO 7: incrementar cargados
         }
+    } catch (FileNotFoundException e) {
+        // TODO 4: devolver "No existe data/productos.txt; se inicia con el catálogo vacío"
+        return null; // reemplazar
     } catch (IOException e) {
-        // TODO 8: devolver "No se pudo leer: " + e.getMessage(); no relance la excepción
-        return null; // reemplazar por el retorno del TODO 8
+        // TODO 5: devolver "No se pudo leer: " + e.getMessage(); no relance la excepción
+        return null; // reemplazar
     }
 
-    // TODO 9: devolver un resumen: "Se cargaron N productos" y, si omitidas > 0,
-    //         agregar cuántas se omitieron y cuáles (detalle)
-    return null; // reemplazar por el retorno del TODO 9
+    // TODO 6: devolver "Se cargaron N productos", con N el tamaño de la lista
+    return null; // reemplazar
 }
 ```
 
@@ -607,11 +597,12 @@ tiene del Sprint 4, ajústela para que cumpla estos mismos requisitos.
   `try-with-resources`; ningún `close()` manual.
 - `guardar` y `cargar` viven en el `Service`. Las entidades, las estructuras y
   la `View` no importan nada de `java.io`.
-- **Archivo inexistente:** `cargar` no falla; informa y deja la estructura
-  vacía. `guardar` crea `data/` si falta.
-- **Líneas corruptas:** una línea con campos de menos o de más, un número o una
-  fecha inválidos, o un identificador que no existe se **informa** (número de
-  línea) y se omite; las demás líneas se cargan igual.
+- **Archivo inexistente:** `cargar` captura `FileNotFoundException`, informa y
+  deja la estructura vacía. `guardar` crea `data/` si falta.
+- **Línea con campos de menos o de más:** `cargar` la omite con `continue` y
+  sigue con las demás.
+- `cargar` devuelve un texto: "Se cargaron N ..." al terminar, o el mensaje
+  correspondiente si el archivo no existe o no se pudo leer.
 - `cargar` reemplaza el contenido: llamarlo dos veces seguidas deja la
   estructura con los mismos elementos, no con el doble.
 - **El orden se preserva:** lo que se guarda de `head` a `tail` se carga de
@@ -730,7 +721,7 @@ verificación**, que el docente ejecutará al revisar:
 4. Abrir un archivo de `data/` en un editor de texto y **dañar una línea** a
    mano (borrar un campo). Guardar el cambio.
 5. Cerrar el programa con la opción 0 y volver a ejecutarlo.
-6. Verificar que el programa informa la línea dañada, cargó todas las demás y
+6. Verificar que el programa omitió la línea dañada, cargó todas las demás y
    no se cayó.
 7. Listar adelante y atrás: el orden es el original (menos la línea dañada) y
    el listado inverso sigue siendo el espejo del directo.
@@ -785,7 +776,7 @@ proyecto-aula/
 |---|---|---|
 | **`ListaDoble<T>` correcta** | 30 | Las inserciones en ambos extremos y `eliminar(nodo)` cuestan O(1) sin ciclos y mantienen `tamano`; los cuatro casos de eliminación (único, primero, último, medio) dejan `anterior` y `siguiente` coherentes y `head` y `tail` en `null` al quedar vacía; el recorrido hacia atrás entrega exactamente el inverso del recorrido hacia adelante; null en `insertar` lanza `IllegalArgumentException`, y navegar o retirar en lista vacía, en un extremo o sin cursor lanza `NoSuchElementException` con mensaje; eliminar el nodo que es el cursor deja el cursor en `null`; no usa ninguna colección de `java.util`. |
 | **Funcionalidad nueva** | 20 | La entidad dueña coincide con el diagrama de su proyecto (lista `private`, creada en el constructor, sin setter); el `Service` implementa el listado en ambos sentidos, la navegación anterior/siguiente y la anulación del medio; navegar más allá de un extremo y anular sin elemento seleccionado lanzan la excepción esperada; anular no elimina el elemento de ninguna otra lista. |
-| **Archivos de texto** | 25 | Persisten dos estructuras distintas en archivos separados dentro de `data/`; `guardar` y `cargar` usan `BufferedWriter` / `BufferedReader` con `try-with-resources` y capturan `IOException`; un archivo inexistente arranca vacío sin error; una línea corrupta se informa con su número y las demás se cargan; `cargar` dos veces no duplica; el ciclo guardar → cerrar → cargar conserva el orden y `anterior` queda enlazado (el listado inverso de una lista recién cargada es correcto). |
+| **Archivos de texto** | 25 | Persisten dos estructuras distintas en archivos separados dentro de `data/`; `guardar` y `cargar` usan `BufferedWriter` / `BufferedReader` con `try-with-resources` y capturan `FileNotFoundException` e `IOException` y devuelven un texto; un archivo inexistente arranca vacío sin error; una línea con campos de más o de menos se omite y las demás se cargan; `cargar` dos veces no duplica; el ciclo guardar → cerrar → cargar conserva el orden y `anterior` queda enlazado (el listado inverso de una lista recién cargada es correcto). |
 | **Integración en capas** | 15 | Las estructuras viven en `model/structures/`; `guardar`, `cargar` y toda la funcionalidad están en el `Service`; ninguna firma pública del `Service` recibe ni devuelve `ListaDoble<T>` o `NodoDoble<T>`; la `View` lee solo con `ConsoleUtils`, no usa `try` / `catch`, no importa `java.io` ni `model.structures`, y un problema de lista vacía, de extremo o de archivo no cierra el programa; `Main` crea una sola instancia de cada `Service`. |
 | **Buenas prácticas** | 10 | Commits descriptivos al terminar cada Parte sobre la rama `feature/`, fusionada a `main`; nombres de clases, métodos y variables según las convenciones de Java; ningún archivo deja flujos sin cerrar; la carpeta `data/` incluye archivos de ejemplo. |
 | **TOTAL** | **100** | |
@@ -829,13 +820,13 @@ proyecto-aula/
 
 ### "Mi dirección tiene una coma y el archivo se rompió"
 - Por eso el separador es `;` y no `,`. Si un texto del usuario también
-  contiene `;` el archivo se desalinea: no use `;` en los datos de prueba. Además, use `split(SEPARADOR, -1)` para que un
-  último campo vacío (observaciones sin texto) no desaparezca.
+  contiene `;` el archivo se desalinea: no use `;` en los datos de prueba. Además, separe con `split(SEPARADOR)`: una línea con
+  campos de más o de menos se omite.
 
 ### "El programa se cae si borro el archivo, o si una línea está mal"
-- Falta el chequeo de `File.exists()` antes de abrir, o falta capturar
-  `NumberFormatException` y `DateTimeParseException` al convertir cada línea.
-  Una línea mala se cuenta y se informa; nunca se propaga.
+- Falta capturar `FileNotFoundException` (archivo inexistente) o `IOException`
+  alrededor del `try-with-resources`, o falta omitir con `continue` la línea que
+  no tiene el número de campos esperado.
 
 ### "Guardé, pero el archivo quedó vacío o a medias"
 - Dejó de usar `try-with-resources` y olvidó cerrar el `BufferedWriter`: lo
@@ -861,8 +852,8 @@ proyecto-aula/
 - Guarde de forma segura: escriba primero en `data/<archivo>.tmp` y solo si todo
   salió bien reemplace el archivo original, de modo que un fallo a mitad de
   escritura no destruya lo guardado.
-- Haga que `cargar` informe el **motivo** de cada línea omitida (campos de más,
-  fecha inválida, identificador inexistente).
+- Haga que `cargar` informe cuántas líneas omitió y su número, y que no se caiga
+  con un número mal escrito (`NumberFormatException`) ni con una fecha inválida.
 - Agregue una opción que compare, para su funcionalidad, cuántos pasos cuesta
   llegar al penúltimo elemento con `ListaSimple<T>` y con `ListaDoble<T>`.
 
