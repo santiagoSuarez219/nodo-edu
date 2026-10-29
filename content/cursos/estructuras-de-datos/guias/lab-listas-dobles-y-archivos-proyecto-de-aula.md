@@ -231,13 +231,18 @@ classDiagram
   class ListaDoble {
     -NodoDoble head
     -NodoDoble tail
+    -NodoDoble actual
     -int tamano
     +insertarAlInicio(T elemento) void
     +insertarAlFinal(T elemento) void
     +eliminar(NodoDoble nodo) T
     +buscar(T dato) NodoDoble
-    +get(int indice) T
     +getHead() NodoDoble
+    +irAlInicio() T
+    +irAlFinal() T
+    +siguiente() T
+    +anterior() T
+    +retirarActual() T
     +recorrerAdelante() String
     +recorrerAtras() String
     +isEmpty() boolean
@@ -259,6 +264,7 @@ import java.util.NoSuchElementException;
 public class ListaDoble<T> {
     private NodoDoble<T> head;     // primer nodo; null cuando la lista está vacía
     private NodoDoble<T> tail;     // último nodo; null cuando la lista está vacía
+    private NodoDoble<T> actual;   // nodo que se está mirando (cursor); null si no hay ninguno
     private int tamano;            // cuántos nodos hay, llevado al día en cada inserción y eliminación
 
     public ListaDoble() {
@@ -293,7 +299,9 @@ public class ListaDoble<T> {
         //         si no, despues.setAnterior(antes)
         //         -- los dos if son independientes: cubren juntos los cuatro casos (único, primero, último, medio)
         // TODO 4: dejar en null el anterior y el siguiente del nodo retirado
-        // TODO 5: decrementar tamano y devolver el dato del nodo
+        // TODO 5: si el nodo retirado era el cursor (nodo == actual), dejar actual en null:
+        //         un cursor sobre un nodo desenlazado quedaría colgando
+        // TODO 6: decrementar tamano y devolver el dato del nodo
         return null; // reemplazar
     }
 
@@ -306,29 +314,55 @@ public class ListaDoble<T> {
         // TODO 2: mientras el nodo actual no sea null, agregar su dato y un salto de línea
         //         y retroceder con getAnterior
         // TODO 3: devolver el texto armado
-        //         -- no use get(i) en un ciclo: cada get volvería a empezar desde un extremo
+        //         -- use una variable local, no el cursor: listar no debe mover lo que el usuario mira
+        return null; // reemplazar
+    }
+
+    public T irAlFinal() {
+        // TODO 1: si la lista está vacía, lanzar NoSuchElementException("No hay elementos")
+        // TODO 2: poner el cursor en tail y devolver su dato
+        return null; // reemplazar
+    }
+
+    public T anterior() {
+        // TODO 1: si el cursor es null (aún no mira ninguno), empezar por el último: irAlFinal()
+        // TODO 2: si el nodo del cursor no tiene anterior, lanzar
+        //         NoSuchElementException("No hay elemento anterior")
+        // TODO 3: mover el cursor a su anterior y devolver su dato -- un solo paso, O(1)
+        return null; // reemplazar
+    }
+
+    public T retirarActual() {
+        // TODO 1: si el cursor es null, lanzar NoSuchElementException("No hay elemento seleccionado")
+        // TODO 2: eliminar el nodo del cursor con eliminar(nodo) y devolver su dato
         return null; // reemplazar
     }
 }
 ```
+
+`irAlInicio()` y `siguiente()` son simétricos a `irAlFinal()` y `anterior()`:
+complételos usted.
 
 Complete usted el resto de operaciones de la clase con la misma disciplina:
 
 | Método | Qué hace | Condiciones |
 |---|---|---|
 | `insertarAlInicio` | Agrega un elemento antes de `head` | Simétrico a `insertarAlFinal`; null lanza `IllegalArgumentException` |
-| `get(int indice)` | Devuelve el elemento de esa posición sin quitarlo | Índice fuera de `0..size()-1` lanza `IndexOutOfBoundsException`; parte de `head` si el índice está en la primera mitad y de `tail` si está en la segunda |
-| `recorrerAdelante()` | Devuelve un `String` con un elemento por línea, de `head` a `tail` | Una sola pasada, sin `get(i)`; lista vacía devuelve cadena vacía |
+| `irAlInicio()` / `siguiente()` | Simétricos a `irAlFinal()` y `anterior()`: mueven el cursor y devuelven el dato | Lista vacía o extremo alcanzado lanzan `NoSuchElementException` con mensaje |
+| `recorrerAdelante()` | Devuelve un `String` con un elemento por línea, de `head` a `tail` | Una sola pasada, sin mover el cursor; lista vacía devuelve cadena vacía |
 | `isEmpty()` / `size()` | Consultas | Una línea cada una, sin recorrer |
 
-`getHead()` permite que el `Service` recorra los nodos por su cuenta (con
+El **cursor** (`actual`) es el nodo que el usuario está mirando. Moverlo es
+seguir una referencia, `getAnterior()` o `getSiguiente()`, no volver a
+recorrer desde un extremo. `getHead()` permite que el `Service` recorra los nodos por su cuenta (con
 `getSiguiente`) cuando necesita dar formato propio a cada elemento, por ejemplo
 para guardar en un archivo.
 
 **Requisitos:**
 - Las inserciones en los extremos y `eliminar(NodoDoble<T>)` cuestan **O(1)**: ningún
-  `while` ni `for`. Solo `buscar(T)`, `get`, `recorrerAdelante` y
-  `recorrerAtras` recorren la cadena.
+  `while` ni `for`. Solo `buscar(T)`, `recorrerAdelante` y
+  `recorrerAtras` recorren la cadena; avanzar o retroceder el cursor es un
+  solo paso.
 - Tras cualquier operación, recorrer hacia adelante y hacia atrás entrega los
   mismos elementos en orden inverso.
 - Cuando se elimina el último nodo que queda, `head` **y** `tail` quedan en
@@ -343,6 +377,10 @@ imprime `C B A`. Elimine `"B"` (caso del medio) y repita ambos recorridos: `A C`
 y `C A`. Elimine `"A"`, luego `"C"` (caso del único nodo) y compruebe que
 `isEmpty()` es `true`. Inserte `"D"` en la lista ya vaciada y confirme que
 `recorrerAtras` también imprime `D`.
+Con `A B C`, llame a `anterior()` tres veces (devuelve `C`, `B`, `A`) y una cuarta
+vez debe lanzar `NoSuchElementException`; `siguiente()` desde `A` devuelve `B`.
+Llame a `retirarActual()` estando en `B`: la lista queda `A C` y el cursor en
+`null`.
 
 ---
 
@@ -395,8 +433,8 @@ devuelve datos simples o texto (nunca devuelve ni recibe `ListaDoble<T>` ni
 | `insertarAlFinal` | `registrarProducto` | nada |
 | `recorrerAdelante` | `listarProductosEnOrden` | `String`, un producto por línea, del primero al último |
 | `recorrerAtras` | `listarProductosEnOrdenInverso` | `String`, del último al primero |
-| `get(posicion - 1)` | `verProductoAnterior` / `verProductoSiguiente` | el producto al que se mueve el cursor |
-| `buscar` y `eliminar(nodo)` | `retirarProducto` | el producto retirado |
+| `anterior` / `siguiente` | `verProductoAnterior` / `verProductoSiguiente` | el producto al que se mueve el cursor |
+| `retirarActual` | `retirarProducto` | el producto retirado (el que se está mirando) |
 | `size` | `contarProductos` | `int` |
 
 ```java
@@ -406,9 +444,6 @@ devuelve datos simples o texto (nunca devuelve ni recibe `ListaDoble<T>` ni
 // Un solo catálogo por Service: si se creara uno nuevo en cada método,
 // cada operación vería una lista distinta
 private final CatalogoProductos catalogo = new CatalogoProductos("Catálogo del banco");
-
-// Posición (empezando en 0) del producto que el usuario está mirando; -1 si aún no mira ninguno
-private int posicionActual = -1;
 
 public void registrarProducto(String codigo, String nombre, String tipo, double tasaAnual) {
     // TODO 1: crear el ProductoBancario con sus cuatro campos
@@ -423,20 +458,15 @@ public String listarProductosEnOrdenInverso() {
 }
 
 public ProductoBancario verProductoAnterior() {
-    // TODO 1: si no hay productos, lanzar NoSuchElementException("No hay productos")
-    // TODO 2: si posicionActual es -1, ubicarse en el último producto (size - 1);
-    //         si no, retroceder una posición; si ya está en la 0, lanzar
-    //         NoSuchElementException("No hay producto anterior")
-    // TODO 3: devolver el producto de posicionActual (get)
+    // TODO 1: pedir a la lista (catalogo.getProductos()) el anterior con anterior() y devolverlo
+    //         -- el cursor vive en la lista: el Service no guarda posiciones
     return null; // reemplazar
 }
 
-public ProductoBancario retirarProducto(int posicion) {
-    // TODO 1: obtener el producto de esa posición con get (una posición inválida
-    //         deja salir IndexOutOfBoundsException: no la atrape aquí)
-    // TODO 2: ubicar su nodo con buscar y quitarlo de la lista con eliminar(nodo)
-    // TODO 3: reiniciar posicionActual a -1: la posición guardada ya no es confiable
-    // TODO 4: devolver el producto retirado
+public ProductoBancario retirarProducto() {
+    // TODO 1: retirar de la lista el producto que se está mirando con retirarActual()
+    //         (sin producto seleccionado deja salir NoSuchElementException: no la atrape aquí)
+    // TODO 2: devolver el producto retirado
     return null; // reemplazar
 }
 ```
@@ -451,9 +481,9 @@ siguen el mismo patrón: complételos usted.
   `cancelarCita`, `verEvolucionAnterior`, `verMateriaSiguiente`,
   `anularResultado`).
 - Cada método de listado devuelve **texto**; la `View` no recibe la lista.
-- Navegar a un extremo (anterior desde la posición 0, siguiente desde la
-  última) lanza `NoSuchElementException` con mensaje; anular una posición
-  inexistente lanza `IndexOutOfBoundsException`.
+- Navegar a un extremo (anterior desde el primero, siguiente desde el último)
+  lanza `NoSuchElementException` con mensaje; anular sin tener un elemento
+  seleccionado también.
 - Anular un elemento solo lo quita de **esta** lista: no lo elimina de ninguna
   otra lista del `Service` (el producto sale del catálogo, no del inventario;
   la materia sale del plan, no de la lista de materias).
@@ -463,7 +493,7 @@ siguen el mismo patrón: complételos usted.
 
 **Punto de control:** un `Main` temporal registra cuatro productos, lista en
 ambos sentidos (los dos listados son el inverso uno del otro), hojea dos veces
-hacia atrás, retira el segundo y vuelve a listar: quedan tres, en el mismo orden
+hacia atrás, retira el elemento que está mirando (el penúltimo) y vuelve a listar: quedan tres, en el mismo orden
 relativo.
 
 ---
@@ -537,8 +567,6 @@ public String cargarProductos() {
     // TODO 2: dejar la lista vacía antes de leer: mientras getHead no sea null,
     //         eliminar(getHead())
     //         -- sin esto, cargar dos veces duplica todos los productos
-    posicionActual = -1;
-
     int cargados = 0;
     int omitidas = 0;
     StringBuilder detalle = new StringBuilder();
@@ -652,7 +680,7 @@ public class MenuCatalogoView {
         System.out.println("3. Listar del último al primero");
         System.out.println("4. Hojear producto anterior");
         System.out.println("5. Hojear producto siguiente");
-        System.out.println("6. Retirar un producto");
+        System.out.println("6. Retirar el producto que estoy mirando");
         System.out.println("7. Guardar");
         System.out.println("0. Guardar y salir");
     }
@@ -683,7 +711,7 @@ de `MenuPrincipal` para entrar a él.
   anular y guardar; **cargar ocurre al abrir el menú**, no como opción que el
   usuario pueda repetir.
 - La `View` solo imprime lo que el `Service` devuelve de `guardar` y `cargar`.
-- Navegar más allá de un extremo, anular con una posición inexistente o listar
+- Navegar más allá de un extremo, anular sin elemento seleccionado o listar
   una lista vacía muestran un mensaje y **no cierran el programa**.
 - Salir (opción 0) guarda antes de terminar.
 
@@ -755,10 +783,10 @@ proyecto-aula/
 
 | Criterio | Puntos | Descripción |
 |---|---|---|
-| **`ListaDoble<T>` correcta** | 30 | Las inserciones en ambos extremos y `eliminar(nodo)` cuestan O(1) sin ciclos y mantienen `tamano`; los cuatro casos de eliminación (único, primero, último, medio) dejan `anterior` y `siguiente` coherentes y `head` y `tail` en `null` al quedar vacía; el recorrido hacia atrás entrega exactamente el inverso del recorrido hacia adelante; null en `insertar` lanza `IllegalArgumentException`, y eliminar o consultar en lista vacía o fuera de rango lanza `NoSuchElementException` o `IndexOutOfBoundsException` con mensaje; no usa ninguna colección de `java.util`. |
-| **Funcionalidad nueva** | 20 | La entidad dueña coincide con el diagrama de su proyecto (lista `private`, creada en el constructor, sin setter); el `Service` implementa el listado en ambos sentidos, la navegación anterior/siguiente y la anulación del medio; navegar más allá de un extremo y anular una posición inexistente lanzan la excepción esperada; anular no elimina el elemento de ninguna otra lista. |
+| **`ListaDoble<T>` correcta** | 30 | Las inserciones en ambos extremos y `eliminar(nodo)` cuestan O(1) sin ciclos y mantienen `tamano`; los cuatro casos de eliminación (único, primero, último, medio) dejan `anterior` y `siguiente` coherentes y `head` y `tail` en `null` al quedar vacía; el recorrido hacia atrás entrega exactamente el inverso del recorrido hacia adelante; null en `insertar` lanza `IllegalArgumentException`, y navegar o retirar en lista vacía, en un extremo o sin cursor lanza `NoSuchElementException` con mensaje; eliminar el nodo que es el cursor deja el cursor en `null`; no usa ninguna colección de `java.util`. |
+| **Funcionalidad nueva** | 20 | La entidad dueña coincide con el diagrama de su proyecto (lista `private`, creada en el constructor, sin setter); el `Service` implementa el listado en ambos sentidos, la navegación anterior/siguiente y la anulación del medio; navegar más allá de un extremo y anular sin elemento seleccionado lanzan la excepción esperada; anular no elimina el elemento de ninguna otra lista. |
 | **Archivos de texto** | 25 | Persisten dos estructuras distintas en archivos separados dentro de `data/`; `guardar` y `cargar` usan `BufferedWriter` / `BufferedReader` con `try-with-resources` y capturan `IOException`; un archivo inexistente arranca vacío sin error; una línea corrupta se informa con su número y las demás se cargan; `cargar` dos veces no duplica; el ciclo guardar → cerrar → cargar conserva el orden y `anterior` queda enlazado (el listado inverso de una lista recién cargada es correcto). |
-| **Integración en capas** | 15 | Las estructuras viven en `model/structures/`; `guardar`, `cargar` y toda la funcionalidad están en el `Service`; ninguna firma pública del `Service` recibe ni devuelve `ListaDoble<T>` o `NodoDoble<T>`; la `View` lee solo con `ConsoleUtils`, no usa `try` / `catch`, no importa `java.io` ni `model.structures`, y un problema de lista vacía, de extremo o de archivo no cierra el programa; `Main` comparte el mismo `Service`. |
+| **Integración en capas** | 15 | Las estructuras viven en `model/structures/`; `guardar`, `cargar` y toda la funcionalidad están en el `Service`; ninguna firma pública del `Service` recibe ni devuelve `ListaDoble<T>` o `NodoDoble<T>`; la `View` lee solo con `ConsoleUtils`, no usa `try` / `catch`, no importa `java.io` ni `model.structures`, y un problema de lista vacía, de extremo o de archivo no cierra el programa; `Main` crea una sola instancia de cada `Service`. |
 | **Buenas prácticas** | 10 | Commits descriptivos al terminar cada Parte sobre la rama `feature/`, fusionada a `main`; nombres de clases, métodos y variables según las convenciones de Java; ningún archivo deja flujos sin cerrar; la carpeta `data/` incluye archivos de ejemplo. |
 | **TOTAL** | **100** | |
 
@@ -827,9 +855,9 @@ proyecto-aula/
 
 ## Extensiones Sugeridas (Bonus)
 
-- Agregue a `ListaDoble<T>` un cursor interno (`irAlInicio`, `siguiente`,
-  `anterior`) de modo que la navegación del `Service` no necesite el `int
-  posicionActual` ni `get(i)`.
+- Retire por código: agregue al `Service` un método que reciba el identificador,
+  ubique el nodo con `buscar` (la entidad debe sobrescribir `equals`) y lo quite
+  con `eliminar(nodo)`.
 - Guarde de forma segura: escriba primero en `data/<archivo>.tmp` y solo si todo
   salió bien reemplace el archivo original, de modo que un fallo a mitad de
   escritura no destruya lo guardado.
