@@ -239,8 +239,9 @@ classDiagram
     +eliminar(NodoDoble nodo) T
     +buscar(T dato) NodoDoble
     +get(int indice) T
-    +recorrerAdelante(Consumer accion) void
-    +recorrerAtras(Consumer accion) void
+    +getHead() NodoDoble
+    +recorrerAdelante() String
+    +recorrerAtras() String
     +vaciar() void
     +isEmpty() boolean
     +size() int
@@ -257,7 +258,6 @@ funciona hacia adelante y falla hacia atrás.
 package model.structures;
 
 import java.util.NoSuchElementException;
-import java.util.function.Consumer;
 
 public class ListaDoble<T> {
     private NodoDoble<T> head;     // primer nodo; null cuando la lista está vacía
@@ -300,10 +300,17 @@ public class ListaDoble<T> {
         return null; // reemplazar
     }
 
-    public void recorrerAtras(Consumer<T> accion) {
-        // TODO 1: empezar en tail y avanzar con getAnterior hasta salir de la lista
-        // TODO 2: aplicar accion.accept(dato) a cada nodo visitado
+    public NodoDoble<T> getHead() {
+        return head;
+    }
+
+    public String recorrerAtras() {
+        // TODO 1: crear un StringBuilder y empezar en tail
+        // TODO 2: mientras el nodo actual no sea null, agregar su dato y un salto de línea
+        //         y retroceder con getAnterior
+        // TODO 3: devolver el texto armado
         //         -- no use get(i) en un ciclo: cada get volvería a empezar desde un extremo
+        return null; // reemplazar
     }
 }
 ```
@@ -315,12 +322,13 @@ Complete usted el resto de operaciones de la clase con la misma disciplina:
 | `insertarAlInicio` | Agrega un elemento antes de `head` | Simétrico a `insertarAlFinal`; null lanza `IllegalArgumentException` |
 | `eliminarPrimero` / `eliminarUltimo` | Quitan y devuelven el elemento de cada extremo | Lista vacía lanza `NoSuchElementException` con mensaje; reutilizan `eliminar(NodoDoble<T>)` |
 | `get(int indice)` | Devuelve el elemento de esa posición sin quitarlo | Índice fuera de `0..size()-1` lanza `IndexOutOfBoundsException`; parte de `head` si el índice está en la primera mitad y de `tail` si está en la segunda |
-| `recorrerAdelante(Consumer<T>)` | Aplica la acción de `head` a `tail` | Una sola pasada, sin `get(i)` |
+| `recorrerAdelante()` | Devuelve un `String` con un elemento por línea, de `head` a `tail` | Una sola pasada, sin `get(i)`; lista vacía devuelve cadena vacía |
 | `vaciar()` | Deja la lista vacía | `head`, `tail` en `null` y `tamano` en 0 |
 | `isEmpty()` / `size()` | Consultas | Una línea cada una, sin recorrer |
 
-`Consumer<T>` es una interfaz funcional de `java.util.function`, no una
-colección: está permitida. Se usa así: `lista.recorrerAtras(x -> System.out.println(x));`.
+`getHead()` permite que el `Service` recorra los nodos por su cuenta (con
+`getSiguiente`) cuando necesita dar formato propio a cada elemento, por ejemplo
+para guardar en un archivo.
 
 **Requisitos:**
 - Las inserciones y eliminaciones en los extremos cuestan **O(1)**: ningún
@@ -331,8 +339,7 @@ colección: está permitida. Se usa así: `lista.recorrerAtras(x -> System.out.p
 - Cuando se elimina el último nodo que queda, `head` **y** `tail` quedan en
   `null`; el primer nodo siempre tiene `anterior` en `null` y el último siempre
   tiene `siguiente` en `null`.
-- `ListaDoble<T>` solo importa `java.util.NoSuchElementException` y
-  `java.util.function.Consumer`; ninguna colección de `java.util`
+- `ListaDoble<T>` solo importa `java.util.NoSuchElementException`; ninguna colección de `java.util`
   (`LinkedList`, `ArrayList`, `Deque`, `ArrayDeque`...).
 
 **Punto de control (compruébelo con un `Main` temporal):** inserte `"B"` al
@@ -417,9 +424,8 @@ public void registrarProducto(String codigo, String nombre, String tipo, double 
 
 public String listarProductosEnOrdenInverso() {
     // TODO 1: si la lista está vacía, devolver "No hay productos en el catálogo"
-    // TODO 2: crear un StringBuilder y usar recorrerAtras con una expresión lambda
-    //         que agregue cada producto al StringBuilder, una línea por producto
-    // TODO 3: devolver el texto armado
+    // TODO 2: devolver lo que arma recorrerAtras de la lista (un producto por línea)
+    //         -- ProductoBancario debe sobrescribir toString para que cada línea se lea bien
     return null; // reemplazar
 }
 
@@ -513,10 +519,11 @@ public String guardarProductos() {
     }
 
     // TODO 1: armar en un StringBuilder una línea por producto, del primero al último
-    //         (recorrerAdelante con lambda): codigo;nombre;tipo;tasaAnual seguido de salto de línea
+    //         (recorra los nodos desde getHead con getSiguiente): codigo;nombre;tipo;tasaAnual
+    //         seguido de salto de línea
     //         -- escriba ADELANTE: si guarda hacia atrás, el archivo queda invertido al cargar
-    //         -- la lambda de Consumer no puede lanzar IOException, por eso se arma el texto
-    //            primero y se escribe después en una sola llamada
+    //         -- se arma el texto primero y se escribe después en una sola llamada, para que
+    //            el try-with-resources contenga solo la escritura
 
     try (BufferedWriter escritor = new BufferedWriter(new FileWriter(ARCHIVO_PRODUCTOS))) {
         // TODO 2: escribir en el archivo el texto armado en el TODO 1
@@ -776,10 +783,10 @@ proyecto-aula/
   contrario el recorrido inverso se sale por detrás de la lista y puede dar un
   ciclo.
 
-### "`guardar` me da error de compilación dentro de `recorrerAdelante`"
-- La lambda de `Consumer` no puede lanzar `IOException`, y `write` sí. Arme el
-  texto completo en un `StringBuilder` dentro de la lambda y escríbalo después,
-  fuera de ella, dentro del `try-with-resources`.
+### "`guardar` guarda `ProductoBancario@1a2b3c` en lugar de los datos"
+- Usó `recorrerAdelante()` de la lista, que devuelve el `toString` de cada
+  elemento. Para el archivo arme cada línea usted con los campos separados por
+  `;`, recorriendo los nodos desde `getHead()` con `getSiguiente()`.
 
 ### "Cargué y mis datos salieron al revés"
 - Cargó con `insertarAlInicio`, o guardó recorriendo hacia atrás. El archivo se
