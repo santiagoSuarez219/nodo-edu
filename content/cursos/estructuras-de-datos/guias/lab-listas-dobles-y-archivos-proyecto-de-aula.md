@@ -634,17 +634,14 @@ resultado. La `View` no importa `ListaDoble`, `NodoDoble`, la entidad dueña,
 ```java
 package view;
 
-import service.ClienteService;
 import service.ProductoService;
 import utils.ConsoleUtils;
 
 public class MenuCatalogoView {
     private final ProductoService productoService;
-    private final ClienteService clienteService;
 
-    public MenuCatalogoView(ProductoService productoService, ClienteService clienteService) {
+    public MenuCatalogoView(ProductoService productoService) {
         this.productoService = productoService;
-        this.clienteService = clienteService;
     }
 
     public void iniciar() {
@@ -685,8 +682,7 @@ public class MenuCatalogoView {
     }
 
     private void guardarTodo() {
-        // TODO 2: llamar a guardarClientes (clienteService) y guardarProductos (productoService) e imprimir
-        //         el texto que devuelve cada uno
+        // TODO 2: llamar a guardarProductos del Service e imprimir el texto que devuelve
     }
 
     // registrar, verSiguiente y retirar: complételos usted con el mismo patrón
@@ -694,9 +690,9 @@ public class MenuCatalogoView {
 ```
 
 En `Main`, cree **una sola** instancia de `ProductoService` (otra tendría otro
-catálogo vacío), pásela a `MenuCatalogoView` junto con el `Service` que ya usan
-los demás menús, y ofrezca una opción
-de `MenuPrincipal` para entrar a él.
+catálogo vacío), pásela a `MenuCatalogoView` y ofrezca una opción de `MenuPrincipal` para
+entrar a él. Este menú solo usa `ProductoService`: el catálogo no depende de los
+clientes, y estos siguen guardándose desde su propio `Service` y menú.
 
 **Requisitos:**
 - El menú ofrece registrar, ambos listados, navegar anterior y siguiente,
@@ -718,7 +714,8 @@ verificación**, que el docente ejecutará al revisar:
    estructuras vacías, sin caerse.
 2. Registrar cinco elementos de la lista doble (por ejemplo, cinco
    productos) y dos de la segunda estructura (dos clientes).
-3. Listar adelante y atrás: son inversos exactos. Guardar con la opción 7.
+3. Listar adelante y atrás: son inversos exactos. Guardar con la opción 7 (y los
+   clientes, con la opción de guardar de su menú de clientes).
 4. Abrir un archivo de `data/` en un editor de texto y **dañar una línea** a
    mano (borrar un campo). Guardar el cambio.
 5. Cerrar el programa con la opción 0 y volver a ejecutarlo.
