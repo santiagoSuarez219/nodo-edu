@@ -505,7 +505,7 @@ proyecto: la `ListaDoble<T>` nueva y una estructura que ya existe (un
 `ListaSimple<T>` de su Sprint 2). Cada una va en su propio archivo dentro de
 `data/`, en texto, una línea por elemento y campos separados por `;`.
 
-| Proyecto | Archivo de la `ListaDoble` y formato de línea | Segunda estructura (archivo y formato) | Cargar en este orden |
+| Proyecto | Archivo de la `ListaDoble` y formato de línea | Segunda estructura (archivo y formato) | Crear los `Service` en este orden (cada uno carga en su constructor) |
 |---|---|---|---|
 | Sistema Bancario | `data/productos.txt`: `codigo;nombre;tipo;tasaAnual` (el orden de líneas es el orden del catálogo) | `data/clientes.txt`: `identificacion;nombre;telefono;direccion` | cualquiera (no se refieren entre sí) |
 | Papelería | `data/catalogo.txt`: `codigo` (solo el código; el orden de líneas es el orden del catálogo) | `data/inventario.txt`: `tipo;codigo;nombre;precio;stock` (`tipo` indica la subclase: OFICINA, ESCOLAR o ARTE) | inventario, catálogo |
@@ -523,8 +523,10 @@ formato, conserve el suyo siempre que cumpla los requisitos de abajo.
 
 **Cada `Service` implementa `guardar...()` y `cargar...()` de la estructura que
 gestiona:** el `Service` nuevo, los de la lista doble, y el que ya tiene, los de
-la segunda estructura. Ambos métodos devuelven un `String` que la `View` solo
-imprime: así el programa nunca se cae por un problema de archivo.
+la segunda estructura. `guardar` devuelve un `String` que la `View` solo imprime. **Los datos se
+cargan en el `Service`, no en el menú:** el constructor de cada `Service` llama
+a su `cargar...()`, de modo que la estructura ya está llena cuando la `View`
+lo usa. Así el programa nunca se cae por un problema de archivo.
 
 ```java
 // Dentro de ProductoService
@@ -532,6 +534,11 @@ imprime: así el programa nunca se cae por un problema de archivo.
 
 private static final String ARCHIVO_PRODUCTOS = "data/productos.txt";
 private static final String SEPARADOR = ";";
+
+public ProductoService() {
+    // TODO: cargar lo guardado la última vez llamando a cargarProductos()
+    //       (el texto que devuelve se puede ignorar aquí)
+}
 
 private void escribirProductos() throws IOException {
     // TODO 1: crear la carpeta data/ si no existe: obtenga la carpeta del archivo con
@@ -610,7 +617,7 @@ tiene del Sprint 4, ajústela para que cumpla estos mismos requisitos.
 
 **Punto de control:** registre tres productos, guarde, abra
 `data/productos.txt` en un editor de texto (tres líneas en orden), cierre el
-programa, ábralo de nuevo y cargue: la lista adelante y atrás coincide con la
+programa, ábralo de nuevo (el `Service` carga al crearse): la lista adelante y atrás coincide con la
 que tenía.
 
 ---
@@ -641,10 +648,6 @@ public class MenuCatalogoView {
     }
 
     public void iniciar() {
-        // Al abrir el menú se carga lo guardado la última vez (primero los clientes)
-        System.out.println(clienteService.cargarClientes());
-        System.out.println(productoService.cargarProductos());
-
         int opcion;
         do {
             mostrarOpciones();
@@ -697,9 +700,9 @@ de `MenuPrincipal` para entrar a él.
 
 **Requisitos:**
 - El menú ofrece registrar, ambos listados, navegar anterior y siguiente,
-  anular y guardar; **cargar ocurre al abrir el menú**, no como opción que el
-  usuario pueda repetir.
-- La `View` solo imprime lo que el `Service` devuelve de `guardar` y `cargar`.
+  anular y guardar; **cargar ocurre en el constructor del `Service`**, no en el
+  menú ni como opción que el usuario pueda repetir.
+- La `View` solo imprime lo que el `Service` devuelve de `guardar`; no llama a `cargar`.
 - Navegar más allá de un extremo, anular sin elemento seleccionado o listar
   una lista vacía muestran un mensaje y **no cierran el programa**.
 - Salir (opción 0) guarda antes de terminar.
@@ -711,8 +714,8 @@ de `MenuPrincipal` para entrar a él.
 Su programa debe poder recorrer, sin cerrarse, esta **secuencia de
 verificación**, que el docente ejecutará al revisar:
 
-1. Borrar la carpeta `data/` y arrancar: el programa informa que no existen
-   los archivos y inicia con las estructuras vacías.
+1. Borrar la carpeta `data/` y arrancar: el programa inicia con las
+   estructuras vacías, sin caerse.
 2. Registrar cinco elementos de la lista doble (por ejemplo, cinco
    productos) y dos de la segunda estructura (dos clientes).
 3. Listar adelante y atrás: son inversos exactos. Guardar con la opción 7.
@@ -725,8 +728,8 @@ verificación**, que el docente ejecutará al revisar:
    el listado inverso sigue siendo el espejo del directo.
 8. Navegar al anterior y al siguiente desde varias posiciones y anular uno del
    medio; guardar, cerrar y cargar de nuevo: el elemento anulado no reaparece.
-9. Entrar al menú y salir dos veces seguidas: la cantidad de elementos no
-   cambia (cargar no duplica).
+9. Ejecutar y cerrar el programa dos veces seguidas: la cantidad de elementos
+   no cambia (cargar no duplica).
 
 **Plazo de entrega:** domingo 8 de noviembre de 2026.
 
@@ -810,7 +813,7 @@ proyecto-aula/
 
 ### "Cada vez que abro el menú, los elementos se duplican"
 - `cargar` agrega sobre lo que ya hay. Vacíe la lista antes de leer (elimine `getHead()` mientras exista) y
-  cargue una sola vez, al abrir el menú, no en cada opción.
+  cargue una sola vez, en el constructor del `Service`, no en el menú ni en cada opción.
 
 ### "Al cargar, el listado inverso falla pero el directo funciona"
 - Está armando los nodos a mano sin reenlazar `anterior`. Cargue siempre a través
@@ -832,13 +835,14 @@ proyecto-aula/
   `try-with-resources` el cierre es automático.
 
 ### "`NullPointerException` al cargar el plan, las evoluciones o la agenda"
-- Cargó el archivo que refiere a otra entidad antes que ella. Respete el orden
-  de la tabla de la Parte 5: mascotas antes que sus evoluciones, materias antes que el plan, equipos antes
+- Creó el `Service` que refiere a otra entidad antes que el de esa entidad, así
+  que al cargar no la encontró. Cree los `Service` en el orden de la tabla de la
+  Parte 5: mascotas antes que sus evoluciones, materias antes que el plan, equipos antes
   que sus resultados.
 
 ### "¿Puedo guardar y cargar desde la `View`?"
-- No. La `View` solo pide al `Service` que guarde o cargue e imprime el texto
-  que devuelve. Si la `View` importa `java.io`, la separación de capas está rota.
+- No. La `View` solo pide al `Service` que guarde e imprime el texto que
+  devuelve; el `Service` carga por su cuenta al crearse. Si la `View` importa `java.io`, la separación de capas está rota.
 
 ---
 
