@@ -307,30 +307,6 @@ export const estructurasDeDatos: Course = {
       ],
     },
     {
-      id: "estrategias-de-ordenamiento-sobre-listas-enlazadas",
-      slug: "estrategias-de-ordenamiento-sobre-listas-enlazadas",
-      articleSlug: "estrategias-de-ordenamiento-sobre-listas-enlazadas",
-      order: 21,
-      title: "Estrategias de ordenamiento sobre listas enlazadas",
-      topics: [
-        { title: "Insertion sort adaptado a lista enlazada: lógica y complejidad" },
-        { title: "Selection sort adaptado a lista enlazada: lógica y complejidad" },
-        { title: "Por qué ordenar listas enlazadas es más costoso que ordenar arreglos" },
-      ],
-    },
-    {
-      id: "sintesis-del-modulo-de-listas",
-      slug: "sintesis-del-modulo-de-listas",
-      articleSlug: "sintesis-del-modulo-de-listas",
-      order: 22,
-      title: "Síntesis del módulo de listas",
-      topics: [
-        { title: "Comparación entre lista simple, doble y circular" },
-        { title: "Tabla de decisión: cuándo usar cada tipo de lista" },
-        { title: "Integración con el modelo TAD y los diagramas UML" },
-      ],
-    },
-    {
       id: "fundamentos-de-archivos",
       slug: "fundamentos-de-archivos",
       articleSlug: "fundamentos-de-archivos",
@@ -401,6 +377,15 @@ export const estructurasDeDatos: Course = {
       kind: "guide",
       order: 28.5,
       title: "Laboratorio — Colas en el proyecto de aula",
+      topics: [],
+    },
+    {
+      id: "lab-listas-dobles-y-archivos-proyecto-de-aula",
+      slug: "lab-listas-dobles-y-archivos-proyecto-de-aula",
+      articleSlug: "lab-listas-dobles-y-archivos-proyecto-de-aula",
+      kind: "guide",
+      order: 28.7,
+      title: "Laboratorio — Listas dobles y archivos en el proyecto de aula",
       topics: [],
     },
     {
