@@ -533,29 +533,27 @@ imprime: así el programa nunca se cae por un problema de archivo.
 private static final String ARCHIVO_PRODUCTOS = "data/productos.txt";
 private static final String SEPARADOR = ";";
 
-public String guardarProductos() {
-    // La carpeta data/ puede no existir la primera vez
-    File carpeta = new File("data");
-    if (!carpeta.exists()) {
-        carpeta.mkdirs();
-    }
+private void escribirProductos() throws IOException {
+    // TODO 1: crear la carpeta data/ si no existe: obtenga la carpeta del archivo con
+    //         new File(ARCHIVO_PRODUCTOS).getParentFile() y use mkdirs()
 
-    // TODO 1: armar en un StringBuilder una línea por producto, del primero al último
+    // TODO 2: armar un texto con una línea por producto, del primero al último
     //         (recorra los nodos desde getHead con getSiguiente): codigo;nombre;tipo;tasaAnual
-    //         seguido de salto de línea
+    //         unidos con String.join(SEPARADOR, ...) y seguidos de un salto de línea
     //         -- escriba ADELANTE: si guarda hacia atrás, el archivo queda invertido al cargar
-    //         -- se arma el texto primero y se escribe después en una sola llamada, para que
-    //            el try-with-resources contenga solo la escritura
 
     try (BufferedWriter escritor = new BufferedWriter(new FileWriter(ARCHIVO_PRODUCTOS))) {
-        // TODO 2: escribir en el archivo el texto armado en el TODO 1
-        // TODO 3: devolver "Se guardaron N productos en data/productos.txt"
+        // TODO 3: escribir en el archivo el texto armado en el TODO 2
         //         -- el try-with-resources cierra el archivo solo, aun si algo falla
-        return null; // reemplazar por el retorno del TODO 3
-    } catch (IOException e) {
-        // TODO 4: devolver "No se pudo guardar: " + e.getMessage(); no relance la excepción
-        return null; // reemplazar por el retorno del TODO 4
     }
+}
+
+public String guardarProductos() {
+    // TODO 1: llamar a escribirProductos() dentro de un try / catch de IOException
+    // TODO 2: si todo sale bien, devolver "Se guardaron N productos en data/productos.txt"
+    // TODO 3: en el catch, devolver "No se pudo guardar: " + e.getMessage(); no relance la excepción
+    //         -- así la View solo imprime el texto y nunca ve una IOException
+    return null; // reemplazar
 }
 
 public String cargarProductos() {
