@@ -268,6 +268,15 @@ export const analisisDeAlgoritmos: Course = {
       ],
     },
     {
+      id: "lab-evaluativo-04-programacion-dinamica-y-voraces",
+      slug: "lab-evaluativo-04-programacion-dinamica-y-voraces",
+      articleSlug: "lab-evaluativo-04-programacion-dinamica-y-voraces",
+      kind: "guide",
+      order: 16.5,
+      title: "Laboratorio evaluativo 04 — Programación dinámica y algoritmos voraces",
+      topics: [],
+    },
+    {
       id: "proyecto-final",
       slug: "proyecto-final",
       articleSlug: "proyecto-final",
