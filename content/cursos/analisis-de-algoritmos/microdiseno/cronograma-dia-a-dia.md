@@ -15,7 +15,7 @@
 | 16 – 20 oct                     | Evaluaciones institucionales                                       | No — el lunes 19 oct hay clase normal |
 | 26 oct – 1 nov                  | Segunda evaluación de estudiantes a docentes                       | No — administrativo |
 | Hasta el 1 nov                  | Registro en el SIA del 60% evaluado                                 | Sí — revisa que Laboratorios 1-3 (45%) estén registrados a tiempo (ver nota más abajo) |
-| Hasta el 22 nov                 | Fecha límite de cancelación de asignaturas/matrícula                | Coincide con la fecha límite de entrega del Laboratorio 4 |
+| Hasta el 22 nov                 | Fecha límite de cancelación de asignaturas/matrícula                | No coincide con ninguna entrega: el Laboratorio 4 se entrega el 18 nov y el proyecto final el 23 nov |
 | 23 – 29 nov                     | Exámenes finales institucionales                                    | No aplica — el curso ya terminó |
 | 23 – 29 nov                     | Fecha límite de registro del 100% evaluado                          | Sí — registrar Laboratorio 4, Proyecto final y Seguimiento en esta ventana |
 
@@ -108,9 +108,9 @@
 ### Semana 16 — lunes 16 de noviembre
 **Sin clase (festivo: Independencia de Cartagena).** Última semana del curso.
 - **Laboratorio evaluativo 4 — Programación dinámica y algoritmos voraces (15%)** *(antes Laboratorio 5, que valía 20%)*
-  - Entrega asincrónica: informe en GitHub (`lab4-pd-voraces/`), plazo hasta el **22 de noviembre**
+  - Es la parte del proyecto final que usa PD o voraz: cada equipo resuelve la operación 4 de su caso (obligatoria). Entrega en equipo, asincrónica: informe en el repositorio del equipo (`lab4-pd-voraces/`), el **miércoles 18 de noviembre**
   - ⚠️ Registrar el 100% evaluado (Laboratorio 4, Proyecto final y Seguimiento) durante la ventana del 23 al 29 de noviembre
-- **Proyecto final (20%):** caso de estudio en equipos de máximo 4 (ver `info.md` y `projects/casos-evaluacion-ra-2026-2.md`). Entrega única el **lunes 23 de noviembre**: repositorio del equipo en GitHub con el informe en el `README.md` y el informe en PDF. Sin hitos intermedios ni sustentación.
+- **Proyecto final (20%):** caso de estudio en equipos de máximo 4 (ver `info.md` y `projects/casos-evaluacion-ra-2026-2.md`). Entrega única el **lunes 23 de noviembre**: repositorio del equipo en GitHub con el informe en el `README.md` y el informe en PDF. Sin sustentación. La operación 4 del caso se entrega antes, el 18 de noviembre, como Laboratorio 4 (15%).
 
 ---
 
@@ -121,7 +121,7 @@
 | 6      | 7 – 13 sep             | Laboratorio 1: Fundamentos, complejidad y recurrencias       | 15%  |
 | 10     | entrega dom. 11 oct    | Laboratorio 2: Dividir y vencer                              | 15%  |
 | 13     | entrega sáb. 31 oct    | Laboratorio 3: Estructuras de datos                          | 15%  |
-| 16     | hasta el 22 nov        | Laboratorio 4: Programación dinámica y algoritmos voraces    | 15%  |
+| 16     | miércoles 18 nov       | Laboratorio 4: Programación dinámica y algoritmos voraces (equipo, operación 4 del proyecto) | 15%  |
 | —      | lunes 23 nov           | Proyecto final (equipos)                                     | 20%  |
 | —      | Todo el semestre       | Seguimiento                                                  | 20%  |
 | **Total** |                     |                                                              | **100%** |

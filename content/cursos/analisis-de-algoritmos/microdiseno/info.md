@@ -13,7 +13,7 @@
 | **Laboratorio 1:** Fundamentos, complejidad y recurrencias                            | 15%        | Semana 6   |
 | **Laboratorio 2:** Dividir y vencer                                                    | 15%        | Entrega el domingo 11 oct |
 | **Laboratorio 3:** Estructuras de datos                                                | 15%        | Entrega el sábado 31 oct (sesión guiada el lunes 26 oct) |
-| **Laboratorio 4:** Programación dinámica y algoritmos voraces                          | 15%        | Entrega hasta el 22 nov |
+| **Laboratorio 4:** Programación dinámica y algoritmos voraces (operación 4 del caso del proyecto, en equipo) | 15%        | Entrega el miércoles 18 nov |
 | **Proyecto final:** caso de estudio en equipos (máx. 4)                                 | 20%        | Entrega el lunes 23 nov |
 | **Seguimiento:** evaluación continua (quices cortos, participación, consistencia de commits, ejercicios de clase) | 20%        | Durante todo el semestre |
 | **Total**                                                                                 | **100%**   |            |
@@ -92,7 +92,7 @@ Cada uno de los cuatro laboratorios evaluativos se entrega como un **informe de 
 | 13  | Estructuras de datos (Cormen Cap. 11–12)       | Lunes 26 oct: tablas hash y árboles de búsqueda binarios             | ★ Laboratorio 3     |
 | 14  | —                                              | Lunes 2 nov: festivo, sin clase                                      |                     |
 | 15  | Programación dinámica y voraces (Cormen Cap. 15–16) | Lunes 9 nov: rod cutting y fundamentos de la PD; estrategia voraz (resto en lectura autónoma) |  |
-| 16  | —                                              | Lunes 16 nov: festivo, sin clase. Entrega asincrónica hasta el 22 nov | ★ Laboratorio 4 (entrega) |
+| 16  | —                                              | Lunes 16 nov: festivo, sin clase. Entrega asincrónica el miércoles 18 nov | ★ Laboratorio 4 (entrega) |
 
 ---
 
@@ -304,13 +304,13 @@ curso-analisis-algoritmos/
 
 ### Entrega — Laboratorio evaluativo 4: Programación dinámica y algoritmos voraces ★
 
-Entrega asincrónica, plazo hasta el **22 de noviembre** (el lunes 16 es festivo).
+Entrega asincrónica, **en equipo**, el **miércoles 18 de noviembre** (el lunes 16 es festivo). Desde el 2026-11-02 este laboratorio es la parte del proyecto final que usa programación dinámica o estrategia voraz: cada equipo resuelve la **operación 4 de su caso** (tope tarifario en el Caso 1, jornadas de las unidades móviles en el Caso 2, cargue de vehículos en el Caso 3), obligatoria para todos los equipos. El resto del proyecto se entrega el 23 de noviembre.
 
 - Preguntas de selección múltiple sobre subestructura óptima, subproblemas traslapados y la propiedad de elección voraz
 - Preguntas abiertas: dado un problema, argumentar si un enfoque voraz produce la solución óptima o si se requiere programación dinámica
 - Explicación de un tema: el estudiante explica, con sus palabras, por qué la propiedad de subestructura óptima es necesaria (pero no suficiente) para que un enfoque voraz funcione
-- Parte práctica: implementar un problema de programación dinámica (rod cutting, mochila 0/1 o LCS) y un problema voraz (selección de actividades o Huffman); graficar el comportamiento de ambos y comparar sus complejidades
-- Informe de laboratorio en GitHub (`lab4-pd-voraces/`) con rúbrica socializada previamente — **cierre de la evaluación Laboratorio 4 (15%)**
+- Parte práctica: resolver la operación 4 del caso del proyecto con programación dinámica o estrategia voraz (el Caso 1 con programación dinámica sobre los días del mes, el Caso 2 con selección de actividades voraz y el Caso 3 con la mochila 0/1), contrastarla con el enfoque ingenuo y con la regla voraz o exhaustiva que usa hoy la organización, graficar el comportamiento y comparar sus complejidades
+- Informe de laboratorio en el repositorio del equipo (carpeta `lab4-pd-voraces/`) con rúbrica propia del laboratorio socializada previamente (no es la rúbrica institucional del proyecto) — **cierre de la evaluación Laboratorio 4 (15%)**
 
 ---
 
@@ -320,7 +320,8 @@ Instrumento de **Resultados de Aprendizaje 2026-2**, aprobado por la Facultad. E
 
 - **Modalidad:** equipos de máximo 4 estudiantes. Cada equipo trabaja **un** caso de tres (recaudo de un sistema de transporte, tamizaje de diabetes, banco de alimentos), asignado por el docente con reparto equilibrado.
 - **Qué se hace:** analizar el problema, estimar el costo energético del proceso actual, diseñar al menos dos estrategias para cada una de al menos dos operaciones críticas (con al menos una de dividir y vencer, voraz o programación dinámica fuera del ordenamiento), implementarlas en Python, medirlas con datos sintéticos de tamaño creciente y justificar la recomendación con su marco normativo e impacto.
-- **Entrega:** lunes **23 de noviembre**. Repositorio nuevo por equipo en GitHub, con `README.md` que contiene el informe técnico (10–15 páginas sin anexos), más el informe en PDF. Sin hitos intermedios ni sustentación oral.
+- **Entrega:** lunes **23 de noviembre**. Repositorio nuevo por equipo en GitHub, con `README.md` que contiene el informe técnico (10–15 páginas sin anexos), más el informe en PDF. Sin sustentación oral.
+- **Entrega parcial (Laboratorio 4, 15 %):** el **miércoles 18 de noviembre**, el equipo entrega la operación 4 de su caso (programación dinámica o voraz), que es obligatoria. Es un hito interno del curso, con rúbrica propia; la rúbrica institucional del proyecto se aplica solo a la entrega del 23 nov. El equipo completa además, como mínimo, otra operación del caso para cumplir las dos que exige el instrumento.
 - **Calificación:** rúbrica institucional fija (RADE1-1 25 %, RADE1-2 25 %, RADT1 30 %, RAG2 10 %, RAG4 10 %), aplicada por equipo. Todos los integrantes reciben la nota del equipo; el aporte individual se valora en Seguimiento con el historial de commits.
 - **Modelado del problema:** no hay sesión de clase; se publica una guía breve con un ejemplo resuelto junto al enunciado.
 - **Registro:** la nota se reporta por estudiante en la plantilla institucional (`Rubrica RA Análisis de Algoritmos.xlsx`) y se registra en el SIA en la ventana del 23 al 29 de noviembre.
