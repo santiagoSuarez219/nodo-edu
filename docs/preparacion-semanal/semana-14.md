@@ -1,7 +1,7 @@
 # Semana 14 — 2–8 de noviembre de 2026
 
 **Rama:** `feat/manejo-datos-faltantes-pc`
-**Estado:** ⬛ En preparación (commit hecho; sin merge, sin desplegar)
+**Estado:** ✅ Mergeada a `development` y desplegada y abierta en producción (2026-11-02)
 
 > Material fuera del cronograma: el docente pidió una sección nueva de trabajo
 > independiente, posterior a `filtrado-agregacion-y-limpieza-de-datos`. No
@@ -135,21 +135,30 @@ No aplica.
 
 | Paso | Estado | Fecha / detalle |
 |---|---|---|
-| D0 · Alcance y checklist pre-despliegue | ⬜ | |
-| D1 · Lecciones nuevas cerradas por adelantado | ⬜ | cerrar `manejo-de-datos-faltantes` y `caso-pipeline-analisis-de-datos-con-pandas` antes del push si no deben abrirse |
-| D2 · Merge a `main` y deploy en Vercel | ⬜ | |
-| D3 · Banco de preguntas replicado a producción | ⬜ | keyword `datos-faltantes` + 6 preguntas (solo de `manejo-de-datos-faltantes`; el caso no tiene cuestionario) |
-| D4 · Lecciones abiertas a los estudiantes | ⬜ | `programacion-cientifica` → `manejo-de-datos-faltantes` y `caso-pipeline-analisis-de-datos-con-pandas` |
-| D5 · Verificación end-to-end en producción | ⬜ | |
-| D6 · Bitácora cerrada y rama borrada | ⬜ | |
+| D0 · Alcance y checklist pre-despliegue | ✅ | 2026-11-02. Solo código y contenido (sin cambios en `supabase/`); 4 commits de `development` sobre `main`; 17 lecciones abiertas y ninguna cerrada en producción antes del deploy |
+| D1 · Lecciones nuevas cerradas por adelantado | ✅ (no aplica) | Decisión del docente: abiertas desde el deploy, sin filas de cierre |
+| D2 · Merge a `main` y deploy en Vercel | ✅ | Rama `deploy/semana-14` → `main` con `--no-ff`, commit `82121dc`, push autorizado por el docente. Deployment `dpl_2uGG8Ff9B6QpQDNTnUkg1REvi6ZL` en estado READY |
+| D3 · Banco de preguntas replicado a producción | ✅ | Keyword `datos-faltantes` creada en producción. 6 preguntas creadas, publicadas y montadas en `manejo-de-datos-faltantes` (ver IDs abajo) |
+| D4 · Lecciones abiertas a los estudiantes | ✅ | Abiertas por no existir fila de cierre: `manejo-de-datos-faltantes` (10.5) y `caso-pipeline-analisis-de-datos-con-pandas` (10.6). `list_course_lessons`: 19 lecciones, 0 cerradas, 0 huérfanas |
+| D5 · Verificación end-to-end en producción | ⬜ | Pendiente: lo verifica el docente en `https://www.nod0.dev` (diagrama Mermaid, videos, autoevaluación al final). No se abrió el navegador |
+| D6 · Bitácora cerrada y rama `deploy/` borrada | ✅ | Rama `deploy/semana-14` borrada en local (nunca se publicó en remoto) |
 
-- [ ] Verificado que las lecciones de semanas futuras siguen **cerradas**
+### IDs de las preguntas en producción (`manejo-de-datos-faltantes`)
+
+1. `1d35c2ad-4b6d-4e19-9c5f-eec33f3807c1`
+2. `5cfff3a1-2c69-462d-8088-e259faa50752`
+3. `11107243-508a-4388-8d72-dab46c3408b0`
+4. `61ce32e7-e48a-488a-b6af-a9f8f16f451e`
+5. `b7a3fa83-04b2-4b94-9f75-711913321c44`
+6. `b3a04c41-98a2-4d9a-b4d9-655f40c69767`
+
+Verificado con `list_lesson_questions` en producción: 6 preguntas, publicadas, montadas y en este orden.
+
+- [x] Verificado que no hay lecciones de semanas futuras en el catálogo ni cerradas indebidamente (el catálogo de producción coincide con `lib/courses/data/`).
 
 ## Pendientes
 
-- Aprobación explícita del docente para el merge a `development` (`@reviewer` ya aprobó).
-- Volver a correr `npm run build` tras las últimas ediciones de texto del `.mdx`.
-- El Entregable 1 del proyecto integrador vence el **jueves 5 de noviembre**: el caso completo solo ayuda si está desplegado y abierto antes.
+- Verificación visual en producción por el docente (D5).
+- `git push origin development` (lo ejecuta el docente): `origin/development` aún no tiene los commits de esta ronda; `main` ya está desplegado.
+- Marcar las lecciones como vistas en clase de cada grupo (D7) **después** de dictarlas o asignarlas; no se marcó nada, y no corresponde antes de la sesión.
 - Confirmar las unidades (días, masas de Júpiter, parsecs) del dataset `planets` contra su documentación.
-- Las lecciones nuevas quedan **abiertas apenas se despliegan** si no se crea antes su fila de cierre (D1).
-- El `estimated_time` de `filtrado-agregacion-y-limpieza-de-datos` dice "Semana 13" mientras su `order` es 10: es una inconsistencia previa, fuera del alcance de esta ronda.

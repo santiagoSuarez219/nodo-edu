@@ -27,7 +27,7 @@ Al no tener prerrequisitos en el pensum, el curso recibe estudiantes de primer s
 | **Momento evaluativo 1:** Programación con Python — variables, condicionales, bucles, estructuras de datos nativas | 15%        | Semana 5 — jueves 3 de septiembre de 2026     |
 | **Momento evaluativo 2:** POO                                                            | 15%        | Semana 8 — jueves 24 de septiembre de 2026     |
 | **Momento evaluativo 3:** NumPy                                                          | 15%        | Semana 11 — jueves 15 de octubre de 2026    |
-| **Momento evaluativo 4:** Pandas (aplicado al proyecto integrador)                       | 15%        | Semana 14 — jueves 5 de noviembre de 2026    |
+| **Momento evaluativo 4:** Pandas (aplicado al proyecto integrador)                       | 15%        | Semana 15 — jueves 12 de noviembre de 2026    |
 | **Momento evaluativo 5:** Matplotlib y Seaborn (portafolio + presentación del proyecto)  | 20%        | Semana 16 — jueves 19 de noviembre de 2026    |
 | **Seguimiento**                                                                           | 20%        | Durante todo el semestre           |
 
@@ -293,18 +293,20 @@ Para bajar la carga de decisión, especialmente a estudiantes de primer semestre
 
 ---
 
-## Semana 14 ★ — Momento evaluativo 4: Pandas (15%)
+## Semana 14 — Avances del proyecto integrador
 
-**Sesión evaluativa**
-- Entrega de un informe corto de análisis con Pandas: carga, inspección, filtrado/agregación y limpieza del dataset del proyecto
-- Espacio de socialización de avances y retroalimentación como guía para el cierre del proyecto
-- Evaluación mediante rúbrica: uso adecuado de funciones de Pandas, claridad del análisis y documentación
+**Sesión**
+- Espacio de socialización de avances y retroalimentación como guía para el cierre del Entregable 1 (Momento evaluativo 4, que se entrega en la semana 15)
 
 ---
 
 ## Módulo 7 — Visualización de datos
 
-### Semana 15 — Matplotlib y Seaborn
+### Semana 15 ★ — Matplotlib y Seaborn · Entrega del Momento evaluativo 4: Pandas (15%)
+
+**Entrega del Momento evaluativo 4** (jueves 12 de noviembre, 23:59)
+- Entrega de un informe corto de análisis con Pandas: carga, inspección, filtrado/agregación y limpieza del dataset del proyecto
+- Evaluación mediante rúbrica: uso adecuado de funciones de Pandas, claridad del análisis y documentación
 
 **Sesión**
 - Matplotlib: gráficos básicos (líneas, barras, dispersión, histogramas)

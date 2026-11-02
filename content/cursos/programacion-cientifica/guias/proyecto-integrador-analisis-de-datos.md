@@ -1,12 +1,12 @@
 ---
 title: "Proyecto integrador — Análisis de datos con pandas, Matplotlib y Seaborn"
-updatedAt: "2026-10-28"
+updatedAt: "2026-11-02"
 ---
 
 # Proyecto integrador — Análisis de datos con pandas, Matplotlib y Seaborn
 
 > **El proyecto integrador vale el 35 % de la nota final del curso** y se
-> entrega en dos partes: el **Entregable 1 (pandas, 15 %)** el jueves 5 de
+> entrega en dos partes: el **Entregable 1 (pandas, 15 %)** el jueves 12 de
 > noviembre y el **Entregable 2 (Matplotlib, Seaborn y exposición, 20 %)** el
 > jueves 19 de noviembre de 2026. Se desarrolla **en parejas**, y cada pareja
 > trabaja sobre un conjunto de datos asignado por el docente.
@@ -265,7 +265,7 @@ README y una plantilla para copiar.
 
 ## Entregable 1 — Análisis con pandas (15 %)
 
-**Plazo:** jueves 5 de noviembre de 2026, 23:59. Se califica el contenido del
+**Plazo:** jueves 12 de noviembre de 2026, 23:59. Se califica el contenido del
 repositorio hasta esa hora.
 
 ### Qué debe contener el notebook `notebooks/analisis.ipynb`
@@ -519,6 +519,6 @@ que ambos conozcan todo el análisis.
 - **Asesorías:** use las sesiones de clase previas a cada entrega para resolver
   dudas del proyecto con el docente.
 
-**Plazos de entrega:** Entregable 1, jueves 5 de noviembre de 2026 a las
+**Plazos de entrega:** Entregable 1, jueves 12 de noviembre de 2026 a las
 23:59. Entregable 2 y exposición, jueves 19 de noviembre de 2026, al inicio de
 la clase.

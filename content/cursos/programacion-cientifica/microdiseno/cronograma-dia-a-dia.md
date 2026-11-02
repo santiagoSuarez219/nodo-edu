@@ -31,8 +31,8 @@
 | 11 | **jue. 15 oct** | — | ★ **Momento evaluativo 3** — NumPy (15%) | Justo antes de "Evaluaciones institucionales" (16–20 oct) |
 | 12 | **jue. 22 oct** | Pandas: carga e inspección + arranque del proyecto integrador |  | — |
 | 13 | **jue. 29 oct** | Filtrado, agregación y limpieza de datos |  | Coincide con "Segunda evaluación de estudiantes a docentes" (26 oct–1 nov) — no afecta la clase |
-| 14 | **jue. 5 nov**  | — | ★ **Momento evaluativo 4** — Pandas (15%) | Ver ⚠️ nota sobre registro del 60% en SIA más abajo |
-| 15 | **jue. 12 nov** | Matplotlib y Seaborn |  | — |
+| 14 | **jue. 5 nov**  | Espacio de avances y retroalimentación del proyecto integrador |  | — |
+| 15 | **jue. 12 nov** | Matplotlib y Seaborn | ★ **Momento evaluativo 4** — Pandas (15%): entrega del Entregable 1 (23:59) | Ver ⚠️ nota sobre registro del 60% en SIA más abajo |
 | 16 | **jue. 19 nov** | — | ★ **Momento evaluativo 5** — Portafolio + presentación final (20%) | — |
 | — | jue. 26 nov | **Reserva / buffer** (sin contenido nuevo) |  | Última semana antes de exámenes finales |
 | — | 23–29 nov | — | — | Semana de exámenes finales institucional |
@@ -48,7 +48,7 @@ El calendario institucional exige tener registrado el **60% evaluado en el SIA h
 - Momento evaluativo 1, 2 y 3 → 45%
 - Seguimiento acumulado de las semanas 1 a 13 (una parte importante del 20% total)
 
-Para llegar sin apuros al 60% antes del 1 de noviembre, conviene **calificar y registrar el Seguimiento de forma progresiva** (semana a semana) en vez de dejarlo acumulado para el final del semestre, en lugar de depender del Momento evaluativo 4 (Pandas), que queda programado para el 5 de noviembre — después de esa fecha límite.
+Para llegar sin apuros al 60% antes del 1 de noviembre, conviene **calificar y registrar el Seguimiento de forma progresiva** (semana a semana) en vez de dejarlo acumulado para el final del semestre, en lugar de depender del Momento evaluativo 4 (Pandas), que queda programado para el 12 de noviembre — después de esa fecha límite.
 
 ---
 
