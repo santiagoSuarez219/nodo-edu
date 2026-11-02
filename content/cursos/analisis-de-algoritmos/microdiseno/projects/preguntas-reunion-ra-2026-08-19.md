@@ -7,6 +7,9 @@
 
 > Las preguntas están ordenadas por impacto: las del Bloque A condicionan todo
 > lo demás y conviene resolverlas primero, aunque la reunión se quede corta.
+>
+> **Respondidas.** Las respuestas de la reunión se registraron el 2026-10-14 en
+> la sección final "Respuestas de la reunión".
 
 ---
 
@@ -192,3 +195,37 @@ Por qué encaja:
   entrega la potencia del servidor (450 W) para que el consumo energético se
   calcule, y define dos fallas concretas del algoritmo cuyo costo recae sobre
   usuarios reales.
+
+---
+
+## Respuestas de la reunión
+
+> Reunión del 19 de agosto de 2026. Respuestas registradas el 2026-10-14 a
+> partir de lo informado por el docente.
+
+| # | Pregunta | Respuesta |
+|---|---|---|
+| 1 | ¿Caso propio o el del ejemplo? | **Lo redacta el docente**, pero debe ser **aprobado por la Facultad**. Pendiente: enviar la propuesta cuando se defina. |
+| 2 | ¿Rúbrica fija o ajustable? | **Todo fijo**: criterios, códigos, pesos (25/25/30/10/10) y descriptores. |
+| 3 | ¿Afecta la nota? | **Sí, 20 %** — ocupa la casilla de proyecto final abierta en el reajuste del 2026-10-03. |
+| 4 | ¿Semana de aplicación? | **Semana de finales** (23–29 nov). |
+| 5 | ¿Hitos intermedios? | **No**: solo entrega final. |
+| 6 | ¿Reporte de resultados? | **Por estudiante, aparte del SIA**. |
+| 7 | ¿Solo contenido dictado? | **Admite autoestudio.** |
+| 8 | ¿Caso común a todos los grupos? | **No**: un caso por docente. |
+| 9 | ¿Sustentación oral? | **A criterio del docente.** |
+| 10 | ¿Equipos obligatorios? ¿Calificación individual? | **Equipos de máximo 3, obligatorios**; el historial de commits sirve como evidencia individual. *(2026-10-24: el docente ajustó el máximo a 4 integrantes.)* |
+| 11 | ¿Evidencia suficiente para RAG2 y RAG4? | **A criterio del docente** (no hay lineamiento institucional). |
+| 12 | ¿Dictar ética e impacto o solo evaluarlos? | **Solo evaluarlos.** |
+| 13 | Descriptores idénticos de RAG2 y RAG4 | **No se trató.** La plantilla definitiva (`Rubrica RA Análisis de Algoritmos.xlsx`, recibida el 2026-10-24) ya los diferencia: RAG2 evalúa ética y normatividad; RAG4, impactos actuales y futuros. |
+| 14 | ¿Quién consolida y en qué formato? | **Gustavo Macías, con una plantilla** que él provee. |
+| 15 | ¿Se conservan los informes? | **Sí**, como evidencia de acreditación (tiempo y custodia no definidos). |
+| 16 | ¿Cancelaciones y no entregas? | **No entrega = 0.0.** |
+
+### Pendientes que quedan tras la reunión
+
+- Enviar la propuesta de caso a la Facultad para su aprobación.
+- Decidir si habrá sustentación oral.
+- Solicitar a Gustavo Macías la plantilla de reporte.
+- Fijar la fecha exacta de entrega dentro del 23–29 nov, considerando que esa
+  misma ventana es la de registro del 100 % en el SIA.

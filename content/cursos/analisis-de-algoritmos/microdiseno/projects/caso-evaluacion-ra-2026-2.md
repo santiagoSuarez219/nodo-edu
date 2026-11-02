@@ -1,10 +1,19 @@
 # Evaluación Resultados de Aprendizaje 2026-2 — Análisis de Algoritmos
 
-> **Estado: PROPUESTA.** Documento preparado para la reunión del 19 de agosto de
-> 2026 con el docente encargado de resultados de aprendizaje (Gustavo Macías).
-> No se ha socializado con los estudiantes ni se ha publicado en la plataforma.
-> Ver `preguntas-reunion-ra-2026-08-19.md` para los puntos pendientes de
-> definición institucional.
+> **⚠️ REEMPLAZADO (2026-10-24)** por `casos-evaluacion-ra-2026-2.md`, que
+> propone tres casos de estudio. Este caso de telemedición se conserva como
+> antecedente y no se envía a la Facultad.
+
+> **Estado: PENDIENTE DE APROBACIÓN DE LA FACULTAD.** Las condiciones del
+> instrumento se definieron en la reunión del 19 de agosto de 2026 con el
+> docente encargado de resultados de aprendizaje (Gustavo Macías): el caso lo
+> redacta el docente y lo aprueba la Facultad. Vale el 20 % de la nota y se
+> entrega en la semana de finales (23–29 nov). No se ha socializado con los
+> estudiantes ni se ha publicado en la plataforma. Ver
+> `preguntas-reunion-ra-2026-08-19.md` → "Respuestas de la reunión".
+> La rúbrica completa (desempeño esperado y descriptores por nivel) se
+> transcribió el 2026-10-24 desde la plantilla institucional
+> `Rubrica RA Análisis de Algoritmos.xlsx`.
 
 ---
 
@@ -156,16 +165,19 @@ El equipo deberá:
 3. Seleccionar **al menos dos** de las cuatro operaciones críticas del proceso
    (deduplicación, ordenamiento, detección de los mayores consumos, consulta
    puntual) y diseñar, para cada una, **al menos dos estrategias algorítmicas
-   distintas** que la resuelvan.
-4. Implementar las estrategias diseñadas utilizando el lenguaje de programación
-   definido por el docente.
-5. Analizar la complejidad temporal y espacial de cada solución.
+   distintas** que la resuelvan. Una de las operaciones seleccionadas debe ser
+   el **ordenamiento**, y el equipo debe identificar explícitamente la
+   estrategia de diseño en que se apoya cada propuesta (dividir y vencer,
+   voraz, programación dinámica u otra).
+4. Implementar las estrategias diseñadas en Python.
+5. Analizar la complejidad temporal y espacial de cada solución y estimar su
+   consumo energético.
 6. Diseñar pruebas experimentales utilizando diferentes tamaños de entrada.
 7. Comparar el comportamiento de las soluciones mediante métricas objetivas y
    contrastar los resultados empíricos con la complejidad teórica esperada.
 8. Justificar técnicamente las estrategias recomendadas para ser implementadas
-   por la empresa, incluyendo las implicaciones éticas, sociales y ambientales
-   de la decisión.
+   por la empresa, incluyendo el marco normativo aplicable y las implicaciones
+   éticas, sociales y ambientales de la decisión.
 
 ### Supuestos permitidos
 
@@ -201,12 +213,17 @@ incluir anexos), que contenga como mínimo los siguientes apartados:
 - Descripción del problema computacional.
 - Identificación de entradas, salidas y restricciones.
 - Identificación de las operaciones críticas del proceso.
+- Costo energético del proceso actual (tiempo de ejecución × potencia del
+  servidor), como línea base para la propuesta.
 - Supuestos realizados por el equipo.
 
 **Diseño de la solución**
 
 - Descripción de las estructuras de datos seleccionadas.
 - Diseño de al menos dos estrategias algorítmicas por cada operación abordada.
+- Estrategia de diseño en que se apoya cada propuesta (dividir y vencer, voraz,
+  programación dinámica u otra) y cómo reduce el consumo energético frente al
+  proceso actual.
 - Diagramas, pseudocódigo o representaciones equivalentes que permitan
   comprender el funcionamiento de cada propuesta.
 
@@ -241,6 +258,12 @@ incluir anexos), que contenga como mínimo los siguientes apartados:
   descarta por error una lectura legítima, o cuando la detección de consumos
   atípicos señala equivocadamente a un usuario. Quién asume el costo de ese
   error y cómo puede mitigarse desde el diseño del algoritmo.
+- **Marco normativo y buenas prácticas:** qué normas y buenas prácticas
+  condicionan la solución —por ejemplo, la protección de datos personales
+  (Ley 1581 de 2012) y el régimen de servicios públicos domiciliarios en lo
+  relativo a la medición y facturación del consumo (Ley 142 de 1994)— y cómo
+  las respeta el diseño propuesto, en particular la trazabilidad del archivo
+  original.
 - **Sostenibilidad de la decisión:** cómo se comportarían las estrategias
   recomendadas si el parque de medidores creciera a 3.000.000 de cuentas, o si
   la frecuencia de reporte pasara de una a cuatro lecturas diarias.
@@ -266,22 +289,100 @@ commits.
 
 ## Rúbrica de evaluación
 
-> Rúbrica institucional transcrita del instrumento remitido por la Facultad.
-> **Pendiente de confirmar** si es fija para todas las asignaturas o admite
-> ajuste (ver `preguntas-reunion-ra-2026-08-19.md`, pregunta 2).
+> Rúbrica institucional transcrita de la plantilla
+> `Rubrica RA Análisis de Algoritmos.xlsx` remitida por la Facultad (Medición 1,
+> Taxonomía Socioformativa, Tobón 2025). Es fija: criterios, códigos, pesos y
+> descriptores no admiten ajuste por asignatura (reunión del 19 de agosto de
+> 2026). En la transcripción solo se corrigieron erratas tipográficas.
 
-| Criterio | % |
+### Criterios y pesos
+
+| RA | Desempeño esperado | % |
+|---|---|---|
+| RADE1-1 | Análisis de un algoritmo empleando estrategias como dividir y vencer, algoritmos voraces o programación dinámica, de tal manera que reduzcan el consumo de energía para que sean más amigables con el medio ambiente. | 25 |
+| RADE1-2 | Diseño de un algoritmo empleando estrategias como dividir y vencer, algoritmos voraces o programación dinámica, de tal manera que reduzcan el consumo de energía para que sean más amigables con el medio ambiente. | 25 |
+| RADT1 | Analiza diferentes complejidades y escoge la opción que mejor se adapte al caso de uso. | 30 |
+| RAG2 | Aplica de manera efectiva principios éticos establecidos para la práctica de la ingeniería en los que se evidencia la toma de decisiones responsables de acuerdo con aspectos regulatorios, normativos y de buenas prácticas. | 10 |
+| RAG4 | Argumenta cómo sus acciones y decisiones planteadas impactan al medio ambiente, a la sociedad actual y a la del futuro. | 10 |
+| | **Total** | **100** |
+
+### Niveles de desempeño
+
+| Nivel | Rango |
 |---|---|
-| Analiza el problema computacional (RADE1-1) | 25 |
-| Diseña y compara estrategias algorítmicas (RADE1-2) | 25 |
-| Evalúa el desempeño de la solución (RADT1) | 30 |
-| Justifica la solución propuesta: desde los principios éticos (RAG2) | 10 |
-| Justifica la solución propuesta: desde el impacto ambiental, social y futuro (RAG4) | 10 |
-| **Total** | **100** |
+| Emergente | 0.0–0.9 |
+| En desarrollo | 1.0–1.9 |
+| Receptivo | 2.0–2.9 |
+| Resolutivo | 3.0–3.9 |
+| Crítico | 4.0–4.5 |
+| Reflexivo | 4.6–5.0 |
 
-Cada criterio se valora en seis niveles de desempeño: Emergente (0.0–1.9),
-En desarrollo (2.0–2.9), Receptivo (3.0–3.4), Resolutivo (3.5–3.9), Crítico
-(4.0–4.5) y Reflexivo (4.6–5.0).
+### Cómo se calcula la nota
+
+La rúbrica se aplica por equipo. Cada criterio recibe una nota entre 0.0 y 5.0
+dentro del rango del nivel de desempeño alcanzado, y la nota del proyecto es la
+suma ponderada de los cinco criterios, también en escala de 0.0 a 5.0:
+
+```
+Nota = 0.25·RADE1-1 + 0.25·RADE1-2 + 0.30·RADT1 + 0.10·RAG2 + 0.10·RAG4
+```
+
+### Descriptores por criterio
+
+#### RADE1-1 — Análisis del problema (25 %)
+
+| Nivel | Descriptor |
+|---|---|
+| Emergente (0.0–0.9) | No logra diseñar algoritmos coherentes ni aplica estrategias. |
+| En desarrollo (1.0–1.9) | Analiza algoritmos básicos con errores en la aplicación de estrategias y sin considerar impacto ambiental. |
+| Receptivo (2.0–2.9) | Aplica parcialmente análisis de algoritmos en las estrategias, con poca claridad en la reducción de consumo energético. |
+| Resolutivo (3.0–3.9) | Analiza algoritmos coherentes aplicando estrategias adecuadas y considerando impacto ambiental. |
+| Crítico (4.0–4.5) | Analiza algoritmos fundamentados, optimizando consumo energético y orientados a sostenibilidad. |
+| Reflexivo (4.6–5.0) | Propone el análisis de algoritmos sólidos, anticipando necesidades futuras, aplicando estrategias avanzadas y maximizando eficiencia energética con visión ambiental. |
+
+#### RADE1-2 — Diseño de estrategias (25 %)
+
+| Nivel | Descriptor |
+|---|---|
+| Emergente (0.0–0.9) | No logra diseñar algoritmos coherentes ni aplica estrategias. |
+| En desarrollo (1.0–1.9) | Diseña algoritmos básicos con errores en la aplicación de estrategias y sin considerar impacto ambiental. |
+| Receptivo (2.0–2.9) | Aplica parcialmente el diseño de algoritmos según estrategias, con poca claridad en la reducción de consumo energético. |
+| Resolutivo (3.0–3.9) | Diseña algoritmos coherentes aplicando estrategias adecuadas y considerando impacto ambiental. |
+| Crítico (4.0–4.5) | Diseña algoritmos fundamentados, optimizando consumo energético y orientados a sostenibilidad. |
+| Reflexivo (4.6–5.0) | Propone el diseño de algoritmos sólidos, anticipando necesidades futuras, aplicando estrategias avanzadas y maximizando eficiencia energética con visión ambiental. |
+
+#### RADT1 — Evaluación del desempeño (30 %)
+
+| Nivel | Descriptor |
+|---|---|
+| Emergente (0.0–0.9) | No logra analizar complejidades ni seleccionar opciones adecuadas. |
+| En desarrollo (1.0–1.9) | Analiza complejidades básicas con errores en la selección de la opción. |
+| Receptivo (2.0–2.9) | Analiza parcialmente, seleccionando opciones con poca claridad en la justificación. |
+| Resolutivo (3.0–3.9) | Analiza complejidades de forma coherente, seleccionando opciones adecuadas al caso de uso. |
+| Crítico (4.0–4.5) | Analiza y selecciona opciones fundamentadas, optimizando rendimiento y escalabilidad. |
+| Reflexivo (4.6–5.0) | Realiza análisis integral de complejidades, seleccionando opciones estratégicas y anticipando impactos futuros en el rendimiento. |
+
+#### RAG2 — Principios éticos (10 %)
+
+| Nivel | Descriptor |
+|---|---|
+| Emergente (0.0–0.9) | No aplica principios éticos ni considera aspectos regulatorios. |
+| En desarrollo (1.0–1.9) | Aplica principios básicos con errores en la toma de decisiones responsables. |
+| Receptivo (2.0–2.9) | Aplica principios éticos parcialmente, con poca claridad en la responsabilidad y normatividad. |
+| Resolutivo (3.0–3.9) | Aplica principios éticos de manera coherente, tomando decisiones responsables y considerando normativas. |
+| Crítico (4.0–4.5) | Aplica principios éticos fundamentados, evidenciando responsabilidad y compromiso con buenas prácticas. |
+| Reflexivo (4.6–5.0) | Integra principios éticos de manera ejemplar, anticipando riesgos, garantizando cumplimiento normativo y promoviendo sostenibilidad social. |
+
+#### RAG4 — Impacto ambiental, social y futuro (10 %)
+
+| Nivel | Descriptor |
+|---|---|
+| Emergente (0.0–0.9) | No logra argumentar impactos de sus acciones ni decisiones. |
+| En desarrollo (1.0–1.9) | Argumenta de forma básica con errores en la identificación de impactos. |
+| Receptivo (2.0–2.9) | Argumenta parcialmente, con poca claridad en los impactos ambientales y sociales. |
+| Resolutivo (3.0–3.9) | Argumenta de manera coherente, identificando impactos ambientales y sociales actuales. |
+| Crítico (4.0–4.5) | Argumenta con fundamentos sólidos, evidenciando impactos ambientales y sociales y proponiendo mejoras. |
+| Reflexivo (4.6–5.0) | Argumenta de forma integral, anticipando impactos futuros, proponiendo soluciones sostenibles y con visión estratégica para sociedad y medio ambiente. |
 
 ---
 
@@ -299,44 +400,61 @@ exigen contenidos que este curso **no dicta**:
 
 | Caso del ejemplo | Contenido que exige | Estado en el microdiseño |
 |---|---|---|
-| Programación académica | Satisfacción de restricciones, *backtracking* con poda, coloreado de grafos | *Backtracking* y coloreado: no se dictan. Heurísticas voraces: Semana 16, la última del curso |
-| Rutas de emergencia | Grafo dirigido y ponderado, Dijkstra / Bellman-Ford / BFS | Grafos figuran en "Temas opcionales"; el taller de la antigua Semana 17 se absorbió en la Semana 16. Cobertura real: ninguna |
+| Programación académica | Satisfacción de restricciones, *backtracking* con poda, coloreado de grafos | *Backtracking* y coloreado: no se dictan. Estrategia voraz: Semana 15, la última con clase |
+| Rutas de emergencia | Grafo dirigido y ponderado, Dijkstra / Bellman-Ford / BFS | Grafos figuran en "Temas opcionales" y como lectura autónoma, sin sesión. Cobertura real: ninguna |
 
 El correo de convocatoria establece que "cada asignatura contará con su
 correspondiente caso de estudio y rúbrica de evaluación, los cuales deberán
 guardar coherencia con sus contenidos, competencias y resultados de
-aprendizaje". Este caso ejerce esa facultad.
+aprendizaje", y en la reunión del 19 de agosto se confirmó que el caso lo
+redacta cada docente. Aunque el instrumento admite temas de autoestudio, un
+caso que se apoye principalmente en contenido dictado mide mejor los resultados
+de aprendizaje del curso.
 
 ## Cobertura del caso frente al microdiseño
 
-Cada operación crítica del caso tiene una ruta de solución construida con
-contenido efectivamente dictado, y con margen antes de cualquier fecha de
-entrega razonable:
+Cada operación crítica del caso tiene al menos una ruta de solución construida
+con contenido dictado. Las alternativas marcadas como autoestudio son opcionales
+para el equipo: el instrumento las admite (reunión del 19 de agosto), pero
+ninguna es indispensable para cumplir "dos estrategias por operación".
 
-| Operación del caso | Estrategias esperables | Semana en que se dicta |
-|---|---|---|
-| Deduplicación | Comparación exhaustiva O(n²) → tabla hash con encadenamiento o direccionamiento abierto | Semana 13 (Lab 4) |
-| Ordenamiento | Insertion sort → merge sort, heapsort, quicksort; counting/radix sort si el rango de claves lo permite | Semanas 4, 9, 10, 11 (Lab 3) |
-| Mayores consumos (top-k) | Ordenar todo con merge sort y tomar los k últimos, Θ(n log n) → recorrer una vez manteniendo una lista ordenada de los k mayores, Θ(n·k) | Semanas 4 y 12 |
-| Consulta puntual | Búsqueda lineal → búsqueda binaria sobre el arreglo ordenado, o tabla hash | Semanas 12 y 13 |
+| Operación del caso | Estrategias con contenido dictado | Alternativas por autoestudio | Semana en que se dicta |
+|---|---|---|---|
+| Deduplicación | Comparación exhaustiva O(n²) → tabla hash con encadenamiento o direccionamiento abierto; árbol de búsqueda binario | — | Semana 13 (Lab 3) |
+| Ordenamiento | Insertion sort Θ(n²) → merge sort Θ(n log n) | Heapsort, quicksort; counting/radix sort si el rango de claves lo permite (Módulo 6, retirado del curso; las lecciones siguen publicadas) | Semanas 3 y 4 |
+| Mayores consumos (top-k) | Ordenar todo con merge sort y tomar los k últimos, Θ(n log n) → recorrer una vez manteniendo una lista ordenada de los k mayores, Θ(n·k) | Montículo de mínimos de tamaño k, Θ(n log k) | Semanas 3 y 4 |
+| Consulta puntual | Búsqueda lineal → tabla hash por `id_cuenta`; árbol de búsqueda binario | Búsqueda binaria sobre el arreglo ordenado | Semana 13 |
 
 El caso **no exige** grafos, *backtracking*, NP-completitud ni programación
 paralela.
 
+**Estrategias de diseño (RADE1-1 y RADE1-2).** El desempeño esperado de la
+rúbrica nombra dividir y vencer, voraces y programación dinámica. De las
+estrategias del caso, solo merge sort es dividir y vencer en sentido estricto;
+las tablas hash, los árboles de búsqueda y la búsqueda binaria son estructuras
+o técnicas de búsqueda, no estrategias de diseño. Por eso el ordenamiento es
+obligatorio entre las operaciones seleccionadas: garantiza que todo equipo
+analice y diseñe al menos una estrategia de la familia que nombra la rúbrica
+con contenido dictado. La programación dinámica no tiene una aplicación natural
+en el caso; como la rúbrica dice "estrategias **como**", la lista se lee como
+ilustrativa y no se fuerza.
+
 El contraste empírico-teórico que pide el apartado "Evaluación del desempeño" es
-exactamente la práctica que los cinco laboratorios del curso vienen ejercitando
-desde la Semana 3, de modo que el proyecto capitaliza el trabajo ya hecho en
-lugar de abrir un frente nuevo.
+exactamente la práctica que los cuatro laboratorios del curso vienen ejercitando
+desde la Semana 3. En particular, la parte práctica del Laboratorio 3
+(rediseñar con una tabla hash una solución basada en listas enlazadas) es la
+base directa de la deduplicación y la consulta puntual. De este modo, el
+proyecto capitaliza el trabajo ya hecho en lugar de abrir un frente nuevo.
 
 ## Mapeo del caso a los criterios de la rúbrica
 
 | Criterio | % | Cómo lo provoca este caso | Estado en el curso |
 |---|---|---|---|
-| RADE1-1 — Analiza el problema | 25 | El caso se entrega como contexto organizacional, no como problema formalizado: el equipo debe extraer entradas, salidas, restricciones y operaciones críticas | ⚠️ Vacío parcial: los laboratorios entregan problemas ya definidos. Requiere al menos una sesión de modelado |
-| RADE1-2 — Diseña y compara estrategias | 25 | Exige explícitamente dos operaciones × dos estrategias cada una | ✅ Cubierto (Labs 2, 3 y 5 ya comparan enfoques) |
-| RADT1 — Evalúa el desempeño | 30 | Pruebas con tamaños crecientes, métricas objetivas y contraste con la complejidad teórica | ✅ Cubierto: es la marca declarada del curso |
-| RAG2 — Principios éticos | 10 | Errores de depuración y falsos positivos de la detección de atípicos afectan a usuarios reales, con costo asignable | ❌ Sin cobertura. Requiere contenido nuevo |
-| RAG4 — Impacto ambiental, social y futuro | 10 | El consumo eléctrico es **calculable** con los datos del caso (450 W, tiempo medido). La proyección a 3.000.000 de cuentas mide sostenibilidad | ❌ Sin cobertura. Requiere contenido nuevo |
+| RADE1-1 — Analiza el problema | 25 | El caso se entrega como contexto organizacional, no como problema formalizado: el equipo debe extraer entradas, salidas, restricciones y operaciones críticas. El costo energético del proceso actual es la línea base del análisis | ⚠️ Vacío parcial: los laboratorios entregan problemas ya definidos. Requiere al menos una sesión de modelado |
+| RADE1-2 — Diseña y compara estrategias | 25 | Exige dos operaciones × dos estrategias cada una, con el ordenamiento obligatorio (merge sort, dividir y vencer) y la estrategia de diseño y su efecto energético declarados | ✅ Cubierto (Labs 2, 3 y 4 ya comparan enfoques) |
+| RADT1 — Evalúa el desempeño | 30 | Pruebas con tamaños crecientes, métricas objetivas y contraste con la complejidad teórica; la proyección de crecimiento evidencia escalabilidad (nivel Crítico en adelante) | ✅ Cubierto: es la marca declarada del curso |
+| RAG2 — Principios éticos | 10 | Errores de depuración y falsos positivos de la detección de atípicos afectan a usuarios reales, con costo asignable; el marco normativo (datos personales, servicios públicos) cubre lo "regulatorio y normativo" del descriptor | Solo se evalúa (no se dicta, reunión del 19 de agosto). Evidencia anclada en dos fallas concretas del caso y en el marco normativo |
+| RAG4 — Impacto ambiental, social y futuro | 10 | El consumo eléctrico es **calculable** con los datos del caso (450 W, tiempo medido). La proyección a 3.000.000 de cuentas mide sostenibilidad | Solo se evalúa (no se dicta, reunión del 19 de agosto). Evidencia anclada en kWh calculados y en la proyección de crecimiento |
 
 ## Decisión de diseño sobre RAG2 y RAG4
 
@@ -354,32 +472,78 @@ estudiante produce:
   equivocadamente a un usuario), no en una reflexión genérica sobre ética
   profesional.
 
-Aun así, **este anclaje no sustituye la enseñanza del tema**: sigue siendo
-necesario dictar contenido sobre implicaciones éticas y ambientales de las
-decisiones algorítmicas antes de exigir esa evidencia.
+En la reunión del 19 de agosto se definió que estos dos resultados **solo se
+evalúan**: no hay que dictar contenido de ética ni de impacto, y la evidencia
+suficiente queda a criterio del docente. Este anclaje es, por lo tanto, el
+mecanismo con el que se califican.
 
-## Impacto pendiente sobre el microdiseño
+En el instrumento de ejemplo los descriptores de RAG2 y RAG4 parecían idénticos;
+la plantilla definitiva (`Rubrica RA Análisis de Algoritmos.xlsx`) los
+diferencia: RAG2 evalúa decisiones responsables frente a aspectos regulatorios,
+normativos y de buenas prácticas, y RAG4 la argumentación de impactos
+ambientales y sociales, actuales y futuros. El informe pide evidencia distinta
+para cada uno: consecuencias sobre las personas y marco normativo para RAG2;
+consumo energético y proyección de crecimiento para RAG4.
 
-Este documento **no modifica** `info.md` ni `cronograma-dia-a-dia.md`. Los
-ajustes que quedarían pendientes, una vez se confirmen las condiciones del
-instrumento el 19 de agosto, son:
+El consumo energético no se califica solo en RAG4: los descriptores de RADE1-1
+y RADE1-2 piden reducción del consumo energético en el análisis y en el diseño.
+Por eso la línea base energética va en "Análisis del problema" y el efecto
+energético de cada estrategia en "Diseño de la solución".
 
-1. **Ubicación del proyecto en el sistema de evaluación.** El esquema actual ya
-   suma 100% (5 laboratorios 80% + Seguimiento 20%). La opción recomendada es
-   que el proyecto reemplace al Laboratorio 5 (20%) y opere como cierre
-   integrador, manteniendo el dictado de programación dinámica y algoritmos
-   voraces. Depende de la respuesta a la pregunta 3 de la reunión.
-2. **Sesión de modelado** (RADE1-1): traducir un requisito organizacional en un
-   problema computacional. No existe hoy en el microdiseño.
-3. **Hilo transversal de ética e impacto** (RAG2, RAG4): integrarlo a sesiones
-   existentes en lugar de abrir una semana nueva. El enganche natural está en la
-   Semana 3, que ya argumenta que los algoritmos son una tecnología con
-   consecuencias medibles en tiempo y dinero; extenderlo a energía, acceso y
-   equidad cuesta media sesión.
-4. **Trabajo en equipo.** El curso es hoy íntegramente individual: repositorio
-   individual e informes individuales. Definir conformación de equipos,
-   estrategia de repositorio compartido y trazabilidad individual por commits
-   (este último criterio ya se valora en Seguimiento, de modo que transfiere sin
-   fricción).
-5. **Hitos intermedios del proyecto** en el cronograma, según lo que exija la
-   Facultad.
+## Observaciones sobre la plantilla institucional
+
+Detectadas al transcribir la rúbrica (2026-10-24); conviene reportarlas a
+Gustavo Macías antes de consolidar resultados:
+
+- **Error de fórmula:** en la hoja `Consolidado`, la celda F19 (RAG4 del
+  Grupo 1) apunta a `'Eq 2'!B22` en lugar de `'Eq 1'!B22`: el Grupo 1 recibiría
+  el RAG4 del Grupo 2.
+- **Fórmula faltante:** la fila "Promedio RA" de `Consolidado` no tiene el
+  promedio de RADE1-2 (celda C33 vacía).
+- **Códigos que no coinciden con su descripción:** el criterio RAG2 evalúa
+  principios éticos, pero el RA asociado en la hoja (RAG2, competencia C4) es
+  "participa activamente en equipos de trabajo… comunicación efectiva"; el
+  criterio RAG4 evalúa impacto ambiental y social, pero el RA asociado (C7) es
+  "identifica, selecciona y aplica nuevos conocimientos". Los códigos también
+  varían: "RAD1" y "RAT1" en las hojas por equipo, "RADE1" y "RADT1" en el
+  resto.
+- **Rangos de nivel:** los rangos de la plantilla (Emergente 0.0–0.9 … Resolutivo
+  3.0–3.9) difieren de los que se habían tomado del instrumento de ejemplo
+  (Emergente 0.0–1.9 … Resolutivo 3.5–3.9). Este documento usa los de la
+  plantilla.
+
+## Impacto sobre el microdiseño
+
+Condiciones ya definidas (reunión del 19 de agosto y reajuste del 2026-10-03):
+
+1. **Ubicación en la evaluación:** proyecto final, **20 %** de la nota, en la
+   casilla abierta por el reajuste del 2026-10-03 (4 laboratorios de 15 % +
+   proyecto 20 % + Seguimiento 20 %).
+2. **Fecha:** semana de finales (23–29 nov). No se exigen hitos intermedios:
+   solo hay entrega final. Esa misma semana es la ventana de registro del 100 %
+   en el SIA, así que la fecha exacta debe dejar tiempo para calificar.
+3. **Trabajo en equipo:** equipos de máximo 3 integrantes, obligatorios. La
+   evidencia individual es el historial de commits, que ya se valora en
+   Seguimiento.
+4. **Ética e impacto:** solo se evalúan; no se abre espacio curricular.
+5. **Reporte:** por estudiante, en la plantilla de Gustavo Macías
+   (`Rubrica RA Análisis de Algoritmos.xlsx`), aparte del SIA. La plantilla
+   tiene una hoja por equipo (hasta 12) con docente, título del proyecto,
+   estudiantes y un campo de **valoración individual**, y una hoja
+   `Consolidado` que también pide momento, fecha, número de estudiantes y de
+   equipos, aula y horario. La no entrega se reporta como 0.0. Los informes se
+   conservan como evidencia de acreditación.
+
+Pendiente de decisión del docente:
+
+- **Valoración individual:** la rúbrica se aplica por equipo, pero la plantilla
+  trae un campo de valoración individual. Definir si todos los integrantes
+  reciben la nota del equipo o si se ajusta por aporte (historial de commits).
+
+- **Sustentación oral:** opcional según la Facultad.
+- **Sesión de modelado** (RADE1-1): los laboratorios entregan problemas ya
+  definidos y no hay sesión que enseñe a traducir un requisito organizacional en
+  un problema computacional. Con el calendario actual no queda una sesión libre
+  para ella.
+- **Repositorio del equipo:** el curso usa un repositorio individual por
+  estudiante; hay que definir dónde vive el proyecto de un equipo.
