@@ -273,6 +273,8 @@ export const analisisDeAlgoritmos: Course = {
       articleSlug: "proyecto-final",
       order: 17,
       title: "Proyecto final",
+      summary:
+        "Enunciado del proyecto final (20 % de la nota): en equipos de hasta cuatro, analicen el proceso de una organización, diseñen y comparen estrategias algorítmicas, midan su eficiencia y su consumo de energía, y justifiquen la que recomiendan. Entrega el lunes 23 de noviembre.",
       topics: [],
     },
   ],
