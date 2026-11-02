@@ -168,7 +168,7 @@ Transit                         397      1
 Transit Timing Variations         4      0
 ```
 
-`size` es el número de planetas del método y `count` cuántos tienen masa. El patrón es clarísimo: *Radial Velocity* tiene la masa de 510 de sus 553 planetas, mientras que *Transit* la tiene de **1 de 397**. De las 522 masas que faltan, 396 son de *Transit*: ese método **no mide la masa**. No es un descuido de quien capturó los datos; la red simplemente no atrapa ese dato. Es el equivalente al "no aplica" de un diccionario de datos. De las 522 que faltan, solo 43 corresponden a *Radial Velocity*, el método que sí la mide: esos son huecos reales.
+`size` es el número de planetas del método y `count` cuántos tienen masa. El patrón es clarísimo: *Radial Velocity* tiene la masa de 510 de sus 553 planetas, mientras que *Transit* la tiene de **1 de 397**. De las 522 masas que faltan, 396 son de *Transit*: ese método **casi nunca mide la masa** (solo 1 de sus 397 planetas la tiene). No es un descuido de quien capturó los datos; la red simplemente no atrapa ese dato. Es el equivalente al "no aplica" de un diccionario de datos, y lo mismo ocurre con *Imaging*, *Microlensing* y los demás métodos con masa casi siempre vacía. De las 522 que faltan, solo 43 corresponden a *Radial Velocity*, el método que sí la mide de forma sistemática: esos son huecos reales.
 
 **Atípicos y valores imposibles.** Primero lo imposible, con un filtro: una masa, un periodo o una distancia que sean cero o negativos no tendrían sentido físico.
 
@@ -213,7 +213,7 @@ Name: count, dtype: int64
 643  Imaging       4        170000.0   NaN     39.94  2008
 ```
 
-El criterio señala 126 planetas (el 12 %) con periodos superiores a 1306.8 días. Pero **señalar no es lo mismo que equivocarse**: los periodos más largos pertenecen a planetas de imagen directa, que están muy lejos de su estrella y de verdad tardan miles de años en dar una vuelta (730 000 días son unos 2000 años). Es una consecuencia de la malla de la red, no un error de captura.
+El criterio señala 126 planetas (el 12 %) con periodos superiores a 1306.8 días. Pero **señalar no es lo mismo que equivocarse**: los periodos más largos pertenecen a planetas de imagen directa, que están muy lejos de su estrella y de verdad tardan miles de años en dar una vuelta (730 000 días son unos 2000 años). Es una consecuencia de la malla de la red, no un error de captura. Lo mismo vale para los 97 extremos de *Radial Velocity*: son planetas gigantes con periodos de unos pocos años o más, que ese método también detecta, solo que tarda más en verlos.
 
 **Filas repetidas y filas sin información.**
 
@@ -251,7 +251,7 @@ Resumen del diagnóstico:
 
 | Hallazgo | Magnitud | Naturaleza |
 |---|---|---|
-| `mass` vacía | 522 filas (50.4 %) | 479 son "no aplica" (el método no la mide); 43 son huecos reales de *Radial Velocity* |
+| `mass` vacía | 522 filas (50.4 %) | 479 son "no aplica" (métodos que casi nunca la miden); 43 son huecos reales de *Radial Velocity* |
 | `distance` vacía | 227 filas (21.9 %) | Huecos reales, distribuidos según el método |
 | `orbital_period` vacío | 43 filas (4.2 %) | Huecos reales, pocos |
 | Periodos extremos | 126 filas (12 %) | Reales: planetas con órbitas larguísimas |
@@ -312,6 +312,8 @@ print(limpio["distancia_imputada"].sum(), limpio["distance"].isna().sum())
 Imputamos 226 de los 227 vacíos. Queda uno sin rellenar: el único planeta del método *Pulsation Timing Variations* no tiene ninguna distancia conocida, así que no hay mediana de grupo con qué rellenarlo. Cuando el grupo entero está vacío, la imputación por grupo se queda sin información, y es correcto dejarlo así en lugar de inventar.
 
 Una advertencia honesta: ninguna de nuestras cinco preguntas **necesita** las distancias imputadas, y cuando respondamos la pregunta 5 las vamos a excluir. Hacemos la imputación para mostrar el procedimiento y porque cualquier análisis posterior que pida filas completas la necesitaría. Si tu análisis no la necesita, **no imputar es una decisión igual de defendible**.
+
+> ⚠️ **En tu proyecto las estrategias deben ser distintas.** En este caso las dos imputaciones usan la mediana, aunque con reglas diferentes (una solo donde el método sí mide la variable, otra por grupo), porque estos datos no ofrecen otra columna con vacíos. El Entregable 1 pide imputar **al menos dos columnas con estrategias distintas** (por ejemplo, mediana en una y moda o mediana por grupo en otra), cada una justificada según el tipo de dato. Elige las tuyas según tu dataset, no copies las de este caso.
 
 **Decisión 3. `orbital_period`: no imputar, y señalar los extremos sin borrarlos.**
 Son solo 43 vacíos (4.2 %), y el periodo es justo la variable que estudia la pregunta 3. Rellenar el periodo de un planeta con el valor típico de su método sería suponer que sus características son "las típicas", cuando el periodo es la propia característica que queremos estudiar. Preferimos **excluir esas 43 filas solo en las preguntas que usan el periodo**, con `dropna(subset=...)`. Para los extremos, no los borramos (son reales) y los marcamos para poder separarlos cuando haga falta; además, para resumir esta columna usaremos la **mediana** y no el promedio, porque el 730 000 arrastraría el promedio a 2002.9 cuando lo típico es 40.
@@ -541,7 +543,7 @@ Qué responden los datos hasta aquí:
 - Solo *Radial Velocity* nos da la masa de forma sistemática. Comparar las masas de dos métodos no es posible con estos datos.
 - Para la decisión del equipo: si el objetivo es conocer **la masa** de los planetas, *Radial Velocity* es la única opción; si el objetivo es encontrar muchos planetas cercanos a su estrella, *Transit*.
 
-Qué queda abierto para las gráficas: ver la distribución de los periodos (en la que el promedio engaña y el 730 000 se distorsiona), comparar visualmente los métodos año a año y mostrar cómo se reparten las distancias por método. Ese trabajo viene después, sobre estos mismos datos ya limpios.
+Qué queda abierto para las gráficas: ver la distribución de los periodos (en la que el promedio engaña y el 730 000 distorsiona la escala), comparar visualmente los métodos año a año y mostrar cómo se reparten las distancias por método. Ese trabajo viene después, sobre estos mismos datos ya limpios.
 
 También hay limitaciones que el informe debe decir: los datos llegan hasta 2014; varios métodos tienen muy pocos planetas; y encontrar que un método descubre planetas de periodo corto no prueba que ese tipo de planeta sea más común en el universo, solo que es más fácil de ver con esa red.
 
@@ -550,7 +552,7 @@ También hay limitaciones que el informe debe decir: los datos llegan hasta 2014
 Todo este recorrido tiene un destino: un informe que otra persona pueda leer sin abrir tu notebook. En el proyecto integrador ese informe es el `README.md` del repositorio, con esta estructura:
 
 ```markdown
-# Proyecto — <título>
+# Proyecto integrador — Grupo N: <título>
 
 ## Integrantes
 ## El conjunto de datos

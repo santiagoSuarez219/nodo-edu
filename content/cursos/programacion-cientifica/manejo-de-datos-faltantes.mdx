@@ -311,7 +311,7 @@ print(limpio["body_mass_g"].isna().sum())
 
 El original conserva sus 2 huecos y la copia ya no tiene ninguno. `copy()` te protege: si te equivocas de valor, puedes volver a empezar sin recargar el dataset. Esa es la razón de trabajar siempre sobre una copia.
 
-> ⚠️ En pandas 3 no uses `inplace=True` ni escribas `df["col"].fillna(..., inplace=True)`. Esa forma no modifica tu tabla: los huecos siguen ahí y solo recibes una advertencia. El patrón correcto es siempre `df["col"] = df["col"].fillna(valor)`.
+> ⚠️ Evita `inplace=True`. En su forma encadenada, `df["col"].fillna(..., inplace=True)`, pandas 3 no modifica tu tabla: los huecos siguen ahí y solo recibes una advertencia. El patrón que siempre funciona, y el más claro de leer, es `df["col"] = df["col"].fillna(valor)`.
 
 ¿Con qué valor rellenar? Depende del tipo de columna:
 
@@ -405,7 +405,7 @@ La solución es calcular la mediana **dentro de cada grupo** y usarla para relle
 
 ```python
 mediana_por_especie = pinguinos.groupby("species")["body_mass_g"].transform("median")
-print(mediana_por_especie.loc[[3, 339]])
+print(mediana_por_especie.loc[[3, 339]])  # loc[[3, 339]] muestra solo las filas con etiqueta 3 y 339
 ```
 
 ```text
@@ -414,7 +414,7 @@ print(mediana_por_especie.loc[[3, 339]])
 Name: body_mass_g, dtype: float64
 ```
 
-Cada fila trae ahora la mediana de su especie. Esa Series se usa como relleno: `fillna` recibe una Series y rellena cada hueco con el valor de **su misma posición**:
+Cada fila trae ahora la mediana de su especie. Esa Series se usa como relleno: `fillna` recibe una Series y rellena cada hueco con el valor que esa Series tiene **para la misma fila** (alinea por la etiqueta del índice, es decir, el número de fila):
 
 ```python
 peso_por_grupo = pinguinos["body_mass_g"].fillna(mediana_por_especie)
@@ -473,7 +473,7 @@ Cada decisión sobre un hueco tiene su herramienta y su señal de alerta:
 | ¿Cuáles filas tienen huecos? | `isna()` como máscara, `isna().any(axis=1)` | Detectar con `==` (un `NaN` no es igual a nada) |
 | ¿Por qué faltan? | `groupby` sobre las filas con hueco | Huecos concentrados en un solo grupo |
 | ¿Elimino? | `dropna`, `subset`, `how`, `thresh` | No comparar `shape` antes y después |
-| ¿Relleno con un valor típico? | `fillna(mediana)`, `fillna("Desconocido")` | Olvidar asignar el resultado, o usar `inplace=True` |
+| ¿Relleno con un valor típico? | `fillna(mediana)`, `fillna("Desconocido")` | Olvidar asignar el resultado, o encadenar `fillna(..., inplace=True)` |
 | ¿Relleno según el grupo? | `groupby(...).transform("median")` | Dar a un grupo el valor típico de otro |
 | ¿Cómo lo dejo documentado? | Bitácora de limpieza | Un análisis cuyas filas "desaparecen" sin explicación |
 

@@ -75,8 +75,8 @@ No aplica.
 - [x] `summary` presente en frontmatter **y** en registro TS
 - [x] Salidas de todo el código de la lección ejecutadas con pandas 3.0.2 y el dataset real
 - [x] Coherencia cruzada lección ↔ cuestionario (cifras verificadas con código)
+- [x] `@reviewer`: APROBADO (revisión conjunta con la ronda 2; observaciones menores corregidas)
 - [x] `npm run lint` completo (0 errores; 7 warnings previos en otros archivos)
-- [ ] `@reviewer`: pendiente
 
 ---
 
@@ -119,7 +119,15 @@ No aplica.
 - [x] Todos los bloques de código ejecutados con pandas 3.0.2 y el dataset real; las salidas del texto se compararon con la ejecución (4 bloques corregidos)
 - [x] Sin `#` H1, sin `###`, sin `<`/`{`/`$` sueltos en prosa
 - [x] `summary` presente en frontmatter **y** en registro TS
-- [ ] `@reviewer`: pendiente
+- [x] `@reviewer` (ronda 2): APROBADO, sin bloqueantes; 1 hallazgo mayor y varios menores, corregidos en un commit posterior (ver abajo)
+
+### Correcciones tras la revisión
+
+- Caso: advertencia explícita de que, en el proyecto, las dos imputaciones deben usar estrategias distintas (el caso usa medianas con reglas diferentes porque sus datos no ofrecen otra opción).
+- Caso: matizado "no aplica" (los métodos "casi nunca" miden la masa, no "nunca"); añadida la justificación de los 97 extremos de *Radial Velocity*; plantilla del README copiada de la guía del proyecto; frase de las gráficas aclarada; salidas de `unstack` regeneradas con la ejecución real.
+- `manejo-de-datos-faltantes`: precisado que el fallo de `inplace=True` es el de la forma encadenada; `fillna` con una Series alinea por etiqueta del índice (no por posición); aclaración de `loc[[3, 339]]`.
+- Decisión del docente: se mantiene la narración en primera persona del plural del caso (el estándar del curso pide segunda persona del singular).
+- `npm run build` en verde tras las correcciones.
 
 ---
 
@@ -139,7 +147,7 @@ No aplica.
 
 ## Pendientes
 
-- Revisión de `@reviewer` y aprobación del merge a `development`.
+- Aprobación explícita del docente para el merge a `development` (`@reviewer` ya aprobó).
 - Volver a correr `npm run build` tras las últimas ediciones de texto del `.mdx`.
 - El Entregable 1 del proyecto integrador vence el **jueves 5 de noviembre**: el caso completo solo ayuda si está desplegado y abierto antes.
 - Confirmar las unidades (días, masas de Júpiter, parsecs) del dataset `planets` contra su documentación.
