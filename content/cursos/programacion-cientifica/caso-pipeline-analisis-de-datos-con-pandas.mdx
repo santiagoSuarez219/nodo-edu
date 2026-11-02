@@ -1,0 +1,596 @@
+---
+title: "Caso completo: del problema a los hallazgos con pandas"
+course: "Programación Científica"
+course_code: "PC"
+level: "Primeros semestres"
+type: "Apuntes teóricos"
+language: "Python 3 (Google Colab)"
+difficulty: "Intermedio"
+estimated_time: "Lectura independiente de 30 minutos"
+presentation: false
+slides_hint: "Trabajo independiente del estudiante; no se proyecta en clase."
+date: "2026-11-02"
+author: "Asistente de Docencia"
+summary: "Recorre un análisis completo con pandas sobre un dataset de exoplanetas: parte de la decisión que apoya y de las preguntas que se quieren responder, diagnostica la calidad de los datos, limpia justificando cada decisión y responde con filtrado y agregación, hasta dejarlo listo para un informe."
+updatedAt: "2026-11-02"
+---
+
+> 📖 Caso de ejemplo de trabajo independiente — unos 30 minutos. Ejecuta cada bloque en Colab, en orden, y compara tu salida con la que aparece aquí.
+>
+> Es un análisis completo y resuelto, con la misma estructura del **Entregable 1 del proyecto integrador**: carga e inspección, diagnóstico de calidad, limpieza justificada, preguntas de análisis y conclusiones parciales. Úsalo para ver cómo se razona cada decisión, no para copiarlo: cada pareja debe hacer su propio análisis sobre el dataset que le asignaron. Este caso usa datos **reales** de exoplanetas; los de tu proyecto son sintéticos.
+
+## El problema: ¿qué red usar para pescar planetas?
+
+Imagina que quieres pescar en un lago, pero cada red tiene una malla distinta. Una malla fina atrapa peces pequeños y deja pasar los grandes; una de malla ancha, al revés. Si solo pescas con una red, tu captura no es una foto fiel del lago: es una foto de **lo que esa red es capaz de atrapar**.
+
+Los astrónomos tienen el mismo problema con los planetas fuera del Sistema Solar (**exoplanetas**). No los ven directamente: usan **métodos de detección**, y cada uno es una red con su propia malla. El método de velocidad radial mide el bamboleo que un planeta causa en su estrella, y permite estimar su masa. El de tránsito mide cuánto se oscurece la estrella cuando el planeta pasa por delante, y da información sobre el tamaño, pero no sobre la masa. La imagen directa fotografía el planeta, y por eso solo funciona con planetas grandes y lejanos de su estrella.
+
+La decisión que apoya este análisis es la de un equipo que debe planificar su próxima campaña de búsqueda: **¿qué método conviene según el tipo de planeta que quiere encontrar?** Para orientarla trabajamos con el registro de 1035 exoplanetas descubiertos hasta 2014, que viene incluido en la librería Seaborn. Cada fila es un planeta, y cada columna dice cómo se detectó o qué se midió de él.
+
+Antes de abrir los datos, escribimos las **preguntas de análisis**. Son lo que da dirección a todo lo demás: sin ellas no sabemos qué columnas importan ni qué problemas de calidad nos afectan de verdad.
+
+1. ¿Qué método ha descubierto más planetas?
+2. ¿En qué año se descubrieron más, y cómo cambió el protagonismo entre los dos métodos principales?
+3. ¿Cómo cambia el periodo orbital típico (cuánto tarda el planeta en dar una vuelta a su estrella) según el método?
+4. ¿Cuáles son los cinco planetas más masivos y con qué método se descubrieron?
+5. ¿A qué distancia de la Tierra se descubre con cada método?
+
+## Cargar e inspeccionar los datos
+
+Cargamos el dataset y miramos su forma, sus primeras filas y los tipos de cada columna. Es el primer contacto: todavía no cambiamos nada.
+
+```python
+import pandas as pd
+import seaborn as sns
+
+planetas = sns.load_dataset("planets")
+
+print(planetas.shape)
+print(planetas.head())
+planetas.info()
+```
+
+```text
+(1035, 6)
+            method  number  orbital_period   mass  distance  year
+0  Radial Velocity       1         269.300   7.10     77.40  2006
+1  Radial Velocity       1         874.774   2.21     56.95  2008
+2  Radial Velocity       1         763.000   2.60     19.84  2011
+3  Radial Velocity       1         326.030  19.40    110.62  2007
+4  Radial Velocity       1         516.220  10.50    119.47  2009
+<class 'pandas.DataFrame'>
+RangeIndex: 1035 entries, 0 to 1034
+Data columns (total 6 columns):
+ #   Column          Non-Null Count  Dtype  
+---  ------          --------------  -----  
+ 0   method          1035 non-null   str    
+ 1   number          1035 non-null   int64  
+ 2   orbital_period  992 non-null    float64
+ 3   mass            513 non-null    float64
+ 4   distance        808 non-null    float64
+ 5   year            1035 non-null   int64  
+dtypes: float64(3), int64(2), str(1)
+memory usage: 60.5 KB
+```
+
+> La salida puede variar levemente según la versión de pandas de tu Colab: en versiones anteriores la columna de texto aparece como `object` y no como `str`. El contenido es el mismo.
+
+Qué dice cada resultado:
+
+- **Forma:** 1035 filas y 6 columnas. Cada fila es un planeta.
+- **`method`:** el método con que se descubrió (texto). **`number`:** cuántos planetas tiene el sistema de esa estrella. **`orbital_period`:** periodo orbital, en días. **`mass`:** masa, en masas de Júpiter. **`distance`:** distancia a la Tierra, en parsecs. **`year`:** año del descubrimiento. (Las unidades vienen de la documentación del conjunto de datos.)
+- **Tipos:** son correctos. `year` es un entero y no una fecha completa, así que no hace falta convertirlo.
+- **`Non-Null Count`:** ya delata el problema. `method`, `number` y `year` están completas (1035), pero `orbital_period` tiene 992, `distance` 808 y `mass` apenas 513.
+
+Ahora las estadísticas de las columnas numéricas y los métodos que aparecen:
+
+```python
+print(planetas.describe().round(2))
+print(planetas["method"].value_counts())
+```
+
+```text
+        number  orbital_period    mass  distance     year
+count  1035.00          992.00  513.00    808.00  1035.00
+mean      1.79         2002.92    2.64    264.07  2009.07
+std       1.24        26014.73    3.82    733.12     3.97
+min       1.00            0.09    0.00      1.35  1989.00
+25%       1.00            5.44    0.23     32.56  2007.00
+50%       1.00           39.98    1.26     55.25  2010.00
+75%       2.00          526.00    3.04    178.50  2012.00
+max       7.00       730000.00   25.00   8500.00  2014.00
+method
+Radial Velocity                  553
+Transit                          397
+Imaging                           38
+Microlensing                      23
+Eclipse Timing Variations          9
+Pulsar Timing                      5
+Transit Timing Variations          4
+Orbital Brightness Modulation      3
+Astrometry                         2
+Pulsation Timing Variations        1
+Name: count, dtype: int64
+```
+
+Qué llama la atención:
+
+- **`orbital_period`:** el promedio (2002.92 días) es 50 veces la mediana (39.98), y el máximo es 730 000 días. Una columna así tiene valores muy extremos que arrastran el promedio. Hay que mirarla con cuidado.
+- **`method`:** diez métodos, pero dos concentran casi todo: *Radial Velocity* (553) y *Transit* (397). Hay métodos con 1 o 2 planetas, de los que nada confiable se puede concluir.
+- **`year`:** va de 1989 a 2014, sin valores imposibles a simple vista.
+
+## Diagnóstico de calidad: ¿qué tan confiables son los datos?
+
+Antes de contestar nada, medimos qué le pasa a cada columna: cuántos datos faltan, por qué faltan, qué valores son sospechosos y qué filas se repiten.
+
+**Faltantes por columna.** La cantidad y el porcentaje, con las dos herramientas que ya conoces de la lección "Manejo de datos faltantes":
+
+```python
+print(planetas.isna().sum())
+print((planetas.isna().mean() * 100).round(1))
+```
+
+```text
+method              0
+number              0
+orbital_period     43
+mass              522
+distance          227
+year                0
+dtype: int64
+method             0.0
+number             0.0
+orbital_period     4.2
+mass              50.4
+distance          21.9
+year               0.0
+dtype: float64
+```
+
+La masa falta en la mitad de los planetas (50.4 %), la distancia en uno de cada cinco (21.9 %) y el periodo en una fracción pequeña (4.2 %). Con ese 50.4 % la tentación es borrar la columna o rellenarla. Antes hay que preguntar **por qué falta**, y aquí la analogía de las redes responde: veamos cuántas masas hay por método.
+
+```python
+print(planetas.groupby("method")["mass"].agg(["size", "count"]))
+```
+
+```text
+                               size  count
+method                                    
+Astrometry                        2      0
+Eclipse Timing Variations         9      2
+Imaging                          38      0
+Microlensing                     23      0
+Orbital Brightness Modulation     3      0
+Pulsar Timing                     5      0
+Pulsation Timing Variations       1      0
+Radial Velocity                 553    510
+Transit                         397      1
+Transit Timing Variations         4      0
+```
+
+`size` es el número de planetas del método y `count` cuántos tienen masa. El patrón es clarísimo: *Radial Velocity* tiene la masa de 510 de sus 553 planetas, mientras que *Transit* la tiene de **1 de 397**. De las 522 masas que faltan, 396 son de *Transit*: ese método **casi nunca mide la masa** (solo 1 de sus 397 planetas la tiene). No es un descuido de quien capturó los datos; la red simplemente no atrapa ese dato. Es el equivalente al "no aplica" de un diccionario de datos, y lo mismo ocurre con *Imaging*, *Microlensing* y los demás métodos con masa casi siempre vacía. De las 522 que faltan, solo 43 corresponden a *Radial Velocity*, el método que sí la mide de forma sistemática: esos son huecos reales.
+
+**Atípicos y valores imposibles.** Primero lo imposible, con un filtro: una masa, un periodo o una distancia que sean cero o negativos no tendrían sentido físico.
+
+```python
+print((planetas["mass"] <= 0).sum())
+print((planetas["orbital_period"] <= 0).sum())
+print((planetas["distance"] <= 0).sum())
+```
+
+```text
+0
+0
+0
+```
+
+Ninguno. Luego lo extremo, con el criterio del rango intercuartílico (IQR) sobre el periodo orbital:
+
+```python
+q1 = planetas["orbital_period"].quantile(0.25)
+q3 = planetas["orbital_period"].quantile(0.75)
+iqr = q3 - q1
+limite_sup = q3 + 1.5 * iqr
+es_extremo = planetas["orbital_period"] > limite_sup
+
+print(round(limite_sup, 1), es_extremo.sum())
+print(planetas[es_extremo]["method"].value_counts())
+print(planetas.sort_values("orbital_period", ascending=False).head(3))
+```
+
+```text
+1306.8 126
+method
+Radial Velocity              97
+Imaging                      12
+Eclipse Timing Variations     9
+Microlensing                  7
+Pulsar Timing                 1
+Name: count, dtype: int64
+      method  number  orbital_period  mass  distance  year
+937  Imaging       1        730000.0   NaN       NaN  2006
+68   Imaging       1        318280.0   NaN      7.69  2008
+643  Imaging       4        170000.0   NaN     39.94  2008
+```
+
+El criterio señala 126 planetas (el 12 %) con periodos superiores a 1306.8 días. Pero **señalar no es lo mismo que equivocarse**: los periodos más largos pertenecen a planetas de imagen directa, que están muy lejos de su estrella y de verdad tardan miles de años en dar una vuelta (730 000 días son unos 2000 años). Es una consecuencia de la malla de la red, no un error de captura. Lo mismo vale para los 97 extremos de *Radial Velocity*: son planetas gigantes con periodos de unos pocos años o más, que ese método también detecta, solo que tarda más en verlos.
+
+**Filas repetidas y filas sin información.**
+
+```python
+print(planetas.duplicated().sum())
+print(planetas[planetas.duplicated(keep=False)])
+
+sin_medidas = planetas[["orbital_period", "mass", "distance"]].isna().all(axis=1)
+print(sin_medidas.sum())
+print(planetas[sin_medidas]["method"].value_counts())
+```
+
+```text
+4
+           method  number  orbital_period  mass  distance  year
+33        Imaging       1             NaN   NaN       NaN  2008
+902  Microlensing       1             NaN   NaN       NaN  2008
+903  Microlensing       1             NaN   NaN       NaN  2008
+904  Microlensing       1             NaN   NaN       NaN  2009
+923  Microlensing       1             NaN   NaN       NaN  2009
+925  Microlensing       2             NaN   NaN    4080.0  2012
+926  Microlensing       2             NaN   NaN    4080.0  2012
+957       Imaging       1             NaN   NaN       NaN  2008
+11
+method
+Microlensing                 6
+Imaging                      4
+Transit Timing Variations    1
+Name: count, dtype: int64
+```
+
+`duplicated()` marca como repetida cada fila idéntica a una anterior: hay 4. Con `keep=False` vemos todas las filas involucradas (8, en cuatro parejas). Además, 11 planetas no tienen ninguna de las tres medidas: solo se sabe cómo y cuándo se descubrieron.
+
+Resumen del diagnóstico:
+
+| Hallazgo | Magnitud | Naturaleza |
+|---|---|---|
+| `mass` vacía | 522 filas (50.4 %) | 479 son "no aplica" (métodos que casi nunca la miden); 43 son huecos reales de *Radial Velocity* |
+| `distance` vacía | 227 filas (21.9 %) | Huecos reales, distribuidos según el método |
+| `orbital_period` vacío | 43 filas (4.2 %) | Huecos reales, pocos |
+| Periodos extremos | 126 filas (12 %) | Reales: planetas con órbitas larguísimas |
+| Valores imposibles | 0 | — |
+| Filas repetidas | 4 | Sin identificador del planeta, no se puede asegurar que sean errores |
+| Filas sin ninguna medida | 11 | Solo conocemos método y año |
+
+## Limpieza: cada decisión con su justificación
+
+Esta es la parte donde más se aprende, porque ninguna regla se aplica sola. Para cada problema hay que responder tres cosas: **qué hacemos, por qué y cuánto nos cuesta**. Todo el trabajo se hace sobre una **copia** para conservar el original intacto:
+
+```python
+limpio = planetas.copy()
+print(limpio.shape)
+```
+
+```text
+(1035, 6)
+```
+
+**Decisión 1. `mass`: conservar la columna, no imputar el "no aplica", imputar solo los huecos reales.**
+Eliminar la columna perdería las 510 masas válidas de *Radial Velocity*, que son justo las que responden la pregunta 4. Rellenar los 479 vacíos de "no aplica" sería inventar masas que ese método **no puede medir**. En cambio, los 43 huecos de *Radial Velocity* sí son un dato que debió existir. Los rellenamos con la **mediana de ese método** (no la global, porque la mediana de masa depende de lo que cada método detecta), y dejamos una columna que indica qué valores fueron imputados:
+
+```python
+es_rv = limpio["method"] == "Radial Velocity"
+mediana_rv = limpio.loc[es_rv, "mass"].median()
+hueco_rv = es_rv & limpio["mass"].isna()
+
+limpio["masa_imputada"] = hueco_rv
+limpio.loc[hueco_rv, "mass"] = mediana_rv
+
+print(mediana_rv, hueco_rv.sum(), limpio["mass"].isna().sum())
+```
+
+```text
+1.26 43 479
+```
+
+Imputamos 43 valores con 1.26 masas de Júpiter y quedan 479 vacíos, los de "no aplica". Un efecto secundario a vigilar: en *Radial Velocity*, el promedio de masa pasa de 2.631 a 2.524 y la desviación estándar de 3.826 a 3.692. Como siempre al imputar con un único valor, los datos se ven un poco menos variados de lo que son; con 43 de 553, el efecto es pequeño.
+
+**Decisión 2. `distance`: imputar con la mediana por método y marcar lo imputado.**
+La distancia depende mucho del método (veremos más abajo que con *Microlensing* se detectan planetas a miles de parsecs y con *Imaging* a unas decenas), así que rellenar con una mediana global le daría a cada planeta una distancia que no corresponde a su grupo. Usamos la mediana (no el promedio) porque la columna tiene valores extremos (hasta 8500). Con `transform` calculamos la mediana de cada fila según su método, y la usamos como relleno:
+
+```python
+mediana_distancia = limpio.groupby("method")["distance"].transform("median")
+hueco_distancia = limpio["distance"].isna()
+
+limpio["distancia_imputada"] = hueco_distancia & mediana_distancia.notna()
+limpio["distance"] = limpio["distance"].fillna(mediana_distancia)
+
+print(limpio["distancia_imputada"].sum(), limpio["distance"].isna().sum())
+```
+
+```text
+226 1
+```
+
+Imputamos 226 de los 227 vacíos. Queda uno sin rellenar: el único planeta del método *Pulsation Timing Variations* no tiene ninguna distancia conocida, así que no hay mediana de grupo con qué rellenarlo. Cuando el grupo entero está vacío, la imputación por grupo se queda sin información, y es correcto dejarlo así en lugar de inventar.
+
+Una advertencia honesta: ninguna de nuestras cinco preguntas **necesita** las distancias imputadas, y cuando respondamos la pregunta 5 las vamos a excluir. Hacemos la imputación para mostrar el procedimiento y porque cualquier análisis posterior que pida filas completas la necesitaría. Si tu análisis no la necesita, **no imputar es una decisión igual de defendible**.
+
+> ⚠️ **En tu proyecto las estrategias deben ser distintas.** En este caso las dos imputaciones usan la mediana, aunque con reglas diferentes (una solo donde el método sí mide la variable, otra por grupo), porque estos datos no ofrecen otra columna con vacíos. El Entregable 1 pide imputar **al menos dos columnas con estrategias distintas** (por ejemplo, mediana en una y moda o mediana por grupo en otra), cada una justificada según el tipo de dato. Elige las tuyas según tu dataset, no copies las de este caso.
+
+**Decisión 3. `orbital_period`: no imputar, y señalar los extremos sin borrarlos.**
+Son solo 43 vacíos (4.2 %), y el periodo es justo la variable que estudia la pregunta 3. Rellenar el periodo de un planeta con el valor típico de su método sería suponer que sus características son "las típicas", cuando el periodo es la propia característica que queremos estudiar. Preferimos **excluir esas 43 filas solo en las preguntas que usan el periodo**, con `dropna(subset=...)`. Para los extremos, no los borramos (son reales) y los marcamos para poder separarlos cuando haga falta; además, para resumir esta columna usaremos la **mediana** y no el promedio, porque el 730 000 arrastraría el promedio a 2002.9 cuando lo típico es 40.
+
+```python
+limpio["periodo_extremo"] = limpio["orbital_period"] > limite_sup
+print(limpio["periodo_extremo"].sum())
+```
+
+```text
+126
+```
+
+**Decisión 4. Filas repetidas y filas sin medidas: conservarlas.**
+No hay una columna que identifique a cada planeta, así que dos filas idénticas (mismo método, mismo año, mismos vacíos) pueden ser **dos planetas distintos descubiertos el mismo año con el mismo método**, algo plausible en métodos como *Microlensing*. Borrarlas sería perder descubrimientos reales y afectaría las preguntas 1 y 2. Con las 11 filas sin medidas ocurre lo mismo: siguen siendo descubrimientos que cuentan al responder cuántos planetas halló cada método, y las excluimos pregunta por pregunta, cuando una pregunta necesita una medida.
+
+**El costo de las decisiones.** Hay que dejarlo siempre a la vista:
+
+```python
+print(limpio.shape)
+print(limpio.isna().sum())
+```
+
+```text
+(1035, 9)
+method                  0
+number                  0
+orbital_period         43
+mass                  479
+distance                1
+year                    0
+masa_imputada           0
+distancia_imputada      0
+periodo_extremo         0
+dtype: int64
+```
+
+Tabla de decisiones de la limpieza, en el formato que pide el README del proyecto:
+
+| Columna | Problema | % afectado | Decisión | Justificación | Costo |
+|---|---|---|---|---|---|
+| `mass` | Faltantes, la mayoría "no aplica" | 50.4 % | Conservar; imputar solo los 43 huecos de *Radial Velocity* con su mediana (1.26); no imputar los 479 "no aplica" | Eliminar la columna perdería 510 masas válidas; rellenar el "no aplica" inventaría datos que el método no mide | 43 valores imputados; 479 vacíos permanecen |
+| `distance` | Faltantes reales | 21.9 % | Imputar con la mediana por método; marcar con `distancia_imputada` | Muy asimétrica y dependiente del método; la mediana resiste los extremos | 226 valores imputados; 1 vacío permanece |
+| `orbital_period` | Faltantes y extremos | 4.2 % (vacíos); 12 % (extremos) | No imputar; excluir por pregunta con `dropna(subset)`; marcar extremos con `periodo_extremo` | Es la variable que se estudia; los extremos son planetas reales | 0 filas eliminadas; 43 excluidas solo en la pregunta 3 |
+| Filas repetidas | 4 filas idénticas | 0.4 % | Conservar | Sin identificador, pueden ser planetas distintos | 0 filas eliminadas |
+| Filas sin medidas | 11 filas sin periodo, masa ni distancia | 1.1 % | Conservar y excluir por pregunta | Cuentan como descubrimientos | 0 filas eliminadas |
+
+En total la tabla pasó de 1035 a 1035 filas y de 6 a 9 columnas (las 3 columnas indicadoras). Imputamos 269 valores (43 + 226), un 4.3 % de las 6210 celdas.
+
+## Responder las preguntas
+
+Con los datos diagnosticados y limpios, ahora sí contestamos. Cada respuesta usa las herramientas de selección, filtrado, ordenamiento y agregación de la lección "Filtrado, agregación y limpieza de datos", y en cada agregación se incluye `count` para saber con cuántos datos se calculó.
+
+**Pregunta 1: ¿qué método ha descubierto más planetas?**
+
+```python
+print(limpio["method"].value_counts().head(3))
+print(limpio["method"].value_counts(normalize=True).round(3).head(3))
+```
+
+```text
+method
+Radial Velocity    553
+Transit            397
+Imaging             38
+Name: count, dtype: int64
+method
+Radial Velocity    0.534
+Transit            0.384
+Imaging            0.037
+Name: proportion, dtype: float64
+```
+
+*Radial Velocity* lidera con 553 planetas (53.4 %), seguido de *Transit* con 397 (38.4 %). Juntos suman el 91.8 % de todos los descubrimientos; los otros ocho métodos reparten el 8.2 % restante. Aquí usamos todas las filas, incluidas las 4 repetidas y las 11 sin medidas, porque cuentan como descubrimientos.
+
+**Pregunta 2: ¿en qué año se descubrieron más, y cómo cambió el protagonismo?**
+
+```python
+print(limpio.groupby("year").size().sort_values(ascending=False).head(3))
+
+por_anio_y_metodo = limpio.groupby(["year", "method"]).size().unstack(fill_value=0)
+print(por_anio_y_metodo.loc[2008:2014, ["Radial Velocity", "Transit"]])
+```
+
+```text
+year
+2011    185
+2012    140
+2013    118
+dtype: int64
+method  Radial Velocity  Transit
+year                           
+2008                 43       17
+2009                 74       18
+2010                 43       48
+2011                 94       80
+2012                 38       92
+2013                 29       75
+2014                 11       40
+```
+
+El año con más descubrimientos fue 2011 (185 planetas).
+
+La línea `limpio.groupby(["year", "method"]).size().unstack(fill_value=0)` hace tres cosas encadenadas:
+
+1. **`groupby(["year", "method"])`** separa la tabla en un grupo por **cada combinación** de año y método: "2010 con *Radial Velocity*", "2010 con *Transit*", "2011 con *Radial Velocity*", y así. Es como agrupar por una sola columna, pero con dos criterios a la vez.
+2. **`size()`** cuenta cuántas filas (planetas) hay en cada grupo. El resultado es una lista larga con una fila por combinación. Con un recorte de dos años y dos métodos se ve así:
+
+```text
+year  method         
+2010  Radial Velocity    43
+      Transit            48
+2011  Radial Velocity    94
+      Transit            80
+dtype: int64
+```
+
+   Funciona, pero comparar métodos obliga a recorrer filas una por una.
+3. **`unstack()`** toma el **último criterio del agrupamiento** (aquí `method`) y lo convierte en **columnas**, de modo que los años quedan en las filas y los métodos en las columnas:
+
+```text
+method  Radial Velocity  Transit
+year                            
+2010                 43       48
+2011                 94       80
+```
+
+   Ahora cada celda responde "¿cuántos planetas descubrió este método ese año?", y se compara de un vistazo.
+
+Piensa en la lista de asistencia de un curso: `groupby` y `size` te dan una línea por cada "estudiante + día", y `unstack` la convierte en la tabla de doble entrada, con estudiantes en las filas, días en las columnas y en cada celda si asistió.
+
+**`fill_value=0`** resuelve un caso que `size()` no puede mostrar: una combinación que no ocurrió. Si en 2005 el método *Transit* no descubrió ningún planeta, esa combinación no aparece en la lista larga del paso 2, y al girar la tabla queda un hueco. Sin `fill_value`, pandas lo llena con `NaN`, que significa "no sé"; con `fill_value=0` lo llena con `0`, que es la respuesta correcta: "no descubrió ninguno". Aquí usamos `0` porque estamos contando, y un conteo vacío es cero, no un dato faltante.
+
+En la tabla completa, `.loc[2008:2014, ["Radial Velocity", "Transit"]]` selecciona solo esos años y esos dos métodos. Hasta 2009, *Radial Velocity* dominaba claramente (74 frente a 18 en 2009); en 2010 *Transit* la superó por poco (48 frente a 43); en 2011 *Radial Velocity* volvió a liderar (94 frente a 80); y desde 2012 *Transit* lidera con claridad (92 frente a 38 en 2012, 40 frente a 11 en 2014). Los datos llegan hasta 2014, así que no dicen qué pasó después.
+
+**Pregunta 3: ¿cómo cambia el periodo orbital típico según el método?**
+Aquí necesitamos el periodo, así que excluimos solo en esta pregunta las 43 filas que no lo tienen:
+
+```python
+con_periodo = limpio.dropna(subset=["orbital_period"])
+print(con_periodo.shape)
+
+periodo_por_metodo = (
+    con_periodo.groupby("method")["orbital_period"]
+    .agg(["count", "median", "min", "max"])
+    .round(1)
+    .sort_values("median")
+)
+print(periodo_por_metodo)
+```
+
+```text
+(992, 9)
+                               count   median     min       max
+method                                                         
+Orbital Brightness Modulation      3      0.3     0.2       1.5
+Transit                          397      5.7     0.4     331.6
+Transit Timing Variations          3     57.0    22.3     160.0
+Pulsar Timing                      5     66.5     0.1   36525.0
+Radial Velocity                  553    360.2     0.7   17337.5
+Astrometry                         2    631.2   246.4    1016.0
+Pulsation Timing Variations        1   1170.0  1170.0    1170.0
+Microlensing                       7   3300.0  1825.0    5100.0
+Eclipse Timing Variations          9   4343.5  1916.2   10220.0
+Imaging                           12  27500.0  4639.2  730000.0
+```
+
+Las medianas están ordenadas de menor a mayor y el resultado es nítido. Con *Transit* el planeta típico da una vuelta a su estrella en solo 5.7 días (397 datos), con *Radial Velocity* en 360.2 días (553 datos) y con *Imaging* en 27 500 días, unos 75 años (12 datos). La explicación es la de las redes: el tránsito favorece los planetas muy pegados a su estrella, que pasan por delante con frecuencia, y la imagen directa los lejanos. Ojo con los métodos de pocos datos: una mediana de 3 planetas (como *Transit Timing Variations*) o de 1 (*Pulsation Timing Variations*) no permite concluir nada, y por eso mostramos el `count` al lado.
+
+**Pregunta 4: ¿cuáles son los cinco planetas más masivos y con qué método se descubrieron?**
+Excluimos las masas imputadas, porque no son medidas reales, y mostramos solo las columnas que importan:
+
+```python
+medidas = limpio.loc[~limpio["masa_imputada"]]
+mas_masivos = medidas.sort_values("mass", ascending=False)
+print(mas_masivos[["method", "orbital_period", "mass", "year"]].head(5))
+```
+
+```text
+            method  orbital_period   mass  year
+321  Radial Velocity         2371.00  25.00  2008
+85   Radial Velocity          379.63  21.42  2009
+63   Radial Velocity          305.50  20.60  2013
+913  Radial Velocity          677.80  19.80  2007
+3    Radial Velocity          326.03  19.40  2007
+```
+
+Los cinco más masivos, de 19.4 a 25 masas de Júpiter, se descubrieron todos con *Radial Velocity*. No es una casualidad: es el único método que, en este registro, mide la masa de forma sistemática (510 de las 513 masas medidas), así que ningún otro método podría figurar en este ranking. La conclusión correcta no es "*Radial Velocity* encuentra los planetas más masivos", sino "*Radial Velocity* es el único que nos deja saber su masa".
+
+**Pregunta 5: ¿a qué distancia se descubre con cada método?**
+Excluimos las distancias imputadas, porque calcular la mediana de un grupo con valores que salieron de esa misma mediana no aporta información:
+
+```python
+observadas = limpio.loc[~limpio["distancia_imputada"]]
+distancia_por_metodo = (
+    observadas.groupby("method")["distance"]
+    .agg(["count", "median"])
+    .round(1)
+    .sort_values("median")
+)
+print(distancia_por_metodo)
+```
+
+```text
+                               count  median
+method                                      
+Astrometry                         2    17.9
+Imaging                           32    40.4
+Radial Velocity                  530    40.4
+Eclipse Timing Variations          4   315.4
+Transit                          224   341.0
+Transit Timing Variations          3   855.0
+Orbital Brightness Modulation      2  1180.0
+Pulsar Timing                      1  1200.0
+Microlensing                      10  3840.0
+Pulsation Timing Variations        0     NaN
+```
+
+*Radial Velocity* e *Imaging* descubren a distancias típicas de unos 40 parsecs; *Transit* a 341 parsecs (224 datos) y *Microlensing* a 3840 parsecs (10 datos). Recuerda que el 22 % de las distancias no se conocen, y que algunos grupos tienen muy pocos datos: el resultado de *Pulsation Timing Variations* es `NaN` porque su único planeta no tiene distancia.
+
+## Conclusiones parciales
+
+Qué responden los datos hasta aquí:
+
+- Dos métodos, *Radial Velocity* y *Transit*, aportan el 91.8 % de los descubrimientos, y el protagonismo pasó del primero al segundo de forma sostenida a partir de 2012.
+- Cada método ve un tipo de planeta distinto: *Transit* los de periodos cortos (5.7 días), *Radial Velocity* los de periodos medios (360.2 días), *Imaging* los de periodos larguísimos (27 500 días).
+- Solo *Radial Velocity* nos da la masa de forma sistemática. Comparar las masas de dos métodos no es posible con estos datos.
+- Para la decisión del equipo: si el objetivo es conocer **la masa** de los planetas, *Radial Velocity* es la única opción; si el objetivo es encontrar muchos planetas cercanos a su estrella, *Transit*.
+
+Qué queda abierto para las gráficas: ver la distribución de los periodos (en la que el promedio engaña y el 730 000 distorsiona la escala), comparar visualmente los métodos año a año y mostrar cómo se reparten las distancias por método. Ese trabajo viene después, sobre estos mismos datos ya limpios.
+
+También hay limitaciones que el informe debe decir: los datos llegan hasta 2014; varios métodos tienen muy pocos planetas; y encontrar que un método descubre planetas de periodo corto no prueba que ese tipo de planeta sea más común en el universo, solo que es más fácil de ver con esa red.
+
+## Llevarlo al informe
+
+Todo este recorrido tiene un destino: un informe que otra persona pueda leer sin abrir tu notebook. En el proyecto integrador ese informe es el `README.md` del repositorio, con esta estructura:
+
+```markdown
+# Proyecto integrador — Grupo N: <título>
+
+## Integrantes
+## El conjunto de datos
+   Contexto, origen, filas y columnas, qué es cada fila, tabla de columnas,
+   decisión que apoya.
+## Preguntas de análisis
+   Las preguntas, numeradas.
+## Calidad de los datos y limpieza
+   Tabla: columna | problema | % afectado | decisión | justificación.
+## Hallazgos
+   La respuesta a cada pregunta, con las cifras que la sostienen.
+## Cómo ejecutar el notebook
+   Enlace a Colab y pasos para correrlo de principio a fin.
+```
+
+Con este caso, cada sección tiene su contenido listo: el contexto y la decisión salen de **El problema**; las preguntas, de su lista numerada; la tabla de limpieza, de **Limpieza**; y los hallazgos, de las respuestas a las cinco preguntas, cada una con sus cifras. Antes de entregar, ejecuta el notebook completo con `Entorno de ejecución` → `Reiniciar y ejecutar todas` y confirma que no hay errores: el análisis tiene que funcionar de principio a fin, no solo celda por celda en desorden.
+
+Una última recomendación: cada decisión de la tabla debe poder defenderse con un dato. "Imputé la distancia con la mediana por método porque la columna es muy asimétrica y cambia con el método" se defiende; "imputé porque había nulos" no.
+
+## Síntesis
+
+El análisis siguió siempre el mismo camino:
+
+| Etapa | Pregunta que responde | Herramienta | Señal de alerta |
+|---|---|---|---|
+| Problema y preguntas | ¿Qué decisión apoya y qué queremos saber? | Preguntas numeradas, antes de tocar los datos | Empezar a calcular sin saber qué se busca |
+| Carga e inspección | ¿Qué hay en la tabla? | `shape`, `head`, `info`, `describe`, `value_counts` | Promedio muy distinto de la mediana |
+| Diagnóstico | ¿Qué tan confiables son los datos? | `isna().sum()`, `groupby` sobre los vacíos, IQR, `duplicated` | Vacíos concentrados en un grupo (falta estructural) |
+| Limpieza | ¿Qué hago con cada problema y cuánto cuesta? | copia, `fillna`, `transform`, `dropna(subset)`, columnas indicadoras | Rellenar un "no aplica" o borrar sin medir |
+| Preguntas | ¿Qué dicen los datos? | `loc`, filtros booleanos, `sort_values`, `groupby` con `count` | Un promedio sin su `count`, o un grupo de 1 o 2 datos |
+| Conclusiones | ¿Qué sabemos, qué no y qué falta? | Texto con cifras y limitaciones | Concluir una causa que los datos no demuestran |
+
+Y por sección:
+
+- **El problema:** las preguntas se escriben antes de abrir los datos; cada método de detección es una red con su propia malla.
+- **Carga e inspección:** el primer vistazo ya delata vacíos (`Non-Null Count`) y valores extremos (promedio frente a mediana).
+- **Diagnóstico:** el mismo vacío puede significar cosas distintas; mirar por grupo separó los huecos reales del "no aplica".
+- **Limpieza:** cada decisión responde qué, por qué y cuánto cuesta; imputar, conservar y excluir por pregunta son opciones tan válidas como borrar.
+- **Preguntas:** cada resultado va con su `count`, y se excluye lo imputado cuando el cálculo no puede apoyarse en datos inventados.
+- **Conclusiones:** lo que los datos permiten afirmar, lo que no, y lo que queda para las gráficas.
+- **El informe:** la tabla de decisiones de limpieza es el corazón del README.
