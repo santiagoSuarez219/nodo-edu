@@ -14,11 +14,11 @@
 | **Laboratorio 2:** Dividir y vencer                                                    | 15%        | Entrega el domingo 11 oct |
 | **Laboratorio 3:** Estructuras de datos                                                | 15%        | Entrega el sábado 31 oct (sesión guiada el lunes 26 oct) |
 | **Laboratorio 4:** Programación dinámica y algoritmos voraces                          | 15%        | Entrega hasta el 22 nov |
-| **Proyecto final:** por definir                                                         | 20%        | Por definir |
+| **Proyecto final:** caso de estudio en equipos (máx. 4)                                 | 20%        | Entrega el lunes 23 nov |
 | **Seguimiento:** evaluación continua (quices cortos, participación, consistencia de commits, ejercicios de clase) | 20%        | Durante todo el semestre |
 | **Total**                                                                                 | **100%**   |            |
 
-> **Reajuste del 2026-10-03.** Se retiró el Módulo 6 (Ordenamiento) y, con él, el laboratorio evaluativo de ordenamiento. Los laboratorios pasan de cinco a cuatro y se agrega un proyecto final (20 %, por definir). Desde la Semana 10 el curso se dicta solo los lunes (dos bloques de 2 h) y los lunes festivos —12 oct, 2 nov y 16 nov— no hay clase. Ver `cronograma-dia-a-dia.md`.
+> **Reajuste del 2026-10-03.** Se retiró el Módulo 6 (Ordenamiento) y, con él, el laboratorio evaluativo de ordenamiento. Los laboratorios pasan de cinco a cuatro y se agrega un proyecto final (20 %, definido el 2026-11-02; ver más abajo). Desde la Semana 10 el curso se dicta solo los lunes (dos bloques de 2 h) y los lunes festivos —12 oct, 2 nov y 16 nov— no hay clase. Ver `cronograma-dia-a-dia.md`.
 
 > Cada laboratorio se aplica **después** de que su contenido se ha enseñado por completo, y su componente práctico es la sesión evaluativa (★) del tema correspondiente. No existe un sistema de evaluación paralelo: la sesión ★ *es* el laboratorio.
 
@@ -316,7 +316,14 @@ Entrega asincrónica, plazo hasta el **22 de noviembre** (el lunes 16 es festivo
 
 ## Proyecto final (20%)
 
-*Por definir en un paso aparte. Su alcance, fecha de entrega y rúbrica aún no existen.*
+Instrumento de **Resultados de Aprendizaje 2026-2**, aprobado por la Facultad. El detalle completo (tres casos, actividades, entregable y rúbrica) está en `projects/casos-evaluacion-ra-2026-2.md`; la versión aprobada es `projects/casos-analisis-de-algoritmos-aprobado.pdf`.
+
+- **Modalidad:** equipos de máximo 4 estudiantes. Cada equipo trabaja **un** caso de tres (recaudo de un sistema de transporte, tamizaje de diabetes, banco de alimentos), asignado por el docente con reparto equilibrado.
+- **Qué se hace:** analizar el problema, estimar el costo energético del proceso actual, diseñar al menos dos estrategias para cada una de al menos dos operaciones críticas (con al menos una de dividir y vencer, voraz o programación dinámica fuera del ordenamiento), implementarlas en Python, medirlas con datos sintéticos de tamaño creciente y justificar la recomendación con su marco normativo e impacto.
+- **Entrega:** lunes **23 de noviembre**. Repositorio nuevo por equipo en GitHub, con `README.md` que contiene el informe técnico (10–15 páginas sin anexos), más el informe en PDF. Sin hitos intermedios ni sustentación oral.
+- **Calificación:** rúbrica institucional fija (RADE1-1 25 %, RADE1-2 25 %, RADT1 30 %, RAG2 10 %, RAG4 10 %), aplicada por equipo. Todos los integrantes reciben la nota del equipo; el aporte individual se valora en Seguimiento con el historial de commits.
+- **Modelado del problema:** no hay sesión de clase; se publica una guía breve con un ejemplo resuelto junto al enunciado.
+- **Registro:** la nota se reporta por estudiante en la plantilla institucional (`Rubrica RA Análisis de Algoritmos.xlsx`) y se registra en el SIA en la ventana del 23 al 29 de noviembre.
 
 ---
 

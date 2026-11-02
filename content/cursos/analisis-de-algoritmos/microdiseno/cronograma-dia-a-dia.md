@@ -110,7 +110,7 @@
 - **Laboratorio evaluativo 4 — Programación dinámica y algoritmos voraces (15%)** *(antes Laboratorio 5, que valía 20%)*
   - Entrega asincrónica: informe en GitHub (`lab4-pd-voraces/`), plazo hasta el **22 de noviembre**
   - ⚠️ Registrar el 100% evaluado (Laboratorio 4, Proyecto final y Seguimiento) durante la ventana del 23 al 29 de noviembre
-- **Proyecto final (20%):** por definir en un paso aparte (ver `info.md`). Su fecha de entrega queda pendiente.
+- **Proyecto final (20%):** caso de estudio en equipos de máximo 4 (ver `info.md` y `projects/casos-evaluacion-ra-2026-2.md`). Entrega única el **lunes 23 de noviembre**: repositorio del equipo en GitHub con el informe en el `README.md` y el informe en PDF. Sin hitos intermedios ni sustentación.
 
 ---
 
@@ -122,7 +122,7 @@
 | 10     | entrega dom. 11 oct    | Laboratorio 2: Dividir y vencer                              | 15%  |
 | 13     | entrega sáb. 31 oct    | Laboratorio 3: Estructuras de datos                          | 15%  |
 | 16     | hasta el 22 nov        | Laboratorio 4: Programación dinámica y algoritmos voraces    | 15%  |
-| —      | Por definir            | Proyecto final                                               | 20%  |
+| —      | lunes 23 nov           | Proyecto final (equipos)                                     | 20%  |
 | —      | Todo el semestre       | Seguimiento                                                  | 20%  |
 | **Total** |                     |                                                              | **100%** |
 
