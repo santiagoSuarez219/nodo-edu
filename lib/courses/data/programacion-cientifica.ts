@@ -210,6 +210,21 @@ export const programacionCientifica: Course = {
       ],
     },
     {
+      id: "manejo-de-datos-faltantes",
+      slug: "manejo-de-datos-faltantes",
+      articleSlug: "manejo-de-datos-faltantes",
+      order: 10.5,
+      title: "Manejo de datos faltantes",
+      summary: "Aprende a tratar los huecos de una tabla con el dataset de pingüinos: detecta y mide los datos faltantes con isna, entiende por qué faltan, y decide con criterio entre eliminar con dropna o rellenar con fillna, dejando registro de cada decisión.",
+      topics: [
+        { title: "Detección y medición de datos faltantes: isna, sum y porcentaje por columna" },
+        { title: "Por qué faltan los datos: azar, causa visible y sesgo" },
+        { title: "Eliminar con dropna (subset, how, thresh, axis)" },
+        { title: "Imputar con fillna: media, mediana, moda y por grupo con transform" },
+        { title: "Bitácora de limpieza" },
+      ],
+    },
+    {
       id: "matplotlib-y-seaborn",
       slug: "matplotlib-y-seaborn",
       articleSlug: "matplotlib-y-seaborn",
