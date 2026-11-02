@@ -187,7 +187,9 @@ Keywords creadas en desarrollo: `visualizacion`, `matplotlib`, `seaborn`
 
 - Fechas de la guía del proyecto ajustadas por el usuario a las del microdiseño:
   E1 jueves 5 nov (23:59), E2 + exposición jueves 19 nov. `info.md` y el
-  cronograma no se modificaron. La lección y los apuntes no mencionan fechas.
+  cronograma no se modificaron. **Actualización 2026-11-02:** el docente movió
+  el E1 al jueves 12 nov (23:59); se actualizaron la guía, `info.md` y el
+  cronograma (Momento evaluativo 4 pasa a la semana 15). La lección y los apuntes no mencionan fechas.
 - GitHub se usa "como un Google Drive" (decisión del usuario): la guía del
   proyecto ya no exige commits de ambos integrantes ni mensajes descriptivos, y
   explica paso a paso crear el repositorio, invitar al docente, crear carpetas y
