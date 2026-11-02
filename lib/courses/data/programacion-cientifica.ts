@@ -225,6 +225,21 @@ export const programacionCientifica: Course = {
       ],
     },
     {
+      id: "caso-pipeline-analisis-de-datos-con-pandas",
+      slug: "caso-pipeline-analisis-de-datos-con-pandas",
+      articleSlug: "caso-pipeline-analisis-de-datos-con-pandas",
+      order: 10.6,
+      title: "Caso completo: del problema a los hallazgos con pandas",
+      summary: "Recorre un análisis completo con pandas sobre un dataset de exoplanetas: parte de la decisión que apoya y de las preguntas que se quieren responder, diagnostica la calidad de los datos, limpia justificando cada decisión y responde con filtrado y agregación, hasta dejarlo listo para un informe.",
+      topics: [
+        { title: "Del problema a las preguntas de análisis" },
+        { title: "Carga, inspección y diagnóstico de calidad de los datos" },
+        { title: "Limpieza con cada decisión justificada y su costo" },
+        { title: "Preguntas de análisis con filtrado, ordenamiento y agregación" },
+        { title: "Conclusiones parciales y tabla de decisiones para el informe" },
+      ],
+    },
+    {
       id: "matplotlib-y-seaborn",
       slug: "matplotlib-y-seaborn",
       articleSlug: "matplotlib-y-seaborn",

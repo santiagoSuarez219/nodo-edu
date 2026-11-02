@@ -80,15 +80,58 @@ No aplica.
 
 ---
 
+## Ronda 2 — `programacion-cientifica`: caso completo del pipeline (2026-11-02)
+
+**Alcance confirmado por el usuario:** una segunda lección de trabajo independiente que muestra, con un caso resuelto, todo el pipeline de análisis con pandas (sin gráficas): problema y preguntas, carga e inspección, diagnóstico, limpieza justificada, preguntas de análisis y conclusiones. Toma como guía el Entregable 1 del proyecto integrador. **Sin** apuntes, guía, quiz ni cuestionario de cierre (el usuario respondió que no lleva cuestionario).
+
+### Etapas y aprobaciones
+
+| Etapa | Resultado | Aprobada por el usuario |
+|---|---|---|
+| E2 · Plan de lección | Aprobado tal cual (dataset de exoplanetas, 5 preguntas, tabla de decisiones) | ✅ |
+| E3 · Lección `.mdx` + registro TS | `caso-pipeline-analisis-de-datos-con-pandas` (order 10.6). Ajuste posterior: explicación de `unstack` y `fill_value` en la pregunta 2 | ✅ |
+| E4 · Apuntes del docente | **No pedidos por el usuario** | — |
+| E5 · Cuestionario de cierre | **No** (decisión del usuario) | — |
+| E6 · Guía / quiz A/B/C | No aplica | — |
+
+### Artefactos producidos
+
+| Artefacto | Ruta | Publicado |
+|---|---|---|
+| Lección teórica | `content/cursos/programacion-cientifica/caso-pipeline-analisis-de-datos-con-pandas.mdx` | ⬜ (aún no desplegada) |
+| Registro TS | `lib/courses/data/programacion-cientifica.ts` (`order: 10.6`) | — |
+
+### Decisiones tomadas por Claude en nombre del docente
+
+- Dataset `planets` de Seaborn (exoplanetas, datos reales hasta 2014) en lugar de pingüinos — **motivo:** pingüinos solo tiene 11 vacíos y no permite ilustrar las decisiones del Entregable 1; el docente aprobó la propuesta.
+- `order: 10.6` — **motivo:** entre `manejo-de-datos-faltantes` (10.5) y `matplotlib-y-seaborn` (11), sin cambiar ningún `order` existente.
+- La lección menciona explícitamente el Entregable 1 y advierte que cada pareja debe hacer su propio análisis — **motivo:** el docente lo pidió así.
+- Referencia por título a las lecciones anteriores — **motivo:** el docente lo pidió así (a diferencia de `manejo-de-datos-faltantes`, que es autocontenida).
+- Unidades (días, masas de Júpiter, parsecs) escritas "según la documentación del conjunto" — **motivo:** conocimiento del dataset de Seaborn, **no verificado contra una fuente** durante la sesión.
+- Imputación de `distance` con la mediana por método aunque ninguna pregunta la usa — **motivo:** mostrar el procedimiento; la lección lo declara y excluye lo imputado en la pregunta 5.
+- Filas repetidas y filas sin medidas conservadas — **motivo:** sin identificador del planeta no se puede asegurar que sean errores, y cuentan como descubrimientos.
+- Título de la lección y de las tablas redactado por Claude.
+
+### Verificación (E7)
+
+- [x] `npm run build` en verde (después de la última edición)
+- [x] eslint del registro TS en verde
+- [x] Todos los bloques de código ejecutados con pandas 3.0.2 y el dataset real; las salidas del texto se compararon con la ejecución (4 bloques corregidos)
+- [x] Sin `#` H1, sin `###`, sin `<`/`{`/`$` sueltos en prosa
+- [x] `summary` presente en frontmatter **y** en registro TS
+- [ ] `@reviewer`: pendiente
+
+---
+
 ## Despliegue
 
 | Paso | Estado | Fecha / detalle |
 |---|---|---|
 | D0 · Alcance y checklist pre-despliegue | ⬜ | |
-| D1 · Lecciones nuevas cerradas por adelantado | ⬜ | cerrar `manejo-de-datos-faltantes` antes del push si no debe abrirse |
+| D1 · Lecciones nuevas cerradas por adelantado | ⬜ | cerrar `manejo-de-datos-faltantes` y `caso-pipeline-analisis-de-datos-con-pandas` antes del push si no deben abrirse |
 | D2 · Merge a `main` y deploy en Vercel | ⬜ | |
-| D3 · Banco de preguntas replicado a producción | ⬜ | keyword `datos-faltantes` + 6 preguntas |
-| D4 · Lecciones abiertas a los estudiantes | ⬜ | `programacion-cientifica` → `manejo-de-datos-faltantes` |
+| D3 · Banco de preguntas replicado a producción | ⬜ | keyword `datos-faltantes` + 6 preguntas (solo de `manejo-de-datos-faltantes`; el caso no tiene cuestionario) |
+| D4 · Lecciones abiertas a los estudiantes | ⬜ | `programacion-cientifica` → `manejo-de-datos-faltantes` y `caso-pipeline-analisis-de-datos-con-pandas` |
 | D5 · Verificación end-to-end en producción | ⬜ | |
 | D6 · Bitácora cerrada y rama borrada | ⬜ | |
 
@@ -98,5 +141,7 @@ No aplica.
 
 - Revisión de `@reviewer` y aprobación del merge a `development`.
 - Volver a correr `npm run build` tras las últimas ediciones de texto del `.mdx`.
-- La lección nueva queda **abierta apenas se despliegue** si no se crea antes su fila de cierre (D1).
+- El Entregable 1 del proyecto integrador vence el **jueves 5 de noviembre**: el caso completo solo ayuda si está desplegado y abierto antes.
+- Confirmar las unidades (días, masas de Júpiter, parsecs) del dataset `planets` contra su documentación.
+- Las lecciones nuevas quedan **abiertas apenas se despliegan** si no se crea antes su fila de cierre (D1).
 - El `estimated_time` de `filtrado-agregacion-y-limpieza-de-datos` dice "Semana 13" mientras su `order` es 10: es una inconsistencia previa, fuera del alcance de esta ronda.
