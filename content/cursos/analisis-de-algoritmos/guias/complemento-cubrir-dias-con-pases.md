@@ -364,6 +364,80 @@ Una advertencia: esta exhaustiva usa la misma forma de decidir que la programaci
 
 ---
 
+## La regla día a día: contraejemplo calculado
+
+Al comienzo de la guía, decidir **día por día** costó 22.000 pesos frente a 19.000. Esa forma de decidir es una **regla voraz**: en cada día toma la opción más barata para ese día y nunca reconsidera. La lección "Estrategia voraz" explica cómo se rompe una regla así: se escribe como función, se compara con el óptimo y se presenta el contraejemplo calculado (la instancia, el resultado de la regla, el óptimo y la diferencia). Agregue este código al mismo archivo:
+
+```python
+def costo_dia_a_dia(viajes: list[int]) -> int:
+    """Regla voraz: cada día paga lo más barato solo para ese día.
+
+    Args:
+        viajes: Viajes de cada día; viajes[0] son los del día 1.
+
+    Returns:
+        Lo que se paga decidiendo un día a la vez, sin pases de varios días.
+    """
+    total = 0
+    for viajes_del_dia in viajes:
+        sueltos = viajes_del_dia * VIAJE
+        if sueltos < PASE_DIA:
+            total += sueltos
+        else:
+            total += PASE_DIA
+    return total
+
+
+def contraejemplo_mas_corto(
+    intentos: int = 500, semilla: int = 2026
+) -> list[int] | None:
+    """Busca el periodo más corto donde la regla día a día paga de más.
+
+    Args:
+        intentos: Instancias aleatorias que se prueban por cada largo.
+        semilla: Semilla fija para que el resultado sea reproducible.
+
+    Returns:
+        Los viajes por día de un contraejemplo, o None si no encontró.
+    """
+    rng = random.Random(semilla)
+    for d in range(1, 11):  # primero los periodos más cortos
+        for _ in range(intentos):
+            viajes: list[int] = []
+            for _ in range(d):
+                viajes.append(rng.randint(0, 4))
+            costo, _ = costo_bicicletas(viajes)
+            if costo_dia_a_dia(viajes) > costo[1]:
+                return viajes
+    return None
+
+
+
+viajes = [2, 3, 3, 0, 1, 0, 2, 0, 0, 1]
+costo, _ = costo_bicicletas(viajes)
+print(costo_dia_a_dia(viajes), costo[1])  # 22000 19000
+corto = contraejemplo_mas_corto()
+costo, eleccion = costo_bicicletas(corto)
+print(corto, costo_dia_a_dia(corto), costo[1])
+print(reconstruir_compras(eleccion))
+```
+
+Salida:
+
+```text
+22000 19000
+[3, 2, 2] 13000 11000
+[(1, 'tres_dias')]
+```
+
+El contraejemplo de las vacaciones ya muestra la diferencia: la regla paga 22.000, el óptimo 19.000, **3.000 de más**. La búsqueda encuentra además uno más corto, fácil de explicar a mano: tres días con 3, 2 y 2 viajes. Día por día se paga 5.000 + 4.000 + 4.000 = 13.000; un pase de tres días cubre todo por 11.000.
+
+**La condición contraria.** ¿Cuándo sería óptima la regla día a día? Si **no existieran pases de varios días**. Con solo viajes sueltos y pase de un día, lo que se compra un día no cubre ningún otro: las decisiones de los días son independientes, y la suma de los mejores costos de cada día es el costo mínimo. Son los pases de varios días los que amarran decisiones de días distintos, y por eso hace falta la programación dinámica.
+
+**Costo.** La regla día a día recorre los días una vez: Θ(d), igual que la programación dinámica con un número fijo de productos. Las dos cuestan lo mismo; lo que cambia es el resultado. Mídalas a las dos: es un hallazgo que el informe debe decir, porque la mejora no cuesta tiempo de cómputo adicional.
+
+---
+
 ## Dificultades Comunes
 
 ### "Mi tabla da costos más bajos que la exhaustiva"
@@ -380,5 +454,5 @@ Una advertencia: esta exhaustiva usa la misma forma de decidir que la programaci
 
 ## Recursos
 
-- **Lecciones del curso:** "Fundamentos de programación dinámica" y "Programación dinámica: decidir, verificar y medir".
-- **Libro de texto:** Cormen et al., _Introduction to Algorithms_, 3.ª ed., sección 15.3 (_Elements of dynamic programming_).
+- **Lecciones del curso:** "Fundamentos de programación dinámica", "Estrategia voraz" y "Programación dinámica: decidir, verificar y medir".
+- **Libro de texto:** Cormen et al., _Introduction to Algorithms_, 3.ª ed., secciones 15.3 (_Elements of dynamic programming_) y 16.2 (_Elements of the greedy strategy_).

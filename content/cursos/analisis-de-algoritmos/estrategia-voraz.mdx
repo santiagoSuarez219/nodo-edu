@@ -879,9 +879,15 @@ Dos problemas de LeetCode con la misma idea (opcionales):
 - **Medir:** $\Theta(n \log n)$ deja un factor de un poco más de 2 al duplicar `n`.
 - **Frente a la programación dinámica:** $O(n^3)$ con la misma respuesta. Hace falta cuando las actividades tienen pesos.
 
-## ¿Y ahora? Tu caso del proyecto
+## ¿Y ahora? La guía de tu caso
 
-Si tu equipo tiene el **Caso 2 — Plataforma Pulso**, esta lección es el patrón de la operación 3 (jornadas de las unidades móviles) cuando el criterio es el **número de jornadas**. Si tu equipo decide maximizar los pacientes atendidos, el patrón está en la guía **Complemento del Laboratorio 4 — Intervalos ponderados**.
+Esta lección te da el método general: escribir la regla voraz, romperla con un contraejemplo calculado, justificarla cuando es correcta, verificarla y medirla. Lo que la regla voraz tiene de particular en cada caso del proyecto está en la guía complementaria de ese caso, publicada junto al Laboratorio 4:
+
+| Caso del proyecto          | Operación                           | Dónde está la parte voraz de tu caso                                                                                                   |
+| -------------------------- | ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| 1 — Recaudo del transporte | 4. Liquidación del tope tarifario   | Complemento del Laboratorio 4 — Cubrir días con pases: la regla día a día, su contraejemplo y cuándo sería óptima                      |
+| 2 — Plataforma Pulso       | 3. Jornadas de las unidades móviles | Esta lección, si tu equipo maximiza el número de jornadas; Complemento del Laboratorio 4 — Intervalos ponderados, si maximiza pacientes |
+| 3 — Banco de alimentos     | 3. Cargue de los vehículos          | Complemento del Laboratorio 4 — Mochila 0/1: la regla por densidad, su contraejemplo y la mochila fraccionaria                          |
 
 En todos los casos, el siguiente paso es la lección **Programación dinámica: decidir, verificar y medir**.
 

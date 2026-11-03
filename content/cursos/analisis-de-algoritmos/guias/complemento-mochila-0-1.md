@@ -314,6 +314,92 @@ No basta verificar el valor: también se comprueba que la **reconstrucción** re
 
 ---
 
+## El atajo por densidad en código
+
+Al comienzo de la guía, el atajo de meter primero lo que más rinde por kilogramo dio 8 frente a 9. Ese atajo es una **regla voraz**: ordena una vez y nunca reconsidera lo que metió. La lección "Estrategia voraz" explica cómo se rompe una regla así: se escribe como función, se compara con el óptimo y se presenta el contraejemplo calculado. Agregue este código al mismo archivo:
+
+```python
+def mochila_por_densidad(
+    objetos: list[Objeto], capacidad: int
+) -> tuple[int, list[int]]:
+    """Regla voraz: mete primero lo de mayor utilidad por kg, si cabe.
+
+    Args:
+        objetos: Peso entero (mayor que 0) y utilidad de cada objeto.
+        capacidad: Capacidad de la mochila en kilogramos.
+
+    Returns:
+        Una pareja (utilidad, elegidos) con lo que logra la regla; los
+        elegidos son posiciones en orden creciente. No garantiza el óptimo.
+    """
+    orden = sorted(
+        range(len(objetos)),
+        key=lambda i: objetos[i][1] / objetos[i][0],  # utilidad por kg
+        reverse=True,  # de mayor a menor densidad
+    )
+    libre = capacidad
+    utilidad = 0
+    elegidos: list[int] = []
+    for i in orden:  # no se detiene en el primero que no cabe
+        peso, valor = objetos[i]
+        if peso <= libre:
+            elegidos.append(i)
+            libre -= peso
+            utilidad += valor
+    elegidos.sort()
+    return utilidad, elegidos
+
+
+def comparar_densidad(casos: int = 1000, semilla: int = 2026) -> None:
+    """Cuenta cuántas veces la regla por densidad no llega al óptimo.
+
+    Args:
+        casos: Número de instancias aleatorias a probar.
+        semilla: Semilla fija para que el resultado sea reproducible.
+    """
+    rng = random.Random(semilla)
+    fallos = 0
+    peor = 0.0  # la mayor pérdida, como fracción del óptimo
+    for _ in range(casos):
+        objetos: list[Objeto] = []
+        for _ in range(rng.randint(1, 10)):
+            objetos.append((rng.randint(1, 8), rng.randint(1, 20)))
+        capacidad = rng.randint(1, 25)
+        optimo = mochila(objetos, capacidad)[len(objetos)][capacidad]
+        obtenido, _ = mochila_por_densidad(objetos, capacidad)
+        if obtenido < optimo:
+            fallos += 1
+            perdida = (optimo - obtenido) / optimo
+            if perdida > peor:
+                peor = perdida
+    print(f"falla en {fallos} de {casos} instancias; "
+          f"pérdida máxima: {peor:.0%} del óptimo")
+
+
+
+print(mochila_por_densidad(OBJETOS, 7))  # (8, [0, 3]): A y D
+print(mochila(OBJETOS, 7)[4][7])  # 9: B y C
+comparar_densidad()
+```
+
+Salida:
+
+```text
+(8, [0, 3])
+9
+falla en 151 de 1000 instancias; pérdida máxima: 73% del óptimo
+```
+
+Tres observaciones:
+
+- **El contraejemplo calculado** es el de la salida de campo: la regla lleva A y D (utilidad 8), el óptimo lleva B y C (9), una diferencia de 1. Preséntelo así: instancia, resultado de la regla, óptimo y diferencia.
+- **La regla no falla siempre**, y eso la hace tentadora: en estas instancias acierta en 849 de 1.000. Pero cuando falla puede perder mucho, en alguna instancia casi tres cuartas partes del óptimo. Una instancia donde acierta no prueba nada.
+- **No se detiene en el primer objeto que no cabe:** sigue buscando objetos más pequeños que sí quepan. Si la regla que debe reproducir se detiene en el primero que no cabe, el código cambia, y esa diferencia se documenta.
+
+**Costo.** Ordenar cuesta Θ(n log n) y el recorrido Θ(n): la regla por densidad cuesta Θ(n log n) y **no depende de W**. La programación dinámica cuesta Θ(n·W). La regla es más barata, pero no garantiza el óptimo; esa es la comparación que hay que medir y explicar.
+
+---
+
 ## Mochila 0/1 frente a mochila fraccionaria
 
 El atajo por densidad no es siempre malo: si los objetos se pudieran **fraccionar** (llevar una parte de un lote y obtener la parte proporcional de su valor), meter primero lo de mayor valor por kilogramo y partir el último objeto sí da el óptimo. Esa es la **mochila fraccionaria**, y se resuelve con una regla voraz en Θ(n log n). La lección "Estrategia voraz" explica por qué una regla así puede ser correcta en un problema y fallar en otro.
