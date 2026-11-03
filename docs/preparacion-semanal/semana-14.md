@@ -268,7 +268,7 @@ No aplica.
 ## Ronda — `estructuras-de-datos`, T2 (2026-11-03)
 
 **Rama:** `feat/semana-14-estructuras-de-datos` (recreada tras el merge de T1)
-**Estado:** ✅ Material y cuestionario listos en desarrollo / ⬜ Revisada por `@reviewer` / ⬜ Mergeada a `development` / ⬜ Desplegada y abierta
+**Estado:** ✅ Material y cuestionario listos en desarrollo / ✅ Revisada por `@reviewer` / ✅ Mergeada a `development` (local; push pendiente) / ⬜ Desplegada y abierta
 
 **Alcance confirmado por el usuario:** Sesión T2 (jueves 5 de noviembre), solo
 la lección `insercion-y-recorridos`: `NodoArbol<T>`, inserción como hijo
@@ -322,7 +322,7 @@ No aplica.
 
 ### Decisiones tomadas por Claude en nombre del docente
 
-- Se quitaron a pedido del usuario las tres secciones «Para qué sirve el pre-orden / post-orden / in-orden»: la lección pasó de 373 a 302 líneas y de 15 a 12 secciones `##`. Para que no quedaran afirmaciones sin sustento, también se quitó la cuarta columna del Resumen operativo y tres bullets de la Síntesis, y se añadió a «Dónde se rompe la analogía» la condición del dibujo (cada hijo izquierdo a la izquierda de su padre y cada derecho a su derecha).
+- Se quitaron a pedido del usuario las tres secciones «Para qué sirve el pre-orden / post-orden / in-orden»: la lección pasó de 373 a 302 líneas y de 15 a 12 secciones `##`. Para que no quedaran afirmaciones sin sustento, también se quitó la cuarta columna del Resumen operativo y tres bullets de la Síntesis, y se añadió a «Dónde se rompe la analogía» la condición del dibujo (cada hijo izquierdo a la izquierda de su padre y cada derecho a su derecha; precisada después de la revisión, ver más abajo).
 - El `summary` perdió "y sus usos", en el frontmatter y en el registro — **motivo:** la lección ya no tiene usos; es el único cambio al registro que el usuario no pidió explícitamente.
 - Topic 1 del registro precisado a "Inserción de nodos en un árbol binario: colgar un hijo izquierdo o derecho de un padre dado", y topic 3 reescrito a "Los tres recorridos y sus salidas sobre el mismo árbol" — **motivo:** el usuario los aprobó; el topic 3 original ("Aplicaciones de cada tipo de recorrido") ya no correspondía.
 - **`info.md` no se tocó.** Sigue con dos líneas desalineadas respecto al registro: la 501 ("representación con nodos enlazados en Java", de S14 T1) y la 507 ("Aplicaciones de cada tipo de recorrido") — **motivo:** es fuente de verdad y no se editó sin autorización explícita; quedan como pendiente del usuario.
@@ -340,7 +340,7 @@ No aplica.
 - [x] Checklist de `lesson-authoring` §8 recorrido
 - [x] `summary` presente en frontmatter **y** en registro TS
 - [x] Coherencia cruzada lección ↔ cuestionario (salidas, excepción, `NullPointerException` y fórmula 2n + 1 ejecutadas con Java 17)
-- [ ] `@reviewer`: primera revisión CAMBIOS REQUERIDOS (1 bloqueante, 2 mayores, 3 menores; sin cambios de código); corregidos en un commit posterior, pendiente la segunda revisión
+- [x] `@reviewer`: primera revisión CAMBIOS REQUERIDOS (1 bloqueante, 2 mayores, 3 menores; sin cambios de código); corregidos en un commit posterior; segunda revisión APROBADO, sin bloqueantes ni mayores
 - [ ] Render en navegador (diagrama del árbol de ejemplo): pendiente, lo comprueba el docente
 
 ### Despliegue
@@ -360,7 +360,7 @@ No aplica.
 ### Pendientes
 
 - Actualizar `info.md` (líneas 501 y 507) para que coincidan con los topics del registro, o autorizar a Claude a hacerlo.
-- Comprobar en el navegador que el diagrama del árbol de ejemplo se renderiza (la sintaxis ya está validada).
+- Comprobar en el navegador que el diagrama del árbol de ejemplo se renderiza (la sintaxis ya está validada). El reviewer anota que Mermaid probablemente dibuja los hijos únicos (`G` bajo `E`, `F` bajo `C`) justo debajo del padre, así que el dibujo no ilustra la condición de «Dónde se rompe la analogía»; sugiere, si se quiere, añadir «aunque un nodo tenga un solo hijo, desplázalo hacia su lado».
 - Decidir aparte el laboratorio P del viernes 6 de noviembre.
 - D7: marcar la lección como vista en clase del grupo que la dicte, después de la sesión.
 
