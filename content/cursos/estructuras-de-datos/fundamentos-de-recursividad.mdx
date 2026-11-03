@@ -15,13 +15,13 @@ summary: "Parte de la fila del banco para deducir el caso base y el caso recursi
 updatedAt: "2026-11-03"
 ---
 
-> 📘 **Lección guion para clase en vivo.** Se dicta en la sesión y se sigue paso a paso: ten tu editor abierto, escribe el código a medida que avanzamos y haz cada traza en papel **antes** de mirar la solución. Los bloques de código de los pasos 4 a 7 son acumulativos y viven en un mismo archivo, `Recursion.java`; los errores de los pasos 8 a 10 van en bloques aparte y no se copian a ese archivo.
+> 📘 **Lección guion para clase en vivo.** Se dicta en la sesión y se sigue paso a paso: ten tu editor abierto, escribe el código a medida que avanzamos y haz cada traza en papel **antes** de mirar la solución. Los bloques de código de las secciones «De la fila a Java» y «Bajar y subir» son acumulativos y viven en un mismo archivo, `Recursion.java`; los de las tres secciones «Error planeado» van en bloques aparte y no se copian a ese archivo.
 
 ## La fila del banco
 
 Llegas a la sucursal y hay una fila larga. Sin salirte de tu puesto, quieres saber: **¿en qué puesto estoy?** No puedes contar a todos de un vistazo, así que haces lo que haría cualquiera: le preguntas a la persona de adelante "¿tú en qué puesto estás?", y esa persona le pregunta a la de adelante, y así sucesivamente.
 
-Cada persona hace lo mismo: no resuelve el problema completo, solo **delega una versión más pequeña** (la fila sin ella) y, cuando recibe la respuesta, le suma 1. Igual que con la pila de platos de la lección de pilas, cada pregunta queda **pendiente** hasta que responde la de arriba.
+Cada persona hace lo mismo: no resuelve el problema completo, solo **delega una versión más pequeña** (la fila sin ella) y, cuando recibe la respuesta, le suma 1. Igual que con la pila de platos de la lección Implementación de pilas en Java, cada pregunta queda **pendiente** hasta que responde la persona de adelante.
 
 🛑 **Pausa:** ¿qué pasaría si nadie en la fila supiera que es el primero? ¿Quién respondería primero?
 
@@ -93,22 +93,22 @@ Aquí el estado de `puestoEnFila(3)` en cada instante: cada flecha continua es u
 
 ```mermaid
 sequenceDiagram
-  participant M as "main"
-  participant P3 as "puestoEnFila(3)"
-  participant P2 as "puestoEnFila(2)"
-  participant P1 as "puestoEnFila(1)"
-  participant P0 as "puestoEnFila(0)"
-  M->>P3: "llama"
-  P3->>P2: "1 + puestoEnFila(2)"
-  P2->>P1: "1 + puestoEnFila(1)"
-  P1->>P0: "1 + puestoEnFila(0)"
-  P0-->>P1: "retorna 1"
-  P1-->>P2: "retorna 2"
-  P2-->>P3: "retorna 3"
-  P3-->>M: "retorna 4"
+  participant M as main
+  participant P3 as puestoEnFila(3)
+  participant P2 as puestoEnFila(2)
+  participant P1 as puestoEnFila(1)
+  participant P0 as puestoEnFila(0)
+  M->>P3: llama
+  P3->>P2: 1 + puestoEnFila(2)
+  P2->>P1: 1 + puestoEnFila(1)
+  P1->>P0: 1 + puestoEnFila(0)
+  P0-->>P1: retorna 1
+  P1-->>P2: retorna 2
+  P2-->>P3: retorna 3
+  P3-->>M: retorna 4
 ```
 
-Mientras `puestoEnFila(0)` corre, hay cuatro marcos apilados y los tres de abajo siguen esperando su `1 + ...`. Cuando el de arriba devuelve, se desapila, y el siguiente por fin puede sumar.
+Mientras `puestoEnFila(0)` corre, hay cuatro marcos de `puestoEnFila` apilados (encima del de `main`) y los tres de abajo siguen esperando su `1 + ...`. Cuando el de arriba devuelve, se desapila, y el siguiente por fin puede sumar.
 
 ## Bajar y subir
 
@@ -127,7 +127,7 @@ Para ver la pila trabajar, añade impresiones al método. Déjalo como un métod
     }
 ```
 
-Y en `main`, debajo de la línea anterior: `System.out.println(puestoConTrazas(3));`.
+Y en `main`, **reemplaza** la línea que imprimía `puestoEnFila(3)` por: `System.out.println(puestoConTrazas(3));`.
 
 ## 🗳️ Votación — ¿en qué orden salen las líneas?
 
@@ -190,6 +190,8 @@ Exception in thread "main" java.lang.StackOverflowError
 	...
 ```
 
+El número de línea (`Recursion.java:3`) depende de dónde pongas el método en tu archivo; lo importante es que **se repite**.
+
 🛑 **Pausa:** no creamos ninguna variable gigante. ¿Por qué se acaba la memoria? Porque cada llamada apila un marco nuevo y **nunca ninguna devuelve**: la pila crece hasta llenarse. Una fila donde nadie sabe que es el primero pregunta hacia adelante sin fin.
 
 Este también es el lugar donde se rompe la analogía: una fila real termina en alguien que está de primero; una fila "sin primera persona" o circular no existe en el banco, pero en código sí es posible escribirla, y Java no se da cuenta hasta que la pila se agota.
@@ -208,7 +210,7 @@ static int puestoEnFila(int delante) {
 // main: System.out.println(puestoEnFila(-1));
 ```
 
-El método es el correcto; el problema es la entrada. Con `-1`, la secuencia es -1, -2, -3... y se aleja del 0: el resultado vuelve a ser `StackOverflowError`. La segunda pregunta de diseño, **¿cómo me acerco al paro?**, no basta con que el caso base exista: cada llamada tiene que acercarse a él desde cualquier entrada válida. Aquí la solución es validar la entrada o aclarar con un comentario que `delante` no puede ser negativo.
+El método es el correcto; el problema es la entrada. Con `-1`, la secuencia es -1, -2, -3... y se aleja del 0: el resultado vuelve a ser `StackOverflowError`. Que el caso base exista no basta: responde también la segunda pregunta de diseño, **¿cómo me acerco al paro?** Cada llamada tiene que acercarse al caso base desde la entrada con la que se invoca, y `-1` no lo hace. La solución es validar la entrada o aclarar con un comentario que `delante` no puede ser negativo.
 
 ## Error planeado 3: olvidar el return
 
@@ -358,4 +360,4 @@ Para cada método pregúntate: ¿tiene caso base? ¿El argumento de la llamada r
 
 ## Qué sigue
 
-Con el caso base, el caso recursivo y la pila de llamadas claros, el siguiente tema son los algoritmos recursivos clásicos, donde vas a usar este mismo esquema sobre problemas más conocidos (lección Algoritmos recursivos clásicos, sesión T2).
+Con el caso base, el caso recursivo y la pila de llamadas claros, el siguiente tema son los algoritmos recursivos clásicos, donde vas a usar este mismo esquema sobre problemas más conocidos (lección Algoritmos recursivos clásicos).

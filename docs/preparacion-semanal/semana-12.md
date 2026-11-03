@@ -239,10 +239,10 @@ La ronda es posterior a la fecha de la sesión; el cronograma no se tocó.
 |---|---|---|
 | E2 · Plan de lección | Aprobado (ejemplo, frontmatter, diagrama y reto C confirmados) | ✅ |
 | E3 · Lección `.mdx` + registro TS | `fundamentos-de-recursividad` | ✅ |
-| E4 · Apuntes del docente | **No producidos:** la lección es el guion de la clase en vivo | ✅ (omitida al pasar a E5) |
+| E4 · Apuntes del docente | **No producidos:** la lección es el guion de la clase en vivo | ⬜ No se preguntó explícitamente; se omitió al pasar el usuario a E5 |
 | E5 · Cuestionario de cierre | Propuesto: 6 preguntas → 6 aprobadas, más la keyword `pila-de-llamadas` | ✅ |
-| E6 · Guía del estudiante | No aplica — sesión en vivo | ✅ (omitida) |
-| E6 · Quiz A/B/C | No aplica — la semana no lleva ★ en esta sesión | ✅ (omitida) |
+| E6 · Guía del estudiante | No aplica — sesión en vivo | ⬜ No se preguntó explícitamente; se omitió al pasar el usuario a E7 |
+| E6 · Quiz A/B/C | No aplica — la semana no lleva ★ en esta sesión | ⬜ No se preguntó explícitamente; se omitió al pasar el usuario a E7 |
 
 ### Artefactos producidos
 
@@ -272,7 +272,8 @@ No aplica.
 - Frontmatter `presentation: true` y `type: "Lección guion de clase en vivo"`, sin formalizar la variante en `lesson-authoring` — **motivo:** el usuario eligió esta opción.
 - "Dónde se rompe la analogía" quedó como párrafo dentro del Error planeado 1, no como `##` propio — **motivo:** evitar duplicar el error; el usuario no lo objetó al aprobar.
 - La lección tiene 361 líneas y 15 secciones `##`, más que el plan — **motivo:** Resumen y Síntesis separados, "Qué sigue" y votación como secciones propias.
-- E4 y E6 se omitieron al pasar el usuario a E5/E7 — **motivo:** la lección es el guion de la clase; reversible pidiendo apuntes.
+- E4 y E6 se omitieron al pasar el usuario a E5/E7, sin pregunta explícita — **motivo:** la lección es el guion de la clase; reversible pidiendo apuntes o guía.
+- La lección no incluye la sección «¿Dónde aparece en tu proyecto?» — **motivo:** lo propuso el diseñador y el usuario aprobó el plan; la aplicación al proyecto de aula llega en la Semana 13.
 
 ### Verificación (E7)
 
@@ -283,8 +284,6 @@ No aplica.
 - [x] Coherencia cruzada lección ↔ cuestionario (P6 y la frase del `return` compilados con `javac`)
 - [ ] `@reviewer`: pendiente (E9)
 - [ ] Render en navegador (diagrama de secuencia): pendiente, lo comprueba el docente
-
----
 
 ### Despliegue
 
