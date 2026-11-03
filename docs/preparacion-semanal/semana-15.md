@@ -1,7 +1,7 @@
 # Semana 15 — 9–15 de noviembre
 
 **Rama:** `feat/semana-15-analisis-de-algoritmos` (AA) · `feat/semana-15-programacion-cientifica` (PC) · `feat/semana-15-estructuras-de-datos` (ED; su estado está en la sección «Ronda — `estructuras-de-datos`», más abajo)
-**Estado:** AA: ✅ Material y cuestionarios listos en desarrollo / ⬜ Desplegada · PC: ✅ **Desplegada y abierta en producción (2026-10-28)** · ED: ✅ Material y cuestionario listos en desarrollo / ⬜ Mergeada y desplegada
+**Estado:** AA: ✅ Material y cuestionarios listos en desarrollo / ⬜ Desplegada · PC: ✅ **Desplegada y abierta en producción (2026-10-28)** · ED: ✅ Material y cuestionario listos en desarrollo / ✅ Mergeada a `development` (local; push pendiente) / ⬜ Desplegada
 
 ---
 
@@ -238,7 +238,7 @@ Keywords creadas en desarrollo: `visualizacion`, `matplotlib`, `seaborn`
 ## Ronda — `estructuras-de-datos` (2026-11-03)
 
 **Rama:** `feat/semana-15-estructuras-de-datos`
-**Estado:** ✅ Material y cuestionario listos en desarrollo / ⬜ Revisada por `@reviewer` / ⬜ Mergeada a `development` / ⬜ Desplegada y abierta
+**Estado:** ✅ Material y cuestionario listos en desarrollo / ✅ Revisada por `@reviewer` / ✅ Mergeada a `development` (local; push pendiente) / ⬜ Desplegada y abierta
 
 **Alcance confirmado por el usuario:** Sesión T1 (martes 10 de noviembre), solo
 la lección `bst-busqueda-e-insercion`: la regla del BST y los métodos `buscar`
@@ -310,7 +310,7 @@ No aplica.
 - [x] Checklist de `lesson-authoring` §8 recorrido
 - [x] `summary` presente en frontmatter **y** en registro TS
 - [x] Coherencia cruzada lección ↔ cuestionario (salidas, contadores y alturas calculados con Java 17)
-- [ ] `@reviewer`: primera revisión CAMBIOS REQUERIDOS (1 bloqueante, 4 menores, 4 sugerencias); corregidos en un commit posterior, pendiente la segunda revisión
+- [x] `@reviewer`: primera revisión CAMBIOS REQUERIDOS (1 bloqueante, 4 menores, 4 sugerencias); corregidos en un commit posterior; segunda revisión APROBADO, sin hallazgos bloqueantes, mayores ni menores
 - [ ] Render en navegador (los dos diagramas del árbol): pendiente, lo comprueba el docente
 
 ### Despliegue
