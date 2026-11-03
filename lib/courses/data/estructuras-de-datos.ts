@@ -394,6 +394,8 @@ export const estructurasDeDatos: Course = {
       articleSlug: "fundamentos-de-recursividad",
       order: 29,
       title: "Fundamentos de recursividad",
+      summary:
+        "Parte de la fila del banco para deducir el caso base y el caso recursivo, y sigue en Java cómo la pila de llamadas apila y desapila cada pregunta pendiente, con pruebas de escritorio paso a paso y tres errores clásicos.",
       topics: [
         { title: "Concepto de recursividad: caso base y caso recursivo" },
         { title: "Pila de llamadas (call stack): cómo funciona la recursión en memoria" },
