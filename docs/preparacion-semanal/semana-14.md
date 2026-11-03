@@ -330,6 +330,7 @@ No aplica.
 - Se definió "reemplaza lo que sigue a la construcción" como borrar las líneas de `main` posteriores a `c.insertarDerecho("F");` — **motivo:** evitar repetir las siete líneas de construcción en cada bloque.
 - Recorridos como métodos estáticos de `Recorridos`, no de `NodoArbol` ni de `ArbolBinario<T>` — **motivo:** un árbol vacío es `null`; la lección no dice que "implementan" la interface de S14 T1.
 - Sin errores planeados, retos, «Qué sigue», «¿Dónde aparece en tu proyecto?», serialización ni mención al BST, al laboratorio o a lecciones futuras — **motivo:** decisiones del usuario.
+- Tras la primera revisión se corrigió la Síntesis ("siete llamadas": son el constructor de la raíz y seis llamadas de inserción), se completó la segunda pregunta de diseño de la recursión (¿cómo me acerco al paro?), se precisó la condición del dibujo para leer el in-orden (todo el subárbol izquierdo a la izquierda y todo el derecho a la derecha), se suavizó "no pueden ser métodos del nodo" a "no conviene" y se separaron las dos causas de `static` y genérico — **motivo:** hallazgos de la revisión.
 - Las salidas se verificaron con Java 17 (el entorno no tiene Java 21): tras el recorte se reconstruyeron los estados con los 7 bloques `java` restantes y las 3 salidas coinciden byte a byte.
 
 ### Verificación (E7)
@@ -339,7 +340,7 @@ No aplica.
 - [x] Checklist de `lesson-authoring` §8 recorrido
 - [x] `summary` presente en frontmatter **y** en registro TS
 - [x] Coherencia cruzada lección ↔ cuestionario (salidas, excepción, `NullPointerException` y fórmula 2n + 1 ejecutadas con Java 17)
-- [ ] `@reviewer`: pendiente (E9)
+- [ ] `@reviewer`: primera revisión CAMBIOS REQUERIDOS (1 bloqueante, 2 mayores, 3 menores; sin cambios de código); corregidos en un commit posterior, pendiente la segunda revisión
 - [ ] Render en navegador (diagrama del árbol de ejemplo): pendiente, lo comprueba el docente
 
 ### Despliegue

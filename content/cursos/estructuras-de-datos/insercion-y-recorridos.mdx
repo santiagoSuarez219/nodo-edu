@@ -15,7 +15,7 @@ summary: "Parte de caminar por las carpetas para ver que pre-orden, in-orden y p
 updatedAt: "2026-11-03"
 ---
 
-> 📘 **Lección guion para clase en vivo.** Se dicta en la sesión y se sigue paso a paso: ten tu editor abierto, escribe el código a medida que avanzamos y haz cada traza en papel **antes** de mirar la tabla. El código vive en dos archivos acumulativos: `NodoArbol.java` (secciones «El nodo del árbol» e «Insertar») y `Recorridos.java` (desde «Construir el árbol de ejemplo»). «Añade» significa dentro de la clase y encima de `main` (en `NodoArbol.java`, debajo de lo que ya hay); «reemplaza lo que sigue a la construcción» significa borrar las líneas de `main` posteriores a `c.insertarDerecho("F");` y poner las nuevas.
+> 📘 **Lección guion para clase en vivo.** Se dicta en la sesión y se sigue paso a paso: ten tu editor abierto, escribe el código a medida que avanzamos y haz cada traza en papel **antes** de mirar la tabla. El código vive en dos archivos acumulativos: `NodoArbol.java` (secciones «El nodo del árbol» e «Insertar: colgar un hijo de un padre») y `Recorridos.java` (desde «Construir el árbol de ejemplo»). «Añade» significa dentro de la clase y encima de `main` (en `NodoArbol.java`, debajo de lo que ya hay); «reemplaza lo que sigue a la construcción» significa borrar las líneas de `main` posteriores a `c.insertarDerecho("F");` y poner las nuevas.
 
 ## Caminar por las carpetas: tres momentos para anotar
 
@@ -144,9 +144,9 @@ Se lee de izquierda a derecha: `e` es el nodo `E`, su hijo izquierdo es `G`, y d
 
 ## Pre-orden: visitar, izquierda, derecha
 
-El pre-orden anota el nombre **al llegar**: visita el nodo, y luego recorre el subárbol izquierdo y el derecho. Como el hijo de un nodo es otro árbol, el recorrido es recursivo, con las dos preguntas de la lección Fundamentos de recursividad: **¿cuándo paro?** Cuando el árbol está vacío, que es el caso base de la lección Conceptos y TAD árbol binario.
+El pre-orden anota el nombre **al llegar**: visita el nodo, y luego recorre el subárbol izquierdo y el derecho. Como el hijo de un nodo es otro árbol, el recorrido es recursivo, con las dos preguntas de la lección Fundamentos de recursividad. **¿Cuándo paro?** Cuando el árbol está vacío, que es el caso base de la lección Conceptos y TAD árbol binario. **¿Cómo me acerco al paro?** Cada llamada baja a un subárbol, que es más pequeño que el árbol de partida.
 
-Los métodos son `static` y reciben el nodo como parámetro. No pueden ser métodos del nodo: un árbol vacío es `null`, y sobre `null` no se puede invocar ningún método. Añade el método encima de `main`, en `Recorridos`:
+Los métodos son `static` y reciben el nodo como parámetro. No conviene que sean métodos del nodo: un árbol vacío es `null`, y sobre `null` no se puede invocar ningún método. Añade el método encima de `main`, en `Recorridos`:
 
 ```java
     static <T> void preOrden(NodoArbol<T> nodo) {
@@ -278,7 +278,7 @@ Leyendo cada columna en orden, el subárbol de `B` da: pre-orden `B D E G`, in-o
 Las carpetas explican bien dos de los tres recorridos y fallan en el tercero:
 
 - El **pre-orden** y el **post-orden** tienen su análogo: anotar al llegar a una carpeta y anotar al salir de ella.
-- El **in-orden** no: nadie anota «en medio» de dos carpetas hermanas, porque las subcarpetas de una carpeta real no tienen lado. Por eso el in-orden se apoya en el dibujo del árbol y no en la caminata: si cada hijo izquierdo queda a la izquierda de su padre y cada hijo derecho a su derecha, el in-orden lee los nodos de izquierda a derecha.
+- El **in-orden** no: nadie anota «en medio» de dos carpetas hermanas, porque las subcarpetas de una carpeta real no tienen lado. Por eso el in-orden se apoya en el dibujo del árbol y no en la caminata: si dibujas todo el subárbol izquierdo de un nodo a su izquierda y todo el subárbol derecho a su derecha, el in-orden lee los nodos de izquierda a derecha.
 - Una carpeta real admite **n subcarpetas sin orden**; el árbol binario admite dos, y cada una tiene su lado.
 
 ## Resumen operativo
@@ -295,8 +295,8 @@ Las carpetas explican bien dos de los tres recorridos y fallan en el tercero:
 - Un `NodoArbol<T>` guarda un dato y dos referencias, `izquierdo` y `derecho`; en una hoja valen `null`, los dos subárboles vacíos.
 - Los campos son privados y sin *setters*: las referencias cambian solo con `insertarIzquierdo` e `insertarDerecho`.
 - Insertar es colgar un hijo de un padre dado, sin regla de orden; si el lado está ocupado se lanza `IllegalStateException`, porque reemplazar perdería un subárbol en silencio.
-- El árbol de ejemplo se construye con siete llamadas a `insertarIzquierdo` e `insertarDerecho`, guardando solo los nodos que luego reciben hijos.
-- Los recorridos son métodos `static` y genéricos porque un árbol vacío es `null`, y su caso base es el árbol vacío.
+- El árbol de ejemplo se construye con el constructor de la raíz y seis llamadas a `insertarIzquierdo` e `insertarDerecho`, guardando solo los nodos que luego reciben hijos.
+- Los recorridos son métodos `static` porque un árbol vacío es `null` y no se puede invocar un método sobre `null`; son genéricos porque `NodoArbol<T>` lo es, y su caso base es el árbol vacío.
 - El pre-orden visita al llegar: `A B D E G C F`; su traza tiene 15 llamadas, 7 con nodo y 8 con árbol vacío.
 - In-orden y post-orden solo mueven la línea que imprime; la votación pedía predecir el in-orden, `D B G E A C F`, y el post-orden da `D G E B F C A`.
 - La analogía se rompe en el in-orden, que no tiene análogo en las carpetas, y en que una carpeta admite n subcarpetas sin lado y el árbol binario solo dos.
