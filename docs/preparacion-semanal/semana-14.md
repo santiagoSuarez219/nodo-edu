@@ -2,6 +2,7 @@
 
 **Rama:** `feat/manejo-datos-faltantes-pc`
 **Estado:** ✅ Mergeada a `development` y desplegada y abierta en producción (2026-11-02)
+**Rama (ED):** `feat/semana-14-estructuras-de-datos` — su estado está en la sección «Ronda — `estructuras-de-datos`», más abajo
 
 > Material fuera del cronograma: el docente pidió una sección nueva de trabajo
 > independiente, posterior a `filtrado-agregacion-y-limpieza-de-datos`. No
@@ -223,10 +224,11 @@ No aplica.
 - El tercer topic del registro pasó de "TAD árbol binario: representación con nodos enlazados en Java" a "TAD árbol binario: operaciones como contrato" — **motivo:** el usuario decidió no implementar `NodoArbol` en esta lección y aprobó el cambio.
 - **`info.md` no se tocó** y sigue diciendo "representación con nodos enlazados en Java" para esta sesión, así que contradice el topic del registro — **motivo:** es fuente de verdad y no se editó sin autorización explícita; queda como pendiente del usuario.
 - Convención de altura: aristas del camino más largo, hoja = 0, vacío = -1, raíz en nivel 0 — **motivo:** ni `info.md` ni el cronograma fijan una; se eligió con el usuario y se dice explícitamente en la lección.
-- La votación se movió antes de la traza de la altura — **motivo:** la traza terminaba diciendo "= 3" y regalaba la respuesta de la votación.
+- La votación se movió antes de la traza de la altura — **motivo:** la traza terminaba diciendo "= 3" y regalaba la respuesta de la votación. La revisión encontró que la tabla de vocabulario también la adelantaba ("Altura: 3, camino A, B, E, G"); se reemplazó por una remisión a la votación, se quitaron las menciones a «la fórmula» (aún no vista) y la altura se define en saltos, no en carpetas.
+- Se acotó la afirmación sobre el costo de buscar: la altura manda el costo de llegar a un nodo cuando se sabe el camino; en un árbol sin orden, `contiene` puede visitar todos los nodos — **motivo:** hallazgo de la revisión.
 - Un único fragmento de Java: la `interface ArbolBinario<T>` con solo firmas — **motivo:** sigue el patrón del curso (contrato primero, implementación después), aprobado por el usuario.
 - La lección tiene 257 líneas y 13 secciones `##`, por debajo de lo estimado — **motivo:** el agente no añadió contenido fuera del plan.
-- Sin errores planeados, retos, «Qué sigue» ni «¿Dónde aparece en tu proyecto?» — **motivo:** el usuario quitó los dos primeros de las lecciones anteriores porque la clase no alcanzaba; la aplicación al proyecto entra con la implementación.
+- Sin errores planeados, retos, «Qué sigue» ni «¿Dónde aparece en tu proyecto?» — **motivo:** el usuario quitó los dos primeros de `algoritmos-recursivos-clasicos` porque la clase no alcanzaba (`fundamentos-de-recursividad` los conserva); la aplicación al proyecto entra con la implementación.
 - E4 y E6 se omitieron al pasar el usuario a E5/E7, sin pregunta explícita — **motivo:** la lección es el guion de la clase; reversible pidiendo apuntes o guía.
 - Las cifras y la `interface` se verificaron con Java 17 y scripts (el entorno no tiene Java 21).
 
@@ -237,7 +239,7 @@ No aplica.
 - [x] Checklist de `lesson-authoring` §8 recorrido
 - [x] `summary` presente en frontmatter **y** en registro TS
 - [x] Coherencia cruzada lección ↔ cuestionario (alturas, niveles y conteos calculados con scripts; firma de `izquierdo()` comparada con la interface)
-- [ ] `@reviewer`: pendiente (E9)
+- [ ] `@reviewer`: CAMBIOS REQUERIDOS en la primera revisión (1 bloqueante, 3 mayores, menores); corregidos en un commit posterior, pendiente la segunda revisión
 - [ ] Render en navegador (diagrama del árbol de ejemplo): pendiente, lo comprueba el docente
 
 ### Despliegue

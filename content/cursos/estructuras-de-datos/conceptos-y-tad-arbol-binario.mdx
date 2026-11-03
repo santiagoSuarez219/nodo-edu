@@ -83,8 +83,8 @@ Cada término tiene su equivalente en las carpetas:
 | **Hoja** | Un archivo, o una carpeta sin nada adentro | `D`, `G`, `F` (3 hojas) |
 | **Subárbol** | Una carpeta con todo su contenido | El subárbol de `B` es `B`, `D`, `E`, `G` |
 | **Grado** | Cuántos elementos tiene directamente adentro | `A` tiene grado 2; `E` tiene grado 1; `D`, grado 0 |
-| **Nivel** | Cuántas carpetas hay que cruzar desde el disco | `A` en el nivel 0; `B` y `C` en el 1; `D`, `E` y `F` en el 2; `G` en el 3 |
-| **Altura** | Cuántas carpetas hay en el camino más largo hacia abajo | 3 (camino `A`, `B`, `E`, `G`) |
+| **Nivel** | Cuántos saltos hay desde el disco hasta esa carpeta | `A` en el nivel 0; `B` y `C` en el 1; `D`, `E` y `F` en el 2; `G` un nivel más abajo que `E` |
+| **Altura** | Cuántos saltos hay en el camino más largo hacia abajo | La calculamos en la votación de más abajo |
 
 🛑 **Pausa:** en el árbol de ejemplo, ¿cuál es la raíz? ¿Cuáles son las hojas? ¿Quién es el padre de `G`?
 
@@ -103,7 +103,7 @@ La segunda restricción es la que se olvida. En `B`, el hijo izquierdo es `D` y 
 
 ## La definición recursiva
 
-Ya sabes leer una definición con dos preguntas: **¿cuándo paro?** (caso base) y **¿cómo me acerco al paro?** (caso recursivo), de la lección Fundamentos de recursividad. Un árbol binario se define así:
+Ya sabes leer una definición con las dos preguntas de la lección Fundamentos de recursividad: **¿cuándo paro?** (caso base) y **¿cómo me acerco al paro?** (caso recursivo). Un árbol binario se define así:
 
 > **Árbol binario:** es **vacío**, o es un nodo —la **raíz**— con un **subárbol izquierdo** y un **subárbol derecho**, ambos árboles binarios.
 
@@ -125,9 +125,9 @@ Con la convención del curso (altura = aristas del camino más largo, hoja = 0) 
 - (c) 3
 - (d) 2
 
-Vota solo. Si entre el 30 % y el 70 % del grupo acierta, discutan 2 minutos en parejas y vuelvan a votar; si más del 70 % acierta, la explicación es rápida; si menos del 30 %, vuelve a explicar la convención y la fórmula antes de discutir.
+Vota solo. Si entre el 30 % y el 70 % del grupo acierta, discutan 2 minutos en parejas y vuelvan a votar; si más del 70 % acierta, la explicación es rápida; si menos del 30 %, vuelve a explicar la convención antes de discutir.
 
-Después de votar, la sección siguiente lo comprueba con la definición recursiva: **la respuesta es (c), 3**, el camino `A`, `B`, `E`, `G` tiene 3 aristas. Qué revela cada opción: (a) 7 cuenta los nodos, no el camino más largo; (b) 4 cuenta los nodos de ese camino (o usa hoja = 1), que es la otra convención y no la de este curso; (d) 2 olvida sumar la raíz, es decir, el 1 + de la fórmula, y se queda con la altura del subárbol de `B`.
+Después de votar, la sección siguiente lo comprueba con la definición recursiva: **la respuesta es (c), 3**, el camino `A`, `B`, `E`, `G` tiene 3 aristas. Qué revela cada opción: (a) 7 cuenta los nodos, no el camino más largo; (b) 4 cuenta los nodos de ese camino (o usa hoja = 1), que es la otra convención y no la de este curso; (d) 2 olvida sumar la raíz y se queda con la altura del subárbol de `B`.
 
 ## La definición en acción: calcular la altura
 
@@ -136,7 +136,7 @@ La definición recursiva sirve para algo concreto: comprobar la votación. La al
 - **Caso base:** la altura del árbol vacío es -1.
 - **Caso recursivo:** altura = 1 + max(altura del subárbol izquierdo, altura del subárbol derecho).
 
-El -1 del caso base hace que una hoja dé 1 + max(-1, -1) = 0, justo como pide la convención. Haz la traza a mano sobre el árbol de ejemplo, igual que en Algoritmos recursivos clásicos: las preguntas **bajan** hasta los árboles vacíos y las respuestas **suben** sumando 1.
+El -1 del caso base hace que una hoja dé 1 + max(-1, -1) = 0, justo como pide la convención. Haz la traza a mano sobre el árbol de ejemplo, igual que en la lección Algoritmos recursivos clásicos: las preguntas **bajan** hasta los árboles vacíos y las respuestas **suben** sumando 1.
 
 Al bajar, `A` pregunta por `B`, `B` por `D`, y `D` pregunta por sus dos subárboles vacíos, que responden -1. Después de `D`, `B` pregunta por `E`, `E` por `G`, y así sucesivamente. Completa la tabla en papel antes de mirarla; las filas están en el orden en que se **resuelven**, al subir:
 
@@ -181,7 +181,7 @@ El máximo de nodos no es una obligación. Un árbol puede tener muchos nodos y 
 
 Con 4 nodos, una cadena da altura 3 (el mínimo de nodos para esa altura: h + 1 = 4). Con la misma cantidad de nodos puedes lograr altura 2, por ejemplo con una raíz que tiene un hijo con su propio hijo y otro hijo suelto.
 
-Esta diferencia es la que importa en la práctica: **la altura manda cuánto cuesta buscar**. Para llegar a un nodo hay que bajar por un camino, y ese camino tiene como máximo la altura del árbol. Mil nodos en un árbol de altura 9 se recorren en pocos pasos; mil nodos en una cadena obligan a pasar por casi todos.
+Esta diferencia es la que importa en la práctica: **la altura manda cuánto cuesta llegar a un nodo**. Cuando sabes qué camino tomar, bajas por un camino que tiene como máximo la altura del árbol: con mil nodos en un árbol de altura 9 llegas a cualquiera en pocos pasos, y en una cadena de mil nodos puedes tener que pasar por casi todos. Si el árbol no está ordenado y no sabes por dónde ir, `contiene` puede tener que visitar todos los nodos, sea cual sea la altura.
 
 ## El TAD árbol binario
 
@@ -252,6 +252,6 @@ Las carpetas explican bien el árbol, pero se separan del árbol binario en cuat
 - La altura se calcula con la misma definición: -1 para el vacío y 1 + max(izquierda, derecha) para los demás; la del árbol de ejemplo es 3.
 - La votación obligó a separar la altura (aristas del camino más largo) de otras cuentas posibles: nodos, nodos de un camino o altura sin sumar la raíz.
 - El nivel k tiene a lo sumo **2^k** nodos, y un árbol de altura h tiene entre **h + 1** y **2^(h+1) - 1** nodos.
-- Un árbol degenerado puede tener n nodos y altura n - 1; la altura determina cuánto cuesta buscar.
+- Un árbol degenerado puede tener n nodos y altura n - 1; la altura marca cuántos saltos cuesta llegar a un nodo cuando se sabe el camino.
 - El **TAD árbol binario** es un contrato de operaciones (`estaVacio`, `raiz`, `izquierdo`, `derecho`, `altura`, `tamano`, `contiene` y recorridos) que repite la definición recursiva y no fija cómo se almacena.
 - La analogía de las carpetas se rompe en que una carpeta admite n subcarpetas sin orden y el árbol binario solo dos, con posición.
