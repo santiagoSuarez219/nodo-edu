@@ -408,6 +408,8 @@ export const estructurasDeDatos: Course = {
       articleSlug: "algoritmos-recursivos-clasicos",
       order: 30,
       title: "Algoritmos recursivos clásicos",
+      summary:
+        "Aplica el esquema caso base y caso recursivo a factorial, Fibonacci y las Torres de Hanói, compáralos con sus versiones iterativas, mira por qué la recursión ingenua de Fibonacci repite trabajo y decide cuándo conviene recursión y cuándo un ciclo.",
       topics: [
         { title: "Factorial y Fibonacci: análisis y comparación con la versión iterativa" },
         { title: "Torres de Hanói: planteamiento, solución recursiva y complejidad" },
