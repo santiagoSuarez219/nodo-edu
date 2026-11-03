@@ -450,6 +450,8 @@ export const estructurasDeDatos: Course = {
       articleSlug: "bst-busqueda-e-insercion",
       order: 33,
       title: "BST: búsqueda e inserción",
+      summary:
+        "Parte del juego de adivinar un número con «mayor» y «menor» para llegar a la regla del árbol binario de búsqueda; escribe en Java `buscar` e `insertar` recursivos sobre enteros, cuenta comparaciones y compara un árbol equilibrado con uno degenerado construidos con los mismos datos.",
       topics: [
         { title: "Propiedad de ordenamiento del BST" },
         { title: "Operación buscar: implementación recursiva y análisis de complejidad" },
