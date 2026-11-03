@@ -1,5 +1,728 @@
 ---
 title: "Proyecto final"
-summary: ""
-updatedAt: 2026-10-24
+course: "Análisis de Algoritmos"
+course_code: "AA"
+level: "Últimos semestres"
+type: "Proyecto final"
+language: "Python 3"
+difficulty: "Avanzado"
+estimated_time: "Tres semanas de trabajo en equipo (entrega el lunes 23 de noviembre de 2026)"
+presentation: false
+date: "2026-11-02"
+author: "Asistente de Docencia"
+summary: "Enunciado del proyecto final (20 % de la nota): en equipos de hasta cuatro, analicen el proceso de una organización, diseñen y comparen estrategias algorítmicas, midan su eficiencia y su consumo de energía, y justifiquen la que recomiendan. Entrega el lunes 23 de noviembre."
+updatedAt: "2026-11-03"
 ---
+
+> 📌 Este es el enunciado completo del proyecto final. Léalo entero antes de repartir el trabajo: incluye las reglas, los tres casos, las actividades, el entregable y la rúbrica con la que se califica.
+
+## De qué trata el proyecto
+
+Como equipo de ingenieros de sistemas, deberán analizar un problema computacional planteado por una organización, diseñar y comparar diferentes estrategias algorítmicas para resolverlo, evaluar su eficiencia mediante el análisis de complejidad y pruebas experimentales, y justificar la solución seleccionada considerando criterios técnicos y el impacto de su implementación en el contexto organizacional.
+
+El instrumento contiene tres casos de estudio con la misma estructura. Cada equipo trabaja **un** caso, asignado por el docente. Las actividades, los supuestos, el entregable y la rúbrica son comunes a los tres casos.
+
+## Reglas del proyecto
+
+| Aspecto | Condición |
+|---|---|
+| Valor | 20 % de la nota del curso |
+| Equipos | Máximo 4 estudiantes, obligatorios (no se entrega de forma individual) |
+| Caso | Uno de los tres, asignado por el docente con un reparto equilibrado entre equipos |
+| Repositorio | Un repositorio nuevo en GitHub por equipo, con todos los integrantes como colaboradores |
+| Productos | El repositorio, cuyo `README.md` contiene el informe técnico, y el mismo informe en PDF |
+| Fecha de entrega | **Lunes 23 de noviembre de 2026** |
+| Entrega parcial | La operación de su caso que admite programación dinámica o estrategia voraz (la 4 en el Caso 1, la 3 en los Casos 2 y 3) se entrega antes, el **miércoles 18 de noviembre**, y vale 15 % aparte (Laboratorio 4; ver la sección siguiente) |
+| Sustentación | No hay sustentación oral |
+| Calificación | Rúbrica institucional, aplicada por equipo; todos los integrantes reciben la misma nota |
+| Aporte individual | Se evidencia con el historial de commits, que también se valora en Seguimiento |
+
+## Entrega parcial: Laboratorio 4
+
+El Laboratorio 4 (15 % de la nota del curso) es la parte del proyecto que usa programación dinámica o estrategia voraz. Cada equipo resuelve la **operación de su caso que admite programación dinámica o estrategia voraz**, y es obligatoria para todos los equipos:
+
+| Caso | Operación | Estrategia que se espera trabajar |
+|---|---|---|
+| 1 — Recaudo del transporte | 4. Liquidación del tope tarifario | Programación dinámica |
+| 2 — Plataforma Pulso | 3. Programación de las jornadas de las unidades móviles | Estrategia voraz (selección de actividades) si se maximiza el número de jornadas, o programación dinámica (intervalos ponderados) si se maximizan los pacientes atendidos |
+| 3 — Banco de alimentos | 3. Cargue de los vehículos | Programación dinámica (mochila 0/1) |
+
+- **Fecha:** miércoles 18 de noviembre de 2026.
+- **Modalidad:** en equipo, dentro del mismo repositorio y del mismo informe del proyecto: el código va en `src/`, las gráficas en `graficas/` y el texto en los apartados del `README.md` del proyecto, así que todo lo del laboratorio queda como avance del proyecto. Todos los integrantes reciben la misma nota.
+- **Qué se entrega:** el diseño, la implementación y el análisis de esa operación, contrastada con lo que hace hoy la organización, con gráficas y su análisis de complejidad.
+- **Calificación:** con una rúbrica propia del laboratorio, publicada en la guía del Laboratorio 4. No es la rúbrica institucional del proyecto, que se aplica solo a la entrega del 23 de noviembre.
+- **Material de estudio:** las lecciones "Fundamentos de programación dinámica", "Estrategia voraz" y "Programación dinámica: decidir, verificar y medir", y la guía complementaria de su caso, publicada junto al Laboratorio 4: "Cubrir días con pases" (Caso 1), "Intervalos ponderados" (Caso 2, si el equipo maximiza los pacientes atendidos) o "Mochila 0/1" (Caso 3).
+- **Después del 18 de noviembre:** esa operación forma parte de su proyecto. El equipo trabaja además, como mínimo, otra operación del caso para cumplir las dos que exige el proyecto, y entrega todo el 23 de noviembre.
+
+## Los tres casos
+
+Abra la pestaña del caso que le asignó el docente. Los tres tienen la misma forma: un contexto, un proceso con cuatro operaciones críticas, la información del cliente, sus restricciones y unas preguntas de impacto propias.
+
+<Tabs>
+<Tab label="Caso 1 — Recaudo del transporte">
+
+**Contexto organizacional**
+
+El Sistema Integrado de Transporte del Valle Metropolitano (SITVM) opera el
+metro, dos líneas de cable y las rutas de buses alimentadores de un área
+metropolitana de cerca de 4.000.000 de habitantes. El pasaje se paga con una
+tarjeta sin contacto que el usuario valida al entrar a una estación o al subir
+a un bus.
+
+Cada noche, mientras el sistema está cerrado, un proceso por lotes concilia
+todas las validaciones del día: las depura, liquida lo que se le cobró a cada
+tarjeta y entrega la información a tres áreas internas: Recaudo (liquidación a
+los operadores y devoluciones a los usuarios), Atención al Usuario y
+Planeación de la Operación.
+
+La Gerencia de Tecnología necesita rediseñar ese proceso, que dejó de caber en
+la ventana nocturna desde que entraron en operación las rutas alimentadoras y
+la segunda línea de cable.
+
+**Situación actual**
+
+El proceso nocturno ejecuta las siguientes operaciones:
+
+1. **Deduplicación de validaciones.** Los validadores de los buses trabajan
+   sin conexión y descargan sus registros al llegar al patio. Si la descarga se
+   interrumpe, el validador reenvía el lote completo, y los registros ya
+   recibidos llegan otra vez. El proceso actual compara cada validación con
+   todas las validaciones ya aceptadas para decidir si es repetida.
+2. **Ordenamiento por tarjeta y hora.** Para liquidar transbordos y aplicar el
+   tope tarifario, las validaciones deben quedar ordenadas por número de
+   tarjeta y, dentro de cada tarjeta, por fecha y hora. El proceso actual usa un
+   ordenamiento por inserción implementado hace varios años.
+3. **Detección de las franjas de congestión.** Planeación quiere saber, para
+   cada estación, cuál es el **tramo de intervalos consecutivos** en que más
+   pasajeros se acumularon en la plataforma, para decidir dónde y cuándo
+   reforzar la frecuencia de trenes. Para cada intervalo de 5 minutos se conoce
+   el saldo neto de la plataforma: pasajeros que entraron por los torniquetes
+   menos pasajeros que los trenes alcanzaron a evacuar (puede ser negativo). El
+   programa actual evalúa todos los tramos posibles de la serie. Sobre un mes de
+   datos tarda varios minutos por estación; sobre el histórico de dos años
+   (≈ 166.000 intervalos por estación), que es lo que Planeación necesita, no
+   termina en un tiempo útil.
+4. **Liquidación del tope tarifario.** Desde este año rige una política de
+   **tope tarifario**: al cierre de cada mes, a ningún usuario con tarjeta
+   personalizada se le puede haber cobrado más que la combinación más barata de
+   pasajes y pases que cubra todos sus viajes del mes. La diferencia se le
+   devuelve como saldo en la tarjeta. El programa actual explora todas las
+   combinaciones posibles de pases. Como no termina para las tarjetas que
+   viajan muchos días, a esas se les aplica una regla simplificada: cada día se
+   cobra lo más barato entre los pasajes sencillos y el pase diario, y se aplica
+   el pase semanal o mensual si la suma ya lo supera. Atención al Usuario
+   recibe quejas porque esa regla, en algunos meses, cobra más que el mínimo.
+
+La ventana operativa es de **4 horas** (00:00 – 04:00) para las operaciones 1
+y 2 todas las noches, y también para la operación 4 la noche del cierre de mes;
+a las 04:30 abren las estaciones y los validadores deben
+tener cargada la lista actualizada de tarjetas bloqueadas por robo o pérdida.
+Actualmente el proceso tarda **más de 8 horas**, por lo que:
+
+- los validadores abren con la lista de bloqueos del día anterior, y una
+  tarjeta reportada como robada sigue funcionando un día más;
+- las devoluciones del tope tarifario se acreditan con semanas de retraso;
+- Planeación toma las decisiones de frecuencia con datos de una muestra de
+  estaciones, no de toda la red.
+
+**Problema identificado**
+
+La Gerencia de Tecnología considera que el problema no está en la
+infraestructura de cómputo, sino en las **estrategias algorítmicas** usadas en
+las cuatro operaciones. Requiere que un equipo de consultores analice
+alternativas y recomiende las estrategias más adecuadas para la nueva versión
+del proceso.
+
+**Información suministrada por el cliente**
+
+**Operación**
+
+- 1.400.000 validaciones en un día hábil típico.
+- 2.100 validadores entre estaciones y buses.
+- Entre el 4 % y el 9 % de las validaciones de un día llegan repetidas por
+  reenvío de lotes.
+- 3.200.000 tarjetas emitidas; cerca de 950.000 se usan al menos una vez al mes.
+- 80 estaciones de metro y cable; operación de 04:30 a 23:30 (228 intervalos
+  de 5 minutos por día).
+
+**Estructura de una validación**
+
+| Campo | Descripción |
+|---|---|
+| `id_validador` | Identificador del validador |
+| `id_tarjeta` | Número de la tarjeta |
+| `id_estacion` | Estación o ruta donde se validó |
+| `marca_tiempo` | Fecha y hora de la validación |
+| `valor_cobrado` | Valor descontado, en pesos |
+| `perfil` | General, estudiante, adulto mayor o persona con discapacidad |
+
+**Tarifas vigentes para el perfil general** (los perfiles con tarifa
+diferencial tienen valores menores con la misma estructura)
+
+| Producto | Valor | Cobertura |
+|---|---|---|
+| Pasaje sencillo | \$3.900 | Un viaje |
+| Pase diario | \$9.500 | Viajes ilimitados durante un día calendario |
+| Pase semanal | \$36.000 | Viajes ilimitados durante 7 días consecutivos |
+| Pase mensual | \$135.000 | Viajes ilimitados durante 30 días consecutivos |
+
+**Infraestructura**
+
+- El proceso corre sobre un único servidor dedicado, que consume
+  aproximadamente 500 W bajo carga sostenida.
+- No existe procesamiento distribuido ni en paralelo.
+
+**Restricciones del negocio**
+
+La solución deberá garantizar como mínimo que:
+
+- Las operaciones 1 y 2, y la operación 4 en el cierre de mes, terminen dentro
+  de la ventana de 4 horas.
+- Ninguna validación válida se pierda durante la depuración.
+- Una validación repetida nunca se cobre dos veces. Dos registros del mismo
+  validador, la misma tarjeta y la misma marca de tiempo son la misma
+  validación; si cambia cualquiera de los tres, son validaciones distintas.
+- El tope tarifario devuelva exactamente la diferencia frente a la combinación
+  **más barata**: ni un peso de menos para el usuario, ni un peso de más para el
+  sistema.
+- El tramo de congestión reportado sea el de **mayor** acumulación de la serie,
+  no una aproximación.
+- El archivo original de validaciones no se modifique, para conservar la
+  trazabilidad ante reclamaciones.
+
+**Preguntas de impacto propias de este caso**
+
+Para el apartado "Implicaciones éticas, sociales y ambientales" del informe:
+
+- **Personas:** ¿quién asume el costo cuando una validación se cobra dos veces
+  o cuando el tope se liquida mal? Tenga en cuenta que los usuarios que más
+  viajan y los de tarifa diferencial suelen ser los de menores ingresos.
+- **Normativa:** identifique qué normas o buenas prácticas condicionan la
+  solución y cómo las respeta su diseño. Tenga en cuenta que los viajes de una
+  tarjeta personalizada revelan la ubicación y los hábitos de una persona, y que
+  el cobro de un servicio público de transporte está regulado.
+- **Crecimiento:** ¿cómo se comportan las estrategias recomendadas si entra
+  una tercera línea de cable y las validaciones diarias crecen un 30 %?
+
+</Tab>
+<Tab label="Caso 2 — Plataforma Pulso">
+
+**Contexto organizacional**
+
+La Secretaría de Salud departamental opera el programa de **tamizaje de
+diabetes** a través de la plataforma Pulso. 290 laboratorios e IPS del
+departamento envían a diario los resultados de las pruebas que procesan. Cada
+resultado trae un **índice de riesgo** entre 0 y 100, calculado a partir de
+los valores de laboratorio (glucosa en ayunas y hemoglobina glicosilada) y de
+la historia clínica.
+
+Con esos resultados, la Secretaría hace tres cosas: genera cada madrugada la
+lista de pacientes que el centro de contacto debe llamar, programa las
+jornadas de valoración de las unidades móviles en los municipios y vigila la
+calidad de los laboratorios que reportan.
+
+La plataforma se escribió cuando el programa cubría 7 municipios y unos
+35.000 registros. Tras la ampliación a los 125 municipios del departamento, el
+proceso nocturno desbordó su ventana, y las otras dos tareas se siguen haciendo
+con hojas de cálculo.
+
+**Situación actual**
+
+1. **Consolidación de pacientes repetidos.** Un mismo paciente puede aparecer
+   varias veces: se repitió la prueba, o la tomó en dos IPS distintas. Para
+   cada paciente solo debe quedar su resultado **más reciente**. El proceso
+   actual toma cada resultado nuevo y busca al paciente recorriendo la lista ya
+   consolidada.
+2. **Lista diaria de llamadas.** El centro de contacto solo alcanza a llamar a
+   **9.000 pacientes por día**, en orden de mayor a menor riesgo. El proceso
+   actual ordena los 1.450.000 registros pendientes por índice de riesgo con un
+   ordenamiento por inserción implementado hace once años, y solo usa los
+   primeros 9.000.
+3. **Programación de las jornadas de las unidades móviles.** Cada una de las 9
+   subregiones del departamento tiene **una** unidad móvil de valoración. Cada
+   mes, los municipios de la subregión solicitan jornadas: cada solicitud trae
+   una hora de inicio, una hora de fin (incluido el desplazamiento) y el número
+   de pacientes de alto riesgo pendientes en ese municipio. La unidad no puede
+   estar en dos jornadas a la vez. Hoy el coordinador asigna por orden de
+   llegada de las solicitudes y rechaza las que se cruzan con una ya aceptada;
+   cada mes quedan sin atender municipios con muchos pacientes de alto riesgo.
+4. **Vigilancia de la calidad de los laboratorios.** Para cada lote de
+   pruebas que procesa un laboratorio se calcula la diferencia entre su tasa de
+   resultados positivos (índice de riesgo igual o superior a 70) y la tasa
+   esperada para la población que atiende
+   (puede ser negativa). La Secretaría quiere encontrar, para cada laboratorio,
+   el **tramo de lotes consecutivos** con mayor exceso acumulado de positivos:
+   suele indicar un equipo descalibrado que está enviando a valoración a
+   personas sanas. El programa actual evalúa todos los tramos posibles; con el
+   histórico de tres años tarda varios días para los 290 laboratorios.
+
+La ventana del proceso nocturno (operaciones 1 y 2) es de **4 horas**
+(01:00 – 05:00); a las 06:00 abre el centro de contacto. Actualmente el
+proceso tarda **cerca de 7 horas**, y el centro de contacto vuelve a trabajar
+algunos días con la lista del día anterior.
+
+**Problema identificado**
+
+La Secretaría considera que el problema no está en la infraestructura, sino en
+las **estrategias algorítmicas** de las cuatro operaciones. Requiere que un
+equipo de consultores analice alternativas y recomiende las estrategias más
+adecuadas.
+
+**Información suministrada por el cliente**
+
+**Volumen**
+
+- 1.450.000 resultados pendientes de gestión en un día típico.
+- Entre el 8 % y el 15 % de los resultados corresponden a un paciente que ya
+  tiene otro resultado en la plataforma.
+- Capacidad del centro de contacto: 9.000 llamadas por día.
+- 9 unidades móviles (una por subregión); cada subregión recibe entre 40 y 120
+  solicitudes de jornada por mes.
+- Cada laboratorio procesa en promedio 30 lotes por día; el histórico
+  disponible es de tres años (≈ 33.000 lotes por laboratorio).
+
+**Estructura de un resultado**
+
+| Campo | Descripción |
+|---|---|
+| `tipo_documento`, `numero_documento` | Identificación del paciente |
+| `id_laboratorio` | Laboratorio o IPS que reporta |
+| `id_lote` | Lote de procesamiento |
+| `fecha_resultado` | Fecha y hora del resultado |
+| `indice_riesgo` | Entero entre 0 y 100 |
+| `municipio` | Municipio de residencia |
+
+**Infraestructura**
+
+- Servidor dedicado único, de aproximadamente 380 W bajo carga sostenida.
+- No existe procesamiento distribuido ni en paralelo.
+
+**Restricciones del negocio**
+
+La solución deberá garantizar como mínimo que:
+
+- Las operaciones 1 y 2 terminen dentro de la ventana de 4 horas.
+- De cada paciente quede exactamente un resultado, el más reciente; ningún
+  paciente desaparece de la plataforma por la consolidación.
+- La lista de llamadas contenga **exactamente** los 9.000 pacientes de mayor
+  riesgo: ningún paciente de menor riesgo puede quedar por encima de uno de
+  mayor riesgo que quedó fuera. A igual índice de riesgo, va primero el
+  resultado más antiguo.
+- La programación de una unidad móvil nunca tenga dos jornadas que se crucen.
+- El tramo reportado para un laboratorio sea el de **mayor** exceso acumulado.
+- Los registros originales enviados por los laboratorios no se modifiquen.
+
+**Preguntas de impacto propias de este caso**
+
+- **Personas:** maximizar el **número** de jornadas de la unidad móvil no es lo
+  mismo que maximizar el número de **pacientes de alto riesgo** atendidos.
+  ¿Cuál de los dos criterios debe optimizar el algoritmo y quién debe decidirlo?
+  ¿Qué le pasa a un paciente que la consolidación borra por error, o a uno sano
+  que un laboratorio descalibrado envía a valoración?
+- **Normativa:** identifique qué normas o buenas prácticas condicionan la
+  solución y cómo las respeta su diseño. Tenga en cuenta que la plataforma
+  maneja datos de salud de personas identificadas y que de ella depende la
+  oportunidad con que se atiende a un paciente.
+- **Crecimiento:** ¿cómo se comportan las estrategias recomendadas si el
+  programa incorpora el tamizaje de hipertensión arterial y los resultados diarios se
+  duplican?
+
+</Tab>
+<Tab label="Caso 3 — Banco de alimentos">
+
+**Contexto organizacional**
+
+El Banco Regional de Alimentos es una fundación sin ánimo de lucro que recibe
+alimentos donados por supermercados, la industria y productores del campo
+(muchos de ellos próximos a vencer o con defectos de empaque que les impiden
+venderse) y los distribuye a **420 organizaciones beneficiarias**: comedores
+comunitarios, hogares de adultos mayores, jardines infantiles y fundaciones
+que atienden a población vulnerable.
+
+Cada madrugada, un proceso planea los despachos del día: decide qué lotes
+salen de la bodega, en qué orden y en qué vehículo. La operación creció más
+del doble en tres años y la planeación ya no alcanza a terminar antes de que
+salgan los vehículos. La Dirección de Operaciones quiere rediseñarla, porque
+cada lote que se vence en la bodega es comida que no llegó a nadie.
+
+**Situación actual**
+
+1. **Consulta de inventario.** Durante el alistamiento, los operarios
+   consultan un lote por su código (cerca de 30.000 consultas por día), y el
+   proceso de planeación pide todos los lotes que vencen en un rango de fechas
+   ("¿qué vence en las próximas 72 horas?"). El inventario está guardado en una
+   lista y ambas consultas la recorren completa.
+2. **Ordenamiento FEFO.** La política sanitaria de la bodega es despachar
+   primero lo que vence primero (*first expired, first out*). El proceso
+   ordena los lotes por fecha de vencimiento y, a igual fecha, por categoría,
+   con un ordenamiento por inserción. Los lotes nuevos del día se anexan al
+   final de la lista del día anterior, que ya estaba ordenada.
+3. **Cargue de los vehículos.** Cada vehículo tiene una capacidad máxima en
+   kilogramos. Para cada ruta hay un conjunto de lotes candidatos, cada uno con
+   su peso y su **valor nutricional** (raciones que aporta, ponderadas por la
+   prioridad de la categoría: proteína, frutas y verduras, otros). Hay que
+   escoger qué lotes suben para que el valor nutricional transportado sea el
+   máximo sin superar la capacidad. Un lote no se fracciona: sube completo o no
+   sube. Hoy el coordinador carga por orden de vencimiento hasta que ya no cabe
+   el siguiente lote; los vehículos salen, en promedio, al 78 % de su
+   capacidad.
+4. **Análisis de saturación de la bodega.** Para cada categoría de producto se
+   registra, por cada hora de operación, el cambio neto del inventario en
+   kilogramos: lo que entró menos lo que salió o se descartó (puede ser
+   negativo). La Dirección quiere encontrar, para cada categoría, el **tramo de
+   horas consecutivas** en que más creció el inventario, para dimensionar el
+   cuarto frío que piensa alquilar en temporada. El programa actual evalúa todos
+   los tramos posibles; con el histórico de diez años tarda más de un día para
+   las 40 categorías.
+
+La ventana de planeación (operaciones 1 a 3) es de **2 horas**
+(03:00 – 05:00); a las 05:30 empieza el alistamiento y a las 06:30 salen los
+vehículos. Actualmente la planeación tarda **cerca de 4 horas y media**, así que
+los vehículos salen tarde, las organizaciones reciben después de la hora de
+preparación de sus comidas y parte de los perecederos se vence en la bodega.
+
+**Problema identificado**
+
+La Dirección de Operaciones considera que el problema no está en el equipo de
+cómputo, sino en las **estrategias algorítmicas** de las cuatro operaciones, y
+pide a un equipo de consultores que analice alternativas y recomiende las más
+adecuadas.
+
+**Información suministrada por el cliente**
+
+**Operación**
+
+- Cerca de 220.000 lotes activos en inventario y entre 6.000 y 9.000 lotes
+  nuevos por día.
+- 40 categorías de producto; operación de 12 horas diarias, 300 días al año,
+  con diez años de histórico (≈ 36.000 registros horarios por categoría).
+- 14 vehículos, con capacidades entre 2.500 y 4.000 kg; cada ruta tiene entre
+  300 y 600 lotes candidatos.
+- El banco estima que cada kilogramo de alimento desechado equivale a 2,5 kg
+  de CO₂ equivalente (dato del informe de sostenibilidad de la fundación).
+
+**Estructura de un lote**
+
+| Campo | Descripción |
+|---|---|
+| `codigo_lote` | Identificador único del lote |
+| `categoria` | Una de las 40 categorías de producto |
+| `fecha_vencimiento` | Fecha de vencimiento |
+| `peso_kg` | Peso del lote en kilogramos (entero) |
+| `raciones` | Raciones que aporta |
+| `donante` | Donante que lo entregó |
+
+**Infraestructura**
+
+- La planeación corre en un único computador de escritorio de la fundación,
+  que consume aproximadamente 150 W bajo carga sostenida.
+- No existe procesamiento distribuido ni en paralelo.
+
+**Restricciones del negocio**
+
+La solución deberá garantizar como mínimo que:
+
+- La consulta de lotes por rango de vencimiento y las operaciones 2 y 3
+  terminen dentro de la ventana de 2 horas.
+- Una consulta de lote durante el alistamiento responda en menos de 1 segundo.
+- Ningún lote vencido se despache, y dentro de una categoría siempre salga
+  primero el lote que vence primero.
+- Ningún vehículo supere su capacidad, y el valor nutricional cargado sea el
+  **máximo** posible para esa capacidad, no una aproximación.
+- El tramo de saturación reportado sea el de **mayor** crecimiento acumulado.
+- El registro original de cada lote no se modifique, para conservar la
+  trazabilidad sanitaria ante un eventual retiro de producto.
+
+**Preguntas de impacto propias de este caso**
+
+- **Personas:** maximizar el valor nutricional transportado puede favorecer a
+  las organizaciones de las rutas con más lotes candidatos. ¿Qué pasa con un
+  jardín infantil que nunca queda en el cargue óptimo? ¿Y si un error en el
+  ordenamiento FEFO despacha un lote vencido?
+- **Normativa:** identifique qué normas o buenas prácticas condicionan la
+  solución y cómo las respeta su diseño. Tenga en cuenta que se almacenan y
+  distribuyen alimentos para consumo humano, que existe una política pública
+  contra el desperdicio de alimentos y que los listados de población
+  beneficiaria incluyen datos de menores de edad.
+- **Crecimiento:** ¿cómo se comportan las estrategias recomendadas si el banco
+  abre una segunda bodega y duplica el número de lotes y de vehículos?
+
+</Tab>
+</Tabs>
+
+## Actividades a desarrollar
+
+El equipo deberá, sobre el caso que le fue asignado:
+
+1. Analizar el problema computacional y caracterizar sus elementos principales
+   (entradas, salidas y restricciones).
+2. Identificar las operaciones que representan el mayor costo computacional
+   dentro del proceso actual y estimar su costo energético a partir del tiempo
+   de ejecución y la potencia del equipo informada por el cliente.
+3. Seleccionar **al menos dos** de las cuatro operaciones críticas del caso y
+   diseñar, para cada una, **al menos dos estrategias algorítmicas distintas**
+   que la resuelvan. Entre las estrategias diseñadas debe haber **al menos una
+   de dividir y vencer, voraz o programación dinámica aplicada a una operación
+   distinta del ordenamiento**, y el equipo debe justificar por qué el problema
+   admite esa estrategia.
+4. Implementar las estrategias diseñadas en Python.
+5. Analizar la complejidad temporal y espacial de cada solución y estimar su
+   consumo energético.
+6. Diseñar pruebas experimentales utilizando diferentes tamaños de entrada.
+7. Comparar el comportamiento de las soluciones mediante métricas objetivas y
+   contrastar los resultados empíricos con la complejidad teórica esperada.
+8. Justificar técnicamente las estrategias recomendadas para ser implementadas
+   por la organización, incluyendo el marco normativo aplicable y las
+   implicaciones éticas, sociales y ambientales de la decisión.
+
+## Supuestos permitidos
+
+Con el fin de concentrar el proyecto en el análisis de algoritmos, el equipo
+podrá asumir que:
+
+- Todos los datos suministrados por el cliente son válidos y consistentes en
+  su formato.
+- No existen cambios en los datos durante la ejecución del algoritmo.
+- No es necesario desarrollar una interfaz gráfica.
+- No se requiere persistencia en bases de datos.
+- Los datos pueden cargarse completamente en memoria.
+- **No se exige procesar el volumen real.** El equipo generará conjuntos de
+  datos sintéticos de tamaño creciente, representativos de la estructura
+  descrita, y extrapolará al volumen real a partir de sus mediciones y de la
+  complejidad calculada.
+- No se requiere procesamiento distribuido ni paralelo: el análisis se realiza
+  sobre un único hilo de ejecución.
+
+## Cómo pasar del caso al problema computacional
+
+Los casos llegan como una situación de una organización, no como un problema ya formalizado. Traducirlo es la primera parte del trabajo y se evalúa en el criterio de análisis del problema. Siga estos pasos para cada operación crítica que escoja:
+
+1. **Identifique la operación y su tamaño.** ¿Qué hace el proceso con los datos y qué crece (registros, lotes, solicitudes)? Llame `n` a ese tamaño.
+2. **Escriba entradas, salida y restricciones.** Qué recibe la operación, qué debe devolver y qué no puede fallar (la restricción de correctitud: "ningún registro válido se pierde", "el resultado es el máximo, no una aproximación").
+3. **Nombre la estrategia actual y su orden de crecimiento.** Así sabe qué hay que mejorar y cuánto.
+4. **Mida y calcule el costo energético.** La energía en kilovatios-hora (kWh) es la potencia en kilovatios por el tiempo en horas. Convierta los vatios del cliente a kilovatios dividiendo entre 1.000.
+
+Un ejemplo ajeno a los tres casos, para ver la traducción completa. Una biblioteca universitaria tiene un proceso nocturno que arma, para cada socio, la lista de sus préstamos vencidos y le envía un recordatorio. El programa actual, por cada socio, recorre toda la tabla de préstamos buscando los suyos. Corre en un servidor de 300 W.
+
+| Elemento | Traducción |
+|---|---|
+| Entradas | Una tabla de `n` préstamos (socio, libro, fecha de vencimiento) y la lista de `m` socios; `m` crece en proporción a `n` |
+| Salida | Para cada socio, sus préstamos con fecha de vencimiento pasada |
+| Restricciones | Ningún préstamo vencido se omite, ningún préstamo vigente se incluye, la tabla original no se modifica y el proceso termina antes de las 05:00 |
+| Estrategia actual | Recorre los `n` préstamos una vez por cada uno de los `m` socios: Θ(n·m), que como `m` crece con `n` equivale a un crecimiento cuadrático |
+
+Para medir, el equipo genera datos sintéticos de tamaño creciente. Suponga que con n = 10.000 préstamos el programa tarda 2 s. Con un crecimiento cuadrático, multiplicar `n` por 10 multiplica el tiempo por 100:
+
+| n (préstamos) | Tiempo estimado | Energía por noche |
+|---|---|---|
+| 10.000 | 2 s | Despreciable |
+| 100.000 | 200 s | Despreciable |
+| 1.000.000 | 20.000 s ≈ 5,6 h | 5,6 h × 0,3 kW ≈ 1,7 kWh |
+
+Proyectada a un año de operación (365 noches): 1,67 kWh × 365 ≈ 608 kWh. Esa cifra es la línea base con la que se comparan las estrategias que proponga el equipo. Este ejemplo solo muestra cómo traducir y estimar; no resuelve ningún caso ni sugiere qué estrategia usar.
+
+> ⚠️ Una estimación sin medición no vale. En el proyecto, el tiempo de cada tamaño sale de ejecutar su código y la extrapolación al volumen real se apoya en esas mediciones y en la complejidad calculada.
+
+## Entregable
+
+El proyecto deberá desarrollarse en equipos de máximo cuatro (4) estudiantes y
+entregará dos productos:
+
+1. **Repositorio en GitHub** con el código, las gráficas, los datos de prueba
+   y un `README.md` que contiene el informe técnico completo.
+2. **Informe técnico en PDF**, con el mismo contenido del `README.md`.
+
+**Contenido del informe técnico**
+
+El informe, tanto en el `README.md` como en el PDF, debe tener una extensión
+sugerida entre 10 y 15 páginas (sin incluir anexos) y contener como mínimo los
+siguientes apartados:
+
+**Análisis del problema**
+
+- Descripción del problema computacional.
+- Identificación de entradas, salidas y restricciones.
+- Identificación de las operaciones críticas del proceso.
+- Costo energético del proceso actual (tiempo de ejecución × potencia del
+  equipo), como línea base para la propuesta.
+- Supuestos realizados por el equipo.
+
+**Diseño de la solución**
+
+- Descripción de las estructuras de datos seleccionadas.
+- Diseño de al menos dos estrategias algorítmicas por cada operación abordada.
+- Estrategia de diseño en que se apoya cada propuesta (dividir y vencer, voraz,
+  programación dinámica u otra), por qué el problema la admite y cómo reduce el
+  consumo energético frente al proceso actual.
+- Diagramas, pseudocódigo o representaciones equivalentes que permitan
+  comprender el funcionamiento de cada propuesta.
+
+**Implementación**
+
+- Descripción de la solución desarrollada.
+- Tecnologías y herramientas utilizadas.
+- Decisiones de implementación relevantes.
+
+**Evaluación del desempeño**
+
+- Análisis de complejidad temporal y espacial de cada estrategia.
+- Diseño y ejecución de pruebas experimentales.
+- Presentación e interpretación de los resultados obtenidos mediante tablas o
+  gráficas.
+- Contraste explícito entre el comportamiento empírico observado y la
+  complejidad teórica esperada.
+- Verificación de que cada estrategia cumple las restricciones del negocio
+  (por ejemplo, que la estrategia rápida da el mismo resultado que la exacta).
+
+**Análisis comparativo**
+
+- Comparación de las estrategias implementadas.
+- Ventajas y limitaciones de cada una.
+- Justificación técnica de la solución seleccionada para el contexto planteado.
+
+**Implicaciones éticas, sociales y ambientales**
+
+Responder las "Preguntas de impacto propias de este caso" y, además:
+
+- **Consumo energético:** consumo eléctrico del proceso actual frente al de la
+  solución propuesta, y proyección de esa diferencia a un año de operación.
+- **Consecuencias sobre las personas:** qué ocurre cuando el algoritmo se
+  equivoca o llega tarde, quién asume el costo de ese error y cómo puede
+  mitigarse desde el diseño del algoritmo.
+- **Marco normativo y buenas prácticas:** qué normas y buenas prácticas
+  condicionan la solución, identificadas e investigadas por el equipo con su
+  fuente, y cómo las respeta el diseño propuesto, en particular la trazabilidad
+  de los datos originales.
+- **Sostenibilidad de la decisión:** cómo se comportarían las estrategias
+  recomendadas en el escenario de crecimiento planteado en el caso.
+
+**Conclusiones**
+
+- Principales hallazgos.
+- Lecciones aprendidas.
+- Recomendaciones para futuras mejoras.
+
+**1. Repositorio en GitHub**
+
+El repositorio del equipo sigue la organización de trabajo ya establecida en el
+curso:
+
+- `README.md` con **todos los apartados del informe técnico** descritos arriba,
+  con sus tablas y gráficas, y una sección final que documente cómo generar los
+  datos sintéticos y ejecutar los experimentos.
+- Código Python estructurado: funciones con responsabilidad única, *type
+  hints* y *docstrings*.
+- Gráficas reproducibles y los datos de prueba (o el script que los genera).
+
+Deberá evidenciarse el aporte de cada integrante mediante el historial de
+commits.
+
+**2. Informe técnico en PDF**
+
+Documento PDF con el mismo contenido del `README.md`, para su archivo como
+evidencia de acreditación. Debe coincidir con la versión del `README.md` en la
+fecha de entrega.
+
+## Rúbrica de evaluación
+
+La rúbrica es institucional y fija: criterios, pesos y descriptores son los mismos para todos los equipos y los tres casos.
+
+**Criterios y pesos**
+
+| RA | Desempeño esperado | % |
+|---|---|---|
+| RADE1-1 | Análisis de un algoritmo empleando estrategias como dividir y vencer, algoritmos voraces o programación dinámica, de tal manera que reduzcan el consumo de energía para que sean más amigables con el medio ambiente. | 25 |
+| RADE1-2 | Diseño de un algoritmo empleando estrategias como dividir y vencer, algoritmos voraces o programación dinámica, de tal manera que reduzcan el consumo de energía para que sean más amigables con el medio ambiente. | 25 |
+| RADT1 | Analiza diferentes complejidades y escoge la opción que mejor se adapte al caso de uso. | 30 |
+| RAG2 | Aplica de manera efectiva principios éticos establecidos para la práctica de la ingeniería en los que se evidencia la toma de decisiones responsables de acuerdo con aspectos regulatorios, normativos y de buenas prácticas. | 10 |
+| RAG4 | Argumenta cómo sus acciones y decisiones planteadas impactan al medio ambiente, a la sociedad actual y a la del futuro. | 10 |
+| | **Total** | **100** |
+
+**Niveles de desempeño**
+
+| Nivel | Rango |
+|---|---|
+| Emergente | 0.0–0.9 |
+| En desarrollo | 1.0–1.9 |
+| Receptivo | 2.0–2.9 |
+| Resolutivo | 3.0–3.9 |
+| Crítico | 4.0–4.5 |
+| Reflexivo | 4.6–5.0 |
+
+**Cómo se calcula la nota**
+
+La rúbrica se aplica por equipo. Cada criterio recibe una nota entre 0.0 y 5.0
+dentro del rango del nivel de desempeño alcanzado, y la nota del proyecto es la
+suma ponderada de los cinco criterios, también en escala de 0.0 a 5.0:
+
+```
+Nota = 0.25·RADE1-1 + 0.25·RADE1-2 + 0.30·RADT1 + 0.10·RAG2 + 0.10·RAG4
+```
+
+**Descriptores por criterio**
+
+**RADE1-1 — Análisis del problema (25 %)**
+
+| Nivel | Descriptor |
+|---|---|
+| Emergente (0.0–0.9) | No logra diseñar algoritmos coherentes ni aplica estrategias. |
+| En desarrollo (1.0–1.9) | Analiza algoritmos básicos con errores en la aplicación de estrategias y sin considerar impacto ambiental. |
+| Receptivo (2.0–2.9) | Aplica parcialmente análisis de algoritmos en las estrategias, con poca claridad en la reducción de consumo energético. |
+| Resolutivo (3.0–3.9) | Analiza algoritmos coherentes aplicando estrategias adecuadas y considerando impacto ambiental. |
+| Crítico (4.0–4.5) | Analiza algoritmos fundamentados, optimizando consumo energético y orientados a sostenibilidad. |
+| Reflexivo (4.6–5.0) | Propone el análisis de algoritmos sólidos, anticipando necesidades futuras, aplicando estrategias avanzadas y maximizando eficiencia energética con visión ambiental. |
+
+**RADE1-2 — Diseño de estrategias (25 %)**
+
+| Nivel | Descriptor |
+|---|---|
+| Emergente (0.0–0.9) | No logra diseñar algoritmos coherentes ni aplica estrategias. |
+| En desarrollo (1.0–1.9) | Diseña algoritmos básicos con errores en la aplicación de estrategias y sin considerar impacto ambiental. |
+| Receptivo (2.0–2.9) | Aplica parcialmente el diseño de algoritmos según estrategias, con poca claridad en la reducción de consumo energético. |
+| Resolutivo (3.0–3.9) | Diseña algoritmos coherentes aplicando estrategias adecuadas y considerando impacto ambiental. |
+| Crítico (4.0–4.5) | Diseña algoritmos fundamentados, optimizando consumo energético y orientados a sostenibilidad. |
+| Reflexivo (4.6–5.0) | Propone el diseño de algoritmos sólidos, anticipando necesidades futuras, aplicando estrategias avanzadas y maximizando eficiencia energética con visión ambiental. |
+
+**RADT1 — Evaluación del desempeño (30 %)**
+
+| Nivel | Descriptor |
+|---|---|
+| Emergente (0.0–0.9) | No logra analizar complejidades ni seleccionar opciones adecuadas. |
+| En desarrollo (1.0–1.9) | Analiza complejidades básicas con errores en la selección de la opción. |
+| Receptivo (2.0–2.9) | Analiza parcialmente, seleccionando opciones con poca claridad en la justificación. |
+| Resolutivo (3.0–3.9) | Analiza complejidades de forma coherente, seleccionando opciones adecuadas al caso de uso. |
+| Crítico (4.0–4.5) | Analiza y selecciona opciones fundamentadas, optimizando rendimiento y escalabilidad. |
+| Reflexivo (4.6–5.0) | Realiza análisis integral de complejidades, seleccionando opciones estratégicas y anticipando impactos futuros en el rendimiento. |
+
+**RAG2 — Principios éticos (10 %)**
+
+| Nivel | Descriptor |
+|---|---|
+| Emergente (0.0–0.9) | No aplica principios éticos ni considera aspectos regulatorios. |
+| En desarrollo (1.0–1.9) | Aplica principios básicos con errores en la toma de decisiones responsables. |
+| Receptivo (2.0–2.9) | Aplica principios éticos parcialmente, con poca claridad en la responsabilidad y normatividad. |
+| Resolutivo (3.0–3.9) | Aplica principios éticos de manera coherente, tomando decisiones responsables y considerando normativas. |
+| Crítico (4.0–4.5) | Aplica principios éticos fundamentados, evidenciando responsabilidad y compromiso con buenas prácticas. |
+| Reflexivo (4.6–5.0) | Integra principios éticos de manera ejemplar, anticipando riesgos, garantizando cumplimiento normativo y promoviendo sostenibilidad social. |
+
+**RAG4 — Impacto ambiental, social y futuro (10 %)**
+
+| Nivel | Descriptor |
+|---|---|
+| Emergente (0.0–0.9) | No logra argumentar impactos de sus acciones ni decisiones. |
+| En desarrollo (1.0–1.9) | Argumenta de forma básica con errores en la identificación de impactos. |
+| Receptivo (2.0–2.9) | Argumenta parcialmente, con poca claridad en los impactos ambientales y sociales. |
+| Resolutivo (3.0–3.9) | Argumenta de manera coherente, identificando impactos ambientales y sociales actuales. |
+| Crítico (4.0–4.5) | Argumenta con fundamentos sólidos, evidenciando impactos ambientales y sociales y proponiendo mejoras. |
+| Reflexivo (4.6–5.0) | Argumenta de forma integral, anticipando impactos futuros, proponiendo soluciones sostenibles y con visión estratégica para sociedad y medio ambiente. |
+
+## Lista de verificación antes de entregar
+
+- El `README.md` tiene todos los apartados del informe, con sus tablas y gráficas, y una sección final para generar los datos sintéticos y ejecutar los experimentos.
+- Se trabajaron al menos dos operaciones críticas y cada una tiene al menos dos estrategias distintas; entre ellas hay una de dividir y vencer, voraz o programación dinámica sobre una operación que no es el ordenamiento, con la justificación de por qué el problema la admite.
+- La estrategia que se dice más rápida da el mismo resultado que la exacta, y está verificado.
+- El costo energético del proceso actual y de la solución propuesta está calculado, con su proyección a un año.
+- Las preguntas de impacto del caso están respondidas, y las normas citadas tienen su fuente.
+- El código tiene funciones de responsabilidad única, *type hints* y *docstrings*, y las gráficas se pueden reproducir.
+- El PDF coincide con el `README.md` de la fecha de entrega.
+- Cada integrante aparece en el historial de commits.

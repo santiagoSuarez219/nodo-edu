@@ -1,0 +1,296 @@
+---
+title: "Programación dinámica: decidir, verificar y medir"
+course: "Análisis de Algoritmos"
+course_code: "AA"
+level: "Ultimos semestres"
+type: "Lección de estudio autónomo"
+language: "Python 3"
+difficulty: "Avanzado"
+estimated_time: "30 a 40 minutos de estudio autónomo, con el editor abierto (Semana 15)"
+presentation: false
+date: "2026-10-24"
+author: "Asistente de Docencia"
+summary: "Segunda de dos lecciones de estudio autónomo: cuándo basta una regla voraz y cómo romperla con un contraejemplo, cómo verificar una programación dinámica contra una solución exhaustiva y cómo medir, graficar y extrapolar su costo."
+updatedAt: "2026-11-02"
+---
+
+> 📘 **Lección de estudio autónomo.** Este tema no tiene clase en vivo: está escrito para que lo estudies solo o con tu equipo, de principio a fin. Ten abierto un editor de Python y **ejecuta cada bloque de código** a medida que lees; cuando la lección haga una traza a mano, hazla tú primero en papel y después compara.
+
+## Antes de empezar
+
+Esta es la segunda de las dos lecciones de programación dinámica. Ya sabes plantear una recurrencia (**Fundamentos de programación dinámica**) y estudiaste la estrategia voraz (**Estrategia voraz**). Ahora puedes compararlas. Aquí aprendes lo que hace falta para defender una solución ante otra persona: por qué no basta una regla más simple, cómo demostrar que tu código es correcto y cuánto cuesta de verdad.
+
+Los ejemplos de código usan el corte de varillas de la lección Fundamentos de programación dinámica: copia en el mismo archivo sus funciones antes de ejecutar los bloques de esta lección.
+
+## ¿Programación dinámica o voraz?
+
+Las dos estrategias se apoyan en la subestructura óptima. La diferencia está en **cómo** deciden:
+
+- La **programación dinámica** prueba **todas** las opciones de la primera decisión, cada una con su subproblema ya resuelto, y compara.
+- La estrategia **voraz** se compromete con **una** opción (la que "parece mejor ahora") y nunca vuelve atrás. Es más rápida y más simple, pero solo es correcta si el problema cumple la **propiedad de elección voraz**: existe una solución óptima que empieza con esa elección.
+
+Cuando alguien te propone una regla voraz, tu trabajo es intentar **romperla con un contraejemplo calculado**: una instancia concreta donde la regla da un resultado peor que el óptimo. El procedimiento:
+
+1. Escribe la regla como función y la solución óptima (programación dinámica o exhaustiva).
+2. Genera muchas instancias **pequeñas** al azar y compara los dos resultados.
+3. Cuando difieran, quita elementos de la instancia mientras sigan difiriendo, hasta quedarte con la más pequeña.
+4. Resuélvela a mano y preséntala: instancia, resultado de la regla, resultado óptimo y diferencia.
+
+Así se encuentra, por ejemplo, el contraejemplo del corte de varillas: con la cinta de 4 m, elegir siempre el tramo de mejor precio por metro (3 m, a 8/3 ≈ 2,67 por metro) y luego 1 m da 8 + 1 = 9, frente al óptimo 10 de cortar 2 + 2.
+
+Un contraejemplo también enseña **qué tendría que cambiar** en el problema para que la regla voraz fuera correcta:
+
+| Problema          | Regla voraz              | Cuándo la regla sí es óptima                                                                                                                           |
+| ----------------- | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Mochila (objetos con peso y valor, bajo una capacidad) | Mayor valor por kg | Si los objetos se pueden **fraccionar**: se llena por densidad y el último objeto se parte |
+| Intervalos        | Terminación más temprana | Si todos los intervalos **pesan lo mismo**: maximizar el peso es maximizar el número                                                                   |
+| Corte de varillas | Mejor precio por metro   | Si el precio es **proporcional** a la longitud: todos los cortes valen lo mismo                                                                        |
+
+## Verificar: la solución exhaustiva como juez
+
+Una programación dinámica con un índice corrido devuelve números creíbles pero falsos. La defensa es tener una solución **exhaustiva**, lenta pero fácil de creer, y comparar las dos en muchas instancias pequeñas.
+
+Para el corte de varillas ya tienes esa solución: `cortar_ingenuo`, que prueba todos los cortes sin anotar nada. Es exponencial, pero con varillas cortas es un juez perfecto para `cortar_memo` y `cortar_tabulado`. Copia en el mismo archivo `Contador`, `cortar_ingenuo`, `cortar_memo`, `cortar_tabulado` y `reconstruir_cortes`, de la lección Fundamentos de programación dinámica, antes de ejecutar este bloque:
+
+```python
+import random
+
+
+def verificar_cortes(casos: int = 200, semilla: int = 2026) -> None:
+    """Compara memoización y tabulación con la versión ingenua al azar.
+
+    Args:
+        casos: Número de instancias aleatorias a probar.
+        semilla: Semilla fija para que el resultado sea reproducible.
+    """
+    rng = random.Random(semilla)  # generador propio con semilla fija
+    for _ in range(casos):
+        n = rng.randint(0, 12)  # varillas cortas: la ingenua es exponencial
+        precios = [0]
+        for _ in range(n):
+            precios.append(rng.randint(1, 30))  # precios al azar
+        esperado = cortar_ingenuo(precios, n, Contador())  # el juez
+        assert cortar_memo(precios, n, Contador(), {}) == esperado, precios
+        r, s = cortar_tabulado(precios, n)
+        assert r[n] == esperado, precios
+        tramos = reconstruir_cortes(s, n)
+        largo = 0
+        valor = 0
+        for tramo in tramos:
+            largo += tramo
+            valor += precios[tramo]
+        assert largo == n, precios  # los tramos usan toda la varilla
+        assert valor == esperado, precios  # y valen exactamente el óptimo
+
+
+verificar_cortes()
+print("Todas las instancias coinciden")
+```
+
+Observa cuatro detalles:
+
+- **La semilla fija** hace que cualquiera que ejecute el código obtenga las mismas instancias, así que un fallo se puede reproducir.
+- **El mensaje del `assert`** muestra la instancia que falló (`precios`): es tu punto de partida para depurar o para construir un contraejemplo.
+- **No basta verificar el valor.** También se revisa que la **reconstrucción** cumpla la restricción del problema (los tramos suman exactamente la longitud de la varilla) y que valgan el óptimo. Por eso se recalcula el valor desde los tramos, sin mirar la tabla.
+- **Los tamaños son pequeños a propósito** (hasta 12 m, es decir, hasta 4.096 llamadas de la ingenua). La exhaustiva es exponencial; su único papel es ser el juez.
+
+Una advertencia honesta: aquí el juez usa la misma recurrencia que las versiones rápidas. Por eso detecta errores de índices, de orden de llenado, del cuaderno y de la reconstrucción, pero no un error en el **modelo** mismo, por ejemplo, haber planteado mal la recurrencia. Para eso sirven el ejemplo resuelto a mano (la tabla de la cinta de 10 m) y los **casos límite**: varilla de longitud 0, de longitud 1, precios que hacen que convenga no cortar y precios que hacen que convenga cortar en tramos de 1 m.
+
+## Medir: tiempo, operaciones y extrapolación
+
+Para contrastar la teoría con la realidad se miden dos cosas: el **tiempo** y el **número de operaciones elementales**. El tiempo depende de la máquina; las operaciones, no. Las operaciones se cuentan con la clase `Contador` que ya copiaste de la lección Fundamentos de programación dinámica. Para el tiempo, `time.perf_counter()` da la hora con mucha precisión: se toma antes y después de ejecutar el algoritmo y se resta. Como una sola ejecución es muy ruidosa, se repite varias veces y se promedia. Estas dos funciones miden las dos versiones del corte de varillas:
+
+```python
+import time
+
+
+def tiempo_tabulado(precios: list[int], n: int, repeticiones: int) -> float:
+    """Mide el tiempo medio de cortar_tabulado.
+
+    Args:
+        precios: Tabla de precios, creada ANTES de medir.
+        n: Longitud de la varilla.
+        repeticiones: Cuántas veces se ejecuta para promediar el ruido.
+
+    Returns:
+        El tiempo medio en segundos.
+    """
+    total = 0.0
+    for _ in range(repeticiones):
+        inicio = time.perf_counter()
+        cortar_tabulado(precios, n)  # solo esto queda dentro del cronómetro
+        total += time.perf_counter() - inicio
+    return total / repeticiones
+
+
+def tiempo_ingenuo(precios: list[int], n: int, repeticiones: int) -> float:
+    """Mide el tiempo medio de cortar_ingenuo.
+
+    Args:
+        precios: Tabla de precios, creada ANTES de medir.
+        n: Longitud de la varilla.
+        repeticiones: Cuántas veces se ejecuta para promediar el ruido.
+
+    Returns:
+        El tiempo medio en segundos.
+    """
+    total = 0.0
+    for _ in range(repeticiones):
+        contador = Contador()
+        inicio = time.perf_counter()
+        cortar_ingenuo(precios, n, contador)
+        total += time.perf_counter() - inicio
+    return total / repeticiones
+```
+
+`cortar_ingenuo` y `cortar_memo` ya traen el contador desde la lección Fundamentos de programación dinámica. Para contar en `cortar_tabulado`, agregarías un parámetro `contador: Contador` y la línea `contador.total += 1` dentro del ciclo interno, una por cada corte probado. Fíjate en que los precios se crean **antes** de llamar a estas funciones: así no mides la generación de los datos, solo el algoritmo.
+
+La herramienta de análisis más útil es el **factor al duplicar**: mide en un tamaño y en el doble, y divide. Cada complejidad deja una huella:
+
+| Complejidad | Si duplicas el tamaño, el tiempo se multiplica por…                              |
+| ----------- | -------------------------------------------------------------------------------- |
+| Θ(n)        | ≈ 2                                                                              |
+| Θ(n log n)  | un poco más de 2                                                                 |
+| Θ(n²)       | ≈ 4                                                                              |
+| Θ(2ⁿ)       | al pasar de `n` a `2n`, el tiempo se **eleva al cuadrado**: de 2¹⁰ a 2²⁰, ×1.024 |
+
+Si tu factor medido se aleja mucho del esperado, hay algo que explicar: tamaños tan pequeños que domina el costo fijo de Python, ruido del sistema operativo, o un algoritmo que no es el que crees.
+
+**Extrapolar** es usar la forma de la curva, no una regla de tres a ciegas. Un ejemplo con números inventados: supón que `cortar_tabulado` tarda 0,05 s con una varilla de 1.000 m, y el problema real tiene varillas de 8.000 m. Como el costo es Θ(n²), multiplicar `n` por 8 multiplica el trabajo por 8² = 64: ≈ 3,2 s por varilla. Si hay que resolver 1.000 varillas, ≈ 3.200 s, unos 53 minutos. La **energía** es potencia por tiempo: en un equipo de 200 W, 3.200 s ≈ 0,89 h, y 0,2 kW × 0,89 h ≈ 0,18 kWh. La versión ingenua con 8.000 m haría 2⁸⁰⁰⁰ llamadas por varilla: no es "lenta", es que **no termina**, y eso se dice tal cual.
+
+Si el proceso corre una vez por noche, la proyección a un año es multiplicar: 365 × 0,18 kWh ≈ 66 kWh. Para comparar dos estrategias (por ejemplo, la regla que se usa hoy y la tuya), haz la misma cuenta con cada una y resta: la diferencia anual es lo que se ahorra o se gasta de más por cambiar de estrategia.
+
+## Graficar el tiempo de las dos versiones
+
+La gráfica de la lección Fundamentos de programación dinámica contaba **llamadas**. Ahora se grafica el **tiempo** medido, que es lo que te piden comparar cuando una versión es exhaustiva. Hay una dificultad: la versión ingenua solo termina con varillas cortas, y la tabulación apenas se mueve en ese rango. Por eso la gráfica tiene dos paneles:
+
+- **Izquierda:** las dos versiones **en los mismos ejes**, solo en los tamaños donde la ingenua todavía termina (de 10 a 20 m), con el eje vertical en escala logarítmica.
+- **Derecha:** solo la tabulación, llevada a varillas mucho más largas (de 50 a 1.600 m). Son los tamaños que sostienen la extrapolación.
+
+Escribe este código en el mismo archivo: reutiliza `Contador`, `cortar_ingenuo` y `cortar_tabulado` de la lección Fundamentos de programación dinámica, y `tiempo_tabulado` y `tiempo_ingenuo` de esta lección.
+
+```python
+import matplotlib.pyplot as plt
+
+
+def precios_de_prueba(n_maximo: int) -> list[int]:
+    """Genera una tabla de precios para varillas de hasta n_maximo metros.
+
+    Args:
+        n_maximo: Longitud máxima de varilla que se va a medir.
+
+    Returns:
+        Una lista con precios[0] = 0 y precios[i] = 3 * i.
+    """
+    precios = [0]
+    for i in range(1, n_maximo + 1):
+        precios.append(3 * i)
+    return precios
+
+
+def medir_tiempos(
+    tamanos: list[int], limite_ingenua: int
+) -> tuple[list[float], list[float]]:
+    """Mide el tiempo medio de la tabulación y de la versión ingenua.
+
+    Args:
+        tamanos: Longitudes de varilla a medir, en orden creciente.
+        limite_ingenua: Longitud máxima en la que se ejecuta la ingenua.
+
+    Returns:
+        Dos listas en milisegundos: los tiempos de la tabulación (uno por
+        tamaño) y los de la ingenua (solo hasta limite_ingenua).
+    """
+    precios = precios_de_prueba(tamanos[-1])  # los datos, ANTES de medir
+    tabulada: list[float] = []
+    ingenua: list[float] = []
+    for n in tamanos:
+        tiempo = tiempo_tabulado(precios, n, 5)
+        tabulada.append(tiempo * 1000)
+        if n <= limite_ingenua:
+            tiempo = tiempo_ingenuo(precios, n, 3)
+            ingenua.append(tiempo * 1000)
+    return tabulada, ingenua
+
+
+def graficar_tiempos(archivo: str) -> None:
+    """Grafica el tiempo de ambas versiones y el de la tabulación sola.
+
+    Args:
+        archivo: Ruta del archivo PNG donde se guarda la gráfica.
+    """
+    comunes = list(range(10, 21))  # donde la ingenua todavía termina
+    tabulada, ingenua = medir_tiempos(comunes, limite_ingenua=20)
+    grandes = [50, 100, 200, 400, 800, 1600]  # solo la tabulación
+    solo_tabulada, _ = medir_tiempos(grandes, limite_ingenua=0)
+    figura, ejes = plt.subplots(1, 2, figsize=(11, 4.5))  # dos paneles
+    juntas = ejes[0]
+    sola = ejes[1]
+    juntas.plot(comunes, ingenua, "o-", label="Ingenua (exhaustiva): Θ(2ⁿ)")
+    juntas.plot(comunes, tabulada, "s-", label="Tabulación: Θ(n²)")
+    juntas.set_yscale("log")
+    juntas.set_title("Las dos versiones, donde ambas terminan")
+    juntas.set_ylabel("Tiempo medio (ms, escala logarítmica)")
+    sola.plot(grandes, solo_tabulada, "s-", color="tab:orange",
+              label="Tabulación: Θ(n²)")
+    sola.set_title("Solo la tabulación, con varillas largas")
+    sola.set_ylabel("Tiempo medio (ms)")
+    for eje in ejes:
+        eje.set_xlabel("Longitud de la varilla n (metros)")
+        eje.grid(True, alpha=0.3)
+        eje.legend()
+    figura.suptitle("Corte de varillas: tiempo medido con perf_counter")
+    figura.tight_layout()
+    figura.savefig(archivo, dpi=150)
+    plt.show()
+
+
+graficar_tiempos("tiempo_vs_n.png")
+```
+
+En un portátil corriente se ve así (tus milisegundos serán otros; la forma de las curvas, no):
+
+![Dos paneles de tiempo medido. A la izquierda, en escala logarítmica, la versión ingenua sube en línea recta de 0,07 ms con 10 m a unos 75 ms con 20 m, mientras la tabulación queda por debajo de 0,01 ms. A la derecha, la tabulación sola crece como una parábola, de casi 0 ms con 50 m a unos 34 ms con 1.600 m](/documentos/analisis-de-algoritmos/lecciones/programacion-dinamica-decidir-verificar-y-medir/tiempo-ingenua-vs-tabulada.png)
+
+- **Izquierda.** La ingenua es una **recta** en escala logarítmica: su tiempo se duplica con cada metro, la huella de Θ(2ⁿ). Con 20 m ya tarda unas 10.000 veces más que la tabulación.
+- **Derecha.** La tabulación dibuja una **parábola**. Lee el factor al duplicar en la propia gráfica: de 800 a 1.600 m pasa de unos 8 a unos 34 ms, ≈ 4, la huella de Θ(n²).
+- **Fíjate en lo que no se hace:** la ingenua no aparece en el panel derecho porque con 50 m no terminaría. Una curva que se corta no es un error de la gráfica; es el dato.
+
+Cuida lo mismo que en la gráfica de llamadas: título, ejes rotulados con unidades, leyenda y la escala logarítmica cuando una curva aplasta a la otra. Los datos se generan **antes** de medir, y `tiempo_tabulado` y `tiempo_ingenuo` cronometran solo el algoritmo.
+
+## Errores frecuentes al programar una programación dinámica
+
+- **Índices corridos.** En la cinta, `precios[i]` es el precio de `i` metros porque se agregó `precios[0] = 0`; si se olvida ese cero, todos los precios quedan corridos un metro. Decide la convención antes de escribir y escríbela en el _docstring_.
+- **Llenar en el orden equivocado.** `r[j]` depende de `r[j - i]`, longitudes **menores**; si llenas la tabla de la varilla larga a la corta, lees casillas que todavía valen 0 y el resultado sale bajo sin ningún error visible. En otros problemas el orden es el contrario: lo que manda es llenar primero las casillas de las que dependes.
+- **Olvidar casos de la recurrencia.** La varilla de longitud 0, el caso en que conviene no cortar, una longitud que no aparece en la tabla de precios: cada uno necesita su rama.
+- **Calcular el valor y olvidar la solución.** Si no guardas la decisión (o la tabla completa), después no sabes qué cortar, qué cargar o qué turnos aceptar.
+- **Empates.** Con `>` estricto te quedas con la primera opción que alcanza el máximo; con `>=`, con la última. Las dos son óptimas, pero las pruebas que comparan _qué_ se eligió (no solo el valor) pueden fallar si cambias el criterio.
+- **Reutilizar el cuaderno.** Cada varilla nueva necesita un diccionario nuevo y vacío (`cortar_memo(precios, n, Contador(), {})`); si pasas uno usado con otros precios, devuelve valores viejos.
+- **Recursión demasiado profunda.** La memoización con estados de miles de niveles produce `RecursionError`; la tabulación no tiene ese límite.
+- **Confundir variantes del problema.** Poder fraccionar o no, contar intervalos o sumar sus pesos: la variante decide si basta una regla voraz.
+
+## Resumen operativo
+
+| Tarea                    | Cómo se hace                                                                 |
+| ------------------------ | ---------------------------------------------------------------------------- |
+| Romper una regla voraz   | Instancias pequeñas al azar, comparar con el óptimo, reducir la que falle    |
+| Condición contraria      | Decir qué tendría que cambiar en el problema para que la regla sí funcione   |
+| Verificar                | Exhaustiva como juez, semilla fija, casos límite y la reconstrucción también |
+| Contar operaciones       | Un `Contador` compartido, una suma por operación elemental                   |
+| Medir tiempo             | `time.perf_counter()` solo alrededor del algoritmo, con repeticiones         |
+| Analizar                 | Factor al duplicar el tamaño, comparado con el de la complejidad esperada    |
+| Extrapolar               | Con la forma de la curva; energía = potencia (kW) × tiempo (h); × 365 al año  |
+| Graficar                 | Ambas en los mismos ejes donde las dos terminan; la eficiente sola, más lejos |
+
+## Síntesis
+
+- **PD o voraz:** las dos usan la subestructura óptima; la voraz se compromete con una opción y solo es correcta si se cumple la elección voraz.
+- **Contraejemplo:** una instancia pequeña, calculada, con el resultado de la regla, el óptimo y la diferencia.
+- **Condición contraria:** fraccionar, pesos iguales o precios proporcionales vuelven correctas las reglas voraces.
+- **Verificar:** la exhaustiva es el juez; semilla fija, casos límite y comprobar también la reconstrucción.
+- **Medir:** operaciones con un contador, tiempo con `perf_counter`, factor al duplicar.
+- **Extrapolar:** según la forma de la curva; una exhaustiva que no termina se dice tal cual.
+- **Graficar:** las dos versiones en los mismos ejes donde ambas terminan, y la eficiente sola con tamaños grandes.
+- **Errores frecuentes:** índices, orden de llenado, casos olvidados, empates y recursión profunda.
+
+Lecturas: Cormen et al., _Introduction to Algorithms_, 3.ª ed., secciones 15.3 (_Elements of dynamic programming_) y 16.2 (_Elements of the greedy strategy_).

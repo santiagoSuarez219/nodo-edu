@@ -13,12 +13,12 @@
 | **Laboratorio 1:** Fundamentos, complejidad y recurrencias                            | 15%        | Semana 6   |
 | **Laboratorio 2:** Dividir y vencer                                                    | 15%        | Entrega el domingo 11 oct |
 | **Laboratorio 3:** Estructuras de datos                                                | 15%        | Entrega el sábado 31 oct (sesión guiada el lunes 26 oct) |
-| **Laboratorio 4:** Programación dinámica y algoritmos voraces                          | 15%        | Entrega hasta el 22 nov |
-| **Proyecto final:** por definir                                                         | 20%        | Por definir |
+| **Laboratorio 4:** Programación dinámica y algoritmos voraces (operación de PD o voraz del caso del proyecto, en equipo) | 15%        | Entrega el miércoles 18 nov |
+| **Proyecto final:** caso de estudio en equipos (máx. 4)                                 | 20%        | Entrega el lunes 23 nov |
 | **Seguimiento:** evaluación continua (quices cortos, participación, consistencia de commits, ejercicios de clase) | 20%        | Durante todo el semestre |
 | **Total**                                                                                 | **100%**   |            |
 
-> **Reajuste del 2026-10-03.** Se retiró el Módulo 6 (Ordenamiento) y, con él, el laboratorio evaluativo de ordenamiento. Los laboratorios pasan de cinco a cuatro y se agrega un proyecto final (20 %, por definir). Desde la Semana 10 el curso se dicta solo los lunes (dos bloques de 2 h) y los lunes festivos —12 oct, 2 nov y 16 nov— no hay clase. Ver `cronograma-dia-a-dia.md`.
+> **Reajuste del 2026-10-03.** Se retiró el Módulo 6 (Ordenamiento) y, con él, el laboratorio evaluativo de ordenamiento. Los laboratorios pasan de cinco a cuatro y se agrega un proyecto final (20 %, definido el 2026-11-02; ver más abajo). Desde la Semana 10 el curso se dicta solo los lunes (dos bloques de 2 h) y los lunes festivos —12 oct, 2 nov y 16 nov— no hay clase. Ver `cronograma-dia-a-dia.md`.
 
 > Cada laboratorio se aplica **después** de que su contenido se ha enseñado por completo, y su componente práctico es la sesión evaluativa (★) del tema correspondiente. No existe un sistema de evaluación paralelo: la sesión ★ *es* el laboratorio.
 
@@ -91,14 +91,14 @@ Cada uno de los cuatro laboratorios evaluativos se entrega como un **informe de 
 | 12  | Estructuras de datos (Cormen Cap. 10)          | Lunes 19 oct: pilas, colas, listas enlazadas (sin sesión P) |                     |
 | 13  | Estructuras de datos (Cormen Cap. 11–12)       | Lunes 26 oct: tablas hash y árboles de búsqueda binarios             | ★ Laboratorio 3     |
 | 14  | —                                              | Lunes 2 nov: festivo, sin clase                                      |                     |
-| 15  | Programación dinámica y voraces (Cormen Cap. 15–16) | Lunes 9 nov: rod cutting y fundamentos de la PD; estrategia voraz (resto en lectura autónoma) |  |
-| 16  | —                                              | Lunes 16 nov: festivo, sin clase. Entrega asincrónica hasta el 22 nov | ★ Laboratorio 4 (entrega) |
+| 15  | Programación dinámica y voraces (Cormen Cap. 15–16) | Lunes 9 nov: sin clase en vivo; la PD y la estrategia voraz pasan a estudio autónomo (tres lecciones y guías complementarias por caso; resto en lectura autónoma) |  |
+| 16  | —                                              | Lunes 16 nov: festivo, sin clase. Entrega asincrónica el miércoles 18 nov | ★ Laboratorio 4 (entrega) |
 
 ---
 
 ## Organización del repositorio del curso
 
-A partir del Módulo 1, todo el trabajo del curso vive en un único repositorio. Los cuatro laboratorios evaluativos se organizan en carpetas independientes, cada una con su informe (`README.md`), su código y sus gráficas; el resto de sesiones prácticas (no evaluativas) se agrupan aparte.
+A partir del Módulo 1, todo el trabajo del curso vive en un único repositorio. Los laboratorios evaluativos 1 a 3 se organizan en carpetas independientes (el Laboratorio 4 se entrega dentro del repositorio del proyecto final de cada equipo, ver Módulo 8), cada una con su informe (`README.md`), su código y sus gráficas; el resto de sesiones prácticas (no evaluativas) se agrupan aparte.
 
 ```
 curso-analisis-algoritmos/
@@ -108,8 +108,7 @@ curso-analisis-algoritmos/
 │   │   ├── src/              # código Python del laboratorio
 │   │   └── graficas/         # gráficas de comportamiento generadas
 │   ├── lab2-divide-y-vencer/
-│   ├── lab3-estructuras-datos/
-│   └── lab4-pd-voraces/
+│   └── lab3-estructuras-datos/
 ├── ejercicios-clase/         # código de las sesiones prácticas no evaluativas (incluye los ejercicios del Módulo 2 — Python)
 ├── benchmarks/                # scripts compartidos de medición de tiempos y graficación
 └── README.md
@@ -290,33 +289,50 @@ curso-analisis-algoritmos/
 
 ### Lunes 9 de noviembre (Semana 15) — Fundamentos de PD y estrategia voraz
 
-**T — Fundamentos de programación dinámica**
-- Corte de varillas (*rod cutting*): solución recursiva ingenua vs. memoización vs. tabulación
-- Subestructura óptima y subproblemas traslapados: cómo reconocerlos
-- Reconstrucción de la solución óptima (no solo el valor óptimo)
+**T — Fundamentos de programación dinámica (estudio autónomo desde el 2026-11-02)**
 
-**P — Estrategia voraz**
-- El problema de selección de actividades (*activity-selection problem*)
+> **Ajuste 2026-11-02:** esta sesión deja de dictarse en vivo. Se reemplaza por dos lecciones autocontenidas de estudio autónomo y tres guías complementarias, una por caso del proyecto final. Los apuntes docentes de la sesión se eliminaron.
+
+- Lección **"Fundamentos de programación dinámica"**: corte de varillas (*rod cutting*), solución recursiva ingenua vs. memoización vs. tabulación, con medición experimental del número de llamadas (Θ(2ⁿ) frente a Θ(n²)) y gráfica comparativa; subestructura óptima (argumento de cortar y pegar) y subproblemas traslapados; reconstrucción de la solución óptima; receta de siete preguntas para plantear una programación dinámica.
+- Lección **"Programación dinámica: decidir, verificar y medir"** (se estudia después de "Estrategia voraz"): programación dinámica frente a voraz y condición contraria, contraejemplos calculados, verificación contra una solución exhaustiva con semilla fija, conteo de operaciones, factor al duplicar, extrapolación y energía.
+- Guías complementarias, publicadas junto al Laboratorio 4: **"Cubrir días con pases"** (Caso 1, tope tarifario), **"Intervalos ponderados"** (Caso 2, opcional si el equipo maximiza pacientes atendidos) y **"Mochila 0/1"** (Caso 3, cargue de vehículos).
+
+**P — Estrategia voraz (estudio autónomo desde el 2026-11-02)**
+
+> **Ajuste 2026-11-02:** esta sesión tampoco se dicta en vivo. Se reemplaza por la lección autocontenida **"Estrategia voraz"**, que se estudia entre las dos lecciones de programación dinámica. Los apuntes docentes de la sesión se eliminaron.
+
+- El problema de selección de actividades (*activity-selection problem*) y su búsqueda exhaustiva (Θ(2ⁿ) subconjuntos, medida)
+- Reglas voraces que fallan, contraejemplos calculados y búsqueda sistemática de contraejemplos
+- Terminación más temprana, caso de borde de los intervalos `[s, f)` y argumento de intercambio
 - Elementos de la estrategia voraz: elección voraz y subestructura óptima
-- Implementar la selección de actividades y contrastarla con un enfoque de programación dinámica
+- Verificación contra la búsqueda exhaustiva, medición Θ(n log n) con factor al duplicar, extrapolación y energía
+- Condición contraria: con actividades de distinto peso la regla voraz deja de ser óptima y hace falta programación dinámica
 
 **Lectura autónoma (sin sesión):** multiplicación de cadenas de matrices, subsecuencia común más larga (LCS) y códigos de Huffman, con las lecciones publicadas.
 
 ### Entrega — Laboratorio evaluativo 4: Programación dinámica y algoritmos voraces ★
 
-Entrega asincrónica, plazo hasta el **22 de noviembre** (el lunes 16 es festivo).
+Entrega asincrónica, **en equipo**, el **miércoles 18 de noviembre** (el lunes 16 es festivo). Desde el 2026-11-02 este laboratorio es la parte del proyecto final que usa programación dinámica o estrategia voraz: cada equipo resuelve la **operación de su caso que admite programación dinámica o voraz** (operación 4, tope tarifario, en el Caso 1; operación 3, jornadas de las unidades móviles, en el Caso 2; operación 3, cargue de vehículos, en el Caso 3), obligatoria para todos los equipos. El resto del proyecto se entrega el 23 de noviembre.
 
 - Preguntas de selección múltiple sobre subestructura óptima, subproblemas traslapados y la propiedad de elección voraz
 - Preguntas abiertas: dado un problema, argumentar si un enfoque voraz produce la solución óptima o si se requiere programación dinámica
 - Explicación de un tema: el estudiante explica, con sus palabras, por qué la propiedad de subestructura óptima es necesaria (pero no suficiente) para que un enfoque voraz funcione
-- Parte práctica: implementar un problema de programación dinámica (rod cutting, mochila 0/1 o LCS) y un problema voraz (selección de actividades o Huffman); graficar el comportamiento de ambos y comparar sus complejidades
-- Informe de laboratorio en GitHub (`lab4-pd-voraces/`) con rúbrica socializada previamente — **cierre de la evaluación Laboratorio 4 (15%)**
+- Parte práctica: resolver la operación de PD o voraz del caso del proyecto con programación dinámica o estrategia voraz (el Caso 1 con programación dinámica sobre los días del mes, el Caso 2 con selección de actividades voraz y el Caso 3 con la mochila 0/1), contrastarla con el enfoque ingenuo y con la regla voraz o exhaustiva que usa hoy la organización, graficar el comportamiento y comparar sus complejidades
+- Informe dentro del repositorio y del informe del proyecto final del equipo (código en `src/<operacion>/`, gráficas en `graficas/<operacion>/`, texto en los apartados del `README.md` del proyecto), con rúbrica propia del laboratorio socializada previamente (no es la rúbrica institucional del proyecto) — **cierre de la evaluación Laboratorio 4 (15%)**
 
 ---
 
 ## Proyecto final (20%)
 
-*Por definir en un paso aparte. Su alcance, fecha de entrega y rúbrica aún no existen.*
+Instrumento de **Resultados de Aprendizaje 2026-2**, aprobado por la Facultad. El detalle completo (tres casos, actividades, entregable y rúbrica) está en `projects/casos-evaluacion-ra-2026-2.md`; la versión aprobada es `projects/casos-analisis-de-algoritmos-aprobado.pdf`.
+
+- **Modalidad:** equipos de máximo 4 estudiantes. Cada equipo trabaja **un** caso de tres (recaudo de un sistema de transporte, tamizaje de diabetes, banco de alimentos), asignado por el docente con reparto equilibrado.
+- **Qué se hace:** analizar el problema, estimar el costo energético del proceso actual, diseñar al menos dos estrategias para cada una de al menos dos operaciones críticas (con al menos una de dividir y vencer, voraz o programación dinámica fuera del ordenamiento), implementarlas en Python, medirlas con datos sintéticos de tamaño creciente y justificar la recomendación con su marco normativo e impacto.
+- **Entrega:** lunes **23 de noviembre**. Repositorio nuevo por equipo en GitHub, con `README.md` que contiene el informe técnico (10–15 páginas sin anexos), más el informe en PDF. Sin sustentación oral.
+- **Entrega parcial (Laboratorio 4, 15 %):** el **miércoles 18 de noviembre**, el equipo entrega la operación de su caso que admite programación dinámica o voraz (la 4 en el Caso 1, la 3 en los Casos 2 y 3), que es obligatoria. Es un hito interno del curso, con rúbrica propia; la rúbrica institucional del proyecto se aplica solo a la entrega del 23 nov. El equipo completa además, como mínimo, otra operación del caso para cumplir las dos que exige el instrumento.
+- **Calificación:** rúbrica institucional fija (RADE1-1 25 %, RADE1-2 25 %, RADT1 30 %, RAG2 10 %, RAG4 10 %), aplicada por equipo. Todos los integrantes reciben la nota del equipo; el aporte individual se valora en Seguimiento con el historial de commits.
+- **Modelado del problema:** no hay sesión de clase; se publica una guía breve con un ejemplo resuelto junto al enunciado.
+- **Registro:** la nota se reporta por estudiante en la plantilla institucional (`Rubrica RA Análisis de Algoritmos.xlsx`) y se registra en el SIA en la ventana del 23 al 29 de noviembre.
 
 ---
 

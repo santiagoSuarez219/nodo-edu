@@ -157,6 +157,61 @@ no del proyecto de aula ni de un problema técnico:
   Al final, responde la autoevaluación.`); esto no viola la regla de no
   anunciar laboratorios.
 
+#### Variante de estudio autónomo (sin clase en vivo)
+
+> Decisión del docente (2026-11-02, `analisis-de-algoritmos`, Semana 15:
+> programación dinámica y estrategia voraz). Aplica cuando una sesión **deja
+> de dictarse en vivo** y su tema pasa a trabajo independiente del
+> estudiante. Referencias: `fundamentos-de-programacion-dinamica.mdx`,
+> `estrategia-voraz.mdx` y
+> `programacion-dinamica-decidir-verificar-y-medir.mdx`.
+
+La lección ya no es lectura previa: **es la clase**. Debe ser autocontenida,
+muy explicativa y bastar para la evaluación que dependa del tema (laboratorio
+o proyecto). Reemplaza a la variante "cotidiano → concepto" en estos puntos:
+
+- **Frontmatter:** `type: "Lección de estudio autónomo"`, `presentation:
+  false`, sin `slides_hint`, y `estimated_time` realista ("50 a 60 minutos de
+  estudio autónomo, con el editor abierto (Semana N)").
+- **Apertura:** blockquote `> 📘 **Lección de estudio autónomo.** …` que pide
+  tener el editor abierto, ejecutar cada bloque y hacer las trazas en papel
+  antes de compararlas. Después, `## Antes de empezar`: dónde encaja la
+  lección (qué va antes y después) y cuánto tiempo calcular.
+- **Un solo ejemplo general por lección**, trabajado de principio a fin (corte
+  de varillas, la sala de estudio). Si el tema no cabe en ~60 minutos, se
+  **parte en varias lecciones** con una tabla de organización al inicio de la
+  primera, en lugar de alargar una sola.
+- **Lo específico de cada caso del proyecto va en guías complementarias**
+  (`guias/complemento-<tema>.md`, `kind: "guide"`, en **usted**, con `order`
+  entre la última lección del tema y el laboratorio). Cada guía resuelve un
+  problema con la misma forma que la operación del caso pero con un escenario
+  distinto, y dice explícitamente que no resuelve el caso.
+- **Sin** `## Dónde se rompe la analogía` ni `## ¿Dónde aparece en la
+  práctica?` / `¿Dónde aparece en tu proyecto?`.
+- **Extensión y estructura libres:** sin el tope de ~100–130 líneas (las de
+  referencia tienen entre 180 y 900) y se permiten subsecciones `###`. Sigue
+  sin `# H1` ni separadores `---`.
+- **Código ejecutable y verificado:** los bloques son acumulativos en un mismo
+  archivo (decirlo al inicio) y cada salida, tabla o cifra que se cite sale de
+  ejecutarlos. Si la cifra depende de la máquina (tiempos), se dice; los
+  conteos no varían. En `analisis-de-algoritmos`: **solo Python básico**,
+  lo visto en "Sintaxis de Python". Sin comprensiones, `lambda`,
+  `sorted(key=...)`, funciones anidadas o pasadas como argumento, rebanadas
+  (`s[:i]`), `x if c else y` ni `| None`; ciclos clásicos. Para ordenar, una
+  lista de tuplas con `.sort()` (el criterio de primero).
+- **Lo que reemplaza a la clase:** trazas a mano antes del código, errores
+  planeados como secciones ("Cuidado con el borde"), retos con `<Tabs>` de
+  `Pista` y `Solución`, tablas medidas con factor al duplicar y gráficas
+  guardadas en `public/documentos/<curso>/lecciones/<slug>/`.
+- **Cierre:** `## Errores frecuentes` (si aplica), `## Resumen operativo`,
+  `## Síntesis`, una sección `## ¿Y ahora? La guía de tu caso` con una tabla
+  caso → operación → guía complementaria, y la línea de lecturas.
+- **Excepción a "las lecciones no anuncian laboratorios":** como la lección
+  sustituye a la clase, puede nombrar la evaluación que prepara y remitir a
+  las guías complementarias publicadas.
+- **Sin apuntes del docente:** los de la sesión se eliminan. El cuestionario
+  de cierre (§5) se mantiene y se revisa contra el texto nuevo.
+
 Cada `##` es una diapositiva (por `slides_hint`), así que se mantiene corta:
 5–15 líneas, 1–4 párrafos. **Cero `###`** — si necesitas un nivel más, la
 sección debería partirse en dos. Sin separadores `---`.
@@ -212,6 +267,9 @@ número de diagramas **no es una medida**: ver §2.4.
 > práctica que quizá no exista confunde al estudiante. El puente teoría→práctica
 > lo tiende la **guía de laboratorio**, que referencia a la lección cuando se
 > crea — la dirección es siempre guía → lección, nunca lección → guía.
+>
+> Excepción: la **variante de estudio autónomo** (§2.2), donde la lección
+> sustituye a la clase y cierra remitiendo a las guías complementarias.
 
 ### 2.4 Diagramas Mermaid
 
@@ -792,10 +850,11 @@ y que `mcp-servers/<nombre>/dist/` está compilado.
 
 ## 8. Checklist de cierre
 
-- [ ] `.mdx` sin `# H1`, empieza en `##`, sin `###`, sin `---`.
+- [ ] `.mdx` sin `# H1`, empieza en `##`, sin `###` (salvo estudio autónomo), sin `---`.
 - [ ] `updatedAt` con la fecha de hoy.
 - [ ] Cada diagrama Mermaid se gana su lugar (no hay cuota; cero es válido). Etiquetas entre comillas dobles, sin `end` minúscula.
 - [ ] En `estructuras-de-datos` y `analisis-de-algoritmos`: la lección abre con un ejemplo cotidiano, tiene "Dónde se rompe la analogía" y cierra con la aplicación (al proyecto de aula en `estructuras-de-datos`; a un caso técnico real en `analisis-de-algoritmos`); ~100–130 líneas (lectura previa).
+- [ ] Si la lección es de **estudio autónomo** (§2.2, variante de estudio autónomo): `type` y `presentation` ajustados, un solo ejemplo general, sin "Dónde se rompe la analogía" ni "¿Dónde aparece…?", todo el código ejecutado y sus cifras verificadas, cierre con la tabla de guías por caso y sin apuntes del docente.
 - [ ] En apuntes de `estructuras-de-datos` y `analisis-de-algoritmos`: 🐞 error planeado, 🗳️ votación (distinta del cierre), 👥 reto en parejas y 🏆 práctica externa con enlaces verificados.
 - [ ] Ningún `$` sin escapar; ningún `<`/`{` suelto en prosa (crítico en `.md` de guías).
 - [ ] Solo `Callout`, `Tabs`, `Tab`, `YouTubeEmbed` como JSX.

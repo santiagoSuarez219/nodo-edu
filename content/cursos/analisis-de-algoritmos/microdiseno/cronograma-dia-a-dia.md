@@ -15,7 +15,7 @@
 | 16 – 20 oct                     | Evaluaciones institucionales                                       | No — el lunes 19 oct hay clase normal |
 | 26 oct – 1 nov                  | Segunda evaluación de estudiantes a docentes                       | No — administrativo |
 | Hasta el 1 nov                  | Registro en el SIA del 60% evaluado                                 | Sí — revisa que Laboratorios 1-3 (45%) estén registrados a tiempo (ver nota más abajo) |
-| Hasta el 22 nov                 | Fecha límite de cancelación de asignaturas/matrícula                | Coincide con la fecha límite de entrega del Laboratorio 4 |
+| Hasta el 22 nov                 | Fecha límite de cancelación de asignaturas/matrícula                | No coincide con ninguna entrega: el Laboratorio 4 se entrega el 18 nov y el proyecto final el 23 nov |
 | 23 – 29 nov                     | Exámenes finales institucionales                                    | No aplica — el curso ya terminó |
 | 23 – 29 nov                     | Fecha límite de registro del 100% evaluado                          | Sí — registrar Laboratorio 4, Proyecto final y Seguimiento en esta ventana |
 
@@ -101,16 +101,21 @@
 
 ### Semana 15 — lunes 9 de noviembre
 **Módulo 8: Programación dinámica y algoritmos voraces (Cormen Cap. 15-16)**
-- **Sesión 1 (T):** Fundamentos de programación dinámica — corte de varillas (*rod cutting*): recursión ingenua, memoización, tabulación; subestructura óptima y subproblemas traslapados
-- **Sesión 2 (P):** Estrategia voraz — selección de actividades y elementos de la estrategia voraz
+- **Sesión 1 (T) — pasa a estudio autónomo (ajuste 2026-11-02):** la programación dinámica ya no se dicta en vivo. El estudiante la estudia con dos lecciones autocontenidas:
+  - **"Fundamentos de programación dinámica"** (antes de "Estrategia voraz"): corte de varillas (*rod cutting*), recursión ingenua, memoización y tabulación medidas experimentalmente (Θ(2ⁿ) frente a Θ(n²), con gráfica), subestructura óptima, subproblemas traslapados, reconstrucción y receta para plantear una programación dinámica.
+  - **"Programación dinámica: decidir, verificar y medir"** (después de "Estrategia voraz"): programación dinámica frente a voraz, contraejemplos, verificación con solución exhaustiva, medición y extrapolación, todo sobre el corte de varillas.
+  - **Guías complementarias por caso del proyecto**, publicadas junto al Laboratorio 4: "Cubrir días con pases" (Caso 1), "Intervalos ponderados" (Caso 2, opcional si el equipo maximiza pacientes) y "Mochila 0/1" (Caso 3).
+  - Se eliminaron los apuntes docentes de la sesión (ya no hay sesión en vivo de este tema).
+- **Sesión 2 (P) — pasa a estudio autónomo (ajuste 2026-11-02):** la estrategia voraz tampoco se dicta en vivo. El estudiante la estudia con la lección autocontenida **"Estrategia voraz"** (entre las dos lecciones de programación dinámica): selección de actividades, búsqueda exhaustiva Θ(2ⁿ) medida, reglas voraces que fallan con contraejemplos calculados y búsqueda sistemática de contraejemplos, terminación más temprana con su traza y el caso de borde `>=`, argumento de intercambio (elección voraz) y subestructura óptima, verificación contra la exhaustiva, medición Θ(n log n) con factor al duplicar, extrapolación y energía, y la condición contraria (con pesos hace falta PD). Es el patrón del Caso 2 cuando el criterio es el número de jornadas.
+  - Se eliminaron los apuntes docentes de la sesión.
 - **Lectura autónoma** (con las lecciones ya publicadas, sin sesión de clase): multiplicación de cadenas de matrices, subsecuencia común más larga (LCS) y códigos de Huffman.
 
 ### Semana 16 — lunes 16 de noviembre
 **Sin clase (festivo: Independencia de Cartagena).** Última semana del curso.
 - **Laboratorio evaluativo 4 — Programación dinámica y algoritmos voraces (15%)** *(antes Laboratorio 5, que valía 20%)*
-  - Entrega asincrónica: informe en GitHub (`lab4-pd-voraces/`), plazo hasta el **22 de noviembre**
+  - Es la parte del proyecto final que usa PD o voraz: cada equipo resuelve la operación de su caso que admite PD o voraz (la 4 en el Caso 1, la 3 en los Casos 2 y 3; obligatoria). Entrega en equipo, asincrónica: dentro del repositorio y del informe del proyecto del equipo (código en `src/<operacion>/`, texto en los apartados del `README.md` del proyecto), el **miércoles 18 de noviembre**
   - ⚠️ Registrar el 100% evaluado (Laboratorio 4, Proyecto final y Seguimiento) durante la ventana del 23 al 29 de noviembre
-- **Proyecto final (20%):** por definir en un paso aparte (ver `info.md`). Su fecha de entrega queda pendiente.
+- **Proyecto final (20%):** caso de estudio en equipos de máximo 4 (ver `info.md` y `projects/casos-evaluacion-ra-2026-2.md`). Entrega única el **lunes 23 de noviembre**: repositorio del equipo en GitHub con el informe en el `README.md` y el informe en PDF. Sin sustentación. La operación de PD o voraz del caso se entrega antes, el 18 de noviembre, como Laboratorio 4 (15%).
 
 ---
 
@@ -121,8 +126,8 @@
 | 6      | 7 – 13 sep             | Laboratorio 1: Fundamentos, complejidad y recurrencias       | 15%  |
 | 10     | entrega dom. 11 oct    | Laboratorio 2: Dividir y vencer                              | 15%  |
 | 13     | entrega sáb. 31 oct    | Laboratorio 3: Estructuras de datos                          | 15%  |
-| 16     | hasta el 22 nov        | Laboratorio 4: Programación dinámica y algoritmos voraces    | 15%  |
-| —      | Por definir            | Proyecto final                                               | 20%  |
+| 16     | miércoles 18 nov       | Laboratorio 4: Programación dinámica y algoritmos voraces (equipo, operación de PD o voraz del proyecto) | 15%  |
+| —      | lunes 23 nov           | Proyecto final (equipos)                                     | 20%  |
 | —      | Todo el semestre       | Seguimiento                                                  | 20%  |
 | **Total** |                     |                                                              | **100%** |
 
