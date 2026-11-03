@@ -436,10 +436,12 @@ export const estructurasDeDatos: Course = {
       articleSlug: "insercion-y-recorridos",
       order: 32,
       title: "Inserción y recorridos",
+      summary:
+        "Parte de caminar por las carpetas para ver que pre-orden, in-orden y post-orden son la misma caminata anotando el nombre en tres momentos distintos; construye en Java el nodo del árbol, cuelga hijos izquierdo y derecho de un padre y escribe los tres recorridos recursivos con sus trazas.",
       topics: [
-        { title: "Inserción de nodos en un árbol binario" },
+        { title: "Inserción de nodos en un árbol binario: colgar un hijo izquierdo o derecho de un padre dado" },
         { title: "Recorridos recursivos: in-order, pre-order, post-order" },
-        { title: "Aplicaciones de cada tipo de recorrido" },
+        { title: "Los tres recorridos y sus salidas sobre el mismo árbol" },
       ],
     },
     {
