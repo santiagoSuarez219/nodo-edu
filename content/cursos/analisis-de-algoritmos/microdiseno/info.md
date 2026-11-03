@@ -297,10 +297,16 @@ curso-analisis-algoritmos/
 - Lección **"Programación dinámica: decidir, verificar y medir"** (se estudia después de "Estrategia voraz"): programación dinámica frente a voraz y condición contraria, contraejemplos calculados, verificación contra una solución exhaustiva con semilla fija, conteo de operaciones, factor al duplicar, extrapolación y energía.
 - Guías complementarias, publicadas junto al Laboratorio 4: **"Cubrir días con pases"** (Caso 1, tope tarifario), **"Intervalos ponderados"** (Caso 2, opcional si el equipo maximiza pacientes atendidos) y **"Mochila 0/1"** (Caso 3, cargue de vehículos).
 
-**P — Estrategia voraz**
-- El problema de selección de actividades (*activity-selection problem*)
+**P — Estrategia voraz (estudio autónomo desde el 2026-11-02)**
+
+> **Ajuste 2026-11-02:** esta sesión tampoco se dicta en vivo. Se reemplaza por la lección autocontenida **"Estrategia voraz"**, que se estudia entre las dos lecciones de programación dinámica. Los apuntes docentes de la sesión se eliminaron.
+
+- El problema de selección de actividades (*activity-selection problem*) y su búsqueda exhaustiva (Θ(2ⁿ) subconjuntos, medida)
+- Reglas voraces que fallan, contraejemplos calculados y búsqueda sistemática de contraejemplos
+- Terminación más temprana, caso de borde de los intervalos `[s, f)` y argumento de intercambio
 - Elementos de la estrategia voraz: elección voraz y subestructura óptima
-- Implementar la selección de actividades y contrastarla con un enfoque de programación dinámica
+- Verificación contra la búsqueda exhaustiva, medición Θ(n log n) con factor al duplicar, extrapolación y energía
+- Contraste con el enfoque de programación dinámica O(n³)
 
 **Lectura autónoma (sin sesión):** multiplicación de cadenas de matrices, subsecuencia común más larga (LCS) y códigos de Huffman, con las lecciones publicadas.
 

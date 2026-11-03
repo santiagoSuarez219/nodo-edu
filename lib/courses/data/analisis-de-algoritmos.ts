@@ -277,10 +277,12 @@ export const analisisDeAlgoritmos: Course = {
       order: 16,
       title: "Estrategia voraz",
       summary:
-        "Cómo escoger a ciegas y acertar: en la selección de actividades basta elegir siempre la que termina primero, y la propiedad de elección voraz junto con la subestructura óptima explican por qué otras reglas fallan y por qué esto cuesta Θ(n log n) y no el O(n³) de la programación dinámica.",
+        "Lección de estudio autónomo: con la selección de actividades, por qué probar todos los subconjuntos explota, qué reglas voraces fallan y cómo encontrar sus contraejemplos, por qué terminar primero es óptimo, cómo verificarlo contra una búsqueda exhaustiva y cómo medir su costo Θ(n log n).",
       topics: [
-        { title: "El problema de selección de actividades" },
+        { title: "El problema de selección de actividades y su búsqueda exhaustiva" },
+        { title: "Reglas voraces que fallan y cómo encontrar contraejemplos" },
         { title: "Elementos de la estrategia voraz: elección voraz y subestructura óptima" },
+        { title: "Verificar y medir una estrategia voraz" },
       ],
     },
     {

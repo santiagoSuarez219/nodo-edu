@@ -106,7 +106,8 @@
   - **"Programación dinámica: decidir, verificar y medir"** (después de la Sesión 2): programación dinámica frente a voraz, contraejemplos, verificación con solución exhaustiva, medición y extrapolación, todo sobre el corte de varillas.
   - **Guías complementarias por caso del proyecto**, publicadas junto al Laboratorio 4: "Cubrir días con pases" (Caso 1), "Intervalos ponderados" (Caso 2, opcional si el equipo maximiza pacientes) y "Mochila 0/1" (Caso 3).
   - Se eliminaron los apuntes docentes de la sesión (ya no hay sesión en vivo de este tema).
-- **Sesión 2 (P):** Estrategia voraz — selección de actividades y elementos de la estrategia voraz
+- **Sesión 2 (P) — pasa a estudio autónomo (ajuste 2026-11-02):** la estrategia voraz tampoco se dicta en vivo. El estudiante la estudia con la lección autocontenida **"Estrategia voraz"** (entre las dos lecciones de programación dinámica): selección de actividades, búsqueda exhaustiva Θ(2ⁿ) medida, reglas voraces que fallan con contraejemplos calculados y búsqueda sistemática de contraejemplos, terminación más temprana con su traza y el caso de borde `>=`, argumento de intercambio (elección voraz) y subestructura óptima, verificación contra la exhaustiva, medición Θ(n log n) con factor al duplicar, extrapolación y energía, y contraste con la PD O(n³). Es el patrón del Caso 2 cuando el criterio es el número de jornadas.
+  - Se eliminaron los apuntes docentes de la sesión.
 - **Lectura autónoma** (con las lecciones ya publicadas, sin sesión de clase): multiplicación de cadenas de matrices, subsecuencia común más larga (LCS) y códigos de Huffman.
 
 ### Semana 16 — lunes 16 de noviembre
