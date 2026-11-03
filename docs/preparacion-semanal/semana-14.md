@@ -1,7 +1,7 @@
 # Semana 14 — 2–8 de noviembre de 2026
 
-**Rama:** `feat/manejo-datos-faltantes-pc`
-**Estado:** ✅ Mergeada a `development` y desplegada y abierta en producción (2026-11-02)
+**Rama (PC):** `feat/manejo-datos-faltantes-pc`
+**Estado (PC):** ✅ Mergeada a `development` y desplegada y abierta en producción (2026-11-02)
 **Rama (ED):** `feat/semana-14-estructuras-de-datos` — su estado está en la sección «Ronda — `estructuras-de-datos`», más abajo
 
 > Material fuera del cronograma: el docente pidió una sección nueva de trabajo
@@ -169,7 +169,7 @@ Verificado con `list_lesson_questions` en producción: 6 preguntas, publicadas, 
 ## Ronda — `estructuras-de-datos` (2026-11-03)
 
 **Rama:** `feat/semana-14-estructuras-de-datos`
-**Estado:** ✅ Material y cuestionario listos en desarrollo / ⬜ Revisada por `@reviewer` / ⬜ Mergeada a `development` / ⬜ Desplegada y abierta
+**Estado:** ✅ Material y cuestionario listos en desarrollo / ✅ Revisada por `@reviewer` / ⬜ Mergeada a `development` / ⬜ Desplegada y abierta
 
 **Alcance confirmado por el usuario:** Sesión T1 (martes 3 de noviembre), solo
 la lección `conceptos-y-tad-arbol-binario`, solo conceptos y TAD, sin código de
@@ -239,7 +239,7 @@ No aplica.
 - [x] Checklist de `lesson-authoring` §8 recorrido
 - [x] `summary` presente en frontmatter **y** en registro TS
 - [x] Coherencia cruzada lección ↔ cuestionario (alturas, niveles y conteos calculados con scripts; firma de `izquierdo()` comparada con la interface)
-- [ ] `@reviewer`: CAMBIOS REQUERIDOS en la primera revisión (1 bloqueante, 3 mayores, menores); corregidos en un commit posterior, pendiente la segunda revisión
+- [x] `@reviewer`: primera revisión CAMBIOS REQUERIDOS (1 bloqueante, 3 mayores, menores); corregidos en un commit posterior; segunda revisión APROBADO, sin bloqueantes ni mayores
 - [ ] Render en navegador (diagrama del árbol de ejemplo): pendiente, lo comprueba el docente
 
 ### Despliegue
