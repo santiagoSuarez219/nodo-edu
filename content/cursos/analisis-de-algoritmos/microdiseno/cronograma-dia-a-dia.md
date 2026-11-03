@@ -101,7 +101,11 @@
 
 ### Semana 15 — lunes 9 de noviembre
 **Módulo 8: Programación dinámica y algoritmos voraces (Cormen Cap. 15-16)**
-- **Sesión 1 (T):** Fundamentos de programación dinámica — corte de varillas (*rod cutting*): recursión ingenua, memoización, tabulación; subestructura óptima y subproblemas traslapados
+- **Sesión 1 (T) — pasa a estudio autónomo (ajuste 2026-11-02):** la programación dinámica ya no se dicta en vivo. El estudiante la estudia con dos lecciones autocontenidas:
+  - **"Fundamentos de programación dinámica"** (antes de la Sesión 2): corte de varillas (*rod cutting*), recursión ingenua, memoización y tabulación medidas experimentalmente (Θ(2ⁿ) frente a Θ(n²), con gráfica), subestructura óptima, subproblemas traslapados, reconstrucción y receta para plantear una programación dinámica.
+  - **"Programación dinámica: decidir, verificar y medir"** (después de la Sesión 2): programación dinámica frente a voraz, contraejemplos, verificación con solución exhaustiva, medición y extrapolación, todo sobre el corte de varillas.
+  - **Guías complementarias por caso del proyecto**, publicadas junto al Laboratorio 4: "Cubrir días con pases" (Caso 1), "Intervalos ponderados" (Caso 2, opcional si el equipo maximiza pacientes) y "Mochila 0/1" (Caso 3).
+  - Se eliminaron los apuntes docentes de la sesión (ya no hay sesión en vivo de este tema).
 - **Sesión 2 (P):** Estrategia voraz — selección de actividades y elementos de la estrategia voraz
 - **Lectura autónoma** (con las lecciones ya publicadas, sin sesión de clase): multiplicación de cadenas de matrices, subsecuencia común más larga (LCS) y códigos de Huffman.
 

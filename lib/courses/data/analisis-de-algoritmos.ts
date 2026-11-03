@@ -247,11 +247,27 @@ export const analisisDeAlgoritmos: Course = {
       order: 14,
       title: "Fundamentos de programación dinámica",
       summary:
-        "Cómo dejar de resolver el mismo subproblema una y otra vez: el corte de varillas pasa de Θ(2ⁿ) a Θ(n²) con memoización o tabulación, y un arreglo auxiliar permite recuperar dónde cortar, no solo cuánto se gana.",
+        "Primera de dos lecciones de estudio autónomo: con el corte de varillas, por qué probar todo explota, cómo la memoización y la tabulación lo bajan de Θ(2ⁿ) a Θ(n²), cómo recuperar la solución y una receta para plantear cualquier programación dinámica.",
       topics: [
         { title: "Corte de varillas: solución recursiva ingenua vs. memoización vs. tabulación" },
         { title: "Subestructura óptima y subproblemas traslapados" },
+        { title: "Medición experimental de Θ(2ⁿ) frente a Θ(n²)" },
         { title: "Reconstrucción de la solución óptima" },
+        { title: "Receta para plantear una programación dinámica" },
+      ],
+    },
+    {
+      id: "programacion-dinamica-decidir-verificar-y-medir",
+      slug: "programacion-dinamica-decidir-verificar-y-medir",
+      articleSlug: "programacion-dinamica-decidir-verificar-y-medir",
+      order: 16.25,
+      title: "Programación dinámica: decidir, verificar y medir",
+      summary:
+        "Segunda de dos lecciones de estudio autónomo: cuándo basta una regla voraz y cómo romperla con un contraejemplo, cómo verificar una programación dinámica contra una solución exhaustiva y cómo medir, graficar y extrapolar su costo.",
+      topics: [
+        { title: "Programación dinámica frente a voraz: contraejemplos" },
+        { title: "Verificación con solución exhaustiva" },
+        { title: "Medición, factor al duplicar y extrapolación" },
       ],
     },
     {
@@ -266,6 +282,33 @@ export const analisisDeAlgoritmos: Course = {
         { title: "El problema de selección de actividades" },
         { title: "Elementos de la estrategia voraz: elección voraz y subestructura óptima" },
       ],
+    },
+    {
+      id: "complemento-cubrir-dias-con-pases",
+      slug: "complemento-cubrir-dias-con-pases",
+      articleSlug: "complemento-cubrir-dias-con-pases",
+      kind: "guide",
+      order: 16.43,
+      title: "Complemento del Laboratorio 4 — Cubrir días con pases",
+      topics: [],
+    },
+    {
+      id: "complemento-mochila-0-1",
+      slug: "complemento-mochila-0-1",
+      articleSlug: "complemento-mochila-0-1",
+      kind: "guide",
+      order: 16.45,
+      title: "Complemento del Laboratorio 4 — Mochila 0/1",
+      topics: [],
+    },
+    {
+      id: "complemento-intervalos-ponderados",
+      slug: "complemento-intervalos-ponderados",
+      articleSlug: "complemento-intervalos-ponderados",
+      kind: "guide",
+      order: 16.47,
+      title: "Complemento del Laboratorio 4 — Intervalos ponderados",
+      topics: [],
     },
     {
       id: "lab-evaluativo-04-programacion-dinamica-y-voraces",

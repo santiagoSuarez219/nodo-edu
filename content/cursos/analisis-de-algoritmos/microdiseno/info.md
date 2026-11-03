@@ -91,7 +91,7 @@ Cada uno de los cuatro laboratorios evaluativos se entrega como un **informe de 
 | 12  | Estructuras de datos (Cormen Cap. 10)          | Lunes 19 oct: pilas, colas, listas enlazadas (sin sesión P) |                     |
 | 13  | Estructuras de datos (Cormen Cap. 11–12)       | Lunes 26 oct: tablas hash y árboles de búsqueda binarios             | ★ Laboratorio 3     |
 | 14  | —                                              | Lunes 2 nov: festivo, sin clase                                      |                     |
-| 15  | Programación dinámica y voraces (Cormen Cap. 15–16) | Lunes 9 nov: rod cutting y fundamentos de la PD; estrategia voraz (resto en lectura autónoma) |  |
+| 15  | Programación dinámica y voraces (Cormen Cap. 15–16) | Lunes 9 nov: estrategia voraz; la PD pasa a estudio autónomo (dos lecciones y guías complementarias por caso; resto en lectura autónoma) |  |
 | 16  | —                                              | Lunes 16 nov: festivo, sin clase. Entrega asincrónica el miércoles 18 nov | ★ Laboratorio 4 (entrega) |
 
 ---
@@ -290,10 +290,13 @@ curso-analisis-algoritmos/
 
 ### Lunes 9 de noviembre (Semana 15) — Fundamentos de PD y estrategia voraz
 
-**T — Fundamentos de programación dinámica**
-- Corte de varillas (*rod cutting*): solución recursiva ingenua vs. memoización vs. tabulación
-- Subestructura óptima y subproblemas traslapados: cómo reconocerlos
-- Reconstrucción de la solución óptima (no solo el valor óptimo)
+**T — Fundamentos de programación dinámica (estudio autónomo desde el 2026-11-02)**
+
+> **Ajuste 2026-11-02:** esta sesión deja de dictarse en vivo. Se reemplaza por dos lecciones autocontenidas de estudio autónomo y tres guías complementarias, una por caso del proyecto final. Los apuntes docentes de la sesión se eliminaron.
+
+- Lección **"Fundamentos de programación dinámica"**: corte de varillas (*rod cutting*), solución recursiva ingenua vs. memoización vs. tabulación, con medición experimental del número de llamadas (Θ(2ⁿ) frente a Θ(n²)) y gráfica comparativa; subestructura óptima (argumento de cortar y pegar) y subproblemas traslapados; reconstrucción de la solución óptima; receta de siete preguntas para plantear una programación dinámica.
+- Lección **"Programación dinámica: decidir, verificar y medir"** (se estudia después de "Estrategia voraz"): programación dinámica frente a voraz y condición contraria, contraejemplos calculados, verificación contra una solución exhaustiva con semilla fija, conteo de operaciones, factor al duplicar, extrapolación y energía.
+- Guías complementarias, publicadas junto al Laboratorio 4: **"Cubrir días con pases"** (Caso 1, tope tarifario), **"Intervalos ponderados"** (Caso 2, opcional si el equipo maximiza pacientes atendidos) y **"Mochila 0/1"** (Caso 3, cargue de vehículos).
 
 **P — Estrategia voraz**
 - El problema de selección de actividades (*activity-selection problem*)
