@@ -1,6 +1,10 @@
 # Rúbrica — Laboratorio 4 (Programación dinámica y algoritmos voraces) — 2026-2
 
-> **Estado: APROBADA** (2026-11-02). Se socializa con los equipos antes de la
+> **Estado: APROBADA** (2026-11-02). **Ajuste del 2026-11-02:** el laboratorio
+> se entrega dentro del repositorio y del informe del proyecto, no en una carpeta
+> aparte, para que todo su trabajo sea avance del proyecto; cambian solo las
+> descripciones de "Documentación" (ubicación y estructura) y "Análisis de las
+> gráficas" (proyección anual de la energía). Los puntos no cambian. Se socializa con los equipos antes de la
 > entrega del **miércoles 18 de noviembre**. Está transcrita tal cual en la
 > sección "Criterios de Evaluación" de la guía del estudiante
 > (`guias/lab-evaluativo-04-programacion-dinamica-y-voraces.md`).
@@ -12,8 +16,9 @@
 
 ## Qué se califica
 
-Cada equipo entrega, en la carpeta `lab4-pd-voraces/` del repositorio del
-proyecto, la **operación de su caso que admite programación dinámica o voraz**
+Cada equipo entrega, **dentro del repositorio y del informe del proyecto final**
+(código en `src/<operacion>/`, gráficas en `graficas/<operacion>/` y texto en
+los apartados del `README.md` del proyecto), la **operación de su caso que admite programación dinámica o voraz**
 (la 4 en el Caso 1 y la 3 en los Casos 2 y 3), resuelta con programación dinámica o
 estrategia voraz, contrastada con lo que hace hoy la organización:
 
@@ -32,8 +37,8 @@ La calificación es **por equipo**: todos los integrantes reciben la misma nota.
 | **Corrección conceptual** | 20 | El informe explica por qué el problema admite la estrategia elegida: identifica la subestructura óptima y los subproblemas traslapados (programación dinámica) o la propiedad de elección voraz (voraz) y los ilustra con un ejemplo pequeño resuelto a mano. Muestra con un **contraejemplo calculado** por qué falla la regla que usa hoy la organización (Caso 1: la regla simplificada de pasaje diario y pases; Caso 2: la asignación por orden de llegada; Caso 3: cargar por orden de vencimiento o por densidad de valor) y dice qué condición del problema haría adecuada a la otra familia de estrategias. |
 | **Calidad de la explicación teórica** | 20 | Plantea la recurrencia de la programación dinámica y explica cada término, o el criterio de elección voraz con su justificación de por qué no necesita reconsiderar. Calcula la complejidad temporal y espacial de la estrategia y del enfoque ingenuo o exhaustivo, y las contrasta (Caso 1: Θ(d) frente a exponencial en los días con viaje; Caso 2: Θ(n log n) frente a Θ(2ⁿ); Caso 3: Θ(n·W) frente a Θ(2ⁿ), explicando que el costo depende de la capacidad W y no solo de n). |
 | **Corrección de la implementación** | 25 | El código cumple el estándar del curso (PEP 8, *type hints* y *docstrings* en cada función). Devuelve el resultado correcto en casos pequeños resueltos a mano, en los casos límite del problema y en al menos veinte instancias aleatorias pequeñas donde coincide con la solución exhaustiva. Cumple las restricciones del negocio del caso (Caso 1: devuelve exactamente la diferencia frente a la combinación más barata; Caso 2: ninguna unidad móvil tiene dos jornadas que se crucen; Caso 3: ningún vehículo supera su capacidad, el valor es el máximo y ningún lote se fracciona). Implementa también la regla actual y muestra una instancia donde da un resultado peor. |
-| **Calidad del análisis de las gráficas** | 25 | Existen las gráficas con título, ejes rotulados con unidades y leyenda, y la estrategia y el enfoque con el que se contrasta van en los mismos ejes. Cubren al menos seis tamaños de entrada, dentro de lo que el enfoque exhaustivo alcanza a ejecutar. El análisis calcula el factor de crecimiento al duplicar el tamaño y lo compara con el esperado por la complejidad. Extrapola el tiempo al volumen real del caso, lo compara con la ventana operativa del cliente y estima el consumo de energía con la potencia que informa el caso. |
-| **Documentación y organización del informe** | 10 | La carpeta `lab4-pd-voraces/` tiene `README.md`, `src/` y `graficas/`. El `README.md` sigue el orden del enunciado, muestra las gráficas visibles en GitHub, enlaza el código de cada parte y trae instrucciones para reproducir los datos sintéticos y las mediciones. El historial tiene al menos tres commits y **cada integrante aparece** en él. Se entrega a más tardar el 18 de noviembre. |
+| **Calidad del análisis de las gráficas** | 25 | Existen las gráficas con título, ejes rotulados con unidades y leyenda, y la estrategia y el enfoque con el que se contrasta van en los mismos ejes. Cubren al menos seis tamaños de entrada, dentro de lo que el enfoque exhaustivo alcanza a ejecutar. El análisis calcula el factor de crecimiento al duplicar el tamaño y lo compara con el esperado por la complejidad. Extrapola el tiempo al volumen real del caso, lo compara con la ventana operativa del cliente, estima el consumo de energía con la potencia que informa el caso y proyecta a un año la diferencia entre la regla actual y la estrategia. |
+| **Documentación y organización del informe** | 10 | El repositorio del proyecto tiene el `README.md` con los apartados del informe técnico del proyecto, en su orden, con esta operación completa en ellos y lo pendiente marcado; el código en `src/<operacion>/` y las gráficas en `graficas/<operacion>/`. El informe muestra las gráficas visibles en GitHub, enlaza el código y trae la sección final para reproducir los datos sintéticos y las mediciones. El historial tiene al menos tres commits y **cada integrante aparece** en él. Se entrega a más tardar el 18 de noviembre. |
 | **TOTAL** | **100** | |
 
 La nota del laboratorio se convierte a la escala del curso así:

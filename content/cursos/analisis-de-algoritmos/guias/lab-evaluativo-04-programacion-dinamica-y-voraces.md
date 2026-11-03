@@ -5,7 +5,7 @@ updatedAt: "2026-11-02"
 
 # Laboratorio evaluativo 04 — Programación dinámica y algoritmos voraces
 
-> **Evaluación:** este laboratorio es el **Laboratorio 4 (15 %)** de la nota del curso y es la parte del proyecto final que usa programación dinámica o estrategia voraz: cada equipo resuelve la **operación de su caso que admite programación dinámica o estrategia voraz** (la operación 4 en el Caso 1 y la operación 3 en los Casos 2 y 3), que es obligatoria. Se entrega **en equipo** (máximo 4 integrantes) como informe en GitHub, en la carpeta `lab4-pd-voraces/` del **repositorio del equipo del proyecto**, **a más tardar el miércoles 18 de noviembre de 2026**. Todos los integrantes reciben la misma nota; el aporte de cada uno se evidencia con el historial de commits.
+> **Evaluación:** este laboratorio es el **Laboratorio 4 (15 %)** de la nota del curso y es la parte del proyecto final que usa programación dinámica o estrategia voraz: cada equipo resuelve la **operación de su caso que admite programación dinámica o estrategia voraz** (la operación 4 en el Caso 1 y la operación 3 en los Casos 2 y 3), que es obligatoria. Se entrega **en equipo** (máximo 4 integrantes) **dentro del repositorio y del informe del proyecto final**, **a más tardar el miércoles 18 de noviembre de 2026**: todo lo que produzca aquí es parte del proyecto, no un documento aparte. Todos los integrantes reciben la misma nota; el aporte de cada uno se evidencia con el historial de commits.
 
 ## Objetivo
 
@@ -52,25 +52,27 @@ El texto completo de su caso es el instrumento que le entregó el docente: allí
 
 ## Desarrollo del Laboratorio
 
-El laboratorio tiene **cuatro partes**: modelar y resolver a mano, implementar y verificar, medir y graficar, y analizar. Escriba el informe **con las palabras del equipo**: una respuesta copiada de la lección, del libro o de un asistente de inteligencia artificial se califica en cero en el criterio correspondiente.
+El laboratorio tiene **cuatro partes**: modelar y resolver a mano, implementar y verificar, medir y graficar, y analizar. **Todo se escribe directamente en el informe del proyecto**: el `README.md` de la raíz del repositorio del equipo, con los apartados que exige el enunciado del proyecto final. Cada parte indica en qué apartado va. El 23 de noviembre el equipo completa ese mismo informe con la otra operación y los apartados que faltan; nada de lo que haga aquí se reescribe.
+
+Escriba **con las palabras del equipo**: una respuesta copiada de la lección, del libro o de un asistente de inteligencia artificial se califica en cero en el criterio correspondiente.
 
 ### Parte 1 — Modelar y resolver a mano
 
-Antes de programar, deje por escrito en el `README.md`:
+Antes de programar, deje por escrito en el informe (apartados **Análisis del problema** y **Diseño de la solución**, en la parte de esta operación):
 
 1. **Entradas, salida y restricciones** de la operación, con las unidades y los límites que informa el caso.
-2. **Por qué el problema admite la estrategia elegida.** Si es programación dinámica, identifique la subestructura óptima y los subproblemas que se repiten. Si es voraz, enuncie la propiedad de elección voraz y por qué la elección no necesita reconsiderarse. Apóyese en un ejemplo pequeño (entre 4 y 8 elementos) **resuelto a mano**, paso a paso.
-3. **Un contraejemplo calculado** que muestre por qué falla la regla que usa hoy la organización (Caso 1: la regla de pasaje diario y pases; Caso 2: la asignación por orden de llegada; Caso 3: cargar por orden de vencimiento y, además, por densidad). Entregue la instancia, el resultado de la regla, el resultado óptimo y la diferencia.
-4. **La condición contraria.** Diga qué tendría que cambiar en el problema para que la otra familia de estrategias (voraz si eligió programación dinámica, y viceversa) fuera la adecuada.
+2. **Por qué el problema admite la estrategia elegida.** Si es programación dinámica, identifique la subestructura óptima y los subproblemas que se repiten. Si es voraz, enuncie la propiedad de elección voraz y por qué la elección no necesita reconsiderarse. Apóyese en un ejemplo pequeño (entre 4 y 8 elementos) **resuelto a mano**, paso a paso: es la "representación equivalente" que el proyecto pide para explicar cómo funciona cada propuesta.
+3. **Un contraejemplo calculado** (va en **Análisis comparativo**, como limitación de la estrategia actual) que muestre por qué falla la regla que usa hoy la organización (Caso 1: la regla de pasaje diario y pases; Caso 2: la asignación por orden de llegada; Caso 3: cargar por orden de vencimiento y, además, por densidad). Entregue la instancia, el resultado de la regla, el resultado óptimo y la diferencia.
+4. **La condición contraria** (va en **Análisis comparativo**, como parte de la justificación de la estrategia recomendada). Diga qué tendría que cambiar en el problema para que la otra familia de estrategias (voraz si eligió programación dinámica, y viceversa) fuera la adecuada.
 
 ### Parte 2 — Implementar y verificar
 
-Implemente en la carpeta `src/` los módulos siguientes, respetando firmas y *docstrings*. Los esqueletos son el **mínimo**: puede agregar funciones auxiliares, pero no cambiar lo que devuelven estas. Use solo el esqueleto de **su** caso.
+Implemente los módulos siguientes en una carpeta **de la operación** dentro de `src/` del repositorio del proyecto: `src/tope_tarifario/` (Caso 1), `src/jornadas_unidades/` (Caso 2) o `src/cargue_vehiculos/` (Caso 3). Así, la otra operación del proyecto tendrá su propia carpeta junto a esta y el código no se mueve ni se copia después. Respete firmas y *docstrings*. Los esqueletos son el **mínimo**: puede agregar funciones auxiliares, pero no cambiar lo que devuelven estas. Use solo el esqueleto de **su** caso.
 
-Estructura de `src/` (nombres sugeridos, los mismos para los tres casos):
+Módulos de la carpeta de la operación (los mismos nombres en los tres casos):
 - `estrategia.py`: la estrategia (programación dinámica o voraz).
-- `exhaustivo.py`: la solución que prueba todas las combinaciones.
-- `regla_actual.py`: la regla que usa hoy la organización.
+- `exhaustivo.py`: la solución que prueba todas las combinaciones; en el proyecto es la solución exacta con la que se verifica la estrategia.
+- `regla_actual.py`: la regla que usa hoy la organización; en el proyecto es la línea base del proceso actual.
 - `datos.py`: el generador de instancias sintéticas con semilla fija.
 - `pruebas.py`: las pruebas con `assert`.
 - `medicion.py`: los experimentos y las gráficas.
@@ -264,7 +266,7 @@ def cargar_por_densidad(lotes: list[Lote], capacidad_kg: int) -> tuple[int, list
   - al menos **veinte instancias aleatorias pequeñas** (generadas con semilla fija) en las que la estrategia y la solución exhaustiva obtienen el mismo valor óptimo;
   - la **restricción del negocio** de su caso (Caso 1: la devolución es exactamente la diferencia frente al mínimo; Caso 2: ninguna unidad tiene dos jornadas que se crucen; Caso 3: ningún vehículo supera su capacidad y ningún lote se fracciona);
   - la instancia donde la **regla actual da un resultado peor** que la estrategia, la misma del contraejemplo de la Parte 1.
-- Documente en el `README.md` cualquier supuesto de interpretación que haya tomado (por ejemplo, cómo trató un mes de 31 días o dos jornadas que se tocan en un extremo).
+- Documente en el informe, en **Análisis del problema → Supuestos**, cualquier supuesto de interpretación que haya tomado (por ejemplo, cómo trató un mes de 31 días o dos jornadas que se tocan en un extremo).
 
 Ejemplo del estilo de prueba esperado (sirve para su caso con los nombres que correspondan):
 
@@ -288,9 +290,9 @@ Implemente en `medicion.py` los experimentos y las gráficas, con datos **sinté
 - Para tamaños donde la solución exhaustiva ya no puede ejecutarse, mida solo la estrategia y llévela hasta tamaños mucho mayores: son los que sostienen la extrapolación.
 - Cuente además las **operaciones elementales** (comparaciones, celdas calculadas o combinaciones exploradas, según el caso) con un contador propio, para contrastarlas con el tiempo.
 - **Caso 3, adicionalmente:** repita la medición de la estrategia con el número de lotes fijo y la capacidad `W` creciente, para mostrar que su costo depende de `W` y no solo del número de lotes.
-- Produzca la gráfica `graficas/tiempo_vs_n.png`: tiempo medio frente al tamaño, con la **estrategia y el enfoque exhaustivo en los mismos ejes**, con título, ejes rotulados con unidades y leyenda.
-- Produzca la gráfica `graficas/operaciones_vs_n.png`, con el mismo criterio, para el número de operaciones.
-- Caso 3: produzca además `graficas/tiempo_vs_capacidad.png`.
+- Produzca la gráfica `graficas/<operacion>/tiempo_vs_n.png` (con el mismo nombre de carpeta de la operación que usó en `src/`): tiempo medio frente al tamaño, con la **estrategia y el enfoque exhaustivo en los mismos ejes**, con título, ejes rotulados con unidades y leyenda.
+- Produzca la gráfica `graficas/<operacion>/operaciones_vs_n.png`, con el mismo criterio, para el número de operaciones.
+- Caso 3: produzca además `graficas/cargue_vehiculos/tiempo_vs_capacidad.png`.
 
 **Requisitos:**
 - Genere los datos con una **semilla fija**, de modo que el docente pueda reproducir sus mediciones, y use las mismas instancias para todas las soluciones en cada tamaño.
@@ -302,51 +304,78 @@ Implemente en `medicion.py` los experimentos y las gráficas, con datos **sinté
 - No use tamaños tan grandes que la solución exhaustiva tarde más de un par de minutos en una medición.
 - No concluya con la teoría: lo que diga en la Parte 4 debe poder leerse en sus propias gráficas.
 
-### Parte 4 — Análisis en el `README.md`
+### Parte 4 — Análisis en el informe
 
-Responda, con sus palabras, las cinco preguntas siguientes. Entre todas, no pase de **1.200 palabras**.
+Responda, con sus palabras, las cinco preguntas siguientes, cada una en el apartado del informe que se indica. Sea concreto: el informe completo del proyecto tiene una extensión sugerida de 10 a 15 páginas para todo, y esta operación es una parte.
 
-1. **La recurrencia o el criterio.** Si usó programación dinámica, plantee la recurrencia y explique cada término, el caso base y el orden en que se llenan los subproblemas. Si usó estrategia voraz, enuncie el criterio de elección y justifique por qué no necesita reconsiderar lo elegido.
-2. **Complejidad.** Calcule la complejidad **temporal y espacial** de la estrategia y del enfoque ingenuo o exhaustivo, y contrástelas. (Caso 1: `Θ(d)` frente a exponencial en los días con viaje; Caso 2: `Θ(n log n)` frente a `Θ(2ⁿ)`, o la que corresponda si optó por intervalos ponderados; Caso 3: `Θ(n·W)` frente a `Θ(2ⁿ)`, explicando que el costo depende de la capacidad `W` y no solo de `n`.)
-3. **Lo medido contra lo esperado.** Con sus gráficas, tome la pareja de tamaños donde el segundo es el doble del primero y calcule cuánto se multiplicó el tiempo (y el número de operaciones) de cada solución; diga si coincide con la complejidad de la pregunta 2 y explique las diferencias.
-4. **Escala real, ventana y energía.** Extrapole el tiempo de la estrategia, de la regla actual y de la solución exhaustiva al volumen real de su caso. Compare con la ventana operativa del cliente y diga si cabe. Estime el consumo de energía con la potencia del servidor que informa el caso, con la relación kWh = kW × h, para cada solución. Declare que son **estimaciones** y explique el razonamiento: no use una regla de tres sin justificar la forma de la curva, y diga en qué casos la solución exhaustiva sencillamente no terminaría. Si el caso no fija una ventana para esta operación, diga cuál toma como referencia y por qué.
-5. **Recomendación.** Recomiende a la organización qué estrategia adoptar para esta operación, qué ganaría frente a lo que hace hoy y qué riesgo o límite debe conocer (por ejemplo, qué pasaría si el volumen o la capacidad crecieran).
+1. **La recurrencia o el criterio** (apartado **Diseño de la solución**). Si usó programación dinámica, plantee la recurrencia y explique cada término, el caso base y el orden en que se llenan los subproblemas. Si usó estrategia voraz, enuncie el criterio de elección y justifique por qué no necesita reconsiderar lo elegido.
+2. **Complejidad** (apartado **Evaluación del desempeño**). Calcule la complejidad **temporal y espacial** de la estrategia y del enfoque ingenuo o exhaustivo, y contrástelas. (Caso 1: `Θ(d)` frente a exponencial en los días con viaje; Caso 2: `Θ(n log n)` frente a `Θ(2ⁿ)`, o la que corresponda si optó por intervalos ponderados; Caso 3: `Θ(n·W)` frente a `Θ(2ⁿ)`, explicando que el costo depende de la capacidad `W` y no solo de `n`.)
+3. **Lo medido contra lo esperado** (apartado **Evaluación del desempeño**: es el contraste explícito entre lo empírico y lo teórico que exige el proyecto). Con sus gráficas, tome la pareja de tamaños donde el segundo es el doble del primero y calcule cuánto se multiplicó el tiempo (y el número de operaciones) de cada solución; diga si coincide con la complejidad de la pregunta 2 y explique las diferencias.
+4. **Escala real, ventana y energía** (apartados **Evaluación del desempeño** e **Implicaciones éticas, sociales y ambientales → Consumo energético**). Extrapole el tiempo de la estrategia, de la regla actual y de la solución exhaustiva al volumen real de su caso. Compare con la ventana operativa del cliente y diga si cabe. Estime el consumo de energía con la potencia del servidor que informa el caso, con la relación kWh = kW × h, para cada solución. Declare que son **estimaciones** y explique el razonamiento: no use una regla de tres sin justificar la forma de la curva, y diga en qué casos la solución exhaustiva sencillamente no terminaría. Si el caso no fija una ventana para esta operación, diga cuál toma como referencia y por qué. **Proyecte además la diferencia de consumo entre la regla actual y la estrategia a un año de operación**, como pide el proyecto.
+5. **Recomendación** (apartado **Análisis comparativo**). Recomiende a la organización qué estrategia adoptar para esta operación, qué ganaría frente a lo que hace hoy y qué riesgo o límite debe conocer (por ejemplo, qué pasaría si el volumen o la capacidad crecieran).
 
 ## Entregable
 
+Todo se entrega en el **repositorio del equipo del proyecto**, con la estructura que tendrá el 23 de noviembre:
+
 ```
 repositorio-del-equipo/
-└── lab4-pd-voraces/
-    ├── README.md
-    ├── src/
-    │   ├── estrategia.py
-    │   ├── exhaustivo.py
-    │   ├── regla_actual.py
-    │   ├── datos.py
-    │   ├── pruebas.py
-    │   └── medicion.py
-    └── graficas/
+├── README.md                    # informe técnico del proyecto
+├── requirements.txt
+├── src/
+│   └── <operacion>/             # tope_tarifario, jornadas_unidades o cargue_vehiculos
+│       ├── estrategia.py
+│       ├── exhaustivo.py
+│       ├── regla_actual.py
+│       ├── datos.py
+│       ├── pruebas.py
+│       └── medicion.py
+└── graficas/
+    └── <operacion>/
         ├── tiempo_vs_n.png
         └── operaciones_vs_n.png
 ```
 
-El Caso 3 agrega `graficas/tiempo_vs_capacidad.png`. Las demás carpetas del repositorio del proyecto no forman parte de este laboratorio.
+El Caso 3 agrega `graficas/cargue_vehiculos/tiempo_vs_capacidad.png`. La otra operación del proyecto irá, después, en su propia carpeta junto a esta.
 
-El `README.md` es el informe completo y **el único documento que se califica como texto**. Debe contener, en este orden:
+El `README.md` es el **informe técnico del proyecto** y el único documento que se califica como texto. Para esta entrega debe tener **todos los apartados del enunciado del proyecto**, en su orden, con lo siguiente:
 
-1. El nombre completo de los integrantes, el caso asignado y las instrucciones para reproducir los datos sintéticos y las mediciones (cómo activar el entorno y qué comandos ejecutar para las pruebas y para la medición).
-2. **Parte 1** — el modelado, el ejemplo resuelto a mano, el contraejemplo calculado y la condición contraria.
-3. **Parte 2** — breve descripción de cómo verificó las implementaciones y qué casos cubrió.
-4. **Parte 3** — las gráficas incrustadas y una nota sobre cómo midió (repeticiones, semilla y tamaños usados).
-5. **Parte 4** — las cinco respuestas del análisis.
+1. **Encabezado:** el nombre completo de los integrantes y el caso asignado.
+2. **Análisis del problema:** entradas, salida, restricciones y supuestos **de esta operación** (Parte 1).
+3. **Diseño de la solución:** la estrategia, por qué el problema la admite, el ejemplo resuelto a mano y la recurrencia o el criterio (Parte 1 y pregunta 1 de la Parte 4).
+4. **Implementación:** enlaces en Markdown a `estrategia.py`, `exhaustivo.py`, `regla_actual.py` y `pruebas.py`, y las decisiones de implementación relevantes.
+5. **Evaluación del desempeño:** la complejidad, cómo verificó las implementaciones y qué casos cubrió, enlaces a `datos.py` y `medicion.py`, las gráficas incrustadas con una nota sobre cómo midió (repeticiones, semilla y tamaños), lo medido contra lo esperado y la extrapolación al volumen real (Partes 2 y 3, preguntas 2 a 4).
+6. **Análisis comparativo:** el contraejemplo de la regla actual, la condición contraria y la recomendación (Parte 1 y pregunta 5).
+7. **Implicaciones éticas, sociales y ambientales:** por ahora, solo el **consumo energético** de esta operación: regla actual frente a estrategia y proyección a un año (pregunta 4).
+8. **Conclusiones:** puede quedar marcado como pendiente.
+9. **Sección final de reproducción:** cómo activar el entorno y qué comandos ejecutar para las pruebas y para la medición.
 
-**Cada parte práctica debe enlazar su código**: al inicio de la Parte 2 incluya enlaces en Markdown a `estrategia.py`, `exhaustivo.py`, `regla_actual.py` y `pruebas.py`, y al inicio de la Parte 3 enlaces a `datos.py` y `medicion.py`, apuntando a los archivos dentro del repositorio. Un informe que describe resultados sin enlazar el código que los produjo pierde el criterio de documentación.
+Los apartados o las partes de apartado que correspondan a la otra operación o al proceso completo se dejan con el título y la marca **"Pendiente para la entrega del 23 de noviembre"**. Un informe que describe resultados sin enlazar el código que los produjo pierde el criterio de documentación.
 
 Las gráficas se incrustan con la sintaxis de imagen de Markdown y **ruta relativa** a la ubicación del `README.md`; no basta con dejarlas en la carpeta.
 
 **Trabajo en equipo.** El historial del repositorio debe tener **al menos tres commits descriptivos y cada integrante debe aparecer en él** con su propia cuenta. Se califica por equipo, con la misma nota para todos, pero un integrante sin commits no puede acreditar su aporte.
 
-Haga `push` a la rama `main` del repositorio del equipo antes del cierre del plazo (**miércoles 18 de noviembre de 2026**). Se califica lo que esté publicado en GitHub en ese momento. El resto del proyecto final se entrega por separado y se califica con su propia rúbrica; este laboratorio se califica solo con la de abajo.
+Haga `push` a la rama `main` del repositorio del equipo antes del cierre del plazo (**miércoles 18 de noviembre de 2026**). Se califica lo que esté publicado en GitHub en ese momento, solo con la rúbrica de abajo. El 23 de noviembre el mismo repositorio, ya completo, se califica con la rúbrica institucional del proyecto.
+
+## Del laboratorio al proyecto final
+
+Este laboratorio adelanta, aproximadamente, **entre el 40 % y el 50 % del proyecto final** (es una estimación de referencia, no parte de la nota), y todo lo que produce queda ya en su lugar definitivo: el código en `src/`, las gráficas en `graficas/` y el texto en los apartados del informe. Entre esta entrega y la del proyecto, el lunes 23 de noviembre, hay solo cinco días: organice al equipo desde ahora.
+
+**Lo que queda adelantado:**
+
+- Una de las dos operaciones que exige el proyecto, completa: modelado, tres estrategias implementadas y verificadas (la propuesta, la exacta y la actual), complejidad, mediciones, gráficas, extrapolación, energía con proyección anual y recomendación.
+- El requisito de que al menos una estrategia sea de dividir y vencer, voraz o programación dinámica fuera del ordenamiento.
+- La estructura del repositorio y del informe, y el método de pruebas y de medición, que la segunda operación reutiliza tal cual.
+
+**Lo que falta para el proyecto:**
+
+1. **La segunda operación**, con al menos dos estrategias, implementación, verificación, mediciones y gráficas, en su propia carpeta de `src/` y `graficas/`. Suele apoyarse en lo trabajado en los laboratorios 2 y 3.
+2. **El análisis del proceso completo:** las cuatro operaciones críticas, cuáles cuestan más y el costo energético del proceso actual como línea base.
+3. **El diseño:** las estructuras de datos seleccionadas y diagramas o pseudocódigo de cada propuesta.
+4. **La comparación entre las estrategias de las dos operaciones** y la justificación de la solución recomendada.
+5. **El resto de las implicaciones éticas, sociales y ambientales:** las preguntas de impacto de su caso, el marco normativo con sus fuentes y el escenario de crecimiento. Este apartado pesa el 20 % de la rúbrica del proyecto.
+6. **Las conclusiones y el PDF** con el mismo contenido del `README.md`.
 
 ## Criterios de Evaluación
 
@@ -355,8 +384,8 @@ Haga `push` a la rama `main` del repositorio del equipo antes del cierre del pla
 | **Corrección conceptual** | 20 | El informe explica por qué el problema admite la estrategia elegida: identifica la subestructura óptima y los subproblemas traslapados (programación dinámica) o la propiedad de elección voraz (voraz) y los ilustra con un ejemplo pequeño resuelto a mano. Muestra con un **contraejemplo calculado** por qué falla la regla que usa hoy la organización (Caso 1: la regla simplificada de pasaje diario y pases; Caso 2: la asignación por orden de llegada; Caso 3: cargar por orden de vencimiento o por densidad de valor) y dice qué condición del problema haría adecuada a la otra familia de estrategias. |
 | **Calidad de la explicación teórica** | 20 | Plantea la recurrencia de la programación dinámica y explica cada término, o el criterio de elección voraz con su justificación de por qué no necesita reconsiderar. Calcula la complejidad temporal y espacial de la estrategia y del enfoque ingenuo o exhaustivo, y las contrasta (Caso 1: Θ(d) frente a exponencial en los días con viaje; Caso 2: Θ(n log n) frente a Θ(2ⁿ); Caso 3: Θ(n·W) frente a Θ(2ⁿ), explicando que el costo depende de la capacidad W y no solo de n). |
 | **Corrección de la implementación** | 25 | El código cumple el estándar del curso (PEP 8, *type hints* y *docstrings* en cada función). Devuelve el resultado correcto en casos pequeños resueltos a mano, en los casos límite del problema y en al menos veinte instancias aleatorias pequeñas donde coincide con la solución exhaustiva. Cumple las restricciones del negocio del caso (Caso 1: devuelve exactamente la diferencia frente a la combinación más barata; Caso 2: ninguna unidad móvil tiene dos jornadas que se crucen; Caso 3: ningún vehículo supera su capacidad, el valor es el máximo y ningún lote se fracciona). Implementa también la regla actual y muestra una instancia donde da un resultado peor. |
-| **Calidad del análisis de las gráficas** | 25 | Existen las gráficas con título, ejes rotulados con unidades y leyenda, y la estrategia y el enfoque con el que se contrasta van en los mismos ejes. Cubren al menos seis tamaños de entrada, dentro de lo que el enfoque exhaustivo alcanza a ejecutar. El análisis calcula el factor de crecimiento al duplicar el tamaño y lo compara con el esperado por la complejidad. Extrapola el tiempo al volumen real del caso, lo compara con la ventana operativa del cliente y estima el consumo de energía con la potencia que informa el caso. |
-| **Documentación y organización del informe** | 10 | La carpeta `lab4-pd-voraces/` tiene `README.md`, `src/` y `graficas/`. El `README.md` sigue el orden del enunciado, muestra las gráficas visibles en GitHub, enlaza el código de cada parte y trae instrucciones para reproducir los datos sintéticos y las mediciones. El historial tiene al menos tres commits y **cada integrante aparece** en él. Se entrega a más tardar el 18 de noviembre. |
+| **Calidad del análisis de las gráficas** | 25 | Existen las gráficas con título, ejes rotulados con unidades y leyenda, y la estrategia y el enfoque con el que se contrasta van en los mismos ejes. Cubren al menos seis tamaños de entrada, dentro de lo que el enfoque exhaustivo alcanza a ejecutar. El análisis calcula el factor de crecimiento al duplicar el tamaño y lo compara con el esperado por la complejidad. Extrapola el tiempo al volumen real del caso, lo compara con la ventana operativa del cliente, estima el consumo de energía con la potencia que informa el caso y proyecta a un año la diferencia entre la regla actual y la estrategia. |
+| **Documentación y organización del informe** | 10 | El repositorio del proyecto tiene el `README.md` con los apartados del informe técnico del proyecto, en su orden, con esta operación completa en ellos y lo pendiente marcado; el código en `src/<operacion>/` y las gráficas en `graficas/<operacion>/`. El informe muestra las gráficas visibles en GitHub, enlaza el código y trae la sección final para reproducir los datos sintéticos y las mediciones. El historial tiene al menos tres commits y **cada integrante aparece** en él. Se entrega a más tardar el 18 de noviembre. |
 | **TOTAL** | **100** | |
 
 La nota del laboratorio se convierte a la escala del curso así: `nota_curso = (puntos / 100) x 15 %`. Por ejemplo, 80 puntos equivalen a `0,80 x 15 % = 12 %` de la nota del curso.

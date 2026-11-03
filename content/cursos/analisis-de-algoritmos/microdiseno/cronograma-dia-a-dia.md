@@ -112,7 +112,7 @@
 ### Semana 16 — lunes 16 de noviembre
 **Sin clase (festivo: Independencia de Cartagena).** Última semana del curso.
 - **Laboratorio evaluativo 4 — Programación dinámica y algoritmos voraces (15%)** *(antes Laboratorio 5, que valía 20%)*
-  - Es la parte del proyecto final que usa PD o voraz: cada equipo resuelve la operación de su caso que admite PD o voraz (la 4 en el Caso 1, la 3 en los Casos 2 y 3; obligatoria). Entrega en equipo, asincrónica: informe en el repositorio del equipo (`lab4-pd-voraces/`), el **miércoles 18 de noviembre**
+  - Es la parte del proyecto final que usa PD o voraz: cada equipo resuelve la operación de su caso que admite PD o voraz (la 4 en el Caso 1, la 3 en los Casos 2 y 3; obligatoria). Entrega en equipo, asincrónica: dentro del repositorio y del informe del proyecto del equipo (código en `src/<operacion>/`, texto en los apartados del `README.md` del proyecto), el **miércoles 18 de noviembre**
   - ⚠️ Registrar el 100% evaluado (Laboratorio 4, Proyecto final y Seguimiento) durante la ventana del 23 al 29 de noviembre
 - **Proyecto final (20%):** caso de estudio en equipos de máximo 4 (ver `info.md` y `projects/casos-evaluacion-ra-2026-2.md`). Entrega única el **lunes 23 de noviembre**: repositorio del equipo en GitHub con el informe en el `README.md` y el informe en PDF. Sin sustentación. La operación de PD o voraz del caso se entrega antes, el 18 de noviembre, como Laboratorio 4 (15%).
 

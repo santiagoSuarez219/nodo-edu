@@ -98,7 +98,7 @@ Cada uno de los cuatro laboratorios evaluativos se entrega como un **informe de 
 
 ## Organización del repositorio del curso
 
-A partir del Módulo 1, todo el trabajo del curso vive en un único repositorio. Los cuatro laboratorios evaluativos se organizan en carpetas independientes, cada una con su informe (`README.md`), su código y sus gráficas; el resto de sesiones prácticas (no evaluativas) se agrupan aparte.
+A partir del Módulo 1, todo el trabajo del curso vive en un único repositorio. Los laboratorios evaluativos 1 a 3 se organizan en carpetas independientes (el Laboratorio 4 se entrega dentro del repositorio del proyecto final de cada equipo, ver Módulo 8), cada una con su informe (`README.md`), su código y sus gráficas; el resto de sesiones prácticas (no evaluativas) se agrupan aparte.
 
 ```
 curso-analisis-algoritmos/
@@ -108,8 +108,7 @@ curso-analisis-algoritmos/
 │   │   ├── src/              # código Python del laboratorio
 │   │   └── graficas/         # gráficas de comportamiento generadas
 │   ├── lab2-divide-y-vencer/
-│   ├── lab3-estructuras-datos/
-│   └── lab4-pd-voraces/
+│   └── lab3-estructuras-datos/
 ├── ejercicios-clase/         # código de las sesiones prácticas no evaluativas (incluye los ejercicios del Módulo 2 — Python)
 ├── benchmarks/                # scripts compartidos de medición de tiempos y graficación
 └── README.md
@@ -313,7 +312,7 @@ Entrega asincrónica, **en equipo**, el **miércoles 18 de noviembre** (el lunes
 - Preguntas abiertas: dado un problema, argumentar si un enfoque voraz produce la solución óptima o si se requiere programación dinámica
 - Explicación de un tema: el estudiante explica, con sus palabras, por qué la propiedad de subestructura óptima es necesaria (pero no suficiente) para que un enfoque voraz funcione
 - Parte práctica: resolver la operación de PD o voraz del caso del proyecto con programación dinámica o estrategia voraz (el Caso 1 con programación dinámica sobre los días del mes, el Caso 2 con selección de actividades voraz y el Caso 3 con la mochila 0/1), contrastarla con el enfoque ingenuo y con la regla voraz o exhaustiva que usa hoy la organización, graficar el comportamiento y comparar sus complejidades
-- Informe de laboratorio en el repositorio del equipo (carpeta `lab4-pd-voraces/`) con rúbrica propia del laboratorio socializada previamente (no es la rúbrica institucional del proyecto) — **cierre de la evaluación Laboratorio 4 (15%)**
+- Informe dentro del repositorio y del informe del proyecto final del equipo (código en `src/<operacion>/`, gráficas en `graficas/<operacion>/`, texto en los apartados del `README.md` del proyecto), con rúbrica propia del laboratorio socializada previamente (no es la rúbrica institucional del proyecto) — **cierre de la evaluación Laboratorio 4 (15%)**
 
 ---
 
