@@ -235,7 +235,7 @@ print(reconstruir_mochila(OBJETOS, tabla, 7))  # [1, 2]: B y C
 
 ## El costo de la mochila depende de W
 
-Por la pregunta 7 de la receta: hay `(n + 1)·(W + 1)` estados y cada uno cuesta Θ(1), así que la mochila cuesta **Θ(n·W)** en tiempo y en espacio. La alternativa exhaustiva prueba los `2ⁿ` subconjuntos y suma cada uno: Θ(2ⁿ·n).
+Por la pregunta 7 de la receta: hay `(n + 1)·(W + 1)` estados y cada uno cuesta Θ(1), así que la mochila cuesta **Θ(n·W)** en tiempo y en espacio. La alternativa exhaustiva prueba los `2ⁿ` subconjuntos y suma cada uno: Θ(n·2ⁿ).
 
 Atención a una trampa: Θ(n·W) **no** depende solo del número de objetos. Si duplica la capacidad, duplica el número de columnas y el tiempo. Por eso se dice que la mochila es **pseudo-polinomial**: es polinomial en el _valor numérico_ de `W`, no en el tamaño de la entrada (escribir `W` solo ocupa unos log₂ W bits). Consecuencias prácticas:
 
@@ -263,7 +263,7 @@ def mochila_exhaustiva(objetos: list[Objeto], capacidad: int) -> int:
         capacidad: Capacidad de la mochila en kilogramos.
 
     Returns:
-        La utilidad máxima; costo Θ(2^n · n).
+        La utilidad máxima; costo Θ(n·2^n).
     """
     n = len(objetos)
     mejor = 0

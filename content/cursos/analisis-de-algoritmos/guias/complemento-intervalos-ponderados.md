@@ -86,7 +86,7 @@ Calcule `p(j)` con un caso concreto, E (turno 5, de 12 a 15). Recorra los turnos
 
 **6. ¿Qué se guarda para reconstruir?** Los valores `p(j)` y la tabla `M`: con ellos se puede saber, para cada `j`, cuál opción ganó.
 
-**7. ¿Cuánto cuesta?** Ordenar cuesta Θ(n log n). Calcular cada `p(j)` con búsqueda binaria cuesta Θ(log n), en total Θ(n log n). Llenar `M` y reconstruir, Θ(n). Total: **Θ(n log n)**, frente a Θ(2ⁿ·n) de revisar todos los subconjuntos de turnos.
+**7. ¿Cuánto cuesta?** Ordenar cuesta Θ(n log n). Calcular cada `p(j)` con búsqueda binaria cuesta Θ(log n), en total Θ(n log n). Llenar `M` y reconstruir, Θ(n). Total: **Θ(n log n)**, frente a Θ(n·2ⁿ) de revisar todos los subconjuntos de turnos.
 
 ---
 
@@ -260,9 +260,98 @@ La convención de "se tocan en un extremo" vive en una sola línea: `bisect_righ
 
 ## Costo y verificación
 
-La pregunta 7 de la receta da **Θ(n log n)**: lo mismo que la regla de terminación más temprana, frente a Θ(2ⁿ·n) de revisar todos los subconjuntos de turnos. Es decir, maximizar los estudiantes no cuesta más que maximizar el número de turnos; solo cambia lo que se optimiza.
+La pregunta 7 de la receta da **Θ(n log n)**: lo mismo que la regla de terminación más temprana, frente a Θ(n·2ⁿ) de revisar todos los subconjuntos de turnos. Es decir, maximizar los estudiantes no cuesta más que maximizar el número de turnos; solo cambia lo que se optimiza.
 
-Para verificar, siga el método de la lección "Programación dinámica: decidir, verificar y medir": una solución exhaustiva que pruebe todos los subconjuntos de turnos (con una máscara de bits, como los números de 0 a 2ⁿ − 1 en binario), descarte los que tengan dos turnos que se crucen y se quede con el de más estudiantes. Compárela con `intervalos_ponderados` en muchas instancias pequeñas generadas con semilla fija, y revise también que los turnos que devuelve `reconstruir_turnos` no se crucen entre sí y sumen el óptimo.
+Para verificar, siga el método de la lección "Programación dinámica: decidir, verificar y medir": una solución exhaustiva que pruebe todos los subconjuntos de turnos, descarte los que tengan dos turnos que se crucen y se quede con el de más estudiantes. Igual que en la lección "Estrategia voraz", los subconjuntos se recorren con una **máscara de bits** (los números de 0 a 2ⁿ − 1 escritos en binario) y, como los turnos van ordenados por hora de fin, basta comparar cada turno con el anterior del subconjunto. Escriba este código **en el mismo archivo**: reutiliza `Turno`, `hora_de_fin`, `intervalos_ponderados` y `reconstruir_turnos`.
+
+```python
+import random
+
+
+def se_cruzan(a: Turno, b: Turno) -> bool:
+    """Indica si dos turnos se cruzan; tocarse en un extremo no es cruce.
+
+    Args:
+        a: Inicio, fin y estudiantes de un turno.
+        b: Inicio, fin y estudiantes del otro turno.
+
+    Returns:
+        True si los dos turnos ocupan la sala al mismo tiempo.
+    """
+    return a[0] < b[1] and b[0] < a[1]
+
+
+def intervalos_exhaustivo(turnos: list[Turno]) -> int:
+    """Calcula el máximo de estudiantes probando todos los subconjuntos.
+
+    Args:
+        turnos: Inicio, fin y estudiantes de cada solicitud.
+
+    Returns:
+        El máximo de estudiantes de un subconjunto sin cruces; costo
+        Θ(n·2ⁿ).
+    """
+    orden = sorted(turnos, key=hora_de_fin)  # así basta comparar vecinos
+    n = len(orden)
+    mejor = 0
+    for mascara in range(1 << n):  # cada número es un subconjunto
+        ultimo_fin = 0  # las horas no son negativas
+        total = 0
+        valido = True
+        for i in range(n):
+            if mascara & (1 << i):  # ¿el turno i está en el subconjunto?
+                if orden[i][0] < ultimo_fin:  # se cruza con el anterior
+                    valido = False
+                    break
+                ultimo_fin = orden[i][1]
+                total += orden[i][2]
+        if valido and total > mejor:
+            mejor = total
+    return mejor
+
+
+def verificar_intervalos(casos: int = 200, semilla: int = 2026) -> None:
+    """Compara la programación dinámica con la exhaustiva al azar.
+
+    Args:
+        casos: Número de instancias aleatorias a probar.
+        semilla: Semilla fija para que el resultado sea reproducible.
+    """
+    # Casos límite: sin turnos, uno solo, todos cruzados y en cadena.
+    assert intervalos_ponderados([])[2] == [0]
+    assert intervalos_ponderados([(8, 10, 5)])[2][1] == 5
+    cruzados = [(8, 12, 3), (9, 11, 7), (10, 13, 4)]
+    assert intervalos_ponderados(cruzados)[2][-1] == 7
+    cadena = [(8, 9, 1), (9, 10, 2), (10, 11, 3)]
+    assert intervalos_ponderados(cadena)[2][-1] == 6
+    rng = random.Random(semilla)  # generador propio con semilla fija
+    for _ in range(casos):
+        turnos: list[Turno] = []
+        for _ in range(rng.randint(1, 10)):
+            inicio = rng.randint(0, 20)
+            fin = inicio + rng.randint(1, 6)
+            turnos.append((inicio, fin, rng.randint(1, 15)))
+        orden, p, mejor = intervalos_ponderados(turnos)
+        esperado = intervalos_exhaustivo(turnos)
+        assert mejor[-1] == esperado, turnos  # el valor coincide
+        elegidos = reconstruir_turnos(orden, p, mejor)
+        total = 0
+        for a in range(len(elegidos)):
+            total += elegidos[a][2]
+            for b in range(a + 1, len(elegidos)):
+                assert not se_cruzan(elegidos[a], elegidos[b]), turnos
+        assert total == esperado, turnos  # la reconstrucción suma el óptimo
+
+
+verificar_intervalos()
+print("Todas las instancias coinciden")
+```
+
+Tres detalles importan:
+
+- **La regla de cruce está en un solo lugar,** `se_cruzan`, y coincide con la de `bisect_right`: dos turnos que se tocan en un extremo no se cruzan. Si su caso decide lo contrario, cambie las dos.
+- **No basta verificar el valor.** También se revisa que los turnos de la reconstrucción no se crucen entre sí y que sumen el óptimo.
+- **El mensaje de cada `assert`** es la instancia que falló: el punto de partida para depurar. Haga la prueba de fuego: cambie `bisect_right` por `bisect_left` y vuelva a ejecutar. La verificación debe fallar.
 
 ---
 

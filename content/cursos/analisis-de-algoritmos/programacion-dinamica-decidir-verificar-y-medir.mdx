@@ -138,7 +138,103 @@ Si tu factor medido se aleja mucho del esperado, hay algo que explicar: tamaños
 
 **Extrapolar** es usar la forma de la curva, no una regla de tres a ciegas. Un ejemplo con números inventados: supón que `cortar_tabulado` tarda 0,05 s con una varilla de 1.000 m, y el problema real tiene varillas de 8.000 m. Como el costo es Θ(n²), multiplicar `n` por 8 multiplica el trabajo por 8² = 64: ≈ 3,2 s por varilla. Si hay que resolver 1.000 varillas, ≈ 3.200 s, unos 53 minutos. La **energía** es potencia por tiempo: en un equipo de 200 W, 3.200 s ≈ 0,89 h, y 0,2 kW × 0,89 h ≈ 0,18 kWh. La versión ingenua con 8.000 m haría 2⁸⁰⁰⁰ llamadas por varilla: no es "lenta", es que **no termina**, y eso se dice tal cual.
 
-Para graficar, sigue el mismo modelo de la gráfica de la lección Fundamentos de programación dinámica: las dos estrategias **en los mismos ejes**, con título, ejes rotulados con unidades y leyenda, y un panel en escala logarítmica cuando una curva aplasta a la otra.
+Si el proceso corre una vez por noche, la proyección a un año es multiplicar: 365 × 0,18 kWh ≈ 66 kWh. Para comparar dos estrategias (por ejemplo, la regla que se usa hoy y la tuya), haz la misma cuenta con cada una y resta: la diferencia anual es lo que se ahorra o se gasta de más por cambiar de estrategia.
+
+## Graficar el tiempo de las dos versiones
+
+La gráfica de la lección Fundamentos de programación dinámica contaba **llamadas**. Ahora se grafica el **tiempo** medido, que es lo que te piden comparar cuando una versión es exhaustiva. Hay una dificultad: la versión ingenua solo termina con varillas cortas, y la tabulación apenas se mueve en ese rango. Por eso la gráfica tiene dos paneles:
+
+- **Izquierda:** las dos versiones **en los mismos ejes**, solo en los tamaños donde la ingenua todavía termina (de 10 a 20 m), con el eje vertical en escala logarítmica.
+- **Derecha:** solo la tabulación, llevada a varillas mucho más largas (de 50 a 1.600 m). Son los tamaños que sostienen la extrapolación.
+
+Escribe este código en el mismo archivo: reutiliza `Contador`, `cortar_ingenuo` y `cortar_tabulado` de la lección Fundamentos de programación dinámica, y `medir` de esta lección.
+
+```python
+import matplotlib.pyplot as plt
+
+
+def precios_de_prueba(n_maximo: int) -> list[int]:
+    """Genera una tabla de precios para varillas de hasta n_maximo metros.
+
+    Args:
+        n_maximo: Longitud máxima de varilla que se va a medir.
+
+    Returns:
+        Una lista con precios[0] = 0 y precios[i] = 3 * i.
+    """
+    precios = [0]
+    for i in range(1, n_maximo + 1):
+        precios.append(3 * i)
+    return precios
+
+
+def medir_tiempos(
+    tamanos: list[int], limite_ingenua: int
+) -> tuple[list[float], list[float]]:
+    """Mide el tiempo medio de la tabulación y de la versión ingenua.
+
+    Args:
+        tamanos: Longitudes de varilla a medir, en orden creciente.
+        limite_ingenua: Longitud máxima en la que se ejecuta la ingenua.
+
+    Returns:
+        Dos listas en milisegundos: los tiempos de la tabulación (uno por
+        tamaño) y los de la ingenua (solo hasta limite_ingenua).
+    """
+    precios = precios_de_prueba(tamanos[-1])  # los datos, ANTES de medir
+    tabulada: list[float] = []
+    ingenua: list[float] = []
+    for n in tamanos:
+        tiempo = medir(lambda: cortar_tabulado(precios, n), 5)
+        tabulada.append(tiempo * 1000)
+        if n <= limite_ingenua:
+            tiempo = medir(lambda: cortar_ingenuo(precios, n, Contador()), 3)
+            ingenua.append(tiempo * 1000)
+    return tabulada, ingenua
+
+
+def graficar_tiempos(archivo: str) -> None:
+    """Grafica el tiempo de ambas versiones y el de la tabulación sola.
+
+    Args:
+        archivo: Ruta del archivo PNG donde se guarda la gráfica.
+    """
+    comunes = list(range(10, 21))  # donde la ingenua todavía termina
+    tabulada, ingenua = medir_tiempos(comunes, limite_ingenua=20)
+    grandes = [50, 100, 200, 400, 800, 1600]  # solo la tabulación
+    solo_tabulada, _ = medir_tiempos(grandes, limite_ingenua=0)
+    figura, (juntas, sola) = plt.subplots(1, 2, figsize=(11, 4.5))
+    juntas.plot(comunes, ingenua, "o-", label="Ingenua (exhaustiva): Θ(2ⁿ)")
+    juntas.plot(comunes, tabulada, "s-", label="Tabulación: Θ(n²)")
+    juntas.set_yscale("log")
+    juntas.set_title("Las dos versiones, donde ambas terminan")
+    juntas.set_ylabel("Tiempo medio (ms, escala logarítmica)")
+    sola.plot(grandes, solo_tabulada, "s-", color="tab:orange",
+              label="Tabulación: Θ(n²)")
+    sola.set_title("Solo la tabulación, con varillas largas")
+    sola.set_ylabel("Tiempo medio (ms)")
+    for eje in (juntas, sola):
+        eje.set_xlabel("Longitud de la varilla n (metros)")
+        eje.grid(True, alpha=0.3)
+        eje.legend()
+    figura.suptitle("Corte de varillas: tiempo medido con perf_counter")
+    figura.tight_layout()
+    figura.savefig(archivo, dpi=150)
+    plt.show()
+
+
+graficar_tiempos("tiempo_vs_n.png")
+```
+
+En un portátil corriente se ve así (tus milisegundos serán otros; la forma de las curvas, no):
+
+![Dos paneles de tiempo medido. A la izquierda, en escala logarítmica, la versión ingenua sube en línea recta de 0,07 ms con 10 m a unos 75 ms con 20 m, mientras la tabulación queda por debajo de 0,01 ms. A la derecha, la tabulación sola crece como una parábola, de casi 0 ms con 50 m a unos 34 ms con 1.600 m](/documentos/analisis-de-algoritmos/lecciones/programacion-dinamica-decidir-verificar-y-medir/tiempo-ingenua-vs-tabulada.png)
+
+- **Izquierda.** La ingenua es una **recta** en escala logarítmica: su tiempo se duplica con cada metro, la huella de Θ(2ⁿ). Con 20 m ya tarda unas 10.000 veces más que la tabulación.
+- **Derecha.** La tabulación dibuja una **parábola**. Lee el factor al duplicar en la propia gráfica: de 800 a 1.600 m pasa de unos 8 a unos 34 ms, ≈ 4, la huella de Θ(n²).
+- **Fíjate en lo que no se hace:** la ingenua no aparece en el panel derecho porque con 50 m no terminaría. Una curva que se corta no es un error de la gráfica; es el dato.
+
+Cuida lo mismo que en la gráfica de llamadas: título, ejes rotulados con unidades, leyenda y la escala logarítmica cuando una curva aplasta a la otra. Los datos se generan **antes** de medir y `medir` cronometra solo la función.
 
 ## Errores frecuentes al programar una programación dinámica
 
@@ -161,7 +257,8 @@ Para graficar, sigue el mismo modelo de la gráfica de la lección Fundamentos d
 | Contar operaciones       | Un `Contador` compartido, una suma por operación elemental                   |
 | Medir tiempo             | `time.perf_counter()` solo alrededor del algoritmo, con repeticiones         |
 | Analizar                 | Factor al duplicar el tamaño, comparado con el de la complejidad esperada    |
-| Extrapolar               | Con la forma de la curva; energía = potencia (kW) × tiempo (h)               |
+| Extrapolar               | Con la forma de la curva; energía = potencia (kW) × tiempo (h); × 365 al año  |
+| Graficar                 | Ambas en los mismos ejes donde las dos terminan; la eficiente sola, más lejos |
 
 ## Síntesis
 
@@ -171,6 +268,7 @@ Para graficar, sigue el mismo modelo de la gráfica de la lección Fundamentos d
 - **Verificar:** la exhaustiva es el juez; semilla fija, casos límite y comprobar también la reconstrucción.
 - **Medir:** operaciones con un contador, tiempo con `perf_counter`, factor al duplicar.
 - **Extrapolar:** según la forma de la curva; una exhaustiva que no termina se dice tal cual.
+- **Graficar:** las dos versiones en los mismos ejes donde ambas terminan, y la eficiente sola con tamaños grandes.
 - **Errores frecuentes:** índices, orden de llenado, casos olvidados, empates y recursión profunda.
 
 Lecturas: Cormen et al., _Introduction to Algorithms_, 3.ª ed., secciones 15.3 (_Elements of dynamic programming_) y 16.2 (_Elements of the greedy strategy_).
