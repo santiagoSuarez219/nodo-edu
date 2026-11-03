@@ -25,7 +25,7 @@ Hay dos maneras de jugar. Si pregunta 1, luego 2, luego 3 y así seguido, en el 
 
 🛑 **Pausa:** ¿qué número preguntas primero y por qué? Y si te responden «menor», ¿qué números acabas de descartar?
 
-Primero el 50, porque es el que deja menos números pendientes en el peor de los dos casos. Con «menor» descartaste del 50 al 100 completos: 51 números de un golpe. Esa idea de descartar **todo un lado** de una sola pregunta es la que vamos a convertir en estructura de datos.
+Primero el 50, uno de los dos números del medio (el 51 sería igual de bueno): en el peor de los dos casos deja solo 50 números pendientes. Con «menor» descartaste del 50 al 100 completos: 51 números de un golpe. Esa idea de descartar **todo un lado** de una sola pregunta es la que vamos a convertir en estructura de datos.
 
 Para trabajar a mano usaremos siete tarjetas sobre la mesa: 20, 30, 40, 50, 60, 70 y 80. La primera pregunta es siempre el 50.
 
@@ -142,7 +142,7 @@ in-orden: 20 30 60 50 70
 
 El culpable es el árbol: no es un BST. El 60 cuelga a la derecha del 30 y **cumple con su padre**, pero está en el subárbol izquierdo del 50 y es mayor que 50. Cumplir con el padre no basta: la regla es sobre **todo** el subárbol. La pista visible es el in-orden: `20 30 60 50 70` no sale ordenado.
 
-Un BST nunca se arma así si lo construye `insertar`, porque `insertar` siempre empieza por la raíz y compara con cada ancestro en el camino: el 60 se habría comparado con el 50 antes de llegar al 30.
+Un BST nunca se arma así si lo construye `insertar`, porque `insertar` siempre empieza por la raíz y compara con cada ancestro en el camino: el 60 se habría comparado con el 50 y habría bajado por la derecha, sin pasar nunca por el 30.
 
 ## Insertar: buscar y colgar donde falló la búsqueda
 
@@ -255,12 +255,12 @@ Veamos los mismos siete datos, pero llegando ya ordenados: primero el 20 y luego
 
 ```mermaid
 flowchart TB
-  n20["20"] -->|"der"| n30["30"]
-  n30 -->|"der"| n40["40"]
-  n40 -->|"der"| n50["50"]
-  n50 -->|"der"| n60["60"]
-  n60 -->|"der"| n70["70"]
-  n70 -->|"der"| n80["80"]
+  n20["20"] -->|"mayor"| n30["30"]
+  n30 -->|"mayor"| n40["40"]
+  n40 -->|"mayor"| n50["50"]
+  n50 -->|"mayor"| n60["60"]
+  n60 -->|"mayor"| n70["70"]
+  n70 -->|"mayor"| n80["80"]
 ```
 
 Es el árbol **degenerado** de la lección Conceptos y TAD árbol binario, el que «puede ser alto y flaco»: cada nodo tiene un solo hijo y el árbol es una lista enlazada disfrazada. Reemplaza lo que sigue a la construcción y constrúyelo junto al otro:
@@ -294,7 +294,7 @@ false 3
 in-orden: 20 30 40 50 60 70 80 
 ```
 
-El in-orden es igual de ordenado: la regla se cumple en los dos árboles, pero el costo no. Buscar el 80 cuesta 7 comparaciones en el degenerado, y buscar el 55, que no está, cuesta 5 frente a 3 en el equilibrado. Para medir todos los datos, añade al final de `main` un ciclo que busca cada uno de los siete en ambos árboles y suma las comparaciones:
+El in-orden es igual de ordenado: la regla se cumple en los dos árboles, pero el costo no es el mismo. Buscar el 80 cuesta 7 comparaciones en el degenerado, y buscar el 55, que no está, cuesta 5 frente a 3 en el equilibrado. Para medir todos los datos, añade al final de `main` un ciclo que busca cada uno de los siete en ambos árboles y suma las comparaciones:
 
 ```java
         int[] datos = {20, 30, 40, 50, 60, 70, 80};
@@ -321,7 +321,7 @@ degenerado: 28
 
 El equilibrado suma `1 + 2 + 2 + 3 + 3 + 3 + 3 = 17`; el degenerado, `1 + 2 + ... + 7 = 28`. Y no todo es peor en el degenerado: buscar el 20 cuesta 1 allí y 3 en el equilibrado. Lo que importa es el peor caso y el promedio.
 
-Lo que cuenta es la **altura** `h` del árbol: en el peor caso, buscar o insertar hace `h + 1` comparaciones, es decir, **O(h)**. Con mil datos insertados desde la mediana hacia afuera, el árbol sale de altura 9, que según la lección Conceptos y TAD árbol binario admite hasta 1023 nodos, y la peor búsqueda cuesta 10 comparaciones. Con los mil datos llegando ordenados, la altura es 999 y la peor búsqueda cuesta 1000. En el primer caso `h` crece como `log n`, la misma idea de la búsqueda binaria en la lección Notación Big O y análisis de complejidad; en el segundo, como `n`. Un BST es rápido **si está equilibrado**, y con este `insertar` el orden de llegada de los datos decide si lo está.
+Lo que cuenta es la **altura** `h` del árbol: en el peor caso, buscar o insertar hace `h + 1` comparaciones, es decir, **O(h)**. Con mil datos insertados eligiendo siempre la mitad de lo que queda (primero la mediana y luego la mediana de cada mitad, como en el juego), el árbol sale de altura 9, que según la lección Conceptos y TAD árbol binario admite hasta 1023 nodos, y la peor búsqueda cuesta 10 comparaciones. Con los mil datos llegando ordenados, la altura es 999 y la peor búsqueda cuesta 1000. En el primer caso `h` crece como `log n`, la misma idea de la búsqueda binaria en la lección Notación Big O y análisis de complejidad; en el segundo, como `n`. Un BST es rápido **si está equilibrado**, y con este `insertar` el orden de llegada de los datos decide si lo está.
 
 ## Resumen operativo
 

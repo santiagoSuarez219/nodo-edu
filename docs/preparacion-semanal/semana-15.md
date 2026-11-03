@@ -1,7 +1,7 @@
 # Semana 15 — 9–15 de noviembre
 
 **Rama:** `feat/semana-15-analisis-de-algoritmos` (AA) · `feat/semana-15-programacion-cientifica` (PC) · `feat/semana-15-estructuras-de-datos` (ED; su estado está en la sección «Ronda — `estructuras-de-datos`», más abajo)
-**Estado:** AA: ✅ Material y cuestionarios listos en desarrollo / ⬜ Desplegada · PC: ✅ **Desplegada y abierta en producción (2026-10-28)**
+**Estado:** AA: ✅ Material y cuestionarios listos en desarrollo / ⬜ Desplegada · PC: ✅ **Desplegada y abierta en producción (2026-10-28)** · ED: ✅ Material y cuestionario listos en desarrollo / ⬜ Mergeada y desplegada
 
 ---
 
@@ -294,12 +294,13 @@ No aplica.
 
 - Se quitó `compareTo` y `Comparable` a pedido del usuario: `buscar` e `insertar` trabajan sobre `NodoArbol<Integer>` con `int dato` y comparan con `==` y `<`. Se eliminó la sección «Comparar datos» (la lección pasó de 11 a 10 secciones `##` y de 350 a 343 líneas), y el `summary` pasó de "con `compareTo`" a "sobre enteros", en el frontmatter y en el registro — **motivo:** el `summary` no podía seguir prometiendo `compareTo`; es el único cambio al registro que el usuario no pidió explícitamente.
 - El contador `comparaciones` suma una por nodo visitado, no por el árbol vacío — **motivo:** definición única y verificable; con ella las sumas de las siete búsquedas son 17 (equilibrado) y 28 (degenerado).
-- `NodoArbol<T>` se reutiliza sin modificarlo; `insertar` necesita un árbol con raíz y el `IllegalStateException` de la lección Inserción y recorridos nunca salta — **motivo:** no tocar la lección anterior.
+- `NodoArbol<T>` se reutiliza sin modificarlo; `insertar` necesita un árbol con raíz y el `IllegalStateException` de la lección Inserción y recorridos nunca salta — **motivo:** no tocar la lección Inserción y recorridos.
 - Duplicados: `insertar` los ignora y devuelve `false` — **motivo:** un BST de este curso es un conjunto de claves; aprobado por el usuario.
 - Votación movida a no revelar nada antes: se quitó la frase "sin pasar por ninguna regla" de su sección, que adelantaba que el árbol podía no cumplir la regla — **motivo:** detectado al revisar la lección.
 - Se retiró la fila «In-orden (lección anterior) — O(n)» del Resumen operativo, que el agente añadió fuera del plan — **motivo:** no estaba en lo aprobado.
 - «La lección anterior» sin título se reemplazó por «la lección Inserción y recorridos» en dos líneas — **motivo:** hallazgo del checklist E7, defecto señalado en revisiones anteriores.
 - E4 y E6 se preguntaron y confirmaron al inicio de la ronda.
+- Tras la primera revisión se corrigió la frase de las mil claves («desde la mediana hacia afuera» daba altura 500, no 9; ahora «primero la mediana y luego la mediana de cada mitad, como en el juego»), el «deja menos números» del 50 (el 51 empata), la frase sobre el 60 que sugería llegar al 30, una frase mal construida y las aristas del degenerado, que ahora dicen «mayor» como en el primer diagrama — **motivo:** hallazgos de la revisión; el bloqueante afirmaba una cifra falsa sobre el orden de inserción.
 - Las salidas y cifras se verificaron con Java 17 (el entorno no tiene Java 21): los 10 bloques `java` se reconstruyeron desde la lección y las 7 comprobaciones coinciden byte a byte con los 6 bloques `text`.
 
 ### Verificación (E7)
@@ -309,7 +310,7 @@ No aplica.
 - [x] Checklist de `lesson-authoring` §8 recorrido
 - [x] `summary` presente en frontmatter **y** en registro TS
 - [x] Coherencia cruzada lección ↔ cuestionario (salidas, contadores y alturas calculados con Java 17)
-- [ ] `@reviewer`: pendiente (E9)
+- [ ] `@reviewer`: primera revisión CAMBIOS REQUERIDOS (1 bloqueante, 4 menores, 4 sugerencias); corregidos en un commit posterior, pendiente la segunda revisión
 - [ ] Render en navegador (los dos diagramas del árbol): pendiente, lo comprueba el docente
 
 ### Despliegue
@@ -329,7 +330,8 @@ No aplica.
 ### Pendientes
 
 - Comprobar en el navegador que los dos diagramas del árbol (equilibrado y degenerado) se renderizan (la sintaxis ya está validada).
-- Actualizar `info.md` (líneas 501 y 507) para que coincidan con los topics del registro, o autorizar a Claude a hacerlo.
+- Actualizar `info.md` para que coincida con el registro, o autorizar a Claude a hacerlo: las líneas 501 y 507 (de las sesiones S14 T1 y S14 T2) y, en la S15 T1, el bullet «Efecto de un árbol degenerado sobre la complejidad» (línea 521), que no tiene topic porque se decidió no crear un cuarto.
+- Fuera de esta ronda: `notacion-big-o-y-analisis-de-complejidad.mdx:242` aún marca la fila del BST como «pendiente — semana 15»; conviene actualizarla en una ronda futura.
 - La Semana 13 (recursión sobre listas; riesgos, límites y backtracking) sigue sin lecciones registradas.
 - Decidir aparte los laboratorios P pendientes, incluido el del viernes 13 de noviembre.
 - D7: marcar la lección como vista en clase del grupo que la dicte, después de la sesión.
