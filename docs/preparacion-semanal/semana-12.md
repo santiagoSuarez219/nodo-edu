@@ -214,3 +214,92 @@ No aplica.
 - Revisión (`@reviewer`, APROBADO): aplicadas 3 correcciones menores (`memory usage` igualado a 2.9 KB, nota `str`/`object` y primera línea de `info()`, sin nombrar la lección futura). La semana 13 debe partir sabiendo que `isna().sum()` ya se mostró.
 - Resolver la P3 del cuestionario si se prefiere mostrar la salida de pandas 2.
 - Hay una lección más de pandas pendiente (`filtrado-agregacion-y-limpieza-de-datos`, semana 13), hoy stub.
+
+---
+
+## Ronda — `estructuras-de-datos` (2026-11-03)
+
+**Rama:** `feat/semana-12-estructuras-de-datos`
+**Estado:** ✅ Material y cuestionario listos en desarrollo / ⬜ Mergeada a `development` / ⬜ Desplegada y abierta
+
+**Alcance confirmado por el usuario:** Sesión T1 (jueves 22 de octubre), solo
+la lección `fundamentos-de-recursividad`. **Excluidas:** T2 (algoritmos
+recursivos clásicos), el laboratorio P y la recursión sobre listas (Semana 13).
+La ronda es posterior a la fecha de la sesión; el cronograma no se tocó.
+
+### Sesiones cubiertas
+
+| Sesión | Fecha | Tema | ★/◇ |
+|---|---|---|---|
+| T1 | jue. 22 oct | Caso base y caso recursivo; pila de llamadas; prueba de escritorio | |
+
+### Etapas y aprobaciones
+
+| Etapa | Resultado | Aprobada por el usuario |
+|---|---|---|
+| E2 · Plan de lección | Aprobado (ejemplo, frontmatter, diagrama y reto C confirmados) | ✅ |
+| E3 · Lección `.mdx` + registro TS | `fundamentos-de-recursividad` | ✅ |
+| E4 · Apuntes del docente | **No producidos:** la lección es el guion de la clase en vivo | ⬜ No se preguntó explícitamente; se omitió al pasar el usuario a E5 |
+| E5 · Cuestionario de cierre | Propuesto: 6 preguntas → 6 aprobadas, más la keyword `pila-de-llamadas` | ✅ |
+| E6 · Guía del estudiante | No aplica — sesión en vivo | ⬜ No se preguntó explícitamente; se omitió al pasar el usuario a E7 |
+| E6 · Quiz A/B/C | No aplica — la semana no lleva ★ en esta sesión | ⬜ No se preguntó explícitamente; se omitió al pasar el usuario a E7 |
+
+### Artefactos producidos
+
+| Artefacto | Ruta | Publicado |
+|---|---|---|
+| Lección teórica (guion de clase en vivo) | `content/cursos/estructuras-de-datos/fundamentos-de-recursividad.mdx` | ⬜ |
+| Registro TS | `lib/courses/data/estructuras-de-datos.ts` (`order: 29`, solo se añadió `summary`) | — |
+
+### Cuestionario de cierre
+
+| Lección | Entorno | IDs de preguntas | Publicadas | Montadas (`list_lesson_questions`) |
+|---|---|---|---|---|
+| `fundamentos-de-recursividad` | desarrollo | `a45100d3-79a8-484b-a817-cb3900a6e53b`, `c9649fd5-fefe-4041-a3fc-383a83973221`, `33ee250b-1890-45d8-b7ff-1052772b799c`, `e4102e7f-ef2c-4b36-b681-5702fd5e0d44`, `18dc498c-decb-4c2f-8a62-4850f2b946c7`, `a566fc9d-72e1-4a47-8345-1611ab41468f` (P1–P6, en ese orden) | ✅ | ✅ 6/6 |
+| `fundamentos-de-recursividad` | **producción** | — | ⬜ | ⬜ |
+
+> Las preguntas **no viajan con el deploy**: se recrean en producción en D3,
+> incluida la keyword nueva `pila-de-llamadas` (no existe allá). P3 admite
+> varias correctas (casillas). P5 y P6 retoman los errores planeados 2 y 3 de
+> la clase; son consolidación posterior, no lectura previa.
+
+### Quiz calificable A/B/C
+
+No aplica.
+
+### Decisiones tomadas por Claude en nombre del docente
+
+- Frontmatter `presentation: true` y `type: "Lección guion de clase en vivo"`, sin formalizar la variante en `lesson-authoring` — **motivo:** el usuario eligió esta opción.
+- "Dónde se rompe la analogía" quedó como párrafo dentro del Error planeado 1, no como `##` propio — **motivo:** evitar duplicar el error; el usuario no lo objetó al aprobar.
+- La lección tiene 363 líneas y 15 secciones `##`, más que el plan — **motivo:** Resumen y Síntesis separados, "Qué sigue" y votación como secciones propias.
+- E4 y E6 se omitieron al pasar el usuario a E5/E7, sin pregunta explícita — **motivo:** la lección es el guion de la clase; reversible pidiendo apuntes o guía.
+- La lección no incluye la sección «¿Dónde aparece en tu proyecto?» — **motivo:** lo propuso el diseñador y el usuario aprobó el plan; la aplicación al proyecto de aula llega en la Semana 13.
+
+### Verificación (E7)
+
+- [x] `npm run build` en verde
+- [x] `npm run lint` en verde (0 errores; 7 warnings preexistentes en archivos ajenos)
+- [x] Checklist de `lesson-authoring` §8 recorrido
+- [x] `summary` presente en frontmatter **y** en registro TS
+- [x] Coherencia cruzada lección ↔ cuestionario (P6 y la frase del `return` compilados con `javac`)
+- [ ] `@reviewer`: pendiente (E9)
+- [ ] Render en navegador (diagrama de secuencia): pendiente, lo comprueba el docente
+
+### Despliegue
+
+| Paso | Estado | Fecha / detalle |
+|---|---|---|
+| D0 · Alcance y checklist pre-despliegue | ⬜ | |
+| D1 · Lecciones nuevas cerradas por adelantado | ⬜ | |
+| D2 · Merge a `main` y deploy en Vercel | ⬜ | |
+| D3 · Banco de preguntas replicado a producción | ⬜ | keyword `pila-de-llamadas` + 6 preguntas |
+| D4 · Lecciones abiertas a los estudiantes | ⬜ | estructuras-de-datos → `fundamentos-de-recursividad` |
+| D5 · Verificación end-to-end en producción | ⬜ | |
+| D6 · Bitácora cerrada y rama `deploy/` borrada | ⬜ | |
+
+- [ ] Verificado que las lecciones de semanas futuras siguen **cerradas**
+
+### Pendientes
+
+- Comprobar en el navegador que el `sequenceDiagram` de la pila de llamadas se renderiza.
+- D7: marcar la lección como vista en clase del grupo que la dicte, después de la sesión.
