@@ -194,8 +194,11 @@ o proyecto). Reemplaza a la variante "cotidiano → concepto" en estos puntos:
 - **Código ejecutable y verificado:** los bloques son acumulativos en un mismo
   archivo (decirlo al inicio) y cada salida, tabla o cifra que se cite sale de
   ejecutarlos. Si la cifra depende de la máquina (tiempos), se dice; los
-  conteos no varían. En `analisis-de-algoritmos`: **sin comprensiones de
-  lista, diccionario ni generadores**; ciclos clásicos.
+  conteos no varían. En `analisis-de-algoritmos`: **solo Python básico**,
+  lo visto en "Sintaxis de Python". Sin comprensiones, `lambda`,
+  `sorted(key=...)`, funciones anidadas o pasadas como argumento, rebanadas
+  (`s[:i]`), `x if c else y` ni `| None`; ciclos clásicos. Para ordenar, una
+  lista de tuplas con `.sort()` (el criterio de primero).
 - **Lo que reemplaza a la clase:** trazas a mano antes del código, errores
   planeados como secciones ("Cuidado con el borde"), retos con `<Tabs>` de
   `Pista` y `Solución`, tablas medidas con factor al duplicar y gráficas

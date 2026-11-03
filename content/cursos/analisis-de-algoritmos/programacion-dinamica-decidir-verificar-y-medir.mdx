@@ -70,7 +70,7 @@ def verificar_cortes(casos: int = 200, semilla: int = 2026) -> None:
         for _ in range(n):
             precios.append(rng.randint(1, 30))  # precios al azar
         esperado = cortar_ingenuo(precios, n, Contador())  # el juez
-        assert cortar_memo(precios, n, Contador()) == esperado, precios
+        assert cortar_memo(precios, n, Contador(), {}) == esperado, precios
         r, s = cortar_tabulado(precios, n)
         assert r[n] == esperado, precios
         tramos = reconstruir_cortes(s, n)
@@ -98,18 +98,18 @@ Una advertencia honesta: aquí el juez usa la misma recurrencia que las versione
 
 ## Medir: tiempo, operaciones y extrapolación
 
-Para contrastar la teoría con la realidad se miden dos cosas: el **tiempo** y el **número de operaciones elementales**. El tiempo depende de la máquina; las operaciones, no. Un contador propio basta: es la clase `Contador` que ya copiaste de la lección Fundamentos de programación dinámica. Agrega la función que mide el tiempo:
+Para contrastar la teoría con la realidad se miden dos cosas: el **tiempo** y el **número de operaciones elementales**. El tiempo depende de la máquina; las operaciones, no. Las operaciones se cuentan con la clase `Contador` que ya copiaste de la lección Fundamentos de programación dinámica. Para el tiempo, `time.perf_counter()` da la hora con mucha precisión: se toma antes y después de ejecutar el algoritmo y se resta. Como una sola ejecución es muy ruidosa, se repite varias veces y se promedia. Estas dos funciones miden las dos versiones del corte de varillas:
 
 ```python
 import time
-from collections.abc import Callable
 
 
-def medir(funcion: Callable[[], object], repeticiones: int = 5) -> float:
-    """Mide el tiempo medio de ejecución de una función sin argumentos.
+def tiempo_tabulado(precios: list[int], n: int, repeticiones: int) -> float:
+    """Mide el tiempo medio de cortar_tabulado.
 
     Args:
-        funcion: La función a cronometrar (los datos ya deben existir).
+        precios: Tabla de precios, creada ANTES de medir.
+        n: Longitud de la varilla.
         repeticiones: Cuántas veces se ejecuta para promediar el ruido.
 
     Returns:
@@ -118,12 +118,32 @@ def medir(funcion: Callable[[], object], repeticiones: int = 5) -> float:
     total = 0.0
     for _ in range(repeticiones):
         inicio = time.perf_counter()
-        funcion()
+        cortar_tabulado(precios, n)  # solo esto queda dentro del cronómetro
+        total += time.perf_counter() - inicio
+    return total / repeticiones
+
+
+def tiempo_ingenuo(precios: list[int], n: int, repeticiones: int) -> float:
+    """Mide el tiempo medio de cortar_ingenuo.
+
+    Args:
+        precios: Tabla de precios, creada ANTES de medir.
+        n: Longitud de la varilla.
+        repeticiones: Cuántas veces se ejecuta para promediar el ruido.
+
+    Returns:
+        El tiempo medio en segundos.
+    """
+    total = 0.0
+    for _ in range(repeticiones):
+        contador = Contador()
+        inicio = time.perf_counter()
+        cortar_ingenuo(precios, n, contador)
         total += time.perf_counter() - inicio
     return total / repeticiones
 ```
 
-`cortar_ingenuo` y `cortar_memo` ya traen el contador desde la lección Fundamentos de programación dinámica. Para contar en `cortar_tabulado`, agregarías un parámetro `contador: Contador` y la línea `contador.total += 1` dentro del ciclo interno, una por cada corte probado. Para cronometrar, genera los datos **antes** y pasa una función sin argumentos: `medir(lambda: cortar_tabulado(precios, 1000))`. Así no mides la generación.
+`cortar_ingenuo` y `cortar_memo` ya traen el contador desde la lección Fundamentos de programación dinámica. Para contar en `cortar_tabulado`, agregarías un parámetro `contador: Contador` y la línea `contador.total += 1` dentro del ciclo interno, una por cada corte probado. Fíjate en que los precios se crean **antes** de llamar a estas funciones: así no mides la generación de los datos, solo el algoritmo.
 
 La herramienta de análisis más útil es el **factor al duplicar**: mide en un tamaño y en el doble, y divide. Cada complejidad deja una huella:
 
@@ -147,7 +167,7 @@ La gráfica de la lección Fundamentos de programación dinámica contaba **llam
 - **Izquierda:** las dos versiones **en los mismos ejes**, solo en los tamaños donde la ingenua todavía termina (de 10 a 20 m), con el eje vertical en escala logarítmica.
 - **Derecha:** solo la tabulación, llevada a varillas mucho más largas (de 50 a 1.600 m). Son los tamaños que sostienen la extrapolación.
 
-Escribe este código en el mismo archivo: reutiliza `Contador`, `cortar_ingenuo` y `cortar_tabulado` de la lección Fundamentos de programación dinámica, y `medir` de esta lección.
+Escribe este código en el mismo archivo: reutiliza `Contador`, `cortar_ingenuo` y `cortar_tabulado` de la lección Fundamentos de programación dinámica, y `tiempo_tabulado` y `tiempo_ingenuo` de esta lección.
 
 ```python
 import matplotlib.pyplot as plt
@@ -185,10 +205,10 @@ def medir_tiempos(
     tabulada: list[float] = []
     ingenua: list[float] = []
     for n in tamanos:
-        tiempo = medir(lambda: cortar_tabulado(precios, n), 5)
+        tiempo = tiempo_tabulado(precios, n, 5)
         tabulada.append(tiempo * 1000)
         if n <= limite_ingenua:
-            tiempo = medir(lambda: cortar_ingenuo(precios, n, Contador()), 3)
+            tiempo = tiempo_ingenuo(precios, n, 3)
             ingenua.append(tiempo * 1000)
     return tabulada, ingenua
 
@@ -203,7 +223,9 @@ def graficar_tiempos(archivo: str) -> None:
     tabulada, ingenua = medir_tiempos(comunes, limite_ingenua=20)
     grandes = [50, 100, 200, 400, 800, 1600]  # solo la tabulación
     solo_tabulada, _ = medir_tiempos(grandes, limite_ingenua=0)
-    figura, (juntas, sola) = plt.subplots(1, 2, figsize=(11, 4.5))
+    figura, ejes = plt.subplots(1, 2, figsize=(11, 4.5))  # dos paneles
+    juntas = ejes[0]
+    sola = ejes[1]
     juntas.plot(comunes, ingenua, "o-", label="Ingenua (exhaustiva): Θ(2ⁿ)")
     juntas.plot(comunes, tabulada, "s-", label="Tabulación: Θ(n²)")
     juntas.set_yscale("log")
@@ -213,7 +235,7 @@ def graficar_tiempos(archivo: str) -> None:
               label="Tabulación: Θ(n²)")
     sola.set_title("Solo la tabulación, con varillas largas")
     sola.set_ylabel("Tiempo medio (ms)")
-    for eje in (juntas, sola):
+    for eje in ejes:
         eje.set_xlabel("Longitud de la varilla n (metros)")
         eje.grid(True, alpha=0.3)
         eje.legend()
@@ -234,7 +256,7 @@ En un portátil corriente se ve así (tus milisegundos serán otros; la forma de
 - **Derecha.** La tabulación dibuja una **parábola**. Lee el factor al duplicar en la propia gráfica: de 800 a 1.600 m pasa de unos 8 a unos 34 ms, ≈ 4, la huella de Θ(n²).
 - **Fíjate en lo que no se hace:** la ingenua no aparece en el panel derecho porque con 50 m no terminaría. Una curva que se corta no es un error de la gráfica; es el dato.
 
-Cuida lo mismo que en la gráfica de llamadas: título, ejes rotulados con unidades, leyenda y la escala logarítmica cuando una curva aplasta a la otra. Los datos se generan **antes** de medir y `medir` cronometra solo la función.
+Cuida lo mismo que en la gráfica de llamadas: título, ejes rotulados con unidades, leyenda y la escala logarítmica cuando una curva aplasta a la otra. Los datos se generan **antes** de medir, y `tiempo_tabulado` y `tiempo_ingenuo` cronometran solo el algoritmo.
 
 ## Errores frecuentes al programar una programación dinámica
 
@@ -243,7 +265,7 @@ Cuida lo mismo que en la gráfica de llamadas: título, ejes rotulados con unida
 - **Olvidar casos de la recurrencia.** La varilla de longitud 0, el caso en que conviene no cortar, una longitud que no aparece en la tabla de precios: cada uno necesita su rama.
 - **Calcular el valor y olvidar la solución.** Si no guardas la decisión (o la tabla completa), después no sabes qué cortar, qué cargar o qué turnos aceptar.
 - **Empates.** Con `>` estricto te quedas con la primera opción que alcanza el máximo; con `>=`, con la última. Las dos son óptimas, pero las pruebas que comparan _qué_ se eligió (no solo el valor) pueden fallar si cambias el criterio.
-- **El diccionario por defecto** en la memoización (`memo={}`), que se comparte entre llamadas.
+- **Reutilizar el cuaderno.** Cada varilla nueva necesita un diccionario nuevo y vacío (`cortar_memo(precios, n, Contador(), {})`); si pasas uno usado con otros precios, devuelve valores viejos.
 - **Recursión demasiado profunda.** La memoización con estados de miles de niveles produce `RecursionError`; la tabulación no tiene ese límite.
 - **Confundir variantes del problema.** Poder fraccionar o no, contar intervalos o sumar sus pesos: la variante decide si basta una regla voraz.
 

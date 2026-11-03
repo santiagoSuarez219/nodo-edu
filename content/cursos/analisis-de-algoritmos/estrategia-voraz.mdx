@@ -11,12 +11,21 @@ presentation: false
 date: "2026-10-24"
 author: "Asistente de Docencia"
 summary: "Lección de estudio autónomo: con la selección de actividades, por qué probar todos los subconjuntos explota, qué reglas voraces fallan y cómo encontrar sus contraejemplos, por qué terminar primero es óptimo, cómo verificarlo contra una búsqueda exhaustiva y cómo medir su costo Θ(n log n)."
-updatedAt: "2026-11-02"
+updatedAt: "2026-11-03"
 ---
 
 > 📘 **Lección de estudio autónomo.** Este tema no tiene clase en vivo: está escrito para que lo estudies solo o con tu equipo, de principio a fin. Ten abierto un editor de Python y **ejecuta cada bloque de código** a medida que lees; cuando la lección haga una traza a mano, hazla tú primero en papel y después compara.
 
-## Antes de empezar
+## Antes de empezar: video introductorio
+
+Mira este video antes de leer. Te da la intuición general de los algoritmos voraces; la lección la convierte después en un método y en código.
+
+<YouTubeEmbed
+  id="ALtJncFD8N8"
+  title="Video introductorio a los algoritmos voraces"
+/>
+
+## Cómo está organizada esta lección
 
 Esta lección va después de **Fundamentos de programación dinámica** y antes de **Programación dinámica: decidir, verificar y medir**, que compara las dos estrategias. Calcula entre 50 y 60 minutos.
 
@@ -53,21 +62,56 @@ Fíjate en lo que se maximiza: el **número** de actividades, no las horas ocupa
 
 La solución más fácil de creer es probar **todas** las combinaciones de actividades, descartar las que tienen cruces y quedarse con la más grande. Es lenta, pero no puede equivocarse, y por eso más adelante será el **juez** de la regla voraz.
 
-Cada actividad entra o no entra en el subconjunto: con `n` actividades hay $2^n$ subconjuntos. Para recorrerlos todos sin recursión se usa un truco: los números de 0 a $2^n - 1$, escritos en binario, son exactamente esos subconjuntos. Con 3 actividades:
+### Cómo recorrer todos los subconjuntos
 
-| Número | Binario | Actividades que entran (bit en 1) |
-| ------ | ------- | --------------------------------- |
-| 0      | `000`   | ninguna                           |
-| 1      | `001`   | la 0                              |
-| 5      | `101`   | la 0 y la 2                       |
-| 7      | `111`   | las tres                          |
+Un subconjunto se decide con una pregunta por actividad: **¿entra o no entra?** Piensa en una fila de interruptores, uno por actividad: 1 si la actividad entra, 0 si no. Con 3 actividades, numeradas 0, 1 y 2, hay $2 \times 2 \times 2 = 8$ filas posibles, y cada una es un subconjunto distinto. Con `n` actividades son $2^n$.
 
-En Python, `mascara & (1 << posicion)` vale distinto de cero cuando el bit de esa posición está en 1.
+| Interruptores (actividad 0, 1, 2) | Subconjunto  |
+| --------------------------------- | ------------ |
+| `(0, 0, 0)`                       | `{}` (vacío) |
+| `(0, 0, 1)`                       | `{2}`        |
+| `(0, 1, 0)`                       | `{1}`        |
+| `(0, 1, 1)`                       | `{1, 2}`     |
+| `(1, 0, 0)`                       | `{0}`        |
+| `(1, 0, 1)`                       | `{0, 2}`     |
+| `(1, 1, 0)`                       | `{0, 1}`     |
+| `(1, 1, 1)`                       | `{0, 1, 2}`  |
 
-Un segundo truco abarata la revisión. Si las actividades se recorren **ordenadas por hora de fin**, un subconjunto no tiene cruces si cada actividad empieza cuando o después de que termina **la anterior del subconjunto**. Así basta comparar vecinas, no todas las parejas.
+No hace falta escribir esas filas a mano: la función `product` del módulo `itertools`, de la biblioteca estándar de Python, las genera todas. `product([0, 1], repeat=3)` combina tres veces las opciones 0 y 1 y entrega cada fila como una tupla, **cada una exactamente una vez**. Para saber si la actividad de la posición `posicion` entra, basta mirar `interruptores[posicion] == 1`. Compruébalo:
+
+```python
+from itertools import product
+
+for interruptores in product([0, 1], repeat=3):
+    dentro: list[int] = []
+    for posicion in range(3):
+        if interruptores[posicion] == 1:  # ¿esta actividad entra?
+            dentro.append(posicion)
+    print(interruptores, dentro)
+```
+
+```text
+(0, 0, 0) []
+(0, 0, 1) [2]
+(0, 1, 0) [1]
+(0, 1, 1) [1, 2]
+(1, 0, 0) [0]
+(1, 0, 1) [0, 2]
+(1, 1, 0) [0, 1]
+(1, 1, 1) [0, 1, 2]
+```
+
+Compara la salida con la tabla: es la misma. Con las 11 actividades de la sala, `product([0, 1], repeat=11)` entrega las 2.048 filas. `product` solo **genera las combinaciones**; decidir cuáles sirven y quedarse con la mejor lo hace tu código.
+
+### Revisar si un subconjunto tiene cruces
+
+Un segundo truco abarata la revisión. Si las actividades se recorren **ordenadas por hora de fin**, un subconjunto no tiene cruces si cada actividad empieza cuando o después de que termina **la anterior del subconjunto**. Así basta comparar cada actividad con la anterior aceptada, no todas las parejas. Por eso, en el código, el interruptor de la posición `posicion` se refiere a la actividad `orden[posicion]`: la que ocupa ese lugar al ordenar por hora de fin.
+
+Para ordenar por hora de fin se usa un recurso sencillo de Python: una lista de **tuplas** se ordena con `.sort()` mirando primero el primer valor de cada tupla y, si empatan, el segundo. La función `ordenar_por_fin` arma las parejas `(fin, índice)`, las ordena y se queda con los índices. Con las tres primeras actividades de la sala, `[(4, 0), (5, 1), (6, 2)]` ya está en orden; con fines `[9, 4, 4]` las parejas `[(9, 0), (4, 1), (4, 2)]` quedan `[(4, 1), (4, 2), (9, 0)]`, y el orden es `[1, 2, 0]`.
 
 ```python
 import time
+from itertools import product
 
 S: list[int] = [1, 3, 0, 5, 3, 5, 6, 8, 8, 2, 12]
 F: list[int] = [4, 5, 6, 7, 9, 9, 10, 11, 12, 14, 16]
@@ -100,13 +144,35 @@ def como_turnos(
     return turnos
 
 
+def ordenar_por_fin(s: list[int], f: list[int]) -> list[int]:
+    """Ordena los índices de las actividades por hora de fin.
+
+    Args:
+        s: Hora de inicio de cada actividad.
+        f: Hora de fin de cada actividad (misma longitud que s).
+
+    Returns:
+        Los índices (base 0) de la que termina primero a la que termina
+        de última; si dos terminan a la misma hora, va primero la de
+        menor índice.
+    """
+    parejas: list[tuple[int, int]] = []
+    for i in range(len(s)):
+        parejas.append((f[i], i))  # primero el fin: es lo que se ordena
+    parejas.sort()  # ordena por el primer valor; si empata, por el segundo
+    orden: list[int] = []
+    for pareja in parejas:
+        orden.append(pareja[1])  # se queda solo con el índice
+    return orden
+
+
 def seleccionar_exhaustivo(
     s: list[int], f: list[int], contador: Contador
 ) -> list[int]:
     """Halla un máximo de actividades compatibles probando todo subconjunto.
 
     Args:
-        s: Hora de inicio de cada actividad.
+        s: Hora de inicio de cada actividad (no negativa).
         f: Hora de fin de cada actividad (misma longitud que s).
         contador: Cuenta los subconjuntos explorados.
 
@@ -115,19 +181,21 @@ def seleccionar_exhaustivo(
         en orden de hora de fin.
     """
     n = len(s)
-    orden = sorted(range(n), key=lambda i: f[i])  # para comparar vecinas
+    orden = ordenar_por_fin(s, f)  # para comparar solo con la anterior
     mejor: list[int] = []
-    for mascara in range(2 ** n):  # cada número es un subconjunto
+    for interruptores in product([0, 1], repeat=n):  # un subconjunto
         contador.total += 1
         elegidas: list[int] = []
+        ultimo_fin = 0  # fin de la última actividad aceptada
         compatible = True
         for posicion in range(n):
-            if mascara & (1 << posicion):  # ¿el bit de esta posición vale 1?
+            if interruptores[posicion] == 1:  # ¿esta actividad entra?
                 i = orden[posicion]
-                if elegidas and s[i] < f[elegidas[-1]]:
-                    compatible = False  # choca con la anterior del subconjunto
+                if s[i] < ultimo_fin:  # choca con la anterior del subconjunto
+                    compatible = False
                     break
                 elegidas.append(i)
+                ultimo_fin = f[i]
         if compatible and len(elegidas) > len(mejor):
             mejor = elegidas
     return mejor
@@ -142,11 +210,11 @@ print(contador.total, "subconjuntos explorados")
 Salida:
 
 ```text
-4 [(1, 4), (5, 7), (8, 11), (12, 16)]
+4 [(3, 5), (5, 7), (8, 12), (12, 16)]
 2048 subconjuntos explorados
 ```
 
-El máximo es **4 turnos**, y para saberlo hubo que revisar $2^{11} = 2.048$ subconjuntos. Compara con lo que encontraste a mano.
+El máximo es **4 turnos**, y para saberlo hubo que revisar $2^{11} = 2.048$ subconjuntos. Compara con lo que encontraste a mano: si tus 4 turnos son otros, no importa. Puede haber **varios subconjuntos óptimos** distintos, todos con 4 turnos; la búsqueda se queda con el primero que encuentra.
 
 ### Cuánto cuesta probar todo
 
@@ -178,6 +246,22 @@ def generar_actividades(
     return s, f
 
 
+def primeras(lista: list[int], n: int) -> list[int]:
+    """Copia los n primeros elementos de una lista.
+
+    Args:
+        lista: Lista de la que se copia.
+        n: Cuántos elementos se copian, desde el principio.
+
+    Returns:
+        Una lista nueva con lista[0], lista[1], ..., lista[n - 1].
+    """
+    copia: list[int] = []
+    for k in range(n):
+        copia.append(lista[k])
+    return copia
+
+
 def tabla_exhaustiva(tamanos: list[int]) -> None:
     """Imprime subconjuntos explorados y tiempo de la búsqueda exhaustiva.
 
@@ -189,12 +273,15 @@ def tabla_exhaustiva(tamanos: list[int]) -> None:
           f"{'tiempo (s)':>10}")
     anterior = 0.0
     for n in tamanos:
-        s, f = s_todas[:n], f_todas[:n]  # las primeras n actividades
+        s = primeras(s_todas, n)  # las primeras n actividades
+        f = primeras(f_todas, n)
         contador = Contador()
         inicio = time.perf_counter()
         seleccionar_exhaustivo(s, f, contador)
         tiempo = time.perf_counter() - inicio
-        factor = f"{tiempo / anterior:.1f}" if anterior else "—"
+        factor = "—"  # la primera fila no tiene con qué compararse
+        if anterior > 0:
+            factor = f"{tiempo / anterior:.1f}"
         print(f"{n:>3} | {contador.total:>12,} | {factor:>6} | "
               f"{tiempo:>10.3f}")
         anterior = tiempo
@@ -227,14 +314,9 @@ Una **regla voraz** ordena las actividades según un criterio, las recorre una v
 - **Inicio más temprano primero:** "atiende primero a quien llega antes".
 - **Termina primero:** "libera la sala lo antes posible".
 
-Para compararlas sin repetir código, escribe un recorrido voraz **genérico** donde lo único que cambia es la clave de orden. Como el orden es arbitrario, cada actividad nueva se compara con **todas** las ya elegidas:
+Para compararlas sin repetir código, el recorrido voraz se parte en dos funciones. `ordenar_por_regla` ordena las actividades según la regla, con el mismo truco de las tuplas: arma parejas `(criterio, índice)` y las ordena. `tomar_en_orden` las recorre en ese orden y toma cada una que quepa. Como el orden puede ser cualquiera, cada actividad nueva se compara con **todas** las ya elegidas:
 
 ```python
-from collections.abc import Callable
-
-Clave = Callable[[int], tuple[int, ...]]
-
-
 def compatibles(s: list[int], f: list[int], i: int, j: int) -> bool:
     """Indica si las actividades i y j caben en la sala sin cruzarse.
 
@@ -250,20 +332,49 @@ def compatibles(s: list[int], f: list[int], i: int, j: int) -> bool:
     return s[j] >= f[i] or s[i] >= f[j]
 
 
-def voraz_con_regla(s: list[int], f: list[int], clave: Clave) -> list[int]:
-    """Recorre las actividades en el orden de una regla y toma las que caben.
+def ordenar_por_regla(s: list[int], f: list[int], regla: str) -> list[int]:
+    """Ordena los índices de las actividades según una regla voraz.
 
     Args:
         s: Hora de inicio de cada actividad.
         f: Hora de fin de cada actividad.
-        clave: Criterio de orden; recibe el índice de una actividad.
+        regla: "menor duración", "inicio más temprano" o
+            "termina primero".
+
+    Returns:
+        Los índices (base 0) en el orden de la regla; en un empate va
+        primero la de menor índice.
+    """
+    parejas: list[tuple[int, int]] = []
+    for i in range(len(s)):
+        if regla == "menor duración":
+            criterio = f[i] - s[i]
+        elif regla == "inicio más temprano":
+            criterio = s[i]
+        else:  # "termina primero"
+            criterio = f[i]
+        parejas.append((criterio, i))
+    parejas.sort()
+    orden: list[int] = []
+    for pareja in parejas:
+        orden.append(pareja[1])
+    return orden
+
+
+def tomar_en_orden(s: list[int], f: list[int], orden: list[int]) -> list[int]:
+    """Recorre las actividades en un orden dado y toma las que caben.
+
+    Args:
+        s: Hora de inicio de cada actividad.
+        f: Hora de fin de cada actividad.
+        orden: Índices de las actividades en el orden en que se revisan.
 
     Returns:
         Los índices (base 0) de las actividades elegidas, en el orden en
         que se tomaron.
     """
     elegidas: list[int] = []
-    for i in sorted(range(len(s)), key=clave):
+    for i in orden:
         cabe = True
         for j in elegidas:  # debe ser compatible con TODAS las ya elegidas
             if not compatibles(s, f, i, j):
@@ -274,42 +385,48 @@ def voraz_con_regla(s: list[int], f: list[int], clave: Clave) -> list[int]:
     return elegidas
 
 
-def reglas(s: list[int], f: list[int]) -> dict[str, Clave]:
-    """Devuelve las reglas de orden que se van a comparar.
+def voraz_con_regla(s: list[int], f: list[int], regla: str) -> list[int]:
+    """Aplica una regla voraz: ordena según la regla y toma lo que cabe.
 
     Args:
         s: Hora de inicio de cada actividad.
         f: Hora de fin de cada actividad.
+        regla: Nombre de la regla, como en ordenar_por_regla.
 
     Returns:
-        Un diccionario: nombre de la regla -> clave de orden. Los empates
-        se resuelven por el índice (gana la que aparece primero).
+        Los índices (base 0) de las actividades que elige la regla.
     """
-    return {
-        "menor duración": lambda i: (f[i] - s[i], i),
-        "inicio más temprano": lambda i: (s[i], i),
-        "termina primero": lambda i: (f[i], i),
-    }
+    orden = ordenar_por_regla(s, f, regla)
+    return tomar_en_orden(s, f, orden)
 
 
-CASOS: dict[str, tuple[list[int], list[int]]] = {
-    "A, B, C": ([0, 5, 6], [6, 7, 12]),
-    "D, E, G": ([0, 1, 3], [10, 2, 4]),
-    "Sala (11 grupos)": (S, F),
-}
+REGLAS: list[str] = [
+    "menor duración",
+    "inicio más temprano",
+    "termina primero",
+]
 
-print(f"{'caso':<17}{'óptimo':>7}{'menor duración':>16}"
-      f"{'inicio temprano':>17}{'termina primero':>17}")
-for nombre, (s, f) in CASOS.items():
-    fila = f"{nombre:<17}"
-    fila += f"{len(seleccionar_exhaustivo(s, f, Contador())):>7}"
-    anchos = [16, 17, 17]
-    columna = 0
-    for clave in reglas(s, f).values():
-        obtenido = len(voraz_con_regla(s, f, clave))
-        fila += f"{obtenido:>{anchos[columna]}}"
-        columna += 1
+
+def imprimir_fila(nombre: str, s: list[int], f: list[int]) -> None:
+    """Imprime el óptimo y lo que logra cada regla en un caso.
+
+    Args:
+        nombre: Nombre del caso, para la primera columna.
+        s: Hora de inicio de cada actividad.
+        f: Hora de fin de cada actividad.
+    """
+    optimo = len(seleccionar_exhaustivo(s, f, Contador()))
+    fila = f"{nombre:<17}{optimo:>7}"
+    for regla in REGLAS:
+        fila += f"{len(voraz_con_regla(s, f, regla)):>17}"
     print(fila)
+
+
+print(f"{'caso':<17}{'óptimo':>7}{'menor duración':>17}"
+      f"{'inicio temprano':>17}{'termina primero':>17}")
+imprimir_fila("A, B, C", [0, 5, 6], [6, 7, 12])
+imprimir_fila("D, E, G", [0, 1, 3], [10, 2, 4])
+imprimir_fila("Sala (11 grupos)", S, F)
 ```
 
 Salida:
@@ -346,7 +463,7 @@ def seleccionar_actividades(s: list[int], f: list[int]) -> list[int]:
     Returns:
         Los índices (base 0) de las actividades elegidas, en orden de fin.
     """
-    orden = sorted(range(len(s)), key=lambda i: f[i])  # Θ(n log n)
+    orden = ordenar_por_fin(s, f)  # Θ(n log n)
     elegidas: list[int] = []
     ultimo_fin = 0  # hora en que se libera la sala; ninguna hora es negativa
     for i in orden:  # Θ(n): una sola pasada
@@ -366,7 +483,7 @@ def seleccionar_con_traza(s: list[int], f: list[int]) -> list[int]:
     Returns:
         Los índices (base 0) de las actividades elegidas, en orden de fin.
     """
-    orden = sorted(range(len(s)), key=lambda i: f[i])
+    orden = ordenar_por_fin(s, f)
     elegidas: list[int] = []
     ultimo_fin = 0
     for i in orden:
@@ -423,7 +540,7 @@ def seleccionar_estricto(s: list[int], f: list[int]) -> list[int]:
     Returns:
         Los índices de las actividades elegidas (no siempre un máximo).
     """
-    orden = sorted(range(len(s)), key=lambda i: f[i])
+    orden = ordenar_por_fin(s, f)
     elegidas: list[int] = []
     ultimo_fin = 0
     for i in orden:
@@ -542,105 +659,15 @@ Detalles que importan:
 - Cada `assert` lleva la instancia como mensaje: si falla, te dice **con qué datos** falló, y ese es tu contraejemplo.
 - Haz la prueba de fuego: cambia `>=` por `>` en `seleccionar_actividades` y vuelve a ejecutar. La verificación debe fallar. Una prueba que nunca falla tampoco prueba nada.
 
-## Encontrar un contraejemplo de forma sistemática
+## Cómo encontrar un contraejemplo
 
-Los contraejemplos de las reglas que fallan no salen de la inspiración. Se buscan con un procedimiento:
+Los contraejemplos de la tabla de reglas no salen de la inspiración. Cuando una regla te parezca dudosa, sigue este procedimiento:
 
-1. Genera muchas instancias **pequeñas** al azar y compara la regla con el óptimo de la búsqueda exhaustiva.
-2. Cuando encuentres una donde la regla da menos, **quita actividades** de una en una mientras siga fallando. Así te quedas con una instancia pequeña, que se puede explicar a mano.
+1. Genera muchas instancias **pequeñas** al azar con `generar_actividades` y compara lo que elige la regla con el óptimo de `seleccionar_exhaustivo`.
+2. Cuando encuentres una donde la regla elige menos, **quita actividades** de una en una mientras siga fallando, hasta quedarte con una instancia que se pueda explicar a mano.
 3. Presenta la instancia, el resultado de la regla, el óptimo y la diferencia.
 
-```python
-def falla(s: list[int], f: list[int], regla: str) -> bool:
-    """Indica si una regla obtiene menos actividades que el óptimo.
-
-    Args:
-        s: Hora de inicio de cada actividad.
-        f: Hora de fin de cada actividad.
-        regla: Nombre de una regla del diccionario de reglas().
-
-    Returns:
-        True si la regla elige menos actividades que la exhaustiva.
-    """
-    obtenido = len(voraz_con_regla(s, f, reglas(s, f)[regla]))
-    optimo = len(seleccionar_exhaustivo(s, f, Contador()))
-    return obtenido < optimo
-
-
-def buscar_contraejemplo(
-    regla: str, intentos: int = 2000, semilla: int = 7
-) -> tuple[list[int], list[int]] | None:
-    """Busca al azar una instancia pequeña donde la regla falla.
-
-    Args:
-        regla: Nombre de una regla del diccionario de reglas().
-        intentos: Cuántas instancias aleatorias se prueban como máximo.
-        semilla: Semilla fija del generador.
-
-    Returns:
-        Una pareja (s, f) donde la regla falla, o None si no encontró.
-    """
-    azar = random.Random(semilla)
-    for _ in range(intentos):
-        n = azar.randint(2, 8)
-        s, f = generar_actividades(n, semilla=azar.randrange(10**6))
-        if falla(s, f, regla):
-            return s, f
-    return None
-
-
-def reducir(
-    s: list[int], f: list[int], regla: str
-) -> tuple[list[int], list[int]]:
-    """Quita actividades de una en una mientras la regla siga fallando.
-
-    Args:
-        s: Inicios de una instancia donde la regla falla.
-        f: Fines de la misma instancia.
-        regla: Nombre de la regla que falla.
-
-    Returns:
-        Una instancia más pequeña donde la regla sigue fallando.
-    """
-    i = 0
-    while i < len(s):
-        s_sin = s[:i] + s[i + 1:]  # la instancia sin la actividad i
-        f_sin = f[:i] + f[i + 1:]
-        if falla(s_sin, f_sin, regla):
-            s, f = s_sin, f_sin  # sigue fallando: se quita de verdad
-        else:
-            i += 1  # hace falta para fallar: se conserva
-    return s, f
-
-
-for regla in ["inicio más temprano", "menor duración", "termina primero"]:
-    hallado = buscar_contraejemplo(regla)
-    print(regla)
-    if hallado is None:
-        print("  sin contraejemplo en 2000 intentos")
-    else:
-        s, f = reducir(hallado[0], hallado[1], regla)
-        obtenido = voraz_con_regla(s, f, reglas(s, f)[regla])
-        optimo = seleccionar_exhaustivo(s, f, Contador())
-        print("  instancia:", como_turnos(s, f, list(range(len(s)))))
-        print("  la regla :", como_turnos(s, f, obtenido))
-        print("  óptimo   :", como_turnos(s, f, optimo))
-```
-
-```text
-inicio más temprano
-  instancia: [(35, 46), (26, 46), (27, 29)]
-  la regla : [(26, 46)]
-  óptimo   : [(27, 29), (35, 46)]
-menor duración
-  instancia: [(5, 15), (15, 20), (13, 16)]
-  la regla : [(13, 16)]
-  óptimo   : [(5, 15), (15, 20)]
-termina primero
-  sin contraejemplo en 2000 intentos
-```
-
-La búsqueda encuentra para cada regla equivocada una instancia de **3 actividades**, con la misma forma que los ejemplos de la tabla: un turno largo que tapa a dos cortos, o un turno corto atravesado entre dos que caben juntos. Para "termina primero" no encuentra nada, y es lo que dice la demostración.
+Aplicado a las reglas de esta lección, el procedimiento termina en instancias de **3 actividades** con la misma forma que las de la tabla. Por ejemplo, para "menor duración": con $[5, 15)$, $[15, 20)$ y $[13, 16)$ la regla toma $[13, 16)$, el más corto, y se queda con 1 turno, cuando $[5, 15)$ y $[15, 20)$ caben juntos (2). Para "termina primero" no aparece ninguno, y es lo que dice la demostración.
 
 Ojo con lo que **no** prueba esto último. No encontrar un contraejemplo no es una demostración: la garantía la da el argumento de intercambio. La búsqueda al azar sirve para **romper** reglas, no para aprobarlas.
 
@@ -648,10 +675,53 @@ Ojo con lo que **no** prueba esto último. No encontrar un contraejemplo no es u
 
 Para contrastar la teoría con la realidad se miden dos cosas: el **tiempo**, que depende de la máquina, y el **número de operaciones elementales**, que no. En un algoritmo que ordena, la operación natural es la **comparación**.
 
-Para contar las comparaciones que hace `sorted`, se le pasa una función de comparación que suma 1 en el contador cada vez que Python la llama. `cmp_to_key` la convierte en una clave de orden:
+`.sort()` no deja contar las comparaciones que hace por dentro. Para contarlas, el ordenamiento se escribe a mano: es **merge sort**, el mismo dividir y vencer que ya estudiaste, ordenando índices por hora de fin y sumando 1 en el contador en cada comparación. Merge sort también cuesta $\Theta(n \log n)$, así que la regla voraz conserva su costo:
 
 ```python
-from functools import cmp_to_key
+def ordenar_contando(
+    f: list[int], indices: list[int], contador: Contador
+) -> list[int]:
+    """Ordena índices por hora de fin con merge sort, contando comparaciones.
+
+    Args:
+        f: Hora de fin de cada actividad.
+        indices: Índices de las actividades que hay que ordenar.
+        contador: Suma 1 por cada comparación entre dos horas de fin.
+
+    Returns:
+        Los mismos índices, ordenados de la que termina primero a la que
+        termina de última.
+    """
+    if len(indices) <= 1:
+        return indices  # caso base: ya está ordenada
+    mitad = len(indices) // 2
+    izquierda: list[int] = []
+    derecha: list[int] = []
+    for k in range(len(indices)):  # dividir en dos mitades
+        if k < mitad:
+            izquierda.append(indices[k])
+        else:
+            derecha.append(indices[k])
+    izquierda = ordenar_contando(f, izquierda, contador)  # vencer
+    derecha = ordenar_contando(f, derecha, contador)
+    mezcla: list[int] = []  # combinar las dos mitades ordenadas
+    a = 0
+    b = 0
+    while a < len(izquierda) and b < len(derecha):
+        contador.total += 1  # una comparación entre dos horas de fin
+        if f[izquierda[a]] <= f[derecha[b]]:
+            mezcla.append(izquierda[a])
+            a += 1
+        else:
+            mezcla.append(derecha[b])
+            b += 1
+    while a < len(izquierda):  # lo que sobró de la izquierda
+        mezcla.append(izquierda[a])
+        a += 1
+    while b < len(derecha):  # lo que sobró de la derecha
+        mezcla.append(derecha[b])
+        b += 1
+    return mezcla
 
 
 def seleccionar_contando(
@@ -667,22 +737,7 @@ def seleccionar_contando(
     Returns:
         Los índices (base 0) de las actividades elegidas, en orden de fin.
     """
-
-    def comparar(i: int, j: int) -> int:
-        """Compara dos actividades por hora de fin y cuenta la comparación.
-
-        Args:
-            i: Índice de una actividad.
-            j: Índice de la otra actividad.
-
-        Returns:
-            Un número negativo si i termina antes que j, cero si empatan y
-            positivo si termina después.
-        """
-        contador.total += 1
-        return f[i] - f[j]
-
-    orden = sorted(range(len(s)), key=cmp_to_key(comparar))
+    orden = ordenar_contando(f, list(range(len(s))), contador)
     elegidas: list[int] = []
     ultimo_fin = 0
     for i in orden:
@@ -706,17 +761,16 @@ def tabla_voraz(tamanos: list[int], repeticiones: int = 5) -> None:
     tiempo_antes = 0.0
     for n in tamanos:
         s, f = generar_actividades(n, semilla=n)  # los datos, ANTES de medir
-        contador = Contador()
-        seleccionar_contando(s, f, contador)
         total = 0.0
         for _ in range(repeticiones):
+            contador = Contador()
             inicio = time.perf_counter()
-            seleccionar_actividades(s, f)  # se cronometra la versión normal
+            seleccionar_contando(s, f, contador)
             total += time.perf_counter() - inicio
         tiempo = total / repeticiones * 1000
         factor_c = "—"
         factor_t = "—"
-        if comparaciones_antes:
+        if comparaciones_antes > 0:
             factor_c = f"{contador.total / comparaciones_antes:.2f}"
             factor_t = f"{tiempo / tiempo_antes:.2f}"
         print(f"{n:>9,} | {contador.total:>13,} | {factor_c:>6} | "
@@ -732,126 +786,45 @@ Salida en un portátil corriente (los tiempos cambian de una máquina a otra; la
 
 | `n`     | Comparaciones | Factor | Tiempo (ms) | Factor |
 | ------- | ------------- | ------ | ----------- | ------ |
-| 1.000   | 9.649         | —      | 0,09        | —      |
-| 2.000   | 21.322        | 2,21   | 0,21        | 2,39   |
-| 4.000   | 46.648        | 2,19   | 0,45        | 2,16   |
-| 8.000   | 101.237       | 2,17   | 1,01        | 2,26   |
-| 16.000  | 218.553       | 2,16   | 2,22        | 2,21   |
-| 32.000  | 469.058       | 2,15   | 4,75        | 2,13   |
-| 64.000  | 1.001.978     | 2,14   | 10,19       | 2,15   |
-| 128.000 | 2.132.069     | 2,13   | 22,58       | 2,22   |
+| 1.000   | 9.726         | —      | 1,08        | —      |
+| 2.000   | 21.444        | 2,20   | 2,38        | 2,19   |
+| 4.000   | 46.829        | 2,18   | 5,21        | 2,19   |
+| 8.000   | 101.577       | 2,17   | 11,15       | 2,14   |
+| 16.000  | 219.277       | 2,16   | 23,90       | 2,14   |
+| 32.000  | 470.557       | 2,15   | 50,89       | 2,13   |
+| 64.000  | 1.005.055     | 2,14   | 110,89      | 2,18   |
+| 128.000 | 2.138.297     | 2,13   | 240,83      | 2,17   |
 
 Lee la tabla con la teoría al lado:
 
-- **Comparaciones.** Con 1.000 actividades son 9.649, muy cerca de $n \log_2 n \approx 9.966$. El orden domina; el recorrido solo agrega `n`.
+- **Comparaciones.** Con 1.000 actividades son 9.726, muy cerca de $n \log_2 n \approx 9.966$. El orden domina; el recorrido solo agrega `n`.
 - **Factor al duplicar.** Es "un poco más de 2", la huella de $\Theta(n \log n)$. Se puede predecir: al pasar de `n` a `2n`, $\frac{2n \log_2 (2n)}{n \log_2 n} = 2 \left(1 + \frac{1}{\log_2 n}\right)$. Con $n = 1.000$ da 2,2 y con $n = 64.000$, 2,125. Es justo lo que mide el contador.
 - **Tiempo.** Sigue el mismo factor, con algo de ruido: el sistema operativo y el costo fijo de Python mueven los milisegundos.
 
-Compara las dos tablas de la lección. La búsqueda exhaustiva con **20** actividades tarda más (0,37 s) que la regla voraz con **128.000** (0,023 s).
+Compara las dos tablas de la lección. La búsqueda exhaustiva con **20** actividades tarda más (0,37 s) que la regla voraz con **128.000** (0,24 s).
 
 ### Extrapolar y estimar la energía
 
 Extrapolar es usar la **forma de la curva**, no una regla de tres a ciegas. Un ejemplo con cifras inventadas: una universidad programa 300 salas, cada una con 2.000 solicitudes por semestre, en un servidor de 200 W.
 
-- **Regla voraz.** Con 2.000 actividades tarda unos 0,21 ms por sala (la tabla), así que las 300 salas toman unos 63 ms. La energía es potencia por tiempo: 0,2 kW × (0,063 / 3.600) h ≈ 0,0000035 kWh. Es despreciable.
+- **Regla voraz.** Con 2.000 actividades tarda unos 2,4 ms por sala (la tabla), así que las 300 salas toman unos 0,71 s. La energía es potencia por tiempo: 0,2 kW × (0,71 / 3.600) h ≈ 0,00004 kWh. Es despreciable.
 - **Búsqueda exhaustiva.** Con 2.000 actividades exploraría $2^{2000}$ subconjuntos por sala. No es "lenta": **no termina**, y eso se dice tal cual. Ni siquiera con 60 actividades sirve: $2^{40}$ veces lo que tarda con 20, más de 12.000 años.
 
 Declara siempre que son **estimaciones**: dices de qué medición partes, qué forma de curva usas y por qué.
 
-## Voraz frente a programación dinámica
+## Cuándo deja de servir la regla voraz
 
-La selección de actividades también se puede resolver con programación dinámica. Cormen la plantea con $c[i, j]$, el máximo de actividades compatibles que caben entre la actividad $i$ y la $j$:
-
-$$
-c[i, j] = \max_{k} \{\, c[i, k] + c[k, j] + 1 \,\}
-$$
-
-donde $k$ recorre las actividades que caben entre $i$ y $j$. Hay $\Theta(n^2)$ parejas $(i, j)$ y cada una prueba hasta `n` valores de $k$: $O(n^3)$. Da la misma respuesta, pero prueba todos los $k$ porque **no sabe** cuál es el bueno. La regla voraz sí lo sabe.
-
-| `n`   | $n^3$ | $n \log_2 n$ |
-| ----- | ----- | ------------ |
-| 11    | 1.331 | 38           |
-| 100   | 10⁶   | 664          |
-| 1.000 | 10⁹   | 9.966        |
-| 10⁵   | 10¹⁵  | ≈ 1,66·10⁶   |
-
-La programación dinámica no sobra: es la herramienta cuando la elección voraz **no** se cumple. Basta cambiar un poco el problema para que pase. Si cada actividad tiene un **peso** (las personas que atiende, el dinero que deja) y se quiere maximizar la suma de pesos y no el número, terminar primero ya no es óptimo. Esa variante se llama **selección de actividades ponderada** y se resuelve con programación dinámica. La lección **Programación dinámica: decidir, verificar y medir** compara las dos estrategias y te enseña a decidir entre ellas.
-
-## Reto: la regla de menos conflictos
-
-Hay una cuarta regla tentadora: **menos conflictos primero**. Se cuenta con cuántas otras actividades se cruza cada una, se ordena de menos a más conflictos y se toman las que quepan. En la sala de 11 grupos acierta: da 4.
-
-**Reto:** encuentra un conjunto de actividades donde esta regla elija menos que el óptimo. Escribe la función que cuenta conflictos y agrega la regla al diccionario de `reglas`. Después intenta primero a mano y luego con `buscar_contraejemplo` (aumenta `intentos` y el tamaño de las instancias si no encuentra). Declara cómo desempatas: el resultado puede depender de eso.
-
-<Tabs>
-<Tab label="Pista">
-
-Piensa en una **cadena óptima** de 4 turnos seguidos. Agrega turnos que no pertenezcan a ella pero que tengan tan pocos conflictos como los de la cadena, o menos, de modo que la regla los prefiera y rompan la cadena. Un turno "aislado", con pocos cruces, puede estorbar más de lo que parece. El contraejemplo necesita más de 3 actividades, así que la búsqueda al azar con instancias de 2 a 8 puede tardar en dar con él.
-
-</Tab>
-<Tab label="Solución">
-
-```python
-def conflictos(s: list[int], f: list[int], i: int) -> int:
-    """Cuenta con cuántas otras actividades se cruza la actividad i.
-
-    Args:
-        s: Hora de inicio de cada actividad.
-        f: Hora de fin de cada actividad.
-        i: Índice de la actividad.
-
-    Returns:
-        Número de actividades distintas de i que no son compatibles con i.
-    """
-    total = 0
-    for j in range(len(s)):
-        if j != i and not compatibles(s, f, i, j):
-            total += 1
-    return total
-
-
-s = [9, 0, 0, 0, 7, 2, 6, 4]
-f = [10, 1, 4, 3, 11, 5, 9, 7]
-cuenta: list[int] = []
-for i in range(len(s)):
-    cuenta.append(conflictos(s, f, i))
-print("conflictos:", cuenta)
-# Desempate: primero el que empieza antes, después el índice.
-elegidas = voraz_con_regla(s, f, lambda i: (conflictos(s, f, i), s[i], i))
-optimo = seleccionar_exhaustivo(s, f, Contador())
-print("la regla  :", como_turnos(s, f, elegidas))
-print("óptimo    :", como_turnos(s, f, optimo))
-```
-
-```text
-conflictos: [1, 2, 3, 3, 2, 3, 2, 2]
-la regla  : [(9, 10), (0, 1), (4, 7)]
-óptimo    : [(0, 1), (2, 5), (6, 9), (9, 10)]
-```
-
-El óptimo es la cadena $[0, 1), [2, 5), [6, 9), [9, 10)$, con 4 turnos. El turno $[9, 10)$ tiene un solo conflicto, así que la regla lo toma primero, y hasta ahí va bien. El daño viene después. Entre los de 2 conflictos hay un empate, y al desempatar por inicio la regla toma $[0, 1)$ y luego $[4, 7)$. Ese turno choca con $[2, 5)$ y con $[6, 9)$ y rompe la cadena: quedan 3.
-
-Este contraejemplo **depende del desempate**: si desempatas por índice, la misma regla da 4. Existen contraejemplos que fallan con cualquier desempate. Uno de 11 actividades: $[5, 8)$, $[0, 6)$, $[14, 16)$, $[3, 7)$, $[12, 16)$, $[7, 12)$, $[13, 15)$, $[1, 4)$, $[10, 14)$, $[0, 4)$, $[13, 16)$. Ahí la regla da 3 y el óptimo es 4.
-
-</Tab>
-</Tabs>
+Basta cambiar un poco el problema para que terminar primero deje de ser óptimo. Si cada actividad tiene un **peso** (las personas que atiende, el dinero que deja) y se quiere maximizar la suma de los pesos y no el número de actividades, la elección voraz ya no se cumple: un turno que termina temprano pero pesa poco puede desplazar a dos que pesan mucho. Esa variante se llama **selección de actividades ponderada** y se resuelve con programación dinámica. Saber decir qué cambio en el problema haría adecuada a la otra estrategia es la **condición contraria**, y la lección **Programación dinámica: decidir, verificar y medir** te enseña a plantearla.
 
 ## Errores frecuentes
 
 - **El signo del borde.** `>` en lugar de `>=` (o al revés) cambia qué turnos caben. Decide si dos turnos que se tocan chocan, escríbelo y pruébalo con un caso de turnos seguidos.
 - **Ordenar por el campo equivocado.** Ordenar por inicio o por duración da programas que corren y devuelven resultados creíbles, pero no óptimos.
-- **Comparar solo con la última elegida sin ordenar por fin.** El atajo de `ultimo_fin` es válido **porque** las actividades van por hora de fin. Con otro orden hay que comparar con todas las elegidas, como hace `voraz_con_regla`.
+- **Comparar solo con la última elegida sin ordenar por fin.** El atajo de `ultimo_fin` es válido **porque** las actividades van por hora de fin. Con otro orden hay que comparar con todas las elegidas, como hace `tomar_en_orden`.
 - **Devolver en otro orden del que se pide.** `seleccionar_actividades` devuelve las elegidas en orden de fin y en base 0. Si la especificación pide otro orden u otra numeración, conviértelo al final y dilo en el _docstring_.
 - **Comparar conjuntos en lugar de tamaños.** Puede haber varios óptimos distintos: verifica el valor que se optimiza y la restricción, no la lista exacta.
 - **Cronometrar la generación de datos.** Genera las instancias **antes** de medir y pon `perf_counter` solo alrededor del algoritmo.
 - **Confundir contar con pesar.** Terminar primero maximiza el **número** de actividades. Si cada una tiene un peso distinto, la regla deja de ser óptima y hace falta programación dinámica.
-
-## Para practicar
-
-Dos problemas de LeetCode con la misma idea (opcionales):
-
-- [Non-overlapping Intervals](https://leetcode.com/problems/non-overlapping-intervals/) (435): el menor número de intervalos que hay que eliminar para que los demás no se crucen. La respuesta es el total menos el resultado de la selección de actividades. Allí los intervalos que solo se tocan **no** se cruzan, como en esta lección.
-- [Minimum Number of Arrows to Burst Balloons](https://leetcode.com/problems/minimum-number-of-arrows-to-burst-balloons/) (452): se resuelve también ordenando por el extremo derecho, pero allí dos globos que se tocan **sí** se revientan con la misma flecha. El signo del borde cambia con el enunciado.
 
 ## Resumen operativo
 
@@ -877,7 +850,7 @@ Dos problemas de LeetCode con la misma idea (opcionales):
 - **Subestructura óptima:** el resto es el mismo problema, más pequeño.
 - **Verificar y romper:** la exhaustiva es el juez; la búsqueda al azar rompe reglas, pero no las aprueba.
 - **Medir:** $\Theta(n \log n)$ deja un factor de un poco más de 2 al duplicar `n`.
-- **Frente a la programación dinámica:** $O(n^3)$ con la misma respuesta. Hace falta cuando las actividades tienen pesos.
+- **Condición contraria:** si las actividades tienen pesos, terminar primero deja de ser óptimo y hace falta programación dinámica.
 
 ## ¿Y ahora? La guía de tu caso
 

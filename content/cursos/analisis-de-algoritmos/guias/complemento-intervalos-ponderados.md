@@ -139,24 +139,53 @@ Resultado: B (9–12) y E (12–15), con 10 + 9 = **19** estudiantes, igual a `M
 
 ## Intervalos ponderados en código
 
-El código separa los tres momentos que usted hizo a mano: calcular `p`, llenar `M` y reconstruir. Para calcular `p(j)` usa **búsqueda binaria** con `bisect_right` del módulo `bisect`: en una lista ordenada, `bisect_right(lista, x)` dice cuántos elementos son menores o iguales que `x`. Con los fines `[10, 11, 12, 13, 15, 16]` y el inicio de E, `bisect_right(fines, 12)` da 3: los tres fines que son 12 o menos. Los argumentos `0, j - 1` limitan la búsqueda a los turnos anteriores a `j`.
+El código separa los tres momentos que usted hizo a mano: calcular `p`, llenar `M` y reconstruir. Para ordenar por hora de fin, `ordenar_por_fin` usa un recurso sencillo: una lista de tuplas se ordena con `.sort()` mirando primero el primer valor de cada tupla, así que basta poner la hora de fin de primera. Para calcular `p(j)` usa **búsqueda binaria**, escrita a mano en `contar_compatibles`: en la lista ordenada de fines, cuenta cuántos son menores o iguales que el inicio del turno `j`, partiendo el rango a la mitad en cada paso. Con los fines `[10, 11, 12, 13, 15, 16]` y el inicio de E (12), da 3: los tres fines que son 12 o menos. El argumento `hasta = j - 1` limita la búsqueda a los turnos anteriores a `j`.
 
 ```python
-from bisect import bisect_right
-
 Turno = tuple[int, int, int]  # (inicio, fin, estudiantes)
 
 
-def hora_de_fin(turno: Turno) -> int:
-    """Devuelve la hora de fin de un turno; sirve como clave para ordenar.
+def ordenar_por_fin(turnos: list[Turno]) -> list[Turno]:
+    """Ordena los turnos por hora de fin.
 
     Args:
-        turno: Inicio, fin y estudiantes de una solicitud.
+        turnos: Inicio, fin y estudiantes de cada solicitud.
 
     Returns:
-        La hora de fin del turno.
+        Los mismos turnos, del que termina primero al que termina de último.
     """
-    return turno[1]
+    tripletas: list[Turno] = []
+    for turno in turnos:
+        inicio, fin, estudiantes = turno
+        tripletas.append((fin, inicio, estudiantes))  # el fin va primero
+    tripletas.sort()  # ordena por el primer valor: la hora de fin
+    orden: list[Turno] = []
+    for tripleta in tripletas:
+        fin, inicio, estudiantes = tripleta
+        orden.append((inicio, fin, estudiantes))  # vuelve al formato original
+    return orden
+
+
+def contar_compatibles(fines: list[int], inicio: int, hasta: int) -> int:
+    """Cuenta, con búsqueda binaria, los fines que no pasan de un inicio.
+
+    Args:
+        fines: Horas de fin en orden creciente.
+        inicio: Hora de inicio del turno que se analiza.
+        hasta: Solo se miran fines[0], ..., fines[hasta - 1].
+
+    Returns:
+        Cuántos de esos fines son menores o iguales que inicio.
+    """
+    bajo = 0
+    alto = hasta  # la respuesta está entre bajo y alto
+    while bajo < alto:
+        medio = (bajo + alto) // 2
+        if fines[medio] <= inicio:  # <=: tocarse en un extremo no es cruce
+            bajo = medio + 1  # ese fin cuenta: la respuesta está a la derecha
+        else:
+            alto = medio  # ese fin no cuenta: la respuesta está a la izquierda
+    return bajo
 
 
 def calcular_p(orden: list[Turno]) -> list[int]:
@@ -176,7 +205,7 @@ def calcular_p(orden: list[Turno]) -> list[int]:
     for j in range(1, len(orden) + 1):
         inicio_j = orden[j - 1][0]
         # Cuántos de los j - 1 fines anteriores son <= inicio_j.
-        p[j] = bisect_right(fines, inicio_j, 0, j - 1)
+        p[j] = contar_compatibles(fines, inicio_j, j - 1)
     return p
 
 
@@ -195,7 +224,7 @@ def intervalos_ponderados(
         Una tripleta (orden, p, mejor): los turnos ordenados por fin, la
         lista p y la tabla M, donde mejor[n] es el máximo de estudiantes.
     """
-    orden = sorted(turnos, key=hora_de_fin)  # preparación
+    orden = ordenar_por_fin(turnos)  # preparación
     p = calcular_p(orden)
     n = len(orden)
     mejor = [0] * (n + 1)  # mejor[0] = 0: caso base
@@ -246,7 +275,7 @@ print(reconstruir_turnos(orden, p, mejor))  # [(9, 12, 10), (12, 15, 9)]
 
 | Pregunta de la receta | En el código                                                        |
 | --------------------- | ------------------------------------------------------------------- |
-| Preparación           | `sorted(turnos, key=hora_de_fin)`                                   |
+| Preparación           | `ordenar_por_fin(turnos)`                                           |
 | 2. Estado             | El índice `j` de `mejor[j]`                                         |
 | 3. Recurrencia        | `no_aceptar` y `aceptar` dentro del ciclo, quedándose con la mayor  |
 | 4. Caso base          | `mejor[0] = 0`, que ya viene en cero                                |
@@ -254,7 +283,7 @@ print(reconstruir_turnos(orden, p, mejor))  # [(9, 12, 10), (12, 15, 9)]
 | 6. Reconstrucción     | `reconstruir_turnos`, saltando a `p[j]` cada vez que un turno entra |
 | 7. Costo              | Ordenar y las búsquedas binarias, Θ(n log n); el resto, Θ(n)        |
 
-La convención de "se tocan en un extremo" vive en una sola línea: `bisect_right` cuenta los fines **iguales** al inicio como compatibles (B termina a las 12 y E empieza a las 12). Si en su problema dos turnos que se tocan sí se cruzan, use `bisect_left`, que cuenta solo los fines estrictamente menores.
+La convención de "se tocan en un extremo" vive en una sola línea: el `<=` de `contar_compatibles` cuenta los fines **iguales** al inicio como compatibles (B termina a las 12 y E empieza a las 12). Si en su problema dos turnos que se tocan sí se cruzan, cambie `<=` por `<`, y así solo cuentan los fines estrictamente menores.
 
 ---
 
@@ -262,10 +291,11 @@ La convención de "se tocan en un extremo" vive en una sola línea: `bisect_righ
 
 La pregunta 7 de la receta da **Θ(n log n)**: lo mismo que la regla de terminación más temprana, frente a Θ(n·2ⁿ) de revisar todos los subconjuntos de turnos. Es decir, maximizar los estudiantes no cuesta más que maximizar el número de turnos; solo cambia lo que se optimiza.
 
-Para verificar, siga el método de la lección "Programación dinámica: decidir, verificar y medir": una solución exhaustiva que pruebe todos los subconjuntos de turnos, descarte los que tengan dos turnos que se crucen y se quede con el de más estudiantes. Igual que en la lección "Estrategia voraz", los subconjuntos se recorren con una **máscara de bits** (los números de 0 a 2ⁿ − 1 escritos en binario) y, como los turnos van ordenados por hora de fin, basta comparar cada turno con el anterior del subconjunto. Escriba este código **en el mismo archivo**: reutiliza `Turno`, `hora_de_fin`, `intervalos_ponderados` y `reconstruir_turnos`.
+Para verificar, siga el método de la lección "Programación dinámica: decidir, verificar y medir": una solución exhaustiva que pruebe todos los subconjuntos de turnos, descarte los que tengan dos turnos que se crucen y se quede con el de más estudiantes. Igual que en la lección "Estrategia voraz", los subconjuntos se recorren con `product([0, 1], repeat=n)` del módulo `itertools`, que entrega una fila de interruptores por subconjunto (`interruptores[i] == 1` significa "el turno `i` se acepta"), y, como los turnos van ordenados por hora de fin, basta comparar cada turno con el anterior del subconjunto. Escriba este código **en el mismo archivo**: reutiliza `Turno`, `ordenar_por_fin`, `intervalos_ponderados` y `reconstruir_turnos`.
 
 ```python
 import random
+from itertools import product
 
 
 def se_cruzan(a: Turno, b: Turno) -> bool:
@@ -291,15 +321,15 @@ def intervalos_exhaustivo(turnos: list[Turno]) -> int:
         El máximo de estudiantes de un subconjunto sin cruces; costo
         Θ(n·2ⁿ).
     """
-    orden = sorted(turnos, key=hora_de_fin)  # así basta comparar vecinos
+    orden = ordenar_por_fin(turnos)  # así basta comparar vecinos
     n = len(orden)
     mejor = 0
-    for mascara in range(1 << n):  # cada número es un subconjunto
+    for interruptores in product([0, 1], repeat=n):  # un subconjunto
         ultimo_fin = 0  # las horas no son negativas
         total = 0
         valido = True
         for i in range(n):
-            if mascara & (1 << i):  # ¿el turno i está en el subconjunto?
+            if interruptores[i] == 1:  # ¿el turno i se acepta?
                 if orden[i][0] < ultimo_fin:  # se cruza con el anterior
                     valido = False
                     break
@@ -349,9 +379,9 @@ print("Todas las instancias coinciden")
 
 Tres detalles importan:
 
-- **La regla de cruce está en un solo lugar,** `se_cruzan`, y coincide con la de `bisect_right`: dos turnos que se tocan en un extremo no se cruzan. Si su caso decide lo contrario, cambie las dos.
+- **La regla de cruce está en un solo lugar,** `se_cruzan`, y coincide con el `<=` de `contar_compatibles`: dos turnos que se tocan en un extremo no se cruzan. Si su caso decide lo contrario, cambie las dos.
 - **No basta verificar el valor.** También se revisa que los turnos de la reconstrucción no se crucen entre sí y que sumen el óptimo.
-- **El mensaje de cada `assert`** es la instancia que falló: el punto de partida para depurar. Haga la prueba de fuego: cambie `bisect_right` por `bisect_left` y vuelva a ejecutar. La verificación debe fallar.
+- **El mensaje de cada `assert`** es la instancia que falló: el punto de partida para depurar. Haga la prueba de fuego: cambie `<=` por `<` en `contar_compatibles` y vuelva a ejecutar. La verificación debe fallar.
 
 ---
 
@@ -376,7 +406,7 @@ Si todos los turnos pesaran lo mismo, maximizar el peso sería maximizar el núm
 
 ### "Mis turnos elegidos se cruzan"
 
-- Revise la convención de los extremos: `bisect_right` considera compatibles dos turnos que se tocan (uno termina cuando el otro empieza); `bisect_left`, no. Use la que corresponda a su problema y declárela.
+- Revise la convención de los extremos: con `<=` en `contar_compatibles` son compatibles dos turnos que se tocan (uno termina cuando el otro empieza); con `<`, no. Use la que corresponda a su problema y declárela.
 
 ### "La reconstrucción no suma el óptimo"
 

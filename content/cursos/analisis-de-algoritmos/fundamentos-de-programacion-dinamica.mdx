@@ -120,7 +120,9 @@ def tabla_de_complejidad(longitudes: list[int]) -> None:
         inicio = time.perf_counter()
         cortar_ingenuo(precios, n, contador)
         tiempo = time.perf_counter() - inicio
-        factor = f"{contador.total / anteriores:.1f}" if anteriores else "—"
+        factor = "—"  # la primera fila no tiene con qué compararse
+        if anteriores > 0:
+            factor = f"{contador.total / anteriores:.1f}"
         print(
             f"{n:>3} | {contador.total:>10,} | {factor:>6} | {tiempo:>10.3f}"
         )
@@ -201,7 +203,7 @@ def cortar_memo(
     precios: list[int],
     n: int,
     contador: Contador,
-    memo: dict[int, int] | None = None,
+    memo: dict[int, int],
 ) -> int:
     """Calcula el ingreso máximo recordando los subproblemas resueltos.
 
@@ -209,14 +211,13 @@ def cortar_memo(
         precios: Precio de un tramo de i metros en la posición i.
         n: Longitud de la varilla.
         contador: Contador compartido por todas las llamadas recursivas.
-        memo: Cuaderno con los valores r_j ya calculados.
+        memo: Cuaderno con los valores r_j ya calculados; en la primera
+            llamada se pasa un diccionario vacío, {}.
 
     Returns:
         El ingreso máximo para una varilla de n metros.
     """
     contador.total += 1  # cuenta esta llamada, aunque se resuelva con memo
-    if memo is None:
-        memo = {}  # cuaderno nuevo en cada llamada externa
     if n == 0:
         return 0
     if n in memo:
@@ -245,9 +246,11 @@ def tabla_memo(longitudes: list[int]) -> None:
     for n in longitudes:
         contador = Contador()  # un contador nuevo para cada longitud
         inicio = time.perf_counter()
-        cortar_memo(precios, n, contador)
+        cortar_memo(precios, n, contador, {})  # cuaderno nuevo y vacío
         milisegundos = (time.perf_counter() - inicio) * 1000
-        factor = f"{contador.total / anteriores:.2f}" if anteriores else "—"
+        factor = "—"
+        if anteriores > 0:
+            factor = f"{contador.total / anteriores:.2f}"
         print(
             f"{n:>4} | {contador.total:>8,} | {factor:>6} | "
             f"{milisegundos:>11.2f}"
@@ -255,7 +258,7 @@ def tabla_memo(longitudes: list[int]) -> None:
         anteriores = contador.total
 
 
-print(cortar_memo(PRECIOS, 10, Contador()))  # 30
+print(cortar_memo(PRECIOS, 10, Contador(), {}))  # 30
 tabla_memo([25, 50, 100, 200, 400, 800])
 ```
 
@@ -306,7 +309,7 @@ def contar_llamadas(n_maximo: int) -> tuple[list[int], list[int], list[int]]:
         contador_ingenuo = Contador()
         cortar_ingenuo(precios, n, contador_ingenuo)
         contador_memo = Contador()
-        cortar_memo(precios, n, contador_memo)
+        cortar_memo(precios, n, contador_memo, {})
         longitudes.append(n)
         ingenua.append(contador_ingenuo.total)
         memo.append(contador_memo.total)
@@ -321,8 +324,10 @@ def graficar_comparacion(n_maximo: int, archivo: str) -> None:
         archivo: Ruta del archivo PNG donde se guarda la gráfica.
     """
     longitudes, ingenua, memo = contar_llamadas(n_maximo)
-    figura, (lineal, logaritmica) = plt.subplots(1, 2, figsize=(11, 4.5))
-    for eje in (lineal, logaritmica):
+    figura, ejes = plt.subplots(1, 2, figsize=(11, 4.5))  # dos paneles
+    lineal = ejes[0]
+    logaritmica = ejes[1]
+    for eje in ejes:
         eje.plot(longitudes, ingenua, "o-", label="Ingenua: Θ(2ⁿ)")
         eje.plot(longitudes, memo, "s-", label="Memoización: Θ(n²)")
         eje.set_xlabel("Longitud de la varilla n (metros)")
@@ -383,7 +388,7 @@ def cortar_tabulado(precios: list[int], n: int) -> tuple[list[int], list[int]]:
     return r, s
 ```
 
-Es el mismo trabajo que la memoización, Θ(n²), sin llamadas recursivas. Tiene dos ventajas prácticas en Python: no hay riesgo de `RecursionError` (la pila de Python se corta, por defecto, cerca de las 1.000 llamadas anidadas, así que `cortar_memo(precios, 2000, Contador())` falla) y el orden de llenado queda escrito en los ciclos, a la vista.
+Es el mismo trabajo que la memoización, Θ(n²), sin llamadas recursivas. Tiene dos ventajas prácticas en Python: no hay riesgo de `RecursionError` (la pila de Python se corta, por defecto, cerca de las 1.000 llamadas anidadas, así que `cortar_memo(precios, 2000, Contador(), {})` falla) y el orden de llenado queda escrito en los ciclos, a la vista.
 
 > **Memoización (de arriba hacia abajo):** recursión que guarda cada respuesta; solo calcula los subproblemas que se piden.
 > **Tabulación (de abajo hacia arriba):** ciclos que llenan la tabla en un orden en que cada casilla ya tiene listas las casillas de las que depende.

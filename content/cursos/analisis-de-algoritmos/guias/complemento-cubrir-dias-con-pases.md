@@ -390,7 +390,7 @@ def costo_dia_a_dia(viajes: list[int]) -> int:
 
 def contraejemplo_mas_corto(
     intentos: int = 500, semilla: int = 2026
-) -> list[int] | None:
+) -> list[int]:
     """Busca el periodo más corto donde la regla día a día paga de más.
 
     Args:
@@ -398,7 +398,8 @@ def contraejemplo_mas_corto(
         semilla: Semilla fija para que el resultado sea reproducible.
 
     Returns:
-        Los viajes por día de un contraejemplo, o None si no encontró.
+        Los viajes por día de un contraejemplo, o una lista vacía si no
+        encontró ninguno.
     """
     rng = random.Random(semilla)
     for d in range(1, 11):  # primero los periodos más cortos
@@ -409,7 +410,7 @@ def contraejemplo_mas_corto(
             costo, _ = costo_bicicletas(viajes)
             if costo_dia_a_dia(viajes) > costo[1]:
                 return viajes
-    return None
+    return []
 
 
 viajes = [2, 3, 3, 0, 1, 0, 2, 0, 0, 1]

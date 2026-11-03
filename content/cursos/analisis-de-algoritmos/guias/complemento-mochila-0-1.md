@@ -249,10 +249,11 @@ Atención a una trampa: Θ(n·W) **no** depende solo del número de objetos. Si 
 
 ## Verificar la mochila con una solución exhaustiva
 
-Como explica la lección "Programación dinámica: decidir, verificar y medir", una programación dinámica se verifica comparándola con una solución exhaustiva en muchas instancias pequeñas. Para la mochila, la exhaustiva prueba todos los subconjuntos con una **máscara de bits**: los números de 0 a 2ⁿ − 1 escritos en binario recorren todos los subconjuntos, y el bit `i` en 1 significa "el objeto `i` está". Con 3 objetos, `0b101` (el 5) es el subconjunto con los objetos 0 y 2.
+Como explica la lección "Programación dinámica: decidir, verificar y medir", una programación dinámica se verifica comparándola con una solución exhaustiva en muchas instancias pequeñas. Para la mochila, la exhaustiva prueba todos los subconjuntos con `product` del módulo `itertools`, como en la lección "Estrategia voraz": `product([0, 1], repeat=n)` entrega todas las filas de interruptores, una por subconjunto, y `interruptores[i] == 1` significa "el objeto `i` va en la mochila". Con 3 objetos, la fila `(1, 0, 1)` es el subconjunto con los objetos 0 y 2. `product` solo genera las combinaciones: elegir la mejor lo hace su código.
 
 ```python
 import random
+from itertools import product
 
 
 def mochila_exhaustiva(objetos: list[Objeto], capacidad: int) -> int:
@@ -267,11 +268,11 @@ def mochila_exhaustiva(objetos: list[Objeto], capacidad: int) -> int:
     """
     n = len(objetos)
     mejor = 0
-    for mascara in range(1 << n):  # 1 << n es 2 elevado a n
+    for interruptores in product([0, 1], repeat=n):  # un subconjunto
         peso = 0
         valor = 0
         for i in range(n):
-            if mascara & (1 << i):  # ¿el objeto i está en el subconjunto?
+            if interruptores[i] == 1:  # ¿el objeto i va en la mochila?
                 peso += objetos[i][0]
                 valor += objetos[i][1]
         if peso <= capacidad and valor > mejor:
@@ -333,16 +334,18 @@ def mochila_por_densidad(
         Una pareja (utilidad, elegidos) con lo que logra la regla; los
         elegidos son posiciones en orden creciente. No garantiza el óptimo.
     """
-    orden = sorted(
-        range(len(objetos)),
-        key=lambda i: objetos[i][1] / objetos[i][0],  # utilidad por kg
-        reverse=True,  # de mayor a menor densidad
-    )
+    parejas: list[tuple[float, int]] = []
+    for i in range(len(objetos)):
+        peso, valor = objetos[i]
+        parejas.append((valor / peso, i))  # (utilidad por kg, posición)
+    parejas.sort()  # de menor a mayor densidad
     libre = capacidad
     utilidad = 0
     elegidos: list[int] = []
-    for i in orden:  # no se detiene en el primero que no cabe
-        peso, valor = objetos[i]
+    # Se recorre desde el final: de mayor a menor densidad.
+    for k in range(len(parejas) - 1, -1, -1):
+        i = parejas[k][1]
+        peso, valor = objetos[i]  # no se detiene en el primero que no cabe
         if peso <= libre:
             elegidos.append(i)
             libre -= peso
@@ -387,13 +390,13 @@ Salida:
 ```text
 (8, [0, 3])
 9
-falla en 151 de 1000 instancias; pérdida máxima: 73% del óptimo
+falla en 150 de 1000 instancias; pérdida máxima: 73% del óptimo
 ```
 
 Tres observaciones:
 
 - **El contraejemplo calculado** es el de la salida de campo: la regla lleva A y D (utilidad 8), el óptimo lleva B y C (9), una diferencia de 1. Preséntelo así: instancia, resultado de la regla, óptimo y diferencia.
-- **La regla no falla siempre**, y eso la hace tentadora: en estas instancias acierta en 849 de 1.000. Pero cuando falla puede perder mucho, en alguna instancia casi tres cuartas partes del óptimo. Una instancia donde acierta no prueba nada.
+- **La regla no falla siempre**, y eso la hace tentadora: en estas instancias acierta en 850 de 1.000. Pero cuando falla puede perder mucho, en alguna instancia casi tres cuartas partes del óptimo. Una instancia donde acierta no prueba nada.
 - **No se detiene en el primer objeto que no cabe:** sigue buscando objetos más pequeños que sí quepan. Si la regla que debe reproducir se detiene en el primero que no cabe, el código cambia, y esa diferencia se documenta.
 
 **Costo.** Ordenar cuesta Θ(n log n) y el recorrido Θ(n): la regla por densidad cuesta Θ(n log n) y **no depende de W**. La programación dinámica cuesta Θ(n·W). La regla es más barata, pero no garantiza el óptimo; esa es la comparación que hay que medir y explicar.

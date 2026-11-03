@@ -306,7 +306,7 @@ curso-analisis-algoritmos/
 - Terminación más temprana, caso de borde de los intervalos `[s, f)` y argumento de intercambio
 - Elementos de la estrategia voraz: elección voraz y subestructura óptima
 - Verificación contra la búsqueda exhaustiva, medición Θ(n log n) con factor al duplicar, extrapolación y energía
-- Contraste con el enfoque de programación dinámica O(n³)
+- Condición contraria: con actividades de distinto peso la regla voraz deja de ser óptima y hace falta programación dinámica
 
 **Lectura autónoma (sin sesión):** multiplicación de cadenas de matrices, subsecuencia común más larga (LCS) y códigos de Huffman, con las lecciones publicadas.
 
