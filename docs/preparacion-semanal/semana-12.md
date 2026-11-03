@@ -271,7 +271,7 @@ No aplica.
 
 - Frontmatter `presentation: true` y `type: "Lección guion de clase en vivo"`, sin formalizar la variante en `lesson-authoring` — **motivo:** el usuario eligió esta opción.
 - "Dónde se rompe la analogía" quedó como párrafo dentro del Error planeado 1, no como `##` propio — **motivo:** evitar duplicar el error; el usuario no lo objetó al aprobar.
-- La lección tiene 361 líneas y 15 secciones `##`, más que el plan — **motivo:** Resumen y Síntesis separados, "Qué sigue" y votación como secciones propias.
+- La lección tiene 363 líneas y 15 secciones `##`, más que el plan — **motivo:** Resumen y Síntesis separados, "Qué sigue" y votación como secciones propias.
 - E4 y E6 se omitieron al pasar el usuario a E5/E7, sin pregunta explícita — **motivo:** la lección es el guion de la clase; reversible pidiendo apuntes o guía.
 - La lección no incluye la sección «¿Dónde aparece en tu proyecto?» — **motivo:** lo propuso el diseñador y el usuario aprobó el plan; la aplicación al proyecto de aula llega en la Semana 13.
 
