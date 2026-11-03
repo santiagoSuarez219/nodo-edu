@@ -422,10 +422,12 @@ export const estructurasDeDatos: Course = {
       articleSlug: "conceptos-y-tad-arbol-binario",
       order: 31,
       title: "Conceptos y TAD árbol binario",
+      summary:
+        "Parte de las carpetas del computador para entender por qué algunos problemas piden una estructura jerárquica, define árbol binario de forma recursiva con caso base y caso recursivo, fija el vocabulario y las propiedades de altura y niveles, y presenta el TAD como contrato.",
       topics: [
         { title: "Estructura de árbol: raíz, nodo, hoja, subárbol, nivel, altura" },
         { title: "Árbol binario: definición y propiedades" },
-        { title: "TAD árbol binario: representación con nodos enlazados en Java" },
+        { title: "TAD árbol binario: operaciones como contrato" },
       ],
     },
     {

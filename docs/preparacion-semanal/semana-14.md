@@ -162,3 +162,102 @@ Verificado con `list_lesson_questions` en producción: 6 preguntas, publicadas, 
 - `git push origin development` (lo ejecuta el docente): `origin/development` aún no tiene los commits de esta ronda; `main` ya está desplegado.
 - Marcar las lecciones como vistas en clase de cada grupo (D7) **después** de dictarlas o asignarlas; no se marcó nada, y no corresponde antes de la sesión.
 - Confirmar las unidades (días, masas de Júpiter, parsecs) del dataset `planets` contra su documentación.
+
+---
+
+## Ronda — `estructuras-de-datos` (2026-11-03)
+
+**Rama:** `feat/semana-14-estructuras-de-datos`
+**Estado:** ✅ Material y cuestionario listos en desarrollo / ⬜ Revisada por `@reviewer` / ⬜ Mergeada a `development` / ⬜ Desplegada y abierta
+
+**Alcance confirmado por el usuario:** Sesión T1 (martes 3 de noviembre), solo
+la lección `conceptos-y-tad-arbol-binario`, solo conceptos y TAD, sin código de
+árbol. **Excluidas:** la T2 (inserción y recorridos), el laboratorio P y las dos
+sesiones de la Semana 13 (ver decisiones y pendientes).
+
+### Sesiones cubiertas
+
+| Sesión | Fecha | Tema | ★/◇ |
+|---|---|---|---|
+| T1 | mar. 3 nov | TAD Árbol binario: raíz, nodo, hoja, subárbol, nivel, altura; definición y propiedades; ¿qué problemas piden una estructura jerárquica? | |
+
+### Etapas y aprobaciones
+
+| Etapa | Resultado | Aprobada por el usuario |
+|---|---|---|
+| E1 · Diagnóstico | El cronograma y el registro no coinciden (ver decisiones); el usuario eligió la S14 T1 | ✅ |
+| E2 · Plan de lección | Aprobado: altura con hoja = 0, vacío = -1 y raíz en nivel 0; carpetas del computador; interface solo con firmas; sin propiedad 4 ni aplicación al proyecto | ✅ |
+| E3 · Lección `.mdx` + registro TS | `conceptos-y-tad-arbol-binario` | ✅ |
+| E4 · Apuntes del docente | **No producidos:** la lección es el guion de la clase en vivo | ⬜ No se preguntó explícitamente; se omitió al pasar el usuario a E5 |
+| E5 · Cuestionario de cierre | Propuesto: 6 preguntas → 6 aprobadas, más la keyword `arboles` | ✅ |
+| E6 · Guía del estudiante | No aplica — sesión en vivo | ⬜ No se preguntó explícitamente; se omitió al pasar el usuario a E7 |
+| E6 · Quiz A/B/C | No aplica — sin ★ en esta sesión | ⬜ No se preguntó explícitamente; se omitió al pasar el usuario a E7 |
+
+### Artefactos producidos
+
+| Artefacto | Ruta | Publicado |
+|---|---|---|
+| Lección teórica (guion de clase en vivo) | `content/cursos/estructuras-de-datos/conceptos-y-tad-arbol-binario.mdx` | ⬜ |
+| Registro TS | `lib/courses/data/estructuras-de-datos.ts` (`order: 31`; se añadió `summary` y se reescribió el tercer topic) | — |
+
+### Cuestionario de cierre
+
+| Lección | Entorno | IDs de preguntas | Publicadas | Montadas (`list_lesson_questions`) |
+|---|---|---|---|---|
+| `conceptos-y-tad-arbol-binario` | desarrollo | `d917d5a5-ef34-4463-9180-5b50faef758c`, `3570bbcf-dd03-444f-956d-3b9e1003a069`, `9ec3a86e-9196-4e4e-a7fe-57e037f746b2`, `4d4d009b-b042-4fcd-ab10-285b53c30811`, `30df4b7e-f96f-4df1-890e-67319a7cc1dd`, `f0dd40bc-76c4-4b05-930d-33e104f21956` (P1–P6, en ese orden) | ✅ | ✅ 6/6 |
+| `conceptos-y-tad-arbol-binario` | **producción** | — | ⬜ | ⬜ |
+
+> Las preguntas **no viajan con el deploy**: se recrean en producción en D3,
+> incluida la keyword nueva `arboles` (no existe allá). En D3 hay que comprobar
+> con `list_keywords` de producción que existan también `estructuras-de-datos`,
+> `nodos`, `recursion` y `complejidad`. El cuestionario se responde después de la
+> clase en vivo y no repite la votación (altura del árbol de ejemplo = 3).
+
+### Quiz calificable A/B/C
+
+No aplica.
+
+### Decisiones tomadas por Claude en nombre del docente
+
+- **La Semana 13 quedó sin lecciones registradas.** El cronograma tiene S13 T1 (recursión sobre listas enlazadas) y S13 T2 (riesgos, límites y backtracking), pero el registro salta de `order` 30 a 31. Se reportó y el usuario eligió la S14 T1 — **motivo:** no se crearon entradas nuevas ni se renumeró nada sin su orden.
+- El tercer topic del registro pasó de "TAD árbol binario: representación con nodos enlazados en Java" a "TAD árbol binario: operaciones como contrato" — **motivo:** el usuario decidió no implementar `NodoArbol` en esta lección y aprobó el cambio.
+- **`info.md` no se tocó** y sigue diciendo "representación con nodos enlazados en Java" para esta sesión, así que contradice el topic del registro — **motivo:** es fuente de verdad y no se editó sin autorización explícita; queda como pendiente del usuario.
+- Convención de altura: aristas del camino más largo, hoja = 0, vacío = -1, raíz en nivel 0 — **motivo:** ni `info.md` ni el cronograma fijan una; se eligió con el usuario y se dice explícitamente en la lección.
+- La votación se movió antes de la traza de la altura — **motivo:** la traza terminaba diciendo "= 3" y regalaba la respuesta de la votación.
+- Un único fragmento de Java: la `interface ArbolBinario<T>` con solo firmas — **motivo:** sigue el patrón del curso (contrato primero, implementación después), aprobado por el usuario.
+- La lección tiene 257 líneas y 13 secciones `##`, por debajo de lo estimado — **motivo:** el agente no añadió contenido fuera del plan.
+- Sin errores planeados, retos, «Qué sigue» ni «¿Dónde aparece en tu proyecto?» — **motivo:** el usuario quitó los dos primeros de las lecciones anteriores porque la clase no alcanzaba; la aplicación al proyecto entra con la implementación.
+- E4 y E6 se omitieron al pasar el usuario a E5/E7, sin pregunta explícita — **motivo:** la lección es el guion de la clase; reversible pidiendo apuntes o guía.
+- Las cifras y la `interface` se verificaron con Java 17 y scripts (el entorno no tiene Java 21).
+
+### Verificación (E7)
+
+- [x] `npm run build` en verde (código de salida 0)
+- [x] `npm run lint` en verde (0 errores; 7 warnings preexistentes en archivos ajenos)
+- [x] Checklist de `lesson-authoring` §8 recorrido
+- [x] `summary` presente en frontmatter **y** en registro TS
+- [x] Coherencia cruzada lección ↔ cuestionario (alturas, niveles y conteos calculados con scripts; firma de `izquierdo()` comparada con la interface)
+- [ ] `@reviewer`: pendiente (E9)
+- [ ] Render en navegador (diagrama del árbol de ejemplo): pendiente, lo comprueba el docente
+
+### Despliegue
+
+| Paso | Estado | Fecha / detalle |
+|---|---|---|
+| D0 · Alcance y checklist pre-despliegue | ⬜ | |
+| D1 · Lecciones nuevas cerradas por adelantado | ⬜ | |
+| D2 · Merge a `main` y deploy en Vercel | ⬜ | |
+| D3 · Banco de preguntas replicado a producción | ⬜ | keyword `arboles` + 6 preguntas |
+| D4 · Lecciones abiertas a los estudiantes | ⬜ | estructuras-de-datos → `conceptos-y-tad-arbol-binario` |
+| D5 · Verificación end-to-end en producción | ⬜ | |
+| D6 · Bitácora cerrada y rama `deploy/` borrada | ⬜ | |
+
+- [ ] Verificado que las lecciones de semanas futuras siguen **cerradas**
+
+### Pendientes
+
+- Actualizar la línea de `info.md` ("TAD Árbol binario: representación con nodos enlazados en Java") para que coincida con el topic del registro, o autorizar a Claude a hacerlo.
+- Decidir qué se hace con las dos sesiones de la Semana 13 (recursión sobre listas; riesgos, límites y backtracking), que no tienen lección registrada.
+- Comprobar en el navegador que el diagrama del árbol de ejemplo se renderiza (la sintaxis ya está validada).
+- D7: marcar la lección como vista en clase del grupo que la dicte, después de la sesión.
+
