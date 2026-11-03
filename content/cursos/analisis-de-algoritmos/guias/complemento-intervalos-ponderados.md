@@ -348,12 +348,16 @@ def verificar_intervalos(casos: int = 200, semilla: int = 2026) -> None:
         semilla: Semilla fija para que el resultado sea reproducible.
     """
     # Casos límite: sin turnos, uno solo, todos cruzados y en cadena.
-    assert intervalos_ponderados([])[2] == [0]
-    assert intervalos_ponderados([(8, 10, 5)])[2][1] == 5
+    orden, p, mejor = intervalos_ponderados([])
+    assert mejor[0] == 0  # sin turnos no se atiende a nadie
+    orden, p, mejor = intervalos_ponderados([(8, 10, 5)])
+    assert mejor[1] == 5
     cruzados = [(8, 12, 3), (9, 11, 7), (10, 13, 4)]
-    assert intervalos_ponderados(cruzados)[2][-1] == 7
+    orden, p, mejor = intervalos_ponderados(cruzados)
+    assert mejor[3] == 7  # solo cabe uno: el de más estudiantes
     cadena = [(8, 9, 1), (9, 10, 2), (10, 11, 3)]
-    assert intervalos_ponderados(cadena)[2][-1] == 6
+    orden, p, mejor = intervalos_ponderados(cadena)
+    assert mejor[3] == 6  # caben los tres seguidos
     rng = random.Random(semilla)  # generador propio con semilla fija
     for _ in range(casos):
         turnos: list[Turno] = []
@@ -363,7 +367,8 @@ def verificar_intervalos(casos: int = 200, semilla: int = 2026) -> None:
             turnos.append((inicio, fin, rng.randint(1, 15)))
         orden, p, mejor = intervalos_ponderados(turnos)
         esperado = intervalos_exhaustivo(turnos)
-        assert mejor[-1] == esperado, turnos  # el valor coincide
+        n = len(turnos)
+        assert mejor[n] == esperado, turnos  # el valor coincide
         elegidos = reconstruir_turnos(orden, p, mejor)
         total = 0
         for a in range(len(elegidos)):

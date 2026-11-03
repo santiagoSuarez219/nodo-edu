@@ -112,6 +112,10 @@ por decisión del usuario (el cronograma lo manda a lectura autónoma).
 |---|---|---|---|---|
 | `estrategia-voraz` | desarrollo | P1 `a585f7f4-c712-4448-bc5b-0c12b5d9488d` · P2 `16ac5ba5-4e9f-46c9-8a6e-237afe98d6d2` · P3 `17d88a10-9407-44d1-8fa0-98fff22e2a97` · P4 `10bd5e29-5632-4a2d-899a-16dfdd80f011` · P5 `445d9e68-5c62-422a-8ea2-9918312e467f` | ✅ | ✅ (orden P1–P5) |
 | `estrategia-voraz` | **producción** (2026-10-28) | P1 `7a57ecff-6f8f-4f1f-8e77-28a60dc300f3` · P2 `64560a2a-eb86-4eaf-91dd-af8303f1c275` · P3 `2f15d00e-2f9e-48b1-9a6e-a7b0be7665eb` · P4 `ff07cc80-83b4-4340-9db3-bad125eedba5` · P5 `bb798ca4-d651-40cb-aea8-d9d20e490182` | ✅ | ✅ (orden P1–P5) |
+| `programacion-dinamica-decidir-verificar-y-medir` | desarrollo (2026-11-03) | P1 `6017d880-ea31-4fc1-8436-49f2e5a80fe4` (precio por metro, movida desde Fundamentos) · P2 `e434060a-c73c-485d-93e1-8a6d532c9b2b` · P3 `ee0370c6-5cca-4bf2-8791-c7bbb50e640a` · P4 `6cba102a-a8d0-468d-81b3-a4419698bdb0` · P5 `6a0f39ac-79ee-48f6-82c1-d06d04605a64` | ✅ | ✅ (orden P1–P5) |
+| `programacion-dinamica-decidir-verificar-y-medir` | **producción** (2026-11-03) | P1 `799f35dd-a4bf-4bb4-9534-250bf47dfc06` (precio por metro, movida desde Fundamentos) · P2 `7f3386ac-930e-4c36-ae5a-cdd46c657585` · P3 `1067dc42-397b-4d2b-bfff-6ec919569d95` · P4 `5bab42ad-d3d5-4440-92c6-3b7a4109d5a4` · P5 `bda8d178-bf21-4ddb-be55-190aec19115b` | ✅ | ✅ (orden P1–P5) |
+
+Ajuste del 2026-11-03: la P4 de `estrategia-voraz` (en ambos entornos) compara ahora la regla voraz con la búsqueda exhaustiva, porque la lección ya no incluye la recurrencia O(n³) de Cormen. Keyword `notacion-asintotica` creada en desarrollo para igualar el catálogo de producción.
 
 Keyword creada en desarrollo: `algoritmos-voraces` (tema); verificarla/crearla en
 producción en D3. Las explicaciones no se guardaron (sin campo de feedback).

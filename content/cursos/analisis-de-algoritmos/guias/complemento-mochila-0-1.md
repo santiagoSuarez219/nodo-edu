@@ -237,13 +237,13 @@ print(reconstruir_mochila(OBJETOS, tabla, 7))  # [1, 2]: B y C
 
 Por la pregunta 7 de la receta: hay `(n + 1)·(W + 1)` estados y cada uno cuesta Θ(1), así que la mochila cuesta **Θ(n·W)** en tiempo y en espacio. La alternativa exhaustiva prueba los `2ⁿ` subconjuntos y suma cada uno: Θ(n·2ⁿ).
 
-Atención a una trampa: Θ(n·W) **no** depende solo del número de objetos. Si duplica la capacidad, duplica el número de columnas y el tiempo. Por eso se dice que la mochila es **pseudo-polinomial**: es polinomial en el _valor numérico_ de `W`, no en el tamaño de la entrada (escribir `W` solo ocupa unos log₂ W bits). Consecuencias prácticas:
+Atención a una trampa: Θ(n·W) **no** depende solo del número de objetos. Si duplica la capacidad, duplica el número de columnas y el tiempo. Por eso se dice que la mochila es **pseudo-polinomial**: su costo crece con el _valor_ de `W`, no con cuántas cifras hacen falta para escribirlo. Pasar de `W = 5.000` a `W = 5.000.000` solo agrega tres cifras al dato, pero multiplica la tabla por mil. Consecuencias prácticas:
 
 - Con 500 objetos y `W = 5.000` kg hay unos 2,5 millones de casillas: rápido. Si la capacidad se expresara en **gramos** (`W = 5.000.000`), serían 2.500 millones: la misma mochila se vuelve impracticable solo por cambiar la unidad.
 - La memoria también crece: una tabla de 2,5 millones de casillas en listas de Python ocupa decenas de megabytes.
 - Para medir este algoritmo hay que variar `n` **y** `W` por separado: con `W` fijo, el tiempo crece lineal en `n` (al duplicar `n`, el tiempo se multiplica por ≈ 2); con `n` fijo, crece lineal en `W` (al duplicar `W`, también ≈ 2).
 
-> **Algoritmo pseudo-polinomial:** su costo es polinomial en el valor numérico de un dato de la entrada (aquí `W`), pero puede ser exponencial en el número de bits con que ese dato se escribe.
+> **Algoritmo pseudo-polinomial:** su costo depende del valor numérico de un dato de la entrada (aquí `W`) y no solo de cuántos datos hay, así que un número grande, aunque se escriba con pocas cifras, puede volverlo impracticable.
 
 ---
 
@@ -369,7 +369,8 @@ def comparar_densidad(casos: int = 1000, semilla: int = 2026) -> None:
         for _ in range(rng.randint(1, 10)):
             objetos.append((rng.randint(1, 8), rng.randint(1, 20)))
         capacidad = rng.randint(1, 25)
-        optimo = mochila(objetos, capacidad)[len(objetos)][capacidad]
+        tabla = mochila(objetos, capacidad)
+        optimo = tabla[len(objetos)][capacidad]
         obtenido, _ = mochila_por_densidad(objetos, capacidad)
         if obtenido < optimo:
             fallos += 1
@@ -381,7 +382,8 @@ def comparar_densidad(casos: int = 1000, semilla: int = 2026) -> None:
 
 
 print(mochila_por_densidad(OBJETOS, 7))  # (8, [0, 3]): A y D
-print(mochila(OBJETOS, 7)[4][7])  # 9: B y C
+tabla = mochila(OBJETOS, 7)
+print(tabla[4][7])  # 9: B y C
 comparar_densidad()
 ```
 
