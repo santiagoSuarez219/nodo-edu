@@ -309,7 +309,7 @@ No aplica.
 ## Ronda — `estructuras-de-datos`, T2 (2026-11-03)
 
 **Rama:** `feat/semana-12-estructuras-de-datos` (recreada tras el merge de T1)
-**Estado:** ✅ Material y cuestionario listos en desarrollo / ⬜ Revisada por `@reviewer` / ⬜ Mergeada a `development` / ⬜ Desplegada y abierta
+**Estado:** ✅ Material y cuestionario listos en desarrollo / ✅ Revisada por `@reviewer` / ⬜ Mergeada a `development` / ⬜ Desplegada y abierta
 
 **Alcance confirmado por el usuario:** Sesión T2 (viernes 23 de octubre), solo
 la lección `algoritmos-recursivos-clasicos`. **Excluidos:** el laboratorio P del
@@ -330,10 +330,10 @@ cronograma no se tocó.
 |---|---|---|
 | E2 · Plan de lección | Aprobado, con un solo recorte (tabla de `fib` solo para n = 4, 10, 20, 30) | ✅ |
 | E3 · Lección `.mdx` + registro TS | `algoritmos-recursivos-clasicos`; recortada a petición del usuario (ver decisiones) | ✅ |
-| E4 · Apuntes del docente | **No producidos:** la lección es el guion de la clase en vivo | ⬜ No se preguntó explícitamente; se omitió al pasar el usuario a E5 |
+| E4 · Apuntes del docente | **No producidos:** la lección es el guion de la clase en vivo | ✅ Confirmado por el usuario en E9 (no se preguntó antes) |
 | E5 · Cuestionario de cierre | Propuesto: 6 preguntas → 6 aprobadas (P4 y P6 reescritas a pedido) | ✅ |
-| E6 · Guía del estudiante | No aplica — sesión en vivo | ⬜ No se preguntó explícitamente; se omitió al pasar el usuario a E7 |
-| E6 · Quiz A/B/C | No aplica — sin ★ en esta sesión | ⬜ No se preguntó explícitamente; se omitió al pasar el usuario a E7 |
+| E6 · Guía del estudiante | No aplica — sesión en vivo | ✅ Confirmado por el usuario en E9 (no se preguntó antes) |
+| E6 · Quiz A/B/C | No aplica — sin ★ en esta sesión | ✅ Confirmado por el usuario en E9 (no se preguntó antes) |
 
 ### Artefactos producidos
 
@@ -367,7 +367,8 @@ No aplica.
 - Sin KaTeX: **2^n − 1** va en negrita, como en el resto del curso.
 - Sin sección «Qué sigue» ni anuncio de sesiones o laboratorios — **motivo:** lo pidió el usuario.
 - La lección no incluye «¿Dónde aparece en tu proyecto?» — **motivo:** igual que T1, la aplicación al proyecto de aula llega en la Semana 13.
-- E4 y E6 se omitieron al pasar el usuario a E5/E7, sin pregunta explícita — **motivo:** la lección es el guion de la clase; reversible pidiendo apuntes o guía.
+- E4 y E6 se omitieron al pasar el usuario a E5/E7, sin pregunta explícita; el usuario lo confirmó en E9 a petición de `@reviewer` — **motivo:** la lección es el guion de la clase.
+- Tras la revisión: se quitó la «Pista» de la pausa inicial (daba la respuesta), la Síntesis pasó a «dos riesgos» (marcos apilados y trabajo repetido) para no contradecir que el desbordamiento es un límite del tipo, se citó «Fundamentos de recursividad» por su título y se usó `-` ASCII dentro del código.
 - Las cifras se verificaron con Java 17 (el entorno no tiene Java 21); nada del código depende de la versión.
 
 ### Verificación (E7)
@@ -377,8 +378,9 @@ No aplica.
 - [x] Checklist de `lesson-authoring` §8 recorrido
 - [x] `summary` presente en frontmatter **y** en registro TS
 - [x] Coherencia cruzada lección ↔ cuestionario (salidas y cifras compiladas con `javac`)
-- [ ] `@reviewer`: pendiente (E9)
-- [ ] Diagrama Mermaid del árbol de `fib(4)`: sin validar con `mermaid.parse` ni en navegador; lo comprueba el docente
+- [x] `@reviewer`: APROBADO (2 hallazgos mayores y 3 menores, corregidos en un commit posterior; sin segunda revisión)
+- [x] Diagrama Mermaid del árbol de `fib(4)`: sintaxis validada con el parser de flowchart del repo (9 nodos, `fib(2)` dos veces)
+- [ ] Render del diagrama en navegador: pendiente, lo comprueba el docente
 
 ### Despliegue
 
@@ -396,6 +398,6 @@ No aplica.
 
 ### Pendientes
 
-- Comprobar en el navegador que el flowchart del árbol de `fib(4)` se renderiza.
+- Comprobar en el navegador que el flowchart del árbol de `fib(4)` se renderiza (la sintaxis ya está validada).
 - Decidir aparte el laboratorio P del martes 27 de octubre (guía de estudiante o demo en vivo); la lección no lo anuncia.
 - D7: marcar la lección como vista en clase del grupo que la dicte, después de la sesión.

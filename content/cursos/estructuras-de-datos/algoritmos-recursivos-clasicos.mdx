@@ -27,7 +27,7 @@ Ya sabes preguntar dos cosas: **¿cuándo paro?** (caso base) y **¿cómo me ace
 
 **Mover un rompecabezas de discos.** Imagina una pila de platos de distinto tamaño, el más grande abajo (como la pila de la lección Implementación de pilas en Java), que debes pasar a otra pila de a un plato por vez, sin poner nunca uno grande sobre uno pequeño y con una tercera pila de ayuda. Ese es el problema de las Torres de Hanói.
 
-🛑 **Pausa:** en cada uno, ¿cuál sería el caso más pequeño que ya sabes resolver sin pensar? (Pista: 0 amigos, escalón 0 o 1, 0 discos.)
+🛑 **Pausa:** en cada uno, ¿cuál sería el caso más pequeño que ya sabes resolver sin pensar?
 
 ## Factorial
 
@@ -55,7 +55,7 @@ public class Clasicos {
 120
 ```
 
-Ahora la traza a mano de `factorial(4)`, con la misma tabla de la lección anterior. Complétala en papel antes de mirarla:
+Ahora la traza a mano de `factorial(4)`, con la misma tabla de la lección Fundamentos de recursividad. Complétala en papel antes de mirarla:
 
 | Llamada | `n` | ¿Caso base? | Acción | Retorna |
 |---|---|---|---|---|
@@ -285,9 +285,9 @@ La varilla `B` es la ayuda. Con 1 disco es trivial; con 2 ya hay que usar `B`. �
 
 Piensa en el disco más grande. Para moverlo de `A` a `C` todos los demás deben estar fuera de camino, en `B`. Entonces el problema se parte en tres partes, dos de las cuales son **el mismo problema con un disco menos**:
 
-1. Mover los `n − 1` discos de arriba de `A` a `B` (usando `C` de ayuda).
+1. Mover los `n - 1` discos de arriba de `A` a `B` (usando `C` de ayuda).
 2. Mover el disco `n` de `A` a `C`.
-3. Mover los `n − 1` discos de `B` a `C` (usando `A` de ayuda).
+3. Mover los `n - 1` discos de `B` a `C` (usando `A` de ayuda).
 
 El caso base es `n == 0`: no hay discos, no se hace nada. Añade el método y **reemplaza** el cuerpo de `main`:
 
@@ -372,7 +372,7 @@ n = 4 -> 15 movimientos
 n = 5 -> 31 movimientos
 ```
 
-La regla sale de la propia solución: mover n discos cuesta mover `n − 1` discos, más 1 movimiento, más mover otra vez `n − 1` discos. Es decir, m(n) = 2 · m(n − 1) + 1, con m(1) = 1. Al duplicar y sumar 1 sucesivamente (1, 3, 7, 15, 31...) cada valor es una potencia de 2 menos 1:
+La regla sale de la propia solución: mover n discos cuesta mover `n - 1` discos, más 1 movimiento, más mover otra vez `n - 1` discos. Es decir, m(n) = 2 · m(n − 1) + 1, con m(1) = 1. Al duplicar y sumar 1 sucesivamente (1, 3, 7, 15, 31...) cada valor es una potencia de 2 menos 1:
 
 **m(n) = 2^n − 1**
 
@@ -388,7 +388,7 @@ La elección no es de gusto: depende de la forma del problema.
 | Legibilidad | El código es casi la definición del problema | La receta paso a paso es igual de clara |
 | Memoria | No te importa un marco apilado por llamada | Quieres memoria constante |
 
-Tres riesgos para revisar siempre antes de elegir recursión:
+Tres cosas para revisar siempre antes de elegir recursión:
 
 - **Marcos apilados.** Cada llamada pendiente ocupa un marco; con n muy grande la pila puede llenarse.
 - **Trabajo repetido.** En Fibonacci el árbol recalcula los mismos valores, como viste en el conteo de llamadas.
@@ -407,7 +407,7 @@ Tres riesgos para revisar siempre antes de elegir recursión:
 ## Síntesis
 
 - Los tres problemas se resuelven con el mismo esquema: un caso base (¿cuándo paro?) y un caso recursivo que se acerca a él.
-- El **factorial** sale de n! = n · (n − 1)!, con 0! = 1, y se traza con la misma tabla de la lección anterior.
+- El **factorial** sale de n! = n · (n − 1)!, con 0! = 1, y se traza con la misma tabla de la lección Fundamentos de recursividad.
 - La versión **iterativa** del factorial usa una variable acumulada en lugar de marcos apilados.
 - El factorial **se desborda** con `int` desde 13! y con `long` desde 21!; el límite es del tipo, no de la recursión.
 - **Fibonacci** necesita dos casos base y dos llamadas recursivas.
@@ -418,4 +418,4 @@ Tres riesgos para revisar siempre antes de elegir recursión:
 - La solución recursiva de Hanói tiene caso base `n == 0` e intercambia los papeles de las varillas.
 - La traza con 3 discos tiene 7 movimientos y deja ver cómo el disco grande se mueve en el centro.
 - El número de movimientos es **2^n − 1**: cada disco extra duplica el trabajo más uno.
-- Elegir entre recursión e iteración depende de la forma del problema y de tres riesgos: marcos apilados, trabajo repetido y desbordamiento.
+- Elegir entre recursión e iteración depende de la forma del problema y de dos riesgos que inclinan la decisión: marcos apilados y trabajo repetido; el desbordamiento es un límite del tipo y afecta igual a las dos versiones.
