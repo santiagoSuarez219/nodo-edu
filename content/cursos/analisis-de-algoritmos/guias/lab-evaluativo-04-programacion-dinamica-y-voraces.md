@@ -22,7 +22,7 @@ Competencias esperadas:
 
 Debe dominar el contenido de las lecciones:
 - **"Fundamentos de programación dinámica"** (estudio autónomo): subestructura óptima, subproblemas traslapados, memoización y tabulación, reconstrucción de la solución óptima y la receta para plantear una programación dinámica.
-- **"Estrategia voraz"**: selección de actividades, propiedad de elección voraz y por qué otras reglas fallan.
+- **"Estrategia voraz"** (estudio autónomo): selección de actividades, búsqueda exhaustiva, reglas voraces que fallan y cómo encontrar sus contraejemplos, propiedad de elección voraz, verificación y medición.
 - **"Programación dinámica: decidir, verificar y medir"** (estudio autónomo): contraejemplos de reglas voraces, verificación con una solución exhaustiva y medición.
 - La guía complementaria de **su caso**, publicada junto a este laboratorio:
   - **Caso 1:** "Complemento del Laboratorio 4 — Cubrir días con pases".
@@ -80,7 +80,7 @@ Módulos de la carpeta de la operación (los mismos nombres en los tres casos):
 **Esqueleto del Caso 1 — tope tarifario.**
 
 ```python
-"""Liquidacion del tope tarifario de una tarjeta."""
+"""Liquidación del tope tarifario de una tarjeta."""
 
 PASAJE = 3900
 DIARIO = 9500
@@ -89,51 +89,51 @@ MENSUAL = 135000
 
 
 def costo_minimo(viajes_por_dia: list[int]) -> int:
-    """Calcula el costo de la combinacion mas barata que cubre todos los viajes.
+    """Calcula el costo de la combinación más barata que cubre los viajes.
 
     Args:
-        viajes_por_dia: viajes de la tarjeta en cada dia del mes. El indice 0
-            es el primer dia; un dia sin viajes vale 0.
+        viajes_por_dia: viajes de la tarjeta en cada día del mes. El índice 0
+            es el primer día; un día sin viajes vale 0.
 
     Returns:
-        El costo minimo en pesos.
+        El costo mínimo en pesos.
     """
-    # TODO: programacion dinamica sobre los dias del mes.
+    # TODO: programación dinámica sobre los días del mes.
 
 
 def costo_exhaustivo(viajes_por_dia: list[int]) -> int:
     """Calcula el mismo costo probando todas las combinaciones de productos.
 
     Args:
-        viajes_por_dia: viajes de la tarjeta en cada dia del mes.
+        viajes_por_dia: viajes de la tarjeta en cada día del mes.
 
     Returns:
-        El costo minimo en pesos.
+        El costo mínimo en pesos.
     """
-    # TODO: solo para instancias pequenas; su costo es exponencial.
+    # TODO: solo para instancias pequeñas; su costo es exponencial.
 
 
 def costo_regla_actual(viajes_por_dia: list[int]) -> int:
     """Calcula lo que cobra hoy la regla simplificada del sistema.
 
     Args:
-        viajes_por_dia: viajes de la tarjeta en cada dia del mes.
+        viajes_por_dia: viajes de la tarjeta en cada día del mes.
 
     Returns:
         El costo cobrado en pesos.
     """
-    # TODO: documente en el README como interpreto la regla del caso.
+    # TODO: documente en el README cómo interpretó la regla del caso.
 
 
 def liquidar_tope(viajes_por_dia: list[int], cobrado: int) -> int:
-    """Calcula la devolucion que corresponde al usuario.
+    """Calcula la devolución que corresponde al usuario.
 
     Args:
-        viajes_por_dia: viajes de la tarjeta en cada dia del mes.
+        viajes_por_dia: viajes de la tarjeta en cada día del mes.
         cobrado: pesos que se le cobraron durante el mes.
 
     Returns:
-        La diferencia entre lo cobrado y el costo minimo, nunca negativa.
+        La diferencia entre lo cobrado y el costo mínimo, nunca negativa.
     """
     # TODO: use costo_minimo.
 ```
@@ -141,35 +141,36 @@ def liquidar_tope(viajes_por_dia: list[int], cobrado: int) -> int:
 **Esqueleto del Caso 2 — jornadas de la unidad móvil.**
 
 ```python
-"""Programacion de las jornadas de una unidad movil."""
+"""Programación de las jornadas de una unidad móvil."""
 
-Jornada = tuple[int, int, int]  # (inicio, fin, pacientes_alto_riesgo), en minutos
+# (inicio, fin, pacientes_alto_riesgo); inicio y fin en minutos.
+Jornada = tuple[int, int, int]
 
 
 def seleccionar_jornadas(solicitudes: list[Jornada]) -> list[Jornada]:
     """Elige las jornadas que atiende la unidad, sin cruces.
 
     Args:
-        solicitudes: solicitudes del mes de una subregion.
+        solicitudes: solicitudes del mes de una subregión.
 
     Returns:
         Las jornadas elegidas, ordenadas por hora de inicio. Optimiza el
-        criterio que el equipo declaro en el README.
+        criterio que el equipo declaró en el README.
     """
-    # TODO: estrategia voraz (o programacion dinamica si el criterio es el
-    # numero de pacientes de alto riesgo).
+    # TODO: estrategia voraz (o programación dinámica si el criterio es el
+    # número de pacientes de alto riesgo).
 
 
 def seleccionar_exhaustivo(solicitudes: list[Jornada]) -> list[Jornada]:
     """Elige el mejor subconjunto sin cruces probando todos los subconjuntos.
 
     Args:
-        solicitudes: solicitudes del mes de una subregion.
+        solicitudes: solicitudes del mes de una subregión.
 
     Returns:
-        Un subconjunto optimo para el mismo criterio.
+        Un subconjunto óptimo para el mismo criterio.
     """
-    # TODO: solo para instancias pequenas; su costo es exponencial.
+    # TODO: solo para instancias pequeñas; su costo es exponencial.
 
 
 def asignar_por_llegada(solicitudes: list[Jornada]) -> list[Jornada]:
@@ -200,60 +201,70 @@ def hay_cruce(jornadas: list[Jornada]) -> bool:
 **Esqueleto del Caso 3 — cargue de los vehículos.**
 
 ```python
-"""Cargue de un vehiculo del banco de alimentos."""
+"""Cargue de un vehículo del banco de alimentos."""
 
 Lote = tuple[int, int, int]  # (peso_kg, valor_nutricional, dias_para_vencer)
 
 
-def cargar_vehiculo(lotes: list[Lote], capacidad_kg: int) -> tuple[int, list[int]]:
-    """Elige los lotes que maximizan el valor nutricional sin superar la capacidad.
+def cargar_vehiculo(
+    lotes: list[Lote], capacidad_kg: int
+) -> tuple[int, list[int]]:
+    """Elige los lotes de mayor valor nutricional que caben en el vehículo.
 
     Args:
         lotes: lotes candidatos de la ruta; no se fraccionan.
-        capacidad_kg: capacidad maxima del vehiculo en kilogramos.
+        capacidad_kg: capacidad máxima del vehículo en kilogramos.
 
     Returns:
-        El valor nutricional maximo y los indices de los lotes cargados.
+        El valor nutricional máximo y los índices de los lotes cargados.
     """
-    # TODO: programacion dinamica (mochila 0/1) y reconstruccion de los lotes.
+    # TODO: programación dinámica (mochila 0/1) y reconstrucción de los lotes.
 
 
-def cargar_exhaustivo(lotes: list[Lote], capacidad_kg: int) -> tuple[int, list[int]]:
+def cargar_exhaustivo(
+    lotes: list[Lote], capacidad_kg: int
+) -> tuple[int, list[int]]:
     """Calcula el mismo resultado probando todos los subconjuntos de lotes.
 
     Args:
         lotes: lotes candidatos de la ruta.
-        capacidad_kg: capacidad maxima del vehiculo en kilogramos.
+        capacidad_kg: capacidad máxima del vehículo en kilogramos.
 
     Returns:
-        El valor nutricional maximo y los indices de los lotes cargados.
+        El valor nutricional máximo y los índices de los lotes cargados.
     """
-    # TODO: solo para instancias pequenas; su costo es exponencial.
+    # TODO: solo para instancias pequeñas; su costo es exponencial.
 
 
-def cargar_por_vencimiento(lotes: list[Lote], capacidad_kg: int) -> tuple[int, list[int]]:
-    """Reproduce el procedimiento actual: por vencimiento hasta que no cabe el siguiente.
+def cargar_por_vencimiento(
+    lotes: list[Lote], capacidad_kg: int
+) -> tuple[int, list[int]]:
+    """Reproduce el procedimiento actual: carga por vencimiento.
+
+    Se detiene en el primer lote que ya no cabe.
 
     Args:
         lotes: lotes candidatos de la ruta.
-        capacidad_kg: capacidad maxima del vehiculo en kilogramos.
+        capacidad_kg: capacidad máxima del vehículo en kilogramos.
 
     Returns:
-        El valor nutricional cargado y los indices de los lotes cargados.
+        El valor nutricional cargado y los índices de los lotes cargados.
     """
-    # TODO: ordene por dias para vencer y deje de cargar en el primer lote
+    # TODO: ordene por días para vencer y deje de cargar en el primer lote
     # que no cabe.
 
 
-def cargar_por_densidad(lotes: list[Lote], capacidad_kg: int) -> tuple[int, list[int]]:
-    """Carga por mayor valor por kilogramo mientras quepa; no garantiza el optimo.
+def cargar_por_densidad(
+    lotes: list[Lote], capacidad_kg: int
+) -> tuple[int, list[int]]:
+    """Carga por mayor valor por kilogramo; no garantiza el óptimo.
 
     Args:
         lotes: lotes candidatos de la ruta.
-        capacidad_kg: capacidad maxima del vehiculo en kilogramos.
+        capacidad_kg: capacidad máxima del vehículo en kilogramos.
 
     Returns:
-        El valor nutricional cargado y los indices de los lotes cargados.
+        El valor nutricional cargado y los índices de los lotes cargados.
     """
     # TODO: ordene por densidad y agregue cada lote que quepa, sin fraccionar.
 ```
@@ -285,7 +296,7 @@ assert seleccionar_jornadas([(60, 120, 5)]) == [(60, 120, 5)]
 
 Implemente en `medicion.py` los experimentos y las gráficas, con datos **sintéticos** generados en `datos.py`, representativos de la estructura que describe el caso. **No se pide procesar el volumen real:** se mide en tamaños crecientes y se extrapola.
 
-- Mida el tiempo de la estrategia y de la solución exhaustiva para al menos **seis tamaños de entrada**, dentro de lo que la solución exhaustiva alcanza a ejecutar. Incluya al menos una pareja de tamaños donde el segundo sea el **doble** del primero. El tamaño es: Caso 1, los días con viaje de la tarjeta; Caso 2, el número de solicitudes; Caso 3, el número de lotes candidatos.
+- Mida el tiempo de la estrategia y de la solución exhaustiva para al menos **seis tamaños de entrada**, dentro de lo que la solución exhaustiva alcanza a ejecutar. Incluya al menos una pareja de tamaños donde el segundo sea el **doble** del primero. El tamaño es: Caso 1, los días `d` del periodo, con viajes en todos o casi todos los días, de modo que los días con viaje crezcan con `d` (la estrategia recorre todos los días del periodo, con o sin viajes; la exhaustiva crece con los días con viaje, así que para ella use periodos cortos); Caso 2, el número de solicitudes; Caso 3, el número de lotes candidatos.
 - Mida también la **regla actual**, para ver si su costo difiere de verdad del de la estrategia o solo su resultado.
 - Para tamaños donde la solución exhaustiva ya no puede ejecutarse, mida solo la estrategia y llévela hasta tamaños mucho mayores: son los que sostienen la extrapolación.
 - Cuente además las **operaciones elementales** (comparaciones, celdas calculadas o combinaciones exploradas, según el caso) con un contador propio, para contrastarlas con el tiempo.
@@ -309,7 +320,7 @@ Implemente en `medicion.py` los experimentos y las gráficas, con datos **sinté
 Responda, con sus palabras, las cinco preguntas siguientes, cada una en el apartado del informe que se indica. Sea concreto: el informe completo del proyecto tiene una extensión sugerida de 10 a 15 páginas para todo, y esta operación es una parte.
 
 1. **La recurrencia o el criterio** (apartado **Diseño de la solución**). Si usó programación dinámica, plantee la recurrencia y explique cada término, el caso base y el orden en que se llenan los subproblemas. Si usó estrategia voraz, enuncie el criterio de elección y justifique por qué no necesita reconsiderar lo elegido.
-2. **Complejidad** (apartado **Evaluación del desempeño**). Calcule la complejidad **temporal y espacial** de la estrategia y del enfoque ingenuo o exhaustivo, y contrástelas. (Caso 1: `Θ(d)` frente a exponencial en los días con viaje; Caso 2: `Θ(n log n)` frente a `Θ(2ⁿ)`, o la que corresponda si optó por intervalos ponderados; Caso 3: `Θ(n·W)` frente a `Θ(2ⁿ)`, explicando que el costo depende de la capacidad `W` y no solo de `n`.)
+2. **Complejidad** (apartado **Evaluación del desempeño**). Calcule la complejidad **temporal y espacial** de la estrategia y del enfoque ingenuo o exhaustivo, y contrástelas. (Caso 1: `Θ(d)` frente a exponencial en los días con viaje; Caso 2: `Θ(n log n)` frente a `Θ(n·2ⁿ)`, o la que corresponda si optó por intervalos ponderados; Caso 3: `Θ(n·W)` frente a `Θ(n·2ⁿ)`, explicando que el costo depende de la capacidad `W` y no solo de `n`.)
 3. **Lo medido contra lo esperado** (apartado **Evaluación del desempeño**: es el contraste explícito entre lo empírico y lo teórico que exige el proyecto). Con sus gráficas, tome la pareja de tamaños donde el segundo es el doble del primero y calcule cuánto se multiplicó el tiempo (y el número de operaciones) de cada solución; diga si coincide con la complejidad de la pregunta 2 y explique las diferencias.
 4. **Escala real, ventana y energía** (apartados **Evaluación del desempeño** e **Implicaciones éticas, sociales y ambientales → Consumo energético**). Extrapole el tiempo de la estrategia, de la regla actual y de la solución exhaustiva al volumen real de su caso. Compare con la ventana operativa del cliente y diga si cabe. Estime el consumo de energía con la potencia del servidor que informa el caso, con la relación kWh = kW × h, para cada solución. Declare que son **estimaciones** y explique el razonamiento: no use una regla de tres sin justificar la forma de la curva, y diga en qué casos la solución exhaustiva sencillamente no terminaría. Si el caso no fija una ventana para esta operación, diga cuál toma como referencia y por qué. **Proyecte además la diferencia de consumo entre la regla actual y la estrategia a un año de operación**, como pide el proyecto.
 5. **Recomendación** (apartado **Análisis comparativo**). Recomiende a la organización qué estrategia adoptar para esta operación, qué ganaría frente a lo que hace hoy y qué riesgo o límite debe conocer (por ejemplo, qué pasaría si el volumen o la capacidad crecieran).
@@ -382,7 +393,7 @@ Este laboratorio adelanta, aproximadamente, **entre el 40 % y el 50 % del proyec
 | Criterio | Puntos | Descripción |
 |---|---|---|
 | **Corrección conceptual** | 20 | El informe explica por qué el problema admite la estrategia elegida: identifica la subestructura óptima y los subproblemas traslapados (programación dinámica) o la propiedad de elección voraz (voraz) y los ilustra con un ejemplo pequeño resuelto a mano. Muestra con un **contraejemplo calculado** por qué falla la regla que usa hoy la organización (Caso 1: la regla simplificada de pasaje diario y pases; Caso 2: la asignación por orden de llegada; Caso 3: cargar por orden de vencimiento o por densidad de valor) y dice qué condición del problema haría adecuada a la otra familia de estrategias. |
-| **Calidad de la explicación teórica** | 20 | Plantea la recurrencia de la programación dinámica y explica cada término, o el criterio de elección voraz con su justificación de por qué no necesita reconsiderar. Calcula la complejidad temporal y espacial de la estrategia y del enfoque ingenuo o exhaustivo, y las contrasta (Caso 1: Θ(d) frente a exponencial en los días con viaje; Caso 2: Θ(n log n) frente a Θ(2ⁿ); Caso 3: Θ(n·W) frente a Θ(2ⁿ), explicando que el costo depende de la capacidad W y no solo de n). |
+| **Calidad de la explicación teórica** | 20 | Plantea la recurrencia de la programación dinámica y explica cada término, o el criterio de elección voraz con su justificación de por qué no necesita reconsiderar. Calcula la complejidad temporal y espacial de la estrategia y del enfoque ingenuo o exhaustivo, y las contrasta (Caso 1: Θ(d) frente a exponencial en los días con viaje; Caso 2: Θ(n log n) frente a Θ(n·2ⁿ); Caso 3: Θ(n·W) frente a Θ(n·2ⁿ), explicando que el costo depende de la capacidad W y no solo de n). |
 | **Corrección de la implementación** | 25 | El código cumple el estándar del curso (PEP 8, *type hints* y *docstrings* en cada función). Devuelve el resultado correcto en casos pequeños resueltos a mano, en los casos límite del problema y en al menos veinte instancias aleatorias pequeñas donde coincide con la solución exhaustiva. Cumple las restricciones del negocio del caso (Caso 1: devuelve exactamente la diferencia frente a la combinación más barata; Caso 2: ninguna unidad móvil tiene dos jornadas que se crucen; Caso 3: ningún vehículo supera su capacidad, el valor es el máximo y ningún lote se fracciona). Implementa también la regla actual y muestra una instancia donde da un resultado peor. |
 | **Calidad del análisis de las gráficas** | 25 | Existen las gráficas con título, ejes rotulados con unidades y leyenda, y la estrategia y el enfoque con el que se contrasta van en los mismos ejes. Cubren al menos seis tamaños de entrada, dentro de lo que el enfoque exhaustivo alcanza a ejecutar. El análisis calcula el factor de crecimiento al duplicar el tamaño y lo compara con el esperado por la complejidad. Extrapola el tiempo al volumen real del caso, lo compara con la ventana operativa del cliente, estima el consumo de energía con la potencia que informa el caso y proyecta a un año la diferencia entre la regla actual y la estrategia. |
 | **Documentación y organización del informe** | 10 | El repositorio del proyecto tiene el `README.md` con los apartados del informe técnico del proyecto, en su orden, con esta operación completa en ellos y lo pendiente marcado; el código en `src/<operacion>/` y las gráficas en `graficas/<operacion>/`. El informe muestra las gráficas visibles en GitHub, enlaza el código y trae la sección final para reproducir los datos sintéticos y las mediciones. El historial tiene al menos tres commits y **cada integrante aparece** en él. Se entrega a más tardar el 18 de noviembre. |

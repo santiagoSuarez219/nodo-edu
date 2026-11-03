@@ -34,7 +34,7 @@ noviembre. **Excluida en esta primera ronda:** la Sesión 2 (P, estrategia voraz
 |---|---|---|
 | Lección teórica | `content/cursos/analisis-de-algoritmos/fundamentos-de-programacion-dinamica.mdx` | ⬜ |
 | Registro TS | `lib/courses/data/analisis-de-algoritmos.ts` (`order: 14`; `summary` añadido, `topics` ajustados) | — |
-| Apunte de clase | `content/cursos/analisis-de-algoritmos/apuntes/fundamentos-de-programacion-dinamica.md` | Solo owner/admin |
+| Apunte de clase | ~~`content/cursos/analisis-de-algoritmos/apuntes/fundamentos-de-programacion-dinamica.md`~~ | Eliminado el 2026-11-02: el tema pasó a estudio autónomo |
 
 ### Cuestionario de cierre
 
@@ -104,7 +104,7 @@ por decisión del usuario (el cronograma lo manda a lectura autónoma).
 |---|---|---|
 | Lección teórica | `content/cursos/analisis-de-algoritmos/estrategia-voraz.mdx` | ⬜ |
 | Registro TS | `lib/courses/data/analisis-de-algoritmos.ts` (`order: 16`; `summary` añadido, Huffman quitado de `topics`) | — |
-| Apunte de clase | `content/cursos/analisis-de-algoritmos/apuntes/estrategia-voraz.md` | Solo owner/admin |
+| Apunte de clase | ~~`content/cursos/analisis-de-algoritmos/apuntes/estrategia-voraz.md`~~ | Eliminado el 2026-11-02: el tema pasó a estudio autónomo |
 
 ### Cuestionario de cierre
 

@@ -98,19 +98,11 @@ Una advertencia honesta: aquí el juez usa la misma recurrencia que las versione
 
 ## Medir: tiempo, operaciones y extrapolación
 
-Para contrastar la teoría con la realidad se miden dos cosas: el **tiempo** y el **número de operaciones elementales**. El tiempo depende de la máquina; las operaciones, no. Un contador propio basta; es la misma clase `Contador` de la lección Fundamentos de programación dinámica:
+Para contrastar la teoría con la realidad se miden dos cosas: el **tiempo** y el **número de operaciones elementales**. El tiempo depende de la máquina; las operaciones, no. Un contador propio basta: es la clase `Contador` que ya copiaste de la lección Fundamentos de programación dinámica. Agrega la función que mide el tiempo:
 
 ```python
 import time
 from collections.abc import Callable
-
-
-class Contador:
-    """Acumula el número de operaciones elementales de un algoritmo."""
-
-    def __init__(self) -> None:
-        """Inicia el conteo en cero."""
-        self.total = 0
 
 
 def medir(funcion: Callable[[], object], repeticiones: int = 5) -> float:
@@ -181,4 +173,4 @@ Para graficar, sigue el mismo modelo de la gráfica de la lección Fundamentos d
 - **Extrapolar:** según la forma de la curva; una exhaustiva que no termina se dice tal cual.
 - **Errores frecuentes:** índices, orden de llenado, casos olvidados, empates y recursión profunda.
 
-Lecturas: Cormen et al., _Introduction to Algorithms_, 3.ª ed., cap. 15.3 (_Elements of dynamic programming_) y cap. 16.2 (_Elements of the greedy strategy_).
+Lecturas: Cormen et al., _Introduction to Algorithms_, 3.ª ed., secciones 15.3 (_Elements of dynamic programming_) y 16.2 (_Elements of the greedy strategy_).

@@ -302,8 +302,9 @@ def verificar_mochila(casos: int = 200, semilla: int = 2026) -> None:
         for i in elegidos:
             peso_total += objetos[i][0]
             valor_total += objetos[i][1]
-        assert peso_total <= capacidad  # la restricción se respeta
-        assert valor_total == esperado  # y la reconstrucción suma el óptimo
+        # La restricción se respeta y la reconstrucción suma el óptimo.
+        assert peso_total <= capacidad, (objetos, capacidad)
+        assert valor_total == esperado, (objetos, capacidad)
 
 
 verificar_mochila()
@@ -374,7 +375,6 @@ def comparar_densidad(casos: int = 1000, semilla: int = 2026) -> None:
                 peor = perdida
     print(f"falla en {fallos} de {casos} instancias; "
           f"pérdida máxima: {peor:.0%} del óptimo")
-
 
 
 print(mochila_por_densidad(OBJETOS, 7))  # (8, [0, 3]): A y D

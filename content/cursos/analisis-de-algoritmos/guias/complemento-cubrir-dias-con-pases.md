@@ -99,7 +99,7 @@ La respuesta del problema completo es `C(1)`: lo mínimo para pagar del día 1 a
 - (b) Pase de tres días: 11.000, y quedan los días desde `t + 3`. Total: `11.000 + C(t + 3)`.
 - (c) Pase semanal: 20.000, y quedan los días desde `t + 7`. Total: `20.000 + C(t + 7)`.
 
-`C(t)` es la más barata de las tres. Si el día `t` **no tiene viajes**, no se compra nada y se pasa al día siguiente: `C(t) = C(t + 1)`. Escrito en una sola fórmula, para un día con `v_t` viajes:
+`C(t)` es la más barata de las tres. Si el día `t` **no tiene viajes**, no se compra nada y se pasa al día siguiente: `C(t) = C(t + 1)`. Escrito en una sola fórmula, para un día con `viajes_t` viajes:
 
 ```text
 C(t) = el menor de:
@@ -410,7 +410,6 @@ def contraejemplo_mas_corto(
             if costo_dia_a_dia(viajes) > costo[1]:
                 return viajes
     return None
-
 
 
 viajes = [2, 3, 3, 0, 1, 0, 2, 0, 0, 1]

@@ -91,7 +91,7 @@ Cada uno de los cuatro laboratorios evaluativos se entrega como un **informe de 
 | 12  | Estructuras de datos (Cormen Cap. 10)          | Lunes 19 oct: pilas, colas, listas enlazadas (sin sesión P) |                     |
 | 13  | Estructuras de datos (Cormen Cap. 11–12)       | Lunes 26 oct: tablas hash y árboles de búsqueda binarios             | ★ Laboratorio 3     |
 | 14  | —                                              | Lunes 2 nov: festivo, sin clase                                      |                     |
-| 15  | Programación dinámica y voraces (Cormen Cap. 15–16) | Lunes 9 nov: estrategia voraz; la PD pasa a estudio autónomo (dos lecciones y guías complementarias por caso; resto en lectura autónoma) |  |
+| 15  | Programación dinámica y voraces (Cormen Cap. 15–16) | Lunes 9 nov: sin clase en vivo; la PD y la estrategia voraz pasan a estudio autónomo (tres lecciones y guías complementarias por caso; resto en lectura autónoma) |  |
 | 16  | —                                              | Lunes 16 nov: festivo, sin clase. Entrega asincrónica el miércoles 18 nov | ★ Laboratorio 4 (entrega) |
 
 ---
