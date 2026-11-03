@@ -1,6 +1,6 @@
 # Semana 15 — 9–15 de noviembre
 
-**Rama:** `feat/semana-15-analisis-de-algoritmos` (AA) · `feat/semana-15-programacion-cientifica` (PC) · `feat/semana-15-estructuras-de-datos` (ED; su estado está en la sección «Ronda — `estructuras-de-datos`», más abajo)
+**Rama:** `feat/semana-15-analisis-de-algoritmos` (AA) · `feat/semana-15-programacion-cientifica` (PC) · `feat/semana-15-estructuras-de-datos` (ED T1) · `feat/semana-15-t2-estructuras-de-datos` (ED T2; su estado está en las secciones «Ronda — `estructuras-de-datos`», más abajo)
 **Estado:** AA: ✅ Material y cuestionarios listos en desarrollo / ⬜ Desplegada · PC: ✅ **Desplegada y abierta en producción (2026-10-28)** · ED: ✅ Material y cuestionario listos en desarrollo / ✅ Mergeada a `development` (local; push pendiente) / ⬜ Desplegada
 
 ---
@@ -336,3 +336,73 @@ No aplica.
 - Decidir aparte los laboratorios P pendientes, incluido el del viernes 13 de noviembre.
 - D7: marcar la lección como vista en clase del grupo que la dicte, después de la sesión.
 
+
+---
+
+## Ronda 2 — `estructuras-de-datos`, T2 (2026-11-03)
+
+**Rama:** `feat/semana-15-t2-estructuras-de-datos`
+**Estado:** ✅ Material y cuestionario listos en desarrollo / ⬜ Revisada por `@reviewer` / ⬜ Mergeada / ⬜ Desplegada y abierta
+
+**Alcance confirmado por el usuario:** solo la sesión T2 (jueves 12 de noviembre):
+eliminación en BST. **Excluidos:** aplicaciones de los BST y síntesis del curso
+(T1 de la Semana 16, 17 nov), que se quitaron de los `topics` del registro; el
+laboratorio P del 13 de noviembre. El slug sigue siendo
+`eliminacion-en-bst-y-sintesis-del-curso` (no cambia ninguna URL) aunque el título
+pasó a «Eliminación en BST».
+
+### Etapas y aprobaciones
+
+| Etapa | Resultado | Aprobada por el usuario |
+|---|---|---|
+| E1 · Diagnóstico | El registro (order 34) juntaba dos sesiones; se acotó a T2 | ✅ |
+| E2 · Plan de lección | Aprobado: setters en `NodoArbol`, `Eliminacion.java` nuevo, `minimo` sin contador, topics de S16 quitados, un solo diagrama | ✅ |
+| E3 · Lección `.mdx` + registro TS | `eliminacion-en-bst-y-sintesis-del-curso` (312 líneas, 10 `##`, 1 Mermaid) | ✅ |
+| E4 · Apuntes del docente | No: la lección es el guion de la clase en vivo | ✅ (patrón de la serie) |
+| E5 · Cuestionario de cierre | Propuestas 6 preguntas → 6 aprobadas tal cual | ✅ |
+| E6 · Guía / Quiz A/B/C | No aplica (sesión en vivo, semana sin ★) | ✅ (patrón de la serie) |
+
+### Artefactos producidos
+
+| Artefacto | Ruta | Publicado |
+|---|---|---|
+| Lección teórica (guion de clase en vivo) | `content/cursos/estructuras-de-datos/eliminacion-en-bst-y-sintesis-del-curso.mdx` | ⬜ |
+| Registro TS | `lib/courses/data/estructuras-de-datos.ts` (`order: 34`; título, `summary` y `topics` reformulados) | — |
+
+### Cuestionario de cierre
+
+| Lección | Entorno | IDs de preguntas | Publicadas | Montadas (`list_lesson_questions`) |
+|---|---|---|---|---|
+| `eliminacion-en-bst-y-sintesis-del-curso` | desarrollo | P1 `176efa7d-61fe-4be5-a6d3-2a8200be2095` · P2 `0bd3d34d-39ae-4831-961c-96e5061caf7a` · P3 `8a125945-14ec-4d9c-bb19-49876ed1faed` · P4 `72c26aff-5a39-473d-a484-807673cf49d6` · P5 `c94cda8b-e3ad-4859-9d19-2896bf485485` · P6 `50835d7f-8727-40eb-aeaa-de79094c2ccd` | ✅ | ✅ 6/6 (orden P1–P6) |
+| `eliminacion-en-bst-y-sintesis-del-curso` | **producción** | — | ⬜ | ⬜ |
+
+> Las preguntas **no viajan con el deploy**: se recrean en producción en D3. No hay
+> keywords nuevas; comprobar en producción que existan `arboles`, `estructuras-de-datos`,
+> `java`, `recursion`, `complejidad` y `nodos`. Correctas: P1=b, P2=d, P3=a, P4=c, P5=a
+> (`50 4`, verificada con Java 17), P6=d. Las explicaciones no se guardan (sin campo de feedback).
+
+### Decisiones tomadas por Claude en nombre del docente
+
+- `NodoArbol` se amplía con `setDato`, `setIzquierdo` y `setDerecho`: eliminar es la primera operación que reemplaza. La lección avisa que `NodoArbol.java` sí se modifica aquí (la lección Inserción y recorridos decía «sin setters»).
+- Título del registro «Eliminación en BST»; el slug conserva «y-sintesis-del-curso» y ya no coincide con el título.
+- Las eliminaciones de la clase son acumulativas sobre el mismo `raiz` (T0: 50, 30, 70, 20, 40, 60, 80, 65): eliminar 20, 60 y 50 da 3 comparaciones cada una.
+- Antes de la votación se dice que el predecesor también serviría pero el curso usa siempre el sucesor, para que la opción (d) se decida por convención.
+- La rama de dos hijos queda como `return nodo;` («pendiente») en el estado intermedio para que cada bloque compile.
+- Las salidas se verificaron con Java 17 (el entorno no tiene Java 21).
+- El subagente de evaluación se negó a ejecutar la creación porque no veía la aprobación del usuario (la dio con AskUserQuestion); la creación, publicación y montaje los hice yo.
+
+### Verificación (E7)
+
+- [x] `npm run build` en verde
+- [x] `npm run lint` sin errores (7 warnings preexistentes)
+- [x] Sin `# H1`, `###`, `---` en el cuerpo ni `$`; Mermaid validado; `tsc` sin errores
+- [x] `summary` idéntico en frontmatter y registro TS
+- [x] Salidas citadas reproducidas byte a byte con Java 17
+- [ ] `@reviewer`
+- [ ] Render en navegador del diagrama del árbol (lo comprueba el docente)
+
+### Pendientes
+
+- Revisión por `@reviewer`, merge a `development` y push (del usuario).
+- Despliegue D0–D7 con confirmación en cada paso.
+- Las líneas de `info.md` de S15 T2 (523–525) también difieren del registro; no se tocaron.

@@ -463,11 +463,13 @@ export const estructurasDeDatos: Course = {
       slug: "eliminacion-en-bst-y-sintesis-del-curso",
       articleSlug: "eliminacion-en-bst-y-sintesis-del-curso",
       order: 34,
-      title: "Eliminación en BST y síntesis del curso",
+      title: "Eliminación en BST",
+      summary:
+        "Parte del juego de las siete tarjetas para ver qué pasa al retirar una; distingue los tres casos de eliminación (hoja, un hijo y dos hijos con el sucesor in-order) y escribe en Java `eliminar` y `minimo` recursivos sobre enteros, comprobando con el recorrido in-orden que el árbol sigue cumpliendo la regla.",
       topics: [
         { title: "Casos de eliminación: nodo hoja, nodo con un hijo, nodo con dos hijos" },
-        { title: "Aplicaciones de los BST: diccionarios, índices, autocompletado" },
-        { title: "Síntesis del curso: hilo conductor entre todos los módulos" },
+        { title: "Sucesor in-order: mínimo del subárbol derecho" },
+        { title: "Verificación de la propiedad BST con el recorrido in-orden" },
       ],
     },
   ],
