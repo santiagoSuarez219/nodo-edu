@@ -111,7 +111,7 @@ Añade una celda y dibuja la dispersión con un color por especie, con el argume
 
 ```python
 ax = sns.scatterplot(data=pinguinos, x="bill_length_mm", y="bill_depth_mm", hue="species")
-ax.set_title("Largo y profundidad del pico")
+ax.set_title("Largo y profundidad del pico, por especie")
 ax.set_xlabel("Largo del pico (mm)")
 ax.set_ylabel("Profundidad del pico (mm)")
 plt.show()
@@ -119,7 +119,7 @@ plt.show()
 
 ![Dispersión de largo y profundidad del pico con tres nubes, una por especie, cada una con tendencia creciente](/documentos/programacion-cientifica/lecciones/graficas-multivariables-con-matplotlib-y-seaborn/dispersion-pico-especie.png)
 
-**La respuesta es (c).** Hay tres nubes en zonas distintas: Adelie arriba a la izquierda, Chinstrap arriba a la derecha y Gentoo abajo a la derecha. Dentro de cada una, la tendencia sube. Calcula la correlación por especie con un ciclo:
+**La respuesta es (c).** Hay tres nubes en zonas distintas: Adelie arriba a la izquierda, Chinstrap arriba a la derecha y Gentoo abajo a la derecha. Dentro de cada una, la tendencia sube. Calcula la correlación por especie con un ciclo. `groupby("species")` reparte las filas en un grupo por especie; en cada vuelta, `especie` es el nombre (`"Adelie"`, …) y `grupo` es la tabla con solo las filas de esa especie:
 
 ```python
 for especie, grupo in pinguinos.groupby("species"):
@@ -190,12 +190,12 @@ La **recta de ajuste** es la que mejor atraviesa la nube. Su **pendiente** dice 
 import numpy as np
 
 datos = pinguinos.dropna(subset=["flipper_length_mm", "body_mass_g"])
-pendiente, intercepto = np.polyfit(datos["flipper_length_mm"], datos["body_mass_g"], 1)
+pendiente, _ = np.polyfit(datos["flipper_length_mm"], datos["body_mass_g"], 1)
 print(round(pendiente, 1))
 
 for especie, grupo in datos.groupby("species"):
-    p, b = np.polyfit(grupo["flipper_length_mm"], grupo["body_mass_g"], 1)
-    print(especie, round(p, 1))
+    pendiente_grupo, _ = np.polyfit(grupo["flipper_length_mm"], grupo["body_mass_g"], 1)
+    print(especie, round(pendiente_grupo, 1))
 ```
 
 ```text
@@ -205,7 +205,7 @@ Chinstrap 34.6
 Gentoo 54.6
 ```
 
-En todo el conjunto, 49.7 g más por cada milímetro de aleta; por especie, 32.8, 34.6 y 54.6 g por milímetro. Es la paradoja de Simpson otra vez, ahora en la pendiente. Seaborn dibuja la recta con `regplot`, y `lmplot` con `hue` dibuja una por especie:
+En todo el conjunto, 49.7 g más por cada milímetro de aleta; por especie, 32.8, 34.6 y 54.6 g por milímetro. Todas son positivas, pero la pendiente global mezcla grupos con pendientes distintas: Gentoo sube mucho más por milímetro que las otras dos. Seaborn dibuja la recta con `regplot`, y `lmplot` con `hue` dibuja una por especie:
 
 ```python
 ax = sns.regplot(data=pinguinos, x="flipper_length_mm", y="body_mass_g")
@@ -240,7 +240,7 @@ plt.show()
 
 ![Mapa de calor de correlaciones: aleta y masa en 0.87, largo y profundidad del pico en menos 0.24](/documentos/programacion-cientifica/lecciones/graficas-multivariables-con-matplotlib-y-seaborn/mapa-calor-correlacion.png)
 
-El rojo más fuerte es aleta con masa: 0.87. Ahí está de nuevo el -0.24 entre largo y profundidad del pico. El mapa muestra solo resúmenes globales. Para ver los datos detrás de cada celda, `pairplot` dibuja todas las parejas en una cuadrícula, con la distribución de cada variable en la diagonal:
+Fuera de la diagonal, el rojo más fuerte es aleta con masa: 0.87. Ahí está de nuevo el -0.24 entre largo y profundidad del pico. El mapa muestra solo resúmenes globales. Para ver los datos detrás de cada celda, `pairplot` dibuja todas las parejas en una cuadrícula, con la distribución de cada variable en la diagonal:
 
 ```python
 sns.pairplot(pinguinos, hue="species")
@@ -251,13 +251,13 @@ Cada celda fuera de la diagonal es una dispersión como la de la votación; la c
 
 ## Burbujas: una tercera variable
 
-Para una **tercera variable numérica** en la dispersión se usa el tamaño del punto: `s=` en Matplotlib o `size=` en Seaborn.
+Para una **tercera variable numérica** en la dispersión se usa el tamaño del punto, con `size=` en Seaborn.
 
 ```python
 fig, ax = plt.subplots(figsize=(8, 4.5))
 sns.scatterplot(data=pinguinos, x="bill_length_mm", y="bill_depth_mm", size="body_mass_g",
                 hue="species", sizes=(20, 300), alpha=0.6, ax=ax)
-ax.set_title("Pico y masa corporal")
+ax.set_title("Pico por especie; el tamaño es la masa corporal")
 ax.set_xlabel("Largo del pico (mm)")
 ax.set_ylabel("Profundidad del pico (mm)")
 plt.show()
@@ -283,15 +283,15 @@ Sin cifras ni conclusión, lo que escribes es una descripción del dibujo, no un
 
 ## Resumen operativo
 
-| Pregunta | Gráfico | Matplotlib / Seaborn | Qué leer |
+| Pregunta | Gráfico | Función | Qué leer |
 |---|---|---|---|
 | ¿Se relacionan dos numéricas? | dispersión | `ax.scatter` / `scatterplot` | Dirección, fuerza, puntos raros |
-| ¿Cómo cambia algo en un orden? | líneas | `ax.plot` / `lineplot` | Solo con eje ordenado |
-| ¿Cómo se comparan grupos? | boxplot por grupo | `ax.boxplot` / `boxplot` | Medianas y traslape de cajas |
-| ¿Cómo se cruzan dos categóricas? | barras agrupadas | `ax.bar` / `countplot(hue=)` | Qué subgrupos existen |
+| ¿Cómo cambia algo en un orden? | líneas | `ax.plot` | Solo con eje ordenado |
+| ¿Cómo se comparan grupos? | boxplot por grupo | `boxplot` | Medianas y traslape de cajas |
+| ¿Cómo se cruzan dos categóricas? | barras agrupadas | `countplot(hue=)` | Qué subgrupos existen |
 | ¿Cuánto cambia y por unidad de x? | regresión | `np.polyfit` / `regplot`, `lmplot`, `jointplot` | Pendiente, dentro del rango |
 | ¿Qué relaciones hay entre muchas? | mapa de calor y pairplot | `sns.heatmap`, `sns.pairplot` | Correlaciones y los datos detrás |
-| ¿Y una tercera numérica? | burbujas | `ax.scatter(s=)` / `scatterplot(size=)` | Tamaño; `alpha` si se tapan |
+| ¿Y una tercera numérica? | burbujas | `scatterplot(size=)` | Tamaño; `alpha` si se tapan |
 
 ## Síntesis
 

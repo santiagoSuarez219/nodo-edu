@@ -15,7 +15,7 @@ summary: "Convierte una columna de números o de categorías en un gráfico que 
 updatedAt: "2026-11-04"
 ---
 
-> 📘 **Lección guion para clase en vivo.** Se dicta en la sesión y se sigue paso a paso: ten un cuaderno de Google Colab abierto, escribe el código a medida que avanzamos y piensa cada respuesta **antes** de mirar la salida. Cada bloque de código es una celda y las celdas son **acumulativas**: la primera trae las importaciones y la carga de los datos, y las siguientes usan lo que ya definió; ejecútalas en orden. «Añade una celda» significa ponerla después de las que ya hay. Esta lección trabaja **una columna a la vez**; para cruzar dos variables, ver la lección Gráficas multivariables con Matplotlib y Seaborn.
+> 📘 **Lección guion para clase en vivo.** Se dicta en la sesión y se sigue paso a paso: ten un cuaderno de Google Colab abierto, escribe el código a medida que avanzamos y piensa cada respuesta **antes** de mirar la salida. Cada bloque de código es una celda y las celdas son **acumulativas**: la primera celda (la del afiche) solo importa Matplotlib; la que trae las demás importaciones y la carga de los pingüinos es la de la sección «Cargar los pingüinos y mirar una columna», y las siguientes usan lo que ya definió; ejecútalas en orden. «Añade una celda» significa ponerla después de las que ya hay. Esta lección trabaja **una columna a la vez**; para cruzar dos variables, ver la lección Gráficas multivariables con Matplotlib y Seaborn.
 
 ## El afiche: figura y ejes
 
@@ -114,7 +114,7 @@ fig.savefig("histograma-masa.png", dpi=150, bbox_inches="tight")   # guardar ANT
 plt.show()
 ```
 
-![Histograma de la masa corporal: dos jorobas, una alrededor de 3700 g y otra alrededor de 5000 g, con un valle entre ellas](/documentos/programacion-cientifica/lecciones/matplotlib-y-seaborn/histograma-masa.png)
+![Histograma de la masa corporal con 20 columnas: un solo pico entre 3600 g y 3960 g y una cola larga hacia los pingüinos más pesados, hasta 6300 g](/documentos/programacion-cientifica/lecciones/matplotlib-y-seaborn/histograma-masa.png)
 
 `dpi=150` da nitidez y `bbox_inches="tight"` evita que se recorten los títulos. Ahora sí, comprobemos la votación. Añade una celda:
 
@@ -128,9 +128,9 @@ print(len(cerca), round(len(cerca) / len(masa) * 100, 1))
 53 15.5
 ```
 
-**La respuesta es (c).** Solo 53 de los 342, el 15.5 %, pesan cerca de la media. Esperarías más porque la media es el «centro», pero el histograma tiene **dos jorobas** y un valle justo donde cae el promedio: la mayoría se agrupa a un lado y al otro. Qué revela cada opción: (a) supone una campana con todos alrededor del centro; (b) lo supone a medias; (d) cree que el promedio no describe a nadie, y no llega a tanto. Lo que importa es la lectura: hay **más de un grupo** en esta columna, y un solo promedio los mezcla.
+**La respuesta es (c).** Solo 53 de los 342, el 15.5 %, pesan cerca de la media. El promedio **no** es donde está la mayoría: el histograma tiene un pico cerca de 3700 g y una cola larga hacia los más pesados. Esa cola jala la media (4202 g) por encima de la mediana (4050 g) y del pico. Además, la ventana de 4000 g a 4400 g mide solo 400 g de ancho, frente a una desviación estándar de unos 802 g, así que atrapa poca gente aunque se centre en la media. Qué revela cada opción: (a) supone que la media es el centro de la mayoría; (b) imagina una campana simétrica con la media en la cima; (d) exagera: poca gente no es casi nadie. Lo que importa es la lectura: en una distribución con cola, la media no es el valor típico.
 
-🛑 **Pausa:** si 4202 g describe a tan pocos, ¿qué cifra de `describe` te parece más honesta para resumir la columna? ¿Por qué?
+🛑 **Pausa:** si la cola jala la media hacia arriba, ¿qué cifra de `describe` te parece más honesta para resumir la columna? ¿Por qué?
 
 Una advertencia más. Matplotlib ignora los nulos **en silencio**: dibujó 342 pingüinos, no 344, y no avisó. Compruébalo en una celda nueva:
 
@@ -191,7 +191,7 @@ ax.set_ylabel("Número de pingüinos")
 plt.show()
 ```
 
-La curva sube dos veces: confirma las dos jorobas. `sns.kdeplot(data=pinguinos, x="body_mass_g")` dibuja solo la curva. Y para resumir la columna entera en una caja, el **boxplot de una variable**:
+La curva muestra un solo pico y una cola hacia la derecha, como el histograma. `sns.kdeplot(data=pinguinos, x="body_mass_g")` dibuja solo la curva. Y para resumir la columna entera en una caja, el **boxplot de una variable**:
 
 ```python
 ax = sns.boxplot(data=pinguinos, x="body_mass_g")
@@ -200,11 +200,11 @@ ax.set_xlabel("Masa corporal (g)")
 plt.show()
 ```
 
-Se lee así: la línea del centro es la mediana (4050 g), la caja va del cuartil 1 al cuartil 3 (3550 g a 4750 g, el IQR que ya usaste en la lección Filtrado, agregación y limpieza de datos), los bigotes llegan hasta 1.5 IQR, y los puntos sueltos serían atípicos: aquí no hay ninguno.
+Se lee así: la línea del centro es la mediana (4050 g), la caja va del cuartil 1 al cuartil 3 (3550 g a 4750 g, el IQR que ya usaste en la lección Filtrado, agregación y limpieza de datos), los bigotes llegan hasta el último dato que queda dentro de 1.5 IQR de la caja, y los puntos sueltos serían atípicos: aquí no hay ninguno.
 
-🛑 **Pausa:** el boxplot muestra una sola caja. ¿Podrías adivinar mirándolo que el histograma tiene dos jorobas? ¿Qué gráfico revela lo que el otro esconde?
+🛑 **Pausa:** el boxplot muestra una sola caja. La media (4202 g) es mayor que la mediana (4050 g): ¿qué forma del histograma explica esa diferencia? ¿Se ve en la caja?
 
-> **Boxplot:** gráfico que resume una numérica con su mediana, su IQR y sus valores atípicos. Es compacto, pero no enseña cuántas jorobas tiene la distribución.
+> **Boxplot:** gráfico que resume una numérica con su mediana, su IQR y sus valores atípicos. Es compacto, pero no enseña los picos de la distribución.
 
 ## Torta y nube de palabras
 
@@ -240,7 +240,7 @@ plt.show()
 
 ![Nube de palabras de los métodos de descubrimiento de exoplanetas: Radial Velocity y Transit dominan, el resto casi no se ve](/documentos/programacion-cientifica/lecciones/matplotlib-y-seaborn/nube-metodos-exoplanetas.png)
 
-La velocidad radial descubrió 553 de los 1035 planetas y el tránsito 397; los demás métodos casi no se ven. La nube sirve para explorar o ilustrar, pero no lleva escala: para comparar 23 contra 38 usa barras.
+La velocidad radial descubrió 553 de los 1035 planetas y el tránsito 397; los demás métodos casi no se ven. La nube sirve para explorar o ilustrar, pero no lleva escala: para comparar Microlensing (23 planetas) con Imaging (38) usa barras.
 
 ## Estándar mínimo y guardar
 
@@ -269,7 +269,7 @@ plt.show()
 
 | Pregunta sobre una columna | Gráfico | Matplotlib / Seaborn | Qué leer |
 |---|---|---|---|
-| ¿Cómo se reparte una numérica? | histograma | `ax.hist` / `histplot` | Cuántas jorobas tiene |
+| ¿Cómo se reparte una numérica? | histograma | `ax.hist` / `histplot` | Dónde está el pico y si hay cola |
 | ¿Qué forma suave tiene? | KDE | `histplot(kde=True)`, `kdeplot` | Dónde sube la curva |
 | ¿Cuál es su mediana y su rango? | boxplot | `ax.boxplot` / `boxplot` | Línea central, caja y atípicos |
 | ¿Cuántos hay de cada categoría? | barras | `ax.bar` / `countplot` | Altura desde 0 |
@@ -281,7 +281,7 @@ plt.show()
 - Un afiche tiene hoja, recuadro y rótulos: en Matplotlib, `fig, ax = plt.subplots()` y el título, los ejes con unidad y el guardado se piden sobre `ax`.
 - El tipo de la columna elige el gráfico: numérica pide histograma, KDE o boxplot; categórica pide barras o torta, y de texto, nube de palabras.
 - La tabla de pingüinos tiene 344 filas y la masa corporal 342 valores: 2 nulos que Matplotlib ignora sin avisar.
-- En la votación, solo 53 de 342 pingüinos (15.5 %) pesan entre 4000 g y 4400 g, aunque la media sea 4202 g, porque el histograma tiene dos jorobas y un valle donde cae el promedio.
+- En la votación, solo 53 de 342 pingüinos (15.5 %) pesan entre 4000 g y 4400 g, aunque la media sea 4202 g, porque el histograma tiene un solo pico cerca de 3700 g y una cola hacia los pesados que jala la media por encima de la mediana, y la ventana de 400 g es angosta frente a una desviación estándar de unos 802 g.
 - `value_counts` y `ax.bar` dan 152, 124 y 68 pingüinos por especie, con el eje desde 0; `countplot` lo hace en una línea.
 - Seaborn dibuja `histplot(kde=True)`, `kdeplot` y el boxplot en una línea: mediana 4050 g, caja de 3550 g a 4750 g y sin atípicos.
 - La torta muestra 44.2 %, 36.0 % y 19.8 %, y solo sirve con pocas porciones; la nube de palabras muestra que 553 de los 1035 exoplanetas se descubrieron por velocidad radial y 397 por tránsito, pero no lleva escala.

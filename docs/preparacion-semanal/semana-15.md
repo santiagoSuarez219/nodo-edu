@@ -484,11 +484,12 @@ Sin cambios de esquema.
 
 **Producción (pendiente en el despliegue):** replicar con los IDs de producción de las 6 preguntas actuales — Q1 `0905d8f0-d259-4cca-a1c2-7c0bcc23b38a`, Q2 `9b32c1bf-fd7f-4257-bc1e-cc7dbd806290`, Q3 `26cc01a8-0e52-4121-bc42-7f151addaa5d`, Q4 `560056d1-ec19-4269-9943-478c14d35840`, Q5 `9343b44e-6ccd-44c7-9a2d-7e4ee82b39b1`, Q6 `c0abcb08-f12b-4f64-ab33-939278b97136` —: `update_question` de Q4, desmontar Q2/Q3/Q5/Q6 de A y montarlas en B, crear las 6 nuevas, publicarlas, montarlas y reordenar. Las keywords ya existen en producción.
 
+> Tras la revisión se corrigieron en desarrollo A2 (opción C: «con 20 se ve un pico cerca de 3700 g y una cola larga hacia los más pesados») y A4 (opción C: «La distribución es simétrica…»); ambas se replican igual en producción.
 > Q6 trae las cifras de la paradoja de Simpson: el cuestionario se responde **después** de la clase B (decisión del usuario).
 
 ### Decisiones tomadas por Claude en nombre del docente
 
-- El histograma de masa se describe con «valle donde cae el promedio», no «hueco»: con 20 columnas la media baja a unos 18–25 pingüinos por columna frente a 35–39 en la joroba mayor.
+- **Corrección (revisión):** la masa de los pingüinos NO es bimodal. Con 20 columnas los conteos son 3, 12, 13, 30, 32, 39, 35, 18, 25, 17, 19, 22, 16, 12, 10, 17, 11, 5, 5, 1: un solo pico en 3600–3960 g y una cola larga hacia los más pesados; media 4202 g, mediana 4050 g. La versión original de la lección, ya en producción, decía «dos jorobas»; ambas lecciones se reescribieron con el razonamiento correcto (la cola jala la media y la ventana de 400 g es angosta frente a una desviación estándar de ~802 g).
 - Cifra corregida del eje cortado en 100: la barra de Gentoo (124) mide el 82 % de la de Adelie (152), no «una sexta parte».
 - El `summary` y los `topics` de B no nombran Simpson ni «por especie», para no delatar la votación.
 - En B, antes de la votación solo aparecen datos inventados y la correlación global -0.24; ni `hue`, ni boxplot por especie, ni la dispersión aleta–masa.
@@ -500,6 +501,7 @@ Sin cambios de esquema.
 
 - [x] `npm run build` en verde; `npm run lint` sin errores (7 warnings preexistentes); `tsc` sin errores
 - [x] Todo el código de ambas lecciones se ejecutó en un venv; salidas y cifras coinciden
+- [x] Primera revisión `@reviewer`: CAMBIOS REQUERIDOS (1 bloqueante por la bimodalidad falsa, 1 mayor por «Simpson en la pendiente», menores); corregido en esta ronda
 - [x] `summary` idéntico en frontmatter y registro (A y B)
 - [x] Nada antes de cada votación revela su respuesta
 - [ ] `@reviewer`
