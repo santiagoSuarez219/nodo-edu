@@ -451,7 +451,7 @@ Sin cambios de esquema.
 ## Ronda 3 — `programacion-cientifica`, lección dividida en dos clases en vivo (2026-11-04)
 
 **Rama:** `feat/semana-15-pc-graficas`
-**Estado:** ✅ Material y cuestionarios listos en desarrollo / ⬜ Revisada por `@reviewer` / ⬜ Mergeada / ⬜ Desplegada (la lección B nace abierta: cerrarla en D1)
+**Estado:** ✅ Material y cuestionarios listos en desarrollo / ✅ Revisada por `@reviewer` / ⬜ Mergeada / ⬜ Desplegada (la lección B nace abierta: cerrarla en D1)
 
 **Alcance confirmado por el usuario:** convertir `matplotlib-y-seaborn` en una clase autocontenida en vivo, como las de `estructuras-de-datos`, dividida en dos clases: gráficas univariables y gráficas multivariables. Los apuntes del docente se eliminaron. **No se tocó el cronograma:** la fecha de la segunda clase la decide el docente.
 
@@ -489,7 +489,7 @@ Sin cambios de esquema.
 
 ### Decisiones tomadas por Claude en nombre del docente
 
-- **Corrección (revisión):** la masa de los pingüinos NO es bimodal. Con 20 columnas los conteos son 3, 12, 13, 30, 32, 39, 35, 18, 25, 17, 19, 22, 16, 12, 10, 17, 11, 5, 5, 1: un solo pico en 3600–3960 g y una cola larga hacia los más pesados; media 4202 g, mediana 4050 g. La versión original de la lección, ya en producción, decía «dos jorobas»; ambas lecciones se reescribieron con el razonamiento correcto (la cola jala la media y la ventana de 400 g es angosta frente a una desviación estándar de ~802 g).
+- **Corrección (revisión):** la masa de los pingüinos NO es bimodal. Con 20 columnas los conteos son 3, 12, 13, 30, 32, 39, 35, 18, 25, 17, 19, 22, 16, 12, 10, 17, 11, 5, 5, 1: un solo pico en 3600–3960 g y una cola larga hacia los más pesados; media 4202 g, mediana 4050 g. La versión original de la lección, ya en producción, decía «dos jorobas»; la lección A se reescribió con el razonamiento correcto y B no repite la afirmación (la cola jala la media y la ventana de 400 g es angosta frente a una desviación estándar de ~802 g).
 - Cifra corregida del eje cortado en 100: la barra de Gentoo (124) mide el 82 % de la de Adelie (152), no «una sexta parte».
 - El `summary` y los `topics` de B no nombran Simpson ni «por especie», para no delatar la votación.
 - En B, antes de la votación solo aparecen datos inventados y la correlación global -0.24; ni `hue`, ni boxplot por especie, ni la dispersión aleta–masa.
@@ -504,7 +504,7 @@ Sin cambios de esquema.
 - [x] Primera revisión `@reviewer`: CAMBIOS REQUERIDOS (1 bloqueante por la bimodalidad falsa, 1 mayor por «Simpson en la pendiente», menores); corregido en esta ronda
 - [x] `summary` idéntico en frontmatter y registro (A y B)
 - [x] Nada antes de cada votación revela su respuesta
-- [ ] `@reviewer`
+- [x] `@reviewer`: segunda revisión APROBADO, sin hallazgos bloqueantes ni mayores
 - [ ] Render en navegador de las lecciones e imágenes
 
 ### Pendientes
