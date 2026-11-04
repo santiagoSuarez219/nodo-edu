@@ -1,7 +1,7 @@
 # Semana 15 — 9–15 de noviembre
 
 **Rama:** `feat/semana-15-analisis-de-algoritmos` (AA) · `feat/semana-15-programacion-cientifica` (PC) · `feat/semana-15-estructuras-de-datos` (ED T1) · `feat/semana-15-t2-estructuras-de-datos` (ED T2; su estado está en las secciones «Ronda — `estructuras-de-datos`», más abajo)
-**Estado:** AA: ✅ Material y cuestionarios listos en desarrollo / ⬜ Desplegada · PC: ✅ **Desplegada y abierta en producción (2026-10-28)** · ED T1: ✅ Material y cuestionario listos en desarrollo / ✅ Mergeada a `development` (local; push pendiente) / ⬜ Desplegada · ED T2: ✅ Material y cuestionario listos en desarrollo / ✅ Revisada por `@reviewer` / ⬜ Mergeada / ⬜ Desplegada (ver «Ronda 2»)
+**Estado:** AA: ✅ Material y cuestionarios listos en desarrollo / ⬜ Desplegada · PC: ✅ **Desplegada y abierta en producción (2026-10-28)** · ED T1: ✅ Material y cuestionario listos en desarrollo / ✅ Mergeada a `development` (local; push pendiente) / ⬜ Desplegada · ED T2: ✅ Material y cuestionario listos en desarrollo / ✅ Revisada por `@reviewer` / ✅ Mergeada a `development` (local; push pendiente) / ⬜ Desplegada (ver «Ronda 2»)
 
 ---
 
@@ -342,7 +342,7 @@ No aplica.
 ## Ronda 2 — `estructuras-de-datos`, T2 (2026-11-03)
 
 **Rama:** `feat/semana-15-t2-estructuras-de-datos`
-**Estado:** ✅ Material y cuestionario listos en desarrollo / ✅ Revisada por `@reviewer` / ⬜ Mergeada / ⬜ Desplegada y abierta
+**Estado:** ✅ Material y cuestionario listos en desarrollo / ✅ Revisada por `@reviewer` / ✅ Mergeada a `development` (local; push pendiente) / ⬜ Desplegada y abierta
 
 **Alcance confirmado por el usuario:** solo la sesión T2 (jueves 12 de noviembre):
 eliminación en BST. **Excluidos:** aplicaciones de los BST y síntesis del curso
@@ -403,6 +403,6 @@ pasó a «Eliminación en BST».
 
 ### Pendientes
 
-- Revisión por `@reviewer`, merge a `development` y push (del usuario).
+- Push de `development` (del usuario).
 - Despliegue D0–D7 con confirmación en cada paso.
 - Las líneas de `info.md` de S15 T2 (523–525) también difieren del registro; no se tocaron.
