@@ -445,3 +445,68 @@ Sin cambios de esquema.
 - `info.md` (líneas 501, 507, 521 y 523–525) sigue sin alinear con el registro.
 - Semana 13 (recursión sobre listas; riesgos, límites y backtracking): sin lecciones registradas.
 - La sesión del 17 nov (aplicaciones de BST y síntesis del curso) quedó sin lección propia por decisión del usuario.
+
+---
+
+## Ronda 3 — `programacion-cientifica`, lección dividida en dos clases en vivo (2026-11-04)
+
+**Rama:** `feat/semana-15-pc-graficas`
+**Estado:** ✅ Material y cuestionarios listos en desarrollo / ⬜ Revisada por `@reviewer` / ⬜ Mergeada / ⬜ Desplegada (la lección B nace abierta: cerrarla en D1)
+
+**Alcance confirmado por el usuario:** convertir `matplotlib-y-seaborn` en una clase autocontenida en vivo, como las de `estructuras-de-datos`, dividida en dos clases: gráficas univariables y gráficas multivariables. Los apuntes del docente se eliminaron. **No se tocó el cronograma:** la fecha de la segunda clase la decide el docente.
+
+### Etapas y aprobaciones
+
+| Etapa | Resultado | Aprobada por el usuario |
+|---|---|---|
+| E1 · Diagnóstico | Una sola sesión en el cronograma (jue 12 nov); el usuario pidió dividir en dos clases | ✅ |
+| E2 · Plan de lección | Aprobado: slug largo para B, mover 4 imágenes, votación de proporción en A, gancho de estatura/zapato en B | ✅ |
+| E3 · Lecciones `.mdx` + registro TS | A `matplotlib-y-seaborn` (290 líneas, 11 `##`) y B `graficas-multivariables-con-matplotlib-y-seaborn` (306 líneas, 13 `##`) | ✅ |
+| E4 · Apuntes del docente | **Eliminados** (`apuntes/matplotlib-y-seaborn.md`) a pedido del usuario | ✅ |
+| E5 · Cuestionario | 6 por lección: Q4 reformulada, Q2/Q3/Q5/Q6 pasadas a B, 6 nuevas | ✅ aprobado tal cual |
+| E6 · Guía / Quiz A/B/C | No aplica | — |
+
+### Artefactos
+
+| Artefacto | Ruta |
+|---|---|
+| Lección A (univariables) | `content/cursos/programacion-cientifica/matplotlib-y-seaborn.mdx` (order 11, slug sin cambio) |
+| Lección B (multivariables) | `content/cursos/programacion-cientifica/graficas-multivariables-con-matplotlib-y-seaborn.mdx` (order 11.2) |
+| Registro TS | `lib/courses/data/programacion-cientifica.ts` (título, `summary` y `topics` de A; entrada nueva de B) |
+| Imágenes | A conserva `histograma-masa` y `nube-metodos-exoplanetas`; B recibió (git mv) `boxplot-masa-especie`, `mapa-calor-correlacion`, `dispersion-pico-especie` y `burbujas-pico-masa` |
+
+### Cuestionario en desarrollo (orden A1–A6 y B1–B6)
+
+| Lección | IDs |
+|---|---|
+| `matplotlib-y-seaborn` | A1 `f7e68922-ba5d-4aa0-b0d1-bf76a7206611` (Q1) · A2 `5933ca23-d0a0-4567-80bc-ceeceea21198` · A3 `55fbed47-aad0-465a-8064-f3558db202f0` · A4 `5a2f11e8-5724-42b9-b1b1-cd16f974087b` · A5 `2f13d949-e23c-4d2b-ab35-24c2a658362d` (Q4 reformulada) · A6 `035b7aa5-505f-48dd-8f03-88fe780da087` |
+| `graficas-multivariables-con-matplotlib-y-seaborn` | B1 `6363c629-605e-4006-a525-02e30c3008d6` (Q2) · B2 `98e67585-cc49-4d5f-a6da-6f3a7db9497d` · B3 `16648dce-6057-40e3-a44c-634910078fcd` (Q3) · B4 `55258601-c9e8-47af-a7a6-2e3ef04fa9da` · B5 `5d1c876e-37e8-41dc-b410-986845310443` (Q5) · B6 `6a1bec38-7b26-4d15-ae42-f0161ed1a696` (Q6) |
+
+**Producción (pendiente en el despliegue):** replicar con los IDs de producción de las 6 preguntas actuales — Q1 `0905d8f0-d259-4cca-a1c2-7c0bcc23b38a`, Q2 `9b32c1bf-fd7f-4257-bc1e-cc7dbd806290`, Q3 `26cc01a8-0e52-4121-bc42-7f151addaa5d`, Q4 `560056d1-ec19-4269-9943-478c14d35840`, Q5 `9343b44e-6ccd-44c7-9a2d-7e4ee82b39b1`, Q6 `c0abcb08-f12b-4f64-ab33-939278b97136` —: `update_question` de Q4, desmontar Q2/Q3/Q5/Q6 de A y montarlas en B, crear las 6 nuevas, publicarlas, montarlas y reordenar. Las keywords ya existen en producción.
+
+> Q6 trae las cifras de la paradoja de Simpson: el cuestionario se responde **después** de la clase B (decisión del usuario).
+
+### Decisiones tomadas por Claude en nombre del docente
+
+- El histograma de masa se describe con «valle donde cae el promedio», no «hueco»: con 20 columnas la media baja a unos 18–25 pingüinos por columna frente a 35–39 en la joroba mayor.
+- Cifra corregida del eje cortado en 100: la barra de Gentoo (124) mide el 82 % de la de Adelie (152), no «una sexta parte».
+- El `summary` y los `topics` de B no nombran Simpson ni «por especie», para no delatar la votación.
+- En B, antes de la votación solo aparecen datos inventados y la correlación global -0.24; ni `hue`, ni boxplot por especie, ni la dispersión aleta–masa.
+- Sin «Dónde se rompe la analogía» en A ni B.
+- Tiempos estimados: A ≈ 59 min y B ≈ 60–65 min; juntas suman ≈ 120–125 min, así que no caben cómodamente en una sola sesión de 120 min.
+- Las 6 imágenes no se abrieron ni regeneraron: el render lo comprueba el docente.
+
+### Verificación (E7)
+
+- [x] `npm run build` en verde; `npm run lint` sin errores (7 warnings preexistentes); `tsc` sin errores
+- [x] Todo el código de ambas lecciones se ejecutó en un venv; salidas y cifras coinciden
+- [x] `summary` idéntico en frontmatter y registro (A y B)
+- [x] Nada antes de cada votación revela su respuesta
+- [ ] `@reviewer`
+- [ ] Render en navegador de las lecciones e imágenes
+
+### Pendientes
+
+- Revisión, merge a `development` y push (del usuario).
+- Despliegue: D1 cerrar la lección B antes del push; D3 replicar el cuestionario en producción; D4 abrir B; D7 marcar cada clase como vista.
+- Fecha de la segunda clase: sin decidir; no se modificó el cronograma ni `info.md`.
