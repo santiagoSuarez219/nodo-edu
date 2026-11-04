@@ -498,13 +498,13 @@ Cada archivo de proyecto detalla la evaluación de viabilidad, las entidades del
 **T1 — Conceptos y TAD árbol binario**
 - Estructura de árbol: raíz, nodo, hoja, subárbol, nivel, altura
 - Árbol binario: definición y propiedades
-- TAD Árbol binario: representación con nodos enlazados en Java
+- TAD árbol binario: operaciones como contrato
 - **¿Qué problemas piden una estructura jerárquica?**
 
 **T2 — Inserción y recorridos**
-- Inserción de nodos en un árbol binario
+- Inserción de nodos en un árbol binario: colgar un hijo izquierdo o derecho de un padre dado
 - Recorridos recursivos: in-order (izquierda–raíz–derecha), pre-order, post-order
-- Aplicaciones de cada tipo de recorrido
+- Los tres recorridos y sus salidas sobre el mismo árbol
 
 **P — Laboratorio: Árbol binario con recorridos**
 - Implementar `NodoArbol<T>` y `ArbolBinario<T>` en Java
@@ -521,8 +521,9 @@ Cada archivo de proyecto detalla la evaluación de viabilidad, las entidades del
 - Efecto de un árbol degenerado sobre la complejidad
 
 **T2 — Eliminación en BST**
-- Casos de eliminación: nodo hoja, nodo con un hijo, nodo con dos hijos (sucesor in-order)
-- Verificación de que la propiedad BST se mantiene tras cada eliminación
+- Casos de eliminación: nodo hoja, nodo con un hijo, nodo con dos hijos
+- Sucesor in-order: mínimo del subárbol derecho
+- Verificación de la propiedad BST con el recorrido in-orden
 
 **P — Laboratorio: BST completo**
 - Implementar un `BST<T>` con inserción, búsqueda, eliminación y recorridos

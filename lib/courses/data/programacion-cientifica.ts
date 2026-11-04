@@ -244,13 +244,31 @@ export const programacionCientifica: Course = {
       slug: "matplotlib-y-seaborn",
       articleSlug: "matplotlib-y-seaborn",
       order: 11,
-      title: "Matplotlib y Seaborn",
+      title: "Gráficas univariables con Matplotlib y Seaborn",
       summary:
-        "Descubre con el dataset de pingüinos por qué un número puede mentir y un gráfico bien elegido no: elige el tipo de gráfico según la variable, constrúyelo con Matplotlib y Seaborn, y aprende a leerlo e interpretarlo.",
+        "Convierte una columna de números o de categorías en un gráfico que se lee: la figura y los ejes de Matplotlib, histograma, KDE, boxplot, barras, torta y nube de palabras con el dataset de pingüinos, y el estándar mínimo que debe cumplir todo gráfico.",
       topics: [
-        { title: "Matplotlib: gráficos básicos (líneas, barras, dispersión, histogramas)" },
-        { title: "Seaborn: gráficos estadísticos (boxplot, heatmap, pairplot)" },
-        { title: "Buenas prácticas de visualización: elección del tipo de gráfico según el dato" },
+        { title: "Figura y ejes de Matplotlib: título, etiquetas con unidad y guardado" },
+        { title: "Una variable numérica: histograma, KDE y boxplot" },
+        { title: "Una variable categórica: barras, countplot, torta y nube de palabras" },
+        { title: "Seaborn sobre Matplotlib: tema, paleta y gráficos en una línea" },
+        { title: "Estándar mínimo de un gráfico" },
+      ],
+    },
+    {
+      id: "graficas-multivariables-con-matplotlib-y-seaborn",
+      slug: "graficas-multivariables-con-matplotlib-y-seaborn",
+      articleSlug: "graficas-multivariables-con-matplotlib-y-seaborn",
+      order: 11.2,
+      title: "Gráficas multivariables con Matplotlib y Seaborn",
+      summary:
+        "Cruza dos o más variables de los pingüinos: dispersión, líneas, boxplot por grupo, barras agrupadas, regresión, mapa de calor, pairplot y burbujas, y aprende a leer cada relación e interpretarla con cuidado antes de sacar conclusiones.",
+      topics: [
+        { title: "Dispersión y líneas: relacionar dos variables" },
+        { title: "Comparar grupos: boxplot y barras agrupadas con `hue`" },
+        { title: "Relación con recta de ajuste: regresión y `jointplot`" },
+        { title: "Varias relaciones a la vez: mapa de calor, `pairplot` y burbujas" },
+        { title: "Correlación y causalidad: cómo interpretar un gráfico en tres partes" },
       ],
     },
     {

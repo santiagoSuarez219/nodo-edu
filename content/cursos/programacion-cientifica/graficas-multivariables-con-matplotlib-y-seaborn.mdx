@@ -1,0 +1,306 @@
+---
+title: "Gráficas multivariables con Matplotlib y Seaborn"
+course: "Programación Científica"
+course_code: "PC"
+level: "Primeros semestres"
+type: "Lección guion de clase en vivo"
+language: "Python 3 (Google Colab)"
+difficulty: "Intermedio"
+estimated_time: "60 a 65 minutos de clase en vivo (Semana 15)"
+presentation: true
+slides_hint: "Cada sección ## es un paso proyectable; las pausas 🛑 son preguntas al grupo y la votación 🗳️ se lanza antes de dibujar la dispersión de los pingüinos."
+date: "2026-11-04"
+author: "Asistente de Docencia"
+summary: "Cruza dos o más variables de los pingüinos: dispersión, líneas, boxplot por grupo, barras agrupadas, regresión, mapa de calor, pairplot y burbujas, y aprende a leer cada relación e interpretarla con cuidado antes de sacar conclusiones."
+updatedAt: "2026-11-04"
+---
+
+> 📘 **Lección guion para clase en vivo.** Se dicta en la sesión y se sigue paso a paso: ten un cuaderno de Google Colab abierto, escribe el código a medida que avanzamos y piensa cada respuesta **antes** de mirar la salida. Cada bloque de código es una celda y las celdas son **acumulativas**: la primera trae las importaciones y la carga de los datos, y las siguientes usan lo que ya definió; ejecútalas en orden, cada gráfico en su propia celda. Se apoya en la figura y los ejes que viste en la lección Gráficas univariables con Matplotlib y Seaborn.
+
+## El salón en un plano
+
+Imagina que anotas la estatura de ocho compañeros y la talla de su zapato. Cada compañero es un punto en un plano: a lo ancho su estatura, a lo alto su talla. Si los puntos forman una nube que sube de izquierda a derecha, los más altos calzan más. Esa nube es una **dispersión**, y cada punto cruza **dos variables** de la misma persona.
+
+Los datos de este ejemplo los inventamos; no son medidas reales. Esta primera celda trae también las importaciones y los pingüinos, que usaremos más adelante:
+
+```python
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+pinguinos = sns.load_dataset("penguins")
+sns.set_theme(palette="colorblind")
+
+estatura = [1.52, 1.58, 1.60, 1.65, 1.68, 1.72, 1.78, 1.85]   # datos de ejemplo
+talla = [36, 37, 37, 38, 40, 41, 42, 44]
+
+fig, ax = plt.subplots(figsize=(8, 4.5))
+ax.scatter(estatura, talla)
+ax.set_title("Estatura y talla de zapato en el salón (datos de ejemplo)")
+ax.set_xlabel("Estatura (m)")
+ax.set_ylabel("Talla de zapato")
+plt.show()
+```
+
+Una nube se lee con tres preguntas: la **dirección** (¿sube o baja?), la **fuerza** (¿los puntos se pegan a una recta o se esparcen?) y los **puntos raros** (¿alguien queda lejos de los demás?). Aquí la nube sube, es angosta y no hay ningún punto raro.
+
+🛑 **Pausa:** si un compañero midiera 1.85 m y calzara 36, ¿qué punto sería y qué le pasaría a la nube?
+
+> **Dispersión:** gráfico con un punto por observación, que cruza dos variables numéricas. Se lee por dirección, fuerza y puntos raros.
+
+## Líneas: cuando hay un orden
+
+Si en vez de ocho personas distintas tienes **el mismo objeto medido varias veces seguidas**, los puntos tienen un orden, y la línea que los une cuenta cómo cambia. El dataset de pingüinos no tiene fechas, así que usamos siete pesajes inventados de un solo pingüino, solo para ver la forma de la llamada. Añade una celda:
+
+```python
+pesajes = [3750, 3800, 3880, 3950, 4020, 4090, 4150]   # datos de ejemplo
+
+fig, ax = plt.subplots(figsize=(8, 4.5))
+ax.plot(range(1, 8), pesajes, marker="o")
+ax.set_title("Masa de un pingüino en siete pesajes (datos de ejemplo)")
+ax.set_xlabel("Número de pesaje")
+ax.set_ylabel("Masa corporal (g)")
+plt.show()
+```
+
+La línea sube de 3750 g a 4150 g. Une los puntos porque el pesaje 3 viene **después** del 2. Por eso una línea solo tiene sentido si el eje x tiene orden: unir con una línea las islas «Biscoe, Dream, Torgersen» sugeriría un camino de una a otra que no existe.
+
+> **Gráfico de líneas:** une puntos consecutivos de una secuencia ordenada (tiempo, número de medición). No se usa con categorías sin orden.
+
+## Un número para la relación
+
+Mirar la nube ayuda, pero a veces quieres una cifra. La **correlación** resume en un número, de -1 a 1, qué tan bien una sola recta describe la nube de puntos: el signo dice la dirección y el tamaño dice la fuerza. En las ocho personas:
+
+```python
+salon = pd.DataFrame({"estatura_m": estatura, "talla": talla})
+print(round(salon["estatura_m"].corr(salon["talla"]), 2))
+```
+
+```text
+0.99
+```
+
+Casi 1: la nube se pega a una recta que sube. Ahora hacemos la misma pregunta con los pingüinos: ¿los picos más largos son también más profundos? Pedimos la correlación entre el largo y la profundidad del pico, calculada sobre los 342 pingüinos que tienen ambas medidas:
+
+```python
+print(round(pinguinos["bill_length_mm"].corr(pinguinos["bill_depth_mm"]), 2))
+```
+
+```text
+-0.24
+```
+
+> **Correlación:** número entre -1 y 1 que resume el grado en que dos variables numéricas siguen una recta; positivo si suben juntas, negativo si una sube cuando la otra baja.
+
+## 🗳️ Votación — un número cerca de cero
+
+Largo y profundidad del pico de 342 pingüinos tienen correlación global -0.24. Dibujas la dispersión pintando cada especie de un color. ¿Qué verás?
+
+Sin ejecutar y sin hablar con nadie:
+
+- (a) Una nube inclinada hacia abajo, como dice el número, tanto en el conjunto como dentro de cada especie.
+- (b) Una nube sin forma, porque -0.24 es casi cero, con las especies mezcladas sin orden.
+- (c) Tres grupos de colores en zonas distintas; dentro de cada grupo los puntos suben.
+- (d) Tres grupos de colores en zonas distintas; dentro de cada grupo los puntos bajan.
+
+Vota solo. Si entre el 30 % y el 70 % del grupo acierta, discutan 2 minutos en parejas y vuelvan a votar; si más del 70 % acierta, la explicación es rápida; si menos del 30 %, vuelve a explicar qué resume y qué no resume la correlación antes de discutir.
+
+## Comprobar la votación: tres nubes
+
+Añade una celda y dibuja la dispersión con un color por especie, con el argumento `hue`:
+
+```python
+ax = sns.scatterplot(data=pinguinos, x="bill_length_mm", y="bill_depth_mm", hue="species")
+ax.set_title("Largo y profundidad del pico, por especie")
+ax.set_xlabel("Largo del pico (mm)")
+ax.set_ylabel("Profundidad del pico (mm)")
+plt.show()
+```
+
+![Dispersión de largo y profundidad del pico con tres nubes, una por especie, cada una con tendencia creciente](/documentos/programacion-cientifica/lecciones/graficas-multivariables-con-matplotlib-y-seaborn/dispersion-pico-especie.png)
+
+**La respuesta es (c).** Hay tres nubes en zonas distintas: Adelie arriba a la izquierda, Chinstrap arriba a la derecha y Gentoo abajo a la derecha. Dentro de cada una, la tendencia sube. Calcula la correlación por especie con un ciclo. `groupby("species")` reparte las filas en un grupo por especie; en cada vuelta, `especie` es el nombre (`"Adelie"`, …) y `grupo` es la tabla con solo las filas de esa especie:
+
+```python
+for especie, grupo in pinguinos.groupby("species"):
+    print(especie, round(grupo["bill_length_mm"].corr(grupo["bill_depth_mm"]), 2))
+```
+
+```text
+Adelie 0.39
+Chinstrap 0.65
+Gentoo 0.64
+```
+
+Las tres son positivas y la global era -0.24. Qué revela cada opción: (a) cree que el número global vale dentro de cada grupo; (b) lee un valor cercano a cero como una nube sin forma, cuando solo dice que **una** recta no resume el conjunto entero; (d) acierta con las tres zonas, pero se equivoca en el signo dentro de cada grupo.
+
+Este fenómeno se llama **paradoja de Simpson**. Gentoo tiene picos más largos y menos profundos que Adelie, y al mezclar las especies esa diferencia entre grupos tapa la relación que hay dentro de cada una. El -0.24 estaba bien calculado y respondía mal a la pregunta.
+
+> **Paradoja de Simpson:** una relación entre dos variables cambia de signo, o desaparece, cuando se separa por una tercera variable que define grupos.
+
+🛑 **Pausa:** si solo hubieras mirado el -0.24, ¿qué le habrías dicho a alguien que quiere identificar la especie por el pico?
+
+## Comparar grupos: boxplot por especie
+
+Cuando una variable es numérica y la otra categórica, el gráfico natural es un **boxplot por grupo**: una caja por categoría, todas en la misma escala. Añade una celda:
+
+```python
+ax = sns.boxplot(data=pinguinos, x="species", y="body_mass_g")
+ax.set_title("Masa corporal por especie")
+ax.set_xlabel("Especie")
+ax.set_ylabel("Masa corporal (g)")
+plt.show()
+```
+
+![Boxplot de la masa corporal por especie: Gentoo claramente por encima de Adelie y Chinstrap](/documentos/programacion-cientifica/lecciones/graficas-multivariables-con-matplotlib-y-seaborn/boxplot-masa-especie.png)
+
+La línea del centro de cada caja es la mediana, y la caja va del cuartil 1 al cuartil 3. La mediana de Gentoo es 5000 g, con una caja de 4700 g a 5500 g; la de Adelie es 3700 g, con una caja de 3350 g a 4000 g, y la de Chinstrap también 3700 g, con una caja de 3488 g a 3950 g. Gentoo queda separado de las otras dos, mientras que las cajas de Adelie y Chinstrap se **traslapan**: con la masa sola no hay una diferencia clara entre ellas.
+
+## Barras agrupadas
+
+Para cruzar **dos categóricas** se parte cada barra por la segunda con `hue`. Añade una celda:
+
+```python
+ax = sns.countplot(data=pinguinos, x="island", hue="species")
+ax.set_title("Pingüinos por isla y especie")
+ax.set_xlabel("Isla")
+ax.set_ylabel("Número de pingüinos")
+plt.show()
+
+print(pd.crosstab(pinguinos["island"], pinguinos["species"]))
+```
+
+```text
+species    Adelie  Chinstrap  Gentoo
+island                              
+Biscoe         44          0     124
+Dream          56         68       0
+Torgersen      52          0       0
+```
+
+Las barras de Adelie aparecen en las tres islas. Gentoo vive solo en Biscoe (124) y Chinstrap solo en Dream (68). La tabla `crosstab` da los mismos números que el gráfico.
+
+> **Barras agrupadas:** cada barra se divide por una segunda categoría (`hue`) para comparar subgrupos lado a lado.
+
+## Regresión: la recta de ajuste
+
+La **recta de ajuste** es la que mejor atraviesa la nube. Su **pendiente** dice cuánto cambia y por cada unidad de x. Con la aleta y la masa:
+
+```python
+import numpy as np
+
+datos = pinguinos.dropna(subset=["flipper_length_mm", "body_mass_g"])
+pendiente, _ = np.polyfit(datos["flipper_length_mm"], datos["body_mass_g"], 1)
+print(round(pendiente, 1))
+
+for especie, grupo in datos.groupby("species"):
+    pendiente_grupo, _ = np.polyfit(grupo["flipper_length_mm"], grupo["body_mass_g"], 1)
+    print(especie, round(pendiente_grupo, 1))
+```
+
+```text
+49.7
+Adelie 32.8
+Chinstrap 34.6
+Gentoo 54.6
+```
+
+En todo el conjunto, 49.7 g más por cada milímetro de aleta; por especie, 32.8, 34.6 y 54.6 g por milímetro. Todas son positivas, pero la pendiente global mezcla grupos con pendientes distintas: Gentoo sube mucho más por milímetro que las otras dos. Seaborn dibuja la recta con `regplot`, y `lmplot` con `hue` dibuja una por especie:
+
+```python
+ax = sns.regplot(data=pinguinos, x="flipper_length_mm", y="body_mass_g")
+ax.set_title("Aleta y masa corporal, con recta de ajuste")
+ax.set_xlabel("Longitud de la aleta (mm)")
+ax.set_ylabel("Masa corporal (g)")
+plt.show()
+
+sns.lmplot(data=pinguinos, x="flipper_length_mm", y="body_mass_g", hue="species")
+plt.show()
+```
+
+`jointplot` suma además la distribución de cada eje en los márgenes:
+
+```python
+sns.jointplot(data=pinguinos, x="flipper_length_mm", y="body_mass_g", hue="species")
+plt.show()
+```
+
+La pendiente se lee con cautela: es una asociación, solo vale dentro del rango observado de aletas, y no dice qué le pasaría a un pingüino concreto si le alargaras la aleta.
+
+## Mapa de calor y pairplot
+
+Para ver muchas relaciones a la vez, el **mapa de calor** pinta la matriz de correlaciones entre todas las columnas numéricas. `numeric_only=True` descarta las de texto, que no tienen correlación:
+
+```python
+corr = pinguinos.corr(numeric_only=True)
+ax = sns.heatmap(corr, annot=True, fmt=".2f", cmap="vlag", vmin=-1, vmax=1)
+ax.set_title("Correlación entre las medidas numéricas")
+plt.show()
+```
+
+![Mapa de calor de correlaciones: aleta y masa en 0.87, largo y profundidad del pico en menos 0.24](/documentos/programacion-cientifica/lecciones/graficas-multivariables-con-matplotlib-y-seaborn/mapa-calor-correlacion.png)
+
+Fuera de la diagonal, el rojo más fuerte es aleta con masa: 0.87. Ahí está de nuevo el -0.24 entre largo y profundidad del pico. El mapa muestra solo resúmenes globales. Para ver los datos detrás de cada celda, `pairplot` dibuja todas las parejas en una cuadrícula, con la distribución de cada variable en la diagonal:
+
+```python
+sns.pairplot(pinguinos, hue="species")
+plt.show()
+```
+
+Cada celda fuera de la diagonal es una dispersión como la de la votación; la cuadrícula te deja revisar muchos pares de golpe.
+
+## Burbujas: una tercera variable
+
+Para una **tercera variable numérica** en la dispersión se usa el tamaño del punto, con `size=` en Seaborn.
+
+```python
+fig, ax = plt.subplots(figsize=(8, 4.5))
+sns.scatterplot(data=pinguinos, x="bill_length_mm", y="bill_depth_mm", size="body_mass_g",
+                hue="species", sizes=(20, 300), alpha=0.6, ax=ax)
+ax.set_title("Pico por especie; el tamaño es la masa corporal")
+ax.set_xlabel("Largo del pico (mm)")
+ax.set_ylabel("Profundidad del pico (mm)")
+plt.show()
+```
+
+![Burbujas del largo y la profundidad del pico por especie; el tamaño de cada punto es la masa corporal, y Gentoo concentra los más grandes](/documentos/programacion-cientifica/lecciones/graficas-multivariables-con-matplotlib-y-seaborn/burbujas-pico-masa.png)
+
+Cada punto lleva cuatro datos: largo, profundidad, especie (color) y masa (tamaño). Las burbujas más grandes se concentran en Gentoo. `alpha=0.6` vuelve translúcidos los puntos para que los que se tapan entre sí se sigan viendo.
+
+## Correlación no es causa
+
+Que dos variables suban juntas no prueba que una produzca la otra. La aleta y la masa tienen correlación 0.87, pero alargar la aleta de un pingüino no lo engorda: ambas dependen del tamaño del animal. Un gráfico muestra **asociación**; la causa se estudia con otros métodos.
+
+Por eso una buena interpretación tiene **tres partes**: la pregunta que respondes, lo que se observa (con cifras) y lo que implica. Con la dispersión de la votación sería:
+
+- **Pregunta:** ¿los picos más largos son más profundos?
+- **Observación:** dentro de cada especie sí, con correlación de 0.39 en Adelie, 0.65 en Chinstrap y 0.64 en Gentoo, aunque la global sea -0.24.
+- **Implicación:** no se puede comparar el pico de especies distintas como si fueran un solo grupo.
+
+Sin cifras ni conclusión, lo que escribes es una descripción del dibujo, no una interpretación.
+
+🛑 **Pausa:** escribe en tres partes qué se observa en el boxplot de masa por especie. ¿Cuál es tu pregunta y cuál tu implicación?
+
+## Resumen operativo
+
+| Pregunta | Gráfico | Función | Qué leer |
+|---|---|---|---|
+| ¿Se relacionan dos numéricas? | dispersión | `ax.scatter` / `scatterplot` | Dirección, fuerza, puntos raros |
+| ¿Cómo cambia algo en un orden? | líneas | `ax.plot` | Solo con eje ordenado |
+| ¿Cómo se comparan grupos? | boxplot por grupo | `boxplot` | Medianas y traslape de cajas |
+| ¿Cómo se cruzan dos categóricas? | barras agrupadas | `countplot(hue=)` | Qué subgrupos existen |
+| ¿Cuánto cambia y por unidad de x? | regresión | `np.polyfit` / `regplot`, `lmplot`, `jointplot` | Pendiente, dentro del rango |
+| ¿Qué relaciones hay entre muchas? | mapa de calor y pairplot | `sns.heatmap`, `sns.pairplot` | Correlaciones y los datos detrás |
+| ¿Y una tercera numérica? | burbujas | `scatterplot(size=)` | Tamaño; `alpha` si se tapan |
+
+## Síntesis
+
+- Cada compañero del salón es un punto en un plano, y la dispersión se lee por dirección, fuerza y puntos raros; la correlación de los ocho datos de ejemplo es 0.99.
+- La línea une puntos solo si el eje x tiene orden; no se unen categorías como las islas.
+- La correlación global entre largo y profundidad del pico es -0.24, calculada sobre 342 pingüinos con ambas medidas.
+- En la votación, la dispersión con un color por especie mostró tres nubes en zonas distintas y, dentro de cada una, tendencia creciente: correlación de 0.39 en Adelie, 0.65 en Chinstrap y 0.64 en Gentoo. Es la paradoja de Simpson, y el -0.24 respondía mal a la pregunta.
+- En el boxplot por especie, Gentoo (mediana 5000 g) se separa; Adelie y Chinstrap tienen mediana 3700 g y cajas que se traslapan.
+- Las barras agrupadas con `hue` muestran que Gentoo vive solo en Biscoe (124) y Chinstrap solo en Dream (68).
+- La pendiente global de aleta contra masa es 49.7 g por mm, y por especie 32.8, 34.6 y 54.6; la recta se lee dentro del rango observado.
+- El mapa de calor resume las correlaciones (aleta y masa 0.87), el `pairplot` muestra los datos detrás, y las burbujas suman una tercera numérica con el tamaño.
+- Correlación no es causa: se interpreta en tres partes, con la pregunta, la observación con cifras y la implicación.

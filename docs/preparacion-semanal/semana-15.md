@@ -1,7 +1,7 @@
 # Semana 15 — 9–15 de noviembre
 
 **Rama:** `feat/semana-15-analisis-de-algoritmos` (AA) · `feat/semana-15-programacion-cientifica` (PC) · `feat/semana-15-estructuras-de-datos` (ED T1) · `feat/semana-15-t2-estructuras-de-datos` (ED T2; su estado está en las secciones «Ronda — `estructuras-de-datos`», más abajo)
-**Estado:** AA: ✅ Material y cuestionarios listos en desarrollo / ⬜ Desplegada · PC: ✅ **Desplegada y abierta en producción (2026-10-28)** · ED T1: ✅ Material y cuestionario listos en desarrollo / ✅ Mergeada a `development` (local; push pendiente) / ⬜ Desplegada · ED T2: ✅ Material y cuestionario listos en desarrollo / ✅ Revisada por `@reviewer` / ✅ Mergeada a `development` (local; push pendiente) / ⬜ Desplegada (ver «Ronda 2»)
+**Estado:** AA: ✅ Material y cuestionarios listos en desarrollo / ⬜ Desplegada · PC: ✅ **Desplegada y abierta en producción (2026-10-28)** · ED (T1 y T2): ✅ **Desplegada y abierta en producción (2026-11-04)** — ver «Despliegue — `estructuras-de-datos`», al final
 
 ---
 
@@ -406,3 +406,109 @@ pasó a «Eliminación en BST».
 - Push de `development` (del usuario).
 - Despliegue D0–D7 con confirmación en cada paso.
 - Las líneas de `info.md` de S15 T2 (523–525) también difieren del registro; no se tocaron.
+
+---
+
+## Despliegue — `estructuras-de-datos` (2026-11-04)
+
+Alcance: las 6 lecciones de la serie de recursión y árboles (`order` 29 a 34).
+Sin cambios de esquema.
+
+| Paso | Estado | Fecha / detalle |
+|---|---|---|
+| D0 · Alcance y checklist pre-despliegue | ✅ | 24 commits, 11 archivos; sin migraciones; build y lint en verde |
+| D1 · Lecciones nuevas cerradas por adelantado | ✅ (no hizo falta) | Las 6 ya estaban cerradas en producción desde 2026-08-03 |
+| D2 · Merge a `main` y deploy en Vercel | ✅ | `616e176` (`deploy/semana-15-ed`, borrada); deployment `dpl_4LaqTwA7AMnoVZuZk58zLhb5gyT8` READY |
+| D3 · Banco de preguntas replicado a producción | ✅ | 3 keywords (`arboles`, `excepciones`, `pila-de-llamadas`) y 36 preguntas, publicadas y montadas en orden P1–P6 |
+| D4 · Lecciones abiertas a los estudiantes | ✅ | Las 6 abiertas; `list_course_lessons`: 0 lecciones cerradas, ninguna futura abierta por error |
+| D5 · Verificación end-to-end en producción | ⬜ | Pendiente: render de la lección y de los diagramas Mermaid, autoevaluación al final (lo comprueba el docente) |
+| D6 · Bitácora cerrada y rama `deploy/` borrada | ✅ | Rama local borrada (no se subió al remoto) |
+
+### Preguntas en producción (P1 a P6, en ese orden)
+
+| Lección | IDs |
+|---|---|
+| `fundamentos-de-recursividad` | `42f70736-3d9e-4142-a416-495464fc2896` · `f7f2ef6d-851b-4ac9-8037-b6ea33a914f0` · `e5225ee0-723f-420d-b18b-1f79acc5df3e` · `286769b9-3ea1-46e0-a6c2-f3475bb2dd8a` · `622a92c1-1bad-4fdb-89fe-9a06ebc82b68` · `24dc979f-4225-49ea-930c-a05695581a44` |
+| `algoritmos-recursivos-clasicos` | `81277f71-019d-4bf4-a61a-d51ce0662401` · `1a6be449-53fa-4384-9e71-bd31fe71a152` · `0f07c173-59fa-48e0-8216-bcc9a2fdf9a4` · `e7e1dc70-1e85-4207-8ded-db4000cdaed1` · `4e9fc2b1-fab4-44ee-9b74-9600096cd387` · `afcd4793-4fc9-431f-92dd-07b191653dab` |
+| `conceptos-y-tad-arbol-binario` | `2ea98ead-d92f-4146-961b-29c52aeb41b7` · `8031d164-afa3-4fcf-9703-bd73861a6004` · `7f4c06c8-72e1-44a1-ba02-0359465207e3` · `ca8d841b-1447-4f6d-982a-86b2234ea107` · `739c64ac-c8c0-42dc-8ed0-7fb776950bd7` · `903785b4-e87e-4edf-9bab-d3874c16debf` |
+| `insercion-y-recorridos` | `96a3775c-9d12-4a09-ab18-fe10acc46716` · `fdfddd29-e23a-4774-a286-e5caf2e4ed99` · `e5273d5e-cf7a-45df-afb4-91678ac65841` · `0b4b52f2-decc-45cf-ae51-3e1acff3b0b9` · `7e3824c5-6ee3-464e-b455-66aeeba927cc` · `8eda8542-ac43-4e68-8d29-f8e96c579d4b` |
+| `bst-busqueda-e-insercion` | `54e67db3-b55f-4941-8d13-4440fe3bd95f` · `5e9d9151-8fc1-47ae-8203-13b36a8c4c2f` · `7ed92ec4-9d4b-403d-916f-0852c1036478` · `248b7d24-20b5-4c62-a7dd-9fbab723037e` · `f5f66c1c-5c17-40c1-b440-ace548de3f10` · `4fa8424e-7747-4205-afed-76d1e0838711` |
+| `eliminacion-en-bst-y-sintesis-del-curso` | `1b7201d7-4bee-479c-ae2f-eb3911301988` · `b7018cb9-ba5d-403e-9146-079092ac3c40` · `0f9a6fab-e232-4c7a-afb1-b79dd4b1fb9d` · `77a2bad0-bb8b-43a6-a7ef-cb5b9d109405` · `1bbe1fd5-9f2f-4ec0-aa0d-b1fff33d2b1f` · `0a15cab0-e79b-4595-b559-2104d4523963` |
+
+> No se hizo una lectura de control con `list_lesson_questions` en producción: cada `mount_question_in_lesson` devolvió los índices 0 a 5 en orden, y las lecciones estaban en 0 preguntas antes.
+> El subagente `assessment-builder` se negó a ejecutar la creación en la ronda T2 porque no veía la aprobación; la ejecuté yo con la aprobación del usuario.
+
+### Pendientes
+
+- D5: el docente verifica en producción, con sesión, el render de las lecciones y de los diagramas Mermaid, y que la autoevaluación aparezca al final.
+- D7: marcar cada lección como vista en clase del grupo que la dicte, después de la sesión.
+- `info.md` (líneas 501, 507, 521 y 523–525) sigue sin alinear con el registro.
+- Semana 13 (recursión sobre listas; riesgos, límites y backtracking): sin lecciones registradas.
+- La sesión del 17 nov (aplicaciones de BST y síntesis del curso) quedó sin lección propia por decisión del usuario.
+
+---
+
+## Ronda 3 — `programacion-cientifica`, lección dividida en dos clases en vivo (2026-11-04)
+
+**Rama:** `feat/semana-15-pc-graficas`
+**Estado:** ✅ Material y cuestionarios listos en desarrollo / ✅ Revisada por `@reviewer` / ✅ Mergeada a `development` (local; push pendiente) / ⬜ Desplegada (la lección B nace abierta: cerrarla en D1)
+
+**Alcance confirmado por el usuario:** convertir `matplotlib-y-seaborn` en una clase autocontenida en vivo, como las de `estructuras-de-datos`, dividida en dos clases: gráficas univariables y gráficas multivariables. Los apuntes del docente se eliminaron. **No se tocó el cronograma:** la fecha de la segunda clase la decide el docente.
+
+### Etapas y aprobaciones
+
+| Etapa | Resultado | Aprobada por el usuario |
+|---|---|---|
+| E1 · Diagnóstico | Una sola sesión en el cronograma (jue 12 nov); el usuario pidió dividir en dos clases | ✅ |
+| E2 · Plan de lección | Aprobado: slug largo para B, mover 4 imágenes, votación de proporción en A, gancho de estatura/zapato en B | ✅ |
+| E3 · Lecciones `.mdx` + registro TS | A `matplotlib-y-seaborn` (290 líneas, 11 `##`) y B `graficas-multivariables-con-matplotlib-y-seaborn` (306 líneas, 13 `##`) | ✅ |
+| E4 · Apuntes del docente | **Eliminados** (`apuntes/matplotlib-y-seaborn.md`) a pedido del usuario | ✅ |
+| E5 · Cuestionario | 6 por lección: Q4 reformulada, Q2/Q3/Q5/Q6 pasadas a B, 6 nuevas | ✅ aprobado tal cual |
+| E6 · Guía / Quiz A/B/C | No aplica | — |
+
+### Artefactos
+
+| Artefacto | Ruta |
+|---|---|
+| Lección A (univariables) | `content/cursos/programacion-cientifica/matplotlib-y-seaborn.mdx` (order 11, slug sin cambio) |
+| Lección B (multivariables) | `content/cursos/programacion-cientifica/graficas-multivariables-con-matplotlib-y-seaborn.mdx` (order 11.2) |
+| Registro TS | `lib/courses/data/programacion-cientifica.ts` (título, `summary` y `topics` de A; entrada nueva de B) |
+| Imágenes | A conserva `histograma-masa` y `nube-metodos-exoplanetas`; B recibió (git mv) `boxplot-masa-especie`, `mapa-calor-correlacion`, `dispersion-pico-especie` y `burbujas-pico-masa` |
+
+### Cuestionario en desarrollo (orden A1–A6 y B1–B6)
+
+| Lección | IDs |
+|---|---|
+| `matplotlib-y-seaborn` | A1 `f7e68922-ba5d-4aa0-b0d1-bf76a7206611` (Q1) · A2 `5933ca23-d0a0-4567-80bc-ceeceea21198` · A3 `55fbed47-aad0-465a-8064-f3558db202f0` · A4 `5a2f11e8-5724-42b9-b1b1-cd16f974087b` · A5 `2f13d949-e23c-4d2b-ab35-24c2a658362d` (Q4 reformulada) · A6 `035b7aa5-505f-48dd-8f03-88fe780da087` |
+| `graficas-multivariables-con-matplotlib-y-seaborn` | B1 `6363c629-605e-4006-a525-02e30c3008d6` (Q2) · B2 `98e67585-cc49-4d5f-a6da-6f3a7db9497d` · B3 `16648dce-6057-40e3-a44c-634910078fcd` (Q3) · B4 `55258601-c9e8-47af-a7a6-2e3ef04fa9da` · B5 `5d1c876e-37e8-41dc-b410-986845310443` (Q5) · B6 `6a1bec38-7b26-4d15-ae42-f0161ed1a696` (Q6) |
+
+**Producción (pendiente en el despliegue):** replicar con los IDs de producción de las 6 preguntas actuales — Q1 `0905d8f0-d259-4cca-a1c2-7c0bcc23b38a`, Q2 `9b32c1bf-fd7f-4257-bc1e-cc7dbd806290`, Q3 `26cc01a8-0e52-4121-bc42-7f151addaa5d`, Q4 `560056d1-ec19-4269-9943-478c14d35840`, Q5 `9343b44e-6ccd-44c7-9a2d-7e4ee82b39b1`, Q6 `c0abcb08-f12b-4f64-ab33-939278b97136` —: `update_question` de Q4, desmontar Q2/Q3/Q5/Q6 de A y montarlas en B, crear las 6 nuevas, publicarlas, montarlas y reordenar. Las keywords ya existen en producción.
+
+> Tras la revisión se corrigieron en desarrollo A2 (opción C: «con 20 se ve un pico cerca de 3700 g y una cola larga hacia los más pesados») y A4 (opción C: «La distribución es simétrica…»); ambas se replican igual en producción.
+> Q6 trae las cifras de la paradoja de Simpson: el cuestionario se responde **después** de la clase B (decisión del usuario).
+
+### Decisiones tomadas por Claude en nombre del docente
+
+- **Corrección (revisión):** la masa de los pingüinos NO es bimodal. Con 20 columnas los conteos son 3, 12, 13, 30, 32, 39, 35, 18, 25, 17, 19, 22, 16, 12, 10, 17, 11, 5, 5, 1: un solo pico en 3600–3960 g y una cola larga hacia los más pesados; media 4202 g, mediana 4050 g. La versión original de la lección, ya en producción, decía «dos jorobas»; la lección A se reescribió con el razonamiento correcto y B no repite la afirmación (la cola jala la media y la ventana de 400 g es angosta frente a una desviación estándar de ~802 g).
+- Cifra corregida del eje cortado en 100: la barra de Gentoo (124) mide el 82 % de la de Adelie (152), no «una sexta parte».
+- El `summary` y los `topics` de B no nombran Simpson ni «por especie», para no delatar la votación.
+- En B, antes de la votación solo aparecen datos inventados y la correlación global -0.24; ni `hue`, ni boxplot por especie, ni la dispersión aleta–masa.
+- Sin «Dónde se rompe la analogía» en A ni B.
+- Tiempos estimados: A ≈ 59 min y B ≈ 60–65 min; juntas suman ≈ 120–125 min, así que no caben cómodamente en una sola sesión de 120 min.
+- Las 6 imágenes no se abrieron ni regeneraron: el render lo comprueba el docente.
+
+### Verificación (E7)
+
+- [x] `npm run build` en verde; `npm run lint` sin errores (7 warnings preexistentes); `tsc` sin errores
+- [x] Todo el código de ambas lecciones se ejecutó en un venv; salidas y cifras coinciden
+- [x] Primera revisión `@reviewer`: CAMBIOS REQUERIDOS (1 bloqueante por la bimodalidad falsa, 1 mayor por «Simpson en la pendiente», menores); corregido en esta ronda
+- [x] `summary` idéntico en frontmatter y registro (A y B)
+- [x] Nada antes de cada votación revela su respuesta
+- [x] `@reviewer`: segunda revisión APROBADO, sin hallazgos bloqueantes ni mayores
+- [ ] Render en navegador de las lecciones e imágenes
+
+### Pendientes
+
+- Push de `development` (del usuario).
+- Despliegue: D1 cerrar la lección B antes del push; D3 replicar el cuestionario en producción; D4 abrir B; D7 marcar cada clase como vista.
+- Fecha de la segunda clase: sin decidir; no se modificó el cronograma ni `info.md`.
