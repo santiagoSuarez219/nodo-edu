@@ -224,6 +224,8 @@ El árbol que le llega es 50 con el 30 a la izquierda (su único hijo es el 40) 
 | 4 | `eliminar(70, 65)` | 65 con 70 (2) | menor: el izquierdo será lo que devuelva la llamada 5 |
 | 5 | `eliminar(65, 65)` | 65 con 65 (3) | igual; sin izquierdo: devuelve su derecho, `null`; el 70 ejecuta `setIzquierdo(null)` |
 
+Al final de la salida aparecen dos líneas nuevas:
+
 ```text
 raiz 65, comparaciones 3
 in-orden: 30 40 65 70 80 
@@ -284,7 +286,7 @@ El in-orden queda ordenado con el 30 ausente y el 35 en su lugar: la prueba de q
 
 ## Dónde se rompe la analogía: retirar sin que el juego se desordene
 
-Con tarjetas sobre una mesa, retirar una no cambia a las demás: cada tarjeta es independiente. En el BST los nodos están encadenados: retirar un nodo con dos hijos deja un hueco que no se puede dejar vacío, y por eso **otro dato tiene que subir** a ocuparlo. Además, `eliminar` no reorganiza el árbol: solo arregla el lugar del nodo retirado. Cuesta O(h) comparaciones, como `buscar` e `insertar`, y una secuencia de eliminaciones puede dejar el árbol más alto de lo que estaba.
+Con tarjetas sobre una mesa, retirar una no cambia a las demás: cada tarjeta es independiente. En el BST los nodos están encadenados: retirar un nodo con dos hijos deja un hueco que no se puede dejar vacío, y por eso **otro dato tiene que subir** a ocuparlo. Además, `eliminar` no reorganiza el árbol: solo arregla el lugar del nodo retirado. Cuesta O(h) comparaciones, como `buscar` e `insertar`, y tampoco lo vuelve a equilibrar: si el árbol estaba desequilibrado, sigue igual.
 
 ## Resumen operativo
 
@@ -306,7 +308,7 @@ Con tarjetas sobre una mesa, retirar una no cambia a las demás: cada tarjeta es
 - Una hoja se retira sin más; con un hijo, el hijo ocupa su lugar; con dos hijos, el dato del sucesor in-order (el mínimo del subárbol derecho) ocupa el lugar y se retira de donde estaba.
 - El sucesor conserva la regla sobre **todo** el subárbol: es mayor que todo el izquierdo y menor que el resto del derecho.
 - `eliminar` devuelve la raíz del subárbol que queda, por eso se escribe `nodo.setIzquierdo(eliminar(...))` y `raiz = eliminar(raiz, x)`; para eso `NodoArbol` ganó los *setters* `setDato`, `setIzquierdo` y `setDerecho`.
-- En T0, `eliminar(raiz, 60)` hace 3 llamadas y 3 comparaciones; `eliminar(raiz, 50)` hace 5 llamadas, 3 de ellas de `eliminar` y 2 de `minimo`, y 3 comparaciones, porque `minimo` no suma al contador.
+- En la secuencia de la clase, `eliminar(raiz, 60)` hace 3 llamadas y 3 comparaciones; `eliminar(raiz, 50)` hace 5 llamadas, 3 de ellas de `eliminar` y 2 de `minimo`, y 3 comparaciones, porque `minimo` no suma al contador.
 - El sucesor tiene a lo sumo un hijo porque no tiene hijo izquierdo, así que la recursión siempre termina.
-- En la votación el resultado fue `35 4`: sube el 35, mínimo del subárbol que empieza en el 40, y se retira después como hoja con una comparación más.
+- En la votación el resultado fue `35 4`: sube el 35, mínimo del subárbol que empieza en el 40, y se retira después como hoja con dos comparaciones más.
 - Tras cada eliminación el in-orden sigue saliendo ordenado, y `eliminar` cuesta O(h): no reorganiza el árbol.

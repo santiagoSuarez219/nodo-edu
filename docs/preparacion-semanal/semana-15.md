@@ -1,7 +1,7 @@
 # Semana 15 — 9–15 de noviembre
 
 **Rama:** `feat/semana-15-analisis-de-algoritmos` (AA) · `feat/semana-15-programacion-cientifica` (PC) · `feat/semana-15-estructuras-de-datos` (ED T1) · `feat/semana-15-t2-estructuras-de-datos` (ED T2; su estado está en las secciones «Ronda — `estructuras-de-datos`», más abajo)
-**Estado:** AA: ✅ Material y cuestionarios listos en desarrollo / ⬜ Desplegada · PC: ✅ **Desplegada y abierta en producción (2026-10-28)** · ED: ✅ Material y cuestionario listos en desarrollo / ✅ Mergeada a `development` (local; push pendiente) / ⬜ Desplegada
+**Estado:** AA: ✅ Material y cuestionarios listos en desarrollo / ⬜ Desplegada · PC: ✅ **Desplegada y abierta en producción (2026-10-28)** · ED T1: ✅ Material y cuestionario listos en desarrollo / ✅ Mergeada a `development` (local; push pendiente) / ⬜ Desplegada · ED T2: ✅ Material y cuestionario listos en desarrollo / ⬜ Mergeada / ⬜ Desplegada (ver «Ronda 2»)
 
 ---
 
@@ -398,7 +398,7 @@ pasó a «Eliminación en BST».
 - [x] Sin `# H1`, `###`, `---` en el cuerpo ni `$`; Mermaid validado; `tsc` sin errores
 - [x] `summary` idéntico en frontmatter y registro TS
 - [x] Salidas citadas reproducidas byte a byte con Java 17
-- [ ] `@reviewer`
+- [x] `@reviewer`: primera revisión CAMBIOS REQUERIDOS (1 bloqueante, 1 mayor, 3 menores, 1 sugerencia); corregidos; segunda revisión pendiente
 - [ ] Render en navegador del diagrama del árbol (lo comprueba el docente)
 
 ### Pendientes
