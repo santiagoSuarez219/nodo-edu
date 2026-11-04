@@ -451,7 +451,7 @@ Sin cambios de esquema.
 ## Ronda 3 — `programacion-cientifica`, lección dividida en dos clases en vivo (2026-11-04)
 
 **Rama:** `feat/semana-15-pc-graficas`
-**Estado:** ✅ Material y cuestionarios listos en desarrollo / ✅ Revisada por `@reviewer` / ⬜ Mergeada / ⬜ Desplegada (la lección B nace abierta: cerrarla en D1)
+**Estado:** ✅ Material y cuestionarios listos en desarrollo / ✅ Revisada por `@reviewer` / ✅ Mergeada a `development` (local; push pendiente) / ⬜ Desplegada (la lección B nace abierta: cerrarla en D1)
 
 **Alcance confirmado por el usuario:** convertir `matplotlib-y-seaborn` en una clase autocontenida en vivo, como las de `estructuras-de-datos`, dividida en dos clases: gráficas univariables y gráficas multivariables. Los apuntes del docente se eliminaron. **No se tocó el cronograma:** la fecha de la segunda clase la decide el docente.
 
@@ -509,6 +509,6 @@ Sin cambios de esquema.
 
 ### Pendientes
 
-- Revisión, merge a `development` y push (del usuario).
+- Push de `development` (del usuario).
 - Despliegue: D1 cerrar la lección B antes del push; D3 replicar el cuestionario en producción; D4 abrir B; D7 marcar cada clase como vista.
 - Fecha de la segunda clase: sin decidir; no se modificó el cronograma ni `info.md`.
