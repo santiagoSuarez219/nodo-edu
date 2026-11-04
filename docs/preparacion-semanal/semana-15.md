@@ -1,7 +1,7 @@
 # Semana 15 — 9–15 de noviembre
 
 **Rama:** `feat/semana-15-analisis-de-algoritmos` (AA) · `feat/semana-15-programacion-cientifica` (PC) · `feat/semana-15-estructuras-de-datos` (ED T1) · `feat/semana-15-t2-estructuras-de-datos` (ED T2; su estado está en las secciones «Ronda — `estructuras-de-datos`», más abajo)
-**Estado:** AA: ✅ Material y cuestionarios listos en desarrollo / ⬜ Desplegada · PC: ✅ **Desplegada y abierta en producción (2026-10-28)** · ED T1: ✅ Material y cuestionario listos en desarrollo / ✅ Mergeada a `development` (local; push pendiente) / ⬜ Desplegada · ED T2: ✅ Material y cuestionario listos en desarrollo / ✅ Revisada por `@reviewer` / ✅ Mergeada a `development` (local; push pendiente) / ⬜ Desplegada (ver «Ronda 2»)
+**Estado:** AA: ✅ Material y cuestionarios listos en desarrollo / ⬜ Desplegada · PC: ✅ **Desplegada y abierta en producción (2026-10-28)** · ED (T1 y T2): ✅ **Desplegada y abierta en producción (2026-11-04)** — ver «Despliegue — `estructuras-de-datos`», al final
 
 ---
 
@@ -406,3 +406,42 @@ pasó a «Eliminación en BST».
 - Push de `development` (del usuario).
 - Despliegue D0–D7 con confirmación en cada paso.
 - Las líneas de `info.md` de S15 T2 (523–525) también difieren del registro; no se tocaron.
+
+---
+
+## Despliegue — `estructuras-de-datos` (2026-11-04)
+
+Alcance: las 6 lecciones de la serie de recursión y árboles (`order` 29 a 34).
+Sin cambios de esquema.
+
+| Paso | Estado | Fecha / detalle |
+|---|---|---|
+| D0 · Alcance y checklist pre-despliegue | ✅ | 24 commits, 11 archivos; sin migraciones; build y lint en verde |
+| D1 · Lecciones nuevas cerradas por adelantado | ✅ (no hizo falta) | Las 6 ya estaban cerradas en producción desde 2026-08-03 |
+| D2 · Merge a `main` y deploy en Vercel | ✅ | `616e176` (`deploy/semana-15-ed`, borrada); deployment `dpl_4LaqTwA7AMnoVZuZk58zLhb5gyT8` READY |
+| D3 · Banco de preguntas replicado a producción | ✅ | 3 keywords (`arboles`, `excepciones`, `pila-de-llamadas`) y 36 preguntas, publicadas y montadas en orden P1–P6 |
+| D4 · Lecciones abiertas a los estudiantes | ✅ | Las 6 abiertas; `list_course_lessons`: 0 lecciones cerradas, ninguna futura abierta por error |
+| D5 · Verificación end-to-end en producción | ⬜ | Pendiente: render de la lección y de los diagramas Mermaid, autoevaluación al final (lo comprueba el docente) |
+| D6 · Bitácora cerrada y rama `deploy/` borrada | ✅ | Rama local borrada (no se subió al remoto) |
+
+### Preguntas en producción (P1 a P6, en ese orden)
+
+| Lección | IDs |
+|---|---|
+| `fundamentos-de-recursividad` | `42f70736-3d9e-4142-a416-495464fc2896` · `f7f2ef6d-851b-4ac9-8037-b6ea33a914f0` · `e5225ee0-723f-420d-b18b-1f79acc5df3e` · `286769b9-3ea1-46e0-a6c2-f3475bb2dd8a` · `622a92c1-1bad-4fdb-89fe-9a06ebc82b68` · `24dc979f-4225-49ea-930c-a05695581a44` |
+| `algoritmos-recursivos-clasicos` | `81277f71-019d-4bf4-a61a-d51ce0662401` · `1a6be449-53fa-4384-9e71-bd31fe71a152` · `0f07c173-59fa-48e0-8216-bcc9a2fdf9a4` · `e7e1dc70-1e85-4207-8ded-db4000cdaed1` · `4e9fc2b1-fab4-44ee-9b74-9600096cd387` · `afcd4793-4fc9-431f-92dd-07b191653dab` |
+| `conceptos-y-tad-arbol-binario` | `2ea98ead-d92f-4146-961b-29c52aeb41b7` · `8031d164-afa3-4fcf-9703-bd73861a6004` · `7f4c06c8-72e1-44a1-ba02-0359465207e3` · `ca8d841b-1447-4f6d-982a-86b2234ea107` · `739c64ac-c8c0-42dc-8ed0-7fb776950bd7` · `903785b4-e87e-4edf-9bab-d3874c16debf` |
+| `insercion-y-recorridos` | `96a3775c-9d12-4a09-ab18-fe10acc46716` · `fdfddd29-e23a-4774-a286-e5caf2e4ed99` · `e5273d5e-cf7a-45df-afb4-91678ac65841` · `0b4b52f2-decc-45cf-ae51-3e1acff3b0b9` · `7e3824c5-6ee3-464e-b455-66aeeba927cc` · `8eda8542-ac43-4e68-8d29-f8e96c579d4b` |
+| `bst-busqueda-e-insercion` | `54e67db3-b55f-4941-8d13-4440fe3bd95f` · `5e9d9151-8fc1-47ae-8203-13b36a8c4c2f` · `7ed92ec4-9d4b-403d-916f-0852c1036478` · `248b7d24-20b5-4c62-a7dd-9fbab723037e` · `f5f66c1c-5c17-40c1-b440-ace548de3f10` · `4fa8424e-7747-4205-afed-76d1e0838711` |
+| `eliminacion-en-bst-y-sintesis-del-curso` | `1b7201d7-4bee-479c-ae2f-eb3911301988` · `b7018cb9-ba5d-403e-9146-079092ac3c40` · `0f9a6fab-e232-4c7a-afb1-b79dd4b1fb9d` · `77a2bad0-bb8b-43a6-a7ef-cb5b9d109405` · `1bbe1fd5-9f2f-4ec0-aa0d-b1fff33d2b1f` · `0a15cab0-e79b-4595-b559-2104d4523963` |
+
+> No se hizo una lectura de control con `list_lesson_questions` en producción: cada `mount_question_in_lesson` devolvió los índices 0 a 5 en orden, y las lecciones estaban en 0 preguntas antes.
+> El subagente `assessment-builder` se negó a ejecutar la creación en la ronda T2 porque no veía la aprobación; la ejecuté yo con la aprobación del usuario.
+
+### Pendientes
+
+- D5: el docente verifica en producción, con sesión, el render de las lecciones y de los diagramas Mermaid, y que la autoevaluación aparezca al final.
+- D7: marcar cada lección como vista en clase del grupo que la dicte, después de la sesión.
+- `info.md` (líneas 501, 507, 521 y 523–525) sigue sin alinear con el registro.
+- Semana 13 (recursión sobre listas; riesgos, límites y backtracking): sin lecciones registradas.
+- La sesión del 17 nov (aplicaciones de BST y síntesis del curso) quedó sin lección propia por decisión del usuario.
