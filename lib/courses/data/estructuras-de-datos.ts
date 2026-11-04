@@ -394,6 +394,8 @@ export const estructurasDeDatos: Course = {
       articleSlug: "fundamentos-de-recursividad",
       order: 29,
       title: "Fundamentos de recursividad",
+      summary:
+        "Parte de la fila del banco para deducir el caso base y el caso recursivo, y sigue en Java cómo la pila de llamadas apila y desapila cada pregunta pendiente, con pruebas de escritorio paso a paso y tres errores clásicos.",
       topics: [
         { title: "Concepto de recursividad: caso base y caso recursivo" },
         { title: "Pila de llamadas (call stack): cómo funciona la recursión en memoria" },
@@ -406,6 +408,8 @@ export const estructurasDeDatos: Course = {
       articleSlug: "algoritmos-recursivos-clasicos",
       order: 30,
       title: "Algoritmos recursivos clásicos",
+      summary:
+        "Aplica el esquema caso base y caso recursivo a factorial, Fibonacci y las Torres de Hanói, compáralos con sus versiones iterativas, mira por qué la recursión ingenua de Fibonacci repite trabajo y decide cuándo conviene recursión y cuándo un ciclo.",
       topics: [
         { title: "Factorial y Fibonacci: análisis y comparación con la versión iterativa" },
         { title: "Torres de Hanói: planteamiento, solución recursiva y complejidad" },
@@ -418,10 +422,12 @@ export const estructurasDeDatos: Course = {
       articleSlug: "conceptos-y-tad-arbol-binario",
       order: 31,
       title: "Conceptos y TAD árbol binario",
+      summary:
+        "Parte de las carpetas del computador para entender por qué algunos problemas piden una estructura jerárquica, define árbol binario de forma recursiva con caso base y caso recursivo, fija el vocabulario y las propiedades de altura y niveles, y presenta el TAD como contrato.",
       topics: [
         { title: "Estructura de árbol: raíz, nodo, hoja, subárbol, nivel, altura" },
         { title: "Árbol binario: definición y propiedades" },
-        { title: "TAD árbol binario: representación con nodos enlazados en Java" },
+        { title: "TAD árbol binario: operaciones como contrato" },
       ],
     },
     {
@@ -430,10 +436,12 @@ export const estructurasDeDatos: Course = {
       articleSlug: "insercion-y-recorridos",
       order: 32,
       title: "Inserción y recorridos",
+      summary:
+        "Parte de caminar por las carpetas para ver que pre-orden, in-orden y post-orden son la misma caminata anotando el nombre en tres momentos distintos; construye en Java el nodo del árbol, cuelga hijos izquierdo y derecho de un padre y escribe los tres recorridos recursivos con sus trazas.",
       topics: [
-        { title: "Inserción de nodos en un árbol binario" },
+        { title: "Inserción de nodos en un árbol binario: colgar un hijo izquierdo o derecho de un padre dado" },
         { title: "Recorridos recursivos: in-order, pre-order, post-order" },
-        { title: "Aplicaciones de cada tipo de recorrido" },
+        { title: "Los tres recorridos y sus salidas sobre el mismo árbol" },
       ],
     },
     {
@@ -442,6 +450,8 @@ export const estructurasDeDatos: Course = {
       articleSlug: "bst-busqueda-e-insercion",
       order: 33,
       title: "BST: búsqueda e inserción",
+      summary:
+        "Parte del juego de adivinar un número con «mayor» y «menor» para llegar a la regla del árbol binario de búsqueda; escribe en Java `buscar` e `insertar` recursivos sobre enteros, cuenta comparaciones y compara un árbol equilibrado con uno degenerado construidos con los mismos datos.",
       topics: [
         { title: "Propiedad de ordenamiento del BST" },
         { title: "Operación buscar: implementación recursiva y análisis de complejidad" },
@@ -453,11 +463,13 @@ export const estructurasDeDatos: Course = {
       slug: "eliminacion-en-bst-y-sintesis-del-curso",
       articleSlug: "eliminacion-en-bst-y-sintesis-del-curso",
       order: 34,
-      title: "Eliminación en BST y síntesis del curso",
+      title: "Eliminación en BST",
+      summary:
+        "Parte del juego de las siete tarjetas para ver qué pasa al retirar una; distingue los tres casos de eliminación (hoja, un hijo y dos hijos con el sucesor in-order) y escribe en Java `eliminar` y `minimo` recursivos sobre enteros, comprobando con el recorrido in-orden que el árbol sigue cumpliendo la regla.",
       topics: [
         { title: "Casos de eliminación: nodo hoja, nodo con un hijo, nodo con dos hijos" },
-        { title: "Aplicaciones de los BST: diccionarios, índices, autocompletado" },
-        { title: "Síntesis del curso: hilo conductor entre todos los módulos" },
+        { title: "Sucesor in-order: mínimo del subárbol derecho" },
+        { title: "Verificación de la propiedad BST con el recorrido in-orden" },
       ],
     },
   ],

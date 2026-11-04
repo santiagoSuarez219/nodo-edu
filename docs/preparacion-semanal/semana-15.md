@@ -1,7 +1,7 @@
 # Semana 15 — 9–15 de noviembre
 
-**Rama:** `feat/semana-15-analisis-de-algoritmos` (AA) · `feat/semana-15-programacion-cientifica` (PC)
-**Estado:** AA: ✅ Material y cuestionarios listos en desarrollo / ⬜ Desplegada · PC: ✅ **Desplegada y abierta en producción (2026-10-28)**
+**Rama:** `feat/semana-15-analisis-de-algoritmos` (AA) · `feat/semana-15-programacion-cientifica` (PC) · `feat/semana-15-estructuras-de-datos` (ED T1) · `feat/semana-15-t2-estructuras-de-datos` (ED T2; su estado está en las secciones «Ronda — `estructuras-de-datos`», más abajo)
+**Estado:** AA: ✅ Material y cuestionarios listos en desarrollo / ⬜ Desplegada · PC: ✅ **Desplegada y abierta en producción (2026-10-28)** · ED T1: ✅ Material y cuestionario listos en desarrollo / ✅ Mergeada a `development` (local; push pendiente) / ⬜ Desplegada · ED T2: ✅ Material y cuestionario listos en desarrollo / ✅ Revisada por `@reviewer` / ✅ Mergeada a `development` (local; push pendiente) / ⬜ Desplegada (ver «Ronda 2»)
 
 ---
 
@@ -232,3 +232,177 @@ Keywords creadas en desarrollo: `visualizacion`, `matplotlib`, `seaborn`
 - AA (`fundamentos-de-programacion-dinamica`, `estrategia-voraz`): el 2026-10-28 se recrearon en producción sus 10 preguntas (y las keywords `programacion-dinamica`, `memoizacion`, `tabulacion`, `algoritmos-voraces`) y se abrieron las dos lecciones; el 12 de nov (PC) y el 9 de nov (AA) quedan solo los D7.
 - Tras la clase del 12 de nov: D7, marcar `matplotlib-y-seaborn` como vista por grupo.
 - Revisar en producción, con sesión, el render de la lección y de la guía.
+
+---
+
+## Ronda — `estructuras-de-datos` (2026-11-03)
+
+**Rama:** `feat/semana-15-estructuras-de-datos`
+**Estado:** ✅ Material y cuestionario listos en desarrollo / ✅ Revisada por `@reviewer` / ✅ Mergeada a `development` (local; push pendiente) / ⬜ Desplegada y abierta
+
+**Alcance confirmado por el usuario:** Sesión T1 (martes 10 de noviembre), solo
+la lección `bst-busqueda-e-insercion`: la regla del BST y los métodos `buscar`
+e `insertar` recursivos sobre enteros, con análisis de comparaciones. **Excluidos:**
+la T2 (eliminación en BST), el laboratorio P del viernes 13 de noviembre y la
+clase `BST<T>` completa; la lección no los menciona.
+
+### Sesiones cubiertas
+
+| Sesión | Fecha | Tema | ★/◇ |
+|---|---|---|---|
+| T1 | mar. 10 nov | BST: propiedad de ordenamiento; `buscar` e `insertar` recursivos; análisis de complejidad y efecto de un árbol degenerado | |
+
+### Etapas y aprobaciones
+
+| Etapa | Resultado | Aprobada por el usuario |
+|---|---|---|
+| E1 · Diagnóstico | Sin choque entre cronograma y registro | ✅ |
+| E2 · Plan de lección | Aprobado: juego del 1 al 100, `NodoArbol<T>` reutilizado, duplicados ignorados con `false`, mismos siete datos para el degenerado, in-orden ordenado incluido, sin cuarto topic | ✅ |
+| E3 · Lección `.mdx` + registro TS | `bst-busqueda-e-insercion`; el usuario pidió quitar `compareTo` (ver decisiones) | ✅ |
+| E4 · Apuntes del docente | **No producidos:** la lección es el guion de la clase en vivo | ✅ Preguntado y confirmado en E1 |
+| E5 · Cuestionario de cierre | Propuesto: 6 preguntas → 6 aprobadas (opción (b) de P1 reemplazada) | ✅ |
+| E6 · Guía del estudiante | No aplica — sesión en vivo | ✅ Preguntado y confirmado en E1 |
+| E6 · Quiz A/B/C | No aplica — sin ★ en esta sesión | ✅ Preguntado y confirmado en E1 |
+
+### Artefactos producidos
+
+| Artefacto | Ruta | Publicado |
+|---|---|---|
+| Lección teórica (guion de clase en vivo) | `content/cursos/estructuras-de-datos/bst-busqueda-e-insercion.mdx` | ⬜ |
+| Registro TS | `lib/courses/data/estructuras-de-datos.ts` (`order: 33`; solo se añadió `summary`) | — |
+
+### Cuestionario de cierre
+
+| Lección | Entorno | IDs de preguntas | Publicadas | Montadas (`list_lesson_questions`) |
+|---|---|---|---|---|
+| `bst-busqueda-e-insercion` | desarrollo | `87dba13e-acd0-4825-9c56-097232551d4c`, `fb0f24c4-ff2a-4b16-a395-e51906f82c77`, `2035e278-6a73-4996-91ff-4f2130331ca9`, `ca552414-5a1f-4b54-8040-75c81c36dad1`, `ab7ef586-1814-4f51-9518-9efb70d4b4e7`, `d772752d-0ae0-4a97-8ed2-5daffc480c97` (P1–P6, en ese orden) | ✅ | ✅ 6/6 |
+| `bst-busqueda-e-insercion` | **producción** | — | ⬜ | ⬜ |
+
+> Las preguntas **no viajan con el deploy**: se recrean en producción en D3. No
+> hay keywords nuevas en esta ronda; en D3 hay que comprobar con
+> `list_keywords` de producción que existan `arboles`, `estructuras-de-datos`,
+> `java`, `recursion` y `complejidad` (`arboles` es nueva de una ronda
+> anterior). El cuestionario se responde después de la clase en vivo, no repite
+> la votación (`buscar(r, 60)` = `false 2`) ni la tabla de la clase, y usa
+> árboles y cifras nuevos.
+
+### Quiz calificable A/B/C
+
+No aplica.
+
+### Decisiones tomadas por Claude en nombre del docente
+
+- Se quitó `compareTo` y `Comparable` a pedido del usuario: `buscar` e `insertar` trabajan sobre `NodoArbol<Integer>` con `int dato` y comparan con `==` y `<`. Se eliminó la sección «Comparar datos» (la lección pasó de 11 a 10 secciones `##` y de 350 a 343 líneas), y el `summary` pasó de "con `compareTo`" a "sobre enteros", en el frontmatter y en el registro — **motivo:** el `summary` no podía seguir prometiendo `compareTo`; es el único cambio al registro que el usuario no pidió explícitamente.
+- El contador `comparaciones` suma una por nodo visitado, no por el árbol vacío — **motivo:** definición única y verificable; con ella las sumas de las siete búsquedas son 17 (equilibrado) y 28 (degenerado).
+- `NodoArbol<T>` se reutiliza sin modificarlo; `insertar` necesita un árbol con raíz y el `IllegalStateException` de la lección Inserción y recorridos nunca salta — **motivo:** no tocar la lección Inserción y recorridos.
+- Duplicados: `insertar` los ignora y devuelve `false` — **motivo:** un BST de este curso es un conjunto de claves; aprobado por el usuario.
+- Votación movida a no revelar nada antes: se quitó la frase "sin pasar por ninguna regla" de su sección, que adelantaba que el árbol podía no cumplir la regla — **motivo:** detectado al revisar la lección.
+- Se retiró la fila «In-orden (lección anterior) — O(n)» del Resumen operativo, que el agente añadió fuera del plan — **motivo:** no estaba en lo aprobado.
+- «La lección anterior» sin título se reemplazó por «la lección Inserción y recorridos» en dos líneas — **motivo:** hallazgo del checklist E7, defecto señalado en revisiones anteriores.
+- E4 y E6 se preguntaron y confirmaron al inicio de la ronda.
+- Tras la primera revisión se corrigió la frase de las mil claves («desde la mediana hacia afuera» daba altura 500, no 9; ahora «primero la mediana y luego la mediana de cada mitad, como en el juego»), el «deja menos números» del 50 (el 51 empata), la frase sobre el 60 que sugería llegar al 30, una frase mal construida y las aristas del degenerado, que ahora dicen «mayor» como en el primer diagrama — **motivo:** hallazgos de la revisión; el bloqueante afirmaba una cifra falsa sobre el orden de inserción.
+- Las salidas y cifras se verificaron con Java 17 (el entorno no tiene Java 21): los 10 bloques `java` se reconstruyeron desde la lección y las 7 comprobaciones coinciden byte a byte con los 6 bloques `text`.
+
+### Verificación (E7)
+
+- [x] `npm run build` en verde (código de salida 0)
+- [x] `npm run lint` en verde (0 errores; 7 warnings preexistentes en archivos ajenos)
+- [x] Checklist de `lesson-authoring` §8 recorrido
+- [x] `summary` presente en frontmatter **y** en registro TS
+- [x] Coherencia cruzada lección ↔ cuestionario (salidas, contadores y alturas calculados con Java 17)
+- [x] `@reviewer`: primera revisión CAMBIOS REQUERIDOS (1 bloqueante, 4 menores, 4 sugerencias); corregidos en un commit posterior; segunda revisión APROBADO, sin hallazgos bloqueantes, mayores ni menores
+- [ ] Render en navegador (los dos diagramas del árbol): pendiente, lo comprueba el docente
+
+### Despliegue
+
+| Paso | Estado | Fecha / detalle |
+|---|---|---|
+| D0 · Alcance y checklist pre-despliegue | ⬜ | |
+| D1 · Lecciones nuevas cerradas por adelantado | ⬜ | |
+| D2 · Merge a `main` y deploy en Vercel | ⬜ | |
+| D3 · Banco de preguntas replicado a producción | ⬜ | 6 preguntas |
+| D4 · Lecciones abiertas a los estudiantes | ⬜ | estructuras-de-datos → `bst-busqueda-e-insercion` |
+| D5 · Verificación end-to-end en producción | ⬜ | |
+| D6 · Bitácora cerrada y rama `deploy/` borrada | ⬜ | |
+
+- [ ] Verificado que las lecciones de semanas futuras siguen **cerradas**
+
+### Pendientes
+
+- Comprobar en el navegador que los dos diagramas del árbol (equilibrado y degenerado) se renderizan (la sintaxis ya está validada).
+- Actualizar `info.md` para que coincida con el registro, o autorizar a Claude a hacerlo: las líneas 501 y 507 (de las sesiones S14 T1 y S14 T2) y, en la S15 T1, el bullet «Efecto de un árbol degenerado sobre la complejidad» (línea 521), que no tiene topic porque se decidió no crear un cuarto.
+- Fuera de esta ronda: `notacion-big-o-y-analisis-de-complejidad.mdx:242` aún marca la fila del BST como «pendiente — semana 15»; conviene actualizarla en una ronda futura.
+- La Semana 13 (recursión sobre listas; riesgos, límites y backtracking) sigue sin lecciones registradas.
+- Decidir aparte los laboratorios P pendientes, incluido el del viernes 13 de noviembre.
+- D7: marcar la lección como vista en clase del grupo que la dicte, después de la sesión.
+
+
+---
+
+## Ronda 2 — `estructuras-de-datos`, T2 (2026-11-03)
+
+**Rama:** `feat/semana-15-t2-estructuras-de-datos`
+**Estado:** ✅ Material y cuestionario listos en desarrollo / ✅ Revisada por `@reviewer` / ✅ Mergeada a `development` (local; push pendiente) / ⬜ Desplegada y abierta
+
+**Alcance confirmado por el usuario:** solo la sesión T2 (jueves 12 de noviembre):
+eliminación en BST. **Excluidos:** aplicaciones de los BST y síntesis del curso
+(T1 de la Semana 16, 17 nov), que se quitaron de los `topics` del registro; el
+laboratorio P del 13 de noviembre. El slug sigue siendo
+`eliminacion-en-bst-y-sintesis-del-curso` (no cambia ninguna URL) aunque el título
+pasó a «Eliminación en BST».
+
+### Etapas y aprobaciones
+
+| Etapa | Resultado | Aprobada por el usuario |
+|---|---|---|
+| E1 · Diagnóstico | El registro (order 34) juntaba dos sesiones; se acotó a T2 | ✅ |
+| E2 · Plan de lección | Aprobado: setters en `NodoArbol`, `Eliminacion.java` nuevo, `minimo` sin contador, topics de S16 quitados, un solo diagrama | ✅ |
+| E3 · Lección `.mdx` + registro TS | `eliminacion-en-bst-y-sintesis-del-curso` (312 líneas, 10 `##`, 1 Mermaid) | ✅ |
+| E4 · Apuntes del docente | No: la lección es el guion de la clase en vivo | ✅ (patrón de la serie) |
+| E5 · Cuestionario de cierre | Propuestas 6 preguntas → 6 aprobadas tal cual | ✅ |
+| E6 · Guía / Quiz A/B/C | No aplica (sesión en vivo, semana sin ★) | ✅ (patrón de la serie) |
+
+### Artefactos producidos
+
+| Artefacto | Ruta | Publicado |
+|---|---|---|
+| Lección teórica (guion de clase en vivo) | `content/cursos/estructuras-de-datos/eliminacion-en-bst-y-sintesis-del-curso.mdx` | ⬜ |
+| Registro TS | `lib/courses/data/estructuras-de-datos.ts` (`order: 34`; título, `summary` y `topics` reformulados) | — |
+
+### Cuestionario de cierre
+
+| Lección | Entorno | IDs de preguntas | Publicadas | Montadas (`list_lesson_questions`) |
+|---|---|---|---|---|
+| `eliminacion-en-bst-y-sintesis-del-curso` | desarrollo | P1 `176efa7d-61fe-4be5-a6d3-2a8200be2095` · P2 `0bd3d34d-39ae-4831-961c-96e5061caf7a` · P3 `8a125945-14ec-4d9c-bb19-49876ed1faed` · P4 `72c26aff-5a39-473d-a484-807673cf49d6` · P5 `c94cda8b-e3ad-4859-9d19-2896bf485485` · P6 `50835d7f-8727-40eb-aeaa-de79094c2ccd` | ✅ | ✅ 6/6 (orden P1–P6) |
+| `eliminacion-en-bst-y-sintesis-del-curso` | **producción** | — | ⬜ | ⬜ |
+
+> Las preguntas **no viajan con el deploy**: se recrean en producción en D3. No hay
+> keywords nuevas; comprobar en producción que existan `arboles`, `estructuras-de-datos`,
+> `java`, `recursion`, `complejidad` y `nodos`. Correctas: P1=b, P2=d, P3=a, P4=c, P5=a
+> (`50 4`, verificada con Java 17), P6=d. Las explicaciones no se guardan (sin campo de feedback).
+
+### Decisiones tomadas por Claude en nombre del docente
+
+- `NodoArbol` se amplía con `setDato`, `setIzquierdo` y `setDerecho`: eliminar es la primera operación que reemplaza. La lección avisa que `NodoArbol.java` sí se modifica aquí (la lección Inserción y recorridos decía «sin setters»).
+- Título del registro «Eliminación en BST»; el slug conserva «y-sintesis-del-curso» y ya no coincide con el título.
+- Las eliminaciones de la clase son acumulativas sobre el mismo `raiz` (T0: 50, 30, 70, 20, 40, 60, 80, 65): eliminar 20, 60 y 50 da 3 comparaciones cada una.
+- Antes de la votación se dice que el predecesor también serviría pero el curso usa siempre el sucesor, para que la opción (d) se decida por convención.
+- La rama de dos hijos queda como `return nodo;` («pendiente») en el estado intermedio para que cada bloque compile.
+- Las salidas se verificaron con Java 17 (el entorno no tiene Java 21).
+- El subagente de evaluación se negó a ejecutar la creación porque no veía la aprobación del usuario (la dio con AskUserQuestion); la creación, publicación y montaje los hice yo.
+
+### Verificación (E7)
+
+- [x] `npm run build` en verde
+- [x] `npm run lint` sin errores (7 warnings preexistentes)
+- [x] Sin `# H1`, `###`, `---` en el cuerpo ni `$`; Mermaid validado; `tsc` sin errores
+- [x] `summary` idéntico en frontmatter y registro TS
+- [x] Salidas citadas reproducidas byte a byte con Java 17
+- [x] `@reviewer`: primera revisión CAMBIOS REQUERIDOS (1 bloqueante, 1 mayor, 3 menores, 1 sugerencia); corregidos en `eef9de4`; segunda revisión APROBADO, sin hallazgos bloqueantes, mayores ni menores
+- [ ] Render en navegador del diagrama del árbol (lo comprueba el docente)
+
+### Pendientes
+
+- Push de `development` (del usuario).
+- Despliegue D0–D7 con confirmación en cada paso.
+- Las líneas de `info.md` de S15 T2 (523–525) también difieren del registro; no se tocaron.

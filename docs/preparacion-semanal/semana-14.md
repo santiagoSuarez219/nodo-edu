@@ -1,7 +1,8 @@
 # Semana 14 — 2–8 de noviembre de 2026
 
-**Rama:** `feat/manejo-datos-faltantes-pc`
-**Estado:** ✅ Mergeada a `development` y desplegada y abierta en producción (2026-11-02)
+**Rama (PC):** `feat/manejo-datos-faltantes-pc`
+**Estado (PC):** ✅ Mergeada a `development` y desplegada y abierta en producción (2026-11-02)
+**Rama (ED):** `feat/semana-14-estructuras-de-datos` — su estado está en la sección «Ronda — `estructuras-de-datos`», más abajo
 
 > Material fuera del cronograma: el docente pidió una sección nueva de trabajo
 > independiente, posterior a `filtrado-agregacion-y-limpieza-de-datos`. No
@@ -162,3 +163,204 @@ Verificado con `list_lesson_questions` en producción: 6 preguntas, publicadas, 
 - `git push origin development` (lo ejecuta el docente): `origin/development` aún no tiene los commits de esta ronda; `main` ya está desplegado.
 - Marcar las lecciones como vistas en clase de cada grupo (D7) **después** de dictarlas o asignarlas; no se marcó nada, y no corresponde antes de la sesión.
 - Confirmar las unidades (días, masas de Júpiter, parsecs) del dataset `planets` contra su documentación.
+
+---
+
+## Ronda — `estructuras-de-datos` (2026-11-03)
+
+**Rama:** `feat/semana-14-estructuras-de-datos`
+**Estado:** ✅ Material y cuestionario listos en desarrollo / ✅ Revisada por `@reviewer` / ✅ Mergeada a `development` (`20fe80a`, local; push pendiente) / ⬜ Desplegada y abierta
+
+**Alcance confirmado por el usuario:** Sesión T1 (martes 3 de noviembre), solo
+la lección `conceptos-y-tad-arbol-binario`, solo conceptos y TAD, sin código de
+árbol. **Excluidas:** la T2 (inserción y recorridos), el laboratorio P y las dos
+sesiones de la Semana 13 (ver decisiones y pendientes).
+
+### Sesiones cubiertas
+
+| Sesión | Fecha | Tema | ★/◇ |
+|---|---|---|---|
+| T1 | mar. 3 nov | TAD Árbol binario: raíz, nodo, hoja, subárbol, nivel, altura; definición y propiedades; ¿qué problemas piden una estructura jerárquica? | |
+
+### Etapas y aprobaciones
+
+| Etapa | Resultado | Aprobada por el usuario |
+|---|---|---|
+| E1 · Diagnóstico | El cronograma y el registro no coinciden (ver decisiones); el usuario eligió la S14 T1 | ✅ |
+| E2 · Plan de lección | Aprobado: altura con hoja = 0, vacío = -1 y raíz en nivel 0; carpetas del computador; interface solo con firmas; sin propiedad 4 ni aplicación al proyecto | ✅ |
+| E3 · Lección `.mdx` + registro TS | `conceptos-y-tad-arbol-binario` | ✅ |
+| E4 · Apuntes del docente | **No producidos:** la lección es el guion de la clase en vivo | ⬜ No se preguntó explícitamente; se omitió al pasar el usuario a E5 |
+| E5 · Cuestionario de cierre | Propuesto: 6 preguntas → 6 aprobadas, más la keyword `arboles` | ✅ |
+| E6 · Guía del estudiante | No aplica — sesión en vivo | ⬜ No se preguntó explícitamente; se omitió al pasar el usuario a E7 |
+| E6 · Quiz A/B/C | No aplica — sin ★ en esta sesión | ⬜ No se preguntó explícitamente; se omitió al pasar el usuario a E7 |
+
+### Artefactos producidos
+
+| Artefacto | Ruta | Publicado |
+|---|---|---|
+| Lección teórica (guion de clase en vivo) | `content/cursos/estructuras-de-datos/conceptos-y-tad-arbol-binario.mdx` | ⬜ |
+| Registro TS | `lib/courses/data/estructuras-de-datos.ts` (`order: 31`; se añadió `summary` y se reescribió el tercer topic) | — |
+
+### Cuestionario de cierre
+
+| Lección | Entorno | IDs de preguntas | Publicadas | Montadas (`list_lesson_questions`) |
+|---|---|---|---|---|
+| `conceptos-y-tad-arbol-binario` | desarrollo | `d917d5a5-ef34-4463-9180-5b50faef758c`, `3570bbcf-dd03-444f-956d-3b9e1003a069`, `9ec3a86e-9196-4e4e-a7fe-57e037f746b2`, `4d4d009b-b042-4fcd-ab10-285b53c30811`, `30df4b7e-f96f-4df1-890e-67319a7cc1dd`, `f0dd40bc-76c4-4b05-930d-33e104f21956` (P1–P6, en ese orden) | ✅ | ✅ 6/6 |
+| `conceptos-y-tad-arbol-binario` | **producción** | — | ⬜ | ⬜ |
+
+> Las preguntas **no viajan con el deploy**: se recrean en producción en D3,
+> incluida la keyword nueva `arboles` (no existe allá). En D3 hay que comprobar
+> con `list_keywords` de producción que existan también `estructuras-de-datos`,
+> `nodos`, `recursion` y `complejidad`. El cuestionario se responde después de la
+> clase en vivo y no repite la votación (altura del árbol de ejemplo = 3).
+
+### Quiz calificable A/B/C
+
+No aplica.
+
+### Decisiones tomadas por Claude en nombre del docente
+
+- **La Semana 13 quedó sin lecciones registradas.** El cronograma tiene S13 T1 (recursión sobre listas enlazadas) y S13 T2 (riesgos, límites y backtracking), pero el registro salta de `order` 30 a 31. Se reportó y el usuario eligió la S14 T1 — **motivo:** no se crearon entradas nuevas ni se renumeró nada sin su orden.
+- El tercer topic del registro pasó de "TAD árbol binario: representación con nodos enlazados en Java" a "TAD árbol binario: operaciones como contrato" — **motivo:** el usuario decidió no implementar `NodoArbol` en esta lección y aprobó el cambio.
+- **`info.md` no se tocó** y sigue diciendo "representación con nodos enlazados en Java" para esta sesión, así que contradice el topic del registro — **motivo:** es fuente de verdad y no se editó sin autorización explícita; queda como pendiente del usuario.
+- Convención de altura: aristas del camino más largo, hoja = 0, vacío = -1, raíz en nivel 0 — **motivo:** ni `info.md` ni el cronograma fijan una; se eligió con el usuario y se dice explícitamente en la lección.
+- La votación se movió antes de la traza de la altura — **motivo:** la traza terminaba diciendo "= 3" y regalaba la respuesta de la votación. La revisión encontró que la tabla de vocabulario también la adelantaba ("Altura: 3, camino A, B, E, G"); se reemplazó por una remisión a la votación, se quitaron las menciones a «la fórmula» (aún no vista) y la altura se define en saltos, no en carpetas.
+- Se acotó la afirmación sobre el costo de buscar: la altura manda el costo de llegar a un nodo cuando se sabe el camino; en un árbol sin orden, `contiene` puede visitar todos los nodos — **motivo:** hallazgo de la revisión.
+- Un único fragmento de Java: la `interface ArbolBinario<T>` con solo firmas — **motivo:** sigue el patrón del curso (contrato primero, implementación después), aprobado por el usuario.
+- La lección tiene 257 líneas y 13 secciones `##`, por debajo de lo estimado — **motivo:** el agente no añadió contenido fuera del plan.
+- Sin errores planeados, retos, «Qué sigue» ni «¿Dónde aparece en tu proyecto?» — **motivo:** el usuario quitó los dos primeros de `algoritmos-recursivos-clasicos` porque la clase no alcanzaba (`fundamentos-de-recursividad` los conserva); la aplicación al proyecto entra con la implementación.
+- E4 y E6 se omitieron al pasar el usuario a E5/E7, sin pregunta explícita — **motivo:** la lección es el guion de la clase; reversible pidiendo apuntes o guía.
+- Las cifras y la `interface` se verificaron con Java 17 y scripts (el entorno no tiene Java 21).
+
+### Verificación (E7)
+
+- [x] `npm run build` en verde (código de salida 0)
+- [x] `npm run lint` en verde (0 errores; 7 warnings preexistentes en archivos ajenos)
+- [x] Checklist de `lesson-authoring` §8 recorrido
+- [x] `summary` presente en frontmatter **y** en registro TS
+- [x] Coherencia cruzada lección ↔ cuestionario (alturas, niveles y conteos calculados con scripts; firma de `izquierdo()` comparada con la interface)
+- [x] `@reviewer`: primera revisión CAMBIOS REQUERIDOS (1 bloqueante, 3 mayores, menores); corregidos en un commit posterior; segunda revisión APROBADO, sin bloqueantes ni mayores
+- [ ] Render en navegador (diagrama del árbol de ejemplo): pendiente, lo comprueba el docente
+
+### Despliegue
+
+| Paso | Estado | Fecha / detalle |
+|---|---|---|
+| D0 · Alcance y checklist pre-despliegue | ⬜ | |
+| D1 · Lecciones nuevas cerradas por adelantado | ⬜ | |
+| D2 · Merge a `main` y deploy en Vercel | ⬜ | |
+| D3 · Banco de preguntas replicado a producción | ⬜ | keyword `arboles` + 6 preguntas |
+| D4 · Lecciones abiertas a los estudiantes | ⬜ | estructuras-de-datos → `conceptos-y-tad-arbol-binario` |
+| D5 · Verificación end-to-end en producción | ⬜ | |
+| D6 · Bitácora cerrada y rama `deploy/` borrada | ⬜ | |
+
+- [ ] Verificado que las lecciones de semanas futuras siguen **cerradas**
+
+### Pendientes
+
+- Actualizar la línea de `info.md` ("TAD Árbol binario: representación con nodos enlazados en Java") para que coincida con el topic del registro, o autorizar a Claude a hacerlo.
+- Decidir qué se hace con las dos sesiones de la Semana 13 (recursión sobre listas; riesgos, límites y backtracking), que no tienen lección registrada.
+- Comprobar en el navegador que el diagrama del árbol de ejemplo se renderiza (la sintaxis ya está validada).
+- D7: marcar la lección como vista en clase del grupo que la dicte, después de la sesión.
+
+---
+
+## Ronda — `estructuras-de-datos`, T2 (2026-11-03)
+
+**Rama:** `feat/semana-14-estructuras-de-datos` (recreada tras el merge de T1)
+**Estado:** ✅ Material y cuestionario listos en desarrollo / ✅ Revisada por `@reviewer` / ✅ Mergeada a `development` (local; push pendiente) / ⬜ Desplegada y abierta
+
+**Alcance confirmado por el usuario:** Sesión T2 (jueves 5 de noviembre), solo
+la lección `insercion-y-recorridos`: `NodoArbol<T>`, inserción como hijo
+izquierdo o derecho de un padre dado y los tres recorridos recursivos, sin la
+clase `ArbolBinario<T>` completa. **Excluidos:** el laboratorio P del viernes 6
+de noviembre y el BST de la Semana 15; la lección no los menciona.
+
+### Sesiones cubiertas
+
+| Sesión | Fecha | Tema | ★/◇ |
+|---|---|---|---|
+| T2 | jue. 5 nov | Inserción de nodos y recorridos recursivos: in-order, pre-order, post-order | |
+
+### Etapas y aprobaciones
+
+| Etapa | Resultado | Aprobada por el usuario |
+|---|---|---|
+| E2 · Plan de lección | Aprobado: tres momentos de la caminata por carpetas, `IllegalStateException` si el lado está ocupado, recorridos estáticos, espacio final en las salidas, topic 1 precisado | ✅ |
+| E3 · Lección `.mdx` + registro TS | `insercion-y-recorridos`; recortada a pedido del usuario (ver decisiones) | ✅ |
+| E4 · Apuntes del docente | **No producidos:** la lección es el guion de la clase en vivo | ✅ Preguntado y confirmado en E2 |
+| E5 · Cuestionario de cierre | Propuesto: 6 preguntas → 6 aprobadas (opciones correctas de P2 y P3 acortadas) | ✅ |
+| E6 · Guía del estudiante | No aplica — sesión en vivo | ✅ Preguntado y confirmado en E2 |
+| E6 · Quiz A/B/C | No aplica — sin ★ en esta sesión | ✅ Preguntado y confirmado en E2 |
+
+### Artefactos producidos
+
+| Artefacto | Ruta | Publicado |
+|---|---|---|
+| Lección teórica (guion de clase en vivo) | `content/cursos/estructuras-de-datos/insercion-y-recorridos.mdx` | ⬜ |
+| Registro TS | `lib/courses/data/estructuras-de-datos.ts` (`order: 32`; se añadió `summary` y se reescribieron los topics 1 y 3) | — |
+
+### Cuestionario de cierre
+
+| Lección | Entorno | IDs de preguntas | Publicadas | Montadas (`list_lesson_questions`) |
+|---|---|---|---|---|
+| `insercion-y-recorridos` | desarrollo | `301a8429-c55c-47d8-906a-2abf50ba1a88`, `851e0de6-bfa8-4759-8234-7fef92f620d5`, `9b28830e-11ec-48f0-9b2b-61f1aef723a7`, `1c111436-fdfe-4148-a385-f77cd65df7d8`, `da48a41c-62e7-4ce4-aba8-880b40d7ce4c`, `e002a557-80b3-473d-966a-5f68527a0306` (P1–P6, en ese orden) | ✅ | ✅ 6/6 |
+| `insercion-y-recorridos` | **producción** | — | ⬜ | ⬜ |
+
+> Las preguntas **no viajan con el deploy**: se recrean en producción en D3. No
+> hay keywords nuevas en esta ronda; en D3 hay que comprobar con
+> `list_keywords` de producción que existan `arboles`, `estructuras-de-datos`,
+> `nodos`, `excepciones`, `java`, `recursion`, `complejidad` y
+> `pila-de-llamadas` (`arboles` y `pila-de-llamadas` son nuevas de rondas
+> anteriores). El cuestionario se responde después de la clase en vivo, no repite
+> la votación (`inOrden` del árbol de ejemplo) y no pregunta por usos de los
+> recorridos.
+
+### Quiz calificable A/B/C
+
+No aplica.
+
+### Decisiones tomadas por Claude en nombre del docente
+
+- Se quitaron a pedido del usuario las tres secciones «Para qué sirve el pre-orden / post-orden / in-orden»: la lección pasó de 373 a 302 líneas y de 15 a 12 secciones `##`. Para que no quedaran afirmaciones sin sustento, también se quitó la cuarta columna del Resumen operativo y tres bullets de la Síntesis, y se añadió a «Dónde se rompe la analogía» la condición del dibujo (cada hijo izquierdo a la izquierda de su padre y cada derecho a su derecha; precisada después de la revisión, ver más abajo).
+- El `summary` perdió "y sus usos", en el frontmatter y en el registro — **motivo:** la lección ya no tiene usos; es el único cambio al registro que el usuario no pidió explícitamente.
+- Topic 1 del registro precisado a "Inserción de nodos en un árbol binario: colgar un hijo izquierdo o derecho de un padre dado", y topic 3 reescrito a "Los tres recorridos y sus salidas sobre el mismo árbol" — **motivo:** el usuario los aprobó; el topic 3 original ("Aplicaciones de cada tipo de recorrido") ya no correspondía.
+- **`info.md` no se tocó.** Sigue con dos líneas desalineadas respecto al registro: la 501 ("representación con nodos enlazados en Java", de S14 T1) y la 507 ("Aplicaciones de cada tipo de recorrido") — **motivo:** es fuente de verdad y no se editó sin autorización explícita; quedan como pendiente del usuario.
+- Distractor (d) de la votación redactado como "visita `E` antes de bajar por su hijo izquierdo `G`", y no como "aplica 'en medio' solo en la raíz" — **motivo:** `D B E G A C F` aplica el in-orden bien en `A`, `B` y `C` y falla solo en `E`; el texto original del encargo era inexacto.
+- Se definió "reemplaza lo que sigue a la construcción" como borrar las líneas de `main` posteriores a `c.insertarDerecho("F");` — **motivo:** evitar repetir las siete líneas de construcción en cada bloque.
+- Recorridos como métodos estáticos de `Recorridos`, no de `NodoArbol` ni de `ArbolBinario<T>` — **motivo:** un árbol vacío es `null`; la lección no dice que "implementan" la interface de S14 T1.
+- Sin errores planeados, retos, «Qué sigue», «¿Dónde aparece en tu proyecto?», serialización ni mención al BST, al laboratorio o a lecciones futuras — **motivo:** decisiones del usuario.
+- Tras la primera revisión se corrigió la Síntesis ("siete llamadas": son el constructor de la raíz y seis llamadas de inserción), se completó la segunda pregunta de diseño de la recursión (¿cómo me acerco al paro?), se precisó la condición del dibujo para leer el in-orden (todo el subárbol izquierdo a la izquierda y todo el derecho a la derecha), se suavizó "no pueden ser métodos del nodo" a "no conviene" y se separaron las dos causas de `static` y genérico — **motivo:** hallazgos de la revisión.
+- Las salidas se verificaron con Java 17 (el entorno no tiene Java 21): tras el recorte se reconstruyeron los estados con los 7 bloques `java` restantes y las 3 salidas coinciden byte a byte.
+
+### Verificación (E7)
+
+- [x] `npm run build` en verde (código de salida 0)
+- [x] `npm run lint` en verde (0 errores; 7 warnings preexistentes en archivos ajenos)
+- [x] Checklist de `lesson-authoring` §8 recorrido
+- [x] `summary` presente en frontmatter **y** en registro TS
+- [x] Coherencia cruzada lección ↔ cuestionario (salidas, excepción, `NullPointerException` y fórmula 2n + 1 ejecutadas con Java 17)
+- [x] `@reviewer`: primera revisión CAMBIOS REQUERIDOS (1 bloqueante, 2 mayores, 3 menores; sin cambios de código); corregidos en un commit posterior; segunda revisión APROBADO, sin bloqueantes ni mayores
+- [ ] Render en navegador (diagrama del árbol de ejemplo): pendiente, lo comprueba el docente
+
+### Despliegue
+
+| Paso | Estado | Fecha / detalle |
+|---|---|---|
+| D0 · Alcance y checklist pre-despliegue | ⬜ | |
+| D1 · Lecciones nuevas cerradas por adelantado | ⬜ | |
+| D2 · Merge a `main` y deploy en Vercel | ⬜ | |
+| D3 · Banco de preguntas replicado a producción | ⬜ | 6 preguntas |
+| D4 · Lecciones abiertas a los estudiantes | ⬜ | estructuras-de-datos → `insercion-y-recorridos` |
+| D5 · Verificación end-to-end en producción | ⬜ | |
+| D6 · Bitácora cerrada y rama `deploy/` borrada | ⬜ | |
+
+- [ ] Verificado que las lecciones de semanas futuras siguen **cerradas**
+
+### Pendientes
+
+- Actualizar `info.md` (líneas 501 y 507) para que coincidan con los topics del registro, o autorizar a Claude a hacerlo.
+- Comprobar en el navegador que el diagrama del árbol de ejemplo se renderiza (la sintaxis ya está validada). El reviewer anota que Mermaid probablemente dibuja los hijos únicos (`G` bajo `E`, `F` bajo `C`) justo debajo del padre, así que el dibujo no ilustra la condición de «Dónde se rompe la analogía»; sugiere, si se quiere, añadir «aunque un nodo tenga un solo hijo, desplázalo hacia su lado».
+- Decidir aparte el laboratorio P del viernes 6 de noviembre.
+- D7: marcar la lección como vista en clase del grupo que la dicte, después de la sesión.
+

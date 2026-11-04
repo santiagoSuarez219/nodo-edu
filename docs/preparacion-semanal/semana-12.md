@@ -214,3 +214,190 @@ No aplica.
 - Revisión (`@reviewer`, APROBADO): aplicadas 3 correcciones menores (`memory usage` igualado a 2.9 KB, nota `str`/`object` y primera línea de `info()`, sin nombrar la lección futura). La semana 13 debe partir sabiendo que `isna().sum()` ya se mostró.
 - Resolver la P3 del cuestionario si se prefiere mostrar la salida de pandas 2.
 - Hay una lección más de pandas pendiente (`filtrado-agregacion-y-limpieza-de-datos`, semana 13), hoy stub.
+
+---
+
+## Ronda — `estructuras-de-datos` (2026-11-03)
+
+**Rama:** `feat/semana-12-estructuras-de-datos`
+**Estado:** ✅ Material y cuestionario listos en desarrollo / ✅ Mergeada a `development` (`f5a6a58`, local; push pendiente) / ⬜ Desplegada y abierta
+
+**Alcance confirmado por el usuario:** Sesión T1 (jueves 22 de octubre), solo
+la lección `fundamentos-de-recursividad`. **Excluidas:** T2 (algoritmos
+recursivos clásicos), el laboratorio P y la recursión sobre listas (Semana 13).
+La ronda es posterior a la fecha de la sesión; el cronograma no se tocó.
+
+### Sesiones cubiertas
+
+| Sesión | Fecha | Tema | ★/◇ |
+|---|---|---|---|
+| T1 | jue. 22 oct | Caso base y caso recursivo; pila de llamadas; prueba de escritorio | |
+
+### Etapas y aprobaciones
+
+| Etapa | Resultado | Aprobada por el usuario |
+|---|---|---|
+| E2 · Plan de lección | Aprobado (ejemplo, frontmatter, diagrama y reto C confirmados) | ✅ |
+| E3 · Lección `.mdx` + registro TS | `fundamentos-de-recursividad` | ✅ |
+| E4 · Apuntes del docente | **No producidos:** la lección es el guion de la clase en vivo | ⬜ No se preguntó explícitamente; se omitió al pasar el usuario a E5 |
+| E5 · Cuestionario de cierre | Propuesto: 6 preguntas → 6 aprobadas, más la keyword `pila-de-llamadas` | ✅ |
+| E6 · Guía del estudiante | No aplica — sesión en vivo | ⬜ No se preguntó explícitamente; se omitió al pasar el usuario a E7 |
+| E6 · Quiz A/B/C | No aplica — la semana no lleva ★ en esta sesión | ⬜ No se preguntó explícitamente; se omitió al pasar el usuario a E7 |
+
+### Artefactos producidos
+
+| Artefacto | Ruta | Publicado |
+|---|---|---|
+| Lección teórica (guion de clase en vivo) | `content/cursos/estructuras-de-datos/fundamentos-de-recursividad.mdx` | ⬜ |
+| Registro TS | `lib/courses/data/estructuras-de-datos.ts` (`order: 29`, solo se añadió `summary`) | — |
+
+### Cuestionario de cierre
+
+| Lección | Entorno | IDs de preguntas | Publicadas | Montadas (`list_lesson_questions`) |
+|---|---|---|---|---|
+| `fundamentos-de-recursividad` | desarrollo | `a45100d3-79a8-484b-a817-cb3900a6e53b`, `c9649fd5-fefe-4041-a3fc-383a83973221`, `33ee250b-1890-45d8-b7ff-1052772b799c`, `e4102e7f-ef2c-4b36-b681-5702fd5e0d44`, `18dc498c-decb-4c2f-8a62-4850f2b946c7`, `a566fc9d-72e1-4a47-8345-1611ab41468f` (P1–P6, en ese orden) | ✅ | ✅ 6/6 |
+| `fundamentos-de-recursividad` | **producción** | — | ⬜ | ⬜ |
+
+> Las preguntas **no viajan con el deploy**: se recrean en producción en D3,
+> incluida la keyword nueva `pila-de-llamadas` (no existe allá). P3 admite
+> varias correctas (casillas). P5 y P6 retoman los errores planeados 2 y 3 de
+> la clase; son consolidación posterior, no lectura previa.
+
+### Quiz calificable A/B/C
+
+No aplica.
+
+### Decisiones tomadas por Claude en nombre del docente
+
+- Frontmatter `presentation: true` y `type: "Lección guion de clase en vivo"`, sin formalizar la variante en `lesson-authoring` — **motivo:** el usuario eligió esta opción.
+- "Dónde se rompe la analogía" quedó como párrafo dentro del Error planeado 1, no como `##` propio — **motivo:** evitar duplicar el error; el usuario no lo objetó al aprobar.
+- La lección tiene 363 líneas y 15 secciones `##`, más que el plan — **motivo:** Resumen y Síntesis separados, "Qué sigue" y votación como secciones propias.
+- E4 y E6 se omitieron al pasar el usuario a E5/E7, sin pregunta explícita — **motivo:** la lección es el guion de la clase; reversible pidiendo apuntes o guía.
+- La lección no incluye la sección «¿Dónde aparece en tu proyecto?» — **motivo:** lo propuso el diseñador y el usuario aprobó el plan; la aplicación al proyecto de aula llega en la Semana 13.
+
+### Verificación (E7)
+
+- [x] `npm run build` en verde
+- [x] `npm run lint` en verde (0 errores; 7 warnings preexistentes en archivos ajenos)
+- [x] Checklist de `lesson-authoring` §8 recorrido
+- [x] `summary` presente en frontmatter **y** en registro TS
+- [x] Coherencia cruzada lección ↔ cuestionario (P6 y la frase del `return` compilados con `javac`)
+- [ ] `@reviewer`: pendiente (E9)
+- [ ] Render en navegador (diagrama de secuencia): pendiente, lo comprueba el docente
+
+### Despliegue
+
+| Paso | Estado | Fecha / detalle |
+|---|---|---|
+| D0 · Alcance y checklist pre-despliegue | ⬜ | |
+| D1 · Lecciones nuevas cerradas por adelantado | ⬜ | |
+| D2 · Merge a `main` y deploy en Vercel | ⬜ | |
+| D3 · Banco de preguntas replicado a producción | ⬜ | keyword `pila-de-llamadas` + 6 preguntas |
+| D4 · Lecciones abiertas a los estudiantes | ⬜ | estructuras-de-datos → `fundamentos-de-recursividad` |
+| D5 · Verificación end-to-end en producción | ⬜ | |
+| D6 · Bitácora cerrada y rama `deploy/` borrada | ⬜ | |
+
+- [ ] Verificado que las lecciones de semanas futuras siguen **cerradas**
+
+### Pendientes
+
+- Comprobar en el navegador que el `sequenceDiagram` de la pila de llamadas se renderiza.
+- D7: marcar la lección como vista en clase del grupo que la dicte, después de la sesión.
+
+---
+
+## Ronda — `estructuras-de-datos`, T2 (2026-11-03)
+
+**Rama:** `feat/semana-12-estructuras-de-datos` (recreada tras el merge de T1)
+**Estado:** ✅ Material y cuestionario listos en desarrollo / ✅ Revisada por `@reviewer` / ⬜ Mergeada a `development` / ⬜ Desplegada y abierta
+
+**Alcance confirmado por el usuario:** Sesión T2 (viernes 23 de octubre), solo
+la lección `algoritmos-recursivos-clasicos`. **Excluidos:** el laboratorio P del
+martes 27 de octubre (se decide aparte; la lección no lo anuncia) y la Semana 13
+(`StackOverflowError` con límites, costo exponencial de Fibonacci, backtracking
+y recursión sobre listas). La ronda es posterior a la fecha de la sesión; el
+cronograma no se tocó.
+
+### Sesiones cubiertas
+
+| Sesión | Fecha | Tema | ★/◇ |
+|---|---|---|---|
+| T2 | vie. 23 oct | Factorial, Fibonacci y Torres de Hanói; comparación con la versión iterativa; recursión vs iteración | |
+
+### Etapas y aprobaciones
+
+| Etapa | Resultado | Aprobada por el usuario |
+|---|---|---|
+| E2 · Plan de lección | Aprobado, con un solo recorte (tabla de `fib` solo para n = 4, 10, 20, 30) | ✅ |
+| E3 · Lección `.mdx` + registro TS | `algoritmos-recursivos-clasicos`; recortada a petición del usuario (ver decisiones) | ✅ |
+| E4 · Apuntes del docente | **No producidos:** la lección es el guion de la clase en vivo | ✅ Confirmado por el usuario en E9 (no se preguntó antes) |
+| E5 · Cuestionario de cierre | Propuesto: 6 preguntas → 6 aprobadas (P4 y P6 reescritas a pedido) | ✅ |
+| E6 · Guía del estudiante | No aplica — sesión en vivo | ✅ Confirmado por el usuario en E9 (no se preguntó antes) |
+| E6 · Quiz A/B/C | No aplica — sin ★ en esta sesión | ✅ Confirmado por el usuario en E9 (no se preguntó antes) |
+
+### Artefactos producidos
+
+| Artefacto | Ruta | Publicado |
+|---|---|---|
+| Lección teórica (guion de clase en vivo) | `content/cursos/estructuras-de-datos/algoritmos-recursivos-clasicos.mdx` | ⬜ |
+| Registro TS | `lib/courses/data/estructuras-de-datos.ts` (`order: 30`, solo se añadió `summary`) | — |
+
+### Cuestionario de cierre
+
+| Lección | Entorno | IDs de preguntas | Publicadas | Montadas (`list_lesson_questions`) |
+|---|---|---|---|---|
+| `algoritmos-recursivos-clasicos` | desarrollo | `d8875f07-baa3-473a-b32d-52fe16923056`, `4002ed77-d32c-452b-98f4-58186edcf6fe`, `63316d01-90fa-472e-b432-d5f8398a4a75`, `bb86a315-ab98-4499-bcbb-6079daa51aa7`, `f2a6a27d-93c8-4b3d-95ad-a5f63e40c36d`, `6ec4e06c-6019-4c7f-9c26-d08a2c0c5c4a` (P1–P6, en ese orden) | ✅ | ✅ 6/6 |
+| `algoritmos-recursivos-clasicos` | **producción** | — | ⬜ | ⬜ |
+
+> Las preguntas **no viajan con el deploy**: se recrean en producción en D3. No
+> hay keywords nuevas en esta ronda de desarrollo. En D3 hay que comprobar con
+> `list_keywords` de producción que existan `recursion`, `java`, `complejidad` y
+> `pila-de-llamadas` (esta última es nueva de T1; P6 la usa). El cuestionario se
+> responde después de la clase en vivo; no repite el de `fundamentos-de-recursividad`.
+
+### Quiz calificable A/B/C
+
+No aplica.
+
+### Decisiones tomadas por Claude en nombre del docente
+
+- Se retiraron las tres secciones «Error planeado» y la sección «Retos» a pedido del usuario ("la clase no alcanza"): la lección pasó de 575 a 421 líneas y 15 secciones `##`. Antes se había pasado el Reto C a tarea para casa con un fragmento correcto (`factorialLargo(15)`), cambio que quedó sin efecto al quitar los retos.
+- Se conservó la sección «Cuidado: el factorial se desborda» (13! con `int`, 21! con `long`) y solo se quitó la etiqueta «Error planeado» de su primer párrafo — **motivo:** es un concepto central, no un error planeado en el sentido de las secciones eliminadas; reversible recortándola.
+- La respuesta de la votación (fib(2) en fib(4)) va en la sección siguiente, después del árbol, para que los estudiantes lo dibujen antes.
+- Sin KaTeX: **2^n − 1** va en negrita, como en el resto del curso.
+- Sin sección «Qué sigue» ni anuncio de sesiones o laboratorios — **motivo:** lo pidió el usuario.
+- La lección no incluye «¿Dónde aparece en tu proyecto?» — **motivo:** igual que T1, la aplicación al proyecto de aula llega en la Semana 13.
+- E4 y E6 se omitieron al pasar el usuario a E5/E7, sin pregunta explícita; el usuario lo confirmó en E9 a petición de `@reviewer` — **motivo:** la lección es el guion de la clase.
+- Tras la revisión: se quitó la «Pista» de la pausa inicial (daba la respuesta), la Síntesis pasó a «dos riesgos» (marcos apilados y trabajo repetido) para no contradecir que el desbordamiento es un límite del tipo, se citó «Fundamentos de recursividad» por su título y se usó `-` ASCII dentro del código.
+- Las cifras se verificaron con Java 17 (el entorno no tiene Java 21); nada del código depende de la versión.
+
+### Verificación (E7)
+
+- [x] `npm run build` en verde (código de salida 0)
+- [x] `npm run lint` en verde (0 errores; 7 warnings preexistentes en archivos ajenos)
+- [x] Checklist de `lesson-authoring` §8 recorrido
+- [x] `summary` presente en frontmatter **y** en registro TS
+- [x] Coherencia cruzada lección ↔ cuestionario (salidas y cifras compiladas con `javac`)
+- [x] `@reviewer`: APROBADO (2 hallazgos mayores y 3 menores, corregidos en un commit posterior; sin segunda revisión)
+- [x] Diagrama Mermaid del árbol de `fib(4)`: sintaxis validada con el parser de flowchart del repo (9 nodos, `fib(2)` dos veces)
+- [ ] Render del diagrama en navegador: pendiente, lo comprueba el docente
+
+### Despliegue
+
+| Paso | Estado | Fecha / detalle |
+|---|---|---|
+| D0 · Alcance y checklist pre-despliegue | ⬜ | |
+| D1 · Lecciones nuevas cerradas por adelantado | ⬜ | |
+| D2 · Merge a `main` y deploy en Vercel | ⬜ | |
+| D3 · Banco de preguntas replicado a producción | ⬜ | 6 preguntas |
+| D4 · Lecciones abiertas a los estudiantes | ⬜ | estructuras-de-datos → `algoritmos-recursivos-clasicos` |
+| D5 · Verificación end-to-end en producción | ⬜ | |
+| D6 · Bitácora cerrada y rama `deploy/` borrada | ⬜ | |
+
+- [ ] Verificado que las lecciones de semanas futuras siguen **cerradas**
+
+### Pendientes
+
+- Comprobar en el navegador que el flowchart del árbol de `fib(4)` se renderiza (la sintaxis ya está validada).
+- Decidir aparte el laboratorio P del martes 27 de octubre (guía de estudiante o demo en vivo); la lección no lo anuncia.
+- D7: marcar la lección como vista en clase del grupo que la dicte, después de la sesión.
